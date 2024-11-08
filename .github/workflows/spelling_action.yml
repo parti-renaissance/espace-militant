@@ -1,0 +1,25 @@
+name: Spellcheck Action
+on: pull_request
+
+jobs:
+  build:
+    name: Spellcheck
+    runs-on: ubuntu-latest
+    steps:
+      # The checkout step
+      - uses: actions/checkout@v3
+      - name: Get all changed js files
+        uses: tj-actions/changed-files@v45
+        id: changed_files
+        with:
+          files: |
+            **.tsx
+            **.ts
+
+      - name: Run Spellcheck
+        id: spellcheck
+        uses: rojopolis/spellcheck-github-actions@v0
+        with:
+          task_name: Typescript
+          config_path: config/.spellcheck.yml
+          source_files: ${{ steps.changed_files.outputs.all_changed_files }}
