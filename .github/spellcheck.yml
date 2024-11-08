@@ -1,0 +1,7 @@
+matrix:
+  - name: Typescript
+    aspell:
+      lang: fr
+    dictionary:
+      encoding: utf-8
+    default_encoding: utf-8
