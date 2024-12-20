@@ -1,11 +1,8 @@
 name: Prepare node & bun
-description: prepare node and bun 
+description: prepare node and bun
 
 runs:
   using: composite
   steps:
-    - name: 🏗 Setup node
-      uses: actions/setup-node@v4
-      with:
-        cache: yarn
-        node-version: 18.X
+    - name: 🏗 Setup yarn
+      uses: threeal/setup-yarn-action@v2.0.0

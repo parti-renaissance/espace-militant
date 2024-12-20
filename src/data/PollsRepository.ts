@@ -1,4 +1,4 @@
-import type { GeolocationResponse as Location } from '@react-native-community/geolocation'
+import z from 'zod'
 import { Poll } from '../core/entities/Poll'
 import { PollResult } from '../core/entities/PollResult'
 import { DataSource } from './DataSource'
@@ -13,27 +13,28 @@ class PollsRepository {
   private memoryCachedPolls: Array<Poll> = []
   private constructor() {}
 
-  public async getPolls(
-    dataSource: DataSource = 'remote',
-  ): Promise<Array<Poll>> {
+  public async getPolls(dataSource: DataSource = 'remote'): Promise<Array<Poll>> {
     const cacheKey = 'polls'
     switch (dataSource) {
-      case 'cache':
+      case 'cache': {
         const cachedPolls = await this.cacheManager.getFromCache(cacheKey)
-        this.memoryCachedPolls = cachedPolls
-        return cachedPolls
-      case 'remote':
+        if (z.array(z.object({})).safeParse(cachedPolls).success) {
+          this.memoryCachedPolls = cachedPolls as Array<Poll>
+          return cachedPolls as Poll[]
+        }
+        return []
+      }
+      case 'remote': {
         const polls = await this.apiService.getPolls()
         await this.cacheManager.setInCache(cacheKey, polls)
         this.memoryCachedPolls = polls
         return polls
+      }
     }
   }
 
   public async getPoll(pollId: string): Promise<Poll> {
-    const cachedPoll = this.memoryCachedPolls.find(
-      (item) => item.uuid === pollId,
-    )
+    const cachedPoll = this.memoryCachedPolls.find((item) => item.uuid === pollId)
     if (cachedPoll) {
       return cachedPoll
     }
@@ -48,11 +49,7 @@ class PollsRepository {
     }
   }
 
-  public async sendPollAnswers(
-    poll: Poll,
-    result: PollResult,
-    location: Location | null,
-  ): Promise<void> {
+  public async sendPollAnswers(poll: Poll, result: PollResult, location: Location | null): Promise<void> {
     const restResponse = RestPollResultRequestMapper.map(poll, result, location)
     await this.apiService.sendPollAnswers(restResponse)
   }

@@ -20,7 +20,6 @@ type Props = {
 }
 
 export function EventShareGroup({ event }: Props) {
-  const isFullEvent = isEventFull(event)
   const handleCopyUrl = useHandleCopyUrl()
   const toast = useToastController()
 
@@ -63,7 +62,7 @@ export function EventShareGroup({ event }: Props) {
     })
   }
 
-  const createEventData = (event: eventTypes.RestFullEvent) => {
+  const createEventData = (event: Partial<eventTypes.RestFullEvent> & { begin_at: string }) => {
     return {
       title: event.name,
       startDate: new Date(event.begin_at).toISOString(),
@@ -79,6 +78,11 @@ export function EventShareGroup({ event }: Props) {
   }
 
   const addToCalendar = useCreateEvent()
+
+  const canAddEventToCalendar = (event: Props['event']): event is Partial<eventTypes.RestFullEvent> & Pick<RestEvent, 'uuid' | 'slug' | 'begin_at'> => {
+    return isEventFull(event) && typeof event.begin_at === 'string'
+  }
+
   return (
     <VoxCard.Section title="Partagez cet événement avec vos contacts pour maximiser sa portée.">
       <Button variant="outlined" size="xl" theme="gray" width="100%" onPress={() => handleCopyUrl(shareUrl)} justifyContent="space-between">
@@ -98,9 +102,9 @@ export function EventShareGroup({ event }: Props) {
         </VoxButton>
       )}
 
-      {isFullEvent ? (
+      {canAddEventToCalendar(event) ? (
         <>
-          <VoxButton variant="outlined" full size="xl" iconLeft={CalendarPlus} onPress={() => addToCalendar(createEventData(event!))}>
+          <VoxButton variant="outlined" full size="xl" iconLeft={CalendarPlus} onPress={() => addToCalendar(createEventData(event))}>
             Ajouter à mon calendrier
           </VoxButton>
         </>

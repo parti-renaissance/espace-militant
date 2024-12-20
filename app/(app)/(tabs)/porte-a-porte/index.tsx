@@ -1,7 +1,6 @@
 import React, { memo, useCallback, useState } from 'react'
 import { Modal, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { LatLng, Region } from '@/components/Maps/Maps'
 import * as metatags from '@/config/metatags'
 import { DoorToDoorCharterNotAccepted } from '@/core/entities/DoorToDoorCharterState'
 import { GetDoorToDoorAddressesInteractor } from '@/core/interactor/GetDoorToDoorAddressesInteractor'
@@ -22,6 +21,16 @@ import * as Geolocation from 'expo-location'
 import { router } from 'expo-router'
 import Head from 'expo-router/head'
 import { YStack } from 'tamagui'
+
+type LatLng = {
+  latitude: number
+  longitude: number
+}
+
+type Region = LatLng & {
+  latitudeDelta: number
+  longitudeDelta: number
+}
 
 const DoorToDoorMapView = memo(_DoorToDoorMapView)
 
@@ -56,6 +65,7 @@ const _fetchAdresses = async (forcedRegion?: Region) => {
     }
     region = getRegionFromLatLng(latLng)
   }
+  if (!region) throw new Error("Can't get region")
   return new GetDoorToDoorAddressesInteractor().execute(region.latitude, region.longitude, region.latitudeDelta, region.longitudeDelta)
 }
 

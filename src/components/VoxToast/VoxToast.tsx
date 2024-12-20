@@ -37,7 +37,6 @@ const VoxToast = () => {
       <Toast.Action
         onPress={currentToast.action.onPress}
         altText={currentToast.action.altText}
-        asChild={!isWeb}
         gap={10}
         justifyContent="space-between"
         flexDirection="row"
