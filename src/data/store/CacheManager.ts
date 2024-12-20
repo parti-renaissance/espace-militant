@@ -1,37 +1,50 @@
-import { Cache } from 'react-native-cache'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CacheMissError } from '../../core/errors'
 
+const NAME_SPACE = 'lrem_data_cache'
 class CacheManager {
   private static instance: CacheManager
-  private cache = new Cache({
-    namespace: 'lrem_data_cache',
-    policy: {
-      maxEntries: 5000,
-      stdTTL: 0,
-    },
-    backend: AsyncStorage,
-  })
+
   private constructor() {}
 
-  async setInCache(cacheKey: string, payload: any) {
-    return this.cache.set(cacheKey, JSON.stringify(payload))
+  private async getNamespaceCache(): Promise<Record<string, unknown>> {
+    const cacheString = await AsyncStorage.getItem(NAME_SPACE)
+    if (cacheString === null) {
+      await AsyncStorage.setItem(NAME_SPACE, JSON.stringify({}))
+    }
+
+    if (cacheString) {
+      try {
+        return JSON.parse(cacheString) as Record<string, unknown>
+      } catch {
+        await AsyncStorage.setItem(NAME_SPACE, JSON.stringify({}))
+        return {}
+      }
+    }
+    return {}
   }
 
-  async getFromCache(cacheKey: string): Promise<any | undefined> {
-    const cacheResult = await this.cache.get(cacheKey)
-    if (cacheResult === undefined) {
+  async setInCache(cacheKey: string, payload: unknown): Promise<void> {
+    const cache = await this.getNamespaceCache()
+    return AsyncStorage.setItem(NAME_SPACE, JSON.stringify({ ...cache, [cacheKey]: payload }))
+  }
+
+  async getFromCache(cacheKey: string): Promise<unknown> {
+    const cache = await this.getNamespaceCache()
+    if (cache[cacheKey] === undefined || cache[cacheKey] === null) {
       throw new CacheMissError()
     }
-    return JSON.parse(cacheResult)
+    return cache[cacheKey]
   }
 
   async removeFromCache(cacheKey: string) {
-    return this.cache.remove(cacheKey)
+    const cache = await this.getNamespaceCache()
+    delete cache[cacheKey]
+    return AsyncStorage.setItem(NAME_SPACE, JSON.stringify(cache))
   }
 
-  purgeCache(): Promise<any> {
-    return this.cache.clearAll()
+  purgeCache(): Promise<void> {
+    return AsyncStorage.removeItem(NAME_SPACE)
   }
 
   public static getInstance(): CacheManager {

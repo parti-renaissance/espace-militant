@@ -1,3 +1,5 @@
-import type * as AddCalendarEvent from 'react-native-add-calendar-event'
+import type { Event } from 'expo-calendar'
 
-export type UseCreateEvent = () => (event: AddCalendarEvent.CreateOptions & { timeZone: string }) => Promise<void | AddCalendarEvent.CreateResult | string>
+export type CreateEventPayload = Omit<Partial<Event>, 'id'>
+
+export type UseCreateEvent = () => (event: CreateEventPayload) => Promise<void>
