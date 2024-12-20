@@ -29,7 +29,11 @@ const getEnvs = () => {
 const addEnvsToEasJson = async () => {
   const easJsonContent = await fs.readFile(easJsonPath, 'utf8')
   const easJson = JSON.parse(easJsonContent)
-  easJson.build[profile].env = getEnvs()
+  const currentEnvs = easJson.build[profile].env ?? {}
+  easJson.build[profile].env = {
+    ...currentEnvs,
+    ...getEnvs(),
+  }
   await fs.writeFile(easJsonPath, JSON.stringify(easJson, null, 2))
   console.log(`Added envs to eas.json`)
 }

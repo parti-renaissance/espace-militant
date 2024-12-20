@@ -24,7 +24,7 @@ if (isWeb) {
 
 initRootAppNotification()
 
-const { routingInstrumentation } = ErrorMonitor.configure()
+const { navigationIntegration } = ErrorMonitor.configure()
 
 SplashScreen.preventAutoHideAsync()
 
@@ -33,7 +33,7 @@ const useRegisterRoutingInstrumentation = () => {
 
   useEffect(() => {
     if (navigationRef) {
-      routingInstrumentation.registerNavigationContainer(navigationRef)
+      navigationIntegration.registerNavigationContainer(navigationRef)
     }
   }, [navigationRef])
 }
@@ -113,4 +113,4 @@ function Root() {
   )
 }
 
-export default Root
+export default ErrorMonitor.wrap(Root)

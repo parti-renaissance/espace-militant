@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { AppState, StatusBar } from 'react-native'
+import { AppState } from 'react-native'
+import {StatusBar} from "expo-status-bar"
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
 import Text from '@/components/base/Text'
@@ -79,7 +80,7 @@ export default function UpdateScreen({ children }: Props) {
 
   return (
     <LayoutPage>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar style="dark" />
       <View p={'$medium'} pt={insets.top} pb={insets.bottom + getTokenValue('$medium')} flex={1}>
         <XStack alignItems="center" justifyContent="center" gap={'$large'}>
           <EuCampaignIllustration pt={'$large'} showIcon={false} />
