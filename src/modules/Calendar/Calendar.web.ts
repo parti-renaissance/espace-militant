@@ -2,7 +2,7 @@ import { useToastController } from '@tamagui/toast'
 import { atcb_action } from 'add-to-calendar-button'
 import { formatDate } from 'date-fns'
 import { UseCreateEvent } from './CalendarTypes'
-import { isAllday as getIsAllDay, handleCreateEventError } from './utils'
+import { isAllday as getIsAllDay, handleCreateEventError, successToast } from './utils'
 
 const useCreateEvent: UseCreateEvent = () => {
   const toast = useToastController()
@@ -19,7 +19,13 @@ const useCreateEvent: UseCreateEvent = () => {
       timeZone: event.timeZone || 'Europe/Paris',
       language: 'fr',
       options: ['Apple', 'Google', 'iCal', 'Microsoft365', 'MicrosoftTeams', 'Outlook.com', 'Yahoo'],
-    }).catch((error) => handleCreateEventError(error, toast))
+    })
+      .then(() => {
+        successToast(toast)
+      })
+      .catch((error) => {
+        handleCreateEventError(error, toast)
+      })
   }
 }
 

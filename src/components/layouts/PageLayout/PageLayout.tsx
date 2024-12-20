@@ -1,13 +1,13 @@
 import { ComponentProps, useRef } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Container from '@/components/layouts/Container'
-import { isWeb, Media, StackProps, useMedia, View, ViewProps, withStaticProperties, XStack, YStack, YStackProps } from 'tamagui'
+import { isWeb, Media, useMedia, View, ViewProps, withStaticProperties, XStack, YStack, YStackProps } from 'tamagui'
 import { ScrollContext } from './scrollContext'
 
 export const padding = '$medium'
 export const columnWidth = 333
 
-const LayoutFrame = ({ children, webScrollable, ...props }: ComponentProps<typeof Container> & { webScrollable?: boolean }) => {
+const LayoutFrame = ({ children, webScrollable, ...props }: ComponentProps<typeof Container> & { webScrollable?: boolean; full?: boolean }) => {
   const insets = useSafeAreaInsets()
   const layoutRef = useRef<HTMLDivElement>(null)
   const media = useMedia()
@@ -77,7 +77,7 @@ const LayoutSideBarRight = ({ children, alwaysShow = false, ...props }: ViewProp
   ) : null
 }
 
-const LayoutMainSingleColumn = ({ children, ...props }: StackProps) => {
+const LayoutMainSingleColumn = ({ children, ...props }: YStackProps) => {
   return (
     <YStack flex={1} flexBasis={0} {...props}>
       {children}

@@ -14,6 +14,10 @@
       "autoIncrement": true,
       "android": {
         "resourceClass": "large"
+      },
+      "env": {
+        "YARN_ENABLE_IMMUTABLE_INSTALLS": "false",
+        "YARN_ENABLE_GLOBAL_CACHE": "false"
       }
     },
     "production": {
@@ -22,6 +26,10 @@
       "autoIncrement": true,
       "android": {
         "resourceClass": "large"
+      },
+      "env": {
+        "YARN_ENABLE_IMMUTABLE_INSTALLS": "false",
+        "YARN_ENABLE_GLOBAL_CACHE": "false"
       }
     }
   },

@@ -1,4 +1,4 @@
-import { Children, isValidElement, useCallback } from 'react'
+import { Children, isValidElement } from 'react'
 import { StatusBar } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'

@@ -3,8 +3,14 @@
 # dependencies
 node_modules/
 
-#package managers
+# Yarn files
+.pnp.*
 .yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # Expo
 .expo/
