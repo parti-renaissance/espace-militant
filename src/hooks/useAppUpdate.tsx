@@ -11,7 +11,7 @@ export default function useAppUpdate() {
   const [isBuildUpdateAvailable, setIsBuildUpdateAvailable] = useState(false)
 
   const checkForUpdate = () => {
-    if (isWeb) {
+    if (isWeb || __DEV__) {
       return
     }
 
