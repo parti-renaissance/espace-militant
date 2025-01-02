@@ -1,0 +1,102 @@
+name: EAS UPDATE STAGING
+on: workflow_dispatch
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
+
+env:
+  BRANCH_NAME: ${{ github.ref_name }}
+  EAS_BUILD_PROFILE: staging
+  APP_STORE_BUNDLE_ID: fr.en-marche.jecoute
+  REF_TYPE: ${{ github.ref_type }}
+  EXPO_PUBLIC_API_BASE_URL: ${{secrets.EXPO_PUBLIC_API_BASE_URL}}
+  EXPO_PUBLIC_OAUTH_BASE_URL: ${{secrets.EXPO_PUBLIC_OAUTH_BASE_URL}}
+  EXPO_PUBLIC_OAUTH_CLIENT_ID: ${{secrets.EXPO_PUBLIC_OAUTH_CLIENT_ID}}
+  EXPO_PUBLIC_SENTRY_DSN: ${{secrets.EXPO_PUBLIC_SENTRY_DSN}}
+  EXPO_PUBLIC_FB_API_KEY: ${{secrets.EXPO_PUBLIC_FB_API_KEY}}
+  EXPO_PUBLIC_FB_PROJECT_ID: ${{secrets.EXPO_PUBLIC_FB_PROJECT_ID}}
+  EXPO_PUBLIC_FB_SENDER_ID: ${{secrets.EXPO_PUBLIC_FB_SENDER_ID}}
+  EXPO_PUBLIC_FB_APP_ID: ${{secrets.EXPO_PUBLIC_FB_APP_ID}}
+  EXPO_PUBLIC_FB_MEASUREMENT_ID: ${{secrets.EXPO_PUBLIC_FB_MEASUREMENT_ID}}
+  EXPO_PUBLIC_ENVIRONMENT: ${{secrets.EXPO_PUBLIC_ENVIRONMENT}}
+  EXPO_PUBLIC_ASSOCIATED_DOMAIN: ${{secrets.EXPO_PUBLIC_ASSOCIATED_DOMAIN}}
+  EXPO_PUBLIC_ADMIN_URL: ${{secrets.EXPO_PUBLIC_ADMIN_URL}}
+  EXPO_PUBLIC_MAP_BOX_ACCESS_TOKEN: ${{ secrets.EXPO_PUBLIC_MAP_BOX_ACCESS_TOKEN }}
+  EXPO_PUBLIC_APP_NAME: ${{ secrets.EXPO_PUBLIC_APP_NAME }}
+  EXPO_PUBLIC_CAMPAIGN_DOMAIN: ${{ secrets.EXPO_PUBLIC_CAMPAIGN_DOMAIN }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-base
+      - uses: ./.github/actions/dependencies
+      - name: ⚙️ Compile web worker
+        run: yarn vite build --config vite.worker.config.js
+      - name: ⚙️ Compile web assets
+        uses: ./.github/actions/build-web
+      - name: ↗️ Upload web assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: ↗️ Upload tamagui cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: tamagui
+          path: .tamagui
+
+  upload-staging-develop-web:
+    runs-on: ubuntu-latest
+    needs: build-web
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        name: ⬇️ Download web artifacts
+      - uses: ./.github/actions/setup-base
+      - uses: ./.github/actions/dependencies
+      - uses: google-github-actions/auth@v2
+        with:
+          create_credentials_file: true
+          credentials_json: ${{ secrets.GCP_SA_KEY_FIREBASE_DEPLOYER }}
+      - uses: ./.github/actions/deploy-firebase-live
+        id: deploy
+        name: 🚀 Send to firebase LIVE hosting
+      - name: 📢 Announce deployment
+        env:
+          URL: ${{steps.deploy.outputs.url}}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: node ./.github/scripts/announce.js
+
+  build-mobile:
+    environment: staging
+    runs-on: ubuntu-latest
+    needs: build-web
+    env:
+      APP_STORE_BUNDLE_ID: fr.en-marche.jecoute
+      REF_TYPE: ${{ github.ref_type }}`
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-base
+      - uses: ./.github/actions/dependencies
+      - uses: actions/download-artifact@v4
+      - uses: ./.github/actions/setup-env
+        name: ⬇️ Download web artifacts
+      - name: 🧙🏻‍️Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          packager: yarn
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Insert envs into eas.json
+        run: node .github/scripts/prepare-eas-envs.js
+      - name: Update android & iOS
+        run: node .github/scripts/update.mjs

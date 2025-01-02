@@ -1,4 +1,5 @@
 import React from 'react'
+// import { Text } from 'react-native'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import AppDownloadCTA from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
@@ -74,6 +75,9 @@ const HomeScreen: React.FC = () => {
           >
             <ScopeModal />
             <HomeFeedList />
+            {/* <YStack gap="$medium" flex={1} justifyContent="center" alignItems="center">
+              <Text>Hello</Text>
+            </YStack> */}
           </BoundarySuspenseWrapper>
         </PageLayout.MainSingleColumn>
         <PageLayout.SideBarRight>

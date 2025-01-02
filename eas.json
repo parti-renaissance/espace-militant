@@ -10,7 +10,7 @@
     },
     "staging": {
       "distribution": "internal",
-      "channel": "staging",
+      "channel": "develop",
       "autoIncrement": true,
       "android": {
         "resourceClass": "large"
