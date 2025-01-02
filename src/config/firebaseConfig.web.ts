@@ -25,7 +25,8 @@ function initFirebase() {
       subscribeToTopic: (x: unknown) => logNotImplemented('subscribeToTopic', x),
       setBackgroundMessageHandler: (x: unknown) => logNotImplemented('setBackgroundMessageHandler', x),
       requestPermission: async (_?: FirebaseMessagingTypes.IOSPermissions): Promise<AuthorizationStatus> => {
-        switch (Notification.permission) {
+        const permission = await Notification.requestPermission()
+        switch (permission) {
           case 'granted':
             return AuthorizationStatus.AUTHORIZED
           case 'denied':
