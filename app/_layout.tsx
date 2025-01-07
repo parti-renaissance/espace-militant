@@ -12,6 +12,7 @@ import UpdateScreen from '@/screens/update/updateScreen'
 import TamaguiProvider from '@/tamagui/provider'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import NetInfo from '@react-native-community/netinfo'
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import { ToastProvider } from '@tamagui/toast'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -97,7 +98,11 @@ function Root() {
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        checkForUpdate()
+        NetInfo.fetch().then((state) => {
+          if (state.isConnected) {
+            checkForUpdate()
+          }
+        })
       }
 
       appState.current = nextAppState

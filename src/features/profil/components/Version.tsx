@@ -24,7 +24,7 @@ export default function Version() {
             </Text.SM>
             {Update.createdAt ? (
               <Text.SM alignSelf="center" secondary>
-                {format(new Date(), 'yyyy-MM-dd HH:mm:ss')}
+                {format(Update.createdAt, 'dd-MM-yyyy HH:mm:ss')}
               </Text.SM>
             ) : null}
           </YStack>

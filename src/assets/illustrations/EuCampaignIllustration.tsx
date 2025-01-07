@@ -2,17 +2,19 @@ import * as React from 'react'
 import { Path, Svg } from 'react-native-svg'
 import { View, XStack, YStackProps } from 'tamagui'
 
-function EuCampaignIllustration({ showText = true, ...props }: YStackProps & { showText?: boolean }) {
+function EuCampaignIllustration({ showText = true, showIcon = true, ...props }: YStackProps & { showText?: boolean; showIcon?: boolean }) {
   return (
     <XStack {...props} gap="$small" alignItems="center">
-      <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-        <Path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M13.344 1.21c.35.152.56.517.512.897l-.879 7.03H21a.863.863 0 01.663 1.415l-10 12a.862.862 0 01-1.519-.659l.88-7.03H3a.863.863 0 01-.662-1.415l10-12a.862.862 0 011.006-.239z"
-          fill="#000"
-        />
-      </Svg>
+      {showIcon ? (
+        <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+          <Path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M13.344 1.21c.35.152.56.517.512.897l-.879 7.03H21a.863.863 0 01.663 1.415l-10 12a.862.862 0 01-1.519-.659l.88-7.03H3a.863.863 0 01-.662-1.415l10-12a.862.862 0 011.006-.239z"
+            fill="#000"
+          />
+        </Svg>
+      ) : null}
       <View display={showText ? 'flex' : 'none'}>
         <Svg width={154} height={16} viewBox="0 0 154 16" fill="none">
           <Path
