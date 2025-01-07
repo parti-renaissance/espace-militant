@@ -3,9 +3,9 @@ import * as api from '@/services/profile/api'
 import { RestProfilResponse, RestProfilResponseTagTypes, RestUpdateProfileRequest } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { getFullVersion } from '@/utils/version'
 import { useToastController } from '@tamagui/toast'
 import { PlaceholderDataFunction, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import Constants from 'expo-constants'
 import * as FileSystem from 'expo-file-system'
 import { isWeb } from 'tamagui'
 import { GenericResponseError } from '../common/errors/generic-errors'
@@ -27,7 +27,6 @@ function useGetSuspenseProfil(props?: { enabled?: boolean }) {
   if (props?.enabled === false) {
     return { data: null }
   }
-
   return useSuspenseQuery({
     queryKey: [PROFIL_QUERY_KEY],
     queryFn: () => api.getProfile(),
@@ -334,7 +333,7 @@ export const useGetTaxReceiptFile = () => {
             {
               headers: {
                 Authorization: `Bearer ${user?.accessToken}`,
-                ['X-App-version']: Constants.expoConfig?.version ?? '0.0.0',
+                ['X-App-version']: getFullVersion(),
               },
             },
           )

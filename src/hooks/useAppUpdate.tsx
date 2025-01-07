@@ -34,6 +34,7 @@ export default function useAppUpdate() {
         if (update.isAvailable) {
           await fetchUpdateAsync()
         }
+        return update.isAvailable
       } catch (error) {
         ErrorMonitor.log('Expo update failed', error)
       }

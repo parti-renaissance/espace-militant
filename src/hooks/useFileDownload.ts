@@ -3,9 +3,9 @@ import clientEnv from '@/config/clientEnv'
 import { useUserStore } from '@/store/user-store'
 import { api } from '@/utils/api'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { getFullVersion } from '@/utils/version'
 import { useToastController } from '@tamagui/toast'
 import { useMutation } from '@tanstack/react-query'
-import Constants from 'expo-constants'
 import * as FileSystem from 'expo-file-system'
 import { shareAsync } from 'expo-sharing'
 import { isWeb } from 'tamagui'
@@ -39,7 +39,7 @@ export function useFileDownload() {
               ? undefined
               : {
                   Authorization: `Bearer ${user?.accessToken}`,
-                  ['X-App-version']: Constants.expoConfig?.version ?? '0.0.0',
+                  ['X-App-version']: getFullVersion(),
                 },
           })
         },

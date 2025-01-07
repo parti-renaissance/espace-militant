@@ -2,9 +2,9 @@ import React from 'react'
 import { TouchableOpacity } from 'react-native'
 import Text from '@/components/base/Text'
 import clientEnv from '@/config/clientEnv'
+import { getFullVersion } from '@/utils/version'
 import { format } from 'date-fns'
 import { nativeBuildVersion } from 'expo-application'
-import Constants from 'expo-constants'
 import * as Update from 'expo-updates'
 import { isWeb, YStack } from 'tamagui'
 
@@ -37,7 +37,7 @@ export default function Version() {
 function VersionText() {
   return (
     <Text.SM alignSelf="center">
-      Version {Constants.expoConfig?.version ?? '0.0.0'} [{isWeb ? '' : nativeBuildVersion}
+      {getFullVersion()} [{isWeb ? '' : nativeBuildVersion}
       {isWeb ? '' : ' - '}
       {clientEnv.ENVIRONMENT}]
     </Text.SM>
