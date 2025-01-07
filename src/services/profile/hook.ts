@@ -24,9 +24,12 @@ export const useGetProfil = (props?: { enabled?: boolean; placeholderData?: Rest
 }
 
 function useGetSuspenseProfil(props?: { enabled?: boolean }) {
+  if (props?.enabled === false) {
+    return { data: null }
+  }
   return useSuspenseQuery({
     queryKey: [PROFIL_QUERY_KEY],
-    queryFn: () => (props?.enabled ? api.getProfile() : Promise.resolve(null)),
+    queryFn: () => api.getProfile(),
   })
 }
 

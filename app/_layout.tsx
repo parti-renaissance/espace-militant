@@ -1,18 +1,16 @@
-import React, { useEffect, useRef } from 'react'
-import { AppState, useColorScheme } from 'react-native'
+import React, { useEffect } from 'react'
+import { useColorScheme } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import WaitingScreen from '@/components/WaitingScreen'
 import { SessionProvider, useSession } from '@/ctx/SessionProvider'
 import { useInitMatomo } from '@/features/matomo/hook'
 import { useInitPushNotification } from '@/features/push-notification/hook'
 import initRootAppNotification from '@/features/push-notification/logic/initRootAppNotification'
-import useAppUpdate from '@/hooks/useAppUpdate'
+import UpdateScreen from '@/features/update/updateScreen'
 import useImportFont from '@/hooks/useImportFont'
-import UpdateScreen from '@/screens/update/updateScreen'
 import TamaguiProvider from '@/tamagui/provider'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import NetInfo from '@react-native-community/netinfo'
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import { ToastProvider } from '@tamagui/toast'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -79,7 +77,6 @@ export const unstable_settings = {
 }
 
 function Root() {
-  const appState = useRef(AppState.currentState)
   const colorScheme = useColorScheme()
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -93,26 +90,6 @@ function Root() {
   const [isFontsLoaded] = useImportFont()
   useRegisterRoutingInstrumentation()
 
-  const { isBuildUpdateAvailable, checkForUpdate, isUpdateAvailable } = useAppUpdate()
-
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        NetInfo.fetch().then((state) => {
-          if (state.isConnected) {
-            checkForUpdate()
-          }
-        })
-      }
-
-      appState.current = nextAppState
-    })
-
-    return () => {
-      subscription.remove()
-    }
-  }, [])
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ToastProvider swipeDirection="up">
@@ -122,7 +99,9 @@ function Root() {
               <BottomSheetModalProvider>
                 <SessionProvider>
                   <WaitingRoomHoc isLoading={!isFontsLoaded}>
-                    {(isBuildUpdateAvailable || isUpdateAvailable) && !isWeb ? <UpdateScreen isBuildUpdate={isBuildUpdateAvailable} /> : <Slot />}
+                    <UpdateScreen>
+                      <Slot />
+                    </UpdateScreen>
                   </WaitingRoomHoc>
                 </SessionProvider>
               </BottomSheetModalProvider>

@@ -22,9 +22,9 @@ instance.interceptors.request.use(
   function (config) {
     const accessToken = useUserStore.getState().user?.accessToken
 
+    config.headers['X-App-version'] = getFullVersion()
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`
-      config.headers['X-App-version'] = getFullVersion()
     }
 
     return config
