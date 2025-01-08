@@ -1,7 +1,7 @@
 {
   "hosting": {
     "public": "dist",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "!.well-known/**"],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
@@ -16,24 +16,6 @@
           {
             "key": "Content-Type",
             "value": "application/wasm"
-          }
-        ]
-      },
-      {
-        "source": "/.well-known/apple-app-site-association",
-        "headers": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ]
-      },
-      {
-        "source": "/.well-known/assetlinks.json",
-        "headers": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
           }
         ]
       }
