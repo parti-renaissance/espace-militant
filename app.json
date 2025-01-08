@@ -135,7 +135,8 @@
       "typedRoutes": true
     },
     "updates": {
-      "url": "https://u.expo.dev/3b41ebc2-860e-4ccb-a101-5edc6b0c7558"
+      "url": "https://u.expo.dev/3b41ebc2-860e-4ccb-a101-5edc6b0c7558",
+      "checkAutomatically": "NEVER"
     }
   }
 }
