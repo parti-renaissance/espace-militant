@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppState } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
@@ -6,23 +6,24 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import LayoutPage from '@/components/layouts/PageLayout/PageLayout'
 import redirectToStore from '@/helpers/redirectToStore'
-import useAppUpdate from '@/hooks/useAppUpdate'
 import useAsyncFn from '@/hooks/useAsyncFn'
+import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import NetInfo from '@react-native-community/netinfo'
 import { Image } from 'expo-image'
-import { reloadAsync } from 'expo-updates'
-import { Spinner, View, XStack, YStack } from 'tamagui'
+import * as Updates from 'expo-updates'
+import { isWeb, Spinner, View, XStack, YStack } from 'tamagui'
+import { checkStoreUpdate } from './utils'
 
 interface Props {
   children: React.ReactNode
 }
 
-const useAppStateOnChange = (callback: () => void) => {
+const useAppStateOnChange = (callback: () => Promise<void>) => {
   const appState = useRef(AppState.currentState)
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
+    const subscription = AppState.addEventListener('change', async (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        callback()
+        await callback()
       }
       appState.current = nextAppState
     })
@@ -34,46 +35,61 @@ const useAppStateOnChange = (callback: () => void) => {
 }
 
 export default function UpdateScreen({ children }: Props) {
-  const { isBuildUpdateAvailable, checkForUpdate, isUpdateAvailable, isDownloading, isUpdatePending } = useAppUpdate()
-  const hasAnyUpdate = isUpdateAvailable || isBuildUpdateAvailable
-  const message = isBuildUpdateAvailable
-    ? 'Mettez à jour votre application depuis votre store pour découvrir les nouveautés.'
-    : 'Nous mettons à jour votre application en arrière plan pour vous faire profiter des dernières nouveautés.'
+  const [updateType, setUpdateType] = useState<'build' | 'update' | null>(null)
+  const { isDownloading } = Updates.useUpdates()
 
-  useAppStateOnChange(() => {
-    NetInfo.fetch().then((state) => {
+  const message =
+    updateType === 'build'
+      ? 'Mettez à jour votre application depuis votre store pour découvrir les nouveautés.'
+      : 'Nous mettons à jour votre application en arrière plan pour vous faire profiter des dernières nouveautés.'
+
+  useAppStateOnChange(async () => {
+    if (isWeb) {
+      return
+    }
+    return NetInfo.fetch().then(async (state) => {
       if (state.isConnected) {
-        checkForUpdate()
+        const newStoreBuildAvailable = await checkStoreUpdate()
+        if (newStoreBuildAvailable) {
+          setUpdateType('build')
+        } else {
+          const isEasUpdateAvailable = await Updates.checkForUpdateAsync()
+          if (isEasUpdateAvailable) {
+            setUpdateType('update')
+            try {
+              await Updates.fetchUpdateAsync()
+              await Updates.reloadAsync()
+            } catch (e) {
+              if (e instanceof Error) {
+                ErrorMonitor.log(e.message)
+              } else {
+                ErrorMonitor.log("Un erreur lors de la mise à jour s'est produite")
+              }
+            }
+          } else {
+            setUpdateType(null)
+          }
+        }
       }
     })
   })
 
   const { isProcessing, trigger: onUpdate } = useAsyncFn(
     useCallback(async () => {
-      if (isBuildUpdateAvailable) {
-        await redirectToStore()
-      } else {
-        await reloadAsync()
-      }
+      await redirectToStore()
     }, []),
   )
 
-  useEffect(() => {
-    if (!isDownloading && isUpdatePending) {
-      onUpdate()
-    }
-  }, [isDownloading, isUpdatePending])
-
   const updateStatusMessage = useMemo(() => {
-    if (!isUpdateAvailable) return null
+    if (updateType !== 'update') return null
     if (isDownloading) return 'Téléchargement...'
-    if (isProcessing) return 'Mise à jour....'
+    if (!isDownloading) return 'Mise à jour....'
     return null
-  }, [isDownloading, isProcessing, isUpdateAvailable])
+  }, [isDownloading, updateType])
 
   const insets = useSafeAreaInsets()
 
-  if (!hasAnyUpdate) {
+  if (!updateType) {
     return children
   }
 
@@ -98,7 +114,7 @@ export default function UpdateScreen({ children }: Props) {
             ) : null}
           </YStack>
         </YStack>
-        {isBuildUpdateAvailable ? (
+        {updateType === 'build' ? (
           <XStack>
             <VoxButton onPress={onUpdate} theme="blue" full size="xl" loading={isProcessing}>
               Mettre à jour

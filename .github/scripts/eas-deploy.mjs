@@ -39,7 +39,22 @@ async function actionHandler() {
         }
         if (process.env.WORKFLOW_ENVIRONMENT === 'staging') {
           console.log(chalk.blue('Will do a build on staging env...'))
-          await aExec(`${expoCommandBase} --profile staging`)
+          const promise = aExec(`${expoCommandBase} --profile staging --auto-submit`)
+          const child  = promise.child
+          child.stdout.on('data', function(data) {
+              console.log('stdout: ' + data);
+          });
+          child.stderr.on('data', function(data) {
+              console.log('stderr: ' + data);
+          });
+          child.on('close', function(code) {
+              console.log('closing code: ' + code);
+          });
+
+          // i.e. can then await for promisified exec call to complete
+          const { stdout, stderr } = await promise;
+          console.log(chalk.blue(`stdout: ${stdout}`))
+          console.log(chalk.red(`stderr: ${stderr}`))
           process.exit(0)
         }
         console.log(chalk.red(`Unknown WORKFLOW_ENVIRONMENT ${process.env.WORKFLOW_ENVIRONMENT}`))
