@@ -154,15 +154,7 @@ export default function ScopesSelector() {
           maxHeight: height * 0.8 - viewport.top - viewport.bottom,
         }}
       >
-        {!hasSelectedScope ? (
-          <ScrollView style={{ flex: 1, paddingBottom: viewport.bottom }}>
-            <FirstStep />
-          </ScrollView>
-        ) : (
-          <ScrollView style={{ flex: 1, paddingBottom: viewport.bottom }}>
-            <SecondStep />
-          </ScrollView>
-        )}
+        <ScrollView style={{ flex: 1, paddingBottom: viewport.bottom }}>{!hasSelectedScope ? <FirstStep /> : <SecondStep />}</ScrollView>
       </YStack>
     </ModalOrPageV2>
   )

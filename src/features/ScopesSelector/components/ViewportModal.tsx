@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react'
-import { Modal, Pressable, ScrollView, StyleSheet } from 'react-native'
+import { Modal, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { Sheet, useMedia, View } from 'tamagui'
@@ -25,14 +25,14 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
   if (viewport.gtSm) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
-        <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
+        <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <CardFrame>
               {header ? header : null}
               {children}
             </CardFrame>
           </View>
-        </Pressable>
+        </View>
       </Modal>
     )
   }
