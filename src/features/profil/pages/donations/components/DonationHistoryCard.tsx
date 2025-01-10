@@ -28,10 +28,10 @@ const EmptyState = () => {
       <YStack gap="$medium">
         <Text.MD semibold>Aucun paiement pour le moment</Text.MD>
         <XStack gap="$small" justifyContent="space-between">
-          <VoxButton variant="text" theme="yellow" size="lg" loading={subscriptionLink.isPending} onPress={subscriptionLink.open}>
+          <VoxButton variant="text" theme="yellow" size="lg" loading={subscriptionLink.isPending} onPress={subscriptionLink.open()}>
             Adhérer
           </VoxButton>
-          <VoxButton variant="text" theme="green" size="lg" loading={donationLink.isPending} onPress={donationLink.open('monthly')}>
+          <VoxButton variant="text" theme="green" size="lg" loading={donationLink.isPending} onPress={donationLink.open({ duration: '0' })}>
             Donner
           </VoxButton>
         </XStack>

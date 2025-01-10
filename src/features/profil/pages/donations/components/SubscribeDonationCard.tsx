@@ -48,7 +48,7 @@ export default function (props: { subscription: RestDonationsResponse[number]; f
                 </VoxCard.Content>
               </VoxCard>
               <XStack gap="$small">
-                <VoxButton size="lg" theme="green" onPress={handlePress('dayly')} disabled={isPending}>
+                <VoxButton size="lg" theme="green" onPress={handlePress({ duration: '0' })} disabled={isPending} loading={isPending}>
                   Faire un don
                 </VoxButton>
                 <VoxButton size="lg" theme="green" variant="text" bg="white" onPress={handleCancel} disabled={isCancelPending} loading={isCancelPending}>
