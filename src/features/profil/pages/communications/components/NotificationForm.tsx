@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { WebView } from 'react-native-webview'
 import SwitchGroup from '@/components/base/SwitchGroup/SwitchGroup'
 import Text from '@/components/base/Text'
@@ -6,11 +6,10 @@ import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useGetNotificationList, useGetReSubscribeConfig } from '@/services/notifications/hook'
-import { useGetProfil, useGetResubscribeLoop, useMutationUpdateProfil } from '@/services/profile/hook'
+import { useGetResubscribeLoop, useGetSuspenseProfil, useMutationUpdateProfil } from '@/services/profile/hook'
 import { RestDetailedProfileResponse } from '@/services/profile/schema'
 import { AlertTriangle, Info } from '@tamagui/lucide-icons'
-import { keepPreviousData } from '@tanstack/react-query'
-import { useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
 import { isWeb, Separator, XStack, YStack } from 'tamagui'
 
@@ -197,11 +196,15 @@ const UnSubscribeCase = () => {
 }
 
 const NotificationForm = (props: { cardProps?: React.ComponentProps<typeof VoxCard>; profile: RestDetailedProfileResponse }) => {
-  const { data: userData } = useGetProfil({ placeholderData: keepPreviousData })
+  const { autorun } = useLocalSearchParams<{ autorun?: '1' | '0' }>()
+  const { data: userData } = useGetSuspenseProfil()
+  const shouldAutoCheck = autorun === '1' && userData && userData.email_subscribed
   const subscription_types = props.profile.subscription_types
-  const user_subscription_values = subscription_types.map((st) => st.code)
+  const isAutoRunHasBeenExecuted = useRef(false)
 
   const { data: _notificationList } = useGetNotificationList()
+  const user_subscription_values = shouldAutoCheck ? _notificationList.map((n) => n.code) : subscription_types.map((st) => st.code)
+
   const notificationList = _notificationList.map((n) => ({ type: n.type, label: n.label, value: n.code }))
   const emailList = notificationList.filter((n) => n.type === 'email')
   const smsList = notificationList.filter((n) => n.type === 'sms')
@@ -219,6 +222,15 @@ const NotificationForm = (props: { cardProps?: React.ComponentProps<typeof VoxCa
   const onSubmit = handleSubmit((data) => {
     return mutateAsync({ subscription_types: Object.values(data).flat() })
   })
+
+  useEffect(() => {
+    if (shouldAutoCheck && !isAutoRunHasBeenExecuted.current) {
+      isAutoRunHasBeenExecuted.current = true
+      onSubmit().then(() => {
+        router.setParams({ autorun: '0' })
+      })
+    }
+  }, [shouldAutoCheck, onSubmit])
 
   const SmsSection = () => {
     return props.profile.phone ? (
@@ -253,7 +265,7 @@ const NotificationForm = (props: { cardProps?: React.ComponentProps<typeof VoxCa
     <VoxCard {...props.cardProps}>
       <VoxCard.Content>
         <Text.LG>Préférences de communication</Text.LG>
-        {!userData?.email_subscribed ? (
+        {userData && !userData.email_subscribed ? (
           <UnSubscribeCase />
         ) : (
           <>
