@@ -1,28 +1,24 @@
-import { useCallback } from 'react'
 import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import InfoCard from '@/components/InfoCard/InfoCard'
 import Menu from '@/components/menu/Menu'
 import ProfilBlock from '@/components/ProfilBlock'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import clientEnv from '@/config/clientEnv'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { ChevronRight, ClipboardCheck, GraduationCap, History, Link as LinkIcon, SquareUser, UserPlus } from '@tamagui/lucide-icons'
 import { getYear } from 'date-fns'
-import { openURL } from 'expo-linking'
 import { Link } from 'expo-router'
-import { isWeb, XStack, YStack } from 'tamagui'
+import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 
 export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
-  const { user: credentials } = useUserStore()
   const { data: { default: default_scope } = {} } = useGetExecutiveScopes()
   const isCadre = profil?.cadre_auth_path && default_scope
-  const onNavigateToCadre = useCallback(() => {
-    if (isCadre) openURL(`${credentials?.isAdmin ? clientEnv.ADMIN_URL : clientEnv.OAUTH_BASE_URL}${profil?.cadre_auth_path}`)
-  }, [profil, isCadre])
+  const { open: openCadre, isPending } = useOpenExternalContent({ slug: 'cadre' })
+
   if (!isCadre) {
     return null
   }
@@ -30,9 +26,10 @@ export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
     <VoxCard
       inside={true}
       bg="$purple1"
-      onPress={onNavigateToCadre}
+      onPress={openCadre({ state: `/?scope=${default_scope.code}` })}
       cursor="pointer"
       animation="100ms"
+      disabled={isPending}
       hoverStyle={{
         bg: '$purple2',
       }}
@@ -52,9 +49,7 @@ export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
               </Text.P>
             ))}
           </YStack>
-          <YStack>
-            <ChevronRight size="$1" color="$purple6" />
-          </YStack>
+          <YStack>{isPending ? <Spinner color="$purple6" /> : <ChevronRight size="$1" color="$purple6" />}</YStack>
         </XStack>
       </VoxCard.Content>
     </VoxCard>

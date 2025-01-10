@@ -19,7 +19,7 @@ const AdhButton = (props: { bgColor?: string; children?: string; variant?: Compo
   const { isPending, open: handleClick } = useOpenExternalContent({ slug: 'adhesion' })
 
   return (
-    <VoxButton variant={props.variant} size="lg" width="100%" theme="yellow" onPress={handleClick} loading={isPending}>
+    <VoxButton variant={props.variant} size="lg" width="100%" theme="yellow" onPress={handleClick()} loading={isPending}>
       {props.children ?? 'Adhérer'}
     </VoxButton>
   )
