@@ -1,4 +1,4 @@
-name: DEPLO
+name: DEPLOY
 on:
   workflow_dispatch:
     inputs:
