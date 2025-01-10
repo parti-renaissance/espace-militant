@@ -46,7 +46,7 @@ const EluExempteNonAdh = () => {
       <Text.MD semibold>
         Le bureau de votre assemblée départementale vous a exempté de cotisation élu mais vous devez être à jour de cotisation adhérent pour en profiter.
       </Text.MD>
-      <VoxButton variant="outlined" alignSelf="flex-end" theme="yellow" disabled={isPending} loading={isPending} onPress={handlePress}>
+      <VoxButton variant="outlined" alignSelf="flex-end" theme="yellow" disabled={isPending} loading={isPending} onPress={handlePress()}>
         Me mettre à jour de cotisation
       </VoxButton>
     </FrameElu>

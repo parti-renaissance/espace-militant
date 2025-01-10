@@ -29,7 +29,7 @@ export default function (props: CommonMembershipCardProps) {
                 ) : null}
               </YStack>
               <XStack gap="$small" flexWrap="wrap">
-                <VoxButton size="lg" theme="yellow" disabled={isPending} onPress={handleAdhesionLink}>
+                <VoxButton size="lg" theme="yellow" disabled={isPending} onPress={handleAdhesionLink()}>
                   Me mettre à jour
                 </VoxButton>
                 <Link href="https://doc.parti.re/bulletin-adhesion.pdf" target="_blank" asChild={!isWeb}>

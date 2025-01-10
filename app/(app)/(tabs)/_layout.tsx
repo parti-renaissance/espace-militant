@@ -61,7 +61,7 @@ export default function AppLayout() {
               name={route.name}
               options={{
                 title: route.screenName,
-                // @ts-expect-error
+                // @ts-expect-error custom property
                 tabBarVisible: !route.hiddenMobile,
                 tabBarTheme: route.theme,
                 tabBarActiveTintColor: '$color5',

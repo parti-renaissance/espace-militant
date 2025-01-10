@@ -13,7 +13,7 @@ import { useGetSuspenseProfil } from '@/services/profile/hook'
 import { useScrollToTop } from '@react-navigation/native'
 import { ChevronDown } from '@tamagui/lucide-icons'
 import { isPast } from 'date-fns'
-import { getToken, getTokenValue, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { getToken, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { useDebounce, useDebouncedCallback } from 'use-debounce'
 
 const splitEvents = (events: RestItemEvent[] | RestPublicItemEvent[]) => {

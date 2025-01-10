@@ -12,7 +12,6 @@ export class CacheMissError extends Error {}
 export class PublicSubscribeEventFormError extends FormError {}
 export class LoginError extends Error {}
 export class EventSubscriptionError extends Error {}
-export class TokenCannotBeSubscribedError extends Error {}
 export class PhoningSessionNoNumberError extends Error {}
 export class PhoningSessionFinishedCampaignError extends Error {}
 export class PhonePollAlreadyAnsweredError extends Error {}

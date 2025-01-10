@@ -1,21 +1,22 @@
+import { useEffect } from 'react'
 import clientEnv from '@/config/clientEnv'
-import * as api from '@/services/matomo/api'
+import * as api from '@/features/matomo/api'
+import { usePathname } from 'expo-router'
 
-export const useMatomo = () => {
-  const userInfo = {}
-  return clientEnv.ENVIRONMENT === 'production'
+const matomoApiObject =
+  clientEnv.ENVIRONMENT === 'production'
     ? {
         trackEvent: (data: Parameters<typeof api.trackEvent>[0]) => {
-          api.trackEvent({ ...data, ...userInfo })
+          api.trackEvent({ ...data })
         },
         trackAction: (data: Parameters<typeof api.trackAction>[0]) => {
-          api.trackAction({ ...data, ...userInfo })
+          api.trackAction({ ...data })
         },
         trackScreenView: (data: Parameters<typeof api.trackScreenView>[0]) => {
-          api.trackScreenView({ ...data, ...userInfo })
+          api.trackScreenView({ ...data })
         },
         trackAppStart: (data?: Parameters<typeof api.trackAppStart>[0]) => {
-          api.trackAppStart({ ...data, ...userInfo })
+          api.trackAppStart({ ...data })
         },
       }
     : {
@@ -32,4 +33,19 @@ export const useMatomo = () => {
           console.log('trackAppStart', x)
         },
       }
+
+export const useMatomo = () => {
+  return matomoApiObject
+}
+
+export const useInitMatomo = () => {
+  const matomo = useMatomo()
+  const pathname = usePathname()
+  useEffect(() => {
+    matomo.trackAppStart()
+  }, [matomo])
+
+  useEffect(() => {
+    matomo.trackScreenView({ pathname })
+  }, [pathname, matomo])
 }

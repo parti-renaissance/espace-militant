@@ -1,12 +1,11 @@
-import nAnalytics from '@react-native-firebase/analytics'
-import installations from '@react-native-firebase/installations'
+import { PermissionsAndroid, Platform } from 'react-native'
 import nMessaging from '@react-native-firebase/messaging'
+import Constants from 'expo-constants'
+import { AuthorizationStatus } from './firebaseTypes'
 
-export { AuthorizationStatus } from './firebaseTypes'
-
+export { AuthorizationStatus }
 // Initialize Firebase
 type Mess = ReturnType<typeof nMessaging>
-type Anal = ReturnType<typeof nAnalytics>
 
 function initFirebase() {
   return {
@@ -21,15 +20,17 @@ function initFirebase() {
       setBackgroundMessageHandler: (x: Parameters<Mess['setBackgroundMessageHandler']>[0]) => nMessaging().setBackgroundMessageHandler(x),
       getInitialNotification: () => nMessaging().getInitialNotification(),
       onNotificationOpenedApp: (x: Parameters<Mess['onNotificationOpenedApp']>[0]) => nMessaging().onNotificationOpenedApp(x),
-      requestPermission: (...x: Parameters<Mess['requestPermission']>) => nMessaging().requestPermission(...x),
+      requestPermission: async (...x: Parameters<Mess['requestPermission']>) => {
+        if (Platform.OS === 'android') {
+          const result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
+          return result === PermissionsAndroid.RESULTS.GRANTED ? AuthorizationStatus.AUTHORIZED : AuthorizationStatus.DENIED
+        }
+        return nMessaging().requestPermission(...x)
+      },
     },
-    analytics: {
-      logEvent: (...x: Parameters<Anal['logEvent']>) => nAnalytics().logEvent(...x),
-      logScreenView: (x: Parameters<Anal['logScreenView']>[0]) => nAnalytics().logScreenView(x),
-      setAnalyticsCollectionEnabled: (x: Parameters<Anal['setAnalyticsCollectionEnabled']>[0]) => nAnalytics().setAnalyticsCollectionEnabled(x),
-    },
+
     app: {
-      deviceId: installations().getId(),
+      deviceId: Constants.sessionId,
     },
   }
 }

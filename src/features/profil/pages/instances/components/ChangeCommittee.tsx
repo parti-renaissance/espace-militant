@@ -54,6 +54,7 @@ const ChangeCommiteeList = ({ currentUuid, ...props }: { currentUuid: string | n
       ListHeaderComponent={<Text.P $gtSm={{ pb: 16 }}>Vous pouvez seulement changer de comité au sein de votre Assemblée.</Text.P>}
       renderItem={({ item }) => (
         <MemoizedCommitteeCard
+          flexBasis={media.gtSm ? 0 : undefined}
           committee={item}
           loading={pendingSelected === item.uuid && isPending}
           selected={selected === item.uuid}

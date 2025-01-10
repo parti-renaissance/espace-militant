@@ -1,16 +1,39 @@
-name: Release branches
+name: DEPLOY
 on:
-  release:
-    types:
-      - published
-
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        default: staging
+        options:
+          - staging
+          - production
+      type:
+        description: 'EAS deployment type'
+        required: true
+        type: choice
+        default: build
+        options:
+          - build
+          - update
+      comment:
+        description: 'Comment'
+        required: false
+        type: string
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
-
+run-name: '${{ github.event.inputs.type }} ${{ github.event.inputs.environment }} from ${{ github.ref_name }}'
 env:
+  EAS_WORKFLOW_TYPE: ${{ github.event.inputs.type }}
+  WORFLOW_COMMENT_INPUT: ${{ github.event.inputs.comment }}
+  WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  WORKFLOW_ENVIRONMENT: ${{ github.event.inputs.environment }}
+  LAST_COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
   BRANCH_NAME: ${{ github.ref_name }}
-  EAS_BUILD_PROFILE: production
+  EAS_BUILD_PROFILE: ${{ github.event.inputs.environment }}
   APP_STORE_BUNDLE_ID: fr.en-marche.jecoute
   REF_TYPE: ${{ github.ref_type }}
   EXPO_PUBLIC_API_BASE_URL: ${{secrets.EXPO_PUBLIC_API_BASE_URL}}
@@ -34,7 +57,7 @@ env:
 jobs:
   build-web:
     runs-on: ubuntu-latest
-    environment: production
+    environment: ${{ github.event.inputs.environment }}
     steps:
       - name: 🏗 Setup repo
         uses: actions/checkout@v4
@@ -49,11 +72,18 @@ jobs:
         with:
           name: dist
           path: dist
+          include-hidden-files: true
 
-  upload-production-release-web:
+      - name: ↗️ Upload tamagui cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: tamagui
+          path: .tamagui
+
+  deploy-web:
     runs-on: ubuntu-latest
     needs: build-web
-    environment: production
+    environment: ${{ github.event.inputs.environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,11 +101,13 @@ jobs:
       - name: 📢 Announce deployment
         env:
           URL: ${{steps.deploy.outputs.url}}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: node ./.github/scripts/announce.js
+          MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
+          WORKFLOW_JOB: 'deploy_web'
 
-  build-mobile:
-    environment: production
+        run: node ./.github/scripts/announce.mjs
+
+  eas-mobile:
+    environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
     needs: build-web
     env:
@@ -95,5 +127,13 @@ jobs:
           eas-version: latest
           packager: yarn
           token: ${{ secrets.EXPO_TOKEN }}
+      - name: Insert envs into eas.json
+        run: node .github/scripts/prepare-eas-envs.mjs
       - name: Build android & iOS
-        run: node .github/scripts/build.mjs
+        run: node .github/scripts/eas-deploy.mjs
+      - name: 📢 Announce deployment
+        env:
+          MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
+          WORKFLOW_JOB: 'deploy_eas'
+
+        run: node ./.github/scripts/announce.mjs

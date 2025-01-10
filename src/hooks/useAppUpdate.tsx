@@ -11,7 +11,7 @@ export default function useAppUpdate() {
   const [isBuildUpdateAvailable, setIsBuildUpdateAvailable] = useState(false)
 
   const checkForUpdate = () => {
-    if (isWeb) {
+    if (isWeb || __DEV__) {
       return
     }
 
@@ -34,6 +34,7 @@ export default function useAppUpdate() {
         if (update.isAvailable) {
           await fetchUpdateAsync()
         }
+        return update.isAvailable
       } catch (error) {
         ErrorMonitor.log('Expo update failed', error)
       }

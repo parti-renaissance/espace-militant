@@ -68,23 +68,25 @@ const DashboardScreen = () => {
 
         <YStack justifyContent="center" alignItems="center">
           <SafeAreaView edges={['bottom']}>
-            <VoxCard.Content pt={24}>
-              <XStack gap={6} alignItems="center">
-                <XStack width="100%" flexShrink={1}>
-                  <Text.LG multiline semibold>
-                    {isAdherent ? 'Désadhérer et supprimer mon compte' : 'Supprimer mon compte'}
-                  </Text.LG>
+            <VoxCard.Content pt={24} gap="$xxxlarge">
+              <YStack gap="$medium">
+                <XStack gap={6} alignItems="center">
+                  <XStack width="100%" flexShrink={1}>
+                    <Text.LG multiline semibold>
+                      {isAdherent ? 'Désadhérer et supprimer mon compte' : 'Supprimer mon compte'}
+                    </Text.LG>
+                  </XStack>
                 </XStack>
-              </XStack>
-              <Text.P>
-                {isAdherent
-                  ? 'Cette action est définitive, vous devrez à nouveau payer une cotisation pour réadhérer. Nous ne serons pas en mesure de restaurer votre historique.'
-                  : 'Cette action est définitive et entraintera la suppression de toutes vos informations personnelles. Nous ne serons pas en mesure de restaurer votre historique.'}
-                <Text.BR />
-                <Text.P link color="$orange6" onPress={removeAccount}>
-                  {isAdherent ? 'Je veux désadhérer !' : 'Supprimer mon compte'}
+                <Text.P>
+                  {isAdherent
+                    ? 'Cette action est définitive, vous devrez à nouveau payer une cotisation pour réadhérer. Nous ne serons pas en mesure de restaurer votre historique.'
+                    : 'Cette action est définitive et entraintera la suppression de toutes vos informations personnelles. Nous ne serons pas en mesure de restaurer votre historique.'}
+                  <Text.BR />
+                  <Text.P link color="$orange6" onPress={removeAccount}>
+                    {isAdherent ? 'Je veux désadhérer !' : 'Supprimer mon compte'}
+                  </Text.P>
                 </Text.P>
-              </Text.P>
+              </YStack>
               <Version />
             </VoxCard.Content>
           </SafeAreaView>

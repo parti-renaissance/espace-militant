@@ -1,7 +1,6 @@
 import React from 'react'
 import Text from '@/components/base/Text'
 import VoxCard, { VoxCardContent } from '@/components/VoxCard/VoxCard'
-import { Analytics } from '@/utils/Analytics'
 import { ArrowUpRight } from '@tamagui/lucide-icons'
 import * as WebBrowser from 'expo-web-browser'
 import { Image, View } from 'tamagui'
@@ -15,7 +14,6 @@ interface CardToolProps {
 const CardTool = ({ name, url, imageUrl }: CardToolProps) => {
   const handlePress = async () => {
     await WebBrowser.openBrowserAsync(url)
-    await Analytics.logUrlOpened(url)
   }
 
   const [maybeType, ...maybeName] = name?.trim().split(':') ?? []

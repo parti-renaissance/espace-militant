@@ -1,7 +1,8 @@
-import { Info } from '@tamagui/lucide-icons'
+import { Info, X } from '@tamagui/lucide-icons'
 import { Toast, useToastState } from '@tamagui/toast'
 import { isWeb, ThemeName, XStack, YStack } from 'tamagui'
 import Text from '../base/Text'
+import { VoxButton } from '../Button/'
 import VoxCard from '../VoxCard/VoxCard'
 
 const getThemeByType = (type: 'error' | 'success' | 'info' | 'warning'): ThemeName => {
@@ -27,6 +28,31 @@ const VoxToast = () => {
   const theme = getThemeByType(type)
   const bgColor = '$color5'
   const textColor = '$white1'
+
+  type InnerContainerProps = {
+    children: React.ReactNode
+  }
+  const InnerContainer = ({ children }: InnerContainerProps) =>
+    currentToast.action ? (
+      <Toast.Action
+        onPress={currentToast.action.onPress}
+        altText={currentToast.action.altText}
+        asChild={!isWeb}
+        gap={10}
+        justifyContent="space-between"
+        flexDirection="row"
+        flexShrink={1}
+        alignItems="center"
+        cursor="pointer"
+      >
+        {children}
+      </Toast.Action>
+    ) : (
+      <XStack gap={10} justifyContent="space-between" alignItems="center" flexShrink={1}>
+        {children}
+      </XStack>
+    )
+
   return (
     <Toast
       key={currentToast.id}
@@ -39,30 +65,38 @@ const VoxToast = () => {
       animation="100ms"
       bg={bgColor}
       padding={0}
-      borderRadius={999}
+      borderRadius={16}
       height="auto"
       theme={theme}
+      maxWidth={320}
       viewportName={currentToast.viewportName}
     >
-      <Toast.Close asChild={!isWeb}>
-        <VoxCard.Content paddingVertical={10}>
-          <XStack gap={10} justifyContent="space-between" alignContent="center" alignItems="center" position="relative">
-            <Info size={20} color={textColor} />
+      <VoxCard.Content paddingVertical={10}>
+        <XStack gap={10} justifyContent="space-between" alignContent="center" alignItems="center" position="relative">
+          <InnerContainer>
             <YStack>
+              <Info size={20} color={textColor} />
+            </YStack>
+            <YStack flexShrink={1}>
               {currentToast.title.length > 0 && (
-                <Text.SM semibold color={textColor} top={5} left={45}>
+                <Text.SM semibold color={textColor} numberOfLines={1}>
                   {currentToast.title}
                 </Text.SM>
               )}
               {!!currentToast.message && (
-                <Text.LG multiline color={textColor}>
+                <Text.MD color={textColor} numberOfLines={3}>
                   {currentToast.message}
-                </Text.LG>
+                </Text.MD>
               )}
             </YStack>
-          </XStack>
-        </VoxCard.Content>
-      </Toast.Close>
+          </InnerContainer>
+          <YStack>
+            <Toast.Close asChild={!isWeb}>
+              <VoxButton theme={theme} size="sm" shrink iconLeft={X}></VoxButton>
+            </Toast.Close>
+          </YStack>
+        </XStack>
+      </VoxCard.Content>
     </Toast>
   )
 }

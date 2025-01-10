@@ -1,8 +1,8 @@
 import clientEnv from '@/config/clientEnv'
 import { getRefreshToken } from '@/services/refresh-token/api'
 import { useUserStore } from '@/store/user-store'
+import { getFullVersion } from '@/utils/version'
 import axios, { AxiosError, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios'
-import Constants from 'expo-constants'
 import { identity } from 'fp-ts/lib/function'
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -22,9 +22,9 @@ instance.interceptors.request.use(
   function (config) {
     const accessToken = useUserStore.getState().user?.accessToken
 
+    config.headers['X-App-version'] = getFullVersion()
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`
-      config.headers['X-App-version'] = Constants.expoConfig?.version ?? '0.0.0'
     }
 
     return config
