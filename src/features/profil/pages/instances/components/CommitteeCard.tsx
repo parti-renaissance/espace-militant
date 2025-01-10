@@ -10,7 +10,7 @@ const CommitteeCardFrame = styled(VoxCardFrame, {
   animation: 'quick',
   cursor: 'pointer',
   flex: 1,
-  flexBasis: 0,
+  // flexBasis: 0,
   height: 148,
   borderWidth: 2,
   borderColor: 'white',
@@ -51,9 +51,17 @@ type CommitteeCardProps = {
   loading?: boolean
 }
 
-export default function CommitteeCard({ committee, selected, onPress, loading }: CommitteeCardProps) {
+export default function CommitteeCard({
+  committee,
+  selected,
+  onPress,
+  loading,
+  flexBasis,
+}: CommitteeCardProps & {
+  flexBasis?: number
+}) {
   return (
-    <CommitteeCardFrame inside selected={selected} onPress={selected ? undefined : onPress} focusable>
+    <CommitteeCardFrame inside selected={selected} onPress={selected ? undefined : onPress} focusable flexBasis={flexBasis}>
       <VoxCard.Content>
         <XStack justifyContent="space-between" alignItems="center" gap="$medium">
           <YStack flexShrink={1} gap={8}>
