@@ -42,7 +42,10 @@ export const useInitPushNotification = (props: { enable: boolean }) => {
       expoNotificationSubscription = Notifications.addNotificationResponseReceivedListener((e) => {
         try {
           if (isMounted) {
-            const link = parseHref(e.notification?.request?.content?.data?.link)
+            const possibleLinkData1 = e.notification?.request?.content?.data?.link
+            //@ts-expect-error type do not contain payload key inside trigger
+            const possibleLinkData2 = e.notification?.request?.trigger?.payload?.link
+            const link = parseHref(possibleLinkData1 ?? possibleLinkData2)
             if (link) setTimeout(() => router.replace(link), 1)
           }
         } catch (e) {
