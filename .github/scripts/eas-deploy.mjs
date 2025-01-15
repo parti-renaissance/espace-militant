@@ -31,30 +31,28 @@ async function actionHandler() {
         break;
       }
       case 'build': {
-        const expoCommandBase = `eas build --platform all --non-interactive --no-wait`
+        const expoCommandBase = `eas build --non-interactive --no-wait`
         if (process.env.WORKFLOW_ENVIRONMENT === 'production') {
           console.log(chalk.magenta('Will do a build on production env...'))
-          await aExec(`${expoCommandBase} --profile production --auto-submit`)
+          await aExec(`${expoCommandBase} --profile production --auto-submit --platform ${process.env.PLATFORM}`)
           process.exit(0)
         }
         if (process.env.WORKFLOW_ENVIRONMENT === 'staging') {
           console.log(chalk.blue('Will do a build on staging env...'))
-          const promise = aExec(`${expoCommandBase} --profile staging --auto-submit`)
+          const promise = aExec(`${expoCommandBase} --profile staging --platform ${process.env.PLATFORM}`)
           const child  = promise.child
           child.stdout.on('data', function(data) {
-              console.log('stdout: ' + data);
+              console.log(data);
           });
           child.stderr.on('data', function(data) {
-              console.log('stderr: ' + data);
+              console.log(data);
           });
           child.on('close', function(code) {
               console.log('closing code: ' + code);
           });
 
           // i.e. can then await for promisified exec call to complete
-          const { stdout, stderr } = await promise;
-          console.log(chalk.blue(`stdout: ${stdout}`))
-          console.log(chalk.red(`stderr: ${stderr}`))
+          await promise;
           process.exit(0)
         }
         console.log(chalk.red(`Unknown WORKFLOW_ENVIRONMENT ${process.env.WORKFLOW_ENVIRONMENT}`))

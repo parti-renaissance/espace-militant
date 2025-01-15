@@ -95,8 +95,8 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
       scheme: 'vox',
       bundleIdentifier: baseIdentifier,
       package: basePackage,
-      googleServicesFileIos: process.env.GOOGLE_SERVICES_IOS_PATH_PRODUCTION || '',
-      googleServicesFileAndroid: process.env.GOOGLE_SERVICES_ANDROID_PATH_PRODUCTION || '',
+      googleServicesFileIos: process.env.GOOGLE_SERVICES_IOS_PATH_PRODUCTION as string,
+      googleServicesFileAndroid: process.env.GOOGLE_SERVICES_ANDROID_PATH_PRODUCTION as string,
       icon: './assets/icon.png',
       adaptiveIcon: './assets/adaptive-icon.png',
       notification: {
@@ -109,8 +109,8 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
       scheme: 'vox-staging',
       bundleIdentifier: `${baseIdentifier}.${profile}`,
       package: `${basePackage}.${profile}`,
-      googleServicesFileIos: process.env.GOOGLE_SERVICES_IOS_PATH_STAGING || '',
-      googleServicesFileAndroid: process.env.GOOGLE_SERVICES_ANDROID_PATH_STAGING || '',
+      googleServicesFileIos: process.env.GOOGLE_SERVICES_IOS_PATH_STAGING as string,
+      googleServicesFileAndroid: process.env.GOOGLE_SERVICES_ANDROID_PATH_STAGING as string,
       adaptiveIcon: './assets/staging/adaptive-icon.png',
       icon: './assets/staging/icon.png',
       notification: {
