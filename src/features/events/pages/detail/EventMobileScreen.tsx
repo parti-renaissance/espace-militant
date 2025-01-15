@@ -86,7 +86,7 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
   const insets = useSafeAreaInsets()
   return (
     <PageLayout.MainSingleColumn backgroundColor="black">
-      <StatusBar barStyle={'light-content'} />
+      <StatusBar barStyle="light-content" />
       <ScrollStack marginTop={insets.top} backgroundColor="$textSurface">
         <VoxCard overflow="hidden" pb={66}>
           {fallbackImage ? <VoxCard.Image large={true} image={fallbackImage} imageData={event.image} /> : null}
@@ -129,7 +129,6 @@ export default EventMobileScreen
 export const EventMobileScreenSkeleton = () => {
   return (
     <PageLayout.MainSingleColumn>
-      <StatusBar barStyle={'light-content'} />
       <SkeCard.Image />
       <SkeCard>
         <SkeCard.Content>
@@ -161,7 +160,6 @@ export const EventMobileScreenDeny = () => {
   const insets = useSafeAreaInsets()
   return (
     <PageLayout.MainSingleColumn backgroundColor="#ECF1F5">
-      <StatusBar barStyle={'dark-content'} />
       <YStack flex={1} justifyContent="center" alignItems="center">
         <Image src={require('@/assets/illustrations/VisuCadnas.png')} />
       </YStack>

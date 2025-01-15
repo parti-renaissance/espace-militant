@@ -1,5 +1,4 @@
 import React from 'react'
-import { StatusBar } from 'react-native'
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
 import { VoxButton } from '@/components/Button'
 import { NavBar, ProfileNav, VoxHeader } from '@/components/Header/Header'
@@ -12,7 +11,6 @@ export default function AppLayout() {
   const media = useMedia()
   return (
     <PortalLayout>
-      <StatusBar barStyle="dark-content" />
       {media.gtSm ? (
         <VoxHeader justifyContent="space-between" display="none" $gtSm={{ display: 'flex' }} safeAreaView={true}>
           <XStack flex={1} flexBasis={0}>

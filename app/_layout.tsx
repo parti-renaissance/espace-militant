@@ -16,6 +16,7 @@ import { ToastProvider } from '@tamagui/toast'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BlurView } from 'expo-blur'
 import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 import { isWeb, ViewProps } from 'tamagui'
 
 if (isWeb) {
@@ -92,6 +93,7 @@ function Root() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar style="inverted" />
       <ToastProvider swipeDirection="up">
         <QueryClientProvider client={queryClient}>
           <TamaguiProvider>
