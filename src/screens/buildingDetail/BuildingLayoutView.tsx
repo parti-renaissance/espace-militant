@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react'
-import { Image, StyleSheet, TextInput, View } from 'react-native'
-import { Text } from 'react-native-paper'
+import { Image, StyleSheet, Text, TextInput, View } from 'react-native'
 import Input from '@/components/base/Input/Input'
 import { VoxButton } from '@/components/Button'
 import { Sheet, YStack } from 'tamagui'
@@ -156,11 +155,9 @@ const SheetLeaflet = ({ open, onChange, onOpenChange }: { open: boolean; onChang
           Fermer
         </VoxButton>
         <Input
-          flex={1}
           ref={inputRef}
           inputMode="decimal"
           keyboardType="number-pad"
-          width="100%"
           label="Nombre de documents distribué"
           selectTextOnFocus
           placeholder={'0'}
