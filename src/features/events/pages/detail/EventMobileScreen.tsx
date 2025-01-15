@@ -1,5 +1,4 @@
 import { Children, isValidElement } from 'react'
-import { StatusBar } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
@@ -14,6 +13,7 @@ import { EventShareGroup } from '@/features/events/components/EventShareGroup'
 import { EventToggleSubscribeButton } from '@/features/events/components/EventToggleSubscribeButton'
 import { EventItemProps } from '@/features/events/types'
 import { RestItemEvent } from '@/services/events/schema'
+import { StatusBar } from 'expo-status-bar'
 import { getTokenValue, Image, XStack, YStack, YStackProps } from 'tamagui'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
 import { ScrollStack } from './EventComponents'
@@ -86,7 +86,7 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
   const insets = useSafeAreaInsets()
   return (
     <PageLayout.MainSingleColumn backgroundColor="black">
-      <StatusBar barStyle="light-content" />
+      <StatusBar style="light" />
       <ScrollStack marginTop={insets.top} backgroundColor="$textSurface">
         <VoxCard overflow="hidden" pb={66}>
           {fallbackImage ? <VoxCard.Image large={true} image={fallbackImage} imageData={event.image} /> : null}
