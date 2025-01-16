@@ -78,7 +78,7 @@ const EventDesktopAside = ({ event, userUuid }: EventItemProps) => {
         <DateItem showTime={isFull} begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} />
         <EventLocation event={event} />
         {isFull && !!event.capacity ? <VoxCard.Capacity>Capacité {event.capacity} personnes</VoxCard.Capacity> : null}
-        {isFull ? <VoxCard.Attendees attendees={{ count: event.participants_count ?? 12 }} /> : null}
+        {isFull && userUuid ? <VoxCard.Attendees attendees={{ count: event.participants_count ?? 12 }} /> : null}
         {event.organizer ? (
           <VoxCard.Section title="Événement créé par :">
             <VoxCard.Author
