@@ -107,7 +107,6 @@ export const RestDetailedProfileResponseSchema = z.object({
   linkedin_page_url: z.string().nullable().optional(),
   telegram_page_url: z.string().nullable().optional(),
   instagram_page_url: z.string().nullable().optional(),
-  adherent: z.boolean(),
   certified: z.boolean(),
   phone: z
     .object({
