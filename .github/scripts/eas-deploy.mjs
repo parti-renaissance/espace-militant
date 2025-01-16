@@ -21,6 +21,10 @@ const candidate = appJson.expo.version
 
 async function actionHandler() {
   try {
+    if (!process.env.PLATFORM) {
+      console.log(chalk.red('PLATFORM is not defined'))
+      process.exit(2)
+    }
     console.log('REF TYPE IS', process.env.REF_TYPE, '\n')
     switch (process.env.EAS_WORKFLOW_TYPE) {
       case 'update': {

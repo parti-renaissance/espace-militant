@@ -10,18 +10,30 @@ const checkStoreUpdate = async () => {
   const version = await checkVersion({
     country: 'fr',
     bundleId: Platform.OS === 'android' ? 'fr.en_marche.jecoute' : 'fr.en-marche.jecoute',
-    currentVersion: nativeApplicationVersion ?? '999',
+    currentVersion: nativeApplicationVersion ?? '0.0.0',
   })
 
   return version
 }
 
-const useAppStateOnChange = (callback: () => void) => {
+const useAppStateOnChange = (callback: () => Promise<void> | void) => {
   const appState = useRef(AppState.currentState)
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        callback()
+        const result = callback()
+        if (result instanceof Promise) {
+          result.catch((error) => {
+            ErrorMonitor.log('AppStateOnChangeError', {
+              message: error.message,
+              stack: error.stack,
+            })
+          })
+        } else {
+          ErrorMonitor.log('AppStateOnChangeError', {
+            message: "Une erreur est survenue lors de l'exécution de la fonction de callback",
+          })
+        }
       }
       appState.current = nextAppState
     })
@@ -68,19 +80,20 @@ export const useCheckExpoUpdate = () => {
   useAppStateOnChange(async () => {
     try {
       setIsError(null)
-      setIsProcessing(true)
       if (!isConnected) {
         setIsProcessing(false)
         return
       }
       const { isAvailable } = await checkForUpdateAsync()
       if (isAvailable) {
+        setIsProcessing(true)
         await fetchUpdateAsync()
         await reloadAsync()
+        setIsProcessing(false)
       }
-      setIsProcessing(false)
     } catch (error) {
       setIsError(error)
+      setIsProcessing(false)
       if (error instanceof Error) {
         ErrorMonitor.log('ErrorWhileUpdatingApp', {
           message: error.message,
