@@ -115,9 +115,7 @@ function Root() {
               <BottomSheetModalProvider>
                 <SessionProvider>
                   <WaitingRoomHoc isLoading={!isFontsLoaded}>
-                    {/* <UpdateScreen> */}
                     <Slot />
-                    {/* </UpdateScreen> */}
                   </WaitingRoomHoc>
                 </SessionProvider>
               </BottomSheetModalProvider>
