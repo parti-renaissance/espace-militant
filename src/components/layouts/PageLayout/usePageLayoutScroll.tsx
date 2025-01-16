@@ -1,5 +1,5 @@
-import { useContext, useEffect } from 'react'
-import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { ComponentRef, MutableRefObject, RefObject, useContext, useEffect } from 'react'
+import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native'
 import { isWeb } from 'tamagui'
 import { ScrollContext } from './scrollContext'
 
@@ -8,7 +8,7 @@ type Props = {
   onEndReachedThreshold?: number
   onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
   scrollEventThrottle?: number
-  ref?: React.RefObject<HTMLDivElement>
+  ref?: MutableRefObject<ComponentRef<typeof ScrollView> | null> | RefObject<HTMLDivElement>
 }
 
 export const usePageLayoutScroll = (props?: Props) => {
@@ -35,12 +35,11 @@ export const usePageLayoutScroll = (props?: Props) => {
     }
 
     let timeoutId: ReturnType<typeof setTimeout>
-    const handleScroll = (e: Event) => {
-      const event = e as WheelEvent
+    const handleScroll = () => {
       if (!scrollActive || !props?.onScroll) return
       const nativeEvent = {
         nativeEvent: {
-          contentOffset: { y: event.pageY },
+          contentOffset: { y: scrollView.scrollTop },
           contentSize: { height: scrollView.scrollHeight, width: scrollView.scrollWidth },
           layoutMeasurement: { height: scrollView.clientHeight, width: scrollView.clientWidth },
         },

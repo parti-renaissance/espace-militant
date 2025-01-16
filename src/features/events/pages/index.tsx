@@ -118,7 +118,7 @@ const EventList = ({
           <XStack justifyContent="center">
             <XStack gap="$small" $md={{ paddingLeft: '$medium' }} $gtLg={{ paddingTop: section.index === 0 ? '$large' : 0 }}>
               <Text.MD color={section.data.length === 0 ? '$textDisabled' : '$gray4'} semibold>
-                {`${section.title} ${section.index === 0 ? `(${section.data.length})` : ''}`.toUpperCase()}
+                {`${section.title}`.toUpperCase()}
               </Text.MD>
               <ChevronDown size={16} color="$textPrimary" />
             </XStack>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LayoutChangeEvent, LayoutRectangle, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
 import Text from '@/components/base/Text'
@@ -112,6 +112,7 @@ export const BreadCrumb = <ID extends string>(
   const parentRef = useRef<View>(null)
   const lastPosition = useRef([0, 0, 0])
   const refs = useRef(new Map<string, TamaguiElement | null>())
+  const [isLayoutReady, setIsLayoutReady] = useState<boolean>(false)
   const setActivePostion = (x: number, y: number, width: number) => {
     const record = [x, y, width]
     if (record.every((x, i) => x === lastPosition.current[i])) return
@@ -124,7 +125,7 @@ export const BreadCrumb = <ID extends string>(
           )
         : 0
     if (vertical) {
-      coordNumber.value = withSpring(clp(y))
+      coordNumber.value = withSpring(y)
     } else {
       coordNumber.value = withSpring(clp(x))
       widthNumber.value = withTiming(width)
@@ -143,16 +144,11 @@ export const BreadCrumb = <ID extends string>(
     props.onChange?.(id)
   }
 
-  const initPosition = (id: string) => (e: LayoutChangeEvent) => {
-    if (id !== props.value) return
-    const { x, y, width } = e.nativeEvent.layout
-    if ([x, y, width].every((x) => x === 0 && vertical)) return
-    setActivePostion(x, y, width)
-  }
-
   useEffect(() => {
-    setActivePositionById(props.value)
-  }, [props.value])
+    if (isLayoutReady) {
+      setActivePositionById(props.value)
+    }
+  }, [props.value, isLayoutReady])
 
   const initParentPosition = (props: LayoutChangeEvent) => {
     const { x, y } = props.nativeEvent.layout
@@ -165,7 +161,7 @@ export const BreadCrumb = <ID extends string>(
   }
 
   const animation = useAnimatedStyle(() => {
-    const value = coordNumber.value >= parentCoordNumber.value ? coordNumber.value - parentCoordNumber.value : 0
+    const value = coordNumber.value
     return {
       transform: vertical ? [{ translateY: value }] : [{ translateX: value }],
       ...(vertical ? { left: -2 } : { width: widthNumber.value, bottom: -2 }),
@@ -174,7 +170,15 @@ export const BreadCrumb = <ID extends string>(
 
   const items = props.items.map((item, index) => {
     return (
-      <BreadCrumbApi.Item first={!vertical && index === 0} key={item.id} onLayout={initPosition(item.id)} ref={setRef(item.id)} onPress={handlePress(item.id)}>
+      <BreadCrumbApi.Item
+        onLayout={() => {
+          setIsLayoutReady(true)
+        }}
+        first={!vertical && index === 0}
+        key={item.id}
+        ref={setRef(item.id)}
+        onPress={handlePress(item.id)}
+      >
         <Text.MD semibold> {item.label}</Text.MD>
       </BreadCrumbApi.Item>
     )

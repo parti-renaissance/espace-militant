@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { AppState } from 'react-native'
+import { AppState, StatusBar } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
 import Text from '@/components/base/Text'
@@ -11,7 +11,7 @@ import useAsyncFn from '@/hooks/useAsyncFn'
 import NetInfo from '@react-native-community/netinfo'
 import { Image } from 'expo-image'
 import { reloadAsync } from 'expo-updates'
-import { Spinner, View, XStack, YStack } from 'tamagui'
+import { getTokenValue, Spinner, View, XStack, YStack } from 'tamagui'
 
 interface Props {
   children: React.ReactNode
@@ -79,7 +79,8 @@ export default function UpdateScreen({ children }: Props) {
 
   return (
     <LayoutPage>
-      <View height="100%" p={'$medium'} pt={insets.top} pb={insets.bottom} flex={1}>
+      <StatusBar barStyle="dark-content" />
+      <View p={'$medium'} pt={insets.top} pb={insets.bottom + getTokenValue('$medium')} flex={1}>
         <XStack alignItems="center" justifyContent="center" gap={'$large'}>
           <EuCampaignIllustration pt={'$large'} showIcon={false} />
         </XStack>
