@@ -1,55 +1,100 @@
-import { useEffect, useState } from 'react'
-import { Platform } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { AppState, Platform } from 'react-native'
 import { checkVersion } from 'react-native-check-version'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import NetInfo from '@react-native-community/netinfo'
 import { nativeApplicationVersion } from 'expo-application'
-import { checkForUpdateAsync, fetchUpdateAsync, useUpdates } from 'expo-updates'
-import { isWeb } from 'tamagui'
+import { checkForUpdateAsync, fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates'
 
-export default function useAppUpdate() {
-  const updates = useUpdates()
-  const [isBuildUpdateAvailable, setIsBuildUpdateAvailable] = useState(false)
+const checkStoreUpdate = async () => {
+  const version = await checkVersion({
+    country: 'fr',
+    bundleId: Platform.OS === 'android' ? 'fr.en_marche.jecoute' : 'fr.en-marche.jecoute',
+    currentVersion: nativeApplicationVersion ?? '999',
+  })
 
-  const checkForUpdate = () => {
-    if (isWeb || __DEV__) {
-      return
+  return version
+}
+
+const useAppStateOnChange = (callback: () => void) => {
+  const appState = useRef(AppState.currentState)
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        callback()
+      }
+      appState.current = nextAppState
+    })
+
+    return () => {
+      subscription.remove()
     }
+  }, [callback])
+}
 
-    const checkStoreUpdate = async () => {
-      const version = await checkVersion({
-        country: 'fr',
-        bundleId: Platform.OS === 'android' ? 'fr.en_marche.jecoute' : 'fr.en-marche.jecoute',
-        currentVersion: nativeApplicationVersion ?? '999',
-      })
+export const useCheckStoreUpdate = () => {
+  const [isPending, setIsPending] = useState(false)
+  const [isBuildUpdateAvailable, setIsBuildUpdateAvailable] = useState(false)
+  const [isError, setIsError] = useState<Error | null>(null)
 
-      if (version.needsUpdate) {
+  useAppStateOnChange(async () => {
+    try {
+      setIsPending(true)
+      setIsError(null)
+      const { needsUpdate } = await checkStoreUpdate()
+      setIsPending(false)
+      if (needsUpdate) {
         setIsBuildUpdateAvailable(true)
       }
+    } catch (error) {
+      setIsPending(false)
+      setIsError(error)
+      setIsBuildUpdateAvailable(false)
     }
-
-    const checkExpoUpdate = async () => {
-      try {
-        const update = await checkForUpdateAsync()
-
-        if (update.isAvailable) {
-          await fetchUpdateAsync()
-        }
-        return update.isAvailable
-      } catch (error) {
-        ErrorMonitor.log('Expo update failed', error)
-      }
-    }
-
-    return Promise.allSettled([checkExpoUpdate(), checkStoreUpdate()])
-  }
-
-  useEffect(() => {
-    checkForUpdate()
-  }, [])
+  })
 
   return {
-    isBuildUpdateAvailable,
-    checkForUpdate,
-    ...updates,
+    isAvailable: isBuildUpdateAvailable,
+    isPending: isPending,
+    isError: isError,
+  }
+}
+
+export const useCheckExpoUpdate = () => {
+  const [isError, setIsError] = useState<Error | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const { isConnected } = NetInfo.useNetInfo()
+  const updatesState = useUpdates()
+  useAppStateOnChange(async () => {
+    try {
+      setIsError(null)
+      setIsProcessing(true)
+      if (!isConnected) {
+        setIsProcessing(false)
+        return
+      }
+      const { isAvailable } = await checkForUpdateAsync()
+      if (isAvailable) {
+        await fetchUpdateAsync()
+        await reloadAsync()
+      }
+      setIsProcessing(false)
+    } catch (error) {
+      setIsError(error)
+      if (error instanceof Error) {
+        ErrorMonitor.log('ErrorWhileUpdatingApp', {
+          message: error.message,
+          stack: error.stack,
+          updateId: updatesState.availableUpdate?.updateId,
+        })
+      }
+    }
+  })
+
+  return {
+    isAvailable: updatesState.isUpdateAvailable,
+    isPending: updatesState.isChecking,
+    isError: isError || updatesState.checkError || updatesState.downloadError,
+    isProcessing: [updatesState.isDownloading, isProcessing].some(Boolean),
   }
 }

@@ -76,3 +76,8 @@ app-release.apks
 # SonarQube
 .scannerwork
 /coverage
+
+# Expo
+.expo
+dist/
+web-build/
