@@ -7,7 +7,6 @@ import LayoutPage from '@/components/layouts/PageLayout/PageLayout'
 import redirectToStore from '@/helpers/redirectToStore'
 import useAsyncFn from '@/hooks/useAsyncFn'
 import { Image } from 'expo-image'
-import { StatusBar } from 'expo-status-bar'
 import { getTokenValue, Spinner, View, XStack, YStack } from 'tamagui'
 
 export function UpdateStoreScreen() {
@@ -21,7 +20,6 @@ export function UpdateStoreScreen() {
 
   return (
     <LayoutPage>
-      <StatusBar style="dark" />
       <View p={'$medium'} pt={insets.top} pb={insets.bottom + getTokenValue('$medium')} flex={1}>
         <XStack alignItems="center" justifyContent="center" gap={'$large'}>
           <EuCampaignIllustration pt={'$large'} showIcon={false} />
@@ -52,7 +50,6 @@ export function UpdateExpoScreen() {
 
   return (
     <LayoutPage>
-      <StatusBar style="dark" />
       <View p={'$medium'} pt={insets.top} pb={insets.bottom + getTokenValue('$medium')} flex={1}>
         <XStack alignItems="center" justifyContent="center" gap={'$large'}>
           <EuCampaignIllustration pt={'$large'} showIcon={false} />
