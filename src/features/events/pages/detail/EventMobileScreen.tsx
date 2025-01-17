@@ -86,7 +86,7 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
   const insets = useSafeAreaInsets()
   return (
     <PageLayout.MainSingleColumn backgroundColor="black">
-      <StatusBar style="light" />
+      <StatusBar animated style="light" />
       <ScrollStack marginTop={insets.top} backgroundColor="$textSurface">
         <VoxCard overflow="hidden" pb={66}>
           {fallbackImage ? <VoxCard.Image large={true} image={fallbackImage} imageData={event.image} /> : null}
