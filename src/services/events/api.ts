@@ -67,3 +67,15 @@ export const subscribePublicEvent = (eventId: string, payload: schemas.RestPostP
     errorThrowers: [publicEventSubscriptionFormErrorThrower],
     type: 'public',
   })(payload)
+
+export const getEventParticipants = (props: { eventId: string; page: number; scope: string }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/events/${props.eventId}/participants`,
+    requestSchema: schemas.RestEventParticipantsRequest,
+    responseSchema: schemas.RestEventParticipantsResponse,
+    type: 'private',
+  })({ page: props.page, scope: props.scope })
+
+export const getEventParticipantsFileEndpoint = (props: { eventId: string; scope: string }) =>
+  `/api/v3/events/${props.eventId}/participants.xlsx?scope=${props.scope}`

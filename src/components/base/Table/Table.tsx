@@ -2,7 +2,9 @@ import { ScrollView, styled, ThemeableStack, withStaticProperties } from 'tamagu
 
 const style = {
   borderColor: '$textOutline',
+  backgroundColor: 'white',
   overflow: 'hidden',
+  flexDirection: 'row',
   variants: {
     splited: {
       start: {
@@ -36,8 +38,10 @@ const style = {
 export const FixedTableFrame = styled(ThemeableStack, style)
 export const ScrollableTableFrame = styled(ScrollView, {
   borderColor: '$textOutline',
+  backgroundColor: 'white',
   contentContainerStyle: {
-    flexDirection: 'column',
+    flexDirection: 'row',
+    flexGrow: 1,
   },
   variants: style.variants,
   defaultVariants: style.defaultVariants,

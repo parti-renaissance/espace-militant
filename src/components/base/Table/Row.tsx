@@ -9,6 +9,7 @@ export const RowFrame = styled(ThemeableStack, {
   flexDirection: 'row',
   alignContent: 'center',
   alignItems: 'center',
+  height: 65,
 })
 
 export const RowHeader = styled(RowFrame, {
