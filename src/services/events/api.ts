@@ -78,4 +78,4 @@ export const getEventParticipants = (props: { eventId: string; page: number; sco
   })({ page: props.page, scope: props.scope })
 
 export const getEventParticipantsFileEndpoint = (props: { eventId: string; scope: string }) =>
-  `/api/v3/events/${props.eventId}/participants.xlsx?scope=${props.scope}`
+  `/api/v3/events/${props.eventId}/participants.xlsx?scope=${encodeURIComponent(props.scope)}`

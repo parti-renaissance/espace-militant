@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react'
+import React, { useState } from 'react'
 import ActivistTags from '@/components/ActivistTags'
 import Table from '@/components/base/Table'
 import Text from '@/components/base/Text'
@@ -6,17 +6,7 @@ import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { useSuspensePaginatedEventPartcipants } from '@/services/events/hook'
 import { getHumanFormattedDate } from '@/utils/date'
-import { useMedia, XStack, YStack } from 'tamagui'
-
-const EndTable = (props: { children: ReactNode }) => {
-  const media = useMedia()
-
-  return media.sm || media.gtLg ? (
-    <Table.ScrollView splited="end" flex={1} children={props.children} horizontal contentContainerStyle={{ flexGrow: 1 }} />
-  ) : (
-    <Table splited="end" flex={1} children={props.children} />
-  )
-}
+import { XStack, YStack } from 'tamagui'
 
 export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; scope: string }) => {
   const { data, fetchNextPage, fetchPreviousPage, isFetchingNextPage, isFetchingPreviousPage } = useSuspensePaginatedEventPartcipants({
@@ -109,7 +99,7 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
             </Table.Row.Header>
             {currentPage.items.map(({ phone, uuid }) => {
               return (
-                <Table.Row key={'tags' + uuid}>
+                <Table.Row key={'phone' + uuid}>
                   <Text.SM textAlign="center">{phone ?? 'Non indiqué'}</Text.SM>
                 </Table.Row>
               )
