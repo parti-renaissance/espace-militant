@@ -1,14 +1,14 @@
 import { ComponentPropsWithoutRef, useState } from 'react'
 import { Platform } from 'react-native'
+import ProfileTags from '@/components/ActivistTags'
 import { DropdownWrapper } from '@/components/base/Dropdown'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import ProfileTags from '@/components/ProfileCards/ProfileCard/ProfileTags'
 import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import ExecutiveRoleSelector from '@/features/profil/components/ExecutiveRoleSelector'
-import { useDeleteProfilPicture, useGetDetailProfil, useGetProfil, useGetTags, usePostProfilPicture } from '@/services/profile/hook'
+import { useDeleteProfilPicture, useGetProfil, useGetTags, usePostProfilPicture } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { Delete, Plus, Repeat2, Settings2 } from '@tamagui/lucide-icons'
 import { ImageResult, manipulateAsync, SaveFormat } from 'expo-image-manipulator'
@@ -122,7 +122,6 @@ const UploadPP = (props: { profil: RestProfilResponse }) => {
 export default function ({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
   const { data: profil } = useGetProfil()
   const { tags } = useGetTags({ tags: ['elu', 'sympathisant', 'adherent'] })
-  const { data: detProfil } = useGetDetailProfil()
   return profil ? (
     <VoxCard $sm={{ bg: 'transparent' }} {...props}>
       <VoxCard.Content>

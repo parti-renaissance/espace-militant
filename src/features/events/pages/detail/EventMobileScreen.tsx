@@ -15,6 +15,7 @@ import { EventItemProps } from '@/features/events/types'
 import { RestItemEvent } from '@/services/events/schema'
 import { StatusBar } from 'expo-status-bar'
 import { getTokenValue, Image, XStack, YStack, YStackProps } from 'tamagui'
+import EventParticipantsSection from '../../components/EventParticipantsSection'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
 import { ScrollStack } from './EventComponents'
 import { LockPublicAuthAdhCard } from './SubscribeCard'
@@ -117,6 +118,7 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
             ) : null}
             <EventShareGroup event={event} />
           </VoxCard.Content>
+          <EventParticipantsSection event={event} userUuid={userUuid} />
         </VoxCard>
       </ScrollStack>
       <BottomCTA event={event} userUuid={userUuid} />

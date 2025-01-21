@@ -107,7 +107,7 @@ function Root() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar animated style="auto" />
+      <StatusBar animated style="dark" />
       <ToastProvider swipeDirection="up">
         <QueryClientProvider client={queryClient}>
           <TamaguiProvider>

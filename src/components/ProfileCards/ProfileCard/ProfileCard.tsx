@@ -1,4 +1,5 @@
 import { TouchableOpacity } from 'react-native'
+import ProfileTags from '@/components/ActivistTags'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ProfilePicture from '@/components/ProfilePicture'
@@ -7,7 +8,6 @@ import { RestProfilResponse } from '@/services/profile/schema'
 import { ChevronRight, Repeat } from '@tamagui/lucide-icons'
 import { Link } from 'expo-router'
 import { View, YStack } from 'tamagui'
-import ProfileTags from './ProfileTags'
 
 export interface ProfileCardProps {
   firstName?: string

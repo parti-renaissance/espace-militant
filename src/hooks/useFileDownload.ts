@@ -15,6 +15,8 @@ type UseFileDownloadProps = {
   url: string
   fileName: string
   publicDownload?: boolean
+  mimeType: string
+  UTI: string
 }
 export function useFileDownload() {
   const toast = useToastController()
@@ -63,21 +65,21 @@ export function useFileDownload() {
           if (permissions.granted) {
             const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 })
 
-            await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, args.fileName, 'application/pdf').then(async (uri) => {
+            await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, args.fileName, args.mimeType).then(async (uri) => {
               await FileSystem.writeAsStringAsync(uri, base64, { encoding: FileSystem.EncodingType.Base64 })
             })
           } else {
             await shareAsync(uri, {
-              mimeType: 'application/pdf',
-              dialogTitle: `Reçu fiscal ${args.fileName}`,
-              UTI: 'com.adobe.pdf',
+              mimeType: args.mimeType,
+              dialogTitle: args.fileName,
+              UTI: args.UTI,
             })
           }
         } else {
           await shareAsync(uri, {
-            mimeType: 'application/pdf',
-            dialogTitle: `Reçu fiscal ${args.fileName}`,
-            UTI: 'com.adobe.pdf',
+            mimeType: args.mimeType,
+            dialogTitle: args.fileName,
+            UTI: args.UTI,
           })
         }
       }
