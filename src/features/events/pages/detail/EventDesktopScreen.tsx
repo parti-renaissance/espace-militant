@@ -16,6 +16,7 @@ import { RestItemEvent } from '@/services/events/schema'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
 import { Image, isWeb, XStack, YStack } from 'tamagui'
+import EventParticipantsSection from '../../components/EventParticipantsSection'
 import { EventToggleSubscribeButton } from '../../components/EventToggleSubscribeButton'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
 import { ScrollStack } from './EventComponents'
@@ -144,6 +145,7 @@ const EventDesktopScreen = ({ event, userUuid }: EventItemProps) => {
             <EventDesktopAside event={event} userUuid={userUuid} />
           </XStack>
         </VoxCard>
+          <EventParticipantsSection event={event} userUuid={userUuid} />
       </YStack>
     </ScrollStack>
   )

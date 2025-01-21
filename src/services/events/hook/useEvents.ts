@@ -107,3 +107,19 @@ export const useSubscribePublicEvent = ({ id: eventId, slug }: { id: string; slu
     },
   })
 }
+
+export const useSuspensePaginatedEventPartcipants = (props: { eventId: string; scope: string }) => {
+  return useSuspenseInfiniteQuery({
+    queryKey: ['eventParticipants', props.eventId],
+    queryFn: ({ pageParam }) => api.getEventParticipants({ eventId: props.eventId, page: pageParam, scope: props.scope }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage ? (lastPage.metadata.last_page > lastPage.metadata.current_page ? lastPage.metadata.current_page + 1 : null) : null,
+    getPreviousPageParam: (_, __, firstPageParam) => {
+      if (firstPageParam <= 1) {
+        return undefined
+      }
+      return firstPageParam - 1
+    },
+  })
+}

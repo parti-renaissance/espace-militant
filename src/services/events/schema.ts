@@ -1,3 +1,4 @@
+import { activistTagSchema } from '@/data/Activist/schema'
 import { z } from 'zod'
 import { createRestPaginationSchema } from '../common/schema'
 
@@ -27,6 +28,7 @@ export const RestEventOrganizerSchema = z.object({
   instance: z.string().nullable(),
   zone: z.string().nullable(),
   image_url: z.string().nullable().optional(),
+  scope: z.string().nullable(),
 })
 
 export const RestEventComitteeSchema = z.object({
@@ -163,3 +165,20 @@ export const RestPostPublicEventSubsciptionRequest = z.object({
   cgu_accepted: z.boolean(),
   join_newsletter: z.boolean(),
 })
+
+// ------------ Rest Event Participants --------------
+export const RestEventParticipantsRequest = z.object({ page: z.number(), scope: z.string() })
+export const RestEventParticipantsResponse = createRestPaginationSchema(
+  z.object({
+    uuid: z.string().uuid(),
+    image_url: z.string().url().nullable(),
+    created_at: z.string().date().nullable(),
+    type: z.string().nullable(),
+    first_name: z.string().nullable(),
+    last_name: z.string().nullable(),
+    postal_code: z.string().min(4).max(6).nullable(),
+    email_address: z.string().email(),
+    phone: z.string().nullable(),
+    tags: z.array(activistTagSchema).nullable(),
+  }),
+)

@@ -26,7 +26,7 @@ const LinkBtn = (props: { uuid: string }) => {
 const DownloadBtn = (props: { fileName: string; uuid: string }) => {
   const { handleDownload, isPending } = useFileDownload()
   const fileName = snakeCase(props.fileName)
-  const handlePress = () => handleDownload({ url: `/api/v3/formations/${props.uuid}/file`, fileName })
+  const handlePress = () => handleDownload({ url: `/api/v3/formations/${props.uuid}/file`, fileName, mimeType: 'application/pdf', UTI: 'com.adobe.pdf' })
   return (
     <VoxButton variant="outlined" iconLeft={Download} loading={isPending} onPress={handlePress}>
       Télécharger
