@@ -13,7 +13,7 @@ const DownloadBtn = ({ receipt }: { receipt: RestTaxReceiptsResponse[number] }) 
   const { handleDownload, isPending } = useFileDownload()
   const url = `/api/v3/profile/me/tax_receipts/${receipt.uuid}/file`
   const fileName = `reçu-fiscal-${receipt.label}.pdf`
-  const handlePress = () => handleDownload({ url, fileName })
+  const handlePress = () => handleDownload({ url, fileName, mimeType: 'application/pdf', UTI: 'com.adobe.pdf' })
   return (
     <VoxButton theme="gray" size="lg" variant="text" iconLeft={Download} bg="white" onPress={handlePress} loading={isPending}>
       Télécharger
