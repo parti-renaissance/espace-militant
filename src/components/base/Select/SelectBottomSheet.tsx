@@ -1,4 +1,4 @@
-import React, { forwardRef, RefObject, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
+import React, { ComponentRef, forwardRef, RefObject, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
 import { TouchableOpacity } from 'react-native'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet'
 import { YStack } from 'tamagui'
@@ -10,7 +10,7 @@ import useSelectSearch from './useSelectSearch'
 const MemoItem = React.memo(DropdownItem)
 
 type BottomsheetLogicProps = {
-  frameRef?: RefObject<TouchableOpacity>
+  frameRef?: RefObject<ComponentRef<typeof TouchableOpacity>>
 } & SelectProps<string>
 
 const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({ options, searchableOptions, frameRef, resetable, ...props }, ref) => {
@@ -37,11 +37,12 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
     setQuery('')
   }
 
-  const handleSelect = (payload: { title: string; id: string }) => () => {
+  const handleSelect = (payload: (typeof filteredItems)[number]) => () => {
     props.onChange?.(payload.id)
     props.onDetailChange?.({
       value: payload.id,
       label: payload.title,
+      subLabel: payload.subtitle,
     })
     setQuery('')
     bottomSheetRef.current?.close()

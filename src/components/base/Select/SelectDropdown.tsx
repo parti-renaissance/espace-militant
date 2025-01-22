@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactNode, RefObject, useCallback, useImperativeHandle, useRef, useState } from 'react'
+import React, { ComponentRef, forwardRef, ReactNode, RefObject, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { FlatList, GestureResponderEvent, Modal, TouchableOpacity } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { YStack } from 'tamagui'
@@ -47,7 +47,7 @@ const ModalDropDown = forwardRef<ModalDropDownRef, ModalDropDownProps>((props, r
 })
 
 type DropDownLogicProps = {
-  frameRef: RefObject<TouchableOpacity>
+  frameRef: RefObject<ComponentRef<typeof TouchableOpacity>>
 } & SelectProps<string>
 
 const MIN_WIDTH = 200
@@ -95,11 +95,12 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
     setQuery('')
   }
 
-  const handleSelect = (payload: { title: string; id: string }) => () => {
+  const handleSelect = (payload: (typeof filteredItems)[number]) => () => {
     props.onChange?.(payload.id)
     props.onDetailChange?.({
       value: payload.id,
       label: payload.title,
+      subLabel: payload.subtitle,
     })
     modalRef.current?.close()
     setQuery('')

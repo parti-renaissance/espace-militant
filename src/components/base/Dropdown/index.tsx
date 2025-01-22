@@ -54,7 +54,7 @@ export const DropdownItemFrame = styled(ThemeableStack, {
 })
 
 type ItemProps = {
-  title: string
+  title: string | React.ReactNode[]
   subtitle?: string
   onPress?: () => void
   selected?: boolean
