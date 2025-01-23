@@ -51,7 +51,7 @@ const InputFrame = styled(XStack, {
   minWidth: 100,
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: '$10',
+  borderRadius: 22,
   paddingHorizontal: '$medium',
   borderWidth: 2,
   borderColor: '$colorTransparent',
@@ -172,6 +172,7 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
     if (el) {
       const lastHeight = el.style.height
       el.style.height = 0
+
       const newHeight = el.offsetHeight - el.clientHeight + el.scrollHeight
 
       if (newHeight < 200) {

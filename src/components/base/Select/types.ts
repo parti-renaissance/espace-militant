@@ -24,6 +24,7 @@ export type SelectProps<A extends string> = {
   onDetailChange?: (value: { value: A; label: string | React.ReactNode[]; subLabel?: string }) => void
   onBlur?: () => void
   disabled?: boolean
+  noValuePlaceholder?: string
   error?: string
   label?: string
   placeholder?: string
