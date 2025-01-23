@@ -11,7 +11,7 @@ export type ModalDropDownRef = {
 
 export type SelectOption<A extends string> = {
   value: A
-  label: string | React.ReactNode[]
+  label: string | React.ReactNode[] | Element
   subLabel?: string
   theme?: ThemeName
   icon?: NamedExoticComponent<IconProps>

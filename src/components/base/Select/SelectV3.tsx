@@ -6,7 +6,7 @@ import SelectBottomSheet from './SelectBottomSheet'
 import SelectDropdown, { SelectDropdownRef } from './SelectDropdown'
 import { ModalDropDownRef, SelectOption, SelectProps } from './types'
 
-export { SelectOption }
+export { SelectOption, SF }
 
 const Select = <A extends string>(props: SelectProps<A>) => {
   const media = useMedia()

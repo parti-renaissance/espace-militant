@@ -13,6 +13,7 @@ export const SelectContext = createStyledContext<{
 
 const SelectFrame = styled(XStack, {
   context: SelectContext,
+  tag: 'button',
   theme: 'gray',
   gap: '$small',
   focusable: true,
@@ -144,7 +145,7 @@ const SelectFrameContainer = XStack.styleable<
 >(({ resetable, onResetPress, ...props }, ref) => {
   return (
     <XStack gap="$small" alignItems="center" flex={1} ref={ref}>
-      <XStack flexShrink={1} flexWrap="wrap" flex={1} {...props} alignItems="center" gap="$xsmall">
+      <XStack flexShrink={1} flex={1} {...props} alignItems="center" gap="$small">
         {props.children}
       </XStack>
       <XStack onPress={resetable ? onResetPress : undefined}>{resetable ? <SelectResetIcon /> : <SelectChevron />}</XStack>
@@ -182,7 +183,7 @@ export const SelectTextValue = styled(Text.MD, {
   } as const,
 })
 
-const SelectIconValue = ({ icon, themedText }: { icon: NamedExoticComponent<IconProps>; themedText?: Boolean }) => {
+const SelectIconValue = ({ icon, themedText }: { icon: NamedExoticComponent<IconProps>; themedText?: boolean }) => {
   const ctx = SelectContext.useStyledContext()
   const isThemed = ctx.themedText || themedText
   const getIcon = useGetThemedIcon({ color: isThemed ? '$color6' : '$textPrimary', size: 14 })

@@ -1,14 +1,30 @@
+import { Suspense, useMemo } from 'react'
 import Input from '@/components/base/Input/Input'
-import Select, { SelectOption } from '@/components/base/Select/SelectV3'
+import Select, { SelectOption, SF } from '@/components/base/Select/SelectV3'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
+import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { RestUserScopesResponse } from '@/services/profile/schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Lock, Unlock } from '@tamagui/lucide-icons'
+import { Lock, Sparkle, Unlock } from '@tamagui/lucide-icons'
 import { addHours, getHours, setHours } from 'date-fns'
 import { Controller, useForm } from 'react-hook-form'
 
-const VisibilityOptions: SelectOption<EventFormData['visibility']>[] = [
+export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<string> => {
+  return {
+    value: scope.code,
+    label: (
+      <>
+        <SF.Text semibold>{scope.name}</SF.Text> <SF.Text>{scope.zones.map(({ name, code }) => `${name} (${code})`).join(', ')}</SF.Text>
+      </>
+    ),
+    theme: 'purple',
+    icon: Sparkle,
+  }
+}
+
+const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
   {
     value: 'adherent',
     icon: Lock,
@@ -35,11 +51,22 @@ const VisibilityOptions: SelectOption<EventFormData['visibility']>[] = [
 ]
 
 export default function CreateEvent() {
+  return (
+    <Suspense>
+      <CreateEventForm />
+    </Suspense>
+  )
+}
+
+export function CreateEventForm() {
+  const scopes = useGetExecutiveScopes()
+  const scopeOptions = useMemo(() => scopes.data.list.map(getFormatedScope), [scopes.data.list])
   const currentDate = new Date()
   const currentHour = getHours(currentDate)
   const startDate = setHours(currentDate, Math.round(currentHour))
   const { control } = useForm<EventFormData>({
     defaultValues: {
+      scope: scopes.data.default?.code,
       name: '',
       category: undefined,
       description: '',
@@ -66,6 +93,14 @@ export default function CreateEvent() {
           <VoxCard.Content>
             <Controller
               render={({ field }) => {
+                return <Select size="sm" theme="purple" matchTextWithTheme label="Pour" value={field.value} options={scopeOptions} onChange={field.onChange} />
+              }}
+              control={control}
+              name="scope"
+            />
+            <VoxCard.Separator />
+            <Controller
+              render={({ field }) => {
                 return <Input size="sm" color="gray" placeholder="Titre" defaultValue={field.value} onChange={field.onChange} />
               }}
               control={control}
@@ -74,11 +109,20 @@ export default function CreateEvent() {
 
             <Controller
               render={({ field }) => {
-                return <Select size="sm" color="gray" label="Accées" value={field.value} options={VisibilityOptions} onChange={field.onChange} />
+                return <Select size="sm" color="gray" label="Accées" value={field.value} options={visibilityOptions} onChange={field.onChange} />
               }}
               control={control}
               name="visibility"
             />
+
+            <Controller
+              render={({ field }) => {
+                return <Select size="sm" color="gray" label="Catégorie" value={field.value} options={visibilityOptions} onChange={field.onChange} />
+              }}
+              control={control}
+              name="category"
+            />
+            <VoxCard.Separator />
           </VoxCard.Content>
         </VoxCard>
       </PageLayout.MainSingleColumn>
