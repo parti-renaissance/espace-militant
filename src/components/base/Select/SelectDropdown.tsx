@@ -6,6 +6,7 @@ import { DropdownFrame, DropdownItem } from '../Dropdown'
 import Input from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
+import { reactTextNodeChildrenToString } from './utils'
 
 type ModalDropDownProps = {
   children: ReactNode
@@ -99,7 +100,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
     props.onChange?.(payload.id)
     props.onDetailChange?.({
       value: payload.id,
-      label: payload.title,
+      label: reactTextNodeChildrenToString(payload.title),
       subLabel: payload.subtitle,
     })
     modalRef.current?.close()
@@ -121,6 +122,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
         <Animated.View style={[dropDownAnimatedStyle]}>
           <DropdownFrame width="100%">
             <FlatList
+              keyboardShouldPersistTaps
               stickyHeaderHiddenOnScroll={props.searchable}
               stickyHeaderIndices={props.searchable ? [0] : undefined}
               ListHeaderComponent={

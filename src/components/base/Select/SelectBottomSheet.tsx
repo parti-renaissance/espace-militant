@@ -6,6 +6,7 @@ import { DropdownFrame, DropdownItem } from '../Dropdown'
 import Input from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
+import { reactTextNodeChildrenToString } from './utils'
 
 const MemoItem = React.memo(DropdownItem)
 
@@ -41,7 +42,7 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
     props.onChange?.(payload.id)
     props.onDetailChange?.({
       value: payload.id,
-      label: payload.title,
+      label: reactTextNodeChildrenToString(payload.title),
       subLabel: payload.subtitle,
     })
     setQuery('')
