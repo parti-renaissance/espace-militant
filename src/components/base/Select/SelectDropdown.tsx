@@ -122,7 +122,6 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
         <Animated.View style={[dropDownAnimatedStyle]}>
           <DropdownFrame width="100%">
             <FlatList
-              keyboardShouldPersistTaps
               stickyHeaderHiddenOnScroll={props.searchable}
               stickyHeaderIndices={props.searchable ? [0] : undefined}
               ListHeaderComponent={
@@ -135,6 +134,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
                       onChangeText={setQuery}
                       placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
                       iconRight={searchableIcon}
+                      loading={searchableOptions?.isFetching}
                     />
                   </YStack>
                 ) : null

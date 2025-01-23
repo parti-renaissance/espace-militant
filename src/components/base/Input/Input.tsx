@@ -272,12 +272,13 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
             />
           )}
         </YStack>
-        {!loading && iconRight && (
+        {!loading && iconRight ? (
           <YStack height="100%" justifyContent="center" onPress={onIconRightPress}>
             {iconRight}
           </YStack>
-        )}
-        {loading && <Spinner color="$blue7" />}
+        ) : null}
+
+        {loading ? <Spinner color="$blue7" /> : null}
       </InputFrame>
       {error && (
         <XStack gap="$small" alignItems="center" pl="$medium">

@@ -33,11 +33,14 @@ export type SelectProps<A extends string> = {
   multiline?: boolean
   color?: InputProps['color']
   theme?: ThemeName
+  icon?: NamedExoticComponent<IconProps>
   customTextComponent?: (x: ComponentProps<typeof Text>) => React.ReactNode
   searchableOptions?: {
     placeholder?: string
     noResults?: string
     icon?: NamedExoticComponent<IconProps>
+    autocompleteCallback?: (value: string) => void
+    isFetching?: boolean
   }
   resetable?: boolean
 }

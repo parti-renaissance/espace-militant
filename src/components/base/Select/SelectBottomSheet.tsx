@@ -16,7 +16,7 @@ type BottomsheetLogicProps = {
 
 const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({ options, searchableOptions, frameRef, resetable, ...props }, ref) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const snapPoints = useMemo(() => ['60%'], [])
+  const snapPoints = useMemo(() => ['90%'], [])
   const { setQuery, filteredItems, queryInputRef, searchableIcon } = useSelectSearch({ options, searchableOptions })
 
   useImperativeHandle(
@@ -58,7 +58,8 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
         backdropComponent={renderBackdrop}
         enablePanDownToClose
         // index={-1}
-        enableDynamicSizing={false}
+        // enableDynamicSizing
+        // keyboardBehavior="fillParent"
         snapPoints={snapPoints}
         onDismiss={handleClose}
         handleIndicatorStyle={{
@@ -70,6 +71,7 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
           <BottomSheetFlatList
             stickyHeaderHiddenOnScroll={props.searchable}
             stickyHeaderIndices={props.searchable ? [0] : undefined}
+            keyboardShouldPersistTaps
             ListHeaderComponent={
               props.searchable ? (
                 <YStack padding={16} bg="white">
@@ -79,6 +81,7 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
                     onChangeText={setQuery}
                     placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
                     iconRight={searchableIcon}
+                    loading={searchableOptions?.isFetching}
                   />
                 </YStack>
               ) : null

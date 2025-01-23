@@ -1,4 +1,5 @@
 import { Suspense, useMemo } from 'react'
+import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import Input from '@/components/base/Input/Input'
 import Select, { SelectOption, SF } from '@/components/base/Select/SelectV3'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
@@ -6,10 +7,12 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { RestUserScopesResponse } from '@/services/profile/schema'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Lock, Sparkle, Unlock } from '@tamagui/lucide-icons'
 import { addHours, getHours, setHours } from 'date-fns'
 import { Controller, useForm } from 'react-hook-form'
+import { YStack } from 'tamagui'
 
 export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<string> => {
   return {
@@ -88,44 +91,67 @@ export function CreateEventForm() {
   })
   return (
     <PageLayout>
-      <PageLayout.MainSingleColumn alignItems="center" justifyContent="center">
-        <VoxCard width={380}>
-          <VoxCard.Content>
-            <Controller
-              render={({ field }) => {
-                return <Select size="sm" theme="purple" matchTextWithTheme label="Pour" value={field.value} options={scopeOptions} onChange={field.onChange} />
-              }}
-              control={control}
-              name="scope"
-            />
-            <VoxCard.Separator />
-            <Controller
-              render={({ field }) => {
-                return <Input size="sm" color="gray" placeholder="Titre" defaultValue={field.value} onChange={field.onChange} />
-              }}
-              control={control}
-              name="name"
-            />
+      <VoxCard.Content>
+        <Controller
+          render={({ field }) => {
+            return <Select size="sm" theme="purple" matchTextWithTheme label="Pour" value={field.value} options={scopeOptions} onChange={field.onChange} />
+          }}
+          control={control}
+          name="scope"
+        />
+        <VoxCard.Separator />
+        <YStack>
+          <Controller
+            render={({ field }) => {
+              return (
+                <YStack height={44}>
+                  <Input size="sm" color="gray" placeholder="Titre" defaultValue={field.value} onChange={field.onChange} />
+                </YStack>
+              )
+            }}
+            control={control}
+            name="name"
+          />
+        </YStack>
 
-            <Controller
-              render={({ field }) => {
-                return <Select size="sm" color="gray" label="Accées" value={field.value} options={visibilityOptions} onChange={field.onChange} />
-              }}
-              control={control}
-              name="visibility"
-            />
+        <Controller
+          render={({ field }) => {
+            return <Select size="sm" color="gray" label="Accées" value={field.value} options={visibilityOptions} onChange={field.onChange} />
+          }}
+          control={control}
+          name="visibility"
+        />
 
-            <Controller
-              render={({ field }) => {
-                return <Select size="sm" color="gray" label="Catégorie" value={field.value} options={visibilityOptions} onChange={field.onChange} />
-              }}
-              control={control}
-              name="category"
-            />
-            <VoxCard.Separator />
-          </VoxCard.Content>
-        </VoxCard>
-      </PageLayout.MainSingleColumn>
+        <Controller
+          render={({ field }) => {
+            return <Select size="sm" color="gray" label="Catégorie" value={field.value} options={visibilityOptions} onChange={field.onChange} />
+          }}
+          control={control}
+          name="category"
+        />
+        <VoxCard.Separator />
+        <Controller
+          render={({ field }) => {
+            return (
+              <AddressAutocomplete
+                size="sm"
+                color="gray"
+                label="Localisation"
+                setAddressComponents={(x) => {
+                  field.onChange({
+                    address: x.address,
+                    city_name: x.city,
+                    postal_code: x.postalCode,
+                    country: x.country,
+                  })
+                }}
+              />
+            )
+          }}
+          control={control}
+          name="post_address"
+        />
+      </VoxCard.Content>
     </PageLayout>
   )
 }

@@ -55,7 +55,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
           }}
           disabled={props.disabled}
         >
-          <SF.Container resetable={props.resetable} onResetPress={handleResetPress}>
+          <SF.Container resetable={props.resetable} icon={props.icon} onResetPress={handleResetPress}>
             {props.label || props.placeholder ? <SF.Label>{props.label || props.placeholder}</SF.Label> : null}
             <SF.ValueContainer theme={fullValue?.theme}>
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}

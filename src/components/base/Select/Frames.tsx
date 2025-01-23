@@ -103,23 +103,6 @@ const SelectFrame = styled(XStack, {
   },
 })
 
-const SelectChevron = styled(ChevronsUpDown, {
-  context: SelectContext,
-  size: 20,
-  variants: {
-    themedText: {
-      true: {
-        //@ts-expect-error miss type for tamagui lucide icons, but it's valid
-        color: '$color4',
-      },
-      false: {
-        //@ts-expect-error miss type for tamagui lucide icons, but it's valid
-        color: '$textSecondary',
-      },
-    },
-  } as const,
-})
-
 const SelectResetIcon = styled(XCircle, {
   context: SelectContext,
   size: 20,
@@ -137,18 +120,27 @@ const SelectResetIcon = styled(XCircle, {
   } as const,
 })
 
+const SelectIconContainer = ({ icon, themedText }: { icon: NamedExoticComponent<IconProps>; themedText?: boolean }) => {
+  const ctx = SelectContext.useStyledContext()
+  const isThemed = ctx.themedText || themedText
+  const getIcon = useGetThemedIcon({ color: isThemed ? '$color4' : '$gray4', size: 14 })
+  return getIcon(icon)
+}
+
 const SelectFrameContainer = XStack.styleable<
   XStackProps & {
     resetable?: boolean
+    icon?: NamedExoticComponent<IconProps>
     onResetPress?: (e: GestureReponderEvent) => void
   }
->(({ resetable, onResetPress, ...props }, ref) => {
+>(({ resetable, onResetPress, icon, ...props }, ref) => {
+  const defIcon = <SelectIconContainer icon={icon ?? ChevronsUpDown} />
   return (
     <XStack gap="$small" alignItems="center" flex={1} ref={ref}>
       <XStack flexShrink={1} flex={1} {...props} alignItems="center" gap="$small">
         {props.children}
       </XStack>
-      <XStack onPress={resetable ? onResetPress : undefined}>{resetable ? <SelectResetIcon /> : <SelectChevron />}</XStack>
+      <XStack onPress={resetable ? onResetPress : undefined}>{resetable ? <SelectResetIcon /> : defIcon}</XStack>
     </XStack>
   )
 })
