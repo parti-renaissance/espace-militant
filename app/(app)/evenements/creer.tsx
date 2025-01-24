@@ -1,8 +1,10 @@
 import { Suspense, useMemo, useState } from 'react'
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
+import { FormFrame } from '@/components/base/FormFrames'
 import Input from '@/components/base/Input/Input'
 import Select, { SelectOption, SF } from '@/components/base/Select/SelectV3'
+import Text from '@/components/base/Text'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
@@ -11,8 +13,24 @@ import { RestUserScopesResponse } from '@/services/profile/schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Lock, Sparkle, Unlock, Video } from '@tamagui/lucide-icons'
 import { addHours, getHours, setHours } from 'date-fns'
+import { getTimezoneOffset } from 'date-fns-tz'
 import { Controller, useForm } from 'react-hook-form'
-import { YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
+
+function getTimezoneOffsetLabel(timeZone) {
+  const offset = getTimezoneOffset(timeZone)
+
+  return `UTC ${offset < 0 ? '' : '+'}${offset / 1000 / 60 / 60}h`
+}
+
+const timezones = useMemo(() => {
+  return Intl.supportedValuesOf('timeZone').map((timeZone) => ({
+    value: timeZone,
+    label: `${timeZone} (${getTimezoneOffsetLabel(timeZone)})`,
+  }))
+}, [])
+
+console.log(timezones)
 
 export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<string> => {
   return {
@@ -32,13 +50,13 @@ const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
     value: 'adherent',
     icon: Lock,
     theme: 'yellow',
-    label: 'Réservé aux adhérants',
+    label: 'Réservé aux adhérents',
   },
   {
     value: 'adherent_dues',
     icon: Lock,
     theme: 'yellow',
-    label: 'Réservé aux adhérants à jour',
+    label: 'Réservé aux adhérents à jour',
   },
   {
     value: 'private',
@@ -76,6 +94,7 @@ export function CreateEventForm() {
       description: '',
       begin_at: startDate,
       finish_at: addHours(startDate, 1),
+      time_zone: 'Europe/Paris',
       capacity: undefined,
       mode: 'meeting',
       visio_url: undefined,
@@ -133,6 +152,75 @@ export function CreateEventForm() {
               name="category"
             />
             <VoxCard.Separator />
+            <FormFrame height="auto" flexDirection="column" paddingHorizontal={0} pt="$medium" overflow="hidden" theme="gray">
+              <Controller
+                render={({ field }) => {
+                  return (
+                    <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
+                      <XStack>
+                        <FormFrame.Label>Date début</FormFrame.Label>
+                      </XStack>
+                      <XStack gap="$small">
+                        <FormFrame.Button>
+                          <Text.MD>12/04/2024</Text.MD>
+                        </FormFrame.Button>
+                        <FormFrame.Button>
+                          <Text.MD>13h00</Text.MD>
+                        </FormFrame.Button>
+                      </XStack>
+                    </XStack>
+                  )
+                }}
+                control={control}
+                name="begin_at"
+              />
+              <Controller
+                render={({ field }) => {
+                  return (
+                    <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
+                      <XStack>
+                        <FormFrame.Label>Date fin</FormFrame.Label>
+                      </XStack>
+                      <XStack gap="$small">
+                        <FormFrame.Button>
+                          <Text.MD>12/04/2024</Text.MD>
+                        </FormFrame.Button>
+                        <FormFrame.Button>
+                          <Text.MD>13h00</Text.MD>
+                        </FormFrame.Button>
+                      </XStack>
+                    </XStack>
+                  )
+                }}
+                control={control}
+                name="finish_at"
+              />
+
+              <Controller
+                render={({ field }) => {
+                  return (
+                    <Select
+                      size="sm"
+                      color="gray"
+                      label="Fuseau horaire"
+                      value={field.value}
+                      searchable
+                      options={timezones}
+                      onChange={field.onChange}
+                      frameProps={{
+                        // borderRadius: 6,
+                        // paddingHorizontal: 0,
+                        pb: '$medium',
+                        pt: '$medium',
+                        height: 50,
+                      }}
+                    />
+                  )
+                }}
+                control={control}
+                name="time_zone"
+              />
+            </FormFrame>
             <VoxCard.Separator />
             <Controller
               render={({ field }) => {

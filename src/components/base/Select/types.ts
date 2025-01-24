@@ -3,6 +3,7 @@ import type Text from '@/components/base/Text'
 import { IconProps } from '@tamagui/helpers-icon'
 import { ThemeName } from 'tamagui'
 import { InputProps } from '../Input/Input'
+import { SelectFrames } from './Frames'
 
 export type ModalDropDownRef = {
   open: () => void
@@ -35,6 +36,7 @@ export type SelectProps<A extends string> = {
   color?: InputProps['color']
   theme?: ThemeName
   icon?: NamedExoticComponent<IconProps>
+  frameProps?: ComponentProps<typeof SelectFrames>
   customTextComponent?: (x: ComponentProps<typeof Text>) => React.ReactNode
   searchableOptions?: {
     placeholder?: string

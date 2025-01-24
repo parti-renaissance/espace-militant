@@ -23,7 +23,7 @@ export default function AppLayout() {
         </VoxHeader>
       ) : null}
 
-      <View style={{ height: isWeb ? 'calc(100vh - 100px)' : '100%', flex: 1 }}>
+      <View style={{ height: isWeb ? 'calc(100vh - 100px)' : '100%', flex: 1 }} backgroundColor="white">
         <Stack screenOptions={{ animation: 'slide_from_right' }}>
           <Stack.Screen
             name="(tabs)"
@@ -40,7 +40,7 @@ export default function AppLayout() {
             }}
           ></Stack.Screen>
           <Stack.Screen
-            name="evenements/[id]"
+            name="evenements/[id]/index"
             options={{
               headerTransparent: true,
               header: ({ navigation }) => {
@@ -52,6 +52,29 @@ export default function AppLayout() {
                   </VoxHeader>
                 ) : null
               },
+            }}
+          />
+
+          <Stack.Screen
+            name="evenements/[id]/editer"
+            options={{
+              presentation: 'formSheet',
+              header: ({ navigation }) => {
+                return media.sm ? (
+                  <VoxHeader backgroundColor="transparent" borderWidth={0}>
+                    <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
+                      <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
+                    </Link>
+                  </VoxHeader>
+                ) : null
+              },
+            }}
+          />
+
+          <Stack.Screen
+            name="evenements/creer"
+            options={{
+              headerShown: false,
             }}
           />
           <Stack.Screen name="porte-a-porte/building-detail" options={{ title: '' }} />

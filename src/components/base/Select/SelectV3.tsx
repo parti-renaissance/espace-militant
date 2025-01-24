@@ -54,6 +54,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
             modalRef.current?.setModalPosition?.()
           }}
           disabled={props.disabled}
+          {...props.frameProps}
         >
           <SF.Container resetable={props.resetable} icon={props.icon} onResetPress={handleResetPress}>
             {props.label || props.placeholder ? <SF.Label>{props.label || props.placeholder}</SF.Label> : null}
