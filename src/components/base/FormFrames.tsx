@@ -1,5 +1,5 @@
 import Text from '@/components/base/Text'
-import { styled, ThemeableStack, withStaticProperties, XStack } from 'tamagui'
+import { Input, styled, ThemeableStack, withStaticProperties, XStack } from 'tamagui'
 
 export const FormFrameBase = styled(XStack, {
   theme: 'gray',
@@ -64,6 +64,57 @@ export const FormFrameBase = styled(XStack, {
   },
 })
 
+export const FormFrameInput = styled(Input, {
+  tag: 'input',
+  height: 36,
+  width: 'auto',
+  unstyled: true,
+  focusable: true,
+  paddingVertical: 4,
+  paddingHorizontal: 8,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 8,
+  cursor: 'pointer',
+
+  variants: {
+    error: {
+      true: {
+        color: '$orange5',
+        backgroundColor: '$orange1',
+        focusStyle: {
+          borderColor: '$orange1',
+        },
+      },
+    },
+    themed: {
+      true: {
+        color: '$color5',
+        backgroundColor: '$color2',
+        hoverStyle: {
+          backgroundColor: '$color3',
+        },
+        pressStyle: {
+          backgroundColor: '$color4',
+        },
+      },
+      false: {
+        color: '$textPrimary',
+        backgroundColor: '$textOutline',
+        hoverStyle: {
+          backgroundColor: '$textOutline20',
+        },
+        pressStyle: {
+          backgroundColor: '$textOutline32',
+        },
+      },
+    },
+  } as const,
+  defaultVariants: {
+    themed: false,
+  },
+})
+
 export const FormFrameButton = styled(ThemeableStack, {
   tag: 'button',
   height: 36,
@@ -76,6 +127,14 @@ export const FormFrameButton = styled(ThemeableStack, {
   cursor: 'pointer',
 
   variants: {
+    error: {
+      true: {
+        backgroundColor: '$orange1',
+        focusStyle: {
+          borderColor: '$orange1',
+        },
+      },
+    },
     themed: {
       true: {
         backgroundColor: '$color2',
@@ -121,5 +180,6 @@ export const FormFrameLabel = styled(Text.MD, {
 
 export const FormFrame = withStaticProperties(FormFrameBase, {
   Button: FormFrameButton,
+  Input: FormFrameInput,
   Label: FormFrameLabel,
 })

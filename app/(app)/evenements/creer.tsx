@@ -5,32 +5,30 @@ import { FormFrame } from '@/components/base/FormFrames'
 import Input from '@/components/base/Input/Input'
 import Select, { SelectOption, SF } from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
+import DatePickerField from '@/components/DatePickerV2'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { RestUserScopesResponse } from '@/services/profile/schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Lock, Sparkle, Unlock, Video } from '@tamagui/lucide-icons'
-import { addHours, getHours, setHours } from 'date-fns'
+import { Lock, Sparkle, Unlock, Video, Webcam } from '@tamagui/lucide-icons'
+import { addHours, addMinutes, getHours, getMinutes, setHours, setMilliseconds, setMinutes, setSeconds } from 'date-fns'
 import { getTimezoneOffset } from 'date-fns-tz'
 import { Controller, useForm } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
 
-function getTimezoneOffsetLabel(timeZone) {
+function getTimezoneOffsetLabel(timeZone: string) {
   const offset = getTimezoneOffset(timeZone)
 
   return `UTC ${offset < 0 ? '' : '+'}${offset / 1000 / 60 / 60}h`
 }
 
-const timezones = useMemo(() => {
-  return Intl.supportedValuesOf('timeZone').map((timeZone) => ({
-    value: timeZone,
-    label: `${timeZone} (${getTimezoneOffsetLabel(timeZone)})`,
-  }))
-}, [])
-
-console.log(timezones)
+const timezones = Intl.supportedValuesOf('timeZone').map((timeZone) => ({
+  value: timeZone,
+  label: `${timeZone} (${getTimezoneOffsetLabel(timeZone)})`,
+}))
 
 export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<string> => {
   return {
@@ -71,6 +69,25 @@ const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
   },
 ]
 
+const roundMinutesToNextDecimal = (date: Date) => {
+  // Remove seconds and milliseconds for precision
+  const cleanDate = setMilliseconds(setSeconds(date, 0), 0)
+
+  // Get the current minutes
+  const currentMinutes = cleanDate.getMinutes()
+
+  // Round up to the next multiple of 10
+  const roundedMinutes = Math.ceil(currentMinutes / 10) * 10
+
+  // Adjust the date
+  if (roundedMinutes === 60) {
+    // If rounding moves to the next hour
+    return addMinutes(cleanDate, roundedMinutes - currentMinutes) // Add remaining minutes to reach the next hour
+  } else {
+    return setMinutes(cleanDate, roundedMinutes) // Set the rounded minutes
+  }
+}
+
 export default function CreateEvent() {
   return (
     <Suspense>
@@ -82,41 +99,68 @@ export default function CreateEvent() {
 export function CreateEventForm() {
   const scopes = useGetExecutiveScopes()
   const scopeOptions = useMemo(() => scopes.data.list.map(getFormatedScope), [scopes.data.list])
-  const currentDate = new Date()
-  const currentHour = getHours(currentDate)
-  const startDate = setHours(currentDate, Math.round(currentHour))
+  const cleanDate = roundMinutesToNextDecimal(new Date())
+  const startDate = addHours(cleanDate, 1)
   const [mode, setMode] = useState('meeting')
-  const { control } = useForm<EventFormData>({
-    defaultValues: {
-      scope: scopes.data.default?.code,
-      name: '',
-      category: undefined,
-      description: '',
-      begin_at: startDate,
-      finish_at: addHours(startDate, 1),
-      time_zone: 'Europe/Paris',
-      capacity: undefined,
-      mode: 'meeting',
-      visio_url: undefined,
-      post_address: {
-        address: '',
-        postal_code: '',
-        city_name: '',
-        country: '',
-      },
-      visibility: 'public',
-      live_url: '',
+
+  const defaultValues = {
+    scope: scopes.data.default?.code,
+    name: '',
+    category: undefined,
+    description: '',
+    begin_at: startDate,
+    finish_at: addHours(startDate, 1),
+    time_zone: 'Europe/Paris',
+    capacity: undefined,
+    mode: 'meeting',
+    visio_url: undefined,
+    post_address: {
+      address: '',
+      postal_code: '',
+      city_name: '',
+      country: '',
     },
+    visibility: 'public',
+    live_url: '',
+  } as const
+
+  const { control, handleSubmit, getValues } = useForm<EventFormData>({
+    defaultValues,
     resolver: zodResolver(createEventSchema),
+    reValidateMode: 'onChange',
   })
+
+  const onSubmit = handleSubmit(
+    (e) => {
+      console.log(e)
+    },
+    (e) => {
+      const values = getValues()
+      const errors = createEventSchema.safeParse(values)
+      console.log(errors.error)
+      console.log(e)
+    },
+  )
+
   return (
     <PageLayout>
       <PageLayout.MainSingleColumn justifyContent="center" alignItems="center">
         <VoxCard width={400}>
           <VoxCard.Content>
             <Controller
-              render={({ field }) => {
-                return <Select size="sm" theme="purple" matchTextWithTheme label="Pour" value={field.value} options={scopeOptions} onChange={field.onChange} />
+              render={({ field, fieldState }) => {
+                return (
+                  <Select
+                    error={fieldState.error?.message}
+                    size="sm"
+                    theme="purple"
+                    matchTextWithTheme
+                    label="Pour"
+                    value={field.value}
+                    options={scopeOptions}
+                    onChange={field.onChange}
+                  />
+                )
               }}
               control={control}
               name="scope"
@@ -124,11 +168,9 @@ export function CreateEventForm() {
             <VoxCard.Separator />
             <YStack>
               <Controller
-                render={({ field }) => {
+                render={({ field, fieldState }) => {
                   return (
-                    <YStack height={44}>
-                      <Input size="sm" color="gray" placeholder="Titre" defaultValue={field.value} onChange={field.onChange} />
-                    </YStack>
+                    <Input error={fieldState.error?.message} size="sm" color="gray" placeholder="Titre" defaultValue={field.value} onChange={field.onChange} />
                   )
                 }}
                 control={control}
@@ -137,16 +179,36 @@ export function CreateEventForm() {
             </YStack>
 
             <Controller
-              render={({ field }) => {
-                return <Select size="sm" color="gray" label="Accées" value={field.value} options={visibilityOptions} onChange={field.onChange} />
+              render={({ field, fieldState }) => {
+                return (
+                  <Select
+                    error={fieldState.error?.message}
+                    size="sm"
+                    color="gray"
+                    label="Accées"
+                    value={field.value}
+                    options={visibilityOptions}
+                    onChange={field.onChange}
+                  />
+                )
               }}
               control={control}
               name="visibility"
             />
 
             <Controller
-              render={({ field }) => {
-                return <Select size="sm" color="gray" label="Catégorie" value={field.value} options={visibilityOptions} onChange={field.onChange} />
+              render={({ field, fieldState }) => {
+                return (
+                  <Select
+                    error={fieldState.error?.message}
+                    size="sm"
+                    color="gray"
+                    label="Catégorie"
+                    value={field.value}
+                    options={visibilityOptions}
+                    onChange={field.onChange}
+                  />
+                )
               }}
               control={control}
               name="category"
@@ -154,42 +216,52 @@ export function CreateEventForm() {
             <VoxCard.Separator />
             <FormFrame height="auto" flexDirection="column" paddingHorizontal={0} pt="$medium" overflow="hidden" theme="gray">
               <Controller
-                render={({ field }) => {
+                render={({ field, fieldState }) => {
                   return (
-                    <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
-                      <XStack>
-                        <FormFrame.Label>Date début</FormFrame.Label>
+                    <YStack>
+                      <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
+                        <XStack>
+                          <FormFrame.Label>Date début</FormFrame.Label>
+                        </XStack>
+                        <XStack gap="$small">
+                          <DatePickerField error={fieldState.error?.message} type="date" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+                          <DatePickerField error={fieldState.error?.message} type="time" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+                        </XStack>
                       </XStack>
-                      <XStack gap="$small">
-                        <FormFrame.Button>
-                          <Text.MD>12/04/2024</Text.MD>
-                        </FormFrame.Button>
-                        <FormFrame.Button>
-                          <Text.MD>13h00</Text.MD>
-                        </FormFrame.Button>
-                      </XStack>
-                    </XStack>
+                      {fieldState.error ? (
+                        <XStack paddingHorizontal="$medium" alignSelf="flex-end" pt="$xsmall">
+                          <Text.XSM textAlign="right" color="$orange5">
+                            {fieldState.error?.message}
+                          </Text.XSM>
+                        </XStack>
+                      ) : null}
+                    </YStack>
                   )
                 }}
                 control={control}
                 name="begin_at"
               />
               <Controller
-                render={({ field }) => {
+                render={({ field, fieldState }) => {
                   return (
-                    <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
-                      <XStack>
-                        <FormFrame.Label>Date fin</FormFrame.Label>
+                    <YStack>
+                      <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
+                        <XStack>
+                          <FormFrame.Label>Date fin</FormFrame.Label>
+                        </XStack>
+                        <XStack gap="$small">
+                          <DatePickerField error={fieldState.error?.message} type="date" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+                          <DatePickerField error={fieldState.error?.message} type="time" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+                        </XStack>
                       </XStack>
-                      <XStack gap="$small">
-                        <FormFrame.Button>
-                          <Text.MD>12/04/2024</Text.MD>
-                        </FormFrame.Button>
-                        <FormFrame.Button>
-                          <Text.MD>13h00</Text.MD>
-                        </FormFrame.Button>
-                      </XStack>
-                    </XStack>
+                      {fieldState.error ? (
+                        <XStack paddingHorizontal="$medium" alignSelf="flex-end" pt="$xsmall">
+                          <Text.XSM textAlign="right" color="$orange5">
+                            {fieldState.error?.message}
+                          </Text.XSM>
+                        </XStack>
+                      ) : null}
+                    </YStack>
                   )
                 }}
                 control={control}
@@ -208,8 +280,6 @@ export function CreateEventForm() {
                       options={timezones}
                       onChange={field.onChange}
                       frameProps={{
-                        // borderRadius: 6,
-                        // paddingHorizontal: 0,
                         pb: '$medium',
                         pt: '$medium',
                         height: 50,
@@ -246,12 +316,13 @@ export function CreateEventForm() {
             />
             {mode === 'meeting' ? (
               <Controller
-                render={({ field }) => {
+                render={({ field, fieldState }) => {
                   return (
                     <AddressAutocomplete
                       size="sm"
                       color="gray"
                       label="Localisation"
+                      error={fieldState.error?.message}
                       setAddressComponents={(x) => {
                         field.onChange({
                           address: x.address,
@@ -269,19 +340,20 @@ export function CreateEventForm() {
             ) : (
               <YStack>
                 <Controller
-                  render={({ field }) => {
+                  render={({ field, fieldState }) => {
                     return (
-                      <YStack height={44}>
-                        <Input
-                          size="sm"
-                          color="gray"
-                          placeholder="Lien visio"
-                          inputMode="url"
-                          defaultValue={field.value}
-                          onChange={field.onChange}
-                          iconRight={<Video size={16} color="$gray4" />}
-                        />
-                      </YStack>
+                      // <YStack height={44}>
+                      <Input
+                        size="sm"
+                        color="gray"
+                        placeholder="Lien visio"
+                        inputMode="url"
+                        error={fieldState.error?.message}
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        iconRight={<Webcam size={16} color="$gray4" />}
+                      />
+                      // </YStack>
                     )
                   }}
                   control={control}
@@ -294,7 +366,7 @@ export function CreateEventForm() {
               <Controller
                 render={({ field }) => {
                   return (
-                    <YStack height={200}>
+                    <YStack height={100}>
                       <Input size="sm" color="gray" placeholder="Description" inputMode="url" multiline defaultValue={field.value} onChange={field.onChange} />
                     </YStack>
                   )
@@ -303,6 +375,34 @@ export function CreateEventForm() {
                 name="description"
               />
             </YStack>
+            <XStack gap="$medium" alignContent="center" alignItems="center">
+              <Text.MD secondary>Optionnel</Text.MD>
+              <VoxCard.Separator />
+            </XStack>
+
+            <YStack>
+              <Controller
+                render={({ field }) => {
+                  return (
+                    <YStack height={44}>
+                      <Input
+                        size="sm"
+                        color="gray"
+                        placeholder="Lien du live"
+                        inputMode="url"
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        iconRight={<Video size={16} color="$gray4" />}
+                      />
+                    </YStack>
+                  )
+                }}
+                control={control}
+                name="live_url"
+              />
+            </YStack>
+
+            <VoxButton onPress={() => onSubmit()}>Créer</VoxButton>
           </VoxCard.Content>
         </VoxCard>
       </PageLayout.MainSingleColumn>

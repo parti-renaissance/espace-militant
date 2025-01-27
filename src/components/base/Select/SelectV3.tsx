@@ -1,6 +1,7 @@
 import React, { ComponentRef, useCallback, useMemo, useRef } from 'react'
 import { GestureResponderEvent, TouchableOpacity } from 'react-native'
-import { useMedia, YStack } from 'tamagui'
+import Text from '@/components/base/Text'
+import { useMedia, XStack, YStack } from 'tamagui'
 import { SelectFrames as SF } from './Frames'
 import SelectBottomSheet from './SelectBottomSheet'
 import SelectDropdown, { SelectDropdownRef } from './SelectDropdown'
@@ -40,7 +41,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
   const fullValue = props.options.find((option) => option.value === props.value)
 
   return (
-    <>
+    <YStack>
       <Selector ref={selectorRef} frameRef={frameRef} {...props} />
 
       <SF.Props themedText={props.matchTextWithTheme ?? false}>
@@ -68,7 +69,14 @@ const Select = <A extends string>(props: SelectProps<A>) => {
           </SF.Container>
         </SF>
       </SF.Props>
-    </>
+      {props.error ? (
+        <XStack paddingHorizontal="$medium" alignSelf="flex-start" pt="$xsmall">
+          <Text.XSM textAlign="right" color="$orange5">
+            {props.error}
+          </Text.XSM>
+        </XStack>
+      ) : null}
+    </YStack>
   )
 }
 

@@ -94,6 +94,3 @@ function AddressAutocomplete({
 }
 
 export default memo(AddressAutocomplete)
-
-const lol = 'fergerger'
-lol.startsWith('@')

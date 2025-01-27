@@ -1,4 +1,5 @@
 import { EventVisibilitySchema } from '@/services/events/schema'
+import { isBefore } from 'date-fns'
 import { z } from 'zod'
 
 const requiredString = (start: string) => z.string().min(1, `${start} est obligatoire.`)
@@ -11,10 +12,10 @@ const addressEntryTranslation = {
 }
 
 const postAddressSchema = z.object({
-  address: z.string().nullable(),
-  postal_code: z.string().nullable(),
-  city_name: z.string().nullable(),
-  country: z.string().nullable(),
+  address: z.string().nullish(),
+  postal_code: z.string().nullish(),
+  city_name: z.string().nullable().nullish(),
+  country: z.string().nullable().nullish(),
 })
 
 export const createEventSchema = z
@@ -23,8 +24,12 @@ export const createEventSchema = z
     name: requiredString('Le titre'),
     category: requiredString('La catégorie'),
     description: requiredString('La description'),
-    begin_at: z.date().min(new Date(), 'La date de début est obligatoire.'),
-    finish_at: z.date().min(new Date(), 'La date de fin est obligatoire.'),
+    begin_at: z.date({
+      required_error: 'La date de début est obligatoire.',
+    }),
+    finish_at: z.date({
+      required_error: 'La date de fin est obligatoire.',
+    }),
     capacity: z.number().optional(),
     mode: z.enum(['online', 'meeting']),
     visio_url: z.string().url().optional(),
@@ -34,22 +39,19 @@ export const createEventSchema = z
     visibility: EventVisibilitySchema,
     live_url: z.string().url().optional(),
   })
+  .refine((data) => isBefore(new Date(), data.begin_at), {
+    message: "L'évenement doit être dans le futur",
+    path: ['begin_at'],
+  })
+  .refine((data) => isBefore(data.begin_at, data.finish_at), {
+    message: 'La date de fin doit être postérieure à la date de début.',
+    path: ['finish_at'],
+  })
+  .refine((data) => data.mode === 'online' && data.visio_url, {
+    message: 'Le lien de la visioconférence est obligatoire pour un événement virtuel',
+    path: ['visio_url'],
+  })
   .superRefine((data, ctx) => {
-    if (data.finish_at > data.begin_at) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['finish_at'],
-        message: 'La date de fin doit être postérieure à la date de début.',
-      })
-    }
-    if (data.mode === 'online' && !data.visio_url) {
-      return ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Le lien de la visioconférence est obligatoire pour un événement virtuel',
-        path: ['visioUrl'],
-      })
-    }
-
     if (data.mode === 'meeting') {
       const checkHasAddressFull = data.post_address?.address && data.post_address?.postal_code && data.post_address?.city_name && data.post_address?.country
 
@@ -58,7 +60,7 @@ export const createEventSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'L’adresse est obligatoire pour un événement physique',
-          path: ['address'],
+          path: ['post_address'],
         })
       }
 
@@ -68,7 +70,7 @@ export const createEventSchema = z
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: addressEntryTranslation[k],
-              path: ['address', k],
+              path: ['post_address'],
             })
           }
         }
