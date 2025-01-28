@@ -3,7 +3,7 @@ import { Keyboard, Platform } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { FormFrame } from '@/components/base/FormFrames'
 import Text from '@/components/base/Text'
-import { getFormattedDate, getHumanFormattedTime, getIntlDate } from '@/utils/date'
+import { getFormattedDate, getFormattedTime, getHumanFormattedTime, getIntlDate } from '@/utils/date'
 import { format, getHours, getMinutes, parseISO, setHours, setMinutes } from 'date-fns'
 import { Input, isWeb } from 'tamagui'
 
@@ -87,13 +87,15 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChan
       setIsDatePickerVisible(true)
     }
   }
+  const placeholder = type === 'date' ? 'JJ/MM/AAAA' : 'HH:MM'
 
+  const formatedValue = (type: 'date' | 'time', value: Date) => (type === 'date' ? getFormattedDate(value) : getFormattedTime(value))
   return Platform.OS === 'web' ? (
     <FormFrame.Input error={Boolean(error)} ref={inputRef} value={inputValue} onChangeText={handleChange} onBlur={() => onBlur?.()} />
   ) : (
     <>
       <FormFrame.Button onPress={onShow} error={Boolean(error)}>
-        <Text.MD color={error ? '$orange5' : '$textPrimary'}>{type === 'date' ? 'JJ/MM/AAAA' : 'HH:MM'}</Text.MD>
+        <Text.MD color={error ? '$orange5' : '$textPrimary'}>{value ? formatedValue(type, value) : placeholder}</Text.MD>
       </FormFrame.Button>
       <DateTimePickerModal
         locale="fr"

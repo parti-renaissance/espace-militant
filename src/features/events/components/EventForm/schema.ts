@@ -2,7 +2,21 @@ import { EventVisibilitySchema } from '@/services/events/schema'
 import { isBefore } from 'date-fns'
 import { z } from 'zod'
 
-const requiredString = (start: string) => z.string().min(1, `${start} est obligatoire.`)
+const partialUrlSchema = z.string().refine((value) => !value || /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w.-]*)*\/?$/.test(value), {
+  message: 'Le lien doit être valide',
+})
+const parsePartialUrl = (url: unknown) => {
+  return partialUrlSchema.safeParse(url)
+}
+
+const requiredString = (start: string, min: number = 1) => {
+  const message = `${start} est obligatoire.`
+  return z
+    .string({
+      required_error: message,
+    })
+    .min(min, min === 1 ? message : `${start} doit contenir au moins ${min} caractères.`)
+}
 
 const addressEntryTranslation = {
   address: 'L’adresse est manquante ou incorrecte.',
@@ -23,7 +37,7 @@ export const createEventSchema = z
     scope: requiredString('Le champ de la portée'),
     name: requiredString('Le titre'),
     category: requiredString('La catégorie'),
-    description: requiredString('La description'),
+    description: requiredString('La description', 10),
     begin_at: z.date({
       required_error: 'La date de début est obligatoire.',
     }),
@@ -32,12 +46,35 @@ export const createEventSchema = z
     }),
     capacity: z.number().optional(),
     mode: z.enum(['online', 'meeting']),
-    visio_url: z.string().url().optional(),
+    visio_url: z
+      .string()
+      .optional()
+      .transform((x) => {
+        if (x) {
+          if (z.string().url().safeParse(x).success) {
+            return x
+          }
+          return `https://${x}`
+        }
+      }),
     post_address: postAddressSchema.optional(),
     time_zone: z.string(),
     electoral: z.boolean().optional(),
     visibility: EventVisibilitySchema,
-    live_url: z.string().url().optional(),
+    live_url: z
+      .string()
+      .optional()
+      .refine((value) => !value || /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w.-]*)*\/?$/.test(value), {
+        message: 'Le lien doit être valide',
+      })
+      .transform((x) => {
+        if (x) {
+          if (z.string().url().safeParse(x).success) {
+            return x
+          }
+          return `https://${x}`
+        }
+      }),
   })
   .refine((data) => isBefore(new Date(), data.begin_at), {
     message: "L'évenement doit être dans le futur",
@@ -47,10 +84,6 @@ export const createEventSchema = z
     message: 'La date de fin doit être postérieure à la date de début.',
     path: ['finish_at'],
   })
-  .refine((data) => data.mode === 'online' && data.visio_url, {
-    message: 'Le lien de la visioconférence est obligatoire pour un événement virtuel',
-    path: ['visio_url'],
-  })
   .superRefine((data, ctx) => {
     if (data.mode === 'meeting') {
       const checkHasAddressFull = data.post_address?.address && data.post_address?.postal_code && data.post_address?.city_name && data.post_address?.country
@@ -59,7 +92,7 @@ export const createEventSchema = z
       if (!checkHasAddressFull) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'L’adresse est obligatoire pour un événement physique',
+          message: 'L’adresse est obligatoire pour un événement en présentiel',
           path: ['post_address'],
         })
       }
@@ -74,6 +107,22 @@ export const createEventSchema = z
             })
           }
         }
+      }
+    } else {
+      if (!data.visio_url || data.visio_url.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Le lien de la visioconférence est obligatoire pour un événement en ligne',
+          path: ['visio_url'],
+        })
+      }
+
+      if (parsePartialUrl(data.visio_url).error) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Le lien de la visioconférence doit être un lien valide',
+          path: ['visio_url'],
+        })
       }
     }
   })

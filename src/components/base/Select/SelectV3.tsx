@@ -50,6 +50,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
           white={props.color === 'white'}
           size={props.size ?? 'lg'}
           onPress={handlePress}
+          error={Boolean(props.error)}
           ref={frameRef}
           onLayout={() => {
             modalRef.current?.setModalPosition?.()

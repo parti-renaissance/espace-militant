@@ -123,3 +123,27 @@ export const useSuspensePaginatedEventPartcipants = (props: { eventId: string; s
     },
   })
 }
+
+export const useSuspenseGetCategories = () => {
+  return useSuspenseQuery({
+    queryKey: ['eventCategories'],
+    queryFn: () => api.getEventCategories(),
+  })
+}
+
+export const useCreateEvent = () => {
+  const toast = useToastController()
+  return useMutation({
+    mutationFn: api.createEvent,
+    onSuccess: () => {
+      toast.show('Succès', { message: 'Événement créé avec succès', type: 'success' })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: 'Impossible de créer cet événement', type: 'error' })
+      }
+    },
+  })
+}

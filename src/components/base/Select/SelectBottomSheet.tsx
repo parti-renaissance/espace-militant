@@ -57,9 +57,9 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
         ref={bottomSheetRef}
         backdropComponent={renderBackdrop}
         enablePanDownToClose
-        // index={-1}
+        index={1}
         // enableDynamicSizing
-        // keyboardBehavior="fillParent"
+        keyboardBehavior="fillParent"
         snapPoints={snapPoints}
         onDismiss={handleClose}
         handleIndicatorStyle={{
