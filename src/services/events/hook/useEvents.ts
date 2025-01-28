@@ -2,11 +2,12 @@ import { EventFilters } from '@/core/entities/Event'
 import { useSession } from '@/ctx/SessionProvider'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/events/api'
+import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { RestPostPublicEventSubsciptionRequest } from '../schema'
-import { optimisticToggleSubscribe } from './helpers'
+import { RestPostEventRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
+import { optimisticToggleSubscribe, optimisticUpdate } from './helpers'
 import { QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
 
 type FetchShortEventsOptions = {
@@ -120,6 +121,162 @@ export const useSuspensePaginatedEventPartcipants = (props: { eventId: string; s
         return undefined
       }
       return firstPageParam - 1
+    },
+  })
+}
+
+export const useSuspenseGetCategories = () => {
+  return useSuspenseQuery({
+    queryKey: ['eventCategories'],
+    queryFn: () => api.getEventCategories(),
+  })
+}
+
+export const useCreateEvent = ({ editSlug, editUuid }: { editSlug?: string; editUuid?: string }) => {
+  const queryClient = useQueryClient()
+  const toast = useToastController()
+  const successMessage = editSlug ? 'Événement modifié avec succès' : 'Événement créé avec succès'
+  const errorMessage = editSlug ? 'Impossible de modifier cet événement' : 'Impossible de créer cet événement'
+  return useMutation({
+    mutationFn: editUuid
+      ? ({ payload, scope }: { payload: RestPostEventRequest; scope: string }) => api.updateEvent({ payload, eventId: editUuid, scope })
+      : api.createEvent,
+    onSuccess: (payload) => {
+      toast.show('Succès', { message: successMessage, type: 'success' })
+      if (editSlug) {
+        optimisticUpdate(
+          payload,
+          {
+            eventId: payload.uuid,
+            slug: payload.slug,
+          },
+          queryClient,
+        )
+      } else {
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS],
+        })
+        queryClient.invalidateQueries({
+          queryKey: [PAGINATED_QUERY_FEED],
+        })
+      }
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: errorMessage, type: 'error' })
+      }
+      return error
+    },
+  })
+}
+
+export const useMutationEventImage = () => {
+  const toast = useToastController()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (x: {
+      eventId: string
+      scope: string
+      payload: string
+      slug: string
+      size: {
+        width: number
+        height: number
+      }
+    }) => api.uploadEventImage(x),
+    onSuccess: (_, { payload, size, eventId, slug }) => {
+      optimisticUpdate(
+        { image: { url: payload, ...size } },
+        {
+          eventId,
+          slug,
+        },
+        queryClient,
+      )
+      toast.show('Succès', { message: "Image de l'événement ajoutée", type: 'success' })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: "Impossible d'ajouter l'image de l'événement", type: 'error' })
+      }
+      return error
+    },
+  })
+}
+
+export const useDeleteEventImage = () => {
+  const toast = useToastController()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (x: { eventId: string; scope: string; slug: string }) => api.deleteEventImage(x),
+    onSuccess: (_, { eventId, slug }) => {
+      toast.show('Succès', { message: "Image de l'événement supprimée", type: 'success' })
+      optimisticUpdate(
+        { image: null },
+        {
+          eventId,
+          slug,
+        },
+        queryClient,
+      )
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: "Impossible de supprimer l'image de l'événement", type: 'error' })
+      }
+      return error
+    },
+  })
+}
+
+export const useDeleteEvent = () => {
+  const toast = useToastController()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: api.deleteEvent,
+    onSuccess: (_, { eventId }) => {
+      toast.show('Succès', { message: 'Événement supprimée', type: 'success' })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [PAGINATED_QUERY_FEED],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY_SINGLE_EVENT, eventId],
+      })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: "Impossible de supprimer l'événement", type: 'error' })
+      }
+      return error
+    },
+  })
+}
+
+export const useCancelEvent = () => {
+  const toast = useToastController()
+  return useMutation({
+    mutationFn: api.cancelEvent,
+    onSuccess: () => {
+      toast.show('Succès', { message: 'Événement annulé', type: 'success' })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: "Impossible d'annuler l'événement", type: 'error' })
+      }
+      return error
     },
   })
 }

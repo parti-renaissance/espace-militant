@@ -1,4 +1,4 @@
-import React, { NamedExoticComponent, useCallback, useEffect } from 'react'
+import React, { ComponentRef, NamedExoticComponent, useCallback, useEffect } from 'react'
 import { FlatList, Modal, TouchableOpacity } from 'react-native'
 import Text from '@/components/base/Text'
 import { useLazyRef } from '@/hooks/useLazyRef'
@@ -7,14 +7,13 @@ import { Check } from '@tamagui/lucide-icons'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 
 export const DropdownItemFrame = styled(ThemeableStack, {
-  paddingHorizontal: '$large',
+  padding: '$medium',
   gap: '$medium',
   backgroundColor: 'white',
   flexDirection: 'row',
   alignItems: 'center',
   alignContent: 'center',
   justifyContent: 'space-between',
-  paddingVertical: '$xsmall',
   borderBottomWidth: 1,
   borderBottomColor: '$textOutline',
   focusable: true,
@@ -54,7 +53,7 @@ export const DropdownItemFrame = styled(ThemeableStack, {
 })
 
 type ItemProps = {
-  title: string
+  title: string | React.ReactNode[] | Element
   subtitle?: string
   onPress?: () => void
   selected?: boolean
@@ -62,21 +61,23 @@ type ItemProps = {
   icon?: NamedExoticComponent<IconProps>
 } & React.ComponentPropsWithoutRef<typeof DropdownItemFrame>
 
-export const DropdownItem = ({ title, subtitle, color = '$textPrimary', ...props }: ItemProps) => {
+export const DropdownItem = ({ title, subtitle, color = '$textPrimary', theme, ...props }: ItemProps) => {
   return (
     <DropdownItemFrame {...props}>
-      <YStack flex={1}>
-        <Text.MD multiline semibold color={color}>
-          {title}
-        </Text.MD>
-        {subtitle ? <Text.SM secondary>{subtitle}</Text.SM> : null}
-      </YStack>
-      {[props.icon, props.selected].some((x) => x) ? (
-        <XStack>
-          {props.icon ? <props.icon color={color} size={20} /> : null}
-          {props.selected ? <Check color={color} size={20} /> : null}
+      <YStack flex={1} gap="$small">
+        <XStack alignSelf="flex-start" theme={theme} gap="$small">
+          {props?.icon ? <props.icon color={theme ? '$color5' : color} size={16} /> : null}
+          <Text.MD textAlign="left" color={theme ? '$color5' : color}>
+            {title}
+          </Text.MD>
         </XStack>
-      ) : null}
+        {subtitle ? (
+          <Text.SM secondary multiline>
+            {subtitle}
+          </Text.SM>
+        ) : null}
+      </YStack>
+      {[props.selected].some((x) => x) ? <XStack>{props.selected ? <Check color={color} size={20} /> : null}</XStack> : null}
     </DropdownItemFrame>
   )
 }
@@ -106,10 +107,13 @@ export const DropdownFrame = styled(ThemeableStack, {
       xl: {
         maxHeight: 64 * 6,
       },
+      false: {
+        maxHeight: 'unset',
+      },
     },
   },
   defaultVariants: {
-    size: 'md',
+    size: 'xl',
   },
 })
 
@@ -129,7 +133,13 @@ export function Dropdown<A extends string>({ items, onSelect, value, ...props }:
         data={items}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
-          <MemoItem {...item} size={props.size ?? 'lg'} onPress={handleSelect(item.id)} selected={item.id === value} last={items.length - 1 === index} />
+          <MemoItem
+            {...item}
+            size={typeof props.size === 'string' ? props.size : 'lg'}
+            onPress={handleSelect(item.id)}
+            selected={item.id === value}
+            last={items.length - 1 === index}
+          />
         )}
       />
     </DropdownFrame>
@@ -143,7 +153,7 @@ export function DropdownWrapper<A extends string>({
 }: DropdownProps<A> & { children: React.ReactNode; open?: boolean; onOpenChange?: (x: boolean) => void }) {
   const open = props.open ?? false
   const setOpen = props.onOpenChange ?? (() => {})
-  const container = React.useRef<TouchableOpacity | null>(null)
+  const container = React.useRef<ComponentRef<typeof TouchableOpacity> | null>(null)
   const [dropdownTop, setDropdownTop] = React.useState(0)
   useEffect(() => {
     if (!container.current || !props.open) return

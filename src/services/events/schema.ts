@@ -76,6 +76,7 @@ export const RestFullEventSchema = z
     participants_count: z.number(),
     capacity: z.number().nullable(),
     visio_url: z.string().nullable(),
+    live_url: z.string().nullable(),
     user_registered_at: z.string().nullable(),
     live_url: z.string().nullable(),
     is_national: z.boolean(),
@@ -182,3 +183,63 @@ export const RestEventParticipantsResponse = createRestPaginationSchema(
     tags: z.array(activistTagSchema).nullable(),
   }),
 )
+
+// ------------- Rest Events Categories -------------
+export const EventCategorySchema = z.object({
+  name: z.string(),
+  slug: z.string(),
+  description: z.string().nullable(),
+  alert: z.string().nullish(),
+})
+
+export type EventCategory = z.infer<typeof EventCategorySchema>
+
+export const RestGetEventCategoriesResponseSchema = z.array(EventCategorySchema)
+
+// ------------ REST CREATE EVENT ---------------\
+
+const postAddressSchema = z.object({
+  address: z.string().nullish(),
+  postal_code: z.string().nullish(),
+  city_name: z.string().nullish(),
+  country: z.string().nullish(),
+})
+
+export type RestPostEventRequest = z.infer<typeof RestPostEventRequestSchema>
+export const RestPostEventRequestSchema = z.object({
+  name: z.string(),
+  category: z.string(),
+  description: z.string(),
+  begin_at: z.date(),
+  finish_at: z.date(),
+  capacity: z.number().optional(),
+  mode: z.enum(['online', 'meeting']),
+  visio_url: z.string().optional(),
+  post_address: postAddressSchema.optional(),
+  time_zone: z.string(),
+  electoral: z.boolean().optional(),
+  visibility: EventVisibilitySchema,
+  live_url: z.string().optional(),
+})
+
+export const RestPostEventResponseSchema = RestFullEventSchema
+
+export const propertyPathPostEventSchema = z.enum([
+  'name',
+  'post_address',
+  'post_address.address',
+  'post_address.postal_code',
+  'post_address.city_name',
+  'post_address.country',
+  'category',
+  'description',
+  'time_zone',
+  'capacity',
+  'begin_at',
+  'finish_at',
+  'mode',
+  'visio_url',
+  'electoral',
+  'visibility',
+  'live_url',
+])

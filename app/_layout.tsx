@@ -106,7 +106,7 @@ function Root() {
   useRegisterRoutingInstrumentation()
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: 'white' }}>
       <StatusBar animated style="dark" />
       <ToastProvider swipeDirection="up">
         <QueryClientProvider client={queryClient}>

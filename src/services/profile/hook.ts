@@ -64,6 +64,10 @@ export const useGetExecutiveScopes = () => {
       lastAvailableScopes,
     },
     ...rest,
+    hasFeature: (x: string) => {
+      const features = cadre_scopes?.flatMap((x) => x.features)
+      return features?.includes(x)
+    },
   }
 }
 

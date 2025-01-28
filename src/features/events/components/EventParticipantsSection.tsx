@@ -10,6 +10,7 @@ import { Download, Sparkle } from '@tamagui/lucide-icons'
 import { XStack } from 'tamagui'
 import { EventParticipantsTable, TableSkeleton } from '../components/EventParticipantsTable'
 import { isEventFull } from '../utils'
+import EventHandleActions from './EventHandleActions'
 
 const EventParticipantsSection = ({ event }: EventItemProps) => {
   const { handleDownload, isPending } = useFileDownload()
@@ -59,11 +60,38 @@ const EventParticipantsSection = ({ event }: EventItemProps) => {
                 Gestion
               </Text.LG>
             </XStack>
+          </XStack>
+
+          <XStack justifyContent="space-between">
+            <XStack gap="$small" alignItems="center">
+              <Text.MD color="$purple6" semibold>
+                Liste des participants
+              </Text.MD>
+            </XStack>
             <VoxButton variant="soft" theme="purple" size="sm" iconRight={Download} onPress={handlePress} loading={isPending}>
               Télécharger la liste
             </VoxButton>
           </XStack>
+
           <EventParticipantsTable eventId={event.uuid} scope={scope} />
+          <VoxCard.Separator />
+          <XStack justifyContent="space-between">
+            <XStack gap="$small" alignItems="center">
+              <Text.MD color="$purple6" semibold>
+                Gérer l'événement
+              </Text.MD>
+            </XStack>
+            <EventHandleActions
+              scope={scope}
+              //@ts-expect-error wrong type
+              event={event}
+              buttonProps={{
+                theme: 'orange',
+                size: 'sm',
+                variant: 'soft',
+              }}
+            />
+          </XStack>
         </VoxCard.Content>
       </VoxCard>
     </Suspense>

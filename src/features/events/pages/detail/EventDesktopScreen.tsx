@@ -16,6 +16,7 @@ import { RestItemEvent } from '@/services/events/schema'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
 import { Image, isWeb, XStack, YStack } from 'tamagui'
+import EventMDXRenderer from '../../components/EventMDXRenderer'
 import EventParticipantsSection from '../../components/EventParticipantsSection'
 import { EventToggleSubscribeButton } from '../../components/EventToggleSubscribeButton'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
@@ -107,13 +108,13 @@ const EventDesktopMain = ({ event }: EventItemProps) => {
     <PageLayout.MainSingleColumn height="100%">
       <VoxCard.Content pr={0} height="100%">
         <VoxCard.Content height="100%" p={0} pr="$medium" borderRightColor="$textOutline32" borderRightWidth={1}>
-          {fallbackImage ? <VoxCard.Image image={fallbackImage} imageData={event.image} /> : null}
+          <VoxCard.Image image={fallbackImage} imageData={event.image} />
           <EventItemHeader>
             <CategoryChip>{event.category?.name}</CategoryChip>
             <EventPremiumChip event={event} />
           </EventItemHeader>
           {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
-          {isFull && event.description ? <VoxCard.Description markdown>{event.description}</VoxCard.Description> : null}
+          {isFull && event.description ? <EventMDXRenderer>{event.description}</EventMDXRenderer> : null}
         </VoxCard.Content>
       </VoxCard.Content>
     </PageLayout.MainSingleColumn>
@@ -145,7 +146,7 @@ const EventDesktopScreen = ({ event, userUuid }: EventItemProps) => {
             <EventDesktopAside event={event} userUuid={userUuid} />
           </XStack>
         </VoxCard>
-          <EventParticipantsSection event={event} userUuid={userUuid} />
+        <EventParticipantsSection event={event} userUuid={userUuid} />
       </YStack>
     </ScrollStack>
   )

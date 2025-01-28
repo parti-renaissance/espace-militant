@@ -2,7 +2,7 @@ import { mapParams, type GetEventsSearchParametersMapperProps } from '@/services
 import * as schemas from '@/services/events/schema'
 import { api } from '@/utils/api'
 import { z } from 'zod'
-import { publicEventSubscriptionFormErrorThrower } from './error'
+import { eventPostFormErrorThrower, publicEventSubscriptionFormErrorThrower } from './error'
 
 export const getEvents = (params: GetEventsSearchParametersMapperProps) =>
   api({
@@ -79,3 +79,71 @@ export const getEventParticipants = (props: { eventId: string; page: number; sco
 
 export const getEventParticipantsFileEndpoint = (props: { eventId: string; scope: string }) =>
   `/api/v3/events/${props.eventId}/participants.xlsx?scope=${encodeURIComponent(props.scope)}`
+
+export const getEventCategories = api({
+  method: 'get',
+  path: '/api/event_categories',
+  requestSchema: z.void(),
+  responseSchema: schemas.RestGetEventCategoriesResponseSchema,
+  type: 'private',
+})
+
+export const createEvent = (props: { payload: schemas.RestPostEventRequest; scope: string }) =>
+  api({
+    method: 'post',
+    path: '/api/v3/events?scope=' + props.scope,
+    requestSchema: schemas.RestPostEventRequestSchema,
+    responseSchema: schemas.RestPostEventResponseSchema,
+    errorThrowers: [eventPostFormErrorThrower],
+    type: 'private',
+  })(props.payload)
+
+export const updateEvent = (props: { payload: schemas.RestPostEventRequest; eventId: string; scope: string }) =>
+  api({
+    method: 'put',
+    path: `/api/v3/events/${props.eventId}?scope=${props.scope}`,
+    requestSchema: schemas.RestPostEventRequestSchema,
+    responseSchema: schemas.RestPostEventResponseSchema,
+    errorThrowers: [eventPostFormErrorThrower],
+    type: 'private',
+  })(props.payload)
+
+export const deleteEvent = (props: { eventId: string; scope: string }) =>
+  api({
+    method: 'DELETE',
+    path: `/api/v3/events/${props.eventId}?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: z.any(),
+    type: 'private',
+  })()
+
+export const cancelEvent = (props: { eventId: string; scope: string }) =>
+  api({
+    method: 'PUT',
+    path: `/api/v3/events/${props.eventId}/cancel?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: z.any(),
+    type: 'private',
+  })()
+
+export const uploadEventImage = (props: { eventId: string; scope: string; payload: string }) =>
+  api({
+    method: 'post',
+    path: `/api/v3/events/${props.eventId}/image?scope=${props.scope}`,
+    requestSchema: z.object({
+      content: z.string(),
+    }),
+    responseSchema: z.any(),
+    type: 'private',
+  })({
+    content: props.payload,
+  })
+
+export const deleteEventImage = (props: { eventId: string; scope: string }) =>
+  api({
+    method: 'delete',
+    path: `/api/v3/events/${props.eventId}/image?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: z.any(),
+    type: 'private',
+  })()
