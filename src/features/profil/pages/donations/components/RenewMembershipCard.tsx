@@ -28,7 +28,7 @@ export default function (props: CommonMembershipCardProps) {
                   <Text.SM secondary>Dernière cotisation le {getHumanFormattedDate(props.last_membership_donation)}</Text.SM>
                 ) : null}
               </YStack>
-              <XStack gap="$small" flexWrap="wrap">
+              <XStack gap="$small" flexWrap="wrap" alignContent="center" alignItems="center">
                 <VoxButton size="lg" theme="yellow" disabled={isPending} onPress={handleAdhesionLink()}>
                   Me mettre à jour
                 </VoxButton>
