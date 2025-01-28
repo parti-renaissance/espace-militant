@@ -1,7 +1,7 @@
 import SelectV3 from '@/components/base/Select/SelectV3'
-import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
+import { Sparkle } from '@tamagui/lucide-icons'
 
 export default function ExecutiveRoleSelector() {
   const { data: scopes } = useGetExecutiveScopes()
@@ -11,6 +11,7 @@ export default function ExecutiveRoleSelector() {
     label: `${scope.name}`,
     subLabel: scope.zones.map(({ name, code }) => `${name} (${code})`).join(', '),
     value: scope.code,
+    icon: Sparkle,
   }))
 
   const handleChange = (value: string) => {
@@ -20,12 +21,19 @@ export default function ExecutiveRoleSelector() {
   if (scopes.list.length === 0) return null
 
   return (
-    <VoxCard backgroundColor="$purple1" inside>
+    <VoxCard inside>
       <VoxCard.Content>
-        <Text.MD semibold textAlign="center" color="$purple6">
-          Changer de rôle actif
-        </Text.MD>
-        <SelectV3 color="purple" size="xl" options={formatedScopes} multiline onChange={handleChange} value={scopes.default.code} />
+        <SelectV3
+          matchTextWithTheme
+          theme="purple"
+          label="Changer de rôle actif"
+          color="purple"
+          size="xl"
+          options={formatedScopes}
+          multiline
+          onChange={handleChange}
+          value={scopes.default.code}
+        />
       </VoxCard.Content>
     </VoxCard>
   )

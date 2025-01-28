@@ -1,4 +1,4 @@
-import React, { forwardRef, RefObject, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
+import React, { ComponentRef, forwardRef, RefObject, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
 import { TouchableOpacity } from 'react-native'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet'
 import { YStack } from 'tamagui'
@@ -6,16 +6,17 @@ import { DropdownFrame, DropdownItem } from '../Dropdown'
 import Input from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
+import { reactTextNodeChildrenToString } from './utils'
 
 const MemoItem = React.memo(DropdownItem)
 
 type BottomsheetLogicProps = {
-  frameRef?: RefObject<TouchableOpacity>
+  frameRef?: RefObject<ComponentRef<typeof TouchableOpacity>>
 } & SelectProps<string>
 
 const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({ options, searchableOptions, frameRef, resetable, ...props }, ref) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const snapPoints = useMemo(() => ['60%'], [])
+  const snapPoints = useMemo(() => ['90%'], [])
   const { setQuery, filteredItems, queryInputRef, searchableIcon } = useSelectSearch({ options, searchableOptions })
 
   useImperativeHandle(
@@ -37,11 +38,12 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
     setQuery('')
   }
 
-  const handleSelect = (payload: { title: string; id: string }) => () => {
+  const handleSelect = (payload: (typeof filteredItems)[number]) => () => {
     props.onChange?.(payload.id)
     props.onDetailChange?.({
       value: payload.id,
-      label: payload.title,
+      label: reactTextNodeChildrenToString(payload.title),
+      subLabel: payload.subtitle,
     })
     setQuery('')
     bottomSheetRef.current?.close()
@@ -55,8 +57,9 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
         ref={bottomSheetRef}
         backdropComponent={renderBackdrop}
         enablePanDownToClose
-        // index={-1}
-        enableDynamicSizing={false}
+        index={1}
+        // enableDynamicSizing
+        keyboardBehavior="fillParent"
         snapPoints={snapPoints}
         onDismiss={handleClose}
         handleIndicatorStyle={{
@@ -68,6 +71,7 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
           <BottomSheetFlatList
             stickyHeaderHiddenOnScroll={props.searchable}
             stickyHeaderIndices={props.searchable ? [0] : undefined}
+            keyboardShouldPersistTaps
             ListHeaderComponent={
               props.searchable ? (
                 <YStack padding={16} bg="white">
@@ -77,6 +81,7 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
                     onChangeText={setQuery}
                     placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
                     iconRight={searchableIcon}
+                    loading={searchableOptions?.isFetching}
                   />
                 </YStack>
               ) : null

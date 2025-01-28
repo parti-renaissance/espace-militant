@@ -4,6 +4,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
+import { VoxButton } from '@/components/Button'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import MyProfileCard from '@/components/ProfileCards/ProfileCard/MyProfileCard'
 import ProfileLoginCTA from '@/components/ProfileCards/ProfileLoginCTA/ProfileLoginCTA'
@@ -14,8 +15,9 @@ import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
 import EventFilterForm from '@/features/events/components/EventFilterForm/EventFilterForm'
 import EventFeedList from '@/features/events/pages'
+import { Link } from 'expo-router'
 import Head from 'expo-router/head'
-import { getTokenValue, XStack, YStack } from 'tamagui'
+import { getTokenValue, isWeb, XStack, YStack } from 'tamagui'
 
 const options = [{ label: 'Tous les événements', value: 'events' } as const, { label: "J'y participe", value: 'myEvents' } as const]
 
@@ -137,6 +139,11 @@ const EventsScreen: React.FC = () => {
                 <YStack paddingHorizontal="$medium" height={50}>
                   <EventFilterForm />
                 </YStack>
+                <Link href="/evenements/creer" asChild={!isWeb}>
+                  <VoxButton pop theme="purple">
+                    Nouvel événement
+                  </VoxButton>
+                </Link>
               </YStack>
             </Animated.View>
 
@@ -208,6 +215,11 @@ const EventsScreen: React.FC = () => {
               <YStack>
                 <EventFilterForm />
               </YStack>
+              <Link href="/evenements/creer" asChild={!isWeb}>
+                <VoxButton pop theme="purple">
+                  Nouvel événement
+                </VoxButton>
+              </Link>
             </YStack>
           </StickyBox>
         </PageLayout.SideBarRight>
