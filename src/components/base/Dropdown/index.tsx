@@ -1,4 +1,4 @@
-import React, { NamedExoticComponent, useCallback, useEffect } from 'react'
+import React, { ComponentRef, NamedExoticComponent, useCallback, useEffect } from 'react'
 import { FlatList, Modal, TouchableOpacity } from 'react-native'
 import Text from '@/components/base/Text'
 import { useLazyRef } from '@/hooks/useLazyRef'
@@ -54,7 +54,7 @@ export const DropdownItemFrame = styled(ThemeableStack, {
 })
 
 type ItemProps = {
-  title: string
+  title: string | React.ReactNode[] | Element
   subtitle?: string
   onPress?: () => void
   selected?: boolean
@@ -143,7 +143,7 @@ export function DropdownWrapper<A extends string>({
 }: DropdownProps<A> & { children: React.ReactNode; open?: boolean; onOpenChange?: (x: boolean) => void }) {
   const open = props.open ?? false
   const setOpen = props.onOpenChange ?? (() => {})
-  const container = React.useRef<TouchableOpacity | null>(null)
+  const container = React.useRef<ComponentRef<typeof TouchableOpacity> | null>(null)
   const [dropdownTop, setDropdownTop] = React.useState(0)
   useEffect(() => {
     if (!container.current || !props.open) return

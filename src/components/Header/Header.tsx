@@ -211,7 +211,7 @@ const VoxHeaderContainerStyled = styled(Container, {
   borderBottomColor: '$textOutline',
 
   $md: {
-    paddingHorizontal: 26,
+    paddingHorizontal: 16,
     paddingVertical: 6,
   },
   $gtMd: {
@@ -276,18 +276,18 @@ const VoxHeaderLeftButtonFrame = styled(ThemeableStack, {
 })
 
 const VoxHeaderLeftButton = (
-  props: React.ComponentProps<typeof VoxHeaderLeftButtonFrame> & { icon: React.NamedExoticComponent<IconProps>; backTitle?: string },
+  props: React.ComponentProps<typeof VoxHeaderLeftButtonFrame> & { icon?: React.NamedExoticComponent<IconProps>; backTitle?: string },
 ) => (
   <VoxHeaderLeftButtonFrame {...props} height="100%">
-    <props.icon size={24} color="$textPrimary" />
+    {props.icon ? <props.icon size={24} color="$textPrimary" /> : null}
     {!!props.backTitle && <Text.LG semibold>{props.backTitle}</Text.LG>}
   </VoxHeaderLeftButtonFrame>
 )
 
-const VoxHeaderTitle = (props: { children: string; icon: React.NamedExoticComponent<IconProps> }) => {
+const VoxHeaderTitle = (props: { children: string; icon?: React.NamedExoticComponent<IconProps> }) => {
   return (
     <XStack alignItems="center" gap={10}>
-      <props.icon size={24} color="$textPrimary" />
+      {props.icon ? <props.icon size={24} color="$textPrimary" /> : null}
       <Text.LG semibold>{props.children}</Text.LG>
     </XStack>
   )

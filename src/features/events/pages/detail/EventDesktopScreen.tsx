@@ -15,6 +15,7 @@ import { RestItemEvent } from '@/services/events/schema'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
 import { Image, isWeb, XStack, YStack } from 'tamagui'
+import EventMDXRenderer from '../../components/EventMDXRenderer'
 import EventParticipantsSection from '../../components/EventParticipantsSection'
 import { EventToggleSubscribeButton } from '../../components/EventToggleSubscribeButton'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
@@ -112,7 +113,7 @@ const EventDesktopMain = ({ event }: EventItemProps) => {
             <EventPremiumChip event={event} />
           </EventItemHeader>
           {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
-          {isFull && event.description ? <VoxCard.Description markdown>{event.description}</VoxCard.Description> : null}
+          {isFull && event.description ? <EventMDXRenderer>{event.description}</EventMDXRenderer> : null}
         </VoxCard.Content>
       </VoxCard.Content>
     </PageLayout.MainSingleColumn>
