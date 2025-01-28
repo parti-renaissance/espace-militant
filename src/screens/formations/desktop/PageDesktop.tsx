@@ -1,4 +1,4 @@
-import { ComponentRef, forwardRef, Fragment, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { ComponentRef, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, LayoutRectangle, NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import BreadCrumb from '@/components/BreadCrumb/BreadCrumb'
@@ -9,10 +9,8 @@ import { items } from '@/screens/formations/bread-crumbs-items'
 import { FormationScreenProps } from '@/screens/formations/types'
 import { useGetFormations } from '@/services/formations/hook'
 import * as types from '@/services/formations/schema'
-import { useGetMagicLink } from '@/services/magic-link/hook'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
-import { Href, Link } from 'expo-router'
-import { getTokenValue, isWeb, ScrollView, YStack } from 'tamagui'
+import { getTokenValue, ScrollView, YStack } from 'tamagui'
 import { FormationDenyCard } from '../components/DenyCard'
 import FormationDesktopLayout from './ FormationDesktopLayout'
 import FormationSection, { FormationSectionSkeleton } from './FormationSection'
@@ -169,17 +167,6 @@ const FormationDesktopScreenAllow: FormationScreenProps = ({ topVisual }) => {
 }
 
 export const FormationDesktopScreenDeny: FormationScreenProps = ({ topVisual }) => {
-  const { data: adhesionLink, isPending } = useGetMagicLink({ slug: 'adhesion' })
-  const MaybeLink = ({ children }: { children: React.ReactNode }) => {
-    if (adhesionLink?.url && !isPending) {
-      return (
-        <Link href={adhesionLink.url as Href<string>} asChild={!isWeb} target="_blank">
-          {children}
-        </Link>
-      )
-    }
-    return <Fragment>{children}</Fragment>
-  }
   return (
     <FormationDesktopLayout topVisual={topVisual} leftComponent={null}>
       <YStack gap="$medium" padding="$medium" pt={topVisual / 2} justifyContent="center" alignItems="center">
