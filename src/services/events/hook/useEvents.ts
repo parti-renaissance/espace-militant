@@ -2,6 +2,7 @@ import { EventFilters } from '@/core/entities/Event'
 import { useSession } from '@/ctx/SessionProvider'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/events/api'
+import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -120,6 +121,38 @@ export const useSuspensePaginatedEventPartcipants = (props: { eventId: string; s
         return undefined
       }
       return firstPageParam - 1
+    },
+  })
+}
+
+export const useSuspenseGetCategories = () => {
+  return useSuspenseQuery({
+    queryKey: ['eventCategories'],
+    queryFn: () => api.getEventCategories(),
+  })
+}
+
+export const useCreateEvent = () => {
+  const queryClient = useQueryClient()
+  const toast = useToastController()
+  return useMutation({
+    mutationFn: api.createEvent,
+    onSuccess: () => {
+      toast.show('Succès', { message: 'Événement créé avec succès', type: 'success' })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [PAGINATED_QUERY_FEED],
+      })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: 'Impossible de créer cet événement', type: 'error' })
+      }
+      return error
     },
   })
 }

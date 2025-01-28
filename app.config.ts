@@ -36,6 +36,11 @@ const applyConfig = (config: Partial<ExpoConfig>, options: ConfigOptions) => {
   if (config.ios) {
     config.ios.bundleIdentifier = options.bundleIdentifier
     config.ios.googleServicesFile = options.googleServicesFileIos
+    if (config.ios.config) {
+      config.ios.config.usesNonExemptEncryption = false
+    } else {
+      config.ios.config = { usesNonExemptEncryption: false }
+    }
     if (options.icon) {
       config.ios.icon = options.icon
     }

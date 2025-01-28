@@ -108,6 +108,10 @@ const InverseContainedFrame = styled(ButtonFrameStyled, {
   name: 'VoxButtonInverseContained',
 })
 
+const InverseSoftFrame = styled(ButtonFrameStyled, {
+  name: 'VoxButtonInverseSoft',
+})
+
 const OutlinedFrame = styled(ButtonFrameStyled, {
   name: 'VoxButtonOutlined',
   borderColor: '$borderColor',
@@ -132,7 +136,7 @@ const getFrame = (variant?: 'outlined' | 'text' | 'soft' | 'contained', inverse?
     case 'text':
       return TextFrame
     case 'soft':
-      return SoftFrame
+      return inverse ? InverseSoftFrame : SoftFrame
     case 'contained':
     default:
       return inverse ? InverseContainedFrame : ContainedFrame

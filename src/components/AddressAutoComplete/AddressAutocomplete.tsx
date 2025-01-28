@@ -2,9 +2,9 @@ import React, { ComponentProps, memo, useCallback, useState } from 'react'
 import usePlaceAutocomplete from '@/components/AddressAutoComplete/Hooks/usePlaceAutocomplete'
 import usePlaceDetails from '@/components/AddressAutoComplete/Hooks/usePlaceDetails'
 import googleAddressMapper from '@/data/mapper/googleAddressMapper'
-import { Search } from '@tamagui/lucide-icons'
+import { MapPin, Search } from '@tamagui/lucide-icons'
 import { useDebounceValue, YStack } from 'tamagui'
-import Select from '../base/Select/Select'
+import Select from '../base/Select/SelectV3'
 
 export interface AddressAutocompleteProps {
   defaultValue?: string
@@ -31,13 +31,11 @@ export interface AddressAutocompleteProps {
 function AddressAutocomplete({
   setAddressComponents,
   defaultValue,
-  minimal,
   error,
   maxWidth,
   minWidth,
   onBlur,
   onReset,
-  forceSelect = true,
   ...rest
 }: Readonly<AddressAutocompleteProps> & Omit<ComponentProps<typeof Select>, 'handleQuery' | 'options' | 'value' | 'onChange'>): JSX.Element {
   const [value, setValue] = useState<string>('default')
@@ -45,7 +43,7 @@ function AddressAutocomplete({
 
   const address = useDebounceValue(query, 500)
 
-  const { data: autocompleteResults, isFetching } = usePlaceAutocomplete({ address })
+  const { data: autocompleteResults, isFetching } = usePlaceAutocomplete({ address, keepPreviousData: true })
   const { mutateAsync } = usePlaceDetails()
 
   // On input notify that user is interacting with component
@@ -72,12 +70,15 @@ function AddressAutocomplete({
       <Select
         placeholder={'Adresse'}
         value={value}
-        loading={isFetching}
         onChange={onPlaceSelect}
         onBlur={onBlur}
-        forceSelect={forceSelect}
-        defaultRightIcon={<Search />}
-        queryHandler={onInput}
+        icon={MapPin}
+        searchable
+        searchableOptions={{
+          autocompleteCallback: onInput,
+          isFetching,
+          icon: Search,
+        }}
         {...rest}
         options={[
           ...(autocompleteResults?.map((x) => ({

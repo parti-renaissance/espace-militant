@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react'
+import React, { Suspense, useCallback, useState } from 'react'
 import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
+import { VoxButton } from '@/components/Button'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import MyProfileCard from '@/components/ProfileCards/ProfileCard/MyProfileCard'
 import ProfileLoginCTA from '@/components/ProfileCards/ProfileLoginCTA/ProfileLoginCTA'
@@ -14,10 +15,29 @@ import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
 import EventFilterForm from '@/features/events/components/EventFilterForm/EventFilterForm'
 import EventFeedList from '@/features/events/pages'
+import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { CalendarPlus, Sparkle } from '@tamagui/lucide-icons'
+import { Link } from 'expo-router'
 import Head from 'expo-router/head'
-import { getTokenValue, XStack, YStack } from 'tamagui'
+import { getTokenValue, isWeb, XStack, YStack, YStackProps } from 'tamagui'
 
 const options = [{ label: 'Tous les événements', value: 'events' } as const, { label: "J'y participe", value: 'myEvents' } as const]
+
+const NewEventBtn = (props: YStackProps) => {
+  const { hasFeature } = useGetExecutiveScopes()
+  if (hasFeature('events') === false) {
+    return null
+  }
+  return (
+    <YStack {...props}>
+      <Link href="/evenements/creer" asChild={!isWeb}>
+        <VoxButton pop variant="soft" size="lg" theme="purple" iconLeft={Sparkle} iconRight={CalendarPlus}>
+          Nouvel événement
+        </VoxButton>
+      </Link>
+    </YStack>
+  )
+}
 
 const EventsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'events' | 'myEvents'>('events')
@@ -137,6 +157,11 @@ const EventsScreen: React.FC = () => {
                 <YStack paddingHorizontal="$medium" height={50}>
                   <EventFilterForm />
                 </YStack>
+                {isAuth ? (
+                  <Suspense>
+                    <NewEventBtn paddingHorizontal="$medium" />
+                  </Suspense>
+                ) : null}
               </YStack>
             </Animated.View>
 
@@ -208,6 +233,11 @@ const EventsScreen: React.FC = () => {
               <YStack>
                 <EventFilterForm />
               </YStack>
+              {isAuth ? (
+                <Suspense>
+                  <NewEventBtn />
+                </Suspense>
+              ) : null}
             </YStack>
           </StickyBox>
         </PageLayout.SideBarRight>
