@@ -15,6 +15,7 @@ type ButtonGroupProps<VALUE extends string> = {
   onChange: (value?: VALUE) => void
   switchMode?: boolean
   size?: ButtonProps['size']
+  variant?: ButtonProps['variant']
 }
 
 const ButtonGroupFrame = styled(ThemeableStack, {
@@ -30,6 +31,7 @@ export default function ButtonGroup<VALUE extends string>({
   theme,
   switchMode,
   size = 'sm',
+  variant = 'contained',
   ...props
 }: ButtonGroupProps<VALUE> & ComponentPropsWithoutRef<typeof ButtonGroupFrame>) {
   const handlePress = (item: VALUE) => () => {
@@ -44,7 +46,7 @@ export default function ButtonGroup<VALUE extends string>({
   return (
     <ButtonGroupFrame {...props}>
       {options.map((option) => (
-        <Button size={size} key={option.value} theme={theme} inverse={!isChecked(option.value)} onPress={handlePress(option.value)}>
+        <Button size={size} variant={variant} key={option.value} theme={theme} inverse={!isChecked(option.value)} onPress={handlePress(option.value)}>
           {option.label}
         </Button>
       ))}

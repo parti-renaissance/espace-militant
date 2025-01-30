@@ -40,7 +40,7 @@ export default function AppLayout() {
             }}
           ></Stack.Screen>
           <Stack.Screen
-            name="evenements/[id]/index"
+            name="evenements/[id]"
             options={{
               headerTransparent: true,
               header: ({ navigation }) => {
