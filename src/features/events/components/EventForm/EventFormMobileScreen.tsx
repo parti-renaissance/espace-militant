@@ -1,235 +1,81 @@
-import { Suspense, useMemo, useState } from 'react'
 import { KeyboardAvoidingView } from 'react-native'
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
 import { FormFrame } from '@/components/base/FormFrames'
 import Input from '@/components/base/Input/Input'
-import Select, { SelectOption, SF } from '@/components/base/Select/SelectV3'
+import Select, { SF } from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import DatePickerField from '@/components/DatePickerV2'
 import { VoxHeader } from '@/components/Header/Header'
-import PageLayout from '@/components/layouts/PageLayout/PageLayout'
+import LayoutPage from '@/components/layouts/PageLayout/PageLayout'
+import { MessageCard } from '@/components/MessageCard/MessageCard'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import DescriptionInput from '@/features/events/components/EventForm/DescriptionInput'
-import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
+import { EventFormData } from '@/features/events/components/EventForm/schema'
 import ScrollView from '@/features/profil/components/ScrollView'
-import { isPathExist } from '@/services/common/errors/utils'
-import { eventPostFormError } from '@/services/events/error'
-import { useCreateEvent, useSuspenseGetCategories } from '@/services/events/hook'
-import { EventCategory } from '@/services/events/schema'
-import { useGetExecutiveScopes } from '@/services/profile/hook'
-import { RestUserScopesResponse } from '@/services/profile/schema'
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Lock, Sparkle, Unlock, Users, Video, Webcam } from '@tamagui/lucide-icons'
-import { addHours, addMinutes, setMilliseconds, setMinutes, setSeconds } from 'date-fns'
-import { getTimezoneOffset } from 'date-fns-tz'
-import { Link, router, useNavigation } from 'expo-router'
-import { Controller, useForm } from 'react-hook-form'
+import { Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
+import { Link, useNavigation } from 'expo-router'
+import { Controller } from 'react-hook-form'
 import { isWeb, XStack, YStack } from 'tamagui'
-import { listTimeZones } from 'timezone-support'
-import { useDebouncedCallback } from 'use-debounce'
+import { useEventFormContext } from './context'
 
-function getTimezoneOffsetLabel(timeZone: string) {
-  const offset = getTimezoneOffset(timeZone)
-
-  return `UTC ${offset < 0 ? '' : '+'}${offset / 1000 / 60 / 60}h`
-}
-
-const timezones = listTimeZones().map((timeZone) => ({
-  value: timeZone,
-  label: `${timeZone} (${getTimezoneOffsetLabel(timeZone)})`,
-}))
-
-export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<string> => {
-  return {
-    value: scope.code,
-    label: [<SF.Text semibold>{scope.name}</SF.Text>, ' ', <SF.Text>{scope.zones.map(({ name, code }) => `${name} (${code})`).join(', ')}</SF.Text>],
-    theme: 'purple',
-    icon: Sparkle,
-  }
-}
-
-export const formatCategorie = (cat: EventCategory): SelectOption<string> => {
-  return {
-    label: cat.name,
-    value: cat.slug,
-  }
-}
-
-const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
-  {
-    value: 'adherent',
-    icon: Lock,
-    theme: 'yellow',
-    label: 'Réservé aux adhérents',
-  },
-  {
-    value: 'adherent_dues',
-    icon: Lock,
-    theme: 'yellow',
-    label: 'Réservé aux adhérents à jour',
-  },
-  {
-    value: 'private',
-    icon: Lock,
-    theme: 'gray',
-    label: 'Réservé aux millitants',
-  },
-  {
-    value: 'public',
-    icon: Unlock,
-    label: 'Ouvert au public',
-  },
-]
-
-const roundMinutesToNextDecimal = (date: Date) => {
-  // Remove seconds and milliseconds for precision
-  const cleanDate = setMilliseconds(setSeconds(date, 0), 0)
-
-  // Get the current minutes
-  const currentMinutes = cleanDate.getMinutes()
-
-  // Round up to the next multiple of 10
-  const roundedMinutes = Math.ceil(currentMinutes / 10) * 10
-
-  // Adjust the date
-  if (roundedMinutes === 60) {
-    // If rounding moves to the next hour
-    return addMinutes(cleanDate, roundedMinutes - currentMinutes) // Add remaining minutes to reach the next hour
-  } else {
-    return setMinutes(cleanDate, roundedMinutes) // Set the rounded minutes
-  }
-}
-
-export default function CreateEvent() {
+export const EventFormMobileScreenSkeleton = () => {
   const navigation = useNavigation()
-  return (
-    <PageLayout>
-      <PageLayout.MainSingleColumn position="relative">
-        <Suspense
-          fallback={
-            <YStack flex={1}>
-              <VoxHeader>
-                <XStack alignItems="center" flex={1} width="100%">
-                  <XStack alignContent="flex-start">
-                    <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
-                      <VoxButton size="lg" variant="soft" theme="orange">
-                        Annuler
-                      </VoxButton>
-                    </Link>
-                  </XStack>
-                  <XStack flexGrow={1} justifyContent="center">
-                    <VoxHeader.Title>Créer un événement</VoxHeader.Title>
-                  </XStack>
-                  <XStack>
-                    <VoxButton size="lg" variant="text" theme="blue" disabled>
-                      Créer
-                    </VoxButton>
-                  </XStack>
-                </XStack>
-              </VoxHeader>
 
-              <SkeCard>
-                <SkeCard.Content>
-                  <SF theme="purple" />
-                  <SkeCard.Separator />
-                  <SF />
-                  <SF />
-                  <SF />
-                  <SkeCard.Separator />
-                  <SF height={200} />
-                  <SkeCard.Separator />
-                  <XStack gap="$small">
-                    <SkeCard.Button />
-                    <SkeCard.Button />
-                  </XStack>
-                  <SF />
-                  <SF height={200} />
-                  <SkeCard.Separator />
-                  <SF />
-                  <SF />
-                </SkeCard.Content>
-              </SkeCard>
-            </YStack>
-          }
-        >
-          <CreateEventForm />
-        </Suspense>
-      </PageLayout.MainSingleColumn>
-    </PageLayout>
+  return (
+    <LayoutPage.MainSingleColumn>
+      <VoxHeader>
+        <XStack alignItems="center" flex={1} width="100%">
+          <XStack alignContent="flex-start">
+            <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
+              <VoxButton size="lg" variant="soft" theme="orange">
+                Annuler
+              </VoxButton>
+            </Link>
+          </XStack>
+          <XStack flexGrow={1} justifyContent="center">
+            <VoxHeader.Title>Créer un événement</VoxHeader.Title>
+          </XStack>
+          <XStack>
+            <VoxButton size="lg" variant="text" theme="blue" disabled>
+              Créer
+            </VoxButton>
+          </XStack>
+        </XStack>
+      </VoxHeader>
+
+      <SkeCard>
+        <SkeCard.Content>
+          <SF theme="purple" />
+          <SkeCard.Separator />
+          <SF />
+          <SF />
+          <SF />
+          <SkeCard.Separator />
+          <SF height={200} />
+          <SkeCard.Separator />
+          <XStack gap="$small">
+            <SkeCard.Button />
+            <SkeCard.Button />
+          </XStack>
+          <SF />
+          <SF height={200} />
+          <SkeCard.Separator />
+          <SF />
+          <SF />
+        </SkeCard.Content>
+      </SkeCard>
+    </LayoutPage.MainSingleColumn>
   )
 }
 
-export function CreateEventForm() {
-  const scopes = useGetExecutiveScopes()
-  const scopeOptions = useMemo(() => scopes.data.list.map(getFormatedScope), [scopes.data.list])
-
-  const categories = useSuspenseGetCategories()
-  const catOptions = categories.data.map(formatCategorie)
-  const cleanDate = roundMinutesToNextDecimal(new Date())
-  const startDate = addHours(cleanDate, 1)
-  const [mode, setMode] = useState('meeting')
-
-  const navigation = useNavigation()
-
-  const { mutateAsync, isPending } = useCreateEvent()
-
-  const defaultValues = {
-    scope: scopes.data.default?.code,
-    name: '',
-    category: undefined,
-    description: '',
-    begin_at: startDate,
-    finish_at: addHours(startDate, 1),
-    time_zone: 'Europe/Paris',
-    capacity: undefined,
-    mode: 'meeting',
-    visio_url: undefined,
-    post_address: undefined,
-    visibility: 'public',
-    live_url: undefined,
-  } as const
-
-  const { control, handleSubmit, reset, setError } = useForm<EventFormData>({
-    defaultValues,
-    resolver: zodResolver(createEventSchema),
-    mode: 'onBlur',
-    reValidateMode: 'onChange',
-  })
-
-  const _onSubmit = handleSubmit(
-    async (data) => {
-      const { scope, ...payload } = data
-      return mutateAsync({ payload, scope })
-        .then(() => {
-          router.push(navigation.canGoBack() ? '../' : '/evenements')
-          reset()
-        })
-        .catch((e) => {
-          if (e instanceof eventPostFormError) {
-            e.violations.forEach((violation) => {
-              if (isPathExist(violation.propertyPath, defaultValues)) {
-                const propPath = violation.propertyPath.startsWith('post_address') ? 'post_address' : violation.propertyPath
-                setError(propPath, { message: violation.message })
-              } else {
-                ErrorMonitor.log('Unknown property path / event form', violation)
-              }
-            })
-          }
-        })
-    },
-    (x) => {
-      console.log(x)
-    },
-  )
-
-  const onSubmit = useDebouncedCallback(_onSubmit)
+export default function EventFormMobileScreen() {
+  const { navigation, onSubmit, scopeOptions, control, visibilityOptions, catOptions, timezones, mode, setMode, isPending } = useEventFormContext()
 
   return (
-    <>
+    <LayoutPage.MainSingleColumn>
       <VoxHeader>
         <XStack alignItems="center" flex={1} width="100%">
           <XStack alignContent="flex-start">
@@ -249,11 +95,14 @@ export function CreateEventForm() {
           </XStack>
         </XStack>
       </VoxHeader>
+      <MessageCard theme="gray" iconLeft={Info}>
+        Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
+      </MessageCard>
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={{
             pb: '$xxxlarge',
-            pt: '$medium',
+            pt: 0,
           }}
         >
           <VoxCard>
@@ -587,6 +436,6 @@ export function CreateEventForm() {
           </VoxCard>
         </ScrollView>
       </KeyboardAvoidingView>
-    </>
+    </LayoutPage.MainSingleColumn>
   )
 }

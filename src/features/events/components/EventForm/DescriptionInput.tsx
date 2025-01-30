@@ -161,10 +161,11 @@ export default function (props: { onChange: () => void; onBlur: () => void; valu
                 <SF.Icon icon={Pen} />
               </XStack>
             </XStack>
-            <YStack flexGrow={1}>
+            <YStack flexGrow={1} onPress={(e) => e.bubbles} cursor="pointer">
               <MyRenderer key={props.value} value={props.value} />
             </YStack>
           </YStack>
+          <YStack position="absolute" bottom={0} left={0} right={0} top={0} cursor="pointer" />
         </SF>
       </SF.Props>
       {props.error ? (

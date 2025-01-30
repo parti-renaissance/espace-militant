@@ -71,7 +71,7 @@ const LayoutMainBarLeft = ({ children }: ViewProps) => {
 const LayoutSideBarRight = ({ children, alwaysShow = false, ...props }: ViewProps & { alwaysShow?: boolean }) => {
   const media = useMedia()
   return media.gtLg || alwaysShow ? (
-    <View width={columnWidth} height="100%" pt={padding} {...props}>
+    <View width={props.width ?? columnWidth} height="100%" pt={padding} {...props}>
       {children}
     </View>
   ) : null

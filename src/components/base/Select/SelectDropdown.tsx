@@ -30,13 +30,16 @@ const ModalDropDown = forwardRef<ModalDropDownRef, ModalDropDownProps>((props, r
   const handleClose = useCallback(() => {
     setIsOpen(false)
     props.onClose()
-  }, [])
+  }, [props.onClose])
 
-  const handleBackDropClose = useCallback((event: GestureResponderEvent) => {
-    if (event.target == event.currentTarget) {
-      handleClose()
-    }
-  }, [])
+  const handleBackDropClose = useCallback(
+    (event: GestureResponderEvent) => {
+      if (event.target == event.currentTarget) {
+        handleClose()
+      }
+    },
+    [handleClose],
+  )
 
   return (
     <Modal visible={isOpen} transparent animationType="fade" onRequestClose={handleClose}>
