@@ -24,7 +24,7 @@ export default function AppLayout() {
       ) : null}
 
       <View style={{ height: isWeb ? 'calc(100vh - 100px)' : '100%', flex: 1 }} backgroundColor="white">
-        <Stack screenOptions={{ animation: 'slide_from_right' }}>
+        <Stack screenOptions={{ animation: 'slide_from_right', fullScreenGestureEnabled: true }}>
           <Stack.Screen
             name="(tabs)"
             options={{
@@ -75,6 +75,7 @@ export default function AppLayout() {
             name="evenements/creer"
             options={{
               headerShown: false,
+              gestureEnabled: false,
             }}
           />
           <Stack.Screen name="porte-a-porte/building-detail" options={{ title: '' }} />

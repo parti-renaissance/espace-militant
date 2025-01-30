@@ -1,6 +1,5 @@
-import { Suspense, useEffect, useMemo, useState } from 'react'
-import { Keyboard, KeyboardAvoidingView } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Suspense, useMemo, useState } from 'react'
+import { KeyboardAvoidingView } from 'react-native'
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
 import { FormFrame } from '@/components/base/FormFrames'
@@ -16,17 +15,20 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import DescriptionInput from '@/features/events/components/EventForm/DescriptionInput'
 import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
 import ScrollView from '@/features/profil/components/ScrollView'
+import { isPathExist } from '@/services/common/errors/utils'
+import { eventPostFormError } from '@/services/events/error'
 import { useCreateEvent, useSuspenseGetCategories } from '@/services/events/hook'
 import { EventCategory } from '@/services/events/schema'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { RestUserScopesResponse } from '@/services/profile/schema'
+import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Calendar, Lock, Sparkle, Unlock, Users, Video, Webcam } from '@tamagui/lucide-icons'
+import { Lock, Sparkle, Unlock, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { addHours, addMinutes, setMilliseconds, setMinutes, setSeconds } from 'date-fns'
 import { getTimezoneOffset } from 'date-fns-tz'
 import { Link, router, useNavigation } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
-import { getTokenValue, isWeb, XStack, YStack } from 'tamagui'
+import { isWeb, XStack, YStack } from 'tamagui'
 import { listTimeZones } from 'timezone-support'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -120,7 +122,7 @@ export default function CreateEvent() {
                     </Link>
                   </XStack>
                   <XStack flexGrow={1} justifyContent="center">
-                    <VoxHeader.Title icon={Calendar}>Créer un événement</VoxHeader.Title>
+                    <VoxHeader.Title>Créer un événement</VoxHeader.Title>
                   </XStack>
                   <XStack>
                     <VoxButton size="lg" variant="text" theme="blue" disabled>
@@ -171,26 +173,9 @@ export function CreateEventForm() {
   const startDate = addHours(cleanDate, 1)
   const [mode, setMode] = useState('meeting')
 
-  const [keyboardOpen, setKeyboardOpen] = useState(false)
-
-  useEffect(() => {
-    const emitterShow = Keyboard.addListener('keyboardWillShow', () => {
-      setKeyboardOpen(true)
-    })
-
-    const emitterHide = Keyboard.addListener('keyboardWillHide', () => {
-      setKeyboardOpen(false)
-    })
-    return () => {
-      emitterShow.remove()
-      emitterHide.remove()
-    }
-  })
-
   const navigation = useNavigation()
 
   const { mutateAsync, isPending } = useCreateEvent()
-  const insets = useSafeAreaInsets()
 
   const defaultValues = {
     scope: scopes.data.default?.code,
@@ -203,29 +188,38 @@ export function CreateEventForm() {
     capacity: undefined,
     mode: 'meeting',
     visio_url: undefined,
-    post_address: {
-      address: '',
-      postal_code: '',
-      city_name: '',
-      country: '',
-    },
+    post_address: undefined,
     visibility: 'public',
     live_url: undefined,
   } as const
 
-  const { control, handleSubmit, reset } = useForm<EventFormData>({
+  const { control, handleSubmit, reset, setError } = useForm<EventFormData>({
     defaultValues,
     resolver: zodResolver(createEventSchema),
+    mode: 'onBlur',
     reValidateMode: 'onChange',
   })
 
   const _onSubmit = handleSubmit(
     async (data) => {
       const { scope, ...payload } = data
-      return mutateAsync({ payload, scope }).then(() => {
-        router.push(navigation.canGoBack() ? '../' : '/evenements')
-        reset()
-      })
+      return mutateAsync({ payload, scope })
+        .then(() => {
+          router.push(navigation.canGoBack() ? '../' : '/evenements')
+          reset()
+        })
+        .catch((e) => {
+          if (e instanceof eventPostFormError) {
+            e.violations.forEach((violation) => {
+              if (isPathExist(violation.propertyPath, defaultValues)) {
+                const propPath = violation.propertyPath.startsWith('post_address') ? 'post_address' : violation.propertyPath
+                setError(propPath, { message: violation.message })
+              } else {
+                ErrorMonitor.log('Unknown property path / event form', violation)
+              }
+            })
+          }
+        })
     },
     (x) => {
       console.log(x)
@@ -246,10 +240,10 @@ export function CreateEventForm() {
             </Link>
           </XStack>
           <XStack flexGrow={1} justifyContent="center">
-            <VoxHeader.Title icon={Calendar}>Créer un événement</VoxHeader.Title>
+            <VoxHeader.Title>Nouvel événement</VoxHeader.Title>
           </XStack>
           <XStack>
-            <VoxButton onPress={() => onSubmit()} size="lg" variant="text" theme="blue" loading={isPending}>
+            <VoxButton onPress={() => onSubmit()} size="md" variant="soft" theme="purple" pop loading={isPending} iconLeft={Sparkle}>
               Créer
             </VoxButton>
           </XStack>
@@ -259,7 +253,7 @@ export function CreateEventForm() {
         <ScrollView
           contentContainerStyle={{
             pb: '$xxxlarge',
-            pt: '$large',
+            pt: '$medium',
           }}
         >
           <VoxCard>
@@ -294,6 +288,7 @@ export function CreateEventForm() {
                         placeholder="Titre"
                         defaultValue={field.value}
                         onChange={field.onChange}
+                        onBlur={field.onBlur}
                       />
                     )
                   }}
@@ -313,6 +308,7 @@ export function CreateEventForm() {
                       value={field.value}
                       options={visibilityOptions}
                       onChange={field.onChange}
+                      onBlur={field.onBlur}
                     />
                   )
                 }}
@@ -331,6 +327,7 @@ export function CreateEventForm() {
                       value={field.value}
                       options={catOptions}
                       onChange={field.onChange}
+                      onBlur={field.onBlur}
                     />
                   )
                 }}
@@ -427,6 +424,7 @@ export function CreateEventForm() {
                         searchable
                         options={timezones}
                         onChange={field.onChange}
+                        onBlur={field.onBlur}
                         frameProps={{
                           pb: '$medium',
                           pt: '$medium',
@@ -473,6 +471,7 @@ export function CreateEventForm() {
                         color="gray"
                         label="Localisation"
                         error={fieldState.error?.message}
+                        onBlur={field.onBlur}
                         setAddressComponents={(x) => {
                           field.onChange({
                             address: x.address,
@@ -496,6 +495,7 @@ export function CreateEventForm() {
                           size="sm"
                           color="gray"
                           placeholder="Lien visio"
+                          onBlur={field.onBlur}
                           inputMode="url"
                           error={fieldState.error?.message}
                           defaultValue={field.value}
@@ -516,7 +516,13 @@ export function CreateEventForm() {
                     return (
                       <>
                         <YStack minHeight={100} maxHeight={300}>
-                          <DescriptionInput label="Description" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+                          <DescriptionInput
+                            error={fieldState.error?.message}
+                            label="Description"
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                          />
                         </YStack>
                       </>
                     )
@@ -542,6 +548,7 @@ export function CreateEventForm() {
                           inputMode="url"
                           defaultValue={field.value}
                           onChange={field.onChange}
+                          onBlur={field.onBlur}
                           error={fieldState.error?.message}
                           iconRight={<Video size={16} color="$gray4" />}
                         />
@@ -565,6 +572,7 @@ export function CreateEventForm() {
                           type="number"
                           inputMode="numeric"
                           defaultValue={field.value?.toString()}
+                          onBlur={field.onBlur}
                           onChange={field.onChange}
                           iconRight={<Users size={16} color="$gray4" />}
                         />

@@ -1,5 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { SelectFrames as SF } from '@/components/base/Select/Frames'
+import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import { CoreBridge, Images, PlaceholderBridge, RichText, TenTapStartKit, Toolbar, ToolbarItem, useEditorBridge } from '@10play/tentap-editor'
@@ -139,7 +140,7 @@ export const MyRenderer = (props: { value: string; matchContent?: boolean }) => 
   )
 }
 
-export default function (props: { onChange: () => void; onBlur: () => void; value: string; label: string }) {
+export default function (props: { onChange: () => void; onBlur: () => void; value: string; label: string; error?: string }) {
   const [open, setOpen] = useState(false)
 
   const handleOnClose = () => {
@@ -150,7 +151,7 @@ export default function (props: { onChange: () => void; onBlur: () => void; valu
   return (
     <>
       <SF.Props>
-        <SF onPress={() => setOpen(true)} height="auto">
+        <SF error={Boolean(props.error)} onPress={() => setOpen(true)} height="auto">
           <YStack flex={1} height={200} gap="$medium" paddingVertical="$medium" overflow="hidden">
             <XStack gap="$small">
               <XStack flexShrink={1} flex={1} {...props} alignItems="center" gap="$small">
@@ -166,6 +167,13 @@ export default function (props: { onChange: () => void; onBlur: () => void; valu
           </YStack>
         </SF>
       </SF.Props>
+      {props.error ? (
+        <XStack paddingHorizontal="$medium" alignSelf="flex-start" pt="$xsmall">
+          <Text.XSM textAlign="right" color="$orange5">
+            {props.error}
+          </Text.XSM>
+        </XStack>
+      ) : null}
       <ModalEditor {...props} onBlur={handleOnClose} open={open} />
     </>
   )

@@ -211,7 +211,7 @@ const VoxHeaderContainerStyled = styled(Container, {
   borderBottomColor: '$textOutline',
 
   $md: {
-    paddingHorizontal: 26,
+    paddingHorizontal: 16,
     paddingVertical: 6,
   },
   $gtMd: {

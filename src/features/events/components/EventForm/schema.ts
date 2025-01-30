@@ -18,24 +18,33 @@ const requiredString = (start: string, min: number = 1) => {
     .min(min, min === 1 ? message : `${start} doit contenir au moins ${min} caractères.`)
 }
 
-const addressEntryTranslation = {
-  address: 'L’adresse est manquante ou incorrecte.',
-  postalCode: 'Le code postal est manquant ou incorrect.',
-  cityName: 'La ville est manquante ou incorrecte.',
-  country: 'Le pays est manquant ou incorrect.',
+const requiredStringAddress = (start: string) => {
+  const message = `La localisation saisie ne contient pas ${start}. Saisissez un lieu plus précis.`
+  return z
+    .string({
+      required_error: message,
+    })
+    .min(1, message)
 }
 
-const postAddressSchema = z.object({
+const postAddressSchemaNullish = z.object({
   address: z.string().nullish(),
   postal_code: z.string().nullish(),
-  city_name: z.string().nullable().nullish(),
-  country: z.string().nullable().nullish(),
+  city_name: z.string().nullish(),
+  country: z.string().nullish(),
+})
+
+const postAddressSchema = z.object({
+  address: requiredStringAddress('d’adresse'),
+  postal_code: z.string().nullish(),
+  city_name: requiredStringAddress('la ville'),
+  country: requiredStringAddress('le pays'),
 })
 
 export const createEventSchema = z
   .object({
     scope: requiredString('Le champ de la portée'),
-    name: requiredString('Le titre'),
+    name: requiredString('Le titre', 5),
     category: requiredString('La catégorie'),
     description: requiredString('La description', 10),
     begin_at: z.date({
@@ -57,7 +66,7 @@ export const createEventSchema = z
           return `https://${x}`
         }
       }),
-    post_address: postAddressSchema.optional(),
+    post_address: postAddressSchemaNullish.optional(),
     time_zone: z.string(),
     electoral: z.boolean().optional(),
     visibility: EventVisibilitySchema,
@@ -86,27 +95,24 @@ export const createEventSchema = z
   })
   .superRefine((data, ctx) => {
     if (data.mode === 'meeting') {
-      const checkHasAddressFull = data.post_address?.address && data.post_address?.postal_code && data.post_address?.city_name && data.post_address?.country
-
+      let errorMessage: string | null = null
+      if (!data.post_address) {
+        errorMessage = 'L’adresse est obligatoire pour un événement en présentiel'
+      } else {
+        const parseAddress = postAddressSchema.safeParse(data.post_address)
+        if (parseAddress.success) {
+          errorMessage = null
+        } else {
+          errorMessage = parseAddress.error.issues[0].message
+        }
+      }
       // Global error
-      if (!checkHasAddressFull) {
+      if (errorMessage !== null) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'L’adresse est obligatoire pour un événement en présentiel',
+          message: errorMessage,
           path: ['post_address'],
         })
-      }
-
-      if (data.post_address) {
-        for (const [k, v] of Object.entries(data.post_address)) {
-          if (!v) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: addressEntryTranslation[k],
-              path: ['post_address'],
-            })
-          }
-        }
       }
     } else {
       if (!data.visio_url || data.visio_url.length === 0) {

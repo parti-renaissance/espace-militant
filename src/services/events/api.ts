@@ -2,7 +2,7 @@ import { mapParams, type GetEventsSearchParametersMapperProps } from '@/services
 import * as schemas from '@/services/events/schema'
 import { api } from '@/utils/api'
 import { z } from 'zod'
-import { publicEventSubscriptionFormErrorThrower } from './error'
+import { eventPostFormErrorThrower, publicEventSubscriptionFormErrorThrower } from './error'
 
 export const getEvents = (params: GetEventsSearchParametersMapperProps) =>
   api({
@@ -94,5 +94,6 @@ export const createEvent = (props: { payload: schemas.RestPostEventRequest; scop
     path: '/api/v3/events?scope=' + props.scope,
     requestSchema: schemas.RestPostEventRequestSchema,
     responseSchema: schemas.RestPostEventResponseSchema,
+    errorThrowers: [eventPostFormErrorThrower],
     type: 'private',
   })(props.payload)

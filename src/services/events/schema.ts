@@ -221,3 +221,23 @@ export const RestPostEventRequestSchema = z.object({
 })
 
 export const RestPostEventResponseSchema = RestItemEventSchema
+
+export const propertyPathPostEventSchema = z.enum([
+  'name',
+  'post_address',
+  'post_address.address',
+  'post_address.postal_code',
+  'post_address.city_name',
+  'post_address.country',
+  'category',
+  'description',
+  'time_zone',
+  'capacity',
+  'begin_at',
+  'finish_at',
+  'mode',
+  'visio_url',
+  'electoral',
+  'visibility',
+  'live_url',
+])
