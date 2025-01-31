@@ -1,5 +1,6 @@
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
+import { FormFileImage } from '@/components/base/FormFileUpload/FormFileImage'
 import { FormFrame } from '@/components/base/FormFrames'
 import Input from '@/components/base/Input/Input'
 import Select, { SF } from '@/components/base/Select/SelectV3'
@@ -21,7 +22,7 @@ import { ScrollStack } from '../../pages/detail/EventComponents'
 import { useEventFormContext } from './context'
 
 const EventDesktopAside = () => {
-  const { onSubmit, scopeOptions, control, visibilityOptions, catOptions, timezones, mode, setMode, isPending } = useEventFormContext()
+  const { scopeOptions, control, visibilityOptions, catOptions, timezones, mode, setMode } = useEventFormContext()
 
   return (
     <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
@@ -285,10 +286,31 @@ const EventDesktopAside = () => {
             name="capacity"
           />
         </YStack>
+      </VoxCard.Content>
+    </PageLayout.SideBarRight>
+  )
+}
+
+const EventDesktopFooter = () => {
+  const { isPending, isUploadImagePending, isUploadDeletePending, onSubmit } = useEventFormContext()
+  return (
+    <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
+      <VoxCard.Content pt={0}>
         <XStack alignItems="center" justifyContent="flex-end" gap="$small" flex={1} width="100%">
           <XStack>
-            <VoxButton onPress={() => onSubmit()} size="md" variant="contained" theme="purple" pop loading={isPending} iconLeft={Sparkle}>
-              Créer l'événement
+            <VoxButton
+              onPress={() => onSubmit()}
+              size="md"
+              variant="contained"
+              theme="purple"
+              pop
+              loading={isPending || isUploadImagePending || isUploadDeletePending}
+              iconLeft={Sparkle}
+            >
+              {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? "Créer l'événement" : null}
+              {isUploadImagePending ? "Envois de l'image..." : null}
+              {isUploadDeletePending ? "Supression de l'image..." : null}
+              {isPending ? 'Création...' : null}
             </VoxButton>
           </XStack>
         </XStack>
@@ -304,7 +326,13 @@ const EventDesktopMain = () => {
     <PageLayout.MainSingleColumn height="100%">
       <VoxCard.Content pr={0} height="100%">
         <VoxCard.Content height="100%" p={0} pr="$medium">
-          <SF height={300} />
+          <Controller
+            render={({ field }) => {
+              return <FormFileImage placeholder="Ajouter une image de couverture" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+            }}
+            control={control}
+            name="image"
+          />
           <VoxCard.Separator />
           <YStack>
             <Controller
@@ -379,10 +407,13 @@ const EventFormDesktopScreen = () => {
               Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
             </MessageCard>
           </VoxCard.Content>
-
           <XStack>
             <EventDesktopMain />
             <EventDesktopAside />
+          </XStack>
+          <XStack>
+            <XStack flex={1} />
+            <EventDesktopFooter />
           </XStack>
         </VoxCard>
       </YStack>

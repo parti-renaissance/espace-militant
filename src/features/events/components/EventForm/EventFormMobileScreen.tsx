@@ -1,6 +1,7 @@
 import { KeyboardAvoidingView } from 'react-native'
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
+import { FormFileImage } from '@/components/base/FormFileUpload/FormFileImage'
 import { FormFrame } from '@/components/base/FormFrames'
 import Input from '@/components/base/Input/Input'
 import Select, { SF } from '@/components/base/Select/SelectV3'
@@ -72,7 +73,20 @@ export const EventFormMobileScreenSkeleton = () => {
 }
 
 export default function EventFormMobileScreen() {
-  const { navigation, onSubmit, scopeOptions, control, visibilityOptions, catOptions, timezones, mode, setMode, isPending } = useEventFormContext()
+  const {
+    navigation,
+    onSubmit,
+    scopeOptions,
+    control,
+    visibilityOptions,
+    catOptions,
+    timezones,
+    mode,
+    setMode,
+    isPending,
+    isUploadImagePending,
+    isUploadDeletePending,
+  } = useEventFormContext()
 
   return (
     <LayoutPage.MainSingleColumn>
@@ -80,9 +94,11 @@ export default function EventFormMobileScreen() {
         <XStack alignItems="center" flex={1} width="100%">
           <XStack alignContent="flex-start">
             <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
-              <VoxButton size="lg" variant="text" theme="orange">
-                Annuler
-              </VoxButton>
+              {[isPending, isUploadImagePending, isUploadDeletePending].some(Boolean) ? null : (
+                <VoxButton size="lg" variant="text" theme="orange">
+                  Annuler
+                </VoxButton>
+              )}
             </Link>
           </XStack>
           <XStack flexGrow={1} justifyContent="center">
@@ -90,7 +106,10 @@ export default function EventFormMobileScreen() {
           </XStack>
           <XStack>
             <VoxButton onPress={() => onSubmit()} size="md" variant="soft" theme="purple" pop loading={isPending} iconLeft={Sparkle}>
-              Créer
+              {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? 'Créer' : null}
+              {isUploadImagePending ? 'image...' : null}
+              {isUploadDeletePending ? 'image...' : null}
+              {isPending ? 'Création...' : null}
             </VoxButton>
           </XStack>
         </XStack>
@@ -385,7 +404,21 @@ export default function EventFormMobileScreen() {
                 <Text.MD secondary>Optionnel</Text.MD>
                 <VoxCard.Separator />
               </XStack>
-
+              <Controller
+                render={({ field }) => {
+                  return (
+                    <FormFileImage
+                      emptyHeight={100}
+                      placeholder="Ajouter une image de couverture"
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                    />
+                  )
+                }}
+                control={control}
+                name="image"
+              />
               <YStack>
                 <Controller
                   render={({ field, fieldState }) => {
