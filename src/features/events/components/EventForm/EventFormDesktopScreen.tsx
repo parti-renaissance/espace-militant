@@ -194,6 +194,7 @@ const EventDesktopAside = () => {
                   size="sm"
                   color="gray"
                   label="Localisation"
+                  defaultValue={field.value ? `${field.value?.address} ${field.value?.city_name}` : undefined}
                   error={fieldState.error?.message}
                   onBlur={field.onBlur}
                   setAddressComponents={(x) => {
@@ -292,7 +293,7 @@ const EventDesktopAside = () => {
 }
 
 const EventDesktopFooter = () => {
-  const { isPending, isUploadImagePending, isUploadDeletePending, onSubmit } = useEventFormContext()
+  const { isPending, isUploadImagePending, isUploadDeletePending, onSubmit, editMode } = useEventFormContext()
   return (
     <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
       <VoxCard.Content pt={0}>
@@ -307,10 +308,10 @@ const EventDesktopFooter = () => {
               loading={isPending || isUploadImagePending || isUploadDeletePending}
               iconLeft={Sparkle}
             >
-              {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? "Créer l'événement" : null}
-              {isUploadImagePending ? "Envois de l'image..." : null}
+              {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? `${editMode ? 'Modifier' : 'Créer'} l'événement` : null}
+              {isUploadImagePending ? "Envoi de l'image..." : null}
               {isUploadDeletePending ? "Supression de l'image..." : null}
-              {isPending ? 'Création...' : null}
+              {isPending ? `${editMode ? 'Modification' : 'Création'}...` : null}
             </VoxButton>
           </XStack>
         </XStack>
@@ -392,6 +393,7 @@ const BackButton = (props: { children?: React.ReactNode }) => {
 }
 
 const EventFormDesktopScreen = () => {
+  const { editMode } = useEventFormContext()
   return (
     <ScrollStack>
       <XStack pb="$medium" flex={1}>
@@ -400,12 +402,14 @@ const EventFormDesktopScreen = () => {
       <YStack gap="$medium">
         <VoxCard>
           <VoxCard.Content pb={0} justifyContent="center" alignItems="center">
-            <VoxHeader.Title icon={Calendar}>Nouvel événement</VoxHeader.Title>
+            <VoxHeader.Title icon={Calendar}>{`${editMode ? 'Modifier' : 'Créer'} l'événement`}</VoxHeader.Title>
           </VoxCard.Content>
           <VoxCard.Content pb={0} pt={0}>
-            <MessageCard theme="gray" iconLeft={Info}>
-              Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
-            </MessageCard>
+            {editMode ? null : (
+              <MessageCard theme="gray" iconLeft={Info}>
+                Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
+              </MessageCard>
+            )}
           </VoxCard.Content>
           <XStack>
             <EventDesktopMain />
@@ -463,7 +467,7 @@ const EventDesktopAsideSkeleton = () => {
   )
 }
 
-export const EventFormDesktopScreenSkeleton = () => {
+export const EventFormDesktopScreenSkeleton = (props?: { editMode?: boolean }) => {
   return (
     <YStack padding="$medium" flex={1}>
       <PageLayout.MainSingleColumn>
@@ -472,12 +476,14 @@ export const EventFormDesktopScreenSkeleton = () => {
         </XStack>
         <SkeCard>
           <VoxCard.Content pb={0} justifyContent="center" alignItems="center">
-            <VoxHeader.Title icon={Calendar}>Nouvel événement</VoxHeader.Title>
+            <VoxHeader.Title icon={Calendar}>{`${props?.editMode ? 'Modifier' : 'Créer'} l'événement`}</VoxHeader.Title>
           </VoxCard.Content>
           <VoxCard.Content pb={0} pt={0}>
-            <MessageCard theme="gray" iconLeft={Info}>
-              Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
-            </MessageCard>
+            {props?.editMode ? null : (
+              <MessageCard theme="gray" iconLeft={Info}>
+                Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
+              </MessageCard>
+            )}
           </VoxCard.Content>
           <XStack>
             <EventDesktopMainSkeleton />

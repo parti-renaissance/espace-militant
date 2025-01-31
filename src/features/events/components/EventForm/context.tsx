@@ -16,6 +16,7 @@ import { router, useNavigation } from 'expo-router'
 import { useForm } from 'react-hook-form'
 import { listTimeZones } from 'timezone-support'
 import { useDebouncedCallback } from 'use-debounce'
+import { EventFormProps } from './types'
 
 function getTimezoneOffsetLabel(timeZone: string) {
   const offset = getTimezoneOffset(timeZone)
@@ -88,7 +89,7 @@ const roundMinutesToNextDecimal = (date: Date) => {
     return setMinutes(cleanDate, roundedMinutes) // Set the rounded minutes
   }
 }
-const useEventFormData = () => {
+const useEventFormData = ({ edit }: EventFormProps) => {
   const scopes = useGetExecutiveScopes()
   const scopeOptions = useMemo(() => scopes.data.list.map(getFormatedScope), [scopes.data.list])
 
@@ -98,25 +99,35 @@ const useEventFormData = () => {
   const startDate = addHours(cleanDate, 1)
   const [mode, setMode] = useState('meeting')
 
+  const editMode = Boolean(edit)
+
   const navigation = useNavigation()
 
-  const { mutateAsync, isPending } = useCreateEvent()
+  const { mutateAsync, isPending } = useCreateEvent({ editSlug: edit?.slug, editUuid: edit?.uuid })
   const { mutateAsync: uploadImage, isPending: isUploadImagePending } = useMutationEventImage()
   const { mutateAsync: deleteImage, isPending: isUploadDeletePending } = useDeleteEventImage()
 
   const defaultValues = {
-    scope: scopes.data.default?.code,
-    name: '',
-    category: undefined,
-    description: '',
-    begin_at: startDate,
-    finish_at: addHours(startDate, 1),
-    time_zone: 'Europe/Paris',
-    capacity: undefined,
-    mode: 'meeting',
-    visio_url: undefined,
-    post_address: undefined,
-    visibility: 'public',
+    scope: edit?.organizer?.scope ?? scopes.data.default?.code,
+    name: edit?.name ?? '',
+    image: edit?.image,
+    category: edit?.category?.slug,
+    description: edit?.description ?? '',
+    begin_at: edit?.begin_at ? new Date(edit.begin_at) : startDate,
+    finish_at: edit?.finish_at ? new Date(edit.finish_at) : addHours(startDate, 1),
+    time_zone: edit?.time_zone ?? 'Europe/Paris',
+    capacity: edit?.capacity ?? undefined,
+    mode: edit?.mode ?? 'meeting',
+    visio_url: edit?.visio_url ?? undefined,
+    post_address: edit?.post_address
+      ? {
+          address: edit.post_address.address ?? undefined,
+          city: edit.post_address.city ?? undefined,
+          city_name: edit.post_address.city_name ?? undefined,
+          country: edit.post_address.country ?? undefined,
+        }
+      : undefined,
+    visibility: edit?.visibility ?? 'public',
     live_url: undefined,
   } as const
 
@@ -130,7 +141,35 @@ const useEventFormData = () => {
   const _onSubmit = handleSubmit(
     async (data) => {
       const { scope, image, ...payload } = data
-      const newEvent = await mutateAsync({ payload, scope }).catch((e) => {
+      try {
+        const newEvent = await mutateAsync({ payload, scope })
+
+        let errorImage = false
+        try {
+          if (newEvent) {
+            if (image === null) {
+              await deleteImage({ scope, eventId: newEvent.uuid })
+            } else if (image && image.url && image.url.startsWith('data:')) {
+              await uploadImage({ scope, eventId: newEvent.uuid, payload: image.url })
+            }
+          }
+        } catch (e) {
+          errorImage = true
+        }
+
+        const fallback = navigation.canGoBack() ? '../' : ('/evenements' as const)
+        router.replace(
+          newEvent?.slug
+            ? {
+                pathname: errorImage ? '/evenements/[id]/modifier' : '/evenements/[id]',
+                params: {
+                  id: newEvent.slug,
+                },
+              }
+            : fallback,
+        )
+        reset()
+      } catch (e) {
         if (e instanceof eventPostFormError) {
           e.violations.forEach((violation) => {
             if (isPathExist(violation.propertyPath, defaultValues)) {
@@ -141,33 +180,7 @@ const useEventFormData = () => {
             }
           })
         }
-      })
-
-      try {
-        if (newEvent) {
-          if (image === null) {
-            await deleteImage({ scope, eventId: newEvent.uuid })
-          } else if (image && image.url && image.url.startsWith('data:')) {
-            await uploadImage({ scope, eventId: newEvent.uuid, payload: image.url })
-          }
-        }
-      } catch (e) {
-        // TODO redirect to edit
-        console.log(e)
       }
-
-      const fallback = navigation.canGoBack() ? '../' : ('/evenements' as const)
-      router.replace(
-        newEvent?.slug
-          ? {
-              pathname: '/evenements/[id]',
-              params: {
-                id: newEvent.slug,
-              },
-            }
-          : fallback,
-      )
-      reset()
     },
     (x) => {
       console.log(x)
@@ -189,6 +202,7 @@ const useEventFormData = () => {
     timezones,
     visibilityOptions,
     navigation,
+    editMode,
   }
 }
 
@@ -196,8 +210,8 @@ type EventFormContext = ReturnType<typeof useEventFormData>
 
 const eventFormContext = createContext<EventFormContext | null>(null)
 
-export const EventFormContextProvider = (props: { children: React.ReactNode }) => {
-  const data = useEventFormData()
+export const EventFormContextProvider = (props: { children: React.ReactNode } & EventFormProps) => {
+  const data = useEventFormData({ edit: props.edit })
 
   return <eventFormContext.Provider children={props.children} value={data} />
 }

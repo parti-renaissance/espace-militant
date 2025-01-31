@@ -98,6 +98,16 @@ export const createEvent = (props: { payload: schemas.RestPostEventRequest; scop
     type: 'private',
   })(props.payload)
 
+export const updateEvent = (props: { payload: schemas.RestPostEventRequest; eventId: string; scope: string }) =>
+  api({
+    method: 'put',
+    path: `/api/v3/events/${props.eventId}?scope=${props.scope}`,
+    requestSchema: schemas.RestPostEventRequestSchema,
+    responseSchema: schemas.RestPostEventResponseSchema,
+    errorThrowers: [eventPostFormErrorThrower],
+    type: 'private',
+  })(props.payload)
+
 export const uploadEventImage = (props: { eventId: string; scope: string; payload: string }) =>
   api({
     method: 'post',
