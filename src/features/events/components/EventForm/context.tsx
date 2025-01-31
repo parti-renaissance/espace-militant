@@ -3,7 +3,7 @@ import { SelectOption, SF } from '@/components/base/Select/SelectV3'
 import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
 import { isPathExist } from '@/services/common/errors/utils'
 import { eventPostFormError } from '@/services/events/error'
-import { useCreateEvent, useSuspenseGetCategories } from '@/services/events/hook'
+import { useCreateEvent, useDeleteEventImage, useMutationEventImage, useSuspenseGetCategories } from '@/services/events/hook'
 import { EventCategory } from '@/services/events/schema'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { RestUserScopesResponse } from '@/services/profile/schema'
@@ -101,6 +101,8 @@ const useEventFormData = () => {
   const navigation = useNavigation()
 
   const { mutateAsync, isPending } = useCreateEvent()
+  const { mutateAsync: uploadImage, isPending: isUploadImagePending } = useMutationEventImage()
+  const { mutateAsync: deleteImage, isPending: isUploadDeletePending } = useDeleteEventImage()
 
   const defaultValues = {
     scope: scopes.data.default?.code,
@@ -127,34 +129,45 @@ const useEventFormData = () => {
 
   const _onSubmit = handleSubmit(
     async (data) => {
-      const { scope, ...payload } = data
-      return mutateAsync({ payload, scope })
-        .then(({ slug }) => {
-          const fallback = navigation.canGoBack() ? '../' : ('/evenements' as const)
-          router.push(
-            slug
-              ? {
-                  pathname: '/evenements/[id]',
-                  params: {
-                    id: slug,
-                  },
-                }
-              : fallback,
-          )
-          reset()
-        })
-        .catch((e) => {
-          if (e instanceof eventPostFormError) {
-            e.violations.forEach((violation) => {
-              if (isPathExist(violation.propertyPath, defaultValues)) {
-                const propPath = violation.propertyPath.startsWith('post_address') ? 'post_address' : violation.propertyPath
-                setError(propPath, { message: violation.message })
-              } else {
-                ErrorMonitor.log('Unknown property path / event form', violation)
-              }
-            })
+      const { scope, image, ...payload } = data
+      const newEvent = await mutateAsync({ payload, scope }).catch((e) => {
+        if (e instanceof eventPostFormError) {
+          e.violations.forEach((violation) => {
+            if (isPathExist(violation.propertyPath, defaultValues)) {
+              const propPath = violation.propertyPath.startsWith('post_address') ? 'post_address' : violation.propertyPath
+              setError(propPath, { message: violation.message })
+            } else {
+              ErrorMonitor.log('Unknown property path / event form', violation)
+            }
+          })
+        }
+      })
+
+      try {
+        if (newEvent) {
+          if (image === null) {
+            await deleteImage({ scope, eventId: newEvent.uuid })
+          } else if (image && image.url && image.url.startsWith('data:')) {
+            await uploadImage({ scope, eventId: newEvent.uuid, payload: image.url })
           }
-        })
+        }
+      } catch (e) {
+        // TODO redirect to edit
+        console.log(e)
+      }
+
+      const fallback = navigation.canGoBack() ? '../' : ('/evenements' as const)
+      router.replace(
+        newEvent?.slug
+          ? {
+              pathname: '/evenements/[id]',
+              params: {
+                id: newEvent.slug,
+              },
+            }
+          : fallback,
+      )
+      reset()
     },
     (x) => {
       console.log(x)
@@ -167,6 +180,8 @@ const useEventFormData = () => {
     control,
     onSubmit,
     isPending,
+    isUploadImagePending,
+    isUploadDeletePending,
     scopeOptions,
     catOptions,
     mode,

@@ -97,3 +97,25 @@ export const createEvent = (props: { payload: schemas.RestPostEventRequest; scop
     errorThrowers: [eventPostFormErrorThrower],
     type: 'private',
   })(props.payload)
+
+export const uploadEventImage = (props: { eventId: string; scope: string; payload: string }) =>
+  api({
+    method: 'post',
+    path: `/api/v3/events/${props.eventId}/image?scope=${props.scope}`,
+    requestSchema: z.object({
+      content: z.string(),
+    }),
+    responseSchema: z.any(),
+    type: 'private',
+  })({
+    content: props.payload,
+  })
+
+export const deleteEventImage = (props: { eventId: string; scope: string }) =>
+  api({
+    method: 'delete',
+    path: `/api/v3/events/${props.eventId}/image?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: z.any(),
+    type: 'private',
+  })()

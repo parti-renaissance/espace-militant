@@ -156,3 +156,39 @@ export const useCreateEvent = () => {
     },
   })
 }
+
+export const useMutationEventImage = () => {
+  const toast = useToastController()
+  return useMutation({
+    mutationFn: (x: { eventId: string; scope: string; payload: string }) => api.uploadEventImage(x),
+    onSuccess: () => {
+      toast.show('Succès', { message: "Image de l'événement ajoutée", type: 'success' })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: "Impossible d'ajouter l'image de l'événement", type: 'error' })
+      }
+      return error
+    },
+  })
+}
+
+export const useDeleteEventImage = () => {
+  const toast = useToastController()
+  return useMutation({
+    mutationFn: (x: { eventId: string; scope: string }) => api.deleteEventImage(x),
+    onSuccess: () => {
+      toast.show('Succès', { message: "Image de l'événement supprimée", type: 'success' })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: "Impossible de supprimer l'image de l'événement", type: 'error' })
+      }
+      return error
+    },
+  })
+}

@@ -44,6 +44,13 @@ const postAddressSchema = z.object({
 export const createEventSchema = z
   .object({
     scope: requiredString('Le champ de la portée'),
+    image: z
+      .object({
+        url: z.string(),
+        width: z.number(),
+        height: z.number(),
+      })
+      .nullish(),
     name: requiredString('Le titre', 5),
     category: requiredString('La catégorie'),
     description: requiredString('La description', 10),
