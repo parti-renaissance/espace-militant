@@ -40,7 +40,7 @@ export default function AppLayout() {
             }}
           ></Stack.Screen>
           <Stack.Screen
-            name="evenements/[id]"
+            name="evenements/[id]/index"
             options={{
               headerTransparent: true,
               header: ({ navigation }) => {
@@ -56,18 +56,10 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="evenements/[id]/editer"
+            name="evenements/[id]/modifier"
             options={{
-              presentation: 'formSheet',
-              header: ({ navigation }) => {
-                return media.sm ? (
-                  <VoxHeader backgroundColor="transparent" borderWidth={0}>
-                    <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
-                      <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
-                    </Link>
-                  </VoxHeader>
-                ) : null
-              },
+              headerShown: false,
+              gestureEnabled: false,
             }}
           />
 

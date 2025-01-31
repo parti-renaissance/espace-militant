@@ -22,7 +22,7 @@ import { Controller } from 'react-hook-form'
 import { isWeb, XStack, YStack } from 'tamagui'
 import { useEventFormContext } from './context'
 
-export const EventFormMobileScreenSkeleton = () => {
+export const EventFormMobileScreenSkeleton = (props?: { editMode?: boolean }) => {
   const navigation = useNavigation()
 
   return (
@@ -37,7 +37,7 @@ export const EventFormMobileScreenSkeleton = () => {
             </Link>
           </XStack>
           <XStack flexGrow={1} justifyContent="center">
-            <VoxHeader.Title>Créer un événement</VoxHeader.Title>
+            <VoxHeader.Title>{props?.editMode ? "Modifier l'événement" : 'Créer un événement'}</VoxHeader.Title>
           </XStack>
           <XStack>
             <VoxButton size="lg" variant="text" theme="blue" disabled>
@@ -86,6 +86,7 @@ export default function EventFormMobileScreen() {
     isPending,
     isUploadImagePending,
     isUploadDeletePending,
+    editMode,
   } = useEventFormContext()
 
   return (
@@ -102,14 +103,14 @@ export default function EventFormMobileScreen() {
             </Link>
           </XStack>
           <XStack flexGrow={1} justifyContent="center">
-            <VoxHeader.Title>Nouvel événement</VoxHeader.Title>
+            <VoxHeader.Title>{`${editMode ? 'Modifier' : 'Créer'} l'événement`}</VoxHeader.Title>
           </XStack>
           <XStack>
-            <VoxButton onPress={() => onSubmit()} size="md" variant="soft" theme="purple" pop loading={isPending} iconLeft={Sparkle}>
-              {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? 'Créer' : null}
+            <VoxButton onPress={() => onSubmit()} size="md" variant="soft" theme="purple" pop loading={isPending} iconLeft={editMode ? undefined : Sparkle}>
+              {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? `${editMode ? 'Modifier' : 'Créer'}` : null}
               {isUploadImagePending ? 'image...' : null}
               {isUploadDeletePending ? 'image...' : null}
-              {isPending ? 'Création...' : null}
+              {isPending ? `${editMode ? 'Modification' : 'Création'}...` : null}
             </VoxButton>
           </XStack>
         </XStack>
@@ -123,9 +124,11 @@ export default function EventFormMobileScreen() {
           }}
         >
           <VoxCard>
-            <MessageCard theme="gray" iconLeft={Info}>
-              Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
-            </MessageCard>
+            {editMode ? null : (
+              <MessageCard theme="gray" iconLeft={Info}>
+                Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
+              </MessageCard>
+            )}
             <VoxCard.Content>
               <Controller
                 render={({ field, fieldState }) => {
@@ -341,6 +344,7 @@ export default function EventFormMobileScreen() {
                         label="Localisation"
                         error={fieldState.error?.message}
                         onBlur={field.onBlur}
+                        defaultValue={field.value ? `${field.value?.address} ${field.value?.city_name}` : undefined}
                         setAddressComponents={(x) => {
                           field.onChange({
                             address: x.address,

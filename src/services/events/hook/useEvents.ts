@@ -6,7 +6,7 @@ import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { RestPostPublicEventSubsciptionRequest } from '../schema'
+import { RestPostEventRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
 import { optimisticToggleSubscribe } from './helpers'
 import { QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
 
@@ -132,25 +132,34 @@ export const useSuspenseGetCategories = () => {
   })
 }
 
-export const useCreateEvent = () => {
+export const useCreateEvent = ({ editSlug, editUuid }: { editSlug?: string; editUuid?: string }) => {
   const queryClient = useQueryClient()
   const toast = useToastController()
+  const successMessage = editSlug ? 'Événement modifié avec succès' : 'Événement créé avec succès'
+  const errorMessage = editSlug ? 'Impossible de modifier cet événement' : 'Impossible de créer cet événement'
   return useMutation({
-    mutationFn: api.createEvent,
+    mutationFn: editUuid
+      ? ({ payload, scope }: { payload: RestPostEventRequest; scope: string }) => api.updateEvent({ payload, eventId: editUuid, scope })
+      : api.createEvent,
     onSuccess: () => {
-      toast.show('Succès', { message: 'Événement créé avec succès', type: 'success' })
+      toast.show('Succès', { message: successMessage, type: 'success' })
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS],
       })
       queryClient.invalidateQueries({
         queryKey: [PAGINATED_QUERY_FEED],
       })
+      if (editSlug) {
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEY_SINGLE_EVENT, editSlug],
+        })
+      }
     },
     onError: (error) => {
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })
       } else {
-        toast.show('Erreur', { message: 'Impossible de créer cet événement', type: 'error' })
+        toast.show('Erreur', { message: errorMessage, type: 'error' })
       }
       return error
     },
