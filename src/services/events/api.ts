@@ -108,6 +108,24 @@ export const updateEvent = (props: { payload: schemas.RestPostEventRequest; even
     type: 'private',
   })(props.payload)
 
+export const deleteEvent = (props: { eventId: string; scope: string }) =>
+  api({
+    method: 'DELETE',
+    path: `/api/v3/events/${props.eventId}?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: z.any(),
+    type: 'private',
+  })()
+
+export const cancelEvent = (props: { eventId: string; scope: string }) =>
+  api({
+    method: 'PUT',
+    path: `/api/v3/events/${props.eventId}/cancel?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: z.any(),
+    type: 'private',
+  })()
+
 export const uploadEventImage = (props: { eventId: string; scope: string; payload: string }) =>
   api({
     method: 'post',

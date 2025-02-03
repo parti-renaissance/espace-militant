@@ -92,6 +92,7 @@ const roundMinutesToNextDecimal = (date: Date) => {
 const useEventFormData = ({ edit }: EventFormProps) => {
   const scopes = useGetExecutiveScopes()
   const scopeOptions = useMemo(() => scopes.data.list.map(getFormatedScope), [scopes.data.list])
+  const currentScope = scopes.data.default
 
   const categories = useSuspenseGetCategories()
   const catOptions = categories.data.map(formatCategorie)
@@ -203,6 +204,8 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     visibilityOptions,
     navigation,
     editMode,
+    currentScope,
+    event: edit,
   }
 }
 

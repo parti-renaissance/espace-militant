@@ -19,6 +19,7 @@ import { Link, useNavigation } from 'expo-router'
 import { Controller } from 'react-hook-form'
 import { isWeb, XStack, YStack } from 'tamagui'
 import { ScrollStack } from '../../pages/detail/EventComponents'
+import EventHandleActions from '../EventHandleActions'
 import { useEventFormContext } from './context'
 
 const EventDesktopAside = () => {
@@ -293,30 +294,48 @@ const EventDesktopAside = () => {
 }
 
 const EventDesktopFooter = () => {
-  const { isPending, isUploadImagePending, isUploadDeletePending, onSubmit, editMode } = useEventFormContext()
+  const { isPending, isUploadImagePending, isUploadDeletePending, onSubmit, editMode, currentScope, event } = useEventFormContext()
   return (
-    <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
-      <VoxCard.Content pt={0}>
-        <XStack alignItems="center" justifyContent="flex-end" gap="$small" flex={1} width="100%">
-          <XStack>
-            <VoxButton
-              onPress={() => onSubmit()}
-              size="md"
-              variant="contained"
-              theme="purple"
-              pop
-              loading={isPending || isUploadImagePending || isUploadDeletePending}
-              iconLeft={Sparkle}
-            >
-              {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? `${editMode ? 'Modifier' : 'Créer'} l'événement` : null}
-              {isUploadImagePending ? "Envoi de l'image..." : null}
-              {isUploadDeletePending ? "Supression de l'image..." : null}
-              {isPending ? `${editMode ? 'Modification' : 'Création'}...` : null}
-            </VoxButton>
-          </XStack>
+    <XStack flex={1}>
+      <VoxCard.Content pt={0} flex={1}>
+        <XStack alignItems="center" gap="$small">
+          {editMode && event ? (
+            <EventHandleActions
+              event={event}
+              scope={currentScope.code}
+              buttonProps={{
+                theme: 'purple',
+                size: 'sm',
+                variant: 'soft',
+              }}
+            />
+          ) : null}
         </XStack>
       </VoxCard.Content>
-    </PageLayout.SideBarRight>
+
+      <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
+        <VoxCard.Content pt={0}>
+          <XStack alignItems="center" justifyContent="flex-end" gap="$small" flex={1} width="100%">
+            <XStack>
+              <VoxButton
+                onPress={() => onSubmit()}
+                size="md"
+                variant="contained"
+                theme="purple"
+                pop
+                loading={isPending || isUploadImagePending || isUploadDeletePending}
+                iconLeft={Sparkle}
+              >
+                {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? `${editMode ? 'Modifier' : 'Créer'} l'événement` : null}
+                {isUploadImagePending ? "Envoi de l'image..." : null}
+                {isUploadDeletePending ? "Supression de l'image..." : null}
+                {isPending ? `${editMode ? 'Modification' : 'Création'}...` : null}
+              </VoxButton>
+            </XStack>
+          </XStack>
+        </VoxCard.Content>
+      </PageLayout.SideBarRight>
+    </XStack>
   )
 }
 
@@ -415,10 +434,7 @@ const EventFormDesktopScreen = () => {
             <EventDesktopMain />
             <EventDesktopAside />
           </XStack>
-          <XStack>
-            <XStack flex={1} />
-            <EventDesktopFooter />
-          </XStack>
+          <EventDesktopFooter />
         </VoxCard>
       </YStack>
     </ScrollStack>
