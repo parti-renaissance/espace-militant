@@ -46,11 +46,11 @@ export function VoxAlertDialog(props: Readonly<AlertDialogProps>) {
 
             <AlertDialog.Description>{props.description}</AlertDialog.Description>
             <XStack gap="$medium" justifyContent="flex-end">
-              <AlertDialog.Cancel asChild theme="blue" onPress={props.onCancel}>
-                <VoxButton variant="contained">Annuler</VoxButton>
+              <AlertDialog.Cancel theme="gray" asChild onPress={props.onCancel}>
+                <VoxButton variant="text">Annuler</VoxButton>
               </AlertDialog.Cancel>
 
-              <AlertDialog.Action asChild onPress={props.onAccept}>
+              <AlertDialog.Action theme="gray" asChild onPress={props.onAccept}>
                 <VoxButton variant="contained">Valider</VoxButton>
               </AlertDialog.Action>
             </XStack>

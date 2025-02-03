@@ -20,6 +20,7 @@ import { Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
 import { Controller } from 'react-hook-form'
 import { isWeb, XStack, YStack } from 'tamagui'
+import EventHandleActions from '../EventHandleActions'
 import { useEventFormContext } from './context'
 
 export const EventFormMobileScreenSkeleton = (props?: { editMode?: boolean }) => {
@@ -87,6 +88,8 @@ export default function EventFormMobileScreen() {
     isUploadImagePending,
     isUploadDeletePending,
     editMode,
+    event,
+    currentScope,
   } = useEventFormContext()
 
   return (
@@ -472,6 +475,19 @@ export default function EventFormMobileScreen() {
               </YStack>
             </VoxCard.Content>
           </VoxCard>
+          <VoxCard.Content>
+            {editMode && event ? (
+              <EventHandleActions
+                event={event}
+                scope={currentScope.code}
+                buttonProps={{
+                  theme: 'orange',
+                  size: 'sm',
+                  variant: 'text',
+                }}
+              />
+            ) : null}
+          </VoxCard.Content>
         </ScrollView>
       </KeyboardAvoidingView>
     </LayoutPage.MainSingleColumn>

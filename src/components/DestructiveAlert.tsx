@@ -6,7 +6,7 @@ import VoxSimpleModal from '@/components/VoxSimpleModal'
 import { XStack, YStack } from 'tamagui'
 
 type DestructiveAlertProps = {
-  onAccept: () => void | (() => Promise<unknown>)
+  onAccept: () => void | Promise<unknown>
   onCancel?: () => void
   isPending?: boolean
   title: string
@@ -24,21 +24,21 @@ export const DestructiveAlert = forwardRef<ModalRef, DestructiveAlertProps>((pro
   }
 
   const handleAccept = async () => {
-    Promise.resolve(props.onAccept()).then(() => {
+    return Promise.resolve(props.onAccept()).then(() => {
       insideRef.current?.close()
     })
   }
 
   return (
     <VoxSimpleModal ref={insideRef}>
-      <VoxCard.Content justifyContent="space-between" gap="$large" maxWidth={350} maxHeight={400}>
+      <VoxCard.Content justifyContent="space-between" gap="$large" maxWidth={350}>
         <YStack gap="$medium">
           <Text.LG bold color="$orange7">
             {props.title}
           </Text.LG>
           {typeof props.description === 'string' ? <Text.MD>{props.description}</Text.MD> : props.description}
         </YStack>
-        <XStack flex={1} gap="$medium">
+        <XStack gap="$medium">
           <VoxButton variant="outlined" flex={3} children="Non" onPress={handleCancel} theme="gray" />
           <VoxButton children="Oui" loading={props.isPending} flex={1} onPress={handleAccept} theme="orange" />
         </XStack>

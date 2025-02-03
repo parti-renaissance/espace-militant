@@ -149,9 +149,18 @@ const useEventFormData = ({ edit }: EventFormProps) => {
         try {
           if (newEvent) {
             if (image === null) {
-              await deleteImage({ scope, eventId: newEvent.uuid })
+              await deleteImage({ scope, eventId: newEvent.uuid, slug: newEvent.slug })
             } else if (image && image.url && image.url.startsWith('data:')) {
-              await uploadImage({ scope, eventId: newEvent.uuid, payload: image.url })
+              await uploadImage({
+                scope,
+                eventId: newEvent.uuid,
+                payload: image.url,
+                slug: newEvent.slug,
+                size: {
+                  width: image.width,
+                  height: image.height,
+                },
+              })
             }
           }
         } catch (e) {

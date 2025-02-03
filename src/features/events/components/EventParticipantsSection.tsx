@@ -86,7 +86,7 @@ const EventParticipantsSection = ({ event }: EventItemProps) => {
               //@ts-expect-error wrong type
               event={event}
               buttonProps={{
-                theme: 'purple',
+                theme: 'orange',
                 size: 'sm',
                 variant: 'soft',
               }}

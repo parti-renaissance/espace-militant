@@ -5,6 +5,7 @@ import { useDestructiveAlert } from '@/components/DestructiveAlert'
 import { useCancelEvent, useDeleteEvent } from '@/services/events/hook'
 import { RestFullEvent } from '@/services/events/schema'
 import { StopCircle, Trash2 } from '@tamagui/lucide-icons'
+import { router } from 'expo-router'
 import { XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import { isEventCancelled } from '../utils'
@@ -17,9 +18,13 @@ type EventHandleButtonProps = {
 
 export const CancelButton = (props: EventHandleButtonProps) => {
   const { mutateAsync, isPending } = useCancelEvent()
-  const handlePress = useDebouncedCallback(() => {
-    mutateAsync(props)
-  }, 200)
+  const handlePress = useDebouncedCallback(
+    () =>
+      mutateAsync(props).then(() => {
+        router.replace('/evenements')
+      }),
+    200,
+  )
 
   const { DestructiveAlertWrapper, present } = useDestructiveAlert({
     title: `Voulez-vous vraiment annuler l'évenement ?`,
@@ -40,7 +45,7 @@ export const CancelButton = (props: EventHandleButtonProps) => {
   return (
     <DestructiveAlertWrapper>
       <VoxButton {...props.buttonProps} loading={isPending} iconLeft={StopCircle} onPress={present}>
-        Annuler
+        Annuler l'événement
       </VoxButton>
     </DestructiveAlertWrapper>
   )
@@ -48,18 +53,22 @@ export const CancelButton = (props: EventHandleButtonProps) => {
 
 export const DeleteButton = (props: EventHandleButtonProps) => {
   const { mutateAsync, isPending } = useDeleteEvent()
-  const handlePress = useDebouncedCallback(() => {
-    mutateAsync(props)
-  }, 200)
+  const handlePress = useDebouncedCallback(
+    () =>
+      mutateAsync(props).then(() => {
+        router.replace('/evenements')
+      }),
+    200,
+  )
   const { DestructiveAlertWrapper, present } = useDestructiveAlert({
-    title: `Voulez-vous vraiment supprimer l'évenement ?`,
+    title: `Voulez-vous vraiment supprimer l'événement ?`,
     description: `La suppression sera définitive !`,
     onAccept: handlePress,
   })
   return (
     <DestructiveAlertWrapper>
       <VoxButton {...props.buttonProps} onPress={present} loading={isPending} iconLeft={Trash2}>
-        Supprimer
+        Supprimer l'événement
       </VoxButton>
     </DestructiveAlertWrapper>
   )
@@ -68,8 +77,7 @@ export const DeleteButton = (props: EventHandleButtonProps) => {
 export default function (props: Omit<EventHandleButtonProps, 'eventId'> & { event: RestFullEvent }) {
   return isEventCancelled(props.event) ? null : (
     <XStack gap="$small">
-      <CancelButton {...props} eventId={props.event.uuid} />
-      {props.event.participants_count < 2 ? <DeleteButton {...props} eventId={props.event.uuid} /> : null}
+      {props.event.participants_count < 2 ? <DeleteButton {...props} eventId={props.event.uuid} /> : <CancelButton {...props} eventId={props.event.uuid} />}
     </XStack>
   )
 }

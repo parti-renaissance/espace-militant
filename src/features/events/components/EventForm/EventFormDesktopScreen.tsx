@@ -304,7 +304,7 @@ const EventDesktopFooter = () => {
               event={event}
               scope={currentScope.code}
               buttonProps={{
-                theme: 'purple',
+                theme: 'orange',
                 size: 'sm',
                 variant: 'soft',
               }}

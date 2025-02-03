@@ -26,3 +26,28 @@ export const map = (x: RestTimelineFeedItem): Partial<RestFullEvent> & { uuid: s
     mode: x.mode,
   }
 }
+
+export const mapEventToFeed = (x: Partial<RestFullEvent>): Partial<RestTimelineFeedItem> => {
+  const mapper = {
+    objectID: x.uuid,
+    identifier: x.slug,
+    title: x.name,
+    editable: x.editable,
+    edit_link: x.edit_link,
+    post_address: x.post_address,
+    author: x.organizer,
+    category: x.category?.name,
+    begin_at: x.begin_at,
+    finish_at: x.finish_at,
+    image: x.image,
+    description: x.description,
+    time_zone: x.time_zone,
+    user_registered_at: x.user_registered_at,
+    capacity: x.capacity,
+    object_state: x.object_state,
+    visibility: x.visibility,
+    mode: x.mode,
+  }
+
+  return Object.fromEntries(Object.entries(mapper).filter(([, v]) => Boolean(v)))
+}

@@ -4,6 +4,7 @@ import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import * as metatags from '@/config/metatags'
 import EventFormScreen, { EventFormScreenSkeleton } from '@/features/events/components/EventForm'
+import { isEventEditable } from '@/features/events/utils'
 import { useGetEvent } from '@/services/events/hook'
 import { RestFullEvent } from '@/services/events/schema'
 import { useLocalSearchParams } from 'expo-router'
@@ -25,6 +26,7 @@ function _EventFormScreen() {
   const params = useLocalSearchParams<{ id: string }>()
   if (!params.id) return <Error404 />
   const { data } = useGetEvent({ id: params.id })
+  if (!isEventEditable(data)) return <Error404 />
   return (
     <>
       <Head>
