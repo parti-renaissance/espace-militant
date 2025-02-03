@@ -220,7 +220,7 @@ export const RestPostEventRequestSchema = z.object({
   live_url: z.string().optional(),
 })
 
-export const RestPostEventResponseSchema = RestItemEventSchema
+export const RestPostEventResponseSchema = RestFullEventSchema
 
 export const propertyPathPostEventSchema = z.enum([
   'name',
