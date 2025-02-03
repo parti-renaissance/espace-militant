@@ -61,7 +61,7 @@ export const isEventEditable = (
   editable: true
   edit_link: string
 } => {
-  return Boolean(isEventFull(event) && event.editable && event.edit_link)
+  return Boolean(isEventFull(event) && event.editable && event.edit_link && !isEventCancelled(event))
 }
 
 export const isEventRegister = (

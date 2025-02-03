@@ -201,3 +201,39 @@ export const useDeleteEventImage = () => {
     },
   })
 }
+
+export const useDeleteEvent = () => {
+  const toast = useToastController()
+  return useMutation({
+    mutationFn: api.deleteEvent,
+    onSuccess: () => {
+      toast.show('Succès', { message: 'Événement supprimée', type: 'success' })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: "Impossible de supprimer l'événement", type: 'error' })
+      }
+      return error
+    },
+  })
+}
+
+export const useCancelEvent = () => {
+  const toast = useToastController()
+  return useMutation({
+    mutationFn: api.cancelEvent,
+    onSuccess: () => {
+      toast.show('Succès', { message: 'Événement annulé', type: 'success' })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: "Impossible d'annuler l'événement", type: 'error' })
+      }
+      return error
+    },
+  })
+}
