@@ -2,6 +2,7 @@ import { ComponentProps, forwardRef, useEffect, useState } from 'react'
 import { GestureResponderEvent, LayoutChangeEvent, NativeSyntheticEvent, TextInput, TextInputFocusEventData, TextInputProps } from 'react-native'
 import Text from '@/components/base/Text'
 import { useForwardRef } from '@/hooks/useForwardRef'
+import { AlertCircle } from '@tamagui/lucide-icons'
 import { AnimatePresence, isWeb, Spinner, styled, TamaguiElement, useTheme, XStack, YStack } from 'tamagui'
 
 export type InputProps = {
@@ -70,6 +71,11 @@ const InputFrame = styled(XStack, {
   },
 
   variants: {
+    multiline: {
+      true: {
+        alignItems: 'flex-start',
+      },
+    },
     fake: {
       true: {
         hoverStyle: {
@@ -245,13 +251,7 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
             {iconLeft}
           </YStack>
         )}
-        <YStack
-          gap="$xsmall"
-          height="auto"
-          flex={1}
-          justifyContent={inputProps.multiline ? undefined : 'center'}
-          paddingTop={inputProps.multiline ? '$medium' : 'xsmall'}
-        >
+        <YStack height="auto" flex={1} paddingTop={inputProps.multiline ? '$medium' : 0}>
           <AnimatePresence>
             {(label ||
               (placeholder && inputProps.value && inputProps.value.length > 0) ||

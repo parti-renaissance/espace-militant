@@ -41,6 +41,7 @@ export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectO
 export const formatCategorie = (cat: EventCategory): SelectOption<string> => {
   return {
     label: cat.name,
+    subLabel: cat.description ?? undefined,
     value: cat.slug,
   }
 }

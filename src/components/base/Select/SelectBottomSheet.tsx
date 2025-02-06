@@ -67,11 +67,11 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
           width: 48,
         }}
       >
-        <DropdownFrame minHeight="100%" flex={1} borderRadius={0} borderWidth={0}>
+        <DropdownFrame size={false} flex={1} borderRadius={0} borderWidth={0}>
           <BottomSheetFlatList
             stickyHeaderHiddenOnScroll={props.searchable}
             stickyHeaderIndices={props.searchable ? [0] : undefined}
-            keyboardShouldPersistTaps
+            keyboardShouldPersistTaps="always"
             ListHeaderComponent={
               props.searchable ? (
                 <YStack padding={16} bg="white">

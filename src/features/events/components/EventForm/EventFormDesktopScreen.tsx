@@ -55,7 +55,7 @@ const EventDesktopAside = () => {
                 error={fieldState.error?.message}
                 size="sm"
                 color="gray"
-                label="Accées"
+                label="Accèes"
                 value={field.value}
                 options={visibilityOptions}
                 onChange={field.onChange}

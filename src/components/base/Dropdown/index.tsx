@@ -108,6 +108,9 @@ export const DropdownFrame = styled(ThemeableStack, {
       xl: {
         maxHeight: 64 * 6,
       },
+      false: {
+        maxHeight: 'unset',
+      },
     },
   },
   defaultVariants: {
@@ -131,7 +134,13 @@ export function Dropdown<A extends string>({ items, onSelect, value, ...props }:
         data={items}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
-          <MemoItem {...item} size={props.size ?? 'lg'} onPress={handleSelect(item.id)} selected={item.id === value} last={items.length - 1 === index} />
+          <MemoItem
+            {...item}
+            size={typeof props.size === 'string' ? props.size : 'lg'}
+            onPress={handleSelect(item.id)}
+            selected={item.id === value}
+            last={items.length - 1 === index}
+          />
         )}
       />
     </DropdownFrame>
