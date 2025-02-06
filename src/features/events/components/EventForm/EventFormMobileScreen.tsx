@@ -90,6 +90,7 @@ export default function EventFormMobileScreen() {
     editMode,
     event,
     currentScope,
+    isAuthor,
   } = useEventFormContext()
 
   return (
@@ -133,25 +134,29 @@ export default function EventFormMobileScreen() {
               </MessageCard>
             )}
             <VoxCard.Content>
-              <Controller
-                render={({ field, fieldState }) => {
-                  return (
-                    <Select
-                      error={fieldState.error?.message}
-                      size="sm"
-                      theme="purple"
-                      matchTextWithTheme
-                      label="Pour"
-                      value={field.value}
-                      options={scopeOptions}
-                      onChange={field.onChange}
-                    />
-                  )
-                }}
-                control={control}
-                name="scope"
-              />
-              <VoxCard.Separator />
+              {isAuthor ? (
+                <>
+                  <Controller
+                    render={({ field, fieldState }) => {
+                      return (
+                        <Select
+                          error={fieldState.error?.message}
+                          size="sm"
+                          theme="purple"
+                          matchTextWithTheme
+                          label="Pour"
+                          value={field.value}
+                          options={scopeOptions}
+                          onChange={field.onChange}
+                        />
+                      )
+                    }}
+                    control={control}
+                    name="scope"
+                  />
+                  <VoxCard.Separator />
+                </>
+              ) : null}
               <YStack>
                 <Controller
                   render={({ field, fieldState }) => {

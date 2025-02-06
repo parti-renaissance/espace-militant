@@ -23,30 +23,34 @@ import EventHandleActions from '../EventHandleActions'
 import { useEventFormContext } from './context'
 
 const EventDesktopAside = () => {
-  const { scopeOptions, control, visibilityOptions, catOptions, timezones, mode, setMode } = useEventFormContext()
+  const { scopeOptions, control, visibilityOptions, catOptions, timezones, mode, setMode, isAuthor } = useEventFormContext()
 
   return (
     <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
       <VoxCard.Content>
-        <Controller
-          render={({ field, fieldState }) => {
-            return (
-              <Select
-                error={fieldState.error?.message}
-                size="sm"
-                theme="purple"
-                matchTextWithTheme
-                label="Pour"
-                value={field.value}
-                options={scopeOptions}
-                onChange={field.onChange}
-              />
-            )
-          }}
-          control={control}
-          name="scope"
-        />
-        <VoxCard.Separator />
+        {isAuthor ? (
+          <>
+            <Controller
+              render={({ field, fieldState }) => {
+                return (
+                  <Select
+                    error={fieldState.error?.message}
+                    size="sm"
+                    theme="purple"
+                    matchTextWithTheme
+                    label="Pour"
+                    value={field.value}
+                    options={scopeOptions}
+                    onChange={field.onChange}
+                  />
+                )
+              }}
+              control={control}
+              name="scope"
+            />
+            <VoxCard.Separator />
+          </>
+        ) : null}
 
         <Controller
           render={({ field, fieldState }) => {

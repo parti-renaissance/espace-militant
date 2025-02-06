@@ -5,7 +5,7 @@ import { isPathExist } from '@/services/common/errors/utils'
 import { eventPostFormError } from '@/services/events/error'
 import { useCreateEvent, useDeleteEventImage, useMutationEventImage, useSuspenseGetCategories } from '@/services/events/hook'
 import { EventCategory } from '@/services/events/schema'
-import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { useGetExecutiveScopes, useGetSuspenseProfil } from '@/services/profile/hook'
 import { RestUserScopesResponse } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -96,8 +96,16 @@ const roundMinutesToNextDecimal = (date: Date) => {
 }
 const useEventFormData = ({ edit }: EventFormProps) => {
   const scopes = useGetExecutiveScopes()
-  const scopeOptions = useMemo(() => scopes.data.list.map(getFormatedScope), [scopes.data.list])
+  const scopeOptions = useMemo(() => scopes.data.list.filter((x) => x.features.includes('events')).map(getFormatedScope), [scopes.data.list])
   const currentScope = scopes.data.default
+  const { data } = useGetSuspenseProfil({ enabled: true })
+
+  const isAuthor = useMemo(() => {
+    if (!edit) return true
+    if (!edit.organizer) return false
+    if (edit.organizer.uuid === data?.uuid) return true
+    return false
+  }, [edit, data])
 
   const categories = useSuspenseGetCategories()
   const catOptions = categories.data.map(formatCategorie)
@@ -146,9 +154,12 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const _onSubmit = handleSubmit(
     async (data) => {
-      const { scope, image, ...payload } = data
+      const { scope, image, mode, visio_url, post_address, ...payload } = data
       try {
-        const newEvent = await mutateAsync({ payload, scope })
+        const newEvent = await mutateAsync({
+          payload: { ...payload, mode, visio_url: mode === 'online' ? visio_url : undefined, post_address: mode === 'meeting' ? post_address : undefined },
+          scope,
+        })
 
         let errorImage = false
         try {
@@ -220,6 +231,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     editMode,
     currentScope,
     event: edit,
+    isAuthor,
   }
 }
 
