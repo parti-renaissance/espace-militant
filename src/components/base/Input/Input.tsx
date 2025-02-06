@@ -57,7 +57,7 @@ const InputFrame = styled(XStack, {
   borderColor: '$colorTransparent',
   animation: 'bouncy',
   hoverStyle: {
-    backgroundColor: 'rgba(237, 239, 242, 1)',
+    backgroundColor: '$gray2',
     cursor: 'text',
   },
   focusStyle: {
@@ -107,13 +107,35 @@ const InputFrame = styled(XStack, {
       },
     },
     size: {
-      xs: {},
-      sm: {},
-      md: {},
-      lg: {},
+      xs: {
+        borderRadius: 20,
+        height: 40,
+      },
+      sm: {
+        height: 44,
+        borderRadius: 22,
+      },
+      md: {
+        height: 48,
+        borderRadius: 24,
+      },
+      lg: {
+        height: 56,
+        borderRadius: 28,
+      },
       xl: {
+        height: 56,
+        borderRadius: 28,
         paddingVertical: '$xsmall',
         paddingHorizontal: '$large',
+      },
+    },
+    multiline: {
+      true: {
+        alignItems: 'flex-start',
+        height: 'auto',
+        minHeight: 56 + 40,
+        borderRadius: 28,
       },
     },
   } as const,
@@ -219,23 +241,17 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
         color={color ?? 'white'}
         error={isFailed}
         fake={fake}
-        size={size}
+        multiline={inputProps.multiline}
+        size={inputProps.multiline ? undefined : (size ?? 'lg')}
         forceStyle={isFocused ? 'focus' : undefined}
         onPress={handlePress}
-        height={inputProps.multiline ? Math.round(calcSize + 40) : calcSize}
       >
         {!loading && iconLeft && (
           <YStack height="100%" justifyContent="center">
             {iconLeft}
           </YStack>
         )}
-        <YStack
-          gap="$xsmall"
-          height="100%"
-          flex={1}
-          justifyContent={inputProps.multiline ? undefined : 'center'}
-          paddingTop={inputProps.multiline ? '$medium' : 'xsmall'}
-        >
+        <YStack height="auto" flex={1} paddingTop={inputProps.multiline ? '$medium' : 0}>
           <AnimatePresence>
             {(label ||
               (placeholder && inputProps.value && inputProps.value.length > 0) ||

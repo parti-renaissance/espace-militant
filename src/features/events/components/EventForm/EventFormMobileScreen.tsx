@@ -184,7 +184,7 @@ export default function EventFormMobileScreen() {
                       error={fieldState.error?.message}
                       size="sm"
                       color="gray"
-                      label="Accées"
+                      label="Accèes"
                       value={field.value}
                       options={visibilityOptions}
                       onChange={field.onChange}
@@ -203,6 +203,7 @@ export default function EventFormMobileScreen() {
                       error={fieldState.error?.message}
                       size="sm"
                       color="gray"
+                      noValuePlaceholder="choisir"
                       label="Catégorie"
                       value={field.value}
                       options={catOptions}

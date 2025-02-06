@@ -4,7 +4,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import { CoreBridge, Images, PlaceholderBridge, RichText, TenTapStartKit, Toolbar, ToolbarItem, useEditorBridge } from '@10play/tentap-editor'
-import { Pen } from '@tamagui/lucide-icons'
+import { Pen, Save } from '@tamagui/lucide-icons'
 import { useMutation } from '@tanstack/react-query'
 import { XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
@@ -239,16 +239,20 @@ function ModalEditor(props: { onChange: (x: string) => void; onBlur: () => void;
       header={
         <VoxHeader>
           <XStack alignItems="center" flex={1} width="100%">
-            <XStack alignContent="flex-start">
-              <VoxButton size="sm" theme="orange" variant="text" onPress={props.onBlur}>
-                Annuler
-              </VoxButton>
-            </XStack>
-            <XStack flexGrow={1} justifyContent="center">
+            <XStack flexGrow={1}>
               <VoxHeader.Title>Description</VoxHeader.Title>
             </XStack>
-            <XStack>
-              <VoxButton size="sm" theme="blue" alignSelf="flex-end" variant="text" onPress={handleOnChange} loading={isPending} disabled={isPending}>
+            <XStack flex={1} justifyContent="flex-end">
+              <VoxButton
+                size="sm"
+                iconLeft={Save}
+                theme="blue"
+                alignSelf="flex-end"
+                variant="text"
+                onPress={handleOnChange}
+                loading={isPending}
+                disabled={isPending}
+              >
                 Terminé
               </VoxButton>
             </XStack>

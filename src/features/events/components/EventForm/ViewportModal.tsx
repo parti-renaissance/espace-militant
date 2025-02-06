@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react'
 import { Modal, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
-import { Sheet, useMedia, View } from 'tamagui'
+import { Sheet, useMedia, useWindowDimensions, View } from 'tamagui'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
@@ -21,13 +21,17 @@ export const useModalOrPageScrollView = () => {
  */
 export default function ViewportModal({ children, onClose, open, header }: ModalOrPageBaseProps) {
   const viewport = useMedia()
+  const size = useWindowDimensions()
+
+  const width = Math.min((size.width * 80) / 100, 1048)
+  const height = (size.height * 60) / 100
 
   if (viewport.gtSm) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <CardFrame>
+            <CardFrame width={width} height={height}>
               {header ? header : null}
               {children}
             </CardFrame>

@@ -30,6 +30,7 @@ export type SelectProps<A extends string> = {
   label?: string
   placeholder?: string
   matchTextWithTheme?: boolean
+  showSubLabel?: boolean
   size?: InputProps['size']
   searchable?: boolean
   multiline?: boolean
