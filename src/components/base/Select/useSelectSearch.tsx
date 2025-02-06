@@ -12,7 +12,7 @@ const useSelectSearch = ({ options, searchableOptions }: Pick<SelectProps<string
     searchableOptions?.autocompleteCallback?.(x)
   }, [])
   const queryInputRef = useRef<TextInput>(null)
-  const items = useMemo(() => options.map((x) => ({ id: x.value, title: x.label, subtitle: x.subLabel })), [options])
+  const items = useMemo(() => options.map((x) => ({ id: x.value, title: x.label, subtitle: x.subLabel, icon: x.icon, theme: x.theme })), [options])
   const filteredItems = useMemo(
     () => (isAutoComplete ? items : items.filter((x) => reactTextNodeChildrenToString(x.title).toLocaleLowerCase().includes(query.toLocaleLowerCase()))),
     [items, query, isAutoComplete],
