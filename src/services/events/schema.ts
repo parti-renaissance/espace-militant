@@ -76,6 +76,7 @@ export const RestFullEventSchema = z
     participants_count: z.number(),
     capacity: z.number().nullable(),
     visio_url: z.string().nullable(),
+    live_url: z.string().nullable(),
     user_registered_at: z.string().nullable(),
 
     editable: z.boolean(),

@@ -2,6 +2,7 @@ import { Children, isValidElement } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
+import VimeoPlayer from '@/components/VimeoPlayer'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { CategoryChip } from '@/features/events/components/CategoryChip'
 import { EventAuthComponent } from '@/features/events/components/EventAuthComponent'
@@ -91,7 +92,16 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
       <StatusBar animated style="light" />
       <ScrollStack marginTop={insets.top} backgroundColor="$textSurface">
         <VoxCard overflow="hidden" pb={66}>
-          {fallbackImage ? <VoxCard.Image large={true} image={fallbackImage} imageData={event.image} /> : null}
+          {isFull && event.live_url && event.live_url.startsWith('https://vimeo.com/event/') ? (
+            <VimeoPlayer
+              url={event.live_url}
+              dom={{
+                matchContents: true,
+              }}
+            />
+          ) : fallbackImage ? (
+            <VoxCard.Image large={true} image={fallbackImage} imageData={event.image} />
+          ) : null}
           <VoxCard.Content pt={fallbackImage ? 0 : undefined}>
             <EventItemHeader>
               <CategoryChip>{event.category?.name}</CategoryChip>
