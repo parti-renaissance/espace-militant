@@ -64,7 +64,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}
               <YStack alignContent="center" flexShrink={1} alignSelf="flex-end" alignItems="flex-end">
                 <SF.Text themedText={Boolean(fullValue?.theme)}>{fullValue ? fullValue.label : (props.noValuePlaceholder ?? '___')}</SF.Text>
-                {fullValue && fullValue.subLabel ? <SF.Text fontSize={12}>{fullValue.subLabel}</SF.Text> : null}
+                {fullValue && fullValue.subLabel && props.showSubLabel ? <SF.Text fontSize={12}>{fullValue.subLabel}</SF.Text> : null}
               </YStack>
             </SF.ValueContainer>
           </SF.Container>

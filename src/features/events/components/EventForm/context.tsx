@@ -47,27 +47,31 @@ export const formatCategorie = (cat: EventCategory): SelectOption<string> => {
 
 const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
   {
+    value: 'public',
+    icon: Unlock,
+    label: 'Ouvert au public',
+    subLabel: 'Tout le monde peut s’y inscrire avec un prénom, un email et un code postal pour découvrir le Parti.',
+  },
+  {
+    value: 'private',
+    icon: Lock,
+    theme: 'blue',
+    label: 'Réservé aux millitants',
+    subLabel: 'Les externes ne pourront pas s’y inscrire sans adhérer ou créer un compte. Un aperçu sera visible publiquement.',
+  },
+  {
     value: 'adherent',
     icon: Lock,
     theme: 'yellow',
     label: 'Réservé aux adhérents',
+    subLabel: 'Les adhérents non-à-jour et les sympathisants ne pourront pas s’y inscrire sans cotiser cette année. Il ne sera pas visible publiquement.',
   },
   {
     value: 'adherent_dues',
     icon: Lock,
     theme: 'yellow',
     label: 'Réservé aux adhérents à jour',
-  },
-  {
-    value: 'private',
-    icon: Lock,
-    theme: 'gray',
-    label: 'Réservé aux millitants',
-  },
-  {
-    value: 'public',
-    icon: Unlock,
-    label: 'Ouvert au public',
+    subLabel: 'Les sympathisants ne pourront pas s’y inscrire sans adhérer. Il ne sera pas visible publiquement.',
   },
 ]
 
