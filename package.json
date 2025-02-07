@@ -29,6 +29,8 @@
     "eas-build-pre-install": "corepack enable && cd ../.. && yarn install"
   },
   "dependencies": {
+    "@10play/react-native-web-webview": "^0.0.3",
+    "@10play/tentap-editor": "^0.6.0",
     "@eslint/js": "^9.3.0",
     "@expo/webpack-config": "~19.0.1",
     "@gorhom/bottom-sheet": "^5",
