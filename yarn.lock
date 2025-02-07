@@ -16776,14 +16776,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-blur@npm:~14.0.2":
-  version: 14.0.2
-  resolution: "expo-blur@npm:14.0.2"
+"expo-blur@npm:~14.0.3":
+  version: 14.0.3
+  resolution: "expo-blur@npm:14.0.3"
   peerDependencies:
     expo: "*"
     react: "*"
     react-native: "*"
-  checksum: 10c0/3138469957f73ed362ab4c483954b98d9740885904bdbeb5c43e159096f0c1c7532d8d14ed9625708a292126844b895a35687efb95ebcc2329435604612146f3
+  checksum: 10c0/fa511f6a2cf893a6b9fe2baac121e34655f5f10d7fb9fbcee1482acd9c30436bdfcb8ad0587bff65bef5cf7b7dfaf740e4c771cdd0d956e92df0ddf39173631e
   languageName: node
   linkType: hard
 
@@ -29890,7 +29890,7 @@ __metadata:
     expo: "npm:~52.0.25"
     expo-application: "npm:~6.0.2"
     expo-auth-session: "npm:~6.0.2"
-    expo-blur: "npm:~14.0.2"
+    expo-blur: "npm:~14.0.3"
     expo-build-properties: "npm:~0.13.2"
     expo-calendar: "npm:~14.0.6"
     expo-checkbox: "npm:~4.0.1"
