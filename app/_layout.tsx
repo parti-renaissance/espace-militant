@@ -6,7 +6,8 @@ import { SessionProvider, useSession } from '@/ctx/SessionProvider'
 import { useInitMatomo } from '@/features/matomo/hook'
 import { useInitPushNotification } from '@/features/push-notification/hook'
 import initRootAppNotification from '@/features/push-notification/logic/initRootAppNotification'
-import UpdateScreen from '@/features/update/updateScreen'
+import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks/useAppUpdate'
+import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen'
 import useImportFont from '@/hooks/useImportFont'
 import TamaguiProvider from '@/tamagui/provider'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
@@ -16,6 +17,7 @@ import { ToastProvider } from '@tamagui/toast'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BlurView } from 'expo-blur'
 import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 import { isWeb, ViewProps } from 'tamagui'
 
 if (isWeb) {
@@ -24,7 +26,7 @@ if (isWeb) {
 
 initRootAppNotification()
 
-const { routingInstrumentation } = ErrorMonitor.configure()
+const { navigationIntegration } = ErrorMonitor.configure()
 
 SplashScreen.preventAutoHideAsync()
 
@@ -33,7 +35,7 @@ const useRegisterRoutingInstrumentation = () => {
 
   useEffect(() => {
     if (navigationRef) {
-      routingInstrumentation.registerNavigationContainer(navigationRef)
+      navigationIntegration.registerNavigationContainer(navigationRef)
     }
   }, [navigationRef])
 }
@@ -41,12 +43,25 @@ const useRegisterRoutingInstrumentation = () => {
 const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: boolean }) => {
   useInitMatomo()
   const { isLoading, isAuth } = useSession()
+  const { isAvailable: isUpdateAvailable, isError: isUpdateError } = useCheckStoreUpdate()
+  const { isAvailable: isExpoUpdateAvailable, isError: isExpoUpdateError, isProcessing: isExpoUpdateProcessing } = useCheckExpoUpdate()
+
   useInitPushNotification({ enable: isAuth && !isLoading && !props.isLoading })
+
+  if (!props.isLoading) {
+    SplashScreen.hideAsync()
+  }
+
   if (isLoading) {
     return <WaitingScreen />
   }
-  if (!isLoading && !props.isLoading) {
-    SplashScreen.hideAsync()
+
+  if (isUpdateAvailable && !isUpdateError) {
+    return <UpdateStoreScreen />
+  }
+
+  if ((isExpoUpdateAvailable || isExpoUpdateProcessing) && !isExpoUpdateError) {
+    return <UpdateExpoScreen />
   }
 
   return (
@@ -92,6 +107,7 @@ function Root() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar animated style="auto" />
       <ToastProvider swipeDirection="up">
         <QueryClientProvider client={queryClient}>
           <TamaguiProvider>
@@ -99,9 +115,7 @@ function Root() {
               <BottomSheetModalProvider>
                 <SessionProvider>
                   <WaitingRoomHoc isLoading={!isFontsLoaded}>
-                    <UpdateScreen>
-                      <Slot />
-                    </UpdateScreen>
+                    <Slot />
                   </WaitingRoomHoc>
                 </SessionProvider>
               </BottomSheetModalProvider>
@@ -113,4 +127,4 @@ function Root() {
   )
 }
 
-export default Root
+export default ErrorMonitor.wrap(Root)

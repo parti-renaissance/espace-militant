@@ -18,7 +18,7 @@ type ButtonProps = ComponentPropsWithoutRef<typeof VoxButton> &
   }
 const Wrapper = forwardRef<ScrollView, ScrollViewProps>((x, r) => {
   const media = useMedia()
-  //@ts-ignore
+  //@ts-expect-error not good type for ref
   return media.gtMd ? <ScrollView ref={r} {...x} /> : <Fragment children={x.children} />
 })
 

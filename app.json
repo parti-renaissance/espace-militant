@@ -1,20 +1,13 @@
 {
   "expo": {
-    "name": "Renaissance",
     "slug": "vox",
     "scheme": "vox",
-    "version": "5.14.0",
+    "version": "5.14.1",
     "owner": "parti-renaissance",
     "runtimeVersion": {
       "policy": "appVersion"
     },
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
@@ -62,18 +55,22 @@
         "android.permission.READ_CALENDAR",
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.WRITE_CALENDAR"
-      ],
-      "config": {
-        "googleMaps": {
-          "apiKey": "key"
-        }
-      }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200
+        }
+      ],
+
       [
         "expo-image-picker",
         {
@@ -109,21 +106,19 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Autorisez $(PRODUCT_NAME) à vous localiser pour vous aider à trouver les portes à frapper et les actions à réaliser."
         }
       ],
+      ["expo-notifications"],
       [
-        "react-native-permissions",
+        "expo-calendar",
         {
-          "iosPermissions": ["CalendarsWriteOnly"],
-          "androidPermissions": ["android.permission.WRITE_CALENDAR"]
+          "calendarPermission": "Autorisez $(PRODUCT_NAME) à ajouter des événements à votre calendrier"
         }
-      ],
-      ["react-native-add-calendar-event"],
-      ["expo-notifications"]
+      ]
     ],
     "extra": {
-      "eas_update_version": "2",
+      "eas_update_version": "0",
       "router": {
         "origin": false
       },

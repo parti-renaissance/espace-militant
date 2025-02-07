@@ -1,9 +1,8 @@
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useGetMagicLink } from '@/services/magic-link/hook'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { Image } from 'expo-image'
-import * as WebBrowser from 'expo-web-browser'
 import { styled, XStack, YStack } from 'tamagui'
 import type { CommonMembershipCardProps } from './types'
 
@@ -14,7 +13,7 @@ const HeaderFrame = styled(XStack, {
 })
 
 export default function (props: CommonMembershipCardProps) {
-  const { data: adhesionLink, isPending } = useGetMagicLink({ slug: 'adhesion' })
+  const { isPending, open: openAdh } = useOpenExternalContent({ slug: 'adhesion' })
   return (
     <VoxCard bg={props.full ? 'white' : '$yellow1'} inside>
       <HeaderFrame>
@@ -33,16 +32,7 @@ export default function (props: CommonMembershipCardProps) {
             <Text.MD semibold>Prenez part à la vie politique française !</Text.MD>
             <Text.MD secondary>Adhérerez à Renaissance.</Text.MD>
           </YStack>
-          <VoxButton
-            theme="yellow"
-            size="lg"
-            disabled={isPending}
-            onPress={() => {
-              if (adhesionLink) {
-                WebBrowser.openBrowserAsync(adhesionLink.url)
-              }
-            }}
-          >
+          <VoxButton theme="yellow" size="lg" disabled={isPending} onPress={openAdh()}>
             J’adhère
           </VoxButton>
         </YStack>

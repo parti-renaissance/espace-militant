@@ -4,61 +4,124 @@ import FontLib from './assets/fonts/generated-lib-fonts'
 const baseIdentifier = 'fr.en-marche.jecoute'
 const basePackage = 'fr.en_marche.jecoute'
 
-const setAssociatedDomain = (config: Partial<ExpoConfig>, associatedDomain: string) => {
-  config.ios.associatedDomains = [`applinks:${associatedDomain}`, `webcredentials:${associatedDomain}`, `activitycontinuation:${associatedDomain}`]
-  config.android.intentFilters[0].data[0].host = associatedDomain
+interface ConfigOptions {
+  name: string
+  scheme?: string
+  bundleIdentifier: string
+  package: string
+  googleServicesFileIos: string
+  googleServicesFileAndroid: string
+  adaptiveIcon?: string
+  icon?: string
+  notification?: {
+    icon?: string
+  }
 }
 
-export default ({ config }: ConfigContext): Partial<ExpoConfig> => {
-  config.plugins.push([
-    'expo-font',
-    {
-      fonts: FontLib,
-    },
-  ])
-  config.plugins.push([
-    '@rnmapbox/maps',
-    {
-      RNMapboxMapsDownloadToken: process.env.MAP_BOX_SECRET_KEY,
-    },
-  ])
+const setAssociatedDomain = (config: Partial<ExpoConfig>, associatedDomain: string | undefined) => {
+  if (!associatedDomain) return
+  if (config.ios) {
+    config.ios.associatedDomains = [`applinks:${associatedDomain}`, `webcredentials:${associatedDomain}`, `activitycontinuation:${associatedDomain}`]
+  }
+  if (config.android?.intentFilters?.[0]?.data?.[0]) {
+    config.android.intentFilters[0].data[0].host = associatedDomain
+  }
+}
+
+const applyConfig = (config: Partial<ExpoConfig>, options: ConfigOptions) => {
+  config.name = options.name
+  if (options.scheme) {
+    config.scheme = options.scheme
+  }
+  if (config.ios) {
+    config.ios.bundleIdentifier = options.bundleIdentifier
+    config.ios.googleServicesFile = options.googleServicesFileIos
+    if (options.icon) {
+      config.ios.icon = options.icon
+    }
+  }
+  if (config.android) {
+    config.android.package = options.package
+    config.android.googleServicesFile = options.googleServicesFileAndroid
+    if (options.adaptiveIcon && config.android.adaptiveIcon) {
+      config.android.adaptiveIcon.foregroundImage = options.adaptiveIcon
+    }
+    if (options.notification) {
+      config.notification = { ...config.notification, ...options.notification }
+    }
+  }
+}
+
+export default (payload: ConfigContext): Partial<ExpoConfig> => {
+  const config = { ...payload.config }
+  const plugins = [...(config.plugins || [])]
+  if (plugins) {
+    plugins.push([
+      'expo-font',
+      {
+        fonts: FontLib,
+      },
+    ])
+    plugins.push([
+      '@rnmapbox/maps',
+      {
+        RNMapboxMapsDownloadToken: process.env.MAP_BOX_SECRET_KEY,
+      },
+    ])
+    plugins.push(['expo-router', { origin: `https://${process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN}` }])
+  }
+  config.plugins = plugins
 
   const profile = process.env.EAS_BUILD_PROFILE
   setAssociatedDomain(config, process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN)
-  config.android.config.googleMaps.apiKey = process.env.EXPO_PUBLIC_ANDROID_GOOGLE_API_KEY
 
   if (!profile || profile === 'development') {
-    config.name = 'Vox Dev'
-    config.scheme = 'vox-dev'
-    config.ios.bundleIdentifier = `${baseIdentifier}.development`
-    config.android.package = `${basePackage}.development`
-    if (profile === 'development') {
-      config.ios.googleServicesFile = process.env.GOOGLE_SERVICES_IOS_PATH_DEVELOPMENT
-      config.android.googleServicesFile = process.env.GOOGLE_SERVICES_ANDROID_PATH_DEVELOPMENT
-    } else {
-      config.ios.googleServicesFile = './config/GoogleService-Info.plist'
-      config.android.googleServicesFile = './config/google-services.json'
-    }
-    config.android.adaptiveIcon.foregroundImage = './assets/developement/adaptive-icon.jpg'
-    config.ios.icon = './assets/developement/icon.jpg'
+    applyConfig(config, {
+      name: 'Vox Dev',
+      scheme: 'vox-dev',
+      bundleIdentifier: `${baseIdentifier}.development`,
+      package: `${basePackage}.development`,
+      googleServicesFileIos: profile === 'development' ? process.env.GOOGLE_SERVICES_IOS_PATH_DEVELOPMENT || '' : './config/GoogleService-Info.plist',
+      googleServicesFileAndroid: profile === 'development' ? process.env.GOOGLE_SERVICES_ANDROID_PATH_DEVELOPMENT || '' : './config/google-services.json',
+      adaptiveIcon: './assets/developement/adaptive-icon.png',
+      icon: './assets/developement/icon.png',
+      notification: {
+        icon: './assets/developement/notif-icon.png',
+      },
+    })
   } else if (profile === 'production') {
-    config.name = process.env.EXPO_PUBLIC_APP_NAME
-    config.ios.bundleIdentifier = baseIdentifier
-    config.android.package = basePackage
-    config.ios.googleServicesFile = process.env.GOOGLE_SERVICES_IOS_PATH_PRODUCTION
-    config.android.googleServicesFile = process.env.GOOGLE_SERVICES_ANDROID_PATH_PRODUCTION
+    applyConfig(config, {
+      name: 'Renaissance',
+      scheme: 'vox',
+      bundleIdentifier: baseIdentifier,
+      package: basePackage,
+      googleServicesFileIos: process.env.GOOGLE_SERVICES_IOS_PATH_PRODUCTION as string,
+      googleServicesFileAndroid: process.env.GOOGLE_SERVICES_ANDROID_PATH_PRODUCTION as string,
+      icon: './assets/icon.png',
+      adaptiveIcon: './assets/adaptive-icon.png',
+      notification: {
+        icon: './assets/notif-icon.png',
+      },
+    })
   } else {
-    config.name = process.env.EXPO_PUBLIC_APP_NAME
-    config.scheme = 'vox-staging'
-    config.android.adaptiveIcon.foregroundImage = './assets/staging/adaptive-icon.jpg'
-    config.ios.icon = './assets/staging/icon.jpg'
-    config.ios.bundleIdentifier = `${baseIdentifier}.${profile}`
-    config.android.package = `${basePackage}.${profile}`
-    config.ios.googleServicesFile = process.env.GOOGLE_SERVICES_IOS_PATH_STAGING
-    config.android.googleServicesFile = process.env.GOOGLE_SERVICES_ANDROID_PATH_STAGING
+    applyConfig(config, {
+      name: process.env.EXPO_PUBLIC_APP_NAME || '',
+      scheme: 'vox-staging',
+      bundleIdentifier: `${baseIdentifier}.${profile}`,
+      package: `${basePackage}.${profile}`,
+      googleServicesFileIos: process.env.GOOGLE_SERVICES_IOS_PATH_STAGING as string,
+      googleServicesFileAndroid: process.env.GOOGLE_SERVICES_ANDROID_PATH_STAGING as string,
+      adaptiveIcon: './assets/staging/adaptive-icon.png',
+      icon: './assets/staging/icon.png',
+      notification: {
+        icon: './assets/staging/notif-icon.png',
+      },
+    })
   }
 
-  config.extra.storybookEnabled = process.env.STORYBOOK_ENABLED
+  if (config.extra) {
+    config.extra.storybookEnabled = process.env.STORYBOOK_ENABLED
+  }
 
   return config
 }

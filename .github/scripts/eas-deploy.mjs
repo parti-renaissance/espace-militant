@@ -21,6 +21,10 @@ const candidate = appJson.expo.version
 
 async function actionHandler() {
   try {
+    if (!process.env.PLATFORM) {
+      console.log(chalk.red('PLATFORM is not defined'))
+      process.exit(2)
+    }
     console.log('REF TYPE IS', process.env.REF_TYPE, '\n')
     switch (process.env.EAS_WORKFLOW_TYPE) {
       case 'update': {
@@ -31,15 +35,28 @@ async function actionHandler() {
         break;
       }
       case 'build': {
-        const expoCommandBase = `eas build --platform all --non-interactive --no-wait`
+        const expoCommandBase = `eas build --non-interactive --no-wait`
         if (process.env.WORKFLOW_ENVIRONMENT === 'production') {
           console.log(chalk.magenta('Will do a build on production env...'))
-          await aExec(`${expoCommandBase} --profile production --auto-submit`)
+          await aExec(`${expoCommandBase} --profile production --auto-submit --platform ${process.env.PLATFORM}`)
           process.exit(0)
         }
         if (process.env.WORKFLOW_ENVIRONMENT === 'staging') {
           console.log(chalk.blue('Will do a build on staging env...'))
-          await aExec(`${expoCommandBase} --profile staging`)
+          const promise = aExec(`${expoCommandBase} --profile staging --platform ${process.env.PLATFORM}`)
+          const child  = promise.child
+          child.stdout.on('data', function(data) {
+              console.log(data);
+          });
+          child.stderr.on('data', function(data) {
+              console.log(data);
+          });
+          child.on('close', function(code) {
+              console.log('closing code: ' + code);
+          });
+
+          // i.e. can then await for promisified exec call to complete
+          await promise;
           process.exit(0)
         }
         console.log(chalk.red(`Unknown WORKFLOW_ENVIRONMENT ${process.env.WORKFLOW_ENVIRONMENT}`))
