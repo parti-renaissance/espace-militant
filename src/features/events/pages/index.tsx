@@ -65,7 +65,7 @@ const EventList = ({
   } = useSuspensePaginatedEvents({
     filters: {
       searchText: filters.search,
-      zone: filters.zone ?? user.data?.instances?.assembly?.code,
+      zone: filters.zone,
       subscribedOnly: activeTab === 'myEvents',
     },
   })
