@@ -1,5 +1,5 @@
 name: Prepare node & bun
-description: prepare node and bun 
+description: prepare node and bun
 
 runs:
   using: composite

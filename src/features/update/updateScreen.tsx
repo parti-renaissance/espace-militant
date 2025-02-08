@@ -55,7 +55,7 @@ export default function UpdateScreen({ children }: Props) {
       } else {
         await reloadAsync()
       }
-    }, []),
+    }, [isBuildUpdateAvailable]),
   )
 
   useEffect(() => {

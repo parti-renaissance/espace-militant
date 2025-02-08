@@ -123,7 +123,7 @@
       ["expo-notifications"]
     ],
     "extra": {
-      "eas_update_version": "2",
+      "eas_update_version": "4",
       "router": {
         "origin": false
       },

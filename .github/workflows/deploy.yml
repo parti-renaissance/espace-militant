@@ -18,6 +18,17 @@ on:
         options:
           - build
           - update
+      platform:
+        description: 'EAS deployment platform'
+        required: true
+        type: choice
+        default: all
+        options:
+          - web
+          - ios
+          - android
+          - native
+          - all
       comment:
         description: 'Comment'
         required: false
@@ -56,6 +67,7 @@ env:
 
 jobs:
   build-web:
+    if: github.event.inputs.platform == 'web' || github.event.inputs.platform == 'all'
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:
@@ -81,6 +93,7 @@ jobs:
           path: .tamagui
 
   deploy-web:
+    if: github.event.inputs.platform == 'web' || github.event.inputs.platform == 'all'
     runs-on: ubuntu-latest
     needs: build-web
     environment: ${{ github.event.inputs.environment }}
@@ -103,24 +116,24 @@ jobs:
           URL: ${{steps.deploy.outputs.url}}
           MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
           WORKFLOW_JOB: 'deploy_web'
+          PLATFORM: WEB
 
         run: node ./.github/scripts/announce.mjs
 
-  eas-mobile:
+  eas-mobile-ios:
+    if: github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'native' || github.event.inputs.platform == 'all'
     environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
-    needs: build-web
     env:
       APP_STORE_BUNDLE_ID: fr.en-marche.jecoute
       REF_TYPE: ${{ github.ref_type }}`
+      PLATFORM: ios
     steps:
       - name: 🏗 Setup repo
         uses: actions/checkout@v4
       - uses: ./.github/actions/setup-base
       - uses: ./.github/actions/dependencies
-      - uses: actions/download-artifact@v4
       - uses: ./.github/actions/setup-env
-        name: ⬇️ Download web artifacts
       - name: 🧙🏻‍️Setup EAS
         uses: expo/expo-github-action@v8
         with:
@@ -130,6 +143,37 @@ jobs:
       - name: Insert envs into eas.json
         run: node .github/scripts/prepare-eas-envs.mjs
       - name: Build android & iOS
+        run: node .github/scripts/eas-deploy.mjs
+      - name: 📢 Announce deployment
+        env:
+          MAKE_WEBHOOK_URL: ${{ secrets.MAKE_WEBHOOK_URL }}
+          WORKFLOW_JOB: 'deploy_eas'
+
+        run: node ./.github/scripts/announce.mjs
+
+  eas-mobile-android:
+    if: github.event.inputs.platform == 'android' || github.event.inputs.platform == 'native' || github.event.inputs.platform == 'all'
+    environment: ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    env:
+      APP_STORE_BUNDLE_ID: fr.en-marche.jecoute
+      REF_TYPE: ${{ github.ref_type }}`
+      PLATFORM: android
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-base
+      - uses: ./.github/actions/dependencies
+      - uses: ./.github/actions/setup-env
+      - name: 🧙🏻‍️Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          packager: yarn
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Insert envs into eas.json
+        run: node .github/scripts/prepare-eas-envs.mjs
+      - name: Build android
         run: node .github/scripts/eas-deploy.mjs
       - name: 📢 Announce deployment
         env:
