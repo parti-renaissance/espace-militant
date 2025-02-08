@@ -7,6 +7,7 @@ import { CategoryChip } from '@/features/events/components/CategoryChip'
 import { EventAuthComponent } from '@/features/events/components/EventAuthComponent'
 import { EventItemHandleButton } from '@/features/events/components/EventItemHandleButton'
 import { EventItemHeader } from '@/features/events/components/EventItemHeader'
+import { EventLive } from '@/features/events/components/EventLive'
 import { EventLocation } from '@/features/events/components/EventLocation'
 import { EventPremiumChip } from '@/features/events/components/EventPremiumChip'
 import { EventShareGroup } from '@/features/events/components/EventShareGroup'
@@ -135,12 +136,15 @@ const EventDesktopScreen = ({ event, userUuid }: EventItemProps) => {
       <XStack alignItems="flex-start" alignSelf="flex-start" pb="$medium">
         <BackButton />
       </XStack>
-      <VoxCard>
-        <XStack>
-          <EventDesktopMain event={event} userUuid={userUuid} />
-          <EventDesktopAside event={event} userUuid={userUuid} />
-        </XStack>
-      </VoxCard>
+      <YStack gap="$medium">
+        <EventLive event={event} userUuid={userUuid} />
+        <VoxCard>
+          <XStack>
+            <EventDesktopMain event={event} userUuid={userUuid} />
+            <EventDesktopAside event={event} userUuid={userUuid} />
+          </XStack>
+        </VoxCard>
+      </YStack>
     </ScrollStack>
   )
 }

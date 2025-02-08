@@ -1,11 +1,28 @@
 import { RestFullEvent, RestItemEvent, RestPartialEvent } from '@/services/events/schema'
 import { useToastController } from '@tamagui/toast'
-import { isBefore } from 'date-fns'
+import { isAfter, isBefore, subHours } from 'date-fns'
 import * as Clipboard from 'expo-clipboard'
 
 export const isEventPast = (event: Partial<RestItemEvent>) => {
   const date = event.finish_at || event.begin_at
   return date ? isBefore(new Date(date), new Date()) : false
+}
+
+export const isEventStarted = (event: Partial<RestItemEvent>) => {
+  const startDate = event.begin_at ? new Date(event.begin_at) : undefined
+  if (!startDate) {
+    return false
+  }
+  return isAfter(new Date(), startDate)
+}
+
+export const isEventStartInLessThanOneHour = (event: Partial<RestItemEvent>) => {
+  const startDate = event.begin_at ? new Date(event.begin_at) : undefined
+  if (!startDate) {
+    return false
+  }
+
+  return isAfter(new Date(), subHours(startDate, 1))
 }
 
 export const isEventCancelled = (
@@ -105,4 +122,22 @@ export function useHandleCopyUrl() {
       .catch(() => {
         toast.show('Erreur lors de la copie du lien', { type: 'error' })
       })
+}
+
+export const isEventHasNationalLive = (
+  event: Partial<RestItemEvent>,
+): event is Partial<RestFullEvent> & {
+  object_state: 'full'
+  live_url: string
+} => {
+  if (!isEventFull(event)) {
+    console.log('event is not full')
+    return false
+  }
+  if (!event.live_url) {
+    console.log('live_url is not defined')
+    return false
+  }
+
+  return event.live_url.startsWith('https://vimeo.com/event/') && Boolean(event.national)
 }

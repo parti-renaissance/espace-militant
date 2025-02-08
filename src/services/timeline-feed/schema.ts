@@ -55,6 +55,7 @@ export const RestTimelineFeedItemSchema = z.object({
   post_address: RestTimelineFeedAddressSchema.nullable().optional(),
   object_state: z.enum(['full', 'partial']).nullish(),
   visibility: z.string().nullish(),
+  live_url: z.string().nullish(),
 })
 
 export type RestTimelineFeedResponse = z.infer<typeof RestTimelineFeedResponseSchema>
