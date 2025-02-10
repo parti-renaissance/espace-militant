@@ -31,14 +31,14 @@ async function actionHandler() {
         if (process.env.WORKFLOW_ENVIRONMENT === 'production') {
           console.log(chalk.magenta('Will do an update on main channel...'))
           console.log(chalk.magenta(`Expo runtime version ${candidate}.`))
-          const expoUpdateCommandBase = `eas update --channel main --auto`
+          const expoUpdateCommandBase = `eas update --channel main --platform ${process.env.PLATFORM} --auto`
           await aExec(expoUpdateCommandBase)
           process.exit(0)
         }
         if (process.env.WORKFLOW_ENVIRONMENT === 'staging') {
           console.log(chalk.magenta('Will do an update on staging channel...'))
           console.log(chalk.magenta(`Expo runtime version ${candidate}.`))
-          const expoUpdateCommandBase = `eas update --channel develop --auto`
+          const expoUpdateCommandBase = `eas update --channel develop --platform ${process.env.PLATFORM} --auto`
           await aExec(expoUpdateCommandBase)
           process.exit(0)
         }
