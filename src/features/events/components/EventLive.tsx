@@ -13,10 +13,10 @@ export const EventLive = ({ event }: EventItemProps) => {
 
   useEffect(() => {
     const tID = setInterval(() => {
-      if (!isEventStarted(event) && isEventHasNationalLive(event)) {
+      if (isEventHasNationalLive(event)) {
         setStarted(isEventStarted(event))
       }
-    }, 10000)
+    }, 1000)
 
     return () => {
       clearInterval(tID)
