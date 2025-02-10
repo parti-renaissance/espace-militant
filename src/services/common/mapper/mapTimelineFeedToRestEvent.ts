@@ -21,7 +21,7 @@ export const map = (x: RestTimelineFeedItem): Partial<RestFullEvent> & { uuid: s
     user_registered_at: x.user_registered_at ?? undefined,
     capacity: x.capacity,
     live_url: x.live_url ?? undefined,
-    national: x.is_local !== undefined ? !x.is_local : undefined,
+    is_national: x.is_national ?? undefined,
     //@ts-expect-error descrininate union on that
     object_state: x.object_state,
     visibility: x.visibility as RestFullEvent['visibility'],

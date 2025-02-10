@@ -76,7 +76,7 @@ export const RestFullEventSchema = z
     visio_url: z.string().nullable(),
     user_registered_at: z.string().nullable(),
     live_url: z.string().nullable(),
-    national: z.boolean(),
+    is_national: z.boolean(),
     editable: z.boolean(),
     edit_link: z.string().optional(),
   })
