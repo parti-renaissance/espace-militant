@@ -3,6 +3,7 @@ import { z } from 'zod'
 export type RestAlertsResponse = z.infer<typeof RestAlertsResponseSchema>
 export const RestAlertsResponseSchema = z.array(
   z.object({
+    type: z.string().nullish(),
     label: z.string(),
     title: z.string(),
     description: z.string(),

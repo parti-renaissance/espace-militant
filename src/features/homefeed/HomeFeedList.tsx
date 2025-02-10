@@ -22,11 +22,18 @@ const TimelineFeedCard = memo((item: RestTimelineFeedItem) => {
 const HomeFeedList = () => {
   const media = useMedia()
   const shouldShowNotificationCard = useShouldShowNotificationCard()
-  const { data: paginatedFeed, fetchNextPage, hasNextPage, refetch, isRefetching } = useGetPaginatedFeed()
+  const { data: paginatedFeed, fetchNextPage, hasNextPage, ...feedQuery } = useGetPaginatedFeed()
+  const { data: alerts, ...alertQuery } = useAlerts()
   const feedData = paginatedFeed?.pages.map((page) => page?.hits ?? []).flat()
 
+  const refetch = () => {
+    feedQuery.refetch()
+    alertQuery.refetch()
+  }
+  const isRefetching = feedQuery.isRefetching || alertQuery.isRefetching
+
   const loadMoreGeneric = () => {
-    if (isRefetching) return
+    if (feedQuery.isRefetching) return
     if (hasNextPage) {
       fetchNextPage()
     }
@@ -45,7 +52,6 @@ const HomeFeedList = () => {
   const flatListRef = useRef<FlatList<RestTimelineFeedItem>>(null)
   useScrollToTop(flatListRef)
 
-  const { data: alerts } = useAlerts()
   const renderFeedItem = useCallback(({ item }: { item: RestTimelineFeedItem }) => {
     return <TimelineFeedCard {...item} />
   }, [])
@@ -56,16 +62,16 @@ const HomeFeedList = () => {
       scrollEnabled={!isWebPageLayoutScrollActive}
       contentContainerStyle={{
         gap: getToken('$medium', 'space'),
-        paddingTop: media.gtSm ? getToken('$medium', 'space') : undefined,
-        paddingLeft: media.gtSm ? getToken('$medium', 'space') : undefined,
-        paddingRight: media.gtSm ? getToken('$medium', 'space') : undefined,
+        paddingTop: media.gtSm ? getToken('$xxlarge', 'space') : undefined,
+        paddingLeft: media.gtSm ? getToken('$xxlarge', 'space') : undefined,
+        paddingRight: media.gtSm ? getToken('$xxlarge', 'space') : undefined,
         paddingBottom: getToken('$11', 'space'),
         justifyContent: 'space-around',
       }}
       ListHeaderComponent={
         alerts.length > 0 || shouldShowNotificationCard
           ? () => (
-              <YStack gap={8} $gtSm={{ gap: 16 }}>
+              <YStack gap={8} $gtSm={{ gap: 16, marginBottom: '$large' }}>
                 {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
                 {alerts.map((alert, i) => (
                   <AlertCard key={`${i}-alert`} payload={alert} />
