@@ -19,8 +19,12 @@ const HomeScreen: React.FC = () => {
         <title>{metatags.createTitle('Le fil')}</title>
       </Head>
       <PageLayout webScrollable>
-        <PageLayout.SideBarLeft>
-          <StickyBox offsetTop="$medium" offsetBottom="$medium">
+        <PageLayout.SideBarLeft
+          $gtSm={{
+            paddingTop: '$xxlarge',
+          }}
+        >
+          <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
             <YStack gap="$medium">
               <MyProfileCard />
             </YStack>
@@ -80,8 +84,12 @@ const HomeScreen: React.FC = () => {
             </YStack> */}
           </BoundarySuspenseWrapper>
         </PageLayout.MainSingleColumn>
-        <PageLayout.SideBarRight>
-          <StickyBox offsetTop="$medium" offsetBottom="$xlarge">
+        <PageLayout.SideBarRight
+          $gtSm={{
+            paddingTop: '$xxlarge',
+          }}
+        >
+          <StickyBox offsetTop="$xxlarge" offsetBottom="$xlarge">
             <YStack>
               <AppDownloadCTA />
             </YStack>

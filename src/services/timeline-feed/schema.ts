@@ -41,7 +41,7 @@ export const RestTimelineFeedItemSchema = z.object({
     .nullable(),
   address: z.string().nullable(),
   category: z.string().nullable(),
-  is_local: z.boolean().nullable(),
+  is_national: z.boolean().nullable(),
   media_type: z.string().nullable().optional(),
   cta_link: z.string().nullable().optional(),
   cta_label: z.string().nullable().optional(),
@@ -55,6 +55,7 @@ export const RestTimelineFeedItemSchema = z.object({
   post_address: RestTimelineFeedAddressSchema.nullable().optional(),
   object_state: z.enum(['full', 'partial']).nullish(),
   visibility: z.string().nullish(),
+  live_url: z.string().nullish(),
 })
 
 export type RestTimelineFeedResponse = z.infer<typeof RestTimelineFeedResponseSchema>

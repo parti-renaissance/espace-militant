@@ -200,14 +200,17 @@ export default Button
 type VoxButtonProps = {
   iconLeft?: NamedExoticComponent<IconProps>
   iconRight?: NamedExoticComponent<IconProps>
+  textColor?: string
   loading?: boolean
   children?: string[] | string
 } & React.ComponentProps<typeof Button>
 
 export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
-  ({ children: child, shrink, iconLeft: IconLeft, iconRight: IconRight, onPress, ...props }, ref) => {
+  ({ children: child, shrink, iconLeft: IconLeft, iconRight: IconRight, onPress, textColor, ...props }, ref) => {
     const children = shrink ? undefined : child
     const fnOnPress = props.asChip ? undefined : onPress
+
+    const customTextProps = textColor ? { color: textColor } : {}
 
     return (
       <Button {...props} onPress={fnOnPress} shrink={shrink} ref={ref} theme={props.theme ?? 'gray'} group>
@@ -223,7 +226,11 @@ export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
             }}
           />
         ) : null}
-        {children ? <ButtonText pop={props.pop}>{children}</ButtonText> : null}
+        {children ? (
+          <ButtonText {...customTextProps} pop={props.pop}>
+            {children}
+          </ButtonText>
+        ) : null}
         {IconRight ? (
           <IconRight
             size={16}

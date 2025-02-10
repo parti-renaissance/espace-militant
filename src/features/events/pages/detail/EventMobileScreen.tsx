@@ -15,6 +15,7 @@ import { EventItemProps } from '@/features/events/types'
 import { RestItemEvent } from '@/services/events/schema'
 import { StatusBar } from 'expo-status-bar'
 import { getTokenValue, Image, XStack, YStack, YStackProps } from 'tamagui'
+import { EventLive } from '../../components/EventLive'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
 import { ScrollStack } from './EventComponents'
 import { LockPublicAuthAdhCard } from './SubscribeCard'
@@ -88,36 +89,39 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
     <PageLayout.MainSingleColumn backgroundColor="black">
       <StatusBar animated style="light" />
       <ScrollStack marginTop={insets.top} backgroundColor="$textSurface">
-        <VoxCard overflow="hidden" pb={66}>
-          {fallbackImage ? <VoxCard.Image large={true} image={fallbackImage} imageData={event.image} /> : null}
-          <VoxCard.Content pt={fallbackImage ? 0 : undefined}>
-            <EventItemHeader>
-              <CategoryChip>{event.category?.name}</CategoryChip>
-              <EventPremiumChip event={event} />
-            </EventItemHeader>
-            {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
-            {isFull && event.description ? <VoxCard.Description markdown>{event.description}</VoxCard.Description> : null}
-            {event.name || (isFull && event.description) ? <VoxCard.Separator /> : null}
-            <DateItem begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} showTime={isFull} />
-            <EventLocation event={event} />
-            {isFull && !!event.capacity ? <VoxCard.Capacity>Capacité {event.capacity} personnes</VoxCard.Capacity> : null}
-            {isFull && userUuid ? <VoxCard.Attendees attendees={{ count: event.participants_count ?? 12 }} /> : null}
-            {event.organizer ? (
-              <VoxCard.Section title="Événement créé par :">
-                <VoxCard.Author
-                  author={{
-                    role: event.organizer?.role,
-                    name: [event.organizer?.first_name, event.organizer?.last_name].filter(Boolean).join(' '),
-                    zone: event.organizer?.zone,
-                    title: event.organizer?.instance,
-                    pictureLink: event.organizer?.image_url ?? undefined,
-                  }}
-                />
-              </VoxCard.Section>
-            ) : null}
-            <EventShareGroup event={event} />
-          </VoxCard.Content>
-        </VoxCard>
+        <YStack>
+          <EventLive event={event} userUuid={userUuid} />
+          <VoxCard overflow="hidden" pb={66}>
+            {fallbackImage ? <VoxCard.Image large={true} image={fallbackImage} imageData={event.image} /> : null}
+            <VoxCard.Content pt={fallbackImage ? 0 : undefined}>
+              <EventItemHeader>
+                <CategoryChip>{event.category?.name}</CategoryChip>
+                <EventPremiumChip event={event} />
+              </EventItemHeader>
+              {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
+              {isFull && event.description ? <VoxCard.Description markdown>{event.description}</VoxCard.Description> : null}
+              {event.name || (isFull && event.description) ? <VoxCard.Separator /> : null}
+              <DateItem begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} showTime={isFull} />
+              <EventLocation event={event} />
+              {isFull && !!event.capacity ? <VoxCard.Capacity>Capacité {event.capacity} personnes</VoxCard.Capacity> : null}
+              {isFull && userUuid ? <VoxCard.Attendees attendees={{ count: event.participants_count ?? 12 }} /> : null}
+              {event.organizer ? (
+                <VoxCard.Section title="Événement créé par :">
+                  <VoxCard.Author
+                    author={{
+                      role: event.organizer?.role,
+                      name: [event.organizer?.first_name, event.organizer?.last_name].filter(Boolean).join(' '),
+                      zone: event.organizer?.zone,
+                      title: event.organizer?.instance,
+                      pictureLink: event.organizer?.image_url ?? undefined,
+                    }}
+                  />
+                </VoxCard.Section>
+              ) : null}
+              <EventShareGroup event={event} />
+            </VoxCard.Content>
+          </VoxCard>
+        </YStack>
       </ScrollStack>
       <BottomCTA event={event} userUuid={userUuid} />
     </PageLayout.MainSingleColumn>

@@ -17,6 +17,11 @@ const ChipFrame = styled(XStack, {
         borderColor: '$color5',
       },
     },
+    alert: {
+      true: {
+        backgroundColor: '#FF3333',
+      },
+    },
   },
   gap: 4,
 } as const)
@@ -28,8 +33,8 @@ export type ChipProps = {
 const Chip = ({ children, ...props }: ChipProps & { icon?: NamedExoticComponent<IconProps> }) => {
   return (
     <ChipFrame {...props} theme={props.theme ?? 'gray'}>
-      {props.icon && <props.icon color="$color5" testID={`chip-icon`} size={12} />}
-      <Text.SM semibold color="$color5">
+      {props.icon && <props.icon color={props.alert ? 'white' : '$color5'} testID={`chip-icon`} size={12} />}
+      <Text.SM semibold color={props.alert ? 'white' : '$color5'}>
         {children}
       </Text.SM>
     </ChipFrame>

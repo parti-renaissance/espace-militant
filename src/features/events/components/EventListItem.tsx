@@ -3,7 +3,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { RestItemEvent } from '@/services/events/schema'
 import { Eye } from '@tamagui/lucide-icons'
 import { Link } from 'expo-router'
-import { isWeb } from 'tamagui'
+import { isWeb, XStack } from 'tamagui'
 import { EventItemProps } from '../types'
 import { getEventItemImageFallback, isEventFull, isEventPrivate } from '../utils'
 import { CategoryChip } from './CategoryChip'
@@ -11,6 +11,7 @@ import { EventAuthDialog } from './EventAuthComponent'
 import { EventItemActions } from './EventItemActions'
 import { EventItemHandleButton } from './EventItemHandleButton'
 import { EventItemHeader } from './EventItemHeader'
+import { EventListItemLiveBadge } from './EventListItemLiveBadge'
 import { EventLocation } from './EventLocation'
 import { EventPremiumChip } from './EventPremiumChip'
 import { EventToggleSubscribeButton } from './EventToggleSubscribeButton'
@@ -46,7 +47,10 @@ export const BaseEventListItem = ({ event, userUuid }: EventItemProps) => {
     <VoxCard>
       <VoxCard.Content>
         <EventItemHeader>
-          <CategoryChip>{event.category?.name}</CategoryChip>
+          <XStack gap="$small" flexWrap="wrap" flexShrink={1}>
+            <CategoryChip>{event.category?.name}</CategoryChip>
+            <EventListItemLiveBadge event={event} />
+          </XStack>
           <EventPremiumChip event={event} />
         </EventItemHeader>
         {event.name ? <VoxCard.Title underline={!fallbackImage}>{event.name}</VoxCard.Title> : null}
