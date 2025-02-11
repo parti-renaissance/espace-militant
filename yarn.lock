@@ -41,9 +41,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@10play/tentap-editor@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "@10play/tentap-editor@npm:0.6.0"
+"@10play/tentap-editor@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "@10play/tentap-editor@npm:0.6.1"
   dependencies:
     "@tiptap/extension-blockquote": "npm:^2.2.1"
     "@tiptap/extension-bold": "npm:^2.2.1"
@@ -78,7 +78,7 @@ __metadata:
     react: "*"
     react-native: "*"
     react-native-webview: "*"
-  checksum: 10c0/7cb47bab78702708e827bdddc1431a3dc66bcfcbd5e7a5e910e8b1512e9f2f34deedc1234728251a65e829dcf32628f399db959436cae03a3285ea695256286a
+  checksum: 10c0/5ed225dea4e75db3ecceb039b0e3d2074433afde997cbd0f3621cfe755e324a2b2acba5f9349a119da2162dc671af50d4791785b5f049f3953bcca3966c7e491
   languageName: node
   linkType: hard
 
@@ -17065,9 +17065,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-image@npm:~2.0.4":
-  version: 2.0.4
-  resolution: "expo-image@npm:2.0.4"
+"expo-image@npm:~2.0.5":
+  version: 2.0.5
+  resolution: "expo-image@npm:2.0.5"
   peerDependencies:
     expo: "*"
     react: "*"
@@ -17076,7 +17076,7 @@ __metadata:
   peerDependenciesMeta:
     react-native-web:
       optional: true
-  checksum: 10c0/e83eae57d22c96b8e3ee44f7ce9d613161d98609bfbc270406e8c3172b41950cf27c2bb799b65ebcfe4343f8579217604f909cf8a792ba32fc92022de24543c2
+  checksum: 10c0/87731e48d923bd240dd4574e1d2f2ea03ae5f668b8b37d3fb3b8a46781dff66e217fc5c5d6cd5702905afcd7fdff16f5bbac2d358645a591220f434448b9d1d2
   languageName: node
   linkType: hard
 
@@ -17133,12 +17133,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-location@npm:~18.0.5":
-  version: 18.0.5
-  resolution: "expo-location@npm:18.0.5"
+"expo-location@npm:~18.0.6":
+  version: 18.0.6
+  resolution: "expo-location@npm:18.0.6"
   peerDependencies:
     expo: "*"
-  checksum: 10c0/9e836aa8be47d886ef1ae2556dac3ab07ebe2cdfd260efa2fde4f5c69e8f2b57a11146f5bd712250e3a6d1c28a60d9d4d008f158190bfbed979ba8cee1c733f5
+  checksum: 10c0/d8308f05c0591c356fd83eac1de274c99b491885052e063b2528d6c84ffeb07d29d2f6f3eb35e316b2dfb49a09708b6e19262883195913386f02ce8a99657c81
   languageName: node
   linkType: hard
 
@@ -29945,7 +29945,7 @@ __metadata:
   resolution: "vox@workspace:."
   dependencies:
     "@10play/react-native-web-webview": "npm:^0.0.3"
-    "@10play/tentap-editor": "npm:^0.6.0"
+    "@10play/tentap-editor": "npm:^0.6.1"
     "@babel/core": "npm:^7.25.2"
     "@eslint/js": "npm:^9.3.0"
     "@expo/webpack-config": "npm:~19.0.1"
@@ -30020,13 +30020,13 @@ __metadata:
     expo-device: "npm:~7.0.2"
     expo-file-system: "npm:~18.0.10"
     expo-font: "npm:~13.0.3"
-    expo-image: "npm:~2.0.4"
+    expo-image: "npm:~2.0.5"
     expo-image-manipulator: "npm:~13.0.6"
     expo-image-picker: "npm:~16.0.5"
     expo-linear-gradient: "npm:~14.0.2"
     expo-linking: "npm:~7.0.5"
     expo-localization: "npm:~16.0.1"
-    expo-location: "npm:~18.0.5"
+    expo-location: "npm:~18.0.6"
     expo-notifications: "npm:~0.29.13"
     expo-router: "npm:~4.0.17"
     expo-screen-orientation: "npm:~8.0.4"
