@@ -147,7 +147,7 @@ export const RestUserScopesResponseSchema = z.array(
     attributes: z
       .object({
         committees: z.array(z.object({ name: z.string(), uuid: z.string().uuid() })),
-        dpt: z.number(),
+        dpt: z.string(),
       })
       .nullable(),
     apps: z.array(z.string()),

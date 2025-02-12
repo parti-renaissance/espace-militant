@@ -72,7 +72,7 @@ export const RestFullEventSchema = z
   .object({
     object_state: z.literal('full'),
     description: z.string(),
-    committee: RestEventComitteeSchema.optional(),
+    committee: RestEventComitteeSchema.nullish(),
     participants_count: z.number(),
     capacity: z.number().nullable(),
     visio_url: z.string().nullable(),
