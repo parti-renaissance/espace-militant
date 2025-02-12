@@ -21,7 +21,7 @@ export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectO
   const { name, description } = getFormatedScopeData(scope)
   return {
     value: scope.code,
-    label: [<SF.Text semibold>{name}</SF.Text>, ' ', <SF.Text>{description}</SF.Text>],
+    label: [<SF.Text key="name" semibold>{name}</SF.Text>, ' ', <SF.Text key="description">{description}</SF.Text>],
     theme: 'purple',
     icon: Sparkle,
   }
