@@ -16,6 +16,7 @@ import { RestItemEvent } from '@/services/events/schema'
 import { StatusBar } from 'expo-status-bar'
 import { getTokenValue, Image, XStack, YStack, YStackProps } from 'tamagui'
 import { EventLive } from '../../components/EventLive'
+import EventMDXRenderer from '../../components/EventMDXRenderer'
 import EventParticipantsSection from '../../components/EventParticipantsSection'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
 import { ScrollStack } from './EventComponents'
@@ -100,7 +101,7 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
                 <EventPremiumChip event={event} />
               </EventItemHeader>
               {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
-              {isFull && event.description ? <VoxCard.Description markdown>{event.description}</VoxCard.Description> : null}
+              {isFull && event.description ? <EventMDXRenderer>{event.description}</EventMDXRenderer> : null}
               {event.name || (isFull && event.description) ? <VoxCard.Separator /> : null}
               <DateItem begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} showTime={isFull} />
               <EventLocation event={event} />
