@@ -201,17 +201,29 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           errorImage = true
         }
 
-        const fallback = navigation.canGoBack() ? '../' : ('/evenements' as const)
-        router.replace(
-          newEvent?.slug
-            ? {
-                pathname: errorImage ? '/evenements/[id]/modifier' : '/evenements/[id]',
-                params: {
-                  id: newEvent.slug,
-                },
-              }
-            : fallback,
-        )
+        const fallback = router.canGoBack() ? '../' : ('/evenements' as const)
+        if (errorImage && newEvent.slug) {
+          router.replace({
+            pathname: '/evenements/[id]/modifier',
+            params: {
+              id: newEvent.slug,
+            },
+          })
+        } else if (router.canGoBack()) {
+          router.back()
+        } else {
+          router.push(
+            newEvent?.slug
+              ? {
+                  pathname: '/evenements/[id]',
+                  params: {
+                    id: newEvent.slug,
+                  },
+                }
+              : fallback,
+          )
+        }
+
         reset()
       } catch (e) {
         if (e instanceof eventPostFormError) {

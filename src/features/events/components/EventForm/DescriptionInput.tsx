@@ -12,6 +12,11 @@ import { useDebouncedCallback } from 'use-debounce'
 import { PublicSans } from './PublicSans'
 import ModalOrPageBase from './ViewportModal'
 
+export enum ToolbarContext {
+  Main,
+  Link,
+  Heading,
+}
 const customFont = (primary?: boolean) => `
 ${PublicSans}
 * {
@@ -57,15 +62,7 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
     disabled: ({ editorState }) => !editorState.canUndo,
     image: () => Images.undo,
   },
-  {
-    onPress:
-      ({ editor }) =>
-      () =>
-        editor.redo(),
-    active: () => false,
-    disabled: ({ editorState }) => !editorState.canRedo,
-    image: () => Images.redo,
-  },
+
   {
     onPress:
       ({ editor }) =>
@@ -84,15 +81,7 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
     disabled: ({ editorState }) => !editorState.canToggleItalic,
     image: () => Images.italic,
   },
-  {
-    onPress:
-      ({ editor }) =>
-      () =>
-        editor.toggleBlockquote(),
-    active: ({ editorState }) => editorState.isBlockquoteActive,
-    disabled: ({ editorState }) => !editorState.canToggleBlockquote,
-    image: () => Images.quote,
-  },
+
   {
     onPress:
       ({ editor }) =>
@@ -112,26 +101,13 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
     image: () => Images.bulletList,
   },
   {
-    // Regular list items (li) and task list items both use the
-    // same sink command and button just with a different parameter, so we check both states here
     onPress:
-      ({ editor, editorState }) =>
+      ({ editor }) =>
       () =>
-        editorState.canSink ? editor.sink() : editor.sinkTaskListItem(),
+        editor.redo(),
     active: () => false,
-    disabled: ({ editorState }) => !editorState.canSink && !editorState.canSinkTaskListItem,
-    image: () => Images.indent,
-  },
-  {
-    // Regular list items (li) and task list items both use the
-    // same lift command and button just with a different parameter, so we check both states here
-    onPress:
-      ({ editor, editorState }) =>
-      () =>
-        editorState.canLift ? editor.lift() : editor.liftTaskListItem(),
-    active: () => false,
-    disabled: ({ editorState }) => !editorState.canLift && !editorState.canLiftTaskListItem,
-    image: () => Images.outdent,
+    disabled: ({ editorState }) => !editorState.canRedo,
+    image: () => Images.redo,
   },
 ]
 
