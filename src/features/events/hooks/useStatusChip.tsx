@@ -7,7 +7,7 @@ import { isEventCancelled, isEventCapacityReached, isEventPast } from '../utils'
 export const useStatusChip = ({ event, buttonProps }: { event: Partial<RestItemEvent>; buttonProps?: ComponentPropsWithoutRef<typeof VoxButton> }) => {
   if (isEventCancelled(event)) {
     return (
-      <VoxButton {...buttonProps} asChip iconLeft={XCircle} theme="red" testID="status-event-chip">
+      <VoxButton {...buttonProps} asChip iconLeft={XCircle} theme="orange" testID="status-event-chip">
         Annulé
       </VoxButton>
     )
