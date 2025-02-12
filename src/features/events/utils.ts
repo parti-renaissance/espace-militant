@@ -131,11 +131,9 @@ export const isEventHasNationalLive = (
   live_url: string
 } => {
   if (!isEventFull(event)) {
-    console.log('event is not full')
     return false
   }
   if (!event.live_url) {
-    console.log('live_url is not defined')
     return false
   }
 
