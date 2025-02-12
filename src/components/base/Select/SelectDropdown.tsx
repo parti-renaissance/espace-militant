@@ -88,7 +88,10 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
         }
         setTimeout(() => queryInputRef.current?.focus(), 100)
       },
-      close: () => modalRef.current?.close(),
+      close: () => {
+        modalRef.current?.close()
+        props.onBlur?.()
+      },
       setModalPosition,
     }),
     [],
@@ -107,6 +110,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
       subLabel: payload.subtitle,
     })
     modalRef.current?.close()
+    props.onBlur?.()
     setQuery('')
   }
 
