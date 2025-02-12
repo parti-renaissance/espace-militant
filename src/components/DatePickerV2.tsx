@@ -3,8 +3,7 @@ import { Keyboard, Platform } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { FormFrame } from '@/components/base/FormFrames'
 import Text from '@/components/base/Text'
-import { getFormattedDate, getFormattedTime, getHumanFormattedTime, getIntlDate } from '@/utils/date'
-import { format, getHours, getMinutes, parseISO, setHours, setMinutes } from 'date-fns'
+import { getFormattedDate, getFormattedTime } from '@/utils/date'
 import { Input, isWeb } from 'tamagui'
 
 interface DatePickerFieldProps {
@@ -18,13 +17,9 @@ interface DatePickerFieldProps {
   type?: 'date' | 'time'
 }
 
-const getDateInputValue = (d: Date, type: 'date' | 'time') => (type === 'date' ? (isWeb ? getIntlDate(d) : format(d, 'dd-MM-yyyy')) : format(d, 'HH:mm'))
-
-const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChange, error, label, disabled, color, type = 'date', onBlur }, ref) => {
+const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChange, error, type = 'date', onBlur }, ref) => {
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false)
 
-  const readableDate = value && typeof value === 'object' ? getDateInputValue(value, type) : ''
-  const [inputValue, setInputValue] = useState(readableDate ?? '')
   const inputRef = useRef(null)
 
   useEffect(() => {
@@ -37,41 +32,35 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChan
   // In case of mobile component
   const handleConfirm = (input: Date) => {
     onChange?.(input)
-    setInputValue(type === 'date' ? getFormattedDate(input) : getHumanFormattedTime(input))
     setIsDatePickerVisible(false)
     onBlur?.()
   }
 
+  const handleDateChange = (input: string) => {
+    const newDate = new Date(input)
+    const time = value ?? new Date()
+    newDate.setHours(time.getHours())
+    newDate.setMinutes(time.getMinutes())
+    onChange?.(newDate)
+  }
+
+  const handleTimeChange = (input: string) => {
+    const [hours, minutes] = input.split(':')
+    const newDate = value ?? new Date()
+    newDate.setHours(parseInt(hours))
+    newDate.setMinutes(parseInt(minutes))
+    newDate.setSeconds(0)
+    onChange?.(newDate)
+  }
+
+  const formattedDate = value ? value.toISOString().split('T')[0] : ''
+  const formattedTime = value ? `${value?.getHours().toString().padStart(2, '0')}:${value?.getMinutes().toString().padStart(2, '0')}` : ''
+
+  const webInputValue = type === 'date' ? formattedDate : formattedTime
+
   // In case of web component
   const handleChange = (input: string) => {
-    setInputValue(input)
-
-    if (input != '' && input.length === 10) {
-      try {
-        const time = value ? [getHours(value), getMinutes(value)] : undefined
-        const date = isWeb ? new Date(input) : parseISO(input)
-        const dateWHour = time && time[0] ? setHours(date, time[0]) : date
-        const fulldate = time && time[1] ? setMinutes(dateWHour, time[1]) : date
-        onChange?.(fulldate)
-      } catch (e) {
-        console.log(e)
-      }
-    } else if (type === 'time') {
-      if (input.includes(':')) {
-        let candidate = value ?? new Date()
-        const inputParts = input.split(':')
-        if (inputParts.length === 2) {
-          candidate = setHours(candidate, Number(inputParts[0]))
-          candidate = setMinutes(candidate, Number(inputParts[1]))
-          onChange?.(candidate)
-          return
-        }
-      }
-
-      onChange?.(undefined)
-    } else {
-      onChange?.(undefined)
-    }
+    type === 'date' ? handleDateChange(input) : handleTimeChange(input)
   }
 
   const onHide = () => {
@@ -91,7 +80,7 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChan
 
   const formatedValue = (type: 'date' | 'time', value: Date) => (type === 'date' ? getFormattedDate(value) : getFormattedTime(value))
   return Platform.OS === 'web' ? (
-    <FormFrame.Input error={Boolean(error)} ref={inputRef} value={inputValue} onChangeText={handleChange} onBlur={() => onBlur?.()} />
+    <FormFrame.Input error={Boolean(error)} ref={inputRef} value={webInputValue} onChangeText={handleChange} onBlur={() => onBlur?.()} />
   ) : (
     <>
       <FormFrame.Button onPress={onShow} error={Boolean(error)}>

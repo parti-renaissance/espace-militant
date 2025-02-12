@@ -33,7 +33,7 @@ export const RestEventOrganizerSchema = z.object({
 
 export const RestEventComitteeSchema = z.object({
   name: z.string(),
-  link: z.string(),
+  uuid: z.string(),
 })
 
 export const RestEventAddressSchema = z.object({
@@ -72,13 +72,12 @@ export const RestFullEventSchema = z
   .object({
     object_state: z.literal('full'),
     description: z.string(),
-    committee: RestEventComitteeSchema.optional(),
+    committee: RestEventComitteeSchema.nullish(),
     participants_count: z.number(),
     capacity: z.number().nullable(),
     visio_url: z.string().nullable(),
     live_url: z.string().nullable(),
     user_registered_at: z.string().nullable(),
-    live_url: z.string().nullable(),
     is_national: z.boolean(),
     editable: z.boolean(),
     edit_link: z.string().optional(),
@@ -210,8 +209,9 @@ export const RestPostEventRequestSchema = z.object({
   name: z.string(),
   category: z.string(),
   description: z.string(),
-  begin_at: z.date(),
-  finish_at: z.date(),
+  committee: z.string().uuid().nullable(),
+  begin_at: z.string(),
+  finish_at: z.string(),
   capacity: z.number().optional(),
   mode: z.enum(['online', 'meeting']),
   visio_url: z.string().optional(),

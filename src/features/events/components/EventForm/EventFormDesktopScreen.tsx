@@ -1,12 +1,10 @@
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
 import { FormFileImage } from '@/components/base/FormFileUpload/FormFileImage'
-import { FormFrame } from '@/components/base/FormFrames'
 import Input from '@/components/base/Input/Input'
 import Select, { SF } from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import DatePickerField from '@/components/DatePickerV2'
 import { VoxHeader } from '@/components/Header/Header'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
@@ -21,37 +19,17 @@ import { isWeb, XStack, YStack } from 'tamagui'
 import { ScrollStack } from '../../pages/detail/EventComponents'
 import EventHandleActions from '../EventHandleActions'
 import { useEventFormContext } from './context'
+import EventDatesField from './EventDatesField'
+import EventScopeSelect from './EventScopeSelect'
 
 const EventDesktopAside = () => {
-  const { scopeOptions, control, visibilityOptions, catOptions, timezones, mode, setMode, isAuthor } = useEventFormContext()
+  const { scopeOptions, control, editMode, visibilityOptions, catOptions, mode, setMode, isAuthor, handleOnChangeBeginAt, handleOnChangeFinishAt } =
+    useEventFormContext()
 
   return (
     <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
       <VoxCard.Content>
-        {isAuthor ? (
-          <>
-            <Controller
-              render={({ field, fieldState }) => {
-                return (
-                  <Select
-                    error={fieldState.error?.message}
-                    size="sm"
-                    theme="purple"
-                    matchTextWithTheme
-                    label="Pour"
-                    value={field.value}
-                    options={scopeOptions}
-                    onChange={field.onChange}
-                  />
-                )
-              }}
-              control={control}
-              name="scope"
-            />
-            <VoxCard.Separator />
-          </>
-        ) : null}
-
+        <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} />
         <Controller
           render={({ field, fieldState }) => {
             return (
@@ -89,84 +67,7 @@ const EventDesktopAside = () => {
           control={control}
           name="category"
         />
-        <FormFrame height="auto" flexDirection="column" paddingHorizontal={0} pt="$medium" overflow="hidden" theme="gray">
-          <Controller
-            render={({ field, fieldState }) => {
-              return (
-                <YStack>
-                  <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
-                    <XStack flex={1}>
-                      <FormFrame.Label>Date début</FormFrame.Label>
-                    </XStack>
-                    <XStack gap="$small" flex={1} justifyContent="flex-end">
-                      <DatePickerField error={fieldState.error?.message} type="date" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
-                      <DatePickerField error={fieldState.error?.message} type="time" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
-                    </XStack>
-                  </XStack>
-                  {fieldState.error ? (
-                    <XStack paddingHorizontal="$medium" alignSelf="flex-end" pt="$xsmall">
-                      <Text.XSM textAlign="right" color="$orange5">
-                        {fieldState.error?.message}
-                      </Text.XSM>
-                    </XStack>
-                  ) : null}
-                </YStack>
-              )
-            }}
-            control={control}
-            name="begin_at"
-          />
-          <Controller
-            render={({ field, fieldState }) => {
-              return (
-                <YStack>
-                  <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
-                    <XStack flex={1}>
-                      <FormFrame.Label>Date fin</FormFrame.Label>
-                    </XStack>
-                    <XStack gap="$small" flex={1} justifyContent="flex-end">
-                      <DatePickerField error={fieldState.error?.message} type="date" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
-                      <DatePickerField error={fieldState.error?.message} type="time" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
-                    </XStack>
-                  </XStack>
-                  {fieldState.error ? (
-                    <XStack paddingHorizontal="$medium" alignSelf="flex-end" pt="$xsmall">
-                      <Text.XSM textAlign="right" color="$orange5">
-                        {fieldState.error?.message}
-                      </Text.XSM>
-                    </XStack>
-                  ) : null}
-                </YStack>
-              )
-            }}
-            control={control}
-            name="finish_at"
-          />
-
-          <Controller
-            render={({ field }) => {
-              return (
-                <Select
-                  size="sm"
-                  color="gray"
-                  label="Fuseau horaire"
-                  value={field.value}
-                  searchable
-                  options={timezones}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  frameProps={{
-                    pb: '$medium',
-                    pt: '$medium',
-                    height: 'auto',
-                  }}
-                />
-              )
-            }}
-            control={control}
-            name="time_zone"
-          />
-        </FormFrame>
+        <EventDatesField control={control} handleOnChangeBeginAt={handleOnChangeBeginAt} handleOnChangeFinishAt={handleOnChangeFinishAt} />
         <Controller
           render={({ field }) => {
             return (
@@ -230,7 +131,7 @@ const EventDesktopAside = () => {
                     error={fieldState.error?.message}
                     defaultValue={field.value}
                     onChange={field.onChange}
-                    iconRight={<Webcam size={16} color="$gray4" />}
+                    iconRight={<Webcam size={20} color="$gray4" />}
                   />
                 )
               }}
@@ -259,7 +160,7 @@ const EventDesktopAside = () => {
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     error={fieldState.error?.message}
-                    iconRight={<Video size={16} color="$gray4" />}
+                    iconRight={<Video size={20} color="$gray4" />}
                   />
                 </YStack>
               )
@@ -283,7 +184,7 @@ const EventDesktopAside = () => {
                     defaultValue={field.value?.toString()}
                     onBlur={field.onBlur}
                     onChange={(x) => field.onChange(Number(x))}
-                    iconRight={<Users size={16} color="$gray4" />}
+                    iconRight={<Users size={20} color="$gray4" />}
                   />
                 </YStack>
               )

@@ -2,12 +2,10 @@ import { KeyboardAvoidingView } from 'react-native'
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
 import { FormFileImage } from '@/components/base/FormFileUpload/FormFileImage'
-import { FormFrame } from '@/components/base/FormFrames'
 import Input from '@/components/base/Input/Input'
 import Select, { SF } from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import DatePickerField from '@/components/DatePickerV2'
 import { VoxHeader } from '@/components/Header/Header'
 import LayoutPage from '@/components/layouts/PageLayout/PageLayout'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
@@ -22,6 +20,8 @@ import { Controller } from 'react-hook-form'
 import { isWeb, XStack, YStack } from 'tamagui'
 import EventHandleActions from '../EventHandleActions'
 import { useEventFormContext } from './context'
+import EventDatesField from './EventDatesField'
+import EventScopeSelect from './EventScopeSelect'
 
 export const EventFormMobileScreenSkeleton = (props?: { editMode?: boolean }) => {
   const navigation = useNavigation()
@@ -81,7 +81,6 @@ export default function EventFormMobileScreen() {
     control,
     visibilityOptions,
     catOptions,
-    timezones,
     mode,
     setMode,
     isPending,
@@ -91,6 +90,8 @@ export default function EventFormMobileScreen() {
     event,
     currentScope,
     isAuthor,
+    handleOnChangeBeginAt,
+    handleOnChangeFinishAt,
   } = useEventFormContext()
 
   return (
@@ -134,29 +135,7 @@ export default function EventFormMobileScreen() {
               </MessageCard>
             )}
             <VoxCard.Content>
-              {isAuthor ? (
-                <>
-                  <Controller
-                    render={({ field, fieldState }) => {
-                      return (
-                        <Select
-                          error={fieldState.error?.message}
-                          size="sm"
-                          theme="purple"
-                          matchTextWithTheme
-                          label="Pour"
-                          value={field.value}
-                          options={scopeOptions}
-                          onChange={field.onChange}
-                        />
-                      )
-                    }}
-                    control={control}
-                    name="scope"
-                  />
-                  <VoxCard.Separator />
-                </>
-              ) : null}
+              <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} />
               <YStack>
                 <Controller
                   render={({ field, fieldState }) => {
@@ -215,108 +194,9 @@ export default function EventFormMobileScreen() {
                 name="category"
               />
               <VoxCard.Separator />
-              <FormFrame height="auto" flexDirection="column" paddingHorizontal={0} pt="$medium" overflow="hidden" theme="gray">
-                <Controller
-                  render={({ field, fieldState }) => {
-                    return (
-                      <YStack>
-                        <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
-                          <XStack flex={1}>
-                            <FormFrame.Label>Date début</FormFrame.Label>
-                          </XStack>
-                          <XStack gap="$small" flex={1} justifyContent="flex-end">
-                            <DatePickerField
-                              error={fieldState.error?.message}
-                              type="date"
-                              value={field.value}
-                              onChange={field.onChange}
-                              onBlur={field.onBlur}
-                            />
-                            <DatePickerField
-                              error={fieldState.error?.message}
-                              type="time"
-                              value={field.value}
-                              onChange={field.onChange}
-                              onBlur={field.onBlur}
-                            />
-                          </XStack>
-                        </XStack>
-                        {fieldState.error ? (
-                          <XStack paddingHorizontal="$medium" alignSelf="flex-end" pt="$xsmall">
-                            <Text.XSM textAlign="right" color="$orange5">
-                              {fieldState.error?.message}
-                            </Text.XSM>
-                          </XStack>
-                        ) : null}
-                      </YStack>
-                    )
-                  }}
-                  control={control}
-                  name="begin_at"
-                />
-                <Controller
-                  render={({ field, fieldState }) => {
-                    return (
-                      <YStack>
-                        <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
-                          <XStack flex={1}>
-                            <FormFrame.Label>Date fin</FormFrame.Label>
-                          </XStack>
-                          <XStack gap="$small" flex={1} justifyContent="flex-end">
-                            <DatePickerField
-                              error={fieldState.error?.message}
-                              type="date"
-                              value={field.value}
-                              onChange={field.onChange}
-                              onBlur={field.onBlur}
-                            />
-                            <DatePickerField
-                              error={fieldState.error?.message}
-                              type="time"
-                              value={field.value}
-                              onChange={field.onChange}
-                              onBlur={field.onBlur}
-                            />
-                          </XStack>
-                        </XStack>
-                        {fieldState.error ? (
-                          <XStack paddingHorizontal="$medium" alignSelf="flex-end" pt="$xsmall">
-                            <Text.XSM textAlign="right" color="$orange5">
-                              {fieldState.error?.message}
-                            </Text.XSM>
-                          </XStack>
-                        ) : null}
-                      </YStack>
-                    )
-                  }}
-                  control={control}
-                  name="finish_at"
-                />
 
-                <Controller
-                  render={({ field }) => {
-                    return (
-                      <Select
-                        size="sm"
-                        color="gray"
-                        label="Fuseau horaire"
-                        value={field.value}
-                        searchable
-                        options={timezones}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        frameProps={{
-                          pb: '$medium',
-                          pt: '$medium',
-                          height: 'auto',
-                        }}
-                      />
-                    )
-                  }}
-                  control={control}
-                  name="time_zone"
-                />
-              </FormFrame>
+              <EventDatesField control={control} handleOnChangeBeginAt={handleOnChangeBeginAt} handleOnChangeFinishAt={handleOnChangeFinishAt} />
+
               <VoxCard.Separator />
               <Controller
                 render={({ field }) => {
@@ -381,7 +261,7 @@ export default function EventFormMobileScreen() {
                           error={fieldState.error?.message}
                           defaultValue={field.value}
                           onChange={field.onChange}
-                          iconRight={<Webcam size={16} color="$gray4" />}
+                          iconRight={<Webcam size={20} color="$gray4" />}
                         />
                       )
                     }}
@@ -445,7 +325,7 @@ export default function EventFormMobileScreen() {
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           error={fieldState.error?.message}
-                          iconRight={<Video size={16} color="$gray4" />}
+                          iconRight={<Video size={20} color="$gray4" />}
                         />
                       </YStack>
                     )
@@ -469,7 +349,7 @@ export default function EventFormMobileScreen() {
                           defaultValue={field.value?.toString()}
                           onBlur={field.onBlur}
                           onChange={field.onChange}
-                          iconRight={<Users size={16} color="$gray4" />}
+                          iconRight={<Users size={20} color="$gray4" />}
                         />
                       </YStack>
                     )

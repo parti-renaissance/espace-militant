@@ -144,6 +144,12 @@ export const RestUserScopesResponseSchema = z.array(
         uuid: z.string().uuid(),
       }),
     ),
+    attributes: z
+      .object({
+        committees: z.array(z.object({ name: z.string(), uuid: z.string().uuid() })),
+        dpt: z.string(),
+      })
+      .nullable(),
     apps: z.array(z.string()),
     features: z.array(z.string()),
   }),

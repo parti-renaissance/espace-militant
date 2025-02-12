@@ -123,7 +123,7 @@ const SelectResetIcon = styled(XCircle, {
 const SelectIconContainer = ({ icon, themedText }: { icon: NamedExoticComponent<IconProps>; themedText?: boolean }) => {
   const ctx = SelectContext.useStyledContext()
   const isThemed = ctx.themedText || themedText
-  const getIcon = useGetThemedIcon({ color: isThemed ? '$color4' : '$gray4', size: 14 })
+  const getIcon = useGetThemedIcon({ color: isThemed ? '$color4' : '$gray4', size: 20 })
   return getIcon(icon)
 }
 

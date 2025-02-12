@@ -113,7 +113,7 @@ const VoxCardLocation = ({ location, asTitle = false }: VoxCardLocationProps & {
   return location ? (
     <XStack gap="$small" alignItems="center">
       {!asTitle && <MapPin size={16} color="$textPrimary" />}
-      <WRPT flexGrow={1} lineBreakStrategyIOS="push-out">
+      <WRPT flexShrink={1}>
         <T multiline medium>
           {[location.city, location.postalCode].filter(Boolean).join(' ')}
         </T>
