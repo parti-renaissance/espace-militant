@@ -18,7 +18,6 @@ ${PublicSans}
     font-family: 'Public Sans', sans-serif;
     font-size: 12px;
     color: ${primary ? 'hsl(211,24%, 17%)' : 'hsl(208, 13%, 45%)'};
-    font-weight: 400;
 }
 
 p, li {
@@ -36,7 +35,6 @@ ${PublicSans}
 * {
     font-family: 'Public Sans', sans-serif;
     font-size: 14px;
-    font-weight: 400;
 }
 
 p, li {
