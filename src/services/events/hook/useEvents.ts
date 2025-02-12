@@ -82,9 +82,11 @@ export const useUnsubscribeEvent = ({ id: eventId, slug }: { id: string; slug?: 
 
 export const useGetEvent = ({ id: eventId }: { id: string }) => {
   const { session } = useSession()
+
   return useSuspenseQuery({
     queryKey: [QUERY_KEY_SINGLE_EVENT, eventId],
     queryFn: () => (session ? api.getEventDetails(eventId) : api.getPublicEventDetails(eventId)),
+    refetchOnMount: true,
   })
 }
 

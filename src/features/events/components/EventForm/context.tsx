@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { SelectOption, SF } from '@/components/base/Select/SelectV3'
 import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
+import { getFormatedScope as getFormatedScopeData } from '@/features/ScopesSelector/utils'
 import { isPathExist } from '@/services/common/errors/utils'
 import { eventPostFormError } from '@/services/events/error'
 import { useCreateEvent, useDeleteEventImage, useMutationEventImage, useSuspenseGetCategories } from '@/services/events/hook'
@@ -10,16 +11,17 @@ import { RestUserScopesResponse } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Lock, Sparkle, Unlock } from '@tamagui/lucide-icons'
-import { addHours, addMinutes, isAfter, isBefore, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
+import { addHours, addMinutes, formatISO, isAfter, isBefore, isEqual, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
 import { router, useNavigation } from 'expo-router'
 import { useForm } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 import { EventFormProps } from './types'
 
 export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<string> => {
+  const { name, description } = getFormatedScopeData(scope)
   return {
     value: scope.code,
-    label: [<SF.Text semibold>{scope.name}</SF.Text>, ' ', <SF.Text>{scope.zones.map(({ name, code }) => `${name} (${code})`).join(', ')}</SF.Text>],
+    label: [<SF.Text semibold>{name}</SF.Text>, ' ', <SF.Text>{description}</SF.Text>],
     theme: 'purple',
     icon: Sparkle,
   }
@@ -141,7 +143,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const handleOnChangeBeginAt = useCallback(
     (onChange: (y: Date) => void) => (x: Date) => {
-      if (isAfter(x, getValues('finish_at'))) {
+      if (isAfter(x, getValues('finish_at')) || isEqual(x, getValues('finish_at'))) {
         setValue('finish_at', addHours(x, 1))
       }
       onChange(x)
@@ -151,7 +153,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const handleOnChangeFinishAt = useCallback(
     (onChange: (y: Date) => void) => (x: Date) => {
-      if (isBefore(x, getValues('begin_at'))) {
+      if (isBefore(x, getValues('begin_at')) || isEqual(x, getValues('begin_at'))) {
         setValue('begin_at', subHours(x, 1))
       }
       onChange(x)
@@ -162,16 +164,25 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const _onSubmit = handleSubmit(
     async (data) => {
       const { scope, image, mode, visio_url, post_address, ...payload } = data
+      const fullScope = scopes.data?.list?.find((x) => x.code === scope) ?? { attributes: { committees: edit?.committee } }
       try {
         const newEvent = await mutateAsync({
-          payload: { ...payload, mode, visio_url: mode === 'online' ? visio_url : undefined, post_address: mode === 'meeting' ? post_address : undefined },
+          payload: {
+            ...payload,
+            finish_at: formatISO(payload.finish_at),
+            begin_at: formatISO(payload.begin_at),
+            mode,
+            visio_url: mode === 'online' ? visio_url : undefined,
+            post_address: mode === 'meeting' ? post_address : undefined,
+            committee: fullScope?.attributes?.committees?.[0]?.uuid ?? null,
+          },
           scope,
         })
 
         let errorImage = false
         try {
           if (newEvent) {
-            if (image === null) {
+            if (edit && edit.image?.url && image === null) {
               await deleteImage({ scope, eventId: newEvent.uuid, slug: newEvent.slug })
             } else if (image && image.url && image.url.startsWith('data:') && image.width !== null && image.height !== null) {
               await uploadImage({

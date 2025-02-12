@@ -33,7 +33,7 @@ export const RestEventOrganizerSchema = z.object({
 
 export const RestEventComitteeSchema = z.object({
   name: z.string(),
-  link: z.string(),
+  uuid: z.string(),
 })
 
 export const RestEventAddressSchema = z.object({
@@ -209,8 +209,9 @@ export const RestPostEventRequestSchema = z.object({
   name: z.string(),
   category: z.string(),
   description: z.string(),
-  begin_at: z.date(),
-  finish_at: z.date(),
+  committee: z.string().uuid().nullable(),
+  begin_at: z.string(),
+  finish_at: z.string(),
   capacity: z.number().optional(),
   mode: z.enum(['online', 'meeting']),
   visio_url: z.string().optional(),

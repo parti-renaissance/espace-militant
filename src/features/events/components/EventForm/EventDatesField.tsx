@@ -6,7 +6,7 @@ import DatePickerField from '@/components/DatePickerV2'
 import { getTimezoneOffset } from 'date-fns-tz'
 import { Controller } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
-import { listTimeZones } from 'timezone-support'
+import timezonesList from 'timezones-list'
 import { EventFormContext } from './context'
 
 function getTimezoneOffsetLabel(timeZone: string) {
@@ -15,9 +15,9 @@ function getTimezoneOffsetLabel(timeZone: string) {
   return `UTC ${offset < 0 ? '' : '+'}${offset / 1000 / 60 / 60}h`
 }
 
-const timezones = listTimeZones().map((timeZone) => ({
-  value: timeZone,
-  label: `${timeZone} (${getTimezoneOffsetLabel(timeZone)})`,
+const timezones = timezonesList.map((timeZone) => ({
+  value: timeZone.tzCode,
+  label: `${timeZone.tzCode} (${getTimezoneOffsetLabel(timeZone.tzCode)})`,
 }))
 
 const DatesField = (props: Pick<EventFormContext, 'control' | 'handleOnChangeBeginAt' | 'handleOnChangeFinishAt'>) => {
