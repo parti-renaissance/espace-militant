@@ -21,6 +21,7 @@ import { isWeb, XStack, YStack } from 'tamagui'
 import EventHandleActions from '../EventHandleActions'
 import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
+import EventScopeSelect from './EventScopeSelect'
 
 export const EventFormMobileScreenSkeleton = (props?: { editMode?: boolean }) => {
   const navigation = useNavigation()
@@ -134,29 +135,7 @@ export default function EventFormMobileScreen() {
               </MessageCard>
             )}
             <VoxCard.Content>
-              {isAuthor ? (
-                <>
-                  <Controller
-                    render={({ field, fieldState }) => {
-                      return (
-                        <Select
-                          error={fieldState.error?.message}
-                          size="sm"
-                          theme="purple"
-                          matchTextWithTheme
-                          label="Pour"
-                          value={field.value}
-                          options={scopeOptions}
-                          onChange={field.onChange}
-                        />
-                      )
-                    }}
-                    control={control}
-                    name="scope"
-                  />
-                  <VoxCard.Separator />
-                </>
-              ) : null}
+              <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} />
               <YStack>
                 <Controller
                   render={({ field, fieldState }) => {

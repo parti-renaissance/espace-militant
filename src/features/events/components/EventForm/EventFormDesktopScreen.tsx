@@ -20,37 +20,16 @@ import { ScrollStack } from '../../pages/detail/EventComponents'
 import EventHandleActions from '../EventHandleActions'
 import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
+import EventScopeSelect from './EventScopeSelect'
 
 const EventDesktopAside = () => {
-  const { scopeOptions, control, visibilityOptions, catOptions, mode, setMode, isAuthor, handleOnChangeBeginAt, handleOnChangeFinishAt } = useEventFormContext()
+  const { scopeOptions, control, editMode, visibilityOptions, catOptions, mode, setMode, isAuthor, handleOnChangeBeginAt, handleOnChangeFinishAt } =
+    useEventFormContext()
 
   return (
     <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
       <VoxCard.Content>
-        {isAuthor ? (
-          <>
-            <Controller
-              render={({ field, fieldState }) => {
-                return (
-                  <Select
-                    error={fieldState.error?.message}
-                    size="sm"
-                    theme="purple"
-                    matchTextWithTheme
-                    label="Pour"
-                    value={field.value}
-                    options={scopeOptions}
-                    onChange={field.onChange}
-                  />
-                )
-              }}
-              control={control}
-              name="scope"
-            />
-            <VoxCard.Separator />
-          </>
-        ) : null}
-
+        <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} />
         <Controller
           render={({ field, fieldState }) => {
             return (
