@@ -46,9 +46,9 @@ export const createEventSchema = z
     scope: requiredString('Le champ de la portée'),
     image: z
       .object({
-        url: z.string(),
-        width: z.number(),
-        height: z.number(),
+        url: z.string().nullable(),
+        width: z.number().nullable(),
+        height: z.number().nullable(),
       })
       .nullish(),
     name: requiredString('Le titre', 5),
@@ -79,7 +79,7 @@ export const createEventSchema = z
     visibility: EventVisibilitySchema,
     live_url: z
       .string()
-      .optional()
+      .nullish()
       .refine((value) => !value || /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w.-]*)*\/?$/.test(value), {
         message: 'Le lien doit être valide',
       })

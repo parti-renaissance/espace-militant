@@ -142,7 +142,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
         }
       : undefined,
     visibility: edit?.visibility ?? 'public',
-    live_url: undefined,
+    live_url: edit?.live_url ?? undefined,
   } as const
 
   const { control, handleSubmit, reset, setError } = useForm<EventFormData>({
@@ -166,7 +166,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           if (newEvent) {
             if (image === null) {
               await deleteImage({ scope, eventId: newEvent.uuid, slug: newEvent.slug })
-            } else if (image && image.url && image.url.startsWith('data:')) {
+            } else if (image && image.url && image.url.startsWith('data:') && image.width !== null && image.height !== null) {
               await uploadImage({
                 scope,
                 eventId: newEvent.uuid,
