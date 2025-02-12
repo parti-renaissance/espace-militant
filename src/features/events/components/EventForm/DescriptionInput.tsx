@@ -12,16 +12,40 @@ import { useDebouncedCallback } from 'use-debounce'
 import { PublicSans } from './PublicSans'
 import ModalOrPageBase from './ViewportModal'
 
-const customFont = `
+const customFont = (primary?: boolean) => `
+${PublicSans}
+* {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 12px;
+    color: ${primary ? 'hsl(211,24%, 17%)' : 'hsl(208, 13%, 45%)'};
+    font-weight: 400;
+}
+
+p, li {
+  line-height: 20px;
+  margin: 0;
+}
+
+ol, ul {
+  padding-left: 24px;
+}
+`
+
+const customFontEdit = `
 ${PublicSans}
 * {
     font-family: 'Public Sans', sans-serif;
     font-size: 14px;
+    font-weight: 400;
 }
 
-p {
+p, li {
   line-height: 22px;
   margin: 0;
+}
+
+ol, ul {
+  padding-left: 28px;
 }
 `
 
@@ -113,7 +137,7 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
   },
 ]
 
-export const MyRenderer = (props: { value: string; matchContent?: boolean }) => {
+export const MyRenderer = (props: { value: string; matchContent?: boolean; primary?: boolean }) => {
   const editor = useEditorBridge({
     editable: false,
     initialContent: props.value,
@@ -123,7 +147,7 @@ export const MyRenderer = (props: { value: string; matchContent?: boolean }) => 
       // as plugin duplicated will be ignored
       ...TenTapStartKit,
       CoreBridge.configureCSS(
-        customFont + ` #root div .ProseMirror {overflow: hidden; text-overflow: ellipsis;} #root div .ProseMirror p { text-overflow: ellipsis;}`,
+        customFont(props.primary) + ` #root div .ProseMirror {overflow: hidden; text-overflow: ellipsis;} #root div .ProseMirror p { text-overflow: ellipsis;}`,
       ), // Custom font
       PlaceholderBridge.configureExtension({
         placeholder: 'Décrivez votre événement...',
@@ -153,7 +177,7 @@ export default function (props: { onChange: () => void; onBlur: () => void; valu
     <>
       <SF.Props>
         <SF error={Boolean(props.error)} onPress={() => setOpen(true)} height="auto">
-          <YStack flex={1} height={200} gap="$medium" paddingVertical="$medium" overflow="hidden">
+          <YStack flex={1} height={214} gap="$medium" paddingVertical="$medium" overflow="hidden">
             <XStack gap="$small">
               <XStack flexShrink={1} flex={1} {...props} alignItems="center" gap="$small">
                 <SF.Label>{props.label}</SF.Label>
@@ -162,8 +186,8 @@ export default function (props: { onChange: () => void; onBlur: () => void; valu
                 <SF.Icon icon={Pen} />
               </XStack>
             </XStack>
-            <YStack flexGrow={1} onPress={(e) => e.bubbles} cursor="pointer">
-              <MyRenderer key={props.value} value={props.value} />
+            <YStack flexGrow={1} onPress={(e) => e.bubbles} cursor="pointer" borderRadius="$space.small">
+              <MyRenderer key={props.value} value={props.value} primary />
             </YStack>
           </YStack>
           <YStack position="absolute" bottom={0} left={0} right={0} top={0} cursor="pointer" />
@@ -194,7 +218,7 @@ const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur:
       // It is important to spread StarterKit BEFORE our extended plugin,
       // as plugin duplicated will be ignored
       ...TenTapStartKit,
-      CoreBridge.configureCSS(customFont), // Custom font
+      CoreBridge.configureCSS(customFontEdit), // Custom font
       PlaceholderBridge.configureExtension({
         placeholder: 'Décrivez votre événement...',
       }),
