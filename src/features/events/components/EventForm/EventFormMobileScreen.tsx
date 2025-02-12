@@ -261,7 +261,7 @@ export default function EventFormMobileScreen() {
                           error={fieldState.error?.message}
                           defaultValue={field.value}
                           onChange={field.onChange}
-                          iconRight={<Webcam size={16} color="$gray4" />}
+                          iconRight={<Webcam size={20} color="$gray4" />}
                         />
                       )
                     }}
@@ -325,7 +325,7 @@ export default function EventFormMobileScreen() {
                           onChange={field.onChange}
                           onBlur={field.onBlur}
                           error={fieldState.error?.message}
-                          iconRight={<Video size={16} color="$gray4" />}
+                          iconRight={<Video size={20} color="$gray4" />}
                         />
                       </YStack>
                     )
@@ -349,7 +349,7 @@ export default function EventFormMobileScreen() {
                           defaultValue={field.value?.toString()}
                           onBlur={field.onBlur}
                           onChange={field.onChange}
-                          iconRight={<Users size={16} color="$gray4" />}
+                          iconRight={<Users size={20} color="$gray4" />}
                         />
                       </YStack>
                     )

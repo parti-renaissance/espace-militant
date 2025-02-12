@@ -25,24 +25,6 @@ export type InputProps = {
   }
 } & Omit<TextInputProps, 'placeholder' | 'onChange'>
 
-const sizes = {
-  xs: {
-    height: 40,
-  },
-  sm: {
-    height: 44,
-  },
-  md: {
-    height: 48,
-  },
-  lg: {
-    height: 52,
-  },
-  xl: {
-    height: 64,
-  },
-} as const
-
 const InputFrame = styled(XStack, {
   name: 'Input',
   gap: '$small',
@@ -284,11 +266,7 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
             />
           )}
         </YStack>
-        {!loading && iconRight ? (
-          <YStack height="100%" justifyContent="center" onPress={onIconRightPress}>
-            {iconRight}
-          </YStack>
-        ) : null}
+        {!loading && iconRight ? <XStack onPress={onIconRightPress}>{iconRight}</XStack> : null}
 
         {loading ? <Spinner color="$blue7" /> : null}
       </InputFrame>

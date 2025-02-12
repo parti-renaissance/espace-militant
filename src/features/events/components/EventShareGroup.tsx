@@ -86,12 +86,12 @@ export function EventShareGroup({ event }: Props) {
   return (
     <VoxCard.Section title="Partagez cet événement avec vos contacts pour maximiser sa portée.">
       <Button variant="outlined" size="xl" theme="gray" width="100%" onPress={() => handleCopyUrl(shareUrl)} justifyContent="space-between">
-        <XStack flex={1}>
+        <XStack flexShrink={1}>
           <Text.MD secondary numberOfLines={1} flex={1}>
             {shareUrl}
           </Text.MD>
         </XStack>
-        <XStack flex={1} justifyContent="flex-end">
+        <XStack justifyContent="flex-end">
           <Copy color="$textSecondary" size={24} />
         </XStack>
       </Button>

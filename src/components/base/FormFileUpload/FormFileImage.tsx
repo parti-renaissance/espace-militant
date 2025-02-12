@@ -10,9 +10,19 @@ import { FormFrame } from '../FormFrames'
 import { SelectFrames } from '../Select/Frames'
 
 type ImageData = {
+  url: string | null
+  width: number | null
+  height: number | null
+}
+
+type ImageDataNonNull = {
   url: string
-  width: number
-  height: number
+  width: number | null
+  height: number | null
+}
+
+const hasUrl = (x?: ImageData | null): x is ImageDataNonNull => {
+  return Boolean(x && x.url)
 }
 
 type FormFileImageProps = {
@@ -77,14 +87,14 @@ export const FormFileImage = ({ height = 326, emptyHeight, ...props }: FormFileI
 
   if (isLoading) return <PendingFile height={emptyHeight ?? height} />
 
-  return props.value ? (
+  return hasUrl(props.value) ? (
     <HasFile value={props.value} onReplace={handleSelectImage} onDelete={handleDelete} height={height} />
   ) : (
     <NoFile placeholder={props.placeholder} onPress={handleSelectImage} height={emptyHeight ?? height} />
   )
 }
 
-const HasFile = (props: { value: ImageData; onReplace?: () => void; onDelete?: () => void; height?: FormFileImageProps['height'] }) => {
+const HasFile = (props: { value: ImageDataNonNull; onReplace?: () => void; onDelete?: () => void; height?: FormFileImageProps['height'] }) => {
   return (
     <FormFrame height={props.height} padding="$medium">
       <YStack flex={1} justifyContent="center" alignItems="center" gap="$medium">
@@ -97,8 +107,8 @@ const HasFile = (props: { value: ImageData; onReplace?: () => void; onDelete?: (
           resizeMode="center"
           source={{
             uri: props.value.url,
-            width: props.value.width,
-            height: props.value.height,
+            width: props.value.width ?? undefined,
+            height: props.value.height ?? undefined,
           }}
         />
 

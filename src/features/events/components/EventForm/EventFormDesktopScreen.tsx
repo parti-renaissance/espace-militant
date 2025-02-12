@@ -131,7 +131,7 @@ const EventDesktopAside = () => {
                     error={fieldState.error?.message}
                     defaultValue={field.value}
                     onChange={field.onChange}
-                    iconRight={<Webcam size={16} color="$gray4" />}
+                    iconRight={<Webcam size={20} color="$gray4" />}
                   />
                 )
               }}
@@ -160,7 +160,7 @@ const EventDesktopAside = () => {
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     error={fieldState.error?.message}
-                    iconRight={<Video size={16} color="$gray4" />}
+                    iconRight={<Video size={20} color="$gray4" />}
                   />
                 </YStack>
               )
@@ -184,7 +184,7 @@ const EventDesktopAside = () => {
                     defaultValue={field.value?.toString()}
                     onBlur={field.onBlur}
                     onChange={(x) => field.onChange(Number(x))}
-                    iconRight={<Users size={16} color="$gray4" />}
+                    iconRight={<Users size={20} color="$gray4" />}
                   />
                 </YStack>
               )
