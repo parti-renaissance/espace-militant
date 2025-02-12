@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { SelectOption, SF } from '@/components/base/Select/SelectV3'
 import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
 import { isPathExist } from '@/services/common/errors/utils'
@@ -10,24 +10,11 @@ import { RestUserScopesResponse } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Lock, Sparkle, Unlock } from '@tamagui/lucide-icons'
-import { addHours, addMinutes, setMilliseconds, setMinutes, setSeconds } from 'date-fns'
-import { getTimezoneOffset } from 'date-fns-tz'
+import { addHours, addMinutes, isAfter, isBefore, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
 import { router, useNavigation } from 'expo-router'
 import { useForm } from 'react-hook-form'
-import { listTimeZones } from 'timezone-support'
 import { useDebouncedCallback } from 'use-debounce'
 import { EventFormProps } from './types'
-
-function getTimezoneOffsetLabel(timeZone: string) {
-  const offset = getTimezoneOffset(timeZone)
-
-  return `UTC ${offset < 0 ? '' : '+'}${offset / 1000 / 60 / 60}h`
-}
-
-const timezones = listTimeZones().map((timeZone) => ({
-  value: timeZone,
-  label: `${timeZone} (${getTimezoneOffsetLabel(timeZone)})`,
-}))
 
 export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<string> => {
   return {
@@ -125,7 +112,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     scope: edit?.organizer?.scope ?? scopes.data.default?.code,
     name: edit?.name ?? '',
     image: edit?.image,
-    category: edit?.category?.slug,
+    category: edit?.category?.slug ?? '',
     description: edit?.description ?? '',
     begin_at: edit?.begin_at ? new Date(edit.begin_at) : startDate,
     finish_at: edit?.finish_at ? new Date(edit.finish_at) : addHours(startDate, 1),
@@ -145,12 +132,32 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     live_url: edit?.live_url ?? undefined,
   } as const
 
-  const { control, handleSubmit, reset, setError } = useForm<EventFormData>({
+  const { control, handleSubmit, reset, setError, getValues, setValue } = useForm<EventFormData>({
     defaultValues,
     resolver: zodResolver(createEventSchema),
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })
+
+  const handleOnChangeBeginAt = useCallback(
+    (onChange: (y: Date) => void) => (x: Date) => {
+      if (isAfter(x, getValues('finish_at'))) {
+        setValue('finish_at', addHours(x, 1))
+      }
+      onChange(x)
+    },
+    [],
+  )
+
+  const handleOnChangeFinishAt = useCallback(
+    (onChange: (y: Date) => void) => (x: Date) => {
+      if (isBefore(x, getValues('begin_at'))) {
+        setValue('begin_at', subHours(x, 1))
+      }
+      onChange(x)
+    },
+    [],
+  )
 
   const _onSubmit = handleSubmit(
     async (data) => {
@@ -225,17 +232,18 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     catOptions,
     mode,
     setMode,
-    timezones,
     visibilityOptions,
     navigation,
     editMode,
     currentScope,
     event: edit,
     isAuthor,
+    handleOnChangeFinishAt,
+    handleOnChangeBeginAt,
   }
 }
 
-type EventFormContext = ReturnType<typeof useEventFormData>
+export type EventFormContext = ReturnType<typeof useEventFormData>
 
 const eventFormContext = createContext<EventFormContext | null>(null)
 

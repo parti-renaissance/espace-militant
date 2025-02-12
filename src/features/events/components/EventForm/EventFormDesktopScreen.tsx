@@ -1,12 +1,10 @@
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
 import { FormFileImage } from '@/components/base/FormFileUpload/FormFileImage'
-import { FormFrame } from '@/components/base/FormFrames'
 import Input from '@/components/base/Input/Input'
 import Select, { SF } from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import DatePickerField from '@/components/DatePickerV2'
 import { VoxHeader } from '@/components/Header/Header'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
@@ -21,9 +19,10 @@ import { isWeb, XStack, YStack } from 'tamagui'
 import { ScrollStack } from '../../pages/detail/EventComponents'
 import EventHandleActions from '../EventHandleActions'
 import { useEventFormContext } from './context'
+import EventDatesField from './EventDatesField'
 
 const EventDesktopAside = () => {
-  const { scopeOptions, control, visibilityOptions, catOptions, timezones, mode, setMode, isAuthor } = useEventFormContext()
+  const { scopeOptions, control, visibilityOptions, catOptions, mode, setMode, isAuthor, handleOnChangeBeginAt, handleOnChangeFinishAt } = useEventFormContext()
 
   return (
     <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
@@ -89,84 +88,7 @@ const EventDesktopAside = () => {
           control={control}
           name="category"
         />
-        <FormFrame height="auto" flexDirection="column" paddingHorizontal={0} pt="$medium" overflow="hidden" theme="gray">
-          <Controller
-            render={({ field, fieldState }) => {
-              return (
-                <YStack>
-                  <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
-                    <XStack flex={1}>
-                      <FormFrame.Label>Date début</FormFrame.Label>
-                    </XStack>
-                    <XStack gap="$small" flex={1} justifyContent="flex-end">
-                      <DatePickerField error={fieldState.error?.message} type="date" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
-                      <DatePickerField error={fieldState.error?.message} type="time" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
-                    </XStack>
-                  </XStack>
-                  {fieldState.error ? (
-                    <XStack paddingHorizontal="$medium" alignSelf="flex-end" pt="$xsmall">
-                      <Text.XSM textAlign="right" color="$orange5">
-                        {fieldState.error?.message}
-                      </Text.XSM>
-                    </XStack>
-                  ) : null}
-                </YStack>
-              )
-            }}
-            control={control}
-            name="begin_at"
-          />
-          <Controller
-            render={({ field, fieldState }) => {
-              return (
-                <YStack>
-                  <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
-                    <XStack flex={1}>
-                      <FormFrame.Label>Date fin</FormFrame.Label>
-                    </XStack>
-                    <XStack gap="$small" flex={1} justifyContent="flex-end">
-                      <DatePickerField error={fieldState.error?.message} type="date" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
-                      <DatePickerField error={fieldState.error?.message} type="time" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
-                    </XStack>
-                  </XStack>
-                  {fieldState.error ? (
-                    <XStack paddingHorizontal="$medium" alignSelf="flex-end" pt="$xsmall">
-                      <Text.XSM textAlign="right" color="$orange5">
-                        {fieldState.error?.message}
-                      </Text.XSM>
-                    </XStack>
-                  ) : null}
-                </YStack>
-              )
-            }}
-            control={control}
-            name="finish_at"
-          />
-
-          <Controller
-            render={({ field }) => {
-              return (
-                <Select
-                  size="sm"
-                  color="gray"
-                  label="Fuseau horaire"
-                  value={field.value}
-                  searchable
-                  options={timezones}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  frameProps={{
-                    pb: '$medium',
-                    pt: '$medium',
-                    height: 'auto',
-                  }}
-                />
-              )
-            }}
-            control={control}
-            name="time_zone"
-          />
-        </FormFrame>
+        <EventDatesField control={control} handleOnChangeBeginAt={handleOnChangeBeginAt} handleOnChangeFinishAt={handleOnChangeFinishAt} />
         <Controller
           render={({ field }) => {
             return (

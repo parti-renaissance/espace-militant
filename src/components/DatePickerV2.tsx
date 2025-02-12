@@ -20,11 +20,10 @@ interface DatePickerFieldProps {
 
 const getDateInputValue = (d: Date, type: 'date' | 'time') => (type === 'date' ? (isWeb ? getIntlDate(d) : format(d, 'dd-MM-yyyy')) : format(d, 'HH:mm'))
 
-const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChange, error, label, disabled, color, type = 'date', onBlur }, ref) => {
+const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChange, error, type = 'date', onBlur }, ref) => {
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false)
 
   const readableDate = value && typeof value === 'object' ? getDateInputValue(value, type) : ''
-  const [inputValue, setInputValue] = useState(readableDate ?? '')
   const inputRef = useRef(null)
 
   useEffect(() => {
@@ -37,15 +36,12 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChan
   // In case of mobile component
   const handleConfirm = (input: Date) => {
     onChange?.(input)
-    setInputValue(type === 'date' ? getFormattedDate(input) : getHumanFormattedTime(input))
     setIsDatePickerVisible(false)
     onBlur?.()
   }
 
   // In case of web component
   const handleChange = (input: string) => {
-    setInputValue(input)
-
     if (input != '' && input.length === 10) {
       try {
         const time = value ? [getHours(value), getMinutes(value)] : undefined
@@ -91,7 +87,7 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChan
 
   const formatedValue = (type: 'date' | 'time', value: Date) => (type === 'date' ? getFormattedDate(value) : getFormattedTime(value))
   return Platform.OS === 'web' ? (
-    <FormFrame.Input error={Boolean(error)} ref={inputRef} value={inputValue} onChangeText={handleChange} onBlur={() => onBlur?.()} />
+    <FormFrame.Input error={Boolean(error)} ref={inputRef} value={readableDate} onChangeText={handleChange} onBlur={() => onBlur?.()} />
   ) : (
     <>
       <FormFrame.Button onPress={onShow} error={Boolean(error)}>

@@ -1,5 +1,5 @@
 import { EventVisibilitySchema } from '@/services/events/schema'
-import { isBefore } from 'date-fns'
+import { isAfter } from 'date-fns'
 import { z } from 'zod'
 
 const partialUrlSchema = z.string().refine((value) => !value || /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w.-]*)*\/?$/.test(value), {
@@ -11,11 +11,14 @@ const parsePartialUrl = (url: unknown) => {
 
 const requiredString = (start: string, min: number = 1) => {
   const message = `${start} est obligatoire.`
-  return z
-    .string({
-      required_error: message,
-    })
-    .min(min, min === 1 ? message : `${start} doit contenir au moins ${min} caractères.`)
+  return (
+    z
+      .string()
+      .min(min, min === 1 ? message : `${start} doit contenir au moins ${min} caractères.`)
+      // trick to make zod parse all the way to the end
+      .optional()
+      .transform((x) => x ?? '')
+  )
 }
 
 const requiredStringAddress = (start: string) => {
@@ -52,7 +55,13 @@ export const createEventSchema = z
       })
       .nullish(),
     name: requiredString('Le titre', 5),
-    category: requiredString('La catégorie'),
+    category: z
+      .string()
+      .min(1, `La catégorie est obligatoire.`)
+      // trick to make zod parse all the way to the end
+      .optional()
+      .transform((x) => x ?? ''),
+
     description: requiredString('La description', 10),
     begin_at: z.date({
       required_error: 'La date de début est obligatoire.',
@@ -92,15 +101,23 @@ export const createEventSchema = z
         }
       }),
   })
-  .refine((data) => isBefore(new Date(), data.begin_at), {
-    message: "L'évenement doit être dans le futur",
-    path: ['begin_at'],
-  })
-  .refine((data) => isBefore(data.begin_at, data.finish_at), {
-    message: 'La date de fin doit être postérieure à la date de début.',
-    path: ['finish_at'],
-  })
   .superRefine((data, ctx) => {
+    if (isAfter(new Date(), data.begin_at)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.invalid_date,
+        message: "L'évenement doit être dans le futur",
+        path: ['begin_at'],
+      })
+    }
+
+    if (isAfter(data.begin_at, data.finish_at)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.invalid_date,
+        message: 'La date de fin doit être postérieure à la date de début.',
+        path: ['finish_at'],
+      })
+    }
+
     if (data.mode === 'meeting') {
       let errorMessage: string | null = null
       if (!data.post_address) {
