@@ -111,10 +111,18 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
   },
 ]
 
+const parseJsonEditorContent = (x: string) => {
+  try {
+    return JSON.parse(x)
+  } catch (_) {
+    return x
+  }
+}
+
 export const MyRenderer = (props: { value: string; matchContent?: boolean; primary?: boolean }) => {
   const editor = useEditorBridge({
     editable: false,
-    initialContent: props.value,
+    initialContent: parseJsonEditorContent(props.value),
     dynamicHeight: props.matchContent,
     bridgeExtensions: [
       // It is important to spread StarterKit BEFORE our extended plugin,
@@ -180,14 +188,14 @@ export default function (props: { onChange: () => void; onBlur: () => void; valu
 }
 
 type EditorRef = {
-  getContent: () => Promise<string>
+  getJSON: () => Promise<object>
 }
 
 const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur: () => void; value: string; label: string }>((props, ref) => {
   const editor = useEditorBridge({
     autofocus: true,
     avoidIosKeyboard: false,
-    initialContent: props.value,
+    initialContent: parseJsonEditorContent(props.value),
     bridgeExtensions: [
       // It is important to spread StarterKit BEFORE our extended plugin,
       // as plugin duplicated will be ignored
@@ -201,7 +209,7 @@ const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur:
 
   useImperativeHandle(ref, () => {
     return {
-      getContent: editor.getHTML,
+      getJSON: editor.getJSON,
     }
   })
 
@@ -221,12 +229,12 @@ function ModalEditor(props: { onChange: (x: string) => void; onBlur: () => void;
   const editorRef = useRef<EditorRef | null>(null)
 
   const { isPending, mutateAsync } = useMutation({
-    mutationFn: () => editorRef.current?.getContent() ?? Promise.resolve(''),
+    mutationFn: () => editorRef.current?.getJSON() ?? Promise.resolve({}),
   })
 
   const handleOnChange = useDebouncedCallback(() => {
     mutateAsync().then((x) => {
-      props.onChange(x)
+      props.onChange(JSON.stringify(x))
       props.onBlur()
     })
   }, 200)

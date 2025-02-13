@@ -55,14 +55,19 @@ function AddressAutocomplete({
   const onPlaceSelect = (id: string) => {
     if (id.length === 0) {
       onReset?.()
+      onBlur?.()
       return
     }
     setValue(id)
-    mutateAsync(id).then((placeDetails) => {
-      if (placeDetails?.formatted && placeDetails.details && placeDetails.geometry) {
-        setAddressComponents?.(googleAddressMapper(placeDetails))
-      }
-    })
+    mutateAsync(id)
+      .then((placeDetails) => {
+        if (placeDetails?.formatted && placeDetails.details && placeDetails.geometry) {
+          setAddressComponents?.(googleAddressMapper(placeDetails))
+        }
+      })
+      .finally(() => {
+        onBlur?.()
+      })
   }
 
   return (
@@ -71,7 +76,6 @@ function AddressAutocomplete({
         placeholder={'Adresse'}
         value={value}
         onChange={onPlaceSelect}
-        onBlur={onBlur}
         icon={MapPin}
         searchable
         searchableOptions={{

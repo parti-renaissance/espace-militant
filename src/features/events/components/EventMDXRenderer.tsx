@@ -1,7 +1,7 @@
-import { MyRenderer } from './EventForm/DescriptionInput'
+import { TipTapRenderer } from '@/components/TipTapRenderer'
 
 const EventMDXRenderer = ({ children }: { children: string }) => {
-  return <MyRenderer value={children} matchContent />
+  return <TipTapRenderer content={children} />
 }
 
 export default EventMDXRenderer
