@@ -45,7 +45,7 @@ const useAppStateOnChange = (callback: () => Promise<void>) => {
     return () => {
       subscription.remove()
     }
-  }, [])
+  }, [callback])
 }
 
 export const useCheckStoreUpdate = () => {
