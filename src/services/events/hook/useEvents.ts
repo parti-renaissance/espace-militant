@@ -2,6 +2,7 @@ import { EventFilters } from '@/core/entities/Event'
 import { useSession } from '@/ctx/SessionProvider'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/events/api'
+import { eventPostFormError } from '@/services/events/error'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
@@ -166,6 +167,8 @@ export const useCreateEvent = ({ editSlug, editUuid }: { editSlug?: string; edit
     onError: (error) => {
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })
+      } else if (error instanceof eventPostFormError) {
+        toast.show('Validation', { message: 'Un ou plusieurs champs sont invalides.', type: 'warning' })
       } else {
         toast.show('Erreur', { message: errorMessage, type: 'error' })
       }
@@ -197,13 +200,12 @@ export const useMutationEventImage = () => {
         },
         queryClient,
       )
-      toast.show('Succès', { message: "Image de l'événement ajoutée", type: 'success' })
     },
     onError: (error) => {
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })
       } else {
-        toast.show('Erreur', { message: "Impossible d'ajouter l'image de l'événement", type: 'error' })
+        toast.show('Oups', { message: "Un problème est survenu lors de l'ajout de l'image de l'événement, veuillez réessayer.", type: 'warning' })
       }
       return error
     },
@@ -216,7 +218,6 @@ export const useDeleteEventImage = () => {
   return useMutation({
     mutationFn: (x: { eventId: string; scope: string; slug: string }) => api.deleteEventImage(x),
     onSuccess: (_, { eventId, slug }) => {
-      toast.show('Succès', { message: "Image de l'événement supprimée", type: 'success' })
       optimisticUpdate(
         { image: null },
         {
@@ -230,7 +231,7 @@ export const useDeleteEventImage = () => {
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })
       } else {
-        toast.show('Erreur', { message: "Impossible de supprimer l'image de l'événement", type: 'error' })
+        toast.show('Oups', { message: "Un problème est survenu lors de la suppression de l'image de l'événement, veuillez réessayer.", type: 'error' })
       }
       return error
     },
