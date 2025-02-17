@@ -1,8 +1,9 @@
-import React, { ComponentRef, forwardRef, RefObject, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
+import React, { ComponentRef, forwardRef, RefObject, useCallback, useImperativeHandle, useRef } from 'react'
 import { TouchableOpacity } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet'
 import { YStack } from 'tamagui'
-import { DropdownFrame, DropdownItem } from '../Dropdown'
+import { DropdownItem } from '../Dropdown'
 import Input from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
@@ -16,8 +17,8 @@ type BottomsheetLogicProps = {
 
 const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({ options, searchableOptions, frameRef, resetable, ...props }, ref) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const snapPoints = useMemo(() => ['90%'], [])
   const { setQuery, filteredItems, queryInputRef, searchableIcon } = useSelectSearch({ options, searchableOptions })
+  const insets = useSafeAreaInsets()
 
   useImperativeHandle(
     ref,
@@ -57,42 +58,44 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
         ref={bottomSheetRef}
         backdropComponent={renderBackdrop}
         enablePanDownToClose
-        index={1}
-        // enableDynamicSizing
-        keyboardBehavior="fillParent"
-        snapPoints={snapPoints}
+        enableDynamicSizing
+        keyboardBehavior="interactive"
         onDismiss={handleClose}
+        topInset={insets.top}
         handleIndicatorStyle={{
           backgroundColor: '#D2DCE5',
           width: 48,
         }}
       >
-        <DropdownFrame minHeight="100%" flex={1} borderRadius={0} borderWidth={0}>
-          <BottomSheetFlatList
-            stickyHeaderHiddenOnScroll={props.searchable}
-            stickyHeaderIndices={props.searchable ? [0] : undefined}
-            keyboardShouldPersistTaps
-            ListHeaderComponent={
-              props.searchable ? (
-                <YStack padding={16} bg="white">
-                  <Input
-                    color="gray"
-                    ref={queryInputRef}
-                    onChangeText={setQuery}
-                    placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
-                    iconRight={searchableIcon}
-                    loading={searchableOptions?.isFetching}
-                  />
-                </YStack>
-              ) : null
-            }
-            data={filteredItems}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item, index }) => (
-              <MemoItem {...item} onPress={handleSelect(item)} size={props.size} selected={item.id === props.value} last={filteredItems.length - 1 === index} />
-            )}
-          />
-        </DropdownFrame>
+        <BottomSheetFlatList
+          stickyHeaderHiddenOnScroll={props.searchable}
+          stickyHeaderIndices={props.searchable ? [0] : undefined}
+          keyboardShouldPersistTaps="always"
+          style={{
+            flex: 1,
+          }}
+          contentContainerStyle={{ paddingBottom: insets.bottom }}
+          ListHeaderComponent={
+            props.searchable ? (
+              <YStack padding={16} bg="white">
+                <Input
+                  bottomSheetInput
+                  color="gray"
+                  ref={queryInputRef}
+                  onChangeText={setQuery}
+                  placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
+                  iconRight={searchableIcon}
+                  loading={searchableOptions?.isFetching}
+                />
+              </YStack>
+            ) : null
+          }
+          data={filteredItems}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => (
+            <MemoItem {...item} onPress={handleSelect(item)} size={props.size} selected={item.id === props.value} last={filteredItems.length - 1 === index} />
+          )}
+        />
       </BottomSheetModal>
     </>
   )

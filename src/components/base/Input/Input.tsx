@@ -1,7 +1,8 @@
-import { ComponentProps, forwardRef, useEffect, useState } from 'react'
+import { ComponentProps, ComponentRef, forwardRef, useEffect, useMemo, useState } from 'react'
 import { GestureResponderEvent, LayoutChangeEvent, NativeSyntheticEvent, TextInput, TextInputFocusEventData, TextInputProps } from 'react-native'
 import Text from '@/components/base/Text'
 import { useForwardRef } from '@/hooks/useForwardRef'
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
 import { AnimatePresence, isWeb, Spinner, styled, TamaguiElement, useTheme, XStack, YStack } from 'tamagui'
 
 export type InputProps = {
@@ -10,6 +11,7 @@ export type InputProps = {
   error?: string
   label?: string
   placeholder?: string
+  bottomSheetInput?: boolean
   disabled?: boolean
   loading?: boolean
   iconLeft?: React.ReactNode
@@ -117,7 +119,7 @@ const InputFrame = styled(XStack, {
   } as const,
 })
 
-export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
+export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>(function Input(_props, ref) {
   const {
     size,
     color,
@@ -137,6 +139,7 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
     onChange,
     frameRef,
     fakeProps,
+    bottomSheetInput,
     ...inputProps
   } = _props
   const [isFocused, setIsFocused] = useState(false)
@@ -208,6 +211,7 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
   }
 
   const FakeTextComponent = fakeProps?.customTextComponent ?? Text.MD
+  const DynInput = useMemo(() => (bottomSheetInput ? BottomSheetTextInput : TextInput), [])
 
   return (
     <YStack gap="$xsmall" flex={1} ref={frameRef}>
@@ -241,7 +245,7 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
           {fake ? (
             <FakeTextComponent {...defaultFakeTextProps} />
           ) : (
-            <TextInput
+            <DynInput
               style={{
                 color: theme.textPrimary.val,
                 padding: 0,
