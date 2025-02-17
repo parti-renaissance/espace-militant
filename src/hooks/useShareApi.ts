@@ -1,5 +1,6 @@
 import { Share } from 'react-native'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { UnavailabilityError } from 'expo-modules-core'
 import * as Sharing from 'expo-sharing'
 
 type ShareContent = { url: string; title?: string; message?: string }
@@ -20,7 +21,11 @@ export default function useShareApi() {
         url: payload.url,
       })
     }
-    await Share.share(payload)
+    await Share.share(payload).catch((e) => {
+      if (e instanceof UnavailabilityError) {
+        throw e
+      }
+    })
   }
 
   return {

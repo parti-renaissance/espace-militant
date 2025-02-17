@@ -9,9 +9,7 @@ import useShareApi from '@/hooks/useShareApi'
 import useCreateEvent from '@/modules/Calendar/Calendar'
 import * as eventTypes from '@/services/events/schema'
 import { RestEvent } from '@/services/events/schema'
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { CalendarPlus, Copy, Share2 } from '@tamagui/lucide-icons'
-import { useToastController } from '@tamagui/toast'
 import { XStack } from 'tamagui'
 import { isEventFull, useHandleCopyUrl } from '../utils'
 
@@ -19,12 +17,10 @@ type Props = {
   event: Partial<RestEvent> & Pick<RestEvent, 'uuid' | 'slug'>
 }
 
-export function EventShareGroup({ event }: Props) {
+export const useEventSharing = ({ event }: Props) => {
   const handleCopyUrl = useHandleCopyUrl()
-  const toast = useToastController()
 
   const shareUrl = `https://${clientEnv.ASSOCIATED_DOMAIN}/evenements/${event.slug}`
-
   const { shareAsync, isShareAvailable } = useShareApi()
 
   const handleShareUrl = () => {
@@ -56,11 +52,18 @@ export function EventShareGroup({ event }: Props) {
           url: shareUrl,
         },
       }),
-    ).catch((e) => {
-      ErrorMonitor.log(e.message, { e })
-      toast.show('Erreur lors du partage du lien', { type: 'error' })
-    })
+    ).catch(() => {})
   }
+  return {
+    copyUrl: () => handleCopyUrl(shareUrl),
+    shareUrl,
+    openShareDialog: handleShareUrl,
+    isShareAvailable,
+  }
+}
+
+export function EventShareGroup({ event }: Props) {
+  const { copyUrl, shareUrl, openShareDialog, isShareAvailable } = useEventSharing({ event })
 
   const createEventData = (event: Partial<eventTypes.RestFullEvent> & { begin_at: string }) => {
     return {
@@ -85,7 +88,7 @@ export function EventShareGroup({ event }: Props) {
 
   return (
     <VoxCard.Section title="Partagez cet événement avec vos contacts pour maximiser sa portée.">
-      <Button variant="outlined" size="xl" theme="gray" width="100%" onPress={() => handleCopyUrl(shareUrl)} justifyContent="space-between">
+      <Button variant="outlined" size="xl" theme="gray" width="100%" onPress={copyUrl} justifyContent="space-between">
         <XStack flexShrink={1}>
           <Text.MD secondary numberOfLines={1} flex={1}>
             {shareUrl}
@@ -97,7 +100,7 @@ export function EventShareGroup({ event }: Props) {
       </Button>
 
       {isShareAvailable && (
-        <VoxButton variant="outlined" full size="xl" iconLeft={Share2} onPress={handleShareUrl}>
+        <VoxButton variant="outlined" full size="xl" iconLeft={Share2} onPress={openShareDialog}>
           Partager
         </VoxButton>
       )}
