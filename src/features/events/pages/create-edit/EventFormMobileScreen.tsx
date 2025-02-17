@@ -11,14 +11,14 @@ import LayoutPage from '@/components/layouts/PageLayout/PageLayout'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import DescriptionInput from '@/features/events/components/EventForm/DescriptionInput'
-import { EventFormData } from '@/features/events/components/EventForm/schema'
+import DescriptionInput from '@/features/events/pages/create-edit/DescriptionInput'
+import { EventFormData } from '@/features/events/pages/create-edit/schema'
 import ScrollView from '@/features/profil/components/ScrollView'
 import { Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
 import { Controller } from 'react-hook-form'
-import { isWeb, XStack, YStack } from 'tamagui'
-import EventHandleActions from '../EventHandleActions'
+import { isWeb, Spinner, XStack, YStack } from 'tamagui'
+import EventHandleActions from '../../components/EventHandleActions'
 import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
@@ -94,8 +94,10 @@ export default function EventFormMobileScreen() {
     handleOnChangeFinishAt,
   } = useEventFormContext()
 
+  const globalPending = isPending || isUploadImagePending || isUploadDeletePending
+
   return (
-    <LayoutPage.MainSingleColumn>
+    <LayoutPage.MainSingleColumn opacity={globalPending ? 0.5 : 1} pointerEvents={globalPending ? 'none' : 'auto'} cursor={globalPending ? 'progress' : 'auto'}>
       <VoxHeader>
         <XStack alignItems="center" flex={1} width="100%">
           <XStack alignContent="flex-start">
@@ -275,17 +277,15 @@ export default function EventFormMobileScreen() {
                 <Controller
                   render={({ field, fieldState }) => {
                     return (
-                      <>
-                        <YStack minHeight={100} maxHeight={300}>
-                          <DescriptionInput
-                            error={fieldState.error?.message}
-                            label="Description"
-                            value={field.value}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                          />
-                        </YStack>
-                      </>
+                      <YStack minHeight={100} maxHeight={300}>
+                        <DescriptionInput
+                          error={fieldState.error?.message}
+                          label="Description"
+                          value={field.value}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                        />
+                      </YStack>
                     )
                   }}
                   control={control}
@@ -375,6 +375,11 @@ export default function EventFormMobileScreen() {
           </VoxCard.Content>
         </ScrollView>
       </KeyboardAvoidingView>
+      {globalPending ? (
+        <YStack top={0} bottom={0} left={0} right={0} position="absolute" justifyContent="center" alignItems="center">
+          <Spinner size="large" color="$blue6" />
+        </YStack>
+      ) : null}
     </LayoutPage.MainSingleColumn>
   )
 }

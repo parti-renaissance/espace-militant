@@ -2,7 +2,7 @@ import React from 'react'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import * as metatags from '@/config/metatags'
-import EventFormScreen, { EventFormScreenSkeleton } from '@/features/events/components/EventForm'
+import EventFormScreen, { EventFormScreenSkeleton } from '@/features/events/pages/create-edit'
 import Head from 'expo-router/head'
 
 const HomeScreen: React.FC = () => {

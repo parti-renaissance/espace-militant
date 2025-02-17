@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { SelectOption, SF } from '@/components/base/Select/SelectV3'
-import { createEventSchema, EventFormData } from '@/features/events/components/EventForm/schema'
+import { createEventSchema, EventFormData } from '@/features/events/pages/create-edit/schema'
 import { getFormatedScope as getFormatedScopeData } from '@/features/ScopesSelector/utils'
 import { isPathExist } from '@/services/common/errors/utils'
 import { eventPostFormError } from '@/services/events/error'
@@ -21,7 +21,13 @@ export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectO
   const { name, description } = getFormatedScopeData(scope)
   return {
     value: scope.code,
-    label: [<SF.Text key="name" semibold>{name}</SF.Text>, ' ', <SF.Text key="description">{description}</SF.Text>],
+    label: [
+      <SF.Text key="name" semibold>
+        {name}
+      </SF.Text>,
+      ' ',
+      <SF.Text key="description">{description}</SF.Text>,
+    ],
     theme: 'purple',
     icon: Sparkle,
   }
@@ -111,7 +117,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const { mutateAsync: deleteImage, isPending: isUploadDeletePending } = useDeleteEventImage()
 
   const defaultValues = {
-    scope: edit?.organizer?.scope ?? scopes.data.default?.code,
+    scope: edit ? (edit.organizer?.scope ?? 'national') : scopes.data.default?.code,
     name: edit?.name ?? '',
     image: edit?.image,
     category: edit?.category?.slug ?? '',
@@ -201,7 +207,6 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           errorImage = true
         }
 
-        const fallback = router.canGoBack() ? '../' : ('/evenements' as const)
         if (errorImage && newEvent.slug) {
           router.replace({
             pathname: '/evenements/[id]/modifier',
@@ -209,19 +214,22 @@ const useEventFormData = ({ edit }: EventFormProps) => {
               id: newEvent.slug,
             },
           })
+        } else if (edit && router.canGoBack()) {
+          router.back()
+        } else if (newEvent?.slug) {
+          router.replace({
+            pathname: '/evenements/[id]',
+            params: {
+              id: newEvent.slug,
+              greet: editMode ? undefined : 'new',
+            },
+          })
         } else if (router.canGoBack()) {
           router.back()
         } else {
-          router.push(
-            newEvent?.slug
-              ? {
-                  pathname: '/evenements/[id]',
-                  params: {
-                    id: newEvent.slug,
-                  },
-                }
-              : fallback,
-          )
+          router.replace({
+            pathname: '/evenements',
+          })
         }
 
         reset()

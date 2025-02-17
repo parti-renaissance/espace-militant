@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { type TextInput } from 'react-native'
+import { ComponentRef, useCallback, useMemo, useRef, useState } from 'react'
+import Input from '@/components/base/Input/Input'
 import { SelectProps } from './types'
 import { reactTextNodeChildrenToString } from './utils'
 
@@ -11,7 +11,7 @@ const useSelectSearch = ({ options, searchableOptions }: Pick<SelectProps<string
     _setQuery(x)
     searchableOptions?.autocompleteCallback?.(x)
   }, [])
-  const queryInputRef = useRef<TextInput>(null)
+  const queryInputRef = useRef<ComponentRef<typeof Input>>(null)
   const items = useMemo(() => options.map((x) => ({ id: x.value, title: x.label, subtitle: x.subLabel, icon: x.icon, theme: x.theme })), [options])
   const filteredItems = useMemo(
     () => (isAutoComplete ? items : items.filter((x) => reactTextNodeChildrenToString(x.title).toLocaleLowerCase().includes(query.toLocaleLowerCase()))),
