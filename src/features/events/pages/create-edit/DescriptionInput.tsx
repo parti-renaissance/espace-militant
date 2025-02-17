@@ -7,7 +7,7 @@ import { VoxHeader } from '@/components/Header/Header'
 import { CoreBridge, PlaceholderBridge, RichText, TenTapStartKit, Toolbar, ToolbarItem, useEditorBridge } from '@10play/tentap-editor'
 import { Pen, Save } from '@tamagui/lucide-icons'
 import { useMutation } from '@tanstack/react-query'
-import { XStack, YStack } from 'tamagui'
+import { isWeb, XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import { PublicSans } from './PublicSans'
 import ModalOrPageBase from './ViewportModal'
@@ -194,7 +194,7 @@ type EditorRef = {
 const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur: () => void; value: string; label: string }>((props, ref) => {
   const editor = useEditorBridge({
     autofocus: true,
-    avoidIosKeyboard: false,
+    avoidIosKeyboard: true,
     initialContent: parseJsonEditorContent(props.value),
     bridgeExtensions: [
       // It is important to spread StarterKit BEFORE our extended plugin,
@@ -214,13 +214,22 @@ const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur:
   })
 
   return (
-    <YStack flex={1} $platform-ios={{ pb: 128 }}>
+    <YStack flex={1}>
+      {isWeb ? (
+        <XStack paddingVertical="$small" borderBottomColor="$textOutline" borderBottomWidth={1}>
+          <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
+        </XStack>
+      ) : null}
       <YStack flex={1} padding="$medium">
         <RichText editor={editor} />
       </YStack>
-      <YStack height={50}>
-        <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
-      </YStack>
+      {isWeb ? null : (
+        <YStack $platform-native={{ flex: 1 }}>
+          <YStack height={46}>
+            <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
+          </YStack>
+        </YStack>
+      )}
     </YStack>
   )
 })

@@ -45,12 +45,11 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
     <Sheet
       modal
       open={!!open}
-      snapPoints={[80]}
+      snapPoints={[100]}
       snapPointsMode="percent"
       disableDrag
-      moveOnKeyboardChange
       dismissOnSnapToBottom={false}
-      dismissOnOverlayPress={true}
+      dismissOnOverlayPress={false}
       onOpenChange={(x) => {
         if (!x) {
           onClose?.()
