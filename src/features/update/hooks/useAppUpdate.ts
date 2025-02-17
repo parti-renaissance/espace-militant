@@ -28,16 +28,15 @@ const handleCallback = async (callback: () => Promise<void>) => {
 const useAppStateOnChange = (callback: () => Promise<void>) => {
   const appState = useRef<AppStateStatus>(AppState.currentState)
   const appHasStarted = useRef(false)
-  const callbackRef = useRef<Promise<void>>()
 
   useEffect(() => {
     if (appHasStarted.current === false) {
-      callbackRef.current = callbackRef.current ?? handleCallback(callback) // avoid multiple calls
+      handleCallback(callback)
       appHasStarted.current = true
     }
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        callbackRef.current = handleCallback(callback)
+        handleCallback(callback)
       }
       appState.current = nextAppState
     })
