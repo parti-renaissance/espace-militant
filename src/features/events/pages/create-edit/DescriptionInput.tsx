@@ -215,7 +215,7 @@ const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur:
   })
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <YStack flex={1}>
         {isWeb ? (
           <XStack paddingVertical="$small" borderBottomColor="$textOutline" borderBottomWidth={1}>
@@ -226,10 +226,8 @@ const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur:
           <RichText editor={editor} />
         </YStack>
         {isWeb ? null : (
-          <YStack $platform-native={{ flex: 1 }}>
-            <YStack height={46}>
-              <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
-            </YStack>
+          <YStack height={46}>
+            <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
           </YStack>
         )}
       </YStack>

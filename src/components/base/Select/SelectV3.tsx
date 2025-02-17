@@ -1,7 +1,7 @@
 import React, { ComponentRef, useCallback, useMemo, useRef } from 'react'
 import { GestureResponderEvent, TouchableOpacity } from 'react-native'
 import Text from '@/components/base/Text'
-import { useMedia, XStack, YStack } from 'tamagui'
+import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import { SelectFrames as SF } from './Frames'
 import SelectBottomSheet from './SelectBottomSheet'
 import SelectDropdown, { SelectDropdownRef } from './SelectDropdown'
@@ -21,7 +21,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
   }, [props.disabled])
 
   const Selector = useMemo(() => {
-    return media.gtSm ? SelectDropdown : SelectBottomSheet
+    return media.gtSm && isWeb ? SelectDropdown : SelectBottomSheet
   }, [media])
 
   const selectorRef = useMemo(() => {
