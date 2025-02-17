@@ -1,4 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import { KeyboardAvoidingView } from 'react-native'
 import { Images } from '@/assets/editor-icons'
 import { SelectFrames as SF } from '@/components/base/Select/Frames'
 import Text from '@/components/base/Text'
@@ -194,7 +195,7 @@ type EditorRef = {
 const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur: () => void; value: string; label: string }>((props, ref) => {
   const editor = useEditorBridge({
     autofocus: true,
-    avoidIosKeyboard: true,
+    avoidIosKeyboard: false,
     initialContent: parseJsonEditorContent(props.value),
     bridgeExtensions: [
       // It is important to spread StarterKit BEFORE our extended plugin,
@@ -214,23 +215,25 @@ const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur:
   })
 
   return (
-    <YStack flex={1}>
-      {isWeb ? (
-        <XStack paddingVertical="$small" borderBottomColor="$textOutline" borderBottomWidth={1}>
-          <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
-        </XStack>
-      ) : null}
-      <YStack flex={1} padding="$medium">
-        <RichText editor={editor} />
-      </YStack>
-      {isWeb ? null : (
-        <YStack $platform-native={{ flex: 1 }}>
-          <YStack height={46}>
+    <KeyboardAvoidingView style={{ flex: 1 }}>
+      <YStack flex={1}>
+        {isWeb ? (
+          <XStack paddingVertical="$small" borderBottomColor="$textOutline" borderBottomWidth={1}>
             <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
-          </YStack>
+          </XStack>
+        ) : null}
+        <YStack flex={1} padding="$medium">
+          <RichText editor={editor} />
         </YStack>
-      )}
-    </YStack>
+        {isWeb ? null : (
+          <YStack $platform-native={{ flex: 1 }}>
+            <YStack height={46}>
+              <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
+            </YStack>
+          </YStack>
+        )}
+      </YStack>
+    </KeyboardAvoidingView>
   )
 })
 
