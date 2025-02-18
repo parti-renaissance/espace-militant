@@ -5,7 +5,7 @@ import * as api from '@/services/events/api'
 import { eventPostFormError } from '@/services/events/error'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 import { useToastController } from '@tamagui/toast'
-import { useMutation, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { RestPostEventRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
 import { optimisticToggleSubscribe, optimisticUpdate } from './helpers'
@@ -33,7 +33,7 @@ export const useSuspensePaginatedEvents = (opts: { filters?: EventFilters; posta
       })
     : ''
 
-  return useSuspenseInfiniteQuery({
+  return useInfiniteQuery({
     queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', filtersKey],
     queryFn: ({ pageParam }) => (isAuth ? fetchEventList(pageParam, opts) : fetchEventPublicList(pageParam, opts)),
     getNextPageParam: (lastPage) =>
