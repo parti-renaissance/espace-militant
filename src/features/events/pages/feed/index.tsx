@@ -133,7 +133,7 @@ const EventList = () => {
               contentContainerStyle={{
                 flexGrow: 1,
                 gap: getToken('$medium', 'space'),
-                paddingTop: media.gtLg ? getToken('$xlarge', 'space') : 145,
+                paddingTop: media.gtLg ? getToken('$xlarge', 'space') : 195,
                 paddingLeft: media.gtSm ? getToken('$xxlarge', 'space') : undefined,
                 paddingRight: media.gtSm ? getToken('$xxlarge', 'space') : undefined,
                 paddingBottom: getToken('$11', 'space'),

@@ -28,8 +28,7 @@ export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof V
         <VoxCard.Content padding="$xlarge">
           <YStack gap="$medium" alignItems="center">
             <Image src={EventIllustration} />
-            <Text.LG textAlign="center">Nouvel événement créé !</Text.LG>
-            <Text.MD textAlign="center">Un mail récapitulatif vient de vous être envoyé.</Text.MD>
+            <Text.LG textAlign="center">Nouvel événement créé </Text.LG>
           </YStack>
         </VoxCard.Content>
         <YStack

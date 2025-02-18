@@ -86,6 +86,7 @@ export const createEventSchema = z
     time_zone: z.string(),
     electoral: z.boolean().optional(),
     visibility: EventVisibilitySchema,
+    send_invitation_email: z.boolean().optional(),
     live_url: z
       .string()
       .nullish()
