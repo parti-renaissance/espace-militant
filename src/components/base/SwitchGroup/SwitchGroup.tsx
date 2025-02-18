@@ -1,3 +1,4 @@
+import { ComponentProps } from 'react'
 import Switch from '@/components/base/SwitchV2/SwitchV2'
 import Text from '@/components/base/Text'
 import { styled } from '@tamagui/core'
@@ -10,6 +11,7 @@ type SwitchGroupProps = {
   }[]
   value: string[]
   onChange: (value: string[]) => void
+  textProps?: ComponentProps<typeof Text.MD>
 }
 
 const SwitchGroupFrame = styled(ThemeableStack, {
@@ -17,7 +19,7 @@ const SwitchGroupFrame = styled(ThemeableStack, {
   flexDirection: 'column',
 })
 
-export default function SwitchGroup({ options, value, onChange }: SwitchGroupProps) {
+export default function SwitchGroup({ options, value, onChange, textProps }: SwitchGroupProps) {
   const handlePress = (item: string) => () => {
     if (value.includes(item)) {
       onChange(value.filter((v) => v !== item))
@@ -31,7 +33,7 @@ export default function SwitchGroup({ options, value, onChange }: SwitchGroupPro
     <SwitchGroupFrame>
       {options.map((option) => (
         <XStack key={option.value} gap="$xsmall" group onPress={handlePress(option.value)} alignItems="center" cursor="pointer" justifyContent="space-between">
-          <Text.MD multiline flexShrink={1}>
+          <Text.MD multiline flexShrink={1} {...textProps}>
             {option.label}
           </Text.MD>
           <Switch checked={isChecked(option.value)} onPress={handlePress(option.value)} />

@@ -10,12 +10,14 @@ import { useGetExecutiveScopes, useGetSuspenseProfil } from '@/services/profile/
 import { RestUserScopesResponse } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Lock, Sparkle, Unlock } from '@tamagui/lucide-icons'
+import { Sparkle } from '@tamagui/lucide-icons'
 import { addHours, addMinutes, formatISO, isAfter, isBefore, isEqual, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
 import { router, useNavigation } from 'expo-router'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
+import { useConfirmAlert } from './ConfirmAlert'
 import { EventFormProps } from './types'
+import visibilityOptions from './visibility-options'
 
 export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<string> => {
   const { name, description } = getFormatedScopeData(scope)
@@ -40,36 +42,6 @@ export const formatCategorie = (cat: EventCategory): SelectOption<string> => {
     value: cat.slug,
   }
 }
-
-const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
-  {
-    value: 'public',
-    icon: Unlock,
-    label: 'Ouvert au public',
-    subLabel: 'Tout le monde peut s’y inscrire avec un prénom, un email et un code postal pour découvrir le Parti.',
-  },
-  {
-    value: 'private',
-    icon: Lock,
-    theme: 'blue',
-    label: 'Réservé aux millitants',
-    subLabel: 'Les externes ne pourront pas s’y inscrire sans adhérer ou créer un compte. Un aperçu sera visible publiquement.',
-  },
-  {
-    value: 'adherent',
-    icon: Lock,
-    theme: 'yellow',
-    label: 'Réservé aux adhérents',
-    subLabel: 'Les adhérents non-à-jour et les sympathisants ne pourront pas s’y inscrire sans cotiser cette année. Il ne sera pas visible publiquement.',
-  },
-  {
-    value: 'adherent_dues',
-    icon: Lock,
-    theme: 'yellow',
-    label: 'Réservé aux adhérents à jour',
-    subLabel: 'Les sympathisants ne pourront pas s’y inscrire sans adhérer. Il ne sera pas visible publiquement.',
-  },
-]
 
 const roundMinutesToNextDecimal = (date: Date) => {
   // Remove seconds and milliseconds for precision
@@ -138,9 +110,10 @@ const useEventFormData = ({ edit }: EventFormProps) => {
       : undefined,
     visibility: edit?.visibility ?? 'public',
     live_url: edit?.live_url ?? undefined,
+    send_invitation_email: edit ? undefined : true,
   } as const
 
-  const { control, handleSubmit, reset, setError, getValues, setValue } = useForm<EventFormData>({
+  const { control, handleSubmit, reset, setError, getValues, setValue, watch } = useForm<EventFormData>({
     defaultValues,
     resolver: zodResolver(createEventSchema),
     mode: 'onBlur',
@@ -167,91 +140,106 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     [],
   )
 
-  const _onSubmit = handleSubmit(
-    async (data) => {
-      const { scope, image, mode, visio_url, post_address, ...payload } = data
-      const fullScope = scopes.data?.list?.find((x) => x.code === scope) ?? { attributes: { committees: edit?.committee } }
+  const finalSubmit: SubmitHandler<EventFormData> = async (data) => {
+    const { scope, image, mode, visio_url, post_address, ...payload } = data
+    const fullScope = scopes.data?.list?.find((x) => x.code === scope) ?? { attributes: { committees: edit?.committee } }
+    try {
+      const newEvent = await mutateAsync({
+        payload: {
+          ...payload,
+          finish_at: formatISO(payload.finish_at),
+          begin_at: formatISO(payload.begin_at),
+          mode,
+          visio_url: mode === 'online' ? visio_url : undefined,
+          post_address: mode === 'meeting' ? post_address : undefined,
+          committee: fullScope?.attributes?.committees?.[0]?.uuid ?? null,
+        },
+        scope,
+      })
+
+      let errorImage = false
       try {
-        const newEvent = await mutateAsync({
-          payload: {
-            ...payload,
-            finish_at: formatISO(payload.finish_at),
-            begin_at: formatISO(payload.begin_at),
-            mode,
-            visio_url: mode === 'online' ? visio_url : undefined,
-            post_address: mode === 'meeting' ? post_address : undefined,
-            committee: fullScope?.attributes?.committees?.[0]?.uuid ?? null,
-          },
-          scope,
-        })
-
-        let errorImage = false
-        try {
-          if (newEvent) {
-            if (edit && edit.image?.url && image === null) {
-              await deleteImage({ scope, eventId: newEvent.uuid, slug: newEvent.slug })
-            } else if (image && image.url && image.url.startsWith('data:') && image.width !== null && image.height !== null) {
-              await uploadImage({
-                scope,
-                eventId: newEvent.uuid,
-                payload: image.url,
-                slug: newEvent.slug,
-                size: {
-                  width: image.width,
-                  height: image.height,
-                },
-              })
-            }
+        if (newEvent) {
+          if (edit && edit.image?.url && image === null) {
+            await deleteImage({ scope, eventId: newEvent.uuid, slug: newEvent.slug })
+          } else if (image && image.url && image.url.startsWith('data:') && image.width !== null && image.height !== null) {
+            await uploadImage({
+              scope,
+              eventId: newEvent.uuid,
+              payload: image.url,
+              slug: newEvent.slug,
+              size: {
+                width: image.width,
+                height: image.height,
+              },
+            })
           }
-        } catch (e) {
-          errorImage = true
         }
-
-        if (errorImage && newEvent.slug) {
-          router.replace({
-            pathname: '/evenements/[id]/modifier',
-            params: {
-              id: newEvent.slug,
-            },
-          })
-        } else if (edit && router.canGoBack()) {
-          router.back()
-        } else if (newEvent?.slug) {
-          router.replace({
-            pathname: '/evenements/[id]',
-            params: {
-              id: newEvent.slug,
-              greet: editMode ? undefined : 'new',
-            },
-          })
-        } else if (router.canGoBack()) {
-          router.back()
-        } else {
-          router.replace({
-            pathname: '/evenements',
-          })
-        }
-
-        reset()
       } catch (e) {
-        if (e instanceof eventPostFormError) {
-          e.violations.forEach((violation) => {
-            if (isPathExist(violation.propertyPath, defaultValues)) {
-              const propPath = violation.propertyPath.startsWith('post_address') ? 'post_address' : violation.propertyPath
-              setError(propPath, { message: violation.message })
-            } else {
-              ErrorMonitor.log('Unknown property path / event form', violation)
-            }
-          })
-        }
+        errorImage = true
       }
-    },
+
+      if (errorImage && newEvent.slug) {
+        router.replace({
+          pathname: '/evenements/[id]/modifier',
+          params: {
+            id: newEvent.slug,
+          },
+        })
+      } else if (edit && router.canGoBack()) {
+        router.back()
+      } else if (newEvent?.slug) {
+        router.replace({
+          pathname: '/evenements/[id]',
+          params: {
+            id: newEvent.slug,
+            greet: editMode ? undefined : 'new',
+          },
+        })
+      } else if (router.canGoBack()) {
+        router.back()
+      } else {
+        router.replace({
+          pathname: '/evenements',
+        })
+      }
+
+      reset()
+    } catch (e) {
+      if (e instanceof eventPostFormError) {
+        e.violations.forEach((violation) => {
+          if (isPathExist(violation.propertyPath, defaultValues)) {
+            const propPath = violation.propertyPath.startsWith('post_address') ? 'post_address' : violation.propertyPath
+            setError(propPath, { message: violation.message })
+          } else {
+            ErrorMonitor.log('Unknown property path / event form', violation)
+          }
+        })
+      }
+    }
+  }
+
+  const _onSubmit = handleSubmit(finalSubmit, (x) => {
+    console.log(x)
+  })
+
+  const preOnSubmit = useDebouncedCallback(_onSubmit)
+
+  const { ConfirmAlert, present } = useConfirmAlert({
+    title: 'Créer l’événement ?',
+    onAccept: preOnSubmit,
+    control,
+    watch,
+  })
+
+  const modalBeforeSubmit = handleSubmit(
+    () => present(),
     (x) => {
       console.log(x)
     },
   )
 
-  const onSubmit = useDebouncedCallback(_onSubmit)
+  const onSubmit = edit ? preOnSubmit : modalBeforeSubmit
 
   return {
     control,
@@ -271,6 +259,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     isAuthor,
     handleOnChangeFinishAt,
     handleOnChangeBeginAt,
+    ConfirmAlert,
   }
 }
 

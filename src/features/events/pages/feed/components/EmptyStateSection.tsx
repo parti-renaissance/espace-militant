@@ -26,11 +26,13 @@ export const EmptyStateSection = () => {
       <YStack gap="$large" alignItems="center">
         <Image src={EventIllustration} />
         <Text.MD secondary>Aucun événement à venir</Text.MD>
-        <Link href="/evenements/creer" asChild={!isWeb}>
-          <VoxButton variant="outlined" size="md" theme="purple" iconLeft={Sparkle}>
-            J’en organise un
-          </VoxButton>
-        </Link>
+        <XStack>
+          <Link href="/evenements/creer" asChild={!isWeb}>
+            <VoxButton variant="outlined" size="md" theme="purple" iconLeft={Sparkle}>
+              J’en organise un
+            </VoxButton>
+          </Link>
+        </XStack>
       </YStack>
     </VoxCard.Content>
   )

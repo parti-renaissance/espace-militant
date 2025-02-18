@@ -315,39 +315,42 @@ const BackButton = (props: { children?: React.ReactNode }) => {
 }
 
 const EventFormDesktopScreen = () => {
-  const { editMode, isUploadImagePending, isUploadDeletePending, isPending } = useEventFormContext()
+  const { editMode, isUploadImagePending, isUploadDeletePending, isPending, ConfirmAlert } = useEventFormContext()
   const globalPending = isPending || isUploadImagePending || isUploadDeletePending
 
   return (
-    <ScrollStack>
-      <XStack pb="$medium" flex={1}>
-        <BackButton />
-      </XStack>
-      <YStack gap="$medium">
-        <VoxCard opacity={globalPending ? 0.5 : 1} pointerEvents={globalPending ? 'none' : 'auto'} cursor={globalPending ? 'progress' : 'auto'}>
-          <VoxCard.Content pb={0} justifyContent="center" alignItems="center">
-            <VoxHeader.Title icon={Calendar}>{`${editMode ? 'Modifier' : 'Créer'} l'événement`}</VoxHeader.Title>
-          </VoxCard.Content>
-          <VoxCard.Content pb={0} pt={0}>
-            {editMode ? null : (
-              <MessageCard theme="gray" iconLeft={Info}>
-                Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
-              </MessageCard>
-            )}
-          </VoxCard.Content>
-          <XStack>
-            <EventDesktopMain />
-            <EventDesktopAside />
-          </XStack>
-          <EventDesktopFooter />
-        </VoxCard>
-        {globalPending ? (
-          <YStack top={0} bottom={0} left={0} right={0} position="absolute" justifyContent="center" alignItems="center">
-            <Spinner size="large" color="$blue6" />
-          </YStack>
-        ) : null}
-      </YStack>
-    </ScrollStack>
+    <>
+      {ConfirmAlert}
+      <ScrollStack>
+        <XStack pb="$medium" flex={1}>
+          <BackButton />
+        </XStack>
+        <YStack gap="$medium">
+          <VoxCard opacity={globalPending ? 0.5 : 1} pointerEvents={globalPending ? 'none' : 'auto'} cursor={globalPending ? 'progress' : 'auto'}>
+            <VoxCard.Content pb={0} justifyContent="center" alignItems="center">
+              <VoxHeader.Title icon={Calendar}>{`${editMode ? 'Modifier' : 'Créer'} l'événement`}</VoxHeader.Title>
+            </VoxCard.Content>
+            <VoxCard.Content pb={0} pt={0}>
+              {editMode ? null : (
+                <MessageCard theme="gray" iconLeft={Info}>
+                  Créez un événement pour faire <Text.MD bold>campagne, rassembler vos militants ou récompenser vos adhérents.</Text.MD>
+                </MessageCard>
+              )}
+            </VoxCard.Content>
+            <XStack>
+              <EventDesktopMain />
+              <EventDesktopAside />
+            </XStack>
+            <EventDesktopFooter />
+          </VoxCard>
+          {globalPending ? (
+            <YStack top={0} bottom={0} left={0} right={0} position="absolute" justifyContent="center" alignItems="center">
+              <Spinner size="large" color="$blue6" />
+            </YStack>
+          ) : null}
+        </YStack>
+      </ScrollStack>
+    </>
   )
 }
 

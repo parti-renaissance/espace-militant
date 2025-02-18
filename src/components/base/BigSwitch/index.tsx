@@ -22,7 +22,6 @@ export const SwitchGroupZone = styled(ThemeableStack, {
   group: true,
 
   cursor: 'pointer',
-  animation: 'bouncy',
 
   '$group-hover': { backgroundColor: '$blue1' },
   backgroundColor: '$white1',
@@ -41,7 +40,6 @@ export const SwitchGroupZone = styled(ThemeableStack, {
 
 export const SwitchGroupItemFrame = styled(ThemeableStack, {
   context: SwitchContext,
-  animation: 'bouncy',
   height: 44,
   flex: 1,
   flexBasis: 0,
@@ -71,8 +69,8 @@ export const SwitchGroupIndicatorFrame = styled(ThemeableStack, {
   top: 0,
   left: 0,
   right: 0,
-  animation: 'bouncy',
   flexDirection: 'row',
+  animation: 'medium',
   transform: [{ translateX: 0 }],
 })
 
