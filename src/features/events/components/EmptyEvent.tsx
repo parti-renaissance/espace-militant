@@ -4,7 +4,7 @@ import { RotateCw } from '@tamagui/lucide-icons'
 import { Image, View, XStack } from 'tamagui'
 import useResetFilters from '../hooks/useResetFilters'
 
-export default function EmptyState(props: { state: string }) {
+export default function EmptyState() {
   const { handleReset } = useResetFilters()
   return (
     <View alignSelf="center" alignContent="center" gap="$large" alignItems={'center'} justifyContent="center" flex={1}>

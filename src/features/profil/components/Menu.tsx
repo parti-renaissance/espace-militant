@@ -16,7 +16,7 @@ const mapPageConfigs = (config: typeof pageConfigs) =>
         key: screenName,
         icon: options.icon,
         children: options.title,
-        pathname: ('/profil' + (screenName === 'index' ? '' : '/' + screenName)) as Href<string>,
+        pathname: ('/profil' + (screenName === 'index' ? '' : '/' + screenName)) as Href,
       }) as const,
   )
 
@@ -52,7 +52,7 @@ const ProfilMenu = () => {
       {clientEnv.ENVIRONMENT === 'staging' ? (
         <Menu>
           <Link href="/storybook" asChild={!isWeb}>
-            <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} onPress={signOut} icon={PenLine} last={true}>
+            <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} icon={PenLine} last={true}>
               StoryBook
             </Menu.Item>
           </Link>

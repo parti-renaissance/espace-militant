@@ -7,6 +7,7 @@ type Props = {
   onEndReached?: () => void
   onEndReachedThreshold?: number
   onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
+  onMomentumScrollEnd?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
   scrollEventThrottle?: number
   ref?: MutableRefObject<ComponentRef<typeof ScrollView> | null> | RefObject<HTMLDivElement>
 }
@@ -37,6 +38,7 @@ export const usePageLayoutScroll = (props?: Props) => {
     let timeoutId: ReturnType<typeof setTimeout>
     const handleScroll = () => {
       if (!scrollActive || !props?.onScroll) return
+      console.log(scrollView.scrollTop)
       const nativeEvent = {
         nativeEvent: {
           contentOffset: { y: scrollView.scrollTop },
@@ -55,12 +57,32 @@ export const usePageLayoutScroll = (props?: Props) => {
       }
     }
 
+    let isScrolling: ReturnType<typeof setTimeout>
+
+    const handleMomentumScrollEnd = () => {
+      if (!scrollActive || !props?.onMomentumScrollEnd) return
+
+      clearTimeout(isScrolling)
+      isScrolling = setTimeout(() => {
+        const nativeEvent = {
+          nativeEvent: {
+            contentOffset: { y: scrollView.scrollTop },
+            contentSize: { height: scrollView.scrollHeight, width: scrollView.scrollWidth },
+            layoutMeasurement: { height: scrollView.clientHeight, width: scrollView.clientWidth },
+          },
+        } as NativeSyntheticEvent<NativeScrollEvent>
+        props.onMomentumScrollEnd?.(nativeEvent)
+      }, 150)
+    }
+
     scrollView.addEventListener('scroll', handleScroll)
     scrollView.addEventListener('scroll', handleScrollReachedEnd)
+    scrollView.addEventListener('scroll', handleMomentumScrollEnd)
 
     return () => {
       scrollView.removeEventListener('scroll', handleScroll)
       scrollView.removeEventListener('scroll', handleScrollReachedEnd)
+      scrollView.removeEventListener('scroll', handleMomentumScrollEnd)
       clearTimeout(timeoutId)
     }
   }, [scrollActive])
