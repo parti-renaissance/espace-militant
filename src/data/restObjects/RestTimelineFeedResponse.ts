@@ -23,7 +23,6 @@ export interface RestTimelineFeedItem {
   image: string | null
   address: string | null
   category: string | null
-  is_local: boolean | null
   media_type: string | null
   cta_link: string | null
   cta_label: string | null
