@@ -25,7 +25,7 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
     () => ({
       open: () => {
         bottomSheetRef.current?.present()
-        setTimeout(() => queryInputRef.current?.focus(), 100)
+        setTimeout(() => queryInputRef.current?.focus(), 200)
       },
       close: () => {
         bottomSheetRef.current?.close()
