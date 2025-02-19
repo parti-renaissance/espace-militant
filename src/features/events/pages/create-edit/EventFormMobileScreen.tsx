@@ -88,7 +88,7 @@ export default function EventFormMobileScreen() {
     isUploadDeletePending,
     editMode,
     event,
-    currentScope,
+    editEventScope,
     isAuthor,
     handleOnChangeBeginAt,
     handleOnChangeFinishAt,
@@ -371,7 +371,7 @@ export default function EventFormMobileScreen() {
               {editMode && event ? (
                 <EventHandleActions
                   event={event}
-                  scope={currentScope.code}
+                  scope={editEventScope}
                   buttonProps={{
                     theme: 'orange',
                     size: 'sm',

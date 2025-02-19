@@ -64,7 +64,6 @@ const roundMinutesToNextDecimal = (date: Date) => {
 const useEventFormData = ({ edit }: EventFormProps) => {
   const scopes = useGetExecutiveScopes()
   const scopeOptions = useMemo(() => scopes.data.list.filter((x) => x.features.includes('events')).map(getFormatedScope), [scopes.data.list])
-  const currentScope = scopes.data.default
   const { data } = useGetSuspenseProfil({ enabled: true })
 
   const isAuthor = useMemo(() => {
@@ -87,6 +86,8 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const { mutateAsync, isPending } = useCreateEvent({ editSlug: edit?.slug, editUuid: edit?.uuid })
   const { mutateAsync: uploadImage, isPending: isUploadImagePending } = useMutationEventImage()
   const { mutateAsync: deleteImage, isPending: isUploadDeletePending } = useDeleteEventImage()
+
+  const editEventScope = edit?.organizer?.scope ?? 'national'
 
   const defaultValues = {
     scope: edit ? (edit.organizer?.scope ?? 'national') : scopes.data.default?.code,
@@ -245,7 +246,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     visibilityOptions,
     navigation,
     editMode,
-    currentScope,
+    editEventScope,
     event: edit,
     isAuthor,
     handleOnChangeFinishAt,

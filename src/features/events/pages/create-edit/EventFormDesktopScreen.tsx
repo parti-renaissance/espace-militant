@@ -199,7 +199,7 @@ const EventDesktopAside = () => {
 }
 
 const EventDesktopFooter = () => {
-  const { isPending, isUploadImagePending, isUploadDeletePending, onSubmit, editMode, currentScope, event } = useEventFormContext()
+  const { isPending, isUploadImagePending, isUploadDeletePending, onSubmit, editMode, event, editEventScope } = useEventFormContext()
   return (
     <XStack flex={1}>
       <VoxCard.Content pt={0} flex={1}>
@@ -207,7 +207,7 @@ const EventDesktopFooter = () => {
           {editMode && event ? (
             <EventHandleActions
               event={event}
-              scope={currentScope.code}
+              scope={editEventScope}
               buttonProps={{
                 theme: 'orange',
                 size: 'sm',
