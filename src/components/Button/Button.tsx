@@ -221,7 +221,7 @@ export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
         {IconLeft ? (
           <IconLeft
             size={16}
-            color={props.pop ? '$colorPop' : '$color'}
+            color={textColor ?? (props.pop ? '$colorPop' : '$color')}
             $group-hover={{
               color: '$colorHover',
             }}
@@ -238,7 +238,7 @@ export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
         {IconRight ? (
           <IconRight
             size={16}
-            color={props.pop ? '$colorPop' : '$color'}
+            color={textColor ?? (props.pop ? '$colorPop' : '$color')}
             $group-hover={{
               color: '$colorHover',
             }}

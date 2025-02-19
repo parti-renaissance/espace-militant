@@ -1,7 +1,5 @@
 import { RestFullEvent, RestItemEvent, RestPartialEvent } from '@/services/events/schema'
-import { useToastController } from '@tamagui/toast'
 import { isAfter, isBefore, subHours } from 'date-fns'
-import * as Clipboard from 'expo-clipboard'
 
 export const isEventPast = (event: Partial<RestItemEvent>) => {
   const date = event.finish_at || event.begin_at
@@ -110,18 +108,6 @@ export const getEventDetailImageFallback = (event: Partial<RestItemEvent>) => {
     return require('@/features/events/assets/images/event-fallback-private-lock.png')
   }
   return event.image?.url ?? require('@/features/events/assets/images/event-fallback.png')
-}
-
-export function useHandleCopyUrl() {
-  const toast = useToastController()
-  return (shareUrl: string) =>
-    Clipboard.setStringAsync(shareUrl)
-      .then(() => {
-        toast.show('Lien copié', { type: 'info' })
-      })
-      .catch(() => {
-        toast.show('Erreur lors de la copie du lien', { type: 'error' })
-      })
 }
 
 export const isEventHasNationalLive = (
