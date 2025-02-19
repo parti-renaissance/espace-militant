@@ -1,5 +1,5 @@
 import React, { ComponentRef, forwardRef, RefObject, useCallback, useImperativeHandle, useRef } from 'react'
-import { TouchableOpacity } from 'react-native'
+import { Platform, TouchableOpacity } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet'
 import { YStack } from 'tamagui'
@@ -25,7 +25,7 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
     () => ({
       open: () => {
         bottomSheetRef.current?.present()
-        setTimeout(() => queryInputRef.current?.focus(), 100)
+        setTimeout(() => queryInputRef.current?.focus(), 200)
       },
       close: () => {
         bottomSheetRef.current?.close()
@@ -58,8 +58,6 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
         ref={bottomSheetRef}
         backdropComponent={renderBackdrop}
         enablePanDownToClose
-        enableDynamicSizing
-        keyboardBehavior="interactive"
         onDismiss={handleClose}
         topInset={insets.top}
         handleIndicatorStyle={{
@@ -71,15 +69,12 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
           stickyHeaderHiddenOnScroll={props.searchable}
           stickyHeaderIndices={props.searchable ? [0] : undefined}
           keyboardShouldPersistTaps="always"
-          style={{
-            flex: 1,
-          }}
           contentContainerStyle={{ paddingBottom: insets.bottom }}
           ListHeaderComponent={
             props.searchable ? (
               <YStack padding={16} bg="white">
                 <Input
-                  bottomSheetInput
+                  bottomSheetInput={Platform.OS === 'ios'}
                   color="gray"
                   ref={queryInputRef}
                   onChangeText={setQuery}

@@ -1,5 +1,5 @@
 import React, { ComponentRef, useCallback, useMemo, useRef } from 'react'
-import { GestureResponderEvent, TouchableOpacity } from 'react-native'
+import { GestureResponderEvent, Platform, TouchableOpacity } from 'react-native'
 import Text from '@/components/base/Text'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import { SelectFrames as SF } from './Frames'
@@ -40,6 +40,15 @@ const Select = <A extends string>(props: SelectProps<A>) => {
 
   const fullValue = props.options.find((option) => option.value === props.value)
 
+  const parseFullValueLabel = (x: typeof fullValue) => {
+    if (!x) return props.noValuePlaceholder ?? '___'
+    // Elipsis on android don't handle dashes..., so we replaced it by spaces.
+    if (typeof x.label === 'string' && Platform.OS === 'android') {
+      return x.label.replaceAll('-', ' ')
+    }
+    return x.label
+  }
+
   return (
     <YStack>
       <Selector ref={selectorRef} frameRef={frameRef} {...props} />
@@ -62,7 +71,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
             {props.label || props.placeholder ? <SF.Label>{props.label || props.placeholder}</SF.Label> : null}
             <SF.ValueContainer theme={fullValue?.theme}>
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}
-              <SF.Text themedText={Boolean(fullValue?.theme)}>{fullValue ? fullValue.label : (props.noValuePlaceholder ?? '___')}</SF.Text>
+              <SF.Text themedText={Boolean(fullValue?.theme)}>{parseFullValueLabel(fullValue)}</SF.Text>
             </SF.ValueContainer>
           </SF.Container>
         </SF>

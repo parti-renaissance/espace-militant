@@ -1,5 +1,5 @@
 import { ComponentProps, ComponentRef, forwardRef, useEffect, useMemo, useState } from 'react'
-import { GestureResponderEvent, LayoutChangeEvent, NativeSyntheticEvent, TextInput, TextInputFocusEventData, TextInputProps } from 'react-native'
+import { GestureResponderEvent, LayoutChangeEvent, NativeSyntheticEvent, Platform, TextInput, TextInputFocusEventData, TextInputProps } from 'react-native'
 import Text from '@/components/base/Text'
 import { useForwardRef } from '@/hooks/useForwardRef'
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
@@ -250,6 +250,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
                 color: theme.textPrimary.val,
                 padding: 0,
                 fontSize: 14,
+                height: Platform.OS === 'android' ? 18 : 'auto',
                 width: '100%',
                 fontWeight: isWeb ? (inputProps.value ? 500 : 400) : undefined,
               }}

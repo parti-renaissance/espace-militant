@@ -66,9 +66,9 @@ export const SwitchGroupIndicatorFrame = styled(ThemeableStack, {
   context: SwitchContext,
   height: 45,
   position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
+  top: -1,
+  left: -1,
+  right: -1,
   flexDirection: 'row',
   animation: 'medium',
   transform: [{ translateX: 0 }],
@@ -79,6 +79,8 @@ export const SwitchGroupIndicator = styled(ThemeableStack, {
   flex: 1,
   height: 45,
   borderRadius: 999,
+  borderWidth: 1,
+  borderColor: '$blue1',
   backgroundColor: '$blue1',
 })
 
