@@ -4,6 +4,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { FormFrame } from '@/components/base/FormFrames'
 import Text from '@/components/base/Text'
 import { getFormattedDate, getFormattedTime } from '@/utils/date'
+import { isValid } from 'date-fns'
 import { Input, isWeb } from 'tamagui'
 
 interface DatePickerFieldProps {
@@ -38,7 +39,7 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChan
 
   const handleDateChange = (input: string) => {
     const newDate = new Date(input)
-    const time = value ?? new Date()
+    const time = value && isValid(value) ? value : new Date()
     newDate.setHours(time.getHours())
     newDate.setMinutes(time.getMinutes())
     onChange?.(newDate)
@@ -46,15 +47,14 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChan
 
   const handleTimeChange = (input: string) => {
     const [hours, minutes] = input.split(':')
-    const newDate = value ?? new Date()
+    const newDate = value && isValid(value) ? value : new Date()
     newDate.setHours(parseInt(hours))
     newDate.setMinutes(parseInt(minutes))
     newDate.setSeconds(0)
     onChange?.(newDate)
   }
-
-  const formattedDate = value ? value.toISOString().split('T')[0] : ''
-  const formattedTime = value ? `${value?.getHours().toString().padStart(2, '0')}:${value?.getMinutes().toString().padStart(2, '0')}` : ''
+  const formattedDate = value && isValid(value) ? value.toISOString().split('T')[0] : ''
+  const formattedTime = value && isValid(value) ? `${value?.getHours().toString().padStart(2, '0')}:${value?.getMinutes().toString().padStart(2, '0')}` : ''
 
   const webInputValue = type === 'date' ? formattedDate : formattedTime
 
