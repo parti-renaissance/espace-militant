@@ -7,6 +7,7 @@ import { useAlerts } from '@/services/alerts/hook'
 import { useGetPaginatedFeed } from '@/services/timeline-feed/hook'
 import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
 import { useScrollToTop } from '@react-navigation/native'
+import { useFocusEffect } from 'expo-router'
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
@@ -38,6 +39,12 @@ const HomeFeedList = () => {
       fetchNextPage()
     }
   }
+  useFocusEffect(
+    useCallback(() => {
+      alertQuery.refetch()
+    }, []),
+  )
+
   const loadMore = useDebouncedCallback(loadMoreGeneric, 1000, { leading: true, trailing: false })
 
   const { isWebPageLayoutScrollActive } = usePageLayoutScroll({

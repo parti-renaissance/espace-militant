@@ -5,13 +5,14 @@ import Button, { VoxButton } from '@/components/Button'
 import { getFormatedVoxCardDate } from '@/components/utils'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import clientEnv from '@/config/clientEnv'
+import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 import useShareApi from '@/hooks/useShareApi'
 import useCreateEvent from '@/modules/Calendar/Calendar'
 import * as eventTypes from '@/services/events/schema'
 import { RestEvent } from '@/services/events/schema'
 import { CalendarPlus, Copy, Share2 } from '@tamagui/lucide-icons'
 import { XStack } from 'tamagui'
-import { isEventFull, useHandleCopyUrl } from '../utils'
+import { isEventFull } from '../utils'
 
 type Props = {
   event: Partial<RestEvent> & Pick<RestEvent, 'uuid' | 'slug'>
