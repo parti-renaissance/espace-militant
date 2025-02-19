@@ -11,7 +11,7 @@ import { RestUserScopesResponse } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Sparkle } from '@tamagui/lucide-icons'
-import { addHours, addMinutes, formatISO, isAfter, isBefore, isEqual, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
+import { addHours, addMinutes, formatISO, isAfter, isBefore, isEqual, isValid, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
 import { router, useNavigation } from 'expo-router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
@@ -123,7 +123,10 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const handleOnChangeBeginAt = useCallback(
     (onChange: (y: Date) => void) => (x: Date) => {
       if (isAfter(x, getValues('finish_at')) || isEqual(x, getValues('finish_at'))) {
-        setValue('finish_at', addHours(x, 1))
+        const updatedDate = addHours(x, 1)
+        if (isValid(updatedDate)) {
+          setValue('finish_at', updatedDate)
+        }
       }
       onChange(x)
     },
@@ -133,7 +136,10 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const handleOnChangeFinishAt = useCallback(
     (onChange: (y: Date) => void) => (x: Date) => {
       if (isBefore(x, getValues('begin_at')) || isEqual(x, getValues('begin_at'))) {
-        setValue('begin_at', subHours(x, 1))
+        const updatedDate = subHours(x, 1)
+        if (isValid(updatedDate)) {
+          setValue('begin_at', updatedDate)
+        }
       }
       onChange(x)
     },
