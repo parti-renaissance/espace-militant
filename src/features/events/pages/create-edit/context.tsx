@@ -219,27 +219,18 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     }
   }
 
-  const _onSubmit = handleSubmit(finalSubmit, (x) => {
-    console.log(x)
-  })
-
-  const preOnSubmit = useDebouncedCallback(_onSubmit)
+  const _onSubmit = handleSubmit(finalSubmit)
+  const finalOnSubmit = useDebouncedCallback(_onSubmit)
 
   const { ConfirmAlert, present } = useConfirmAlert({
     title: 'Créer l’événement ?',
-    onAccept: preOnSubmit,
+    onAccept: finalOnSubmit,
     control,
     watch,
   })
 
-  const modalBeforeSubmit = handleSubmit(
-    () => present(),
-    (x) => {
-      console.log(x)
-    },
-  )
-
-  const onSubmit = edit ? preOnSubmit : modalBeforeSubmit
+  const modalBeforeSubmit = handleSubmit(() => present())
+  const onSubmit = edit ? finalOnSubmit : modalBeforeSubmit
 
   return {
     control,
