@@ -233,7 +233,6 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     title: 'Créer l’événement ?',
     onAccept: finalOnSubmit,
     control,
-    watch,
   })
 
   const modalBeforeSubmit = handleSubmit(() => present())

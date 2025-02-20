@@ -7,7 +7,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import VoxSimpleModal from '@/components/VoxSimpleModal'
 import { EventFormData } from '@/features/events/pages/create-edit/schema'
 import { BellDot, Mail } from '@tamagui/lucide-icons'
-import { Control, Controller, UseFormWatch } from 'react-hook-form'
+import { Control, Controller } from 'react-hook-form'
 import { Theme, XStack, YStack } from 'tamagui'
 import visibilityOptions from './visibility-options'
 
@@ -17,14 +17,37 @@ type ConfirmAlertProps = {
   isPending?: boolean
   title: string
   control: Control<EventFormData>
-  watch: UseFormWatch<EventFormData>
 }
 
 type ModalRef = ComponentRef<typeof VoxSimpleModal>
 
+const VisibilityReview = (props: { visibility: string }) => {
+  const visuOption = visibilityOptions.find((x) => x.value === props.visibility)
+  return visuOption ? (
+    <XStack gap="$small" alignItems="center">
+      <Theme name={visuOption.theme}>
+        {visuOption.icon ? (
+          <XStack flexGrow={1} paddingHorizontal="$medium">
+            <visuOption.icon size={20} color={visuOption.theme ? '$color5' : '$textPrimary'} />
+          </XStack>
+        ) : null}
+        <YStack flexShrink={1}>
+          <Text.MD color={visuOption.theme ? '$color5' : '$textPrimary'}>{visuOption.subLabel}</Text.MD>
+        </YStack>
+      </Theme>
+    </XStack>
+  ) : null
+}
+
 const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
   const insideRef = useRef<ModalRef>(null)
-  useImperativeHandle(ref, () => insideRef.current!)
+
+  useImperativeHandle(ref, () => ({
+    present: () => {
+      insideRef.current?.present()
+    },
+    close: insideRef.current!.close,
+  }))
   const handleCancel = () => {
     props.onCancel?.()
     insideRef.current?.close()
@@ -36,29 +59,12 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
     })
   }
 
-  const visibility = props.watch('visibility')
-
-  const visuOption = visibilityOptions.find((x) => x.value === visibility)
-
   return (
     <VoxSimpleModal ref={insideRef}>
       <VoxCard.Content justifyContent="space-between" gap="$large" $sm={{ maxWidth: 350 }} maxWidth={500}>
         <YStack gap="$medium">
           <Text.LG semibold>{props.title}</Text.LG>
-          {visuOption ? (
-            <XStack gap="$small" alignItems="center">
-              <Theme name={visuOption.theme}>
-                {visuOption.icon ? (
-                  <XStack flexGrow={1} paddingHorizontal="$medium">
-                    <visuOption.icon size={20} color={visuOption.theme ? '$color5' : '$textPrimary'} />
-                  </XStack>
-                ) : null}
-                <YStack flexShrink={1}>
-                  <Text.MD color={visuOption.theme ? '$color5' : '$textPrimary'}>{visuOption.subLabel}</Text.MD>
-                </YStack>
-              </Theme>
-            </XStack>
-          ) : null}
+          <Controller name="visibility" render={({ field }) => <VisibilityReview visibility={field.value} />} control={props.control} />
           <XStack gap="$small" alignItems="center">
             <XStack flexGrow={1} paddingHorizontal="$medium">
               <BellDot size={20} color="$textPrimary" />
@@ -81,7 +87,7 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
                       textProps={{
                         multiline: false,
                       }}
-                      onChange={(x) => field.onChange(x[0] ?? false)}
+                      onChange={(x) => field.onChange(Boolean(x[0]))}
                       value={field.value ? ['notif'] : []}
                       options={[
                         {

@@ -5,7 +5,7 @@ export type ActivistTagTypes = z.infer<typeof ActivistTagTypesSchema>
 
 export const activistTagSchema = z.object({
   label: z.string(),
-  type: ActivistTagTypesSchema,
+  type: ActivistTagTypesSchema.or(z.string()),
   code: z.string(),
 })
 

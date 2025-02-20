@@ -172,8 +172,8 @@ export const RestEventParticipantsResponse = createRestPaginationSchema(
   z.object({
     uuid: z.string().uuid(),
     image_url: z.string().url().nullable(),
-    created_at: z.string().date().nullable(),
-    type: z.string().nullable(),
+    created_at: z.string().nullable(),
+    type: z.string().nullable().optional(),
     first_name: z.string().nullable(),
     last_name: z.string().nullable(),
     postal_code: z.string().min(4).max(6).nullable(),

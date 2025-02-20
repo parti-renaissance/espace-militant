@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react'
+import { ComponentProps, PropsWithChildren } from 'react'
 import { Modal, Pressable, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
@@ -8,6 +8,7 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
   open?: boolean
   header?: React.ReactNode
+  containerProps?: ComponentProps<typeof CardFrame>
 }
 
 export const useModalOrPageScrollView = () => {
@@ -19,7 +20,7 @@ export const useModalOrPageScrollView = () => {
  * This component create a centered modal in sm and more viewport, or a page in small ones
  * @constructor
  */
-export default function ViewportModal({ children, onClose, open, header }: ModalOrPageBaseProps) {
+export default function ViewportModal({ children, onClose, open, header, containerProps }: ModalOrPageBaseProps) {
   const viewport = useMedia()
 
   if (viewport.gtSm) {
@@ -27,7 +28,7 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
       <Modal animationType={'fade'} transparent visible={!!open}>
         <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
           <View style={styles.modalView}>
-            <CardFrame>
+            <CardFrame {...containerProps}>
               {header ? header : null}
               {children}
             </CardFrame>
@@ -54,7 +55,7 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
       }}
     >
       <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-      <Sheet.Frame>
+      <Sheet.Frame {...containerProps}>
         {header ? header : null}
         {children}
       </Sheet.Frame>

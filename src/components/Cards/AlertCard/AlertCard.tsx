@@ -91,7 +91,7 @@ const AlertMeetingShareCard = ({ payload, ...props }: AlertVoxCardProps) => {
           </XStack>
         </YStack>
         <XStack gap="$small">
-          {payload.cta_label && payload.cta_url && (
+          {payload.cta_label && (
             <YStack height={32} paddingHorizontal="$medium" borderRadius="$12" borderColor="$textPrimary" borderWidth={1.5} justifyContent="center">
               <XStack gap={4} alignContent="center" alignItems="center">
                 <Check size={16} color="$textPrimary" />
@@ -111,7 +111,7 @@ const AlertMeetingShareCard = ({ payload, ...props }: AlertVoxCardProps) => {
 }
 
 const AlertMeetingCard = (props: AlertVoxCardProps) => {
-  if (!props.payload.cta_url && props.payload.cta_label === 'inscrit') {
+  if (!props.payload.cta_url) {
     return <AlertMeetingShareCard {...props} />
   }
   return <AlertMeetingSubscribeCard {...props} />
