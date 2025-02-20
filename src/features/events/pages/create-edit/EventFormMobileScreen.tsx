@@ -355,7 +355,7 @@ export default function EventFormMobileScreen() {
                             inputMode="numeric"
                             defaultValue={field.value?.toString()}
                             onBlur={field.onBlur}
-                            onChange={field.onChange}
+                            onChange={(x) => field.onChange(Number(x))}
                             iconRight={<Users size={20} color="$gray4" />}
                           />
                         </YStack>
