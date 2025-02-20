@@ -62,7 +62,22 @@ export const createEventSchema = z
       .optional()
       .transform((x) => x ?? ''),
 
-    description: requiredString('La description', 10),
+    description: z
+      .object({
+        pure: z
+          .string()
+          .optional()
+          .transform((x) => x ?? ''),
+        html: z
+          .string()
+          .optional()
+          .transform((x) => x ?? ''),
+        json: z
+          .string()
+          .optional()
+          .transform((x) => x ?? ''),
+      })
+      .optional(),
     begin_at: z.date({
       required_error: 'La date de début est obligatoire.',
     }),
@@ -103,6 +118,14 @@ export const createEventSchema = z
       }),
   })
   .superRefine((data, ctx) => {
+    if (!data.description?.pure || data.description.pure.length < 10) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'La description doit contenir au moins 10 caractères.',
+        path: ['description'],
+      })
+    }
+
     if (isAfter(new Date(), data.begin_at)) {
       ctx.addIssue({
         code: z.ZodIssueCode.invalid_date,

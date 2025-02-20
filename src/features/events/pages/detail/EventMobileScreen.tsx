@@ -101,7 +101,7 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
                 <EventPremiumChip event={event} />
               </EventItemHeader>
               {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
-              {isFull && event.description ? <EventMDXRenderer>{event.description}</EventMDXRenderer> : null}
+              {isFull && event.description ? <EventMDXRenderer>{event.json_description ?? ''}</EventMDXRenderer> : null}
               {event.name || (isFull && event.description) ? <VoxCard.Separator /> : null}
               <DateItem begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} showTime={isFull} />
               <EventLocation event={event} />

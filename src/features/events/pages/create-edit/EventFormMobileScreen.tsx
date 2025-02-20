@@ -288,7 +288,7 @@ export default function EventFormMobileScreen() {
                           <DescriptionInput
                             error={fieldState.error?.message}
                             label="Description"
-                            value={field.value}
+                            value={field.value!}
                             onChange={field.onChange}
                             onBlur={field.onBlur}
                           />

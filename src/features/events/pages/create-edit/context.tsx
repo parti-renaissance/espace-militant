@@ -94,7 +94,11 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     name: edit?.name ?? '',
     image: edit?.image,
     category: edit?.category?.slug ?? '',
-    description: edit?.description ?? '',
+    description: {
+      pure: edit ? '12345678910' : '',
+      json: edit?.json_description ?? '',
+      html: edit?.description ?? '',
+    },
     begin_at: edit?.begin_at ? new Date(edit.begin_at) : startDate,
     finish_at: edit?.finish_at ? new Date(edit.finish_at) : addHours(startDate, 1),
     time_zone: edit?.time_zone ?? 'Europe/Paris',
@@ -114,7 +118,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     send_invitation_email: edit ? undefined : true,
   } as const
 
-  const { control, handleSubmit, reset, setError, getValues, setValue, watch } = useForm<EventFormData>({
+  const { control, handleSubmit, reset, setError, getValues, setValue } = useForm<EventFormData>({
     defaultValues,
     resolver: zodResolver(createEventSchema),
     mode: 'onBlur',
@@ -157,6 +161,8 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           finish_at: formatISO(payload.finish_at),
           begin_at: formatISO(payload.begin_at),
           mode,
+          description: payload.description?.html ?? '',
+          json_description: payload.description?.json ?? '',
           visio_url: mode === 'online' ? visio_url : undefined,
           post_address: mode === 'meeting' ? post_address : undefined,
           committee: fullScope?.attributes?.committees?.[0]?.uuid ?? null,

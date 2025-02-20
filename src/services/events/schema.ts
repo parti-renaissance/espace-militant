@@ -72,6 +72,7 @@ export const RestFullEventSchema = z
   .object({
     object_state: z.literal('full'),
     description: z.string(),
+    json_description: z.string().optional(),
     committee: RestEventComitteeSchema.nullish(),
     participants_count: z.number(),
     capacity: z.number().nullable(),
@@ -209,6 +210,7 @@ export const RestPostEventRequestSchema = z.object({
   name: z.string(),
   category: z.string(),
   description: z.string(),
+  json_description: z.string().optional(),
   committee: z.string().uuid().nullable(),
   begin_at: z.string(),
   finish_at: z.string(),
@@ -233,6 +235,7 @@ export const propertyPathPostEventSchema = z.enum([
   'post_address.country',
   'category',
   'description',
+  'json_description',
   'time_zone',
   'capacity',
   'begin_at',

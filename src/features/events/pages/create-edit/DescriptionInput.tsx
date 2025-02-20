@@ -148,7 +148,7 @@ export const MyRenderer = (props: { value: string; matchContent?: boolean; prima
   )
 }
 
-export default function (props: { onChange: () => void; onBlur: () => void; value: string; label: string; error?: string }) {
+export default function (props: { onChange: () => void; onBlur: () => void; value: Payloads; label: string; error?: string }) {
   const [open, setOpen] = useState(false)
 
   const handleOnClose = () => {
@@ -170,7 +170,7 @@ export default function (props: { onChange: () => void; onBlur: () => void; valu
               </XStack>
             </XStack>
             <YStack flexGrow={1} onPress={(e) => e.bubbles} cursor="pointer" borderRadius="$space.small">
-              <MyRenderer key={props.value} value={props.value} primary />
+              <MyRenderer key={props.value.json} value={props.value.json} primary />
             </YStack>
           </YStack>
           <YStack position="absolute" bottom={0} left={0} right={0} top={0} cursor="pointer" />
@@ -188,15 +188,25 @@ export default function (props: { onChange: () => void; onBlur: () => void; valu
   )
 }
 
-type EditorRef = {
-  getJSON: () => Promise<object>
+type Payloads = {
+  html: string
+  pure: string
+  json: string
 }
 
-const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur: () => void; value: string; label: string }>((props, ref) => {
+type EditorRef = {
+  getData: () => Promise<{
+    html: string
+    pure: string
+    json: object
+  }>
+}
+
+const MyEditor = forwardRef<EditorRef, { onChange: (x: Payloads) => void; onBlur: () => void; value: Payloads; label: string }>((props, ref) => {
   const editor = useEditorBridge({
     autofocus: true,
     avoidIosKeyboard: false,
-    initialContent: parseJsonEditorContent(props.value),
+    initialContent: parseJsonEditorContent(props.value.json),
     bridgeExtensions: [
       // It is important to spread StarterKit BEFORE our extended plugin,
       // as plugin duplicated will be ignored
@@ -210,7 +220,11 @@ const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur:
 
   useImperativeHandle(ref, () => {
     return {
-      getJSON: editor.getJSON,
+      getData: async () => ({
+        html: await editor.getHTML(),
+        pure: await editor.getText(),
+        json: await editor.getJSON(),
+      }),
     }
   })
 
@@ -235,16 +249,19 @@ const MyEditor = forwardRef<EditorRef, { onChange: (x?: string) => void; onBlur:
   )
 })
 
-function ModalEditor(props: { onChange: (x: string) => void; onBlur: () => void; value: string; label: string; open: boolean }) {
+function ModalEditor(props: { onChange: (x: Payloads) => void; onBlur: () => void; value: Payloads; label: string; open: boolean }) {
   const editorRef = useRef<EditorRef | null>(null)
 
   const { isPending, mutateAsync } = useMutation({
-    mutationFn: () => editorRef.current?.getJSON() ?? Promise.resolve({}),
+    mutationFn: () => editorRef.current!.getData(),
   })
 
   const handleOnChange = useDebouncedCallback(() => {
     mutateAsync().then((x) => {
-      props.onChange(JSON.stringify(x))
+      props.onChange({
+        ...x,
+        json: JSON.stringify(x.json),
+      })
       props.onBlur()
     })
   }, 200)

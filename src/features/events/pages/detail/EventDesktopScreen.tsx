@@ -114,7 +114,7 @@ const EventDesktopMain = ({ event }: EventItemProps) => {
             <EventPremiumChip event={event} />
           </EventItemHeader>
           {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
-          {isFull && event.description ? <EventMDXRenderer>{event.description}</EventMDXRenderer> : null}
+          {isFull && event.description ? <EventMDXRenderer>{event.json_description ?? ''}</EventMDXRenderer> : null}
         </VoxCard.Content>
       </VoxCard.Content>
     </PageLayout.MainSingleColumn>

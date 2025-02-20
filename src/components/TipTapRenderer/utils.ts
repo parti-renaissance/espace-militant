@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import * as schemas from './schema'
 
 export const parseJsonEditorContent = (x: string): { content: schemas.TipTapDocument; type: 'json' } | { content: string; type: 'string' } => {
@@ -42,4 +43,16 @@ export function isTipBulletList(obj: unknown): obj is schemas.TipBulletList {
 
 export function isTipTapDocument(obj: unknown): obj is schemas.TipTapDocument {
   return schemas.tipTapDocumentSchema.safeParse(obj).success
+}
+
+export function isTipHardBreak(obj: unknown): obj is schemas.TipHardBreak {
+  return schemas.hardBreakSchema.safeParse(obj).success
+}
+
+export function isTipNonSupported(obj: unknown): obj is schemas.TipNonSupported {
+  return z
+    .object({
+      type: z.literal('non_supported'),
+    })
+    .safeParse(obj).success
 }

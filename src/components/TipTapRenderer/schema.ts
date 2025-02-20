@@ -11,12 +11,23 @@ export const textSchema = z.object({
   text: z.string(),
   marks: z.array(markSchema).optional(),
 })
-
 export type TipText = z.infer<typeof textSchema>
+
+export const hardBreakSchema = z.object({
+  type: z.literal('hardBreak'),
+})
+
+export type TipHardBreak = z.infer<typeof hardBreakSchema>
+
+export const nonSupportedSchema = z.object({
+  type: z.string().transform(() => 'non_supported' as const),
+})
+
+export type TipNonSupported = z.infer<typeof nonSupportedSchema>
 
 export const paragraphSchema = z.object({
   type: z.literal('paragraph'),
-  content: z.array(textSchema).optional(),
+  content: z.array(textSchema.or(hardBreakSchema).or(nonSupportedSchema)).optional(),
 })
 
 export type TipParagraph = z.infer<typeof paragraphSchema>
@@ -45,7 +56,7 @@ export const bulletListSchema = z.object({
 
 export type TipBulletList = z.infer<typeof bulletListSchema>
 
-const contentSchema = z.union([paragraphSchema, orderedListSchema, bulletListSchema])
+const contentSchema = z.union([paragraphSchema, orderedListSchema, bulletListSchema, nonSupportedSchema])
 
 export type TipContent = z.infer<typeof contentSchema>
 
