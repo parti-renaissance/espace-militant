@@ -38,7 +38,6 @@ export const usePageLayoutScroll = (props?: Props) => {
     let timeoutId: ReturnType<typeof setTimeout>
     const handleScroll = () => {
       if (!scrollActive || !props?.onScroll) return
-      console.log(scrollView.scrollTop)
       const nativeEvent = {
         nativeEvent: {
           contentOffset: { y: scrollView.scrollTop },

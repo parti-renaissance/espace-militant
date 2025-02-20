@@ -100,7 +100,7 @@ const EventList = () => {
   }, [paginatedFeed])
 
   return (
-    <PageLayout webScrollable>
+    <>
       <PageLayout.SideBarLeft
         $gtSm={{
           paddingTop: '$xxlarge',
@@ -123,6 +123,8 @@ const EventList = () => {
             )}
             <SectionList
               ref={listRef}
+              style={{ flex: 1 }}
+              scrollEnabled={!isWebPageLayoutScrollActive}
               onScroll={syncHeader.handleListScroll}
               onMomentumScrollEnd={syncHeader.handleMomentumScrollEnd}
               scrollEventThrottle={16}
@@ -131,7 +133,6 @@ const EventList = () => {
               maxToRenderPerBatch={10}
               removeClippedSubviews={true}
               contentContainerStyle={{
-                flexGrow: 1,
                 gap: getToken('$medium', 'space'),
                 paddingTop: media.gtLg ? getToken('$xlarge', 'space') : 195,
                 paddingLeft: media.gtSm ? getToken('$xxlarge', 'space') : undefined,
@@ -174,7 +175,6 @@ const EventList = () => {
               keyExtractor={(item) => item.uuid}
               refreshing={isRefetching}
               onRefresh={() => refetch()}
-              scrollEnabled={!isWebPageLayoutScrollActive}
               onEndReached={loadMoreNative}
               onEndReachedThreshold={0.5}
               ListFooterComponent={
@@ -197,7 +197,7 @@ const EventList = () => {
           <EventsHeader mode="aside" value={activeTab} onChange={setActiveTab} />
         </StickyBox>
       </PageLayout.SideBarRight>
-    </PageLayout>
+    </>
   )
 }
 
@@ -212,4 +212,12 @@ const styles = StyleSheet.create({
   },
 })
 
-export default EventList
+const PageEvent = () => {
+  return (
+    <PageLayout webScrollable>
+      <EventList />
+    </PageLayout>
+  )
+}
+
+export default PageEvent

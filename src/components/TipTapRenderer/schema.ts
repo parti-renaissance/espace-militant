@@ -1,8 +1,20 @@
 import { z } from 'zod'
 
-export const markSchema = z.object({
-  type: z.union([z.literal('bold'), z.literal('italic')]),
+export const linkMarkSchema = z.object({
+  type: z.literal('link'),
+  attrs: z.object({
+    href: z.string(),
+  }),
 })
+
+export type TipLinkMark = z.infer<typeof linkMarkSchema>
+
+export const markSchema = z
+  .object({
+    type: z.union([z.literal('bold'), z.literal('italic')]),
+  })
+  .or(linkMarkSchema)
+  .or(z.object({ type: z.string().transform(() => 'non_supported' as const) }))
 
 export type TipMark = z.infer<typeof markSchema>
 

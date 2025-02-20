@@ -1,4 +1,5 @@
 import Text from '@/components/base/Text'
+import { Href, Link } from 'expo-router'
 import { isWeb, XStack, YStack } from 'tamagui'
 import VoxCard from '../VoxCard/VoxCard'
 import * as S from './schema'
@@ -20,6 +21,22 @@ const RenderHardBreak: RenderFn<S.TipHardBreak> = () =>
 
 const RenderText: RenderFn<S.TipText> = ({ data }) => {
   const marks = data.marks?.map(({ type }) => type)
+  const link = data.marks?.find(U.isTipLinkMark)
+  if (link) {
+    return (
+      <Link href={link.attrs.href as Href} target="_blank">
+        <Text.SM
+          color="$blue5"
+          textDecorationLine="underline"
+          multiline
+          semibold={marks?.includes('bold')}
+          fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}
+        >
+          {data.text}
+        </Text.SM>
+      </Link>
+    )
+  }
   return (
     <Text.SM multiline secondary semibold={marks?.includes('bold')} fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}>
       {data.text}
