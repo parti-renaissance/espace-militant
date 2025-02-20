@@ -17,7 +17,7 @@ export const useShareOrCopy = () => {
     }
     shareAsync(
       Platform.select({
-        android: { message, url },
+        android: { message: `${message}\n\n${url}`, url },
         ios: { message, url },
         default: { title: message, url },
       }),
