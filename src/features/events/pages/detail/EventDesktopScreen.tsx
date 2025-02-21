@@ -16,6 +16,8 @@ import { RestItemEvent } from '@/services/events/schema'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
 import { Image, isWeb, XStack, YStack } from 'tamagui'
+import EventMDXRenderer from '../../components/EventMDXRenderer'
+import EventParticipantsSection from '../../components/EventParticipantsSection'
 import { EventToggleSubscribeButton } from '../../components/EventToggleSubscribeButton'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
 import { ScrollStack } from './EventComponents'
@@ -78,7 +80,7 @@ const EventDesktopAside = ({ event, userUuid }: EventItemProps) => {
         <VoxCard.Separator />
         <DateItem showTime={isFull} begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} />
         <EventLocation event={event} />
-        {isFull && !!event.capacity ? <VoxCard.Capacity>Capacité {event.capacity} personnes</VoxCard.Capacity> : null}
+        {isFull && !!event.capacity ? <VoxCard.Capacity>Limité à {event.capacity} inscrits</VoxCard.Capacity> : null}
         {isFull && userUuid ? <VoxCard.Attendees attendees={{ count: event.participants_count ?? 12 }} /> : null}
         {event.organizer ? (
           <VoxCard.Section title="Événement créé par :">
@@ -106,13 +108,13 @@ const EventDesktopMain = ({ event }: EventItemProps) => {
     <PageLayout.MainSingleColumn height="100%">
       <VoxCard.Content pr={0} height="100%">
         <VoxCard.Content height="100%" p={0} pr="$medium" borderRightColor="$textOutline32" borderRightWidth={1}>
-          {fallbackImage ? <VoxCard.Image image={fallbackImage} imageData={event.image} /> : null}
+          <VoxCard.Image image={fallbackImage} imageData={event.image} />
           <EventItemHeader>
             <CategoryChip>{event.category?.name}</CategoryChip>
             <EventPremiumChip event={event} />
           </EventItemHeader>
           {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
-          {isFull && event.description ? <VoxCard.Description markdown>{event.description}</VoxCard.Description> : null}
+          {isFull && event.description ? <EventMDXRenderer>{event.json_description ?? ''}</EventMDXRenderer> : null}
         </VoxCard.Content>
       </VoxCard.Content>
     </PageLayout.MainSingleColumn>
@@ -144,6 +146,7 @@ const EventDesktopScreen = ({ event, userUuid }: EventItemProps) => {
             <EventDesktopAside event={event} userUuid={userUuid} />
           </XStack>
         </VoxCard>
+        <EventParticipantsSection event={event} userUuid={userUuid} />
       </YStack>
     </ScrollStack>
   )

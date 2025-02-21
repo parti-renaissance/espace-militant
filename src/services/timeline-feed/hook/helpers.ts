@@ -50,3 +50,15 @@ export const optimisticToggleSubscribe = async (subscribe: boolean, eventId: str
   optmisticSetPaginatedShortFeedItem(optimisticParams)
   return previousData
 }
+
+export const optimisticFeedUpdate = async (payload: Partial<RestTimelineFeedItem>, eventId: string, queryClient: QueryClient) => {
+  const previousData = { shortFeedItems: getCachedPaginatedShortFeedItems(queryClient)! }
+
+  const updateShortFeedItem = (oldShortFeedItemData: RestTimelineFeedItem): RestTimelineFeedItem => {
+    if (!oldShortFeedItemData) return oldShortFeedItemData
+    return { ...oldShortFeedItemData, ...payload }
+  }
+  const optimisticParams = { id: eventId, updater: updateShortFeedItem, queryClient }
+  optmisticSetPaginatedShortFeedItem(optimisticParams)
+  return previousData
+}

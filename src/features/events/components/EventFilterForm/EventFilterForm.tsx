@@ -47,7 +47,7 @@ const EventFilters = ({ onSearchFocus }: EventFiltersProps) => {
   return (
     <YStack gap="$medium" $lg={{ flexDirection: 'row', gap: '$small' }}>
       <AssemblySelectWrapper zone={value.zone} onDetailChange={handleAssemblyChange} />
-      <YStack flex={3}>
+      <YStack flex={1}>
         <SearchBox
           label={value.detailZone ? `Dans ${value.detailZone.label}` : undefined}
           enterKeyHint="done"

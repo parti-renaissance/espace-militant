@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AppState, Platform } from 'react-native'
+import { AppState, AppStateStatus, Platform } from 'react-native'
 import { checkVersion } from 'react-native-check-version'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import NetInfo from '@react-native-community/netinfo'
@@ -16,24 +16,27 @@ const checkStoreUpdate = async () => {
   return version
 }
 
-const useAppStateOnChange = (callback: () => Promise<void> | void) => {
-  const appState = useRef(AppState.currentState)
+const handleCallback = async (callback: () => Promise<void>) => {
+  return callback().catch((error) => {
+    ErrorMonitor.log('AppStateOnChangeError', {
+      message: error.message,
+      stack: error.stack,
+    })
+  })
+}
+
+const useAppStateOnChange = (callback: () => Promise<void>) => {
+  const appState = useRef<AppStateStatus>(AppState.currentState)
+  const appHasStarted = useRef(false)
+
   useEffect(() => {
+    if (appHasStarted.current === false) {
+      handleCallback(callback)
+      appHasStarted.current = true
+    }
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        const result = callback()
-        if (result instanceof Promise) {
-          result.catch((error) => {
-            ErrorMonitor.log('AppStateOnChangeError', {
-              message: error.message,
-              stack: error.stack,
-            })
-          })
-        } else {
-          ErrorMonitor.log('AppStateOnChangeError', {
-            message: "Une erreur est survenue lors de l'exécution de la fonction de callback",
-          })
-        }
+        handleCallback(callback)
       }
       appState.current = nextAppState
     })

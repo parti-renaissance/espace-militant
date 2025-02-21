@@ -1,3 +1,4 @@
+import { activistTagSchema } from '@/data/Activist/schema'
 import { z } from 'zod'
 import { createRestPaginationSchema } from '../common/schema'
 
@@ -27,11 +28,12 @@ export const RestEventOrganizerSchema = z.object({
   instance: z.string().nullable(),
   zone: z.string().nullable(),
   image_url: z.string().nullable().optional(),
+  scope: z.string().nullable(),
 })
 
 export const RestEventComitteeSchema = z.object({
   name: z.string(),
-  link: z.string(),
+  uuid: z.string(),
 })
 
 export const RestEventAddressSchema = z.object({
@@ -70,12 +72,13 @@ export const RestFullEventSchema = z
   .object({
     object_state: z.literal('full'),
     description: z.string(),
-    committee: RestEventComitteeSchema.optional(),
+    json_description: z.string().optional(),
+    committee: RestEventComitteeSchema.nullish(),
     participants_count: z.number(),
     capacity: z.number().nullable(),
     visio_url: z.string().nullable(),
-    user_registered_at: z.string().nullable(),
     live_url: z.string().nullable(),
+    user_registered_at: z.string().nullable(),
     is_national: z.boolean(),
     editable: z.boolean(),
     edit_link: z.string().optional(),
@@ -163,3 +166,83 @@ export const RestPostPublicEventSubsciptionRequest = z.object({
   cgu_accepted: z.boolean(),
   join_newsletter: z.boolean(),
 })
+
+// ------------ Rest Event Participants --------------
+export const RestEventParticipantsRequest = z.object({ page: z.number(), scope: z.string() })
+export const RestEventParticipantsResponse = createRestPaginationSchema(
+  z.object({
+    uuid: z.string().uuid(),
+    image_url: z.string().url().nullable(),
+    created_at: z.string().nullable(),
+    type: z.string().nullable().optional(),
+    first_name: z.string().nullable(),
+    last_name: z.string().nullable(),
+    postal_code: z.string().min(4).max(6).nullable(),
+    email_address: z.string().email(),
+    phone: z.string().nullable(),
+    tags: z.array(activistTagSchema).nullable(),
+  }),
+)
+
+// ------------- Rest Events Categories -------------
+export const EventCategorySchema = z.object({
+  name: z.string(),
+  slug: z.string(),
+  description: z.string().nullable(),
+  alert: z.string().nullish(),
+})
+
+export type EventCategory = z.infer<typeof EventCategorySchema>
+
+export const RestGetEventCategoriesResponseSchema = z.array(EventCategorySchema)
+
+// ------------ REST CREATE EVENT ---------------\
+
+const postAddressSchema = z.object({
+  address: z.string().nullish(),
+  postal_code: z.string().nullish(),
+  city_name: z.string().nullish(),
+  country: z.string().nullish(),
+})
+
+export type RestPostEventRequest = z.infer<typeof RestPostEventRequestSchema>
+export const RestPostEventRequestSchema = z.object({
+  name: z.string(),
+  category: z.string(),
+  description: z.string(),
+  json_description: z.string().optional(),
+  committee: z.string().uuid().nullable(),
+  begin_at: z.string(),
+  finish_at: z.string(),
+  capacity: z.number().optional(),
+  mode: z.enum(['online', 'meeting']),
+  visio_url: z.string().optional(),
+  post_address: postAddressSchema.optional(),
+  time_zone: z.string(),
+  electoral: z.boolean().optional(),
+  visibility: EventVisibilitySchema,
+  live_url: z.string().optional(),
+})
+
+export const RestPostEventResponseSchema = RestFullEventSchema
+
+export const propertyPathPostEventSchema = z.enum([
+  'name',
+  'post_address',
+  'post_address.address',
+  'post_address.postal_code',
+  'post_address.city_name',
+  'post_address.country',
+  'category',
+  'description',
+  'json_description',
+  'time_zone',
+  'capacity',
+  'begin_at',
+  'finish_at',
+  'mode',
+  'visio_url',
+  'electoral',
+  'visibility',
+  'live_url',
+])

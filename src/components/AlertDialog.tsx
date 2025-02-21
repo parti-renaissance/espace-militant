@@ -1,6 +1,6 @@
 import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
 import { AlertDialog, isWeb, ThemeName, XStack, YStack } from 'tamagui'
-import { VoxButton } from './Button'
 
 type AlertDialogProps = {
   children: React.ReactNode

@@ -1,8 +1,8 @@
-import { ComponentProps, forwardRef, useEffect, useState } from 'react'
-import { GestureResponderEvent, LayoutChangeEvent, NativeSyntheticEvent, TextInput, TextInputFocusEventData, TextInputProps } from 'react-native'
+import { ComponentProps, ComponentRef, forwardRef, useEffect, useMemo, useState } from 'react'
+import { GestureResponderEvent, LayoutChangeEvent, NativeSyntheticEvent, Platform, TextInput, TextInputFocusEventData, TextInputProps } from 'react-native'
 import Text from '@/components/base/Text'
 import { useForwardRef } from '@/hooks/useForwardRef'
-import { AlertCircle } from '@tamagui/lucide-icons'
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
 import { AnimatePresence, isWeb, Spinner, styled, TamaguiElement, useTheme, XStack, YStack } from 'tamagui'
 
 export type InputProps = {
@@ -11,6 +11,7 @@ export type InputProps = {
   error?: string
   label?: string
   placeholder?: string
+  bottomSheetInput?: boolean
   disabled?: boolean
   loading?: boolean
   iconLeft?: React.ReactNode
@@ -26,24 +27,6 @@ export type InputProps = {
   }
 } & Omit<TextInputProps, 'placeholder' | 'onChange'>
 
-const sizes = {
-  xs: {
-    height: 40,
-  },
-  sm: {
-    height: 44,
-  },
-  md: {
-    height: 48,
-  },
-  lg: {
-    height: 52,
-  },
-  xl: {
-    height: 64,
-  },
-} as const
-
 const InputFrame = styled(XStack, {
   name: 'Input',
   gap: '$small',
@@ -51,13 +34,13 @@ const InputFrame = styled(XStack, {
   minWidth: 100,
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: '$10',
+  borderRadius: 22,
   paddingHorizontal: '$medium',
   borderWidth: 2,
   borderColor: '$colorTransparent',
   animation: 'bouncy',
   hoverStyle: {
-    backgroundColor: 'rgba(237, 239, 242, 1)',
+    backgroundColor: '$gray2',
     cursor: 'text',
   },
   focusStyle: {
@@ -71,11 +54,6 @@ const InputFrame = styled(XStack, {
   },
 
   variants: {
-    multiline: {
-      true: {
-        alignItems: 'flex-start',
-      },
-    },
     fake: {
       true: {
         hoverStyle: {
@@ -107,19 +85,41 @@ const InputFrame = styled(XStack, {
       },
     },
     size: {
-      xs: {},
-      sm: {},
-      md: {},
-      lg: {},
+      xs: {
+        borderRadius: 20,
+        height: 40,
+      },
+      sm: {
+        height: 44,
+        borderRadius: 22,
+      },
+      md: {
+        height: 48,
+        borderRadius: 24,
+      },
+      lg: {
+        height: 56,
+        borderRadius: 28,
+      },
       xl: {
+        height: 56,
+        borderRadius: 28,
         paddingVertical: '$xsmall',
         paddingHorizontal: '$large',
+      },
+    },
+    multiline: {
+      true: {
+        alignItems: 'flex-start',
+        height: 'auto',
+        minHeight: 56 + 40,
+        borderRadius: 28,
       },
     },
   } as const,
 })
 
-export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
+export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>(function Input(_props, ref) {
   const {
     size,
     color,
@@ -139,6 +139,7 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
     onChange,
     frameRef,
     fakeProps,
+    bottomSheetInput,
     ...inputProps
   } = _props
   const [isFocused, setIsFocused] = useState(false)
@@ -172,6 +173,7 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
     if (el) {
       const lastHeight = el.style.height
       el.style.height = 0
+
       const newHeight = el.offsetHeight - el.clientHeight + el.scrollHeight
 
       if (newHeight < 200) {
@@ -198,7 +200,6 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
     }
   }, [type])
 
-  const calcSize = sizes[size ?? 'lg'].height
   const theme = useTheme()
 
   const defaultFakeTextProps = {
@@ -210,6 +211,7 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
   }
 
   const FakeTextComponent = fakeProps?.customTextComponent ?? Text.MD
+  const DynInput = useMemo(() => (bottomSheetInput ? BottomSheetTextInput : TextInput), [])
 
   return (
     <YStack gap="$xsmall" flex={1} ref={frameRef}>
@@ -218,40 +220,37 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
         color={color ?? 'white'}
         error={isFailed}
         fake={fake}
-        size={size}
+        multiline={inputProps.multiline}
+        size={inputProps.multiline ? undefined : (size ?? 'lg')}
         forceStyle={isFocused ? 'focus' : undefined}
         onPress={handlePress}
-        minHeight={inputProps.multiline ? Math.round(calcSize + 40) : calcSize}
       >
         {!loading && iconLeft && (
           <YStack height="100%" justifyContent="center">
             {iconLeft}
           </YStack>
         )}
-        <YStack
-          gap="$xsmall"
-          height="100%"
-          flex={1}
-          justifyContent={inputProps.multiline ? undefined : 'center'}
-          paddingTop={inputProps.multiline ? '$medium' : 'xsmall'}
-        >
+        <YStack height="auto" flex={1} paddingTop={inputProps.multiline ? '$medium' : 0}>
           <AnimatePresence>
-            {(label || (placeholder && inputProps.value && inputProps.value.length > 0)) && (
+            {(label ||
+              (placeholder && inputProps.value && inputProps.value.length > 0) ||
+              (placeholder && inputProps.defaultValue && inputProps.defaultValue.length > 0)) && (
               <XStack alignSelf="flex-start" width="100%">
-                <Text.SM flex={1} color={error ? '$orange7' : '$textPrimary'} numberOfLines={1}>
+                <Text.XSM flex={1} color={error ? '$orange5' : '$textPrimary'} numberOfLines={1}>
                   {label ?? placeholder}
-                </Text.SM>
+                </Text.XSM>
               </XStack>
             )}
           </AnimatePresence>
           {fake ? (
             <FakeTextComponent {...defaultFakeTextProps} />
           ) : (
-            <TextInput
+            <DynInput
               style={{
                 color: theme.textPrimary.val,
                 padding: 0,
                 fontSize: 14,
+                height: Platform.OS === 'android' ? 18 : 'auto',
                 width: '100%',
                 fontWeight: isWeb ? (inputProps.value ? 500 : 400) : undefined,
               }}
@@ -272,17 +271,13 @@ export default forwardRef<TextInput, InputProps>(function Input(_props, ref) {
             />
           )}
         </YStack>
-        {!loading && iconRight && (
-          <YStack height="100%" justifyContent="center" onPress={onIconRightPress}>
-            {iconRight}
-          </YStack>
-        )}
-        {loading && <Spinner color="$blue7" />}
+        {!loading && iconRight ? <XStack onPress={onIconRightPress}>{iconRight}</XStack> : null}
+
+        {loading ? <Spinner color="$blue7" /> : null}
       </InputFrame>
       {error && (
         <XStack gap="$small" alignItems="center" pl="$medium">
-          <AlertCircle color="$orange7" size={12} />
-          <Text.SM color="$orange7">{error}</Text.SM>
+          <Text.XSM color="$orange5">{error}</Text.XSM>
         </XStack>
       )}
     </YStack>

@@ -109,6 +109,7 @@ export type SkeCardDescritionProps = {
   full?: boolean
 }
 
+const SkeCardLine = ({ width }: { width: number }) => <Stack height="$1" bg={SkeletonColor} width={width} />
 const SkeCardDescription = ({ full }: SkeCardDescritionProps) => {
   return (
     <YStack gap="$small">
@@ -145,6 +146,7 @@ export const SkeCard = withStaticProperties(SkeCardFrame, {
   Section: SkeCardSection,
   Description: SkeCardDescription,
   Button: SkeCardButton,
+  Line: SkeCardLine,
 })
 
 export default SkeCard

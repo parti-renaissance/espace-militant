@@ -1,3 +1,4 @@
+import { activistTagSchema, ActivistTagTypes } from '@/data/Activist/schema'
 import { z } from 'zod'
 
 // -----------------  RestProfil  -----------------
@@ -6,8 +7,7 @@ export type RestProfilRequest = z.infer<typeof RestProfilRequestSchema>
 export const RestProfilRequestSchema = z.void()
 
 export type RestProfilResponse = z.infer<typeof RestProfilResponseSchema>
-export const TagTypesSchema = z.union([z.literal('sympathisant'), z.literal('adherent'), z.literal('elu')])
-export type RestProfilResponseTagTypes = z.infer<typeof TagTypesSchema>
+export type RestProfilResponseTagTypes = ActivistTagTypes
 
 const RestProfilInstancesSchema = z
   .object({
@@ -57,13 +57,7 @@ export const RestProfilResponseSchema = z.object({
       last_month: z.number(),
     })
     .optional(),
-  tags: z.array(
-    z.object({
-      label: z.string(),
-      type: TagTypesSchema,
-      code: z.string(),
-    }),
-  ),
+  tags: z.array(activistTagSchema),
 })
 
 // -----------------  RestDetailedProfile  -----------------
@@ -150,6 +144,12 @@ export const RestUserScopesResponseSchema = z.array(
         uuid: z.string().uuid(),
       }),
     ),
+    attributes: z
+      .object({
+        committees: z.array(z.object({ name: z.string(), uuid: z.string().uuid() })),
+        dpt: z.string(),
+      })
+      .nullable(),
     apps: z.array(z.string()),
     features: z.array(z.string()),
   }),

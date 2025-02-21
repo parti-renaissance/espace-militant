@@ -25,37 +25,28 @@ async function actionHandler() {
       console.log(chalk.red('PLATFORM is not defined'))
       process.exit(2)
     }
+    const platform = ['ios', 'android'].includes(process.env.PLATFORM) ? process.env.PLATFORM : 'all'
+
     console.log('REF TYPE IS', process.env.REF_TYPE, '\n')
     switch (process.env.EAS_WORKFLOW_TYPE) {
       case 'update': {
-        if (process.env.WORKFLOW_ENVIRONMENT === 'production') {
           console.log(chalk.magenta('Will do an update on main channel...'))
           console.log(chalk.magenta(`Expo runtime version ${candidate}.`))
-          const expoUpdateCommandBase = `eas update --channel main --platform ${process.env.PLATFORM} --auto`
+          const expoUpdateCommandBase = `eas update --auto --platform ${platform}`
           await aExec(expoUpdateCommandBase)
           process.exit(0)
-        }
-        if (process.env.WORKFLOW_ENVIRONMENT === 'staging') {
-          console.log(chalk.magenta('Will do an update on staging channel...'))
-          console.log(chalk.magenta(`Expo runtime version ${candidate}.`))
-          const expoUpdateCommandBase = `eas update --channel develop --platform ${process.env.PLATFORM} --auto`
-          await aExec(expoUpdateCommandBase)
-          process.exit(0)
-        }
-        console.log(chalk.red(`Unknown WORKFLOW_ENVIRONMENT ${process.env.WORKFLOW_ENVIRONMENT}`))
-        process.exit(2)
         break;
       }
       case 'build': {
-        const expoCommandBase = `eas build --non-interactive --no-wait`
+        const expoCommandBase = `eas build --non-interactive --no-wait --platform ${platform}`
         if (process.env.WORKFLOW_ENVIRONMENT === 'production') {
           console.log(chalk.magenta('Will do a build on production env...'))
-          await aExec(`${expoCommandBase} --profile production --auto-submit --platform ${process.env.PLATFORM}`)
+          await aExec(`${expoCommandBase} --profile production --auto-submit`)
           process.exit(0)
         }
         if (process.env.WORKFLOW_ENVIRONMENT === 'staging') {
           console.log(chalk.blue('Will do a build on staging env...'))
-          const promise = aExec(`${expoCommandBase} --profile staging --platform ${process.env.PLATFORM}`)
+          const promise = aExec(`${expoCommandBase} --profile staging`)
           const child  = promise.child
           child.stdout.on('data', function(data) {
               console.log(data);
@@ -88,8 +79,6 @@ async function actionHandler() {
     }
     process.exit(3)
   }
-
-
 }
 
 

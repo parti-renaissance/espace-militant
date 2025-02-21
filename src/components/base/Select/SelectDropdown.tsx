@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactNode, RefObject, useCallback, useImperativeHandle, useRef, useState } from 'react'
+import React, { ComponentRef, forwardRef, ReactNode, RefObject, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { FlatList, GestureResponderEvent, Modal, TouchableOpacity } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { YStack } from 'tamagui'
@@ -6,6 +6,7 @@ import { DropdownFrame, DropdownItem } from '../Dropdown'
 import Input from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
+import { reactTextNodeChildrenToString } from './utils'
 
 type ModalDropDownProps = {
   children: ReactNode
@@ -29,13 +30,16 @@ const ModalDropDown = forwardRef<ModalDropDownRef, ModalDropDownProps>((props, r
   const handleClose = useCallback(() => {
     setIsOpen(false)
     props.onClose()
-  }, [])
+  }, [props.onClose])
 
-  const handleBackDropClose = useCallback((event: GestureResponderEvent) => {
-    if (event.target == event.currentTarget) {
-      handleClose()
-    }
-  }, [])
+  const handleBackDropClose = useCallback(
+    (event: GestureResponderEvent) => {
+      if (event.target == event.currentTarget) {
+        handleClose()
+      }
+    },
+    [handleClose],
+  )
 
   return (
     <Modal visible={isOpen} transparent animationType="fade" onRequestClose={handleClose}>
@@ -47,7 +51,7 @@ const ModalDropDown = forwardRef<ModalDropDownRef, ModalDropDownProps>((props, r
 })
 
 type DropDownLogicProps = {
-  frameRef: RefObject<TouchableOpacity>
+  frameRef: RefObject<ComponentRef<typeof TouchableOpacity>>
 } & SelectProps<string>
 
 const MIN_WIDTH = 200
@@ -84,7 +88,10 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
         }
         setTimeout(() => queryInputRef.current?.focus(), 100)
       },
-      close: () => modalRef.current?.close(),
+      close: () => {
+        modalRef.current?.close()
+        props.onBlur?.()
+      },
       setModalPosition,
     }),
     [],
@@ -95,13 +102,15 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
     setQuery('')
   }
 
-  const handleSelect = (payload: { title: string; id: string }) => () => {
+  const handleSelect = (payload: (typeof filteredItems)[number]) => () => {
     props.onChange?.(payload.id)
     props.onDetailChange?.({
       value: payload.id,
-      label: payload.title,
+      label: reactTextNodeChildrenToString(payload.title),
+      subLabel: payload.subtitle,
     })
     modalRef.current?.close()
+    props.onBlur?.()
     setQuery('')
   }
 
@@ -132,6 +141,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
                       onChangeText={setQuery}
                       placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
                       iconRight={searchableIcon}
+                      loading={searchableOptions?.isFetching}
                     />
                   </YStack>
                 ) : null

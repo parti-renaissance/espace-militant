@@ -79,9 +79,6 @@ const HomeScreen: React.FC = () => {
           >
             <ScopeModal />
             <HomeFeedList />
-            {/* <YStack gap="$medium" flex={1} justifyContent="center" alignItems="center">
-              <Text>Hello</Text>
-            </YStack> */}
           </BoundarySuspenseWrapper>
         </PageLayout.MainSingleColumn>
         <PageLayout.SideBarRight

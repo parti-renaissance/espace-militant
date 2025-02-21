@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import Menu from '@/components/menu/Menu'
+import clientEnv from '@/config/clientEnv'
 import { useSession } from '@/ctx/SessionProvider'
 import { useUserStore } from '@/store/user-store'
-import { LogOut } from '@tamagui/lucide-icons'
+import { LogOut, PenLine } from '@tamagui/lucide-icons'
 import { Href, Link, usePathname } from 'expo-router'
 import omit from 'lodash/omit'
 import { isWeb, useMedia, YStack } from 'tamagui'
@@ -15,7 +16,7 @@ const mapPageConfigs = (config: typeof pageConfigs) =>
         key: screenName,
         icon: options.icon,
         children: options.title,
-        pathname: ('/profil' + (screenName === 'index' ? '' : '/' + screenName)) as Href<string>,
+        pathname: ('/profil' + (screenName === 'index' ? '' : '/' + screenName)) as Href,
       }) as const,
   )
 
@@ -48,6 +49,15 @@ const ProfilMenu = () => {
           <Item item={item} index={index} key={item.key} />
         ))}
       </Menu>
+      {clientEnv.ENVIRONMENT === 'staging' ? (
+        <Menu>
+          <Link href="/storybook" asChild={!isWeb}>
+            <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} icon={PenLine} last={true}>
+              StoryBook
+            </Menu.Item>
+          </Link>
+        </Menu>
+      ) : null}
       <Menu>
         <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} onPress={signOut} icon={LogOut} last={true}>
           {credentials?.isAdmin ? 'Quitter l’impersonnification' : 'Me déconnecter'}

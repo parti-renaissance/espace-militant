@@ -1,5 +1,5 @@
 import React, { ComponentProps, forwardRef, useCallback } from 'react'
-import { Pressable, TextInput, TextInputProps } from 'react-native'
+import { Platform, Pressable, TextInput, TextInputProps } from 'react-native'
 import Input from '@/components/base/Input/Input'
 import { useForwardRef } from '@/hooks/useForwardRef'
 import { Filter, Search, XCircle } from '@tamagui/lucide-icons'
@@ -26,7 +26,7 @@ const SearchBox = forwardRef<TextInput, SearchBoxProps>(({ label, value, onChang
 
   return (
     <Input
-      placeholder="Rechercher"
+      placeholder={Platform.OS === 'android' ? 'Rech...' : 'Rechercher'}
       label={label}
       size="sm"
       ref={searchInputRef}

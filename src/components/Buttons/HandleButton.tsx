@@ -6,7 +6,7 @@ import { TamaguiElement } from 'tamagui'
 const HandleButton = forwardRef<TamaguiElement, ComponentPropsWithoutRef<typeof VoxButton>>((props, ref) => {
   return (
     <VoxButton ref={ref} variant="outlined" theme="purple" iconLeft={Sparkle} {...props}>
-      Gérer
+      {props.children ?? 'Gérer'}
     </VoxButton>
   )
 })

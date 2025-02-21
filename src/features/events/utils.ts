@@ -1,7 +1,5 @@
 import { RestFullEvent, RestItemEvent, RestPartialEvent } from '@/services/events/schema'
-import { useToastController } from '@tamagui/toast'
 import { isAfter, isBefore, subHours } from 'date-fns'
-import * as Clipboard from 'expo-clipboard'
 
 export const isEventPast = (event: Partial<RestItemEvent>) => {
   const date = event.finish_at || event.begin_at
@@ -78,7 +76,7 @@ export const isEventEditable = (
   editable: true
   edit_link: string
 } => {
-  return Boolean(isEventFull(event) && event.editable && event.edit_link)
+  return Boolean(isEventFull(event) && event.editable && event.edit_link && !isEventCancelled(event))
 }
 
 export const isEventRegister = (
@@ -112,18 +110,6 @@ export const getEventDetailImageFallback = (event: Partial<RestItemEvent>) => {
   return event.image?.url ?? require('@/features/events/assets/images/event-fallback.png')
 }
 
-export function useHandleCopyUrl() {
-  const toast = useToastController()
-  return (shareUrl: string) =>
-    Clipboard.setStringAsync(shareUrl)
-      .then(() => {
-        toast.show('Lien copié', { type: 'info' })
-      })
-      .catch(() => {
-        toast.show('Erreur lors de la copie du lien', { type: 'error' })
-      })
-}
-
 export const isEventHasNationalLive = (
   event: Partial<RestItemEvent>,
 ): event is Partial<RestFullEvent> & {
@@ -131,11 +117,9 @@ export const isEventHasNationalLive = (
   live_url: string
 } => {
   if (!isEventFull(event)) {
-    console.log('event is not full')
     return false
   }
   if (!event.live_url) {
-    console.log('live_url is not defined')
     return false
   }
 

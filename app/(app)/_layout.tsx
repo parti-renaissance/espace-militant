@@ -23,8 +23,8 @@ export default function AppLayout() {
         </VoxHeader>
       ) : null}
 
-      <View style={{ height: isWeb ? 'calc(100vh - 100px)' : '100%', flex: 1 }}>
-        <Stack screenOptions={{ animation: 'slide_from_right' }}>
+      <View style={{ height: isWeb ? 'calc(100vh - 100px)' : '100%', flex: 1 }} backgroundColor="white">
+        <Stack screenOptions={{ animation: 'slide_from_right', fullScreenGestureEnabled: true }}>
           <Stack.Screen
             name="(tabs)"
             options={{
@@ -40,7 +40,7 @@ export default function AppLayout() {
             }}
           ></Stack.Screen>
           <Stack.Screen
-            name="evenements/[id]"
+            name="evenements/[id]/index"
             options={{
               headerTransparent: true,
               header: ({ navigation }) => {
@@ -52,6 +52,22 @@ export default function AppLayout() {
                   </VoxHeader>
                 ) : null
               },
+            }}
+          />
+
+          <Stack.Screen
+            name="evenements/[id]/modifier"
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="evenements/creer"
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
             }}
           />
           <Stack.Screen name="porte-a-porte/building-detail" options={{ title: '' }} />
