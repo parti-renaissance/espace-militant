@@ -126,6 +126,14 @@ export const createEventSchema = z
       })
     }
 
+    if (data.description?.pure && data.description.pure.length > 10000) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'La description ne peut pas dépasser 10000 caractères.',
+        path: ['description'],
+      })
+    }
+
     if (isAfter(new Date(), data.begin_at)) {
       ctx.addIssue({
         code: z.ZodIssueCode.invalid_date,
