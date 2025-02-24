@@ -148,7 +148,7 @@ export const MyRenderer = (props: { value: string; matchContent?: boolean; prima
   )
 }
 
-export default function (props: { onChange: () => void; onBlur: () => void; value: Payloads; label: string; error?: string }) {
+export default function (props: { onChange: (x: Payloads) => void; onBlur: () => void; value: Payloads; label: string; error?: string }) {
   const [open, setOpen] = useState(false)
 
   const handleOnClose = () => {
