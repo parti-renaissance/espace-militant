@@ -111,6 +111,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           city: edit.post_address.city ?? undefined,
           city_name: edit.post_address.city_name ?? undefined,
           country: edit.post_address.country ?? undefined,
+          postal_code: edit.post_address.postal_code ?? undefined,
         }
       : undefined,
     visibility: edit?.visibility ?? 'public',
