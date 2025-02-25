@@ -1,7 +1,6 @@
 import React, { forwardRef, memo, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { FlatList, ListRenderItemInfo } from 'react-native'
 import { FormFileImage } from '@/components/base/FormFileUpload/FormFileImage'
-import Input from '@/components/base/Input/Input'
 import Select, { SelectOption } from '@/components/base/Select/SelectV3'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
@@ -9,13 +8,14 @@ import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import * as metatags from '@/config/metatags'
 import DescriptionInput from '@/features/events/pages/create-edit/DescriptionInput'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
-import * as S from '@/features/message/pages/create-update/schema'
-import { ChevronDown, ChevronUp, Heading1, Image, Link, Plus, Text, Trash } from '@tamagui/lucide-icons'
+import TestMessage from '@/features/message/data/test'
+import * as S from '@/features/message/schemas/messageBuilderSchema'
+import { ChevronDown, ChevronUp, Image, Link, Plus, Text, Trash } from '@tamagui/lucide-icons'
 import Head from 'expo-router/head'
 import { uniqueId } from 'lodash'
 import { Control, Controller, useForm } from 'react-hook-form'
 import { View, XStack, YStack } from 'tamagui'
-import TestMessage from './test'
+import headingImagePlaceholderNode from '../../data/headingImagePlaceholder'
 import { createNodeByType, getDefaultFormValues, unZipMessage, updateNode, zipMessage } from './utils'
 
 const dataTest = S.MessageSchema.safeParse(TestMessage)
@@ -37,11 +37,6 @@ const fieldOptions: SelectOption<S.NodeType>[] = [
     label: 'Un bouton',
     icon: Link,
     value: 'button',
-  },
-  {
-    label: 'Un titre',
-    icon: Heading1,
-    value: 'title',
   },
   {
     value: 'image',
@@ -82,21 +77,8 @@ const RenderField = (props: { type: S.NodeType; control: Control<S.MessageFormVa
           )}
         />
       )
-    case 'title':
-      return (
-        <Controller
-          control={props.control}
-          name={`title.${props.uuid}`}
-          render={({ field }) => (
-            <Input
-              defaultValue={field.value?.text}
-              placeholder="Titre"
-              onChange={(x) => field.onChange({ ...createNodeByType('title'), text: x })}
-              color="gray"
-            />
-          )}
-        />
-      )
+    default:
+      return null
   }
 }
 
@@ -214,7 +196,7 @@ const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function Rend
 
 function _EventFormScreen() {
   const defaultField = {
-    type: 'title',
+    type: 'image',
     id: uniqueId(),
   } as const
 
@@ -224,7 +206,7 @@ function _EventFormScreen() {
         struct: [defaultField] as S.FieldsArray,
         states: {
           ...getDefaultFormValues(),
-          ['title']: { [defaultField.id]: createNodeByType('title') },
+          ['image']: { [defaultField.id]: headingImagePlaceholderNode },
         } as S.MessageFormValues,
       }
 

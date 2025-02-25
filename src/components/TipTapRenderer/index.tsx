@@ -106,7 +106,7 @@ const RenderOrderedList: RenderFn<S.TipOrderedList> = ({ data: { content } }) =>
   )
 }
 
-const RenderContent: RenderFn<S.TipContent[]> = ({ data }) => {
+export const RenderContent: RenderFn<S.TipContent[]> = ({ data }) => {
   return data.map((x, i) => {
     if (U.isTipNonSupported(x)) {
       return <RenderNonSupported key={i + x.type} data={x} />

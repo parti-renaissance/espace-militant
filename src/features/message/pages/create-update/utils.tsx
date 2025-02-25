@@ -1,14 +1,7 @@
+import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { uniqueId } from 'lodash'
-import * as S from './schema'
 
 type NodeCreator<I extends S.Node> = () => I
-
-const createTitle: NodeCreator<S.TitleNode> = () => {
-  return {
-    type: 'title',
-    text: '',
-  }
-}
 
 const createImage: NodeCreator<S.ImageNode> = () => {
   return {
@@ -40,8 +33,6 @@ export const createNodeByType = (type: S.NodeType) => {
       return createButton()
     case 'doc':
       return createRichText()
-    case 'title':
-      return createTitle()
   }
 }
 
