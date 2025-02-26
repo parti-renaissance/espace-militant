@@ -1,19 +1,17 @@
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { uniqueId } from 'lodash'
+import headingImagePlaceholderNode from '../../data/headingImagePlaceholder'
 
 type NodeCreator<I extends S.Node> = () => I
 
 const createImage: NodeCreator<S.ImageNode> = () => {
-  return {
-    type: 'image',
-    image: null,
-  }
+  return headingImagePlaceholderNode as S.ImageNode
 }
 
 const createRichText: NodeCreator<S.RichTextNode> = () => {
   return {
     type: 'doc',
-    content: [],
+    content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Nouveau block text' }] }],
   }
 }
 
@@ -21,7 +19,8 @@ const createButton: NodeCreator<S.ButtonNode> = () => {
   return {
     type: 'button',
     link: '',
-    label: '',
+    label: 'Nouveau bloc bouton',
+    marks: ['primary'],
   }
 }
 

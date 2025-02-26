@@ -70,6 +70,14 @@ export default function AppLayout() {
               gestureEnabled: false,
             }}
           />
+
+          <Stack.Screen
+            name="message/creer"
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
+            }}
+          />
           <Stack.Screen name="porte-a-porte/building-detail" options={{ title: '' }} />
           <Stack.Screen name="porte-a-porte/tunnel" options={{ presentation: 'fullScreenModal', headerShown: false }} />
         </Stack>

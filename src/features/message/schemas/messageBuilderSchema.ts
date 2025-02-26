@@ -41,6 +41,11 @@ export type MessageFormValues = {
   [K in NodeType]: Record<string, Extract<Node, { type: K }>>
 }
 
+export type GlobalForm = {
+  selectedField: FieldsArray[number] | null
+  formValues: MessageFormValues
+}
+
 export type FieldsArray = { type: NodeType; id: string }[]
 export const nodeTypesArray: NodeType[] = ['image', 'doc', 'button']
 
