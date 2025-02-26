@@ -3,6 +3,7 @@ import { FlatList, ListRenderItemInfo, StyleSheet } from 'react-native'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
+import VoxCard from '@/components/VoxCard/VoxCard'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import { ButtonRenderer } from '@/features/message/components/NodeRenderer/ButtonRenderer'
 import { ImageRenderer } from '@/features/message/components/NodeRenderer/ImageRenderer'
@@ -15,6 +16,7 @@ import { isWeb, YStack } from 'tamagui'
 import { StyleRendererContextProvider } from '../../context/styleRenderContext'
 import headingImagePlaceholderNode from '../../data/headingImagePlaceholder'
 import defaultTheme from '../../themes/default-theme'
+import { NodeEditor } from './components/NodeEditor'
 import { NodeSelectorWrapper } from './components/NodeSelectorWrapper'
 import MessageEditorToolbar, { MessageEditorToolBarRef } from './components/ToolBar'
 import { RenderFieldRef } from './types'
@@ -214,6 +216,11 @@ function _EventFormScreen() {
       </PageLayout.MainSingleColumn>
       <PageLayout.SideBarRight maxWidth={300} showOn="gtLg">
         <VoxButton onPress={onSubmit}>handle submit</VoxButton>
+        <VoxCard>
+          <VoxCard.Content>
+            <NodeEditor control={control} />
+          </VoxCard.Content>
+        </VoxCard>
       </PageLayout.SideBarRight>
     </>
   )
