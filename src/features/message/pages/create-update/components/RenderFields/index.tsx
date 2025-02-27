@@ -1,5 +1,6 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { FlatList, ListRenderItemInfo, StyleSheet } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { RenderFieldRef } from '@/features/message/pages/create-update/types'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { Control } from 'react-hook-form'
@@ -14,6 +15,7 @@ type RenderFieldsProps = {
 export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function RenderFields(props, ref) {
   const [fields, setFields] = useState<S.FieldsArray>(props.defaultStruct)
   const scrollRef = useRef<FlatList>(null)
+  const insets = useSafeAreaInsets()
 
   useImperativeHandle(ref, () => {
     return {
@@ -32,6 +34,7 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
           scrollRef.current?.scrollToIndex({
             index,
             viewPosition: 0.5,
+            viewOffset: insets.top,
             animated: true,
           })
         }
@@ -58,9 +61,11 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
       moveField: (field, distance) => {
         setFields((xs) => {
           const fieldIndex = xs.findIndex((x) => x.id === field.id)
+          const clamp = (x: number) => Math.min(Math.max(x, 0), xs.length)
           if (fieldIndex === -1) return xs
+          const mesureDistance = clamp(fieldIndex + distance)
           const fieldRemoved = [...xs.slice(0, fieldIndex), ...xs.slice(fieldIndex + 1)]
-          const fieldMoved = [...fieldRemoved.slice(0, fieldIndex + distance), field, ...fieldRemoved.slice(fieldIndex + distance)]
+          const fieldMoved = [...fieldRemoved.slice(0, mesureDistance), field, ...fieldRemoved.slice(mesureDistance)]
           return fieldMoved
         })
       },
@@ -70,13 +75,21 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
   const RenderItem = useCallback(({ item }: ListRenderItemInfo<S.FieldsArray[number]>) => <RenderField control={props.control} field={item} />, [])
 
   const keyExtractor = useCallback((props: S.FieldsArray[number]) => props.id, [])
+  const reTryScrollOnFail = useCallback((info: { index: number }) => {
+    const wait = new Promise((resolve) => setTimeout(resolve, 500))
+    wait.then(() => {
+      scrollRef.current?.scrollToIndex({ index: info.index, animated: true })
+    })
+  }, [])
 
   return (
     <FlatList
       style={renderFieldsStyle.flatlist}
       ref={scrollRef}
-      contentContainerStyle={renderFieldsStyle.flatlistContainer}
+      contentContainerStyle={[renderFieldsStyle.flatlistContainer]}
+      contentInset={{ bottom: insets.bottom + 68, top: insets.top }}
       data={fields}
+      onScrollToIndexFailed={reTryScrollOnFail}
       renderItem={RenderItem}
       keyExtractor={keyExtractor}
     />
@@ -86,13 +99,12 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
 const renderFieldsStyle = StyleSheet.create({
   flatlist: {
     flex: 1,
-    width: 600,
+    backgroundColor: 'hsl(240, 9%, 98%)',
+    // width: 600,
   },
   flatlistContainer: {
     backgroundColor: 'white',
-    borderRadius: 16,
-    marginTop: 50,
     overflow: 'hidden',
-    marginBottom: 200,
+    borderRadius: 16,
   },
 })

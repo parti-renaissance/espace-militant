@@ -17,7 +17,7 @@ export const ImageRenderer = (props: { data: S.ImageNode }) => {
 
   return (
     <View style={[containerStyle]}>
-      <Image contentFit={'contain'} source={{ uri: props.data.image.url }} style={[styles.image, dynStyle, baseStyle as ImageStyle]} />
+      <Image contentFit={'cover'} source={{ uri: props.data.image.url }} style={[styles.image, dynStyle, baseStyle as ImageStyle]} />
     </View>
   )
 }
@@ -25,6 +25,5 @@ export const ImageRenderer = (props: { data: S.ImageNode }) => {
 const styles = StyleSheet.create({
   image: {
     flex: 1,
-    width: '100%',
   },
 })

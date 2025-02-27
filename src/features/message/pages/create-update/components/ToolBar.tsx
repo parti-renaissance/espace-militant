@@ -1,13 +1,15 @@
 import { forwardRef, RefObject, useCallback, useImperativeHandle, useState } from 'react'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { VoxButton } from '@/components/Button'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
-import { BetweenHorizontalEnd, ChevronDown, ChevronUp, Image, Link, Pencil, Text as TextIcon, Trash2, X } from '@tamagui/lucide-icons'
+import { ArrowLeft, BetweenHorizontalEnd, ChevronDown, ChevronUp, Image, Link, Pencil, Text as TextIcon, Trash2, X } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
-import { isWeb, styled, ThemeableStack, XStack } from 'tamagui'
+import { isWeb, ScrollView, styled, ThemeableStack, XStack } from 'tamagui'
 import { EditorMethods } from '../types'
 
 const ToolBarPositioner = styled(ThemeableStack, {
   position: 'fixed',
+  zIndex: 10,
   '$platform-native': {
     position: 'absolute',
   },
@@ -17,11 +19,11 @@ const ToolBarPositioner = styled(ThemeableStack, {
 const ToolBarFrame = styled(ThemeableStack, {
   position: 'absolute',
   bottom: 0,
-  left: -(296 / 2),
-  width: 296,
-  height: 56,
+  left: -(360 / 2),
+  width: 360,
+  height: 68,
   padding: 12,
-  borderRadius: 56 / 2,
+  borderRadius: 68 / 2,
   justifyContent: 'space-between',
   alignItems: 'center',
   alignContent: 'center',
@@ -39,6 +41,7 @@ const ToolBarFrame = styled(ThemeableStack, {
   variants: {
     addMode: {
       true: {
+        paddingLeft: 0,
         left: -(360 / 2),
         width: 360,
         $gtSm: {
@@ -60,6 +63,7 @@ export type MessageEditorToolBarRef = {
 }
 
 const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props, ref) => {
+  const insets = useSafeAreaInsets()
   const [showAddBar, setShowAddBar] = useState(false)
   const handleUnSelect = useCallback(() => props.editorMethods.current?.unSelect(), [])
   const handleMoveUp = useCallback(
@@ -100,46 +104,44 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
       name="selectedField"
       render={({ field }) => {
         return (
-          <ToolBarPositioner top={isWeb ? 'calc(100vh - 100px)' : 'unset'} onPress={(e) => e.stopPropagation()}>
+          <ToolBarPositioner top={isWeb ? 'calc(100vh - 100px)' : 'unset'} bottom={!isWeb ? insets.bottom : 'unset'} onPress={(e) => e.stopPropagation()}>
             {!showAddBar && field.value ? (
               <ToolBarFrame>
                 <XStack>
-                  <VoxButton size="md" $gtSm={{ size: 'xl' }} variant="soft" shrink iconLeft={Pencil} />
+                  <VoxButton size="xl" variant="soft" shrink iconLeft={Pencil} />
                 </XStack>
                 <XStack>
-                  <VoxButton size="md" $gtSm={{ size: 'xl' }} variant="soft" shrink iconLeft={ChevronUp} onPress={handleMoveUp(field.value)} />
-                </XStack>
-                <VoxButton size="md" $gtSm={{ size: 'xl' }} variant="soft" shrink iconLeft={BetweenHorizontalEnd} onPress={handleShowAddbar} />
-                <XStack>
-                  <VoxButton size="md" $gtSm={{ size: 'xl' }} variant="soft" shrink iconLeft={ChevronDown} onPress={handleMoveDown(field.value)} />
+                  <VoxButton size="xl" variant="soft" shrink iconLeft={ChevronUp} onPress={handleMoveUp(field.value)} />
                 </XStack>
                 <XStack>
-                  <VoxButton size="md" $gtSm={{ size: 'xl' }} theme="orange" variant="soft" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value)} />
+                  <VoxButton size="xl" variant="soft" shrink iconLeft={BetweenHorizontalEnd} onPress={handleShowAddbar} />
                 </XStack>
                 <XStack>
-                  <VoxButton size="md" $gtSm={{ size: 'xl' }} variant="text" shrink iconLeft={X} theme="blue" textColor="white" onPress={handleUnSelect} />
+                  <VoxButton size="xl" variant="soft" shrink iconLeft={ChevronDown} onPress={handleMoveDown(field.value)} />
+                </XStack>
+                <XStack>
+                  <VoxButton size="xl" theme="orange" variant="soft" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value)} />
+                </XStack>
+                <XStack>
+                  <VoxButton size="xl" variant="text" shrink iconLeft={X} theme="blue" textColor="white" onPress={handleUnSelect} />
                 </XStack>
               </ToolBarFrame>
             ) : (
               <ToolBarFrame addMode>
-                <XStack>
-                  <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="soft" iconLeft={Image} onPress={handleAddField('image', field.value)}>
+                <ScrollView horizontal contentContainerStyle={{ gap: '$small', paddingLeft: 12, justifyContent: 'space-between', flexGrow: 1 }} flex={1}>
+                  <VoxButton full size="xl" variant="soft" iconLeft={Image} onPress={handleAddField('image', field.value)}>
                     Image
                   </VoxButton>
-                </XStack>
-                <XStack>
-                  <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="soft" iconLeft={Link} onPress={handleAddField('button', field.value)}>
+                  <VoxButton full size="xl" variant="soft" iconLeft={Link} onPress={handleAddField('button', field.value)}>
                     Bouton
                   </VoxButton>
-                </XStack>
-                <XStack>
-                  <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="soft" iconLeft={TextIcon} onPress={handleAddField('doc', field.value)}>
+                  <VoxButton full size="xl" variant="soft" iconLeft={TextIcon} onPress={handleAddField('doc', field.value)}>
                     Text
                   </VoxButton>
-                </XStack>
+                </ScrollView>
                 {field.value ? (
                   <XStack>
-                    <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="text" shrink iconLeft={X} theme="blue" textColor="white" onPress={handleCloseAddbar} />
+                    <VoxButton size="sm" variant="text" shrink iconLeft={ArrowLeft} theme="blue" textColor="white" onPress={handleCloseAddbar} />
                   </XStack>
                 ) : null}
               </ToolBarFrame>

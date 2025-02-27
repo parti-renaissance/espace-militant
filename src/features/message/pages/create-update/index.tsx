@@ -69,11 +69,12 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
       renderFieldsRef.current?.addField(field, afterField)
       setTimeout(() => {
         renderFieldsRef.current?.scrollToField(field)
-      })
+      }, 100)
     },
     removeField: (field: S.FieldsArray[number]) => {
       renderFieldsRef.current?.removeField(field)
       unregister(`formValues.${field.type}.${field.id}`)
+      setValue('selectedField', null)
     },
     moveField: (...xs) => {
       renderFieldsRef.current?.moveField(...xs)
@@ -91,12 +92,12 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
   return (
     <>
       <PageLayout.MainSingleColumn>
-        <YStack flex={1} gap="$medium" alignItems="center" position="relative">
+        <YStack flex={1} gap="$medium" position="relative">
           <StyleRendererContextProvider value={defaultTheme}>
             <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} />
           </StyleRendererContextProvider>
-          <MessageEditorToolbar ref={toolbarRef} control={control} editorMethods={editorMethods} />
         </YStack>
+        <MessageEditorToolbar ref={toolbarRef} control={control} editorMethods={editorMethods} />
       </PageLayout.MainSingleColumn>
       <PageLayout.SideBarRight width={500} showOn="gtSm">
         <YStack onPress={(e) => e.stopPropagation()}>
