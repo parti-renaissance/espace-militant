@@ -35,7 +35,7 @@ const ToolBarFrame = styled(ThemeableStack, {
     width: 368,
     height: 68,
     borderRadius: 68 / 2,
-    left: -(368 / 2) - 150,
+    left: -(368 / 2) - 250,
   },
   variants: {
     addMode: {
@@ -44,7 +44,7 @@ const ToolBarFrame = styled(ThemeableStack, {
         width: 360,
         $gtSm: {
           width: 400,
-          left: -(400 / 2) - 150,
+          left: -(400 / 2) - 250,
         },
       },
     },

@@ -194,7 +194,12 @@ type Payloads = {
   json: string
 }
 
-type EditorRef = {
+type Payloads2 = {
+  pure: string
+  json: object
+}
+
+export type EditorRef = {
   getData: () => Promise<{
     html: string
     pure: string
@@ -202,7 +207,55 @@ type EditorRef = {
   }>
 }
 
-const MyEditor = forwardRef<EditorRef, { onChange: (x: Payloads) => void; onBlur: () => void; value: Payloads; label: string }>((props, ref) => {
+export const MyEditor2 = forwardRef<EditorRef, { onChange?: () => void; value: Payloads2 }>((props, ref) => {
+  const editor = useEditorBridge({
+    autofocus: true,
+    avoidIosKeyboard: false,
+    initialContent: props.value.json,
+    onChange: props.onChange,
+    bridgeExtensions: [
+      // It is important to spread StarterKit BEFORE our extended plugin,
+      // as plugin duplicated will be ignored
+      ...TenTapStartKit,
+      CoreBridge.configureCSS(customFontEdit), // Custom font
+      PlaceholderBridge.configureExtension({
+        placeholder: 'Décrivez votre événement...',
+      }),
+    ],
+  })
+
+  useImperativeHandle(ref, () => {
+    return {
+      getData: async () => ({
+        html: await editor.getHTML(),
+        pure: await editor.getText(),
+        json: await editor.getJSON(),
+      }),
+    }
+  })
+
+  return (
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+      <YStack flex={1}>
+        {isWeb ? (
+          <XStack paddingVertical="$small" borderBottomColor="$textOutline" borderBottomWidth={1}>
+            <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
+          </XStack>
+        ) : null}
+        <YStack flex={1} padding="$medium">
+          <RichText editor={editor} />
+        </YStack>
+        {isWeb ? null : (
+          <YStack height={46}>
+            <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
+          </YStack>
+        )}
+      </YStack>
+    </KeyboardAvoidingView>
+  )
+})
+
+export const MyEditor = forwardRef<EditorRef, { onChange: (x: Payloads) => void; onBlur: () => void; value: Payloads; label: string }>((props, ref) => {
   const editor = useEditorBridge({
     autofocus: true,
     avoidIosKeyboard: false,

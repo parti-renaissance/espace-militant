@@ -214,7 +214,7 @@ function _EventFormScreen() {
           <MessageEditorToolbar ref={toolbarRef} control={control} renderFieldsRef={renderFieldsRef} />
         </YStack>
       </PageLayout.MainSingleColumn>
-      <PageLayout.SideBarRight maxWidth={300} showOn="gtLg">
+      <PageLayout.SideBarRight width={500} showOn="gtSm">
         <VoxButton onPress={onSubmit}>handle submit</VoxButton>
         <VoxCard>
           <VoxCard.Content>
