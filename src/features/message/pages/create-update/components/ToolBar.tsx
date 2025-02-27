@@ -1,11 +1,10 @@
 import { forwardRef, RefObject, useCallback, useImperativeHandle, useState } from 'react'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { VoxButton } from '@/components/Button'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { BetweenHorizontalEnd, ChevronDown, ChevronUp, Image, Link, Pencil, Text as TextIcon, Trash2, X } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { isWeb, styled, ThemeableStack, XStack } from 'tamagui'
-import { RenderFieldRef } from '../types'
+import { EditorMethods } from '../types'
 
 const ToolBarPositioner = styled(ThemeableStack, {
   position: 'fixed',
@@ -53,7 +52,7 @@ const ToolBarFrame = styled(ThemeableStack, {
 
 type MessageEditorToolBarProps = {
   control: Control<S.GlobalForm>
-  renderFieldsRef: RefObject<RenderFieldRef>
+  editorMethods: RefObject<EditorMethods>
 }
 
 export type MessageEditorToolBarRef = {
@@ -61,28 +60,25 @@ export type MessageEditorToolBarRef = {
 }
 
 const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props, ref) => {
-  const insets = useSafeAreaInsets()
   const [showAddBar, setShowAddBar] = useState(false)
-  const handleUnSelect = useCallback((fn: (x: null) => void) => () => fn(null), [])
+  const handleUnSelect = useCallback(() => props.editorMethods.current?.unSelect(), [])
   const handleMoveUp = useCallback(
     (x: S.FieldsArray[number]) => () => {
-      props.renderFieldsRef.current?.moveField(x, -1)
-      setTimeout(() => props.renderFieldsRef.current?.scrollToField(x))
+      props.editorMethods.current?.moveField(x, -1)
+      setTimeout(() => props.editorMethods.current?.scrollToField(x))
     },
     [],
   )
   const handleMoveDown = useCallback(
     (x: S.FieldsArray[number]) => () => {
-      props.renderFieldsRef.current?.moveField(x, +1)
-      setTimeout(() => props.renderFieldsRef.current?.scrollToField(x))
+      props.editorMethods.current?.moveField(x, +1)
+      setTimeout(() => props.editorMethods.current?.scrollToField(x))
     },
     [],
   )
-  const handleDeleteField = useCallback((x: S.FieldsArray[number]) => () => props.renderFieldsRef.current?.removeField(x), [])
+  const handleDeleteField = useCallback((x: S.FieldsArray[number]) => () => props.editorMethods.current?.removeField(x), [])
   const handleAddField = useCallback(
-    (...xs: [S.FieldsArray[number] | null, S.NodeType]) =>
-      () =>
-        props.renderFieldsRef.current?.addField(...xs),
+    (node: S.NodeType, after: S.FieldsArray[number] | null) => () => props.editorMethods.current?.addField(node, after ?? undefined),
     [],
   )
   const handleShowAddbar = useCallback(() => {
@@ -104,7 +100,7 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
       name="selectedField"
       render={({ field }) => {
         return (
-          <ToolBarPositioner top={isWeb ? 'calc(100vh - 100px)' : 'unset'}>
+          <ToolBarPositioner top={isWeb ? 'calc(100vh - 100px)' : 'unset'} onPress={(e) => e.stopPropagation()}>
             {!showAddBar && field.value ? (
               <ToolBarFrame>
                 <XStack>
@@ -121,32 +117,23 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
                   <VoxButton size="md" $gtSm={{ size: 'xl' }} theme="orange" variant="soft" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value)} />
                 </XStack>
                 <XStack>
-                  <VoxButton
-                    size="md"
-                    $gtSm={{ size: 'xl' }}
-                    variant="text"
-                    shrink
-                    iconLeft={X}
-                    theme="blue"
-                    textColor="white"
-                    onPress={handleUnSelect(field.onChange)}
-                  />
+                  <VoxButton size="md" $gtSm={{ size: 'xl' }} variant="text" shrink iconLeft={X} theme="blue" textColor="white" onPress={handleUnSelect} />
                 </XStack>
               </ToolBarFrame>
             ) : (
               <ToolBarFrame addMode>
                 <XStack>
-                  <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="soft" iconLeft={Image} onPress={handleAddField(field.value, 'image')}>
+                  <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="soft" iconLeft={Image} onPress={handleAddField('image', field.value)}>
                     Image
                   </VoxButton>
                 </XStack>
                 <XStack>
-                  <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="soft" iconLeft={Link} onPress={handleAddField(field.value, 'button')}>
+                  <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="soft" iconLeft={Link} onPress={handleAddField('button', field.value)}>
                     Bouton
                   </VoxButton>
                 </XStack>
                 <XStack>
-                  <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="soft" iconLeft={TextIcon} onPress={handleAddField(field.value, 'doc')}>
+                  <VoxButton size="sm" $gtSm={{ size: 'xl' }} variant="soft" iconLeft={TextIcon} onPress={handleAddField('doc', field.value)}>
                     Text
                   </VoxButton>
                 </XStack>
@@ -165,64 +152,3 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
 })
 
 export default MessageEditorToolbar
-
-// import { SelectOption } from '@/components/base/Select/SelectV3'
-// import { Image, Link, Text } from '@tamagui/lucide-icons'
-
-// const RenderFieldWithUI = memo(
-//   (props: {
-//     control: Control<S.GlobalForm>
-//     handleAddField: (f: string) => (x: S.NodeType) => void
-//     handleMove: (id: string, distance: number) => () => void
-//     handleDeleteField: (x: S.FieldsArray[number]) => () => void
-//     field: S.FieldsArray[number]
-//   }) => {
-//     return (
-//       <YStack gap="$medium">
-//         <XStack alignItems="center" gap="$small" flex={1}>
-//           <XStack>
-//             <YStack gap="$xsmall">
-//               <VoxButton theme="purple" variant="soft" size="sm" shrink iconLeft={ChevronUp} onPress={props.handleMove(props.field.id, -1)} />
-//               <VoxButton theme="purple" variant="soft" size="sm" shrink iconLeft={ChevronDown} onPress={props.handleMove(props.field.id, +1)} />
-//             </YStack>
-//           </XStack>
-//           <View flex={1}>
-//             <RenderField field={props.field} control={props.control} />
-//           </View>
-//           <XStack>
-//             <VoxButton theme="purple" variant="soft" size="xl" shrink iconLeft={Trash} onPress={props.handleDeleteField(props.field)} />
-//           </XStack>
-//         </XStack>
-//         <XStack justifyContent="center">
-//           <Select
-//             theme="purple"
-//             size="xs"
-//             icon={Plus}
-//             label="Ajouter"
-//             noValuePlaceholder="un block"
-//             options={fieldOptions}
-//             onChange={props.handleAddField(props.field.id)}
-//           />
-//         </XStack>
-//       </YStack>
-//     )
-//   },
-// )
-
-// const fieldOptions: SelectOption<S.NodeType>[] = [
-//   {
-//     label: 'Un bouton',
-//     icon: Link,
-//     value: 'button',
-//   },
-//   {
-//     value: 'image',
-//     icon: Image,
-//     label: 'Une image',
-//   },
-//   {
-//     value: 'doc',
-//     icon: Text,
-//     label: 'Un block Text',
-//   },
-// ]

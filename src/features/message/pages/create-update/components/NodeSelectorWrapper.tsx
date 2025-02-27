@@ -1,4 +1,5 @@
 import { ReactNode, useCallback, useMemo } from 'react'
+import { GestureResponderEvent } from 'react-native'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { Control, Controller } from 'react-hook-form'
 import { styled, ThemeableStack, View } from 'tamagui'
@@ -46,7 +47,13 @@ type NodeSelectorProps = {
 
 export const NodeSelectorWrapper = (props: NodeSelectorProps) => {
   const content = useMemo(() => <View pointerEvents="none">{props.children}</View>, [props.children])
-  const handlePress = useCallback((fn: (x: S.FieldsArray[number]) => void) => () => fn(props.field), [props.field])
+  const handlePress = useCallback(
+    (fn: (x: S.FieldsArray[number]) => void) => (e: GestureResponderEvent) => {
+      e.stopPropagation()
+      fn(props.field)
+    },
+    [props.field],
+  )
   return (
     <View id={`field-${props.field.type}-${props.field.id}`}>
       <Controller
