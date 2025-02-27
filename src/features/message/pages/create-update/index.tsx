@@ -99,7 +99,7 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
         </YStack>
         <MessageEditorToolbar ref={toolbarRef} control={control} editorMethods={editorMethods} />
       </PageLayout.MainSingleColumn>
-      <PageLayout.SideBarRight width={500} showOn="gtSm">
+      {/* <PageLayout.SideBarRight width={500} showOn="gtSm">
         <YStack onPress={(e) => e.stopPropagation()}>
           <VoxButton onPress={onSubmit}>handle submit</VoxButton>
           <VoxCard>
@@ -108,7 +108,7 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
             </VoxCard.Content>
           </VoxCard>
         </YStack>
-      </PageLayout.SideBarRight>
+      </PageLayout.SideBarRight> */}
     </>
   )
 })

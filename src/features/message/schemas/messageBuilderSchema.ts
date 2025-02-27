@@ -5,7 +5,7 @@ import z from 'zod'
 export const ImageNodeSchema = z.object({
   type: z.literal('image'),
   marks: z.array(z.union([z.literal('borderless'), z.literal('frame')]).or(z.string().transform(() => 'unsupported' as const))).optional(),
-  image: z
+  content: z
     .object({
       url: z.string(),
       width: z.number(),
@@ -21,9 +21,12 @@ export type RichTextNode = z.infer<typeof RichTextNodeSchema>
 export const ButtonNodeSchema = z.object({
   type: z.literal('button'),
   marks: z.array(z.union([z.literal('primary'), z.literal('secondary')]).or(z.string().transform(() => 'unsupported' as const))).optional(),
-
-  label: z.string(),
-  link: z.string(),
+  content: z
+    .object({
+      text: z.string(),
+      link: z.string(),
+    })
+    .nullish(),
 })
 export type ButtonNode = z.infer<typeof ButtonNodeSchema>
 

@@ -5,21 +5,23 @@ import headingImagePlaceholderNode from '../../data/headingImagePlaceholder'
 type NodeCreator<I extends S.Node> = () => I
 
 const createImage: NodeCreator<S.ImageNode> = () => {
-  return headingImagePlaceholderNode as S.ImageNode
+  return {
+    type: 'image',
+    content: null,
+  }
 }
 
 const createRichText: NodeCreator<S.RichTextNode> = () => {
   return {
     type: 'doc',
-    content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Nouveau block text' }] }],
+    content: [],
   }
 }
 
 const createButton: NodeCreator<S.ButtonNode> = () => {
   return {
     type: 'button',
-    link: '',
-    label: 'Nouveau bloc bouton',
+    content: null,
     marks: ['primary'],
   }
 }

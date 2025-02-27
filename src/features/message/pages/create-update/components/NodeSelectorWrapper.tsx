@@ -11,6 +11,10 @@ const wrapperContext = createStyledContext({
 
 const WrapperFrame = styled(ThemeableStack, {
   context: wrapperContext,
+  hoverStyle: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
   variants: {
     selected: {
       true: {

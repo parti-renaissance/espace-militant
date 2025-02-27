@@ -6,8 +6,8 @@ import { useThemeStyle } from '../../hooks/useThemeStyle'
 
 export const ImageRenderer = (props: { data: S.ImageNode }) => {
   const { containerStyle, baseStyle } = useThemeStyle(props.data)
-  if (!props.data.image || !props.data.image.url) return null
-  const { width, height } = props.data.image
+  if (!props.data.content) return null
+  const { width, height, url } = props.data.content
   const dynStyle = useMemo(
     () => ({
       aspectRatio: width / height,
@@ -17,7 +17,7 @@ export const ImageRenderer = (props: { data: S.ImageNode }) => {
 
   return (
     <View style={[containerStyle]}>
-      <Image contentFit={'cover'} source={{ uri: props.data.image.url }} style={[styles.image, dynStyle, baseStyle as ImageStyle]} />
+      <Image contentFit={'cover'} source={{ uri: url }} style={[styles.image, dynStyle, baseStyle as ImageStyle]} />
     </View>
   )
 }
