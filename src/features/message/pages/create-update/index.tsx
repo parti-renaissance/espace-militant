@@ -2,7 +2,6 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
-import VoxCard from '@/components/VoxCard/VoxCard'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import TestMessage from '@/features/message/data/test'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
@@ -12,7 +11,6 @@ import { YStack } from 'tamagui'
 import { StyleRendererContextProvider } from '../../context/styleRenderContext'
 import headingImagePlaceholderNode from '../../data/headingImagePlaceholder'
 import defaultTheme from '../../themes/default-theme'
-import { NodeEditor } from './components/NodeEditor'
 import { RenderFields } from './components/RenderFields'
 import MessageEditorToolbar, { MessageEditorToolBarRef } from './components/ToolBar'
 import { EditorMethods, RenderFieldRef } from './types'
@@ -64,7 +62,7 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
     addField: (node: S.NodeType | S.Node, afterField?: S.FieldsArray[number]) => {
       const field = { id: uniqueId(), type: typeof node === 'string' ? node : node.type }
       setValue(`formValues.${field.type}.${field.id}`, typeof node === 'string' ? createNodeByType(node) : node)
-      setValue(`selectedField`, field)
+      setValue(`selectedField`, { edit: false, field })
       toolbarRef.current?.toggleAddBar(false)
       renderFieldsRef.current?.addField(field, afterField)
       setTimeout(() => {
@@ -99,16 +97,16 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
         </YStack>
         <MessageEditorToolbar ref={toolbarRef} control={control} editorMethods={editorMethods} />
       </PageLayout.MainSingleColumn>
-      {/* <PageLayout.SideBarRight width={500} showOn="gtSm">
+      <PageLayout.SideBarRight width={500} showOn="gtSm">
         <YStack onPress={(e) => e.stopPropagation()}>
           <VoxButton onPress={onSubmit}>handle submit</VoxButton>
-          <VoxCard>
+          {/* <VoxCard>
             <VoxCard.Content>
               <NodeEditor control={control} />
             </VoxCard.Content>
-          </VoxCard>
+          </VoxCard> */}
         </YStack>
-      </PageLayout.SideBarRight> */}
+      </PageLayout.SideBarRight>
     </>
   )
 })

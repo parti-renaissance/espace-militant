@@ -45,7 +45,7 @@ export type MessageFormValues = {
 }
 
 export type GlobalForm = {
-  selectedField: FieldsArray[number] | null
+  selectedField: { edit: boolean; field: FieldsArray[number] } | null
   formValues: MessageFormValues
 }
 

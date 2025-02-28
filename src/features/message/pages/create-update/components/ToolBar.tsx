@@ -111,16 +111,16 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
                   <VoxButton size="xl" variant="soft" shrink iconLeft={Pencil} />
                 </XStack>
                 <XStack>
-                  <VoxButton size="xl" variant="soft" shrink iconLeft={ChevronUp} onPress={handleMoveUp(field.value)} />
+                  <VoxButton size="xl" variant="soft" shrink iconLeft={ChevronUp} onPress={handleMoveUp(field.value.field)} />
                 </XStack>
                 <XStack>
                   <VoxButton size="xl" variant="soft" shrink iconLeft={BetweenHorizontalEnd} onPress={handleShowAddbar} />
                 </XStack>
                 <XStack>
-                  <VoxButton size="xl" variant="soft" shrink iconLeft={ChevronDown} onPress={handleMoveDown(field.value)} />
+                  <VoxButton size="xl" variant="soft" shrink iconLeft={ChevronDown} onPress={handleMoveDown(field.value.field)} />
                 </XStack>
                 <XStack>
-                  <VoxButton size="xl" theme="orange" variant="soft" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value)} />
+                  <VoxButton size="xl" theme="orange" variant="soft" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value.field)} />
                 </XStack>
                 <XStack>
                   <VoxButton size="xl" variant="text" shrink iconLeft={X} theme="blue" textColor="white" onPress={handleUnSelect} />
@@ -129,13 +129,13 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
             ) : (
               <ToolBarFrame addMode>
                 <ScrollView horizontal contentContainerStyle={{ gap: '$small', paddingLeft: 12, justifyContent: 'space-between', flexGrow: 1 }} flex={1}>
-                  <VoxButton full size="xl" variant="soft" iconLeft={Image} onPress={handleAddField('image', field.value)}>
+                  <VoxButton full size="xl" variant="soft" iconLeft={Image} onPress={handleAddField('image', field.value?.field ?? null)}>
                     Image
                   </VoxButton>
-                  <VoxButton full size="xl" variant="soft" iconLeft={Link} onPress={handleAddField('button', field.value)}>
+                  <VoxButton full size="xl" variant="soft" iconLeft={Link} onPress={handleAddField('button', field.value?.field ?? null)}>
                     Bouton
                   </VoxButton>
-                  <VoxButton full size="xl" variant="soft" iconLeft={TextIcon} onPress={handleAddField('doc', field.value)}>
+                  <VoxButton full size="xl" variant="soft" iconLeft={TextIcon} onPress={handleAddField('doc', field.value?.field ?? null)}>
                     Text
                   </VoxButton>
                 </ScrollView>

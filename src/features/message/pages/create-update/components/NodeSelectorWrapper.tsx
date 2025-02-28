@@ -7,6 +7,7 @@ import { createStyledContext, styled, ThemeableStack, View, withStaticProperties
 
 const wrapperContext = createStyledContext({
   selected: false,
+  editMode: false,
 })
 
 const WrapperFrame = styled(ThemeableStack, {
@@ -21,6 +22,9 @@ const WrapperFrame = styled(ThemeableStack, {
         borderRadius: 16,
         overflow: 'hidden',
       },
+    },
+    editMode: {
+      true: {},
     },
   } as const,
 })
@@ -46,6 +50,11 @@ const SelectOverlay = styled(ThemeableStack, {
         borderColor: '$blue9',
       },
     },
+    editMode: {
+      true: {
+        borderWidth: 1,
+      },
+    },
   } as const,
 })
 
@@ -62,6 +71,9 @@ const SelectOverlayLayer2 = styled(ThemeableStack, {
         borderColor: 'black',
       },
     },
+    editMode: {
+      true: {},
+    },
   } as const,
 })
 
@@ -77,40 +89,64 @@ type NodeSelectorProps = {
   control: Control<S.GlobalForm>
 }
 
-const MemoWrapper = memo((props: { selected: boolean; htmlId: string; onWrapperPress: (e: GestureResponderEvent) => void; children: ReactNode }) => {
-  return (
-    <Wrapper.Props selected={props.selected}>
-      <Wrapper id={props.htmlId}>
-        <Wrapper.Overlay onPress={props.onWrapperPress}>
-          <Wrapper.OverlayContainer />
-        </Wrapper.Overlay>
-        {props.children}
-      </Wrapper>
-    </Wrapper.Props>
-  )
-})
+const MemoWrapper = memo(
+  (props: {
+    selected: boolean
+    htmlId: string
+    onWrapperPress: (e: GestureResponderEvent) => void
+    onWrapperDoublePress: (e: GestureResponderEvent) => void
+    children: ReactNode
+    editMode?: boolean
+  }) => {
+    return (
+      <Wrapper.Props selected={props.selected} editMode={props.editMode}>
+        <Wrapper id={props.htmlId}>
+          <Wrapper.Overlay className="wrapper" onPress={props.selected ? props.onWrapperDoublePress : props.onWrapperPress}>
+            <Wrapper.OverlayContainer />
+          </Wrapper.Overlay>
+          <View pointerEvents={props.editMode ? 'auto' : 'none'}>{props.children}</View>
+        </Wrapper>
+      </Wrapper.Props>
+    )
+  },
+)
 
 MemoWrapper.displayName = 'MemoWrapper'
 
 export const NodeSelectorWrapper = memo((props: NodeSelectorProps) => {
-  const content = useMemo(() => <View pointerEvents="none">{props.children}</View>, [props.children])
+  const content = useMemo(() => props.children, [props.children])
   //trick to avoid rerenders, avoid to create a new function each time, props.field can't change and field.onChange is a setter, and can't change
   const handlePress = useRef<{ fn: ((e: GestureResponderEvent) => void) | null }>({ fn: null })
-  const handlePressSetter = useLazyRef(() => (fn: (x: S.FieldsArray[number]) => void) => {
+  const handleDoublePress = useRef<{ fn: ((e: GestureResponderEvent) => void) | null }>({ fn: null })
+
+  const handleDoublePressSetter = useLazyRef(() => (fn: (x: S.GlobalForm['selectedField']) => void) => {
+    if (handleDoublePress.current.fn === null) {
+      handleDoublePress.current.fn = (e) => {
+        e.stopPropagation()
+        fn({ edit: true, field: props.field })
+      }
+    }
+    return handleDoublePress.current.fn
+  })
+
+  const handlePressSetter = useLazyRef(() => (fn: (x: S.GlobalForm['selectedField']) => void) => {
     if (handlePress.current.fn === null) {
       handlePress.current.fn = (e: GestureResponderEvent) => {
         e.stopPropagation()
-        fn(props.field)
+        fn({ edit: false, field: props.field })
       }
     }
     return handlePress.current.fn
   })
+
   return (
     <Controller
       render={({ field }) => (
         <MemoWrapper
-          selected={field.value?.id === props.field.id}
+          selected={field.value?.field.id === props.field.id}
+          editMode={field.value?.edit && field.value?.field.id === props.field.id}
           onWrapperPress={handlePressSetter.current(field.onChange)}
+          onWrapperDoublePress={handleDoublePressSetter.current(field.onChange)}
           htmlId={`field-${props.field.type}-${props.field.id}`}
           children={content}
         />

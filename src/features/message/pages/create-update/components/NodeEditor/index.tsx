@@ -14,11 +14,11 @@ export const NodeEditor = (props: NodeEditorProps) => {
       control={props.control}
       name="selectedField"
       render={({ field }) => {
-        if (field.value?.type === 'button') {
+        if (field.value?.field.type === 'button') {
           return (
             <Controller
               control={props.control}
-              name={`formValues.${field.value.type}.${field.value.id}`}
+              name={`formValues.${field.value.field.type}.${field.value.field.id}`}
               render={(form) => {
                 return <ButtonNodeEditor onChange={form.field.onChange} value={form.field.value} />
               }}
@@ -26,11 +26,11 @@ export const NodeEditor = (props: NodeEditorProps) => {
           )
         }
 
-        if (field.value?.type === 'doc') {
+        if (field.value?.field.type === 'doc') {
           return (
             <Controller
               control={props.control}
-              name={`formValues.${field.value.type}.${field.value.id}`}
+              name={`formValues.${field.value.field.type}.${field.value.field.id}`}
               render={(form) => {
                 return <RichTextNodeEditor onChange={form.field.onChange} value={form.field.value} />
               }}
