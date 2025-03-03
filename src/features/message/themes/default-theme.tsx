@@ -1,7 +1,14 @@
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 
 export default {
-  global: {},
+  global: {
+    backgroundColor: 'white',
+    overflow: 'hidden',
+    borderRadius: 16,
+    borderColor: '#EEF0F2',
+    borderWidth: 1,
+    borderStyle: 'solid',
+  },
   image: {
     frame: {
       container: {

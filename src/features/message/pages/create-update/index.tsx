@@ -61,7 +61,7 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
     addField: (node: S.NodeType | S.Node, afterField?: S.FieldsArray[number]) => {
       const field = { id: uniqueId(), type: typeof node === 'string' ? node : node.type }
       setValue(`formValues.${field.type}.${field.id}`, typeof node === 'string' ? createNodeByType(node) : node)
-      setValue(`selectedField`, { edit: false, field })
+      setValue(`selectedField`, { edit: true, field })
       toolbarRef.current?.toggleAddBar(false)
       renderFieldsRef.current?.addField(field, afterField)
       setTimeout(() => {

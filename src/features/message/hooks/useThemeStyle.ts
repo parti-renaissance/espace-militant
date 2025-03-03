@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import { TextStyle, ViewStyle } from 'react-native'
 import { styleRendererContext } from '../context/styleRenderContext'
 import * as S from '../schemas/messageBuilderSchema'
 
@@ -16,8 +17,11 @@ const flatNodeStyle = <T extends S.NodeType, M extends 'container' | 'base'>(mod
     : styles.global?.[mode]
 }
 
-export const useThemeStyle = (node: S.Node) => {
+export function useThemeStyle(): ViewStyle
+export function useThemeStyle(node: S.Node): { containerStyle: ViewStyle; baseStyle: ViewStyle | TextStyle }
+export function useThemeStyle(node?: S.Node) {
   const theme = useContext(styleRendererContext)
+  if (!node) return theme.global
   const nodeTheme = theme[node.type]
   if (!nodeTheme) return {}
   const containerStyle = nodeHasMarks(node) ? flatNodeStyle('container', node, nodeTheme) : (nodeTheme.global?.container ?? {})

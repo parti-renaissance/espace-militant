@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { FlatList, ListRenderItemInfo, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useThemeStyle } from '@/features/message/hooks/useThemeStyle'
 import { RenderFieldRef } from '@/features/message/pages/create-update/types'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { Control } from 'react-hook-form'
@@ -103,12 +104,14 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
     })
   }, [])
 
+  const theme = useThemeStyle()
+
   return (
     <FlatList
       style={renderFieldsStyle.flatlist}
       ref={scrollRef}
-      contentContainerStyle={[renderFieldsStyle.flatlistContainer]}
-      contentInset={{ bottom: insets.bottom + 68, top: insets.top }}
+      contentContainerStyle={theme}
+      contentInset={{ bottom: insets.bottom + 74, top: insets.top }}
       data={fields}
       onScrollToIndexFailed={reTryScrollOnFail}
       renderItem={RenderItem}
@@ -121,11 +124,5 @@ const renderFieldsStyle = StyleSheet.create({
   flatlist: {
     flex: 1,
     backgroundColor: 'hsl(240, 9%, 98%)',
-    // width: 600,
-  },
-  flatlistContainer: {
-    backgroundColor: 'white',
-    overflow: 'hidden',
-    borderRadius: 16,
   },
 })

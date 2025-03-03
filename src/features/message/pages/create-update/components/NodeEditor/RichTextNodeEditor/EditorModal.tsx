@@ -4,7 +4,7 @@ import { VoxHeader } from '@/components/Header/Header'
 import { EditorRef, MyEditor, Payloads } from '@/features/events/pages/create-edit/DescriptionInput'
 import { Save, Text as TextIcon } from '@tamagui/lucide-icons'
 import { useMutation } from '@tanstack/react-query'
-import { XStack } from 'tamagui'
+import { isWeb, XStack } from 'tamagui'
 import ViewportModal from './ViewportModal'
 
 type EditorModalProps = {
@@ -30,6 +30,8 @@ const EditorModal = ({ value, onChange, onBlur, present, onClose }: EditorModalP
       })
     })
   }
+
+  const showEditor = !isWeb ? present : true
 
   return (
     <ViewportModal
@@ -59,7 +61,7 @@ const EditorModal = ({ value, onChange, onBlur, present, onClose }: EditorModalP
         </VoxHeader>
       }
     >
-      {present ? <MyEditor placeholder="Votre contenu..." ref={editorRef} label="Texte" onChange={onChange} onBlur={onBlur} value={value} /> : null}
+      {showEditor ? <MyEditor placeholder="Votre contenu..." ref={editorRef} label="Texte" onChange={onChange} onBlur={onBlur} value={value} /> : null}
     </ViewportModal>
   )
 }
