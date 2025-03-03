@@ -53,11 +53,11 @@ const EmptyRichTextRender = () => {
   )
 }
 
-export const RenderField = memo((props: { field: S.FieldsArray[number]; control: Control<S.GlobalForm> }) => {
+export const RenderField = memo((props: { field: S.FieldsArray[number]; control: Control<S.GlobalForm>; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
   switch (props.field.type) {
     case 'image':
       return (
-        <NodeSelectorWrapper control={props.control} field={props.field}>
+        <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition}>
           <Controller
             control={props.control}
             name={`formValues.image.${props.field.id}`}
@@ -72,7 +72,7 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
           name={`formValues.button.${props.field.id}`}
           render={({ field }) => (
             <>
-              <NodeSelectorWrapper control={props.control} field={props.field}>
+              <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition}>
                 {field.value.content ? <ButtonRenderer data={field.value} /> : <EmptyButtonRenderer />}
               </NodeSelectorWrapper>
               <Controller
@@ -100,7 +100,7 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
           name={`formValues.richtext.${props.field.id}`}
           render={({ field }) => (
             <>
-              <NodeSelectorWrapper control={props.control} field={props.field}>
+              <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition}>
                 {field.value.content && field.value.content.pure.length > 0 ? (
                   <RichTextRenderer id={props.field.id} data={field.value} />
                 ) : (

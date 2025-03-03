@@ -5,21 +5,31 @@ import { useLazyRef } from '@/hooks/useLazyRef'
 import { Control, Controller } from 'react-hook-form'
 import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
 
-const wrapperContext = createStyledContext({
+const wrapperContext = createStyledContext<{ selected: boolean; edgePosition?: 'trailing' | 'leading' | 'alone' }>({
   selected: false,
+  edgePosition: undefined,
 })
 
 const WrapperFrame = styled(ThemeableStack, {
   context: wrapperContext,
-  hoverStyle: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
   variants: {
-    selected: {
-      true: {
-        borderRadius: 16,
+    selected: {},
+    edgePosition: {
+      trailing: {
         overflow: 'hidden',
+        borderBottomRightRadius: 16,
+        borderBottomLeftRadius: 16,
+      },
+
+      leading: {
+        overflow: 'hidden',
+        borderTopRightRadius: 16,
+        borderTopLeftRadius: 16,
+      },
+
+      alone: {
+        overflow: 'hidden',
+        borderRadius: 16,
       },
     },
   } as const,
@@ -34,7 +44,6 @@ const SelectOverlay = styled(ThemeableStack, {
   bottom: 0,
   zIndex: 1,
   cursor: 'pointer',
-  borderRadius: 16,
   hoverStyle: {
     backgroundColor: '$gray/24',
   },
@@ -43,12 +52,30 @@ const SelectOverlay = styled(ThemeableStack, {
       true: {
         borderWidth: 5,
         borderStyle: 'solid',
-        borderColor: '$blue9',
+        borderColor: 'black',
       },
     },
     editMode: {
       true: {
         borderWidth: 1,
+      },
+    },
+    edgePosition: {
+      trailing: {
+        overflow: 'hidden',
+        borderBottomRightRadius: 16,
+        borderBottomLeftRadius: 16,
+      },
+
+      leading: {
+        overflow: 'hidden',
+        borderTopRightRadius: 16,
+        borderTopLeftRadius: 16,
+      },
+
+      alone: {
+        overflow: 'hidden',
+        borderRadius: 16,
       },
     },
   } as const,
@@ -80,6 +107,7 @@ type NodeSelectorProps = {
   field: S.FieldsArray[number]
   children: ReactNode
   control: Control<S.GlobalForm>
+  edgePosition?: 'trailing' | 'leading' | 'alone'
 }
 
 const MemoWrapper = memo(
@@ -89,13 +117,12 @@ const MemoWrapper = memo(
     onWrapperPress: (e: GestureResponderEvent) => void
     onWrapperDoublePress: (e: GestureResponderEvent) => void
     children: ReactNode
+    edgePosition?: 'trailing' | 'leading' | 'alone'
   }) => {
     return (
-      <Wrapper.Props selected={props.selected}>
+      <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition}>
         <Wrapper id={props.htmlId} onPress={props.selected ? props.onWrapperDoublePress : props.onWrapperPress}>
-          <Wrapper.Overlay>
-            <Wrapper.OverlayContainer />
-          </Wrapper.Overlay>
+          <Wrapper.Overlay />
           {props.children}
         </Wrapper>
       </Wrapper.Props>
@@ -140,6 +167,7 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps) => {
           onWrapperDoublePress={handleDoublePressSetter.current(field.onChange)}
           htmlId={`field-${props.field.type}-${props.field.id}`}
           children={content}
+          edgePosition={props.edgePosition}
         />
       )}
       control={props.control}

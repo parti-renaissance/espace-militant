@@ -16,6 +16,18 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
   const [fields, setFields] = useState<S.FieldsArray>(props.defaultStruct)
   const scrollRef = useRef<FlatList>(null)
   const insets = useSafeAreaInsets()
+  const fieldLength = useRef(fields.length)
+
+  const getFieldEdge = useCallback((index: number) => {
+    if (index === 0 && fieldLength.current === 1) {
+      return 'alone'
+    } else if (index === 0) {
+      return 'leading'
+    } else if (index === fieldLength.current - 1) {
+      return 'trailing'
+    }
+    return undefined
+  }, [])
 
   useImperativeHandle(ref, () => {
     return {
@@ -42,11 +54,15 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
       addField: (newField, afterField) => {
         setFields((xs) => {
           if (!afterField) {
-            return [...xs, newField]
+            const newFields = [...xs, newField]
+            fieldLength.current = newFields.length
+            return newFields
           }
           const _appendTo = xs.findIndex((x) => x.id === afterField.id)
           const appendTo = _appendTo === -1 ? xs.length : _appendTo
-          return [...xs.slice(0, appendTo + 1), newField, ...xs.slice(appendTo + 1)]
+          const newFields = [...xs.slice(0, appendTo + 1), newField, ...xs.slice(appendTo + 1)]
+          fieldLength.current = newFields.length
+          return newFields
         })
       },
 
@@ -54,7 +70,9 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
         setFields((xs) => {
           const fieldIndex = xs.findIndex((x) => x.id === id)
           if (fieldIndex === -1) return xs
-          return [...xs.slice(0, fieldIndex), ...xs.slice(fieldIndex + 1)]
+          const newFields = [...xs.slice(0, fieldIndex), ...xs.slice(fieldIndex + 1)]
+          fieldLength.current = newFields.length
+          return newFields
         })
       },
 
@@ -72,7 +90,10 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
     }
   }, [fields])
 
-  const RenderItem = useCallback(({ item }: ListRenderItemInfo<S.FieldsArray[number]>) => <RenderField control={props.control} field={item} />, [])
+  const RenderItem = useCallback(
+    ({ item, index }: ListRenderItemInfo<S.FieldsArray[number]>) => <RenderField control={props.control} field={item} edgePosition={getFieldEdge(index)} />,
+    [],
+  )
 
   const keyExtractor = useCallback((props: S.FieldsArray[number]) => props.id, [])
   const reTryScrollOnFail = useCallback((info: { index: number }) => {
