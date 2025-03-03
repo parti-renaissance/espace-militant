@@ -11,5 +11,6 @@ export type RenderFieldRef = {
 export type EditorMethods = Omit<RenderFieldRef, 'addField' | 'removeField'> & {
   addField: (node: S.Node | S.NodeType, afterField?: S.FieldsArray[number]) => void
   removeField: (field: S.FieldsArray[number]) => void
+  editField: (field: S.FieldsArray[number]) => void
   unSelect: () => void
 }

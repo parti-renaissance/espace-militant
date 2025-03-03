@@ -1,6 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
-import { VoxButton } from '@/components/Button'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import TestMessage from '@/features/message/data/test'
@@ -82,6 +81,7 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
     },
     getFields: () => renderFieldsRef.current?.getFields() ?? [],
     unSelect: () => setValue('selectedField', null),
+    editField: (field: S.FieldsArray[number]) => setValue('selectedField', { edit: true, field }),
   } satisfies EditorMethods)
 
   useImperativeHandle(ref, () => editorMethods.current!)
@@ -89,24 +89,26 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
   const onSubmit = handleSubmit((x) => console.log(x, zipMessage(x.formValues, renderFieldsRef.current!.getFields())))
   return (
     <>
-      <PageLayout.MainSingleColumn>
-        <YStack flex={1} gap="$medium" position="relative">
-          <StyleRendererContextProvider value={defaultTheme}>
-            <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} />
-          </StyleRendererContextProvider>
+      <PageLayout.MainSingleColumn alignItems="center">
+        <YStack maxWidth={500} width="100%" flexGrow={1}>
+          <YStack flex={1} gap="$medium" position="relative">
+            <StyleRendererContextProvider value={defaultTheme}>
+              <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} />
+            </StyleRendererContextProvider>
+          </YStack>
         </YStack>
         <MessageEditorToolbar ref={toolbarRef} control={control} editorMethods={editorMethods} />
       </PageLayout.MainSingleColumn>
-      <PageLayout.SideBarRight width={500} showOn="gtSm">
+      {/* <PageLayout.SideBarRight width={500} showOn="gtSm">
         <YStack onPress={(e) => e.stopPropagation()}>
           <VoxButton onPress={onSubmit}>handle submit</VoxButton>
-          {/* <VoxCard>
+          <VoxCard>
             <VoxCard.Content>
               <NodeEditor control={control} />
             </VoxCard.Content>
-          </VoxCard> */}
+          </VoxCard>
         </YStack>
-      </PageLayout.SideBarRight>
+      </PageLayout.SideBarRight> */}
     </>
   )
 })

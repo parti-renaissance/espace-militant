@@ -36,7 +36,7 @@ const ToolBarFrame = styled(ThemeableStack, {
     width: 368,
     height: 68,
     borderRadius: 68 / 2,
-    left: -(368 / 2) - 250,
+    left: -(368 / 2),
   },
   variants: {
     addMode: {
@@ -46,7 +46,7 @@ const ToolBarFrame = styled(ThemeableStack, {
         width: 360,
         $gtSm: {
           width: 400,
-          left: -(400 / 2) - 250,
+          left: -(400 / 2),
         },
       },
     },
@@ -66,6 +66,12 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
   const insets = useSafeAreaInsets()
   const [showAddBar, setShowAddBar] = useState(false)
   const handleUnSelect = useCallback(() => props.editorMethods.current?.unSelect(), [])
+  const handleEditField = useCallback(
+    (x: S.FieldsArray[number]) => () => {
+      props.editorMethods.current?.editField(x)
+    },
+    [],
+  )
   const handleMoveUp = useCallback(
     (x: S.FieldsArray[number]) => () => {
       props.editorMethods.current?.moveField(x, -1)
@@ -108,7 +114,7 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
             {!showAddBar && field.value ? (
               <ToolBarFrame>
                 <XStack>
-                  <VoxButton size="xl" variant="soft" shrink iconLeft={Pencil} />
+                  <VoxButton size="xl" variant="soft" shrink iconLeft={Pencil} onPress={handleEditField(field.value.field)} />
                 </XStack>
                 <XStack>
                   <VoxButton size="xl" variant="soft" shrink iconLeft={ChevronUp} onPress={handleMoveUp(field.value.field)} />
@@ -135,7 +141,7 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
                   <VoxButton full size="xl" variant="soft" iconLeft={Link} onPress={handleAddField('button', field.value?.field ?? null)}>
                     Bouton
                   </VoxButton>
-                  <VoxButton full size="xl" variant="soft" iconLeft={TextIcon} onPress={handleAddField('doc', field.value?.field ?? null)}>
+                  <VoxButton full size="xl" variant="soft" iconLeft={TextIcon} onPress={handleAddField('richtext', field.value?.field ?? null)}>
                     Text
                   </VoxButton>
                 </ScrollView>

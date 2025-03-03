@@ -3,11 +3,10 @@ import { GestureResponderEvent } from 'react-native'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { useLazyRef } from '@/hooks/useLazyRef'
 import { Control, Controller } from 'react-hook-form'
-import { createStyledContext, styled, ThemeableStack, View, withStaticProperties } from 'tamagui'
+import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
 
 const wrapperContext = createStyledContext({
   selected: false,
-  editMode: false,
 })
 
 const WrapperFrame = styled(ThemeableStack, {
@@ -22,9 +21,6 @@ const WrapperFrame = styled(ThemeableStack, {
         borderRadius: 16,
         overflow: 'hidden',
       },
-    },
-    editMode: {
-      true: {},
     },
   } as const,
 })
@@ -71,9 +67,6 @@ const SelectOverlayLayer2 = styled(ThemeableStack, {
         borderColor: 'black',
       },
     },
-    editMode: {
-      true: {},
-    },
   } as const,
 })
 
@@ -96,15 +89,14 @@ const MemoWrapper = memo(
     onWrapperPress: (e: GestureResponderEvent) => void
     onWrapperDoublePress: (e: GestureResponderEvent) => void
     children: ReactNode
-    editMode?: boolean
   }) => {
     return (
-      <Wrapper.Props selected={props.selected} editMode={props.editMode}>
-        <Wrapper id={props.htmlId}>
-          <Wrapper.Overlay className="wrapper" onPress={props.selected ? props.onWrapperDoublePress : props.onWrapperPress}>
+      <Wrapper.Props selected={props.selected}>
+        <Wrapper id={props.htmlId} onPress={props.selected ? props.onWrapperDoublePress : props.onWrapperPress}>
+          <Wrapper.Overlay>
             <Wrapper.OverlayContainer />
           </Wrapper.Overlay>
-          <View pointerEvents={props.editMode ? 'auto' : 'none'}>{props.children}</View>
+          {props.children}
         </Wrapper>
       </Wrapper.Props>
     )
@@ -144,7 +136,6 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps) => {
       render={({ field }) => (
         <MemoWrapper
           selected={field.value?.field.id === props.field.id}
-          editMode={field.value?.edit && field.value?.field.id === props.field.id}
           onWrapperPress={handlePressSetter.current(field.onChange)}
           onWrapperDoublePress={handleDoublePressSetter.current(field.onChange)}
           htmlId={`field-${props.field.type}-${props.field.id}`}

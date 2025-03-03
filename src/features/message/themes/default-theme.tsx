@@ -12,7 +12,7 @@ export default {
       },
     },
   },
-  doc: {
+  richtext: {
     global: {
       container: {
         padding: 16,

@@ -1,5 +1,4 @@
 import type { TextStyle, ViewStyle } from 'react-native'
-import { tipTapDocumentSchema } from '@/components/TipTapRenderer/schema'
 import z from 'zod'
 
 export const ImageNodeSchema = z.object({
@@ -15,7 +14,16 @@ export const ImageNodeSchema = z.object({
 })
 export type ImageNode = z.infer<typeof ImageNodeSchema>
 
-export const RichTextNodeSchema = tipTapDocumentSchema
+export const RichTextNodeSchema = z.object({
+  type: z.literal('richtext'),
+  content: z
+    .object({
+      pure: z.string(),
+      json: z.string(),
+      html: z.string(),
+    })
+    .nullish(),
+})
 export type RichTextNode = z.infer<typeof RichTextNodeSchema>
 
 export const ButtonNodeSchema = z.object({
@@ -50,7 +58,7 @@ export type GlobalForm = {
 }
 
 export type FieldsArray = { type: NodeType; id: string }[]
-export const nodeTypesArray: NodeType[] = ['image', 'doc', 'button']
+export const nodeTypesArray: NodeType[] = ['image', 'richtext', 'button']
 
 // Extrait les marks d'un type de node
 export type ExtractMarks<T extends NodeType> = Extract<Node, { type: T }> extends { marks?: infer M } ? (M extends (infer U)[] ? U : never) : never

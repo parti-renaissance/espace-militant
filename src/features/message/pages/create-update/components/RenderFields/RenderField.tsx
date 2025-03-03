@@ -9,6 +9,8 @@ import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { Image as ImageIcon, Text as TextIcon } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
+import { ButtonNodeEditor } from '../NodeEditor/ButtonNodeEditor'
+import { RichTextNodeEditor } from '../NodeEditor/RichTextNodeEditor'
 
 const EmptyImageRenderer = () => {
   return (
@@ -65,23 +67,63 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
       )
     case 'button':
       return (
-        <NodeSelectorWrapper control={props.control} field={props.field}>
-          <Controller
-            control={props.control}
-            name={`formValues.button.${props.field.id}`}
-            render={({ field }) => (field.value.content ? <ButtonRenderer data={field.value} /> : <EmptyButtonRenderer />)}
-          />
-        </NodeSelectorWrapper>
+        <Controller
+          control={props.control}
+          name={`formValues.button.${props.field.id}`}
+          render={({ field }) => (
+            <>
+              <NodeSelectorWrapper control={props.control} field={props.field}>
+                {field.value.content ? <ButtonRenderer data={field.value} /> : <EmptyButtonRenderer />}
+              </NodeSelectorWrapper>
+              <Controller
+                control={props.control}
+                render={({ field: { value, onChange } }) => {
+                  return (
+                    <ButtonNodeEditor
+                      onBlur={() => onChange({ edit: false, field: props.field })}
+                      present={value?.field.id === props.field.id && value.edit}
+                      onChange={field.onChange}
+                      value={field.value}
+                    />
+                  )
+                }}
+                name="selectedField"
+              />
+            </>
+          )}
+        />
       )
-    case 'doc':
+    case 'richtext':
       return (
-        <NodeSelectorWrapper control={props.control} field={props.field}>
-          <Controller
-            control={props.control}
-            name={`formValues.doc.${props.field.id}`}
-            render={({ field }) => (field.value.content.length > 0 ? <RichTextRenderer data={field.value} /> : <EmptyRichTextRender />)}
-          />
-        </NodeSelectorWrapper>
+        <Controller
+          control={props.control}
+          name={`formValues.richtext.${props.field.id}`}
+          render={({ field }) => (
+            <>
+              <NodeSelectorWrapper control={props.control} field={props.field}>
+                {field.value.content && field.value.content.pure.length > 0 ? (
+                  <RichTextRenderer id={props.field.id} data={field.value} />
+                ) : (
+                  <EmptyRichTextRender />
+                )}
+              </NodeSelectorWrapper>
+              <Controller
+                control={props.control}
+                render={({ field: { value, onChange } }) => {
+                  return (
+                    <RichTextNodeEditor
+                      onBlur={() => onChange({ edit: false, field: props.field })}
+                      present={value?.field.id === props.field.id && value.edit}
+                      onChange={field.onChange}
+                      value={field.value}
+                    />
+                  )
+                }}
+                name="selectedField"
+              />
+            </>
+          )}
+        />
       )
     default:
       return null

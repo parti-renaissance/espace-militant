@@ -295,6 +295,7 @@ const VoxHeaderTitle = (props: { children: string; icon?: React.NamedExoticCompo
 
 export const VoxHeader = withStaticProperties(VoxHeaderFrameRouter, {
   ModalFrame: VoxHeaderFrameModal,
+  NoSafeFrame: VoxHeaderContainerStyled,
   LeftButtonFrame: VoxHeaderLeftButtonFrame,
   LeftButton: VoxHeaderLeftButton,
   Title: VoxHeaderTitle,
