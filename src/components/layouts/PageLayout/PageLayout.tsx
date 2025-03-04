@@ -32,7 +32,6 @@ const LayoutFrame = ({ children, webScrollable, ...props }: ComponentProps<typeo
 
 const LayoutSideBarLeft = ({ children, showOn = 'gtSm', ...props }: ViewProps & { showOn?: keyof Media }) => {
   const media = useMedia()
-  const insets = useSafeAreaInsets()
   return (
     media[showOn] && (
       <View $gtMd={{ width: columnWidth }} $md={{ width: 250 }} height="100%" pt={padding} $lg={{ pl: padding }} {...props}>
@@ -68,9 +67,9 @@ const LayoutMainBarLeft = ({ children }: ViewProps) => {
   )
 }
 
-const LayoutSideBarRight = ({ children, alwaysShow = false, ...props }: ViewProps & { alwaysShow?: boolean }) => {
+const LayoutSideBarRight = ({ children, alwaysShow, showOn = 'gtLg', ...props }: ViewProps & { showOn?: keyof Media; alwaysShow?: boolean }) => {
   const media = useMedia()
-  return media.gtLg || alwaysShow ? (
+  return media[showOn] || alwaysShow ? (
     <View width={props.width ?? columnWidth} height="100%" pt={padding} {...props}>
       {children}
     </View>

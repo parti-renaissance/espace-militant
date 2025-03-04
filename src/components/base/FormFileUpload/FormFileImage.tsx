@@ -133,7 +133,7 @@ const PendingFile = (props: { height?: FormFileImageProps['height'] }) => {
   )
 }
 
-const NoFile = (props: { placeholder?: string; onPress?: () => void; height?: FormFileImageProps['height'] }) => {
+export const NoFile = (props: { placeholder?: string; onPress?: () => void; height?: FormFileImageProps['height'] }) => {
   return (
     <SelectFrames height={props.height} onPress={props.onPress}>
       <YStack flex={1} justifyContent="center" alignItems="center" paddingVertical="$large">

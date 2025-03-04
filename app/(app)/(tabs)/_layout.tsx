@@ -5,7 +5,7 @@ import TabBar from '@/components/TabBar/TabBar'
 import { ROUTES } from '@/config/routes'
 import { useSession } from '@/ctx/SessionProvider'
 import PageHeader from '@/features/profil/components/PageHeader'
-import { Link2 } from '@tamagui/lucide-icons'
+import { Link2, Send } from '@tamagui/lucide-icons'
 import { Link, Slot, Tabs } from 'expo-router'
 import { isWeb, useMedia, View, XStack } from 'tamagui'
 
@@ -36,6 +36,11 @@ const exectParams = (x: string, canShowHeader: boolean) => {
     case 'ressources':
       return {
         header: () => <PageHeader title="Ressources" icon={Link2} backArrow={false} />,
+        headerShown: canShowHeader,
+      }
+    case 'messages':
+      return {
+        header: () => <PageHeader title="Messages" icon={Send} backArrow={true} />,
         headerShown: canShowHeader,
       }
     default:
