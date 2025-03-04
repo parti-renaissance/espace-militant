@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Input from '@/components/base/Input/Input'
 import Select from '@/components/base/Select/SelectV3'
@@ -8,7 +9,7 @@ import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, Save } from '@tamagui/lucide-icons'
 import { Controller, useForm } from 'react-hook-form'
-import { getTokenValue, isWeb, useMedia, XStack, YStack } from 'tamagui'
+import { getTokenValue, useMedia, XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import ViewportModal from './ViewportModal'
 
@@ -17,7 +18,7 @@ type NodeEditorProps = { value: S.ButtonNode; onChange: (node: S.ButtonNode) => 
 export const ButtonNodeEditor = (props: NodeEditorProps) => {
   const insets = useSafeAreaInsets()
   const media = useMedia()
-  const isMobile = media.sm && !isWeb
+  const isIosMobile = media.sm && Platform.OS === 'ios'
   const { control, handleSubmit } = useForm({
     defaultValues: {
       ...props.value,
@@ -64,7 +65,7 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
             render={({ field, fieldState }) => {
               return (
                 <Input
-                  bottomSheetInput={isMobile}
+                  bottomSheetInput={isIosMobile}
                   selectTextOnFocus
                   label="Label"
                   color="gray"
@@ -84,7 +85,7 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
             render={({ field, fieldState }) => {
               return (
                 <Input
-                  bottomSheetInput={isMobile}
+                  bottomSheetInput={isIosMobile}
                   label="Lien"
                   color="gray"
                   inputMode="url"

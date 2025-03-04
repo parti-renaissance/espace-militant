@@ -6,6 +6,7 @@ type NodeCreator<I extends S.Node> = () => I
 const createImage: NodeCreator<S.ImageNode> = () => {
   return {
     type: 'image',
+    marks: ['frame'],
     content: null,
   }
 }
@@ -46,7 +47,7 @@ export const getDefaultFormValues = () => {
   return acc
 }
 
-export const zipMessage = (states: S.MessageFormValues, struct: S.FieldsArray): S.Message => {
+export const zipMessage = (states: S.MessageFormValues, struct: S.FieldsArray, metaData: S.MessageMetaData): S.Message => {
   return struct.reduce<S.Message>(
     (acc, { id, type }) => {
       const node = states[type]?.[id]
@@ -55,12 +56,12 @@ export const zipMessage = (states: S.MessageFormValues, struct: S.FieldsArray): 
       }
       return acc
     },
-    { type: 'message', content: [] },
+    { type: 'message', metaData, content: [] },
   )
 }
 
-export const unZipMessage = (x: S.Message): { states: S.MessageFormValues; struct: S.FieldsArray } => {
-  return x.content.reduce<{ states: S.MessageFormValues; struct: S.FieldsArray }>(
+export const unZipMessage = (x: S.Message) => {
+  return x.content.reduce<{ states: S.MessageFormValues; struct: S.FieldsArray; metaData: S.MessageMetaData }>(
     (acc, next) => {
       const uuid = uniqueId()
       acc.states[next.type][uuid] = next
@@ -70,6 +71,7 @@ export const unZipMessage = (x: S.Message): { states: S.MessageFormValues; struc
     {
       states: getDefaultFormValues(),
       struct: [],
+      metaData: x.metaData,
     },
   )
 }

@@ -1,10 +1,11 @@
 import { forwardRef, RefObject, useCallback, useImperativeHandle, useState } from 'react'
+import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { VoxButton } from '@/components/Button'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
-import { ArrowLeft, BetweenHorizontalEnd, ChevronDown, ChevronUp, Image, Link, Pencil, Text as TextIcon, Trash2, X } from '@tamagui/lucide-icons'
+import { ArrowLeft, BetweenHorizontalEnd, ChevronDown, ChevronUp, ImagePlus, Pencil, PlusSquare, TextSelect, Trash2, X } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
-import { isWeb, ScrollView, styled, ThemeableStack, XStack } from 'tamagui'
+import { getTokenValue, isWeb, ScrollView, styled, ThemeableStack, XStack } from 'tamagui'
 import { EditorMethods } from '../types'
 
 const ToolBarPositioner = styled(ThemeableStack, {
@@ -104,13 +105,15 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
     }),
     [],
   )
+
+  const mobileMarginBottom = Platform.OS === 'android' ? insets.bottom + getTokenValue('$medium') : insets.bottom
   return (
     <Controller
       control={props.control}
       name="selectedField"
       render={({ field }) => {
         return (
-          <ToolBarPositioner top={isWeb ? 'calc(100vh - 100px)' : 'unset'} bottom={!isWeb ? insets.bottom : 'unset'} onPress={(e) => e.stopPropagation()}>
+          <ToolBarPositioner top={isWeb ? 'calc(100vh - 100px)' : 'unset'} bottom={!isWeb ? mobileMarginBottom : 'unset'} onPress={(e) => e.stopPropagation()}>
             {!showAddBar && field.value ? (
               <ToolBarFrame>
                 <XStack>
@@ -135,14 +138,14 @@ const MessageEditorToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorTo
             ) : (
               <ToolBarFrame addMode>
                 <ScrollView horizontal contentContainerStyle={{ gap: '$small', paddingLeft: 12, justifyContent: 'space-between', flexGrow: 1 }} flex={1}>
-                  <VoxButton full size="xl" variant="soft" iconLeft={Image} onPress={handleAddField('image', field.value?.field ?? null)}>
-                    Image
+                  <VoxButton full size="xl" variant="soft" iconLeft={TextSelect} onPress={handleAddField('richtext', field.value?.field ?? null)}>
+                    Text
                   </VoxButton>
-                  <VoxButton full size="xl" variant="soft" iconLeft={Link} onPress={handleAddField('button', field.value?.field ?? null)}>
+                  <VoxButton full size="xl" variant="soft" iconLeft={PlusSquare} onPress={handleAddField('button', field.value?.field ?? null)}>
                     Bouton
                   </VoxButton>
-                  <VoxButton full size="xl" variant="soft" iconLeft={TextIcon} onPress={handleAddField('richtext', field.value?.field ?? null)}>
-                    Text
+                  <VoxButton full size="xl" variant="soft" iconLeft={ImagePlus} onPress={handleAddField('image', field.value?.field ?? null)}>
+                    Image
                   </VoxButton>
                 </ScrollView>
                 {field.value ? (

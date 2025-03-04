@@ -1,11 +1,14 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { FlatList, ListRenderItemInfo, StyleSheet } from 'react-native'
+import Animated from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useThemeStyle } from '@/features/message/hooks/useThemeStyle'
+import { usePageLayoutScroll } from '@/components/layouts/PageLayout/usePageLayoutScroll'
+import useFlatListHeader from '@/features/message/hooks/useFlatListHeader'
 import { RenderFieldRef } from '@/features/message/pages/create-update/types'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { Control } from 'react-hook-form'
-import { isWeb } from 'tamagui'
+import { isWeb, YStack } from 'tamagui'
+import { MetaDataForm } from './MetaDataForm'
 import { RenderField } from './RenderField'
 
 type RenderFieldsProps = {
@@ -104,19 +107,28 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
     })
   }, [])
 
-  const theme = useThemeStyle()
+  const { scrollHandler, handleHeaderLayout, headerStyle, headerHeight } = useFlatListHeader()
+  const { isWebPageLayoutScrollActive } = usePageLayoutScroll()
 
   return (
-    <FlatList
-      style={renderFieldsStyle.flatlist}
-      ref={scrollRef}
-      contentContainerStyle={theme}
-      contentInset={{ bottom: insets.bottom + 80, top: insets.top }}
-      data={fields}
-      onScrollToIndexFailed={reTryScrollOnFail}
-      renderItem={RenderItem}
-      keyExtractor={keyExtractor}
-    />
+    <YStack flex={1} overflow="hidden">
+      <Animated.View style={!isWebPageLayoutScrollActive ? headerStyle : undefined} onLayout={handleHeaderLayout}>
+        <MetaDataForm control={props.control} />
+      </Animated.View>
+      {headerHeight > 0 ? (
+        <Animated.FlatList
+          style={renderFieldsStyle.flatlist}
+          scrollEnabled={!isWebPageLayoutScrollActive}
+          onScroll={scrollHandler}
+          ref={scrollRef}
+          contentContainerStyle={[!isWebPageLayoutScrollActive ? { paddingBottom: insets.bottom + 96, paddingTop: headerHeight } : undefined]}
+          data={fields}
+          onScrollToIndexFailed={reTryScrollOnFail}
+          renderItem={RenderItem}
+          keyExtractor={keyExtractor}
+        />
+      ) : null}
+    </YStack>
   )
 })
 

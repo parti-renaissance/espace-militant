@@ -4,6 +4,7 @@ import Text from '@/components/base/Text'
 import { ButtonRenderer } from '@/features/message/components/NodeRenderer/ButtonRenderer'
 import { ImageRenderer } from '@/features/message/components/NodeRenderer/ImageRenderer'
 import { RichTextRenderer } from '@/features/message/components/NodeRenderer/RichTextRenderer'
+import { useThemeStyle } from '@/features/message/hooks/useThemeStyle'
 import { NodeSelectorWrapper } from '@/features/message/pages/create-update/components/NodeSelectorWrapper'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { Image as ImageIcon, Text as TextIcon } from '@tamagui/lucide-icons'
@@ -13,9 +14,10 @@ import { ButtonNodeEditor } from '../NodeEditor/ButtonNodeEditor'
 import { ImageNodeEditor } from '../NodeEditor/ImageNodeEditor'
 import { RichTextNodeEditor } from '../NodeEditor/RichTextNodeEditor'
 
-const EmptyImageRenderer = () => {
+const EmptyImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
+  const { wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
   return (
-    <FormFrame borderRadius={0} height={200}>
+    <FormFrame borderRadius={0} height={200} style={wrapperStyle}>
       <YStack flex={1} justifyContent="center" alignItems="center" paddingVertical="$large">
         <XStack gap="$small">
           <ImageIcon size={16} color="$blue5" />
@@ -26,9 +28,10 @@ const EmptyImageRenderer = () => {
   )
 }
 
-const EmptyButtonRenderer = () => {
+const EmptyButtonRenderer = (props: { edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
   return (
     <ButtonRenderer
+      edgePosition={props.edgePosition}
       data={{
         type: 'button',
         marks: ['primary'],
@@ -41,9 +44,10 @@ const EmptyButtonRenderer = () => {
   )
 }
 
-const EmptyRichTextRender = () => {
+const EmptyRichTextRender = (props: { data: S.RichTextNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
+  const { wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
   return (
-    <FormFrame borderRadius={0} height={250} backgroundColor="white">
+    <FormFrame borderRadius={0} height={250} backgroundColor="white" style={wrapperStyle}>
       <YStack flex={1} justifyContent="center" alignItems="center" paddingVertical="$large">
         <XStack gap="$small">
           <TextIcon size={16} color="$blue5" />
@@ -65,7 +69,7 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
             return (
               <>
                 <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition} error={fieldState.error?.message}>
-                  {field.value.content ? <ImageRenderer data={field.value} /> : <EmptyImageRenderer />}
+                  {field.value.content ? <ImageRenderer data={field.value} edgePosition={props.edgePosition} /> : <EmptyImageRenderer data={field.value} />}
                 </NodeSelectorWrapper>
                 <Controller
                   control={props.control}
@@ -94,7 +98,11 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
           render={({ field, fieldState }) => (
             <>
               <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition} error={fieldState.error?.message}>
-                {field.value.content ? <ButtonRenderer data={field.value} /> : <EmptyButtonRenderer />}
+                {field.value.content ? (
+                  <ButtonRenderer data={field.value} edgePosition={props.edgePosition} />
+                ) : (
+                  <EmptyButtonRenderer edgePosition={props.edgePosition} />
+                )}
               </NodeSelectorWrapper>
               <Controller
                 control={props.control}
@@ -123,9 +131,9 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
             <>
               <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition} error={fieldState.error?.message}>
                 {field.value.content && field.value.content.pure.length > 0 ? (
-                  <RichTextRenderer id={props.field.id} data={field.value} />
+                  <RichTextRenderer id={props.field.id} data={field.value} edgePosition={props.edgePosition} />
                 ) : (
-                  <EmptyRichTextRender />
+                  <EmptyRichTextRender data={field.value} edgePosition={props.edgePosition} />
                 )}
               </NodeSelectorWrapper>
               <Controller

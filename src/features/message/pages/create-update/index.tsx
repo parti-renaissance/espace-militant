@@ -3,14 +3,16 @@ import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
+import StickyBox from '@/components/StickyBox/StickyBox'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import TestMessage from '@/features/message/data/test'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { MailPlus } from '@tamagui/lucide-icons'
 import { Link, router } from 'expo-router'
 import { uniqueId } from 'lodash'
 import { useForm } from 'react-hook-form'
-import { isWeb, XStack, YStack } from 'tamagui'
+import { getTokenValue, isWeb, useMedia, XStack, YStack } from 'tamagui'
 import { StyleRendererContextProvider } from '../../context/styleRenderContext'
 import headingImagePlaceholderNode from '../../data/headingImagePlaceholder'
 import defaultTheme from '../../themes/default-theme'
@@ -48,6 +50,9 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
   const defaultData = data
     ? unZipMessage(data)
     : {
+        metaData: {
+          object: '',
+        },
         struct: [defaultField] as S.FieldsArray,
         states: {
           ...getDefaultFormValues(),
@@ -55,13 +60,10 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
         } as S.MessageFormValues,
       }
 
-  const { control, handleSubmit, setValue, unregister, formState } = useForm<S.GlobalForm>({
+  const { control, handleSubmit, setValue, unregister } = useForm<S.GlobalForm>({
     defaultValues: { formValues: defaultData.states, selectedField: null },
     resolver: zodResolver(S.MessageFormValuesValidatorSchema),
   })
-
-  const { errors } = formState
-  console.log(errors)
 
   const renderFieldsRef = useRef<RenderFieldRef>(null)
   const toolbarRef = useRef<MessageEditorToolBarRef>(null)
@@ -93,34 +95,49 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
   } satisfies EditorMethods)
 
   useImperativeHandle(ref, () => editorMethods.current!)
+  const media = useMedia()
 
-  const onSubmit = handleSubmit((x) => console.log(x, zipMessage(x.formValues, renderFieldsRef.current!.getFields())))
+  const onSubmit = handleSubmit((x) => console.log(x, zipMessage(x.formValues, renderFieldsRef.current!.getFields(), x.metaData)))
   return (
     <>
       <PageLayout.MainSingleColumn>
-        <YStack $gtSm={{ marginVertical: '$large', borderRadius: 50, overflow: 'hidden' }}>
-          <VoxHeader borderRadius={20}>
-            <XStack alignItems="center" flex={1} width="100%">
-              <XStack alignContent="flex-start">
-                <Link href={router.canGoBack() ? '../' : '/message'} replace asChild={!isWeb}>
-                  <VoxButton size="lg" variant="soft" theme="orange">
-                    Annuler
+        <StickyBox webOnly offsetTop={media.gtSm ? '$large' : undefined} style={{ zIndex: 10 }}>
+          <YStack $gtSm={{ marginVertical: '$large', borderRadius: 50, overflow: 'hidden', zIndex: 10 }}>
+            <VoxHeader borderRadius={20}>
+              <XStack alignItems="center" flex={1} width="100%">
+                <XStack alignContent="flex-start">
+                  <Link href={router.canGoBack() ? '../' : '/message'} replace asChild={!isWeb}>
+                    <VoxButton size="lg" variant="text" theme="orange">
+                      Annuler
+                    </VoxButton>
+                  </Link>
+                </XStack>
+                <XStack flexGrow={1} justifyContent="center">
+                  <VoxHeader.Title icon={MailPlus}>Message</VoxHeader.Title>
+                </XStack>
+                <XStack>
+                  <VoxButton size="lg" variant="text" theme="purple" onPress={onSubmit}>
+                    Suivant
                   </VoxButton>
-                </Link>
+                </XStack>
               </XStack>
-              <XStack flexGrow={1} justifyContent="center">
-                <VoxHeader.Title>{!data ? 'Créer un message' : 'Editer le message'}</VoxHeader.Title>
-              </XStack>
-              <XStack>
-                <VoxButton size="lg" variant="text" theme="blue" onPress={onSubmit}>
-                  {!data ? 'Créer' : 'Editer'}
-                </VoxButton>
-              </XStack>
-            </XStack>
-          </VoxHeader>
-        </YStack>
+            </VoxHeader>
+          </YStack>
+        </StickyBox>
         <YStack alignItems="center" flex={1}>
-          <YStack maxWidth={500} width="100%" flexGrow={1}>
+          <YStack
+            maxWidth={500}
+            width="100%"
+            flexGrow={1}
+            $gtSm={
+              isWeb
+                ? {
+                    paddingTop: '$large',
+                    paddingBottom: 170 + getTokenValue('$medium'),
+                  }
+                : undefined
+            }
+          >
             <YStack flex={1} gap="$medium" position="relative">
               <StyleRendererContextProvider value={defaultTheme}>
                 <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} />

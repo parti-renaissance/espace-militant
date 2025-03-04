@@ -81,6 +81,18 @@ export type Node = z.infer<typeof NodeSchema>
 export type NodeType = z.infer<typeof NodeSchema>['type']
 
 export const MessageFormValuesValidatorSchema = z.object({
+  metaData: z.object({
+    object: z
+      .string({
+        required_error: "L'objet est obligatoire",
+      })
+      .min(5, {
+        message: "L'objet doit faire minimum 5 charatères",
+      })
+      .max(255, {
+        message: "L'objet doit faire maximum 255 charatères",
+      }),
+  }),
   formValues: z.record(
     z.enum(nodeTypesArray),
     z.record(
@@ -95,8 +107,15 @@ export const MessageFormValuesValidatorSchema = z.object({
   ),
 })
 
+export const MessageMetaDataSchema = z.object({
+  object: z.string(),
+})
+
+export type MessageMetaData = z.infer<typeof MessageMetaDataSchema>
+
 export const MessageSchema = z.object({
   type: z.literal('message'),
+  metaData: MessageMetaDataSchema,
   content: z.array(NodeSchema),
 })
 export type Message = z.infer<typeof MessageSchema>
@@ -108,6 +127,7 @@ export type MessageFormValues = {
 export type GlobalForm = {
   selectedField: { edit: boolean; field: FieldsArray[number] } | null
   formValues: MessageFormValues
+  metaData: MessageMetaData
 }
 
 export type FieldsArray = { type: NodeType; id: string }[]
@@ -130,7 +150,16 @@ export type NodeStyle<T extends NodeType> = {
   : never)
 
 export type MessageStyle = {
-  global: ViewStyle
+  global: {
+    container?: ViewStyle
+    item?: {
+      container?: ViewStyle
+      trailing?: ViewStyle
+      leading?: ViewStyle
+      middle?: ViewStyle
+      alone?: ViewStyle
+    }
+  }
 } & {
   [K in NodeType]?: NodeStyle<K>
 }

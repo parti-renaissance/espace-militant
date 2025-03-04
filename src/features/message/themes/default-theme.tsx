@@ -2,27 +2,61 @@ import * as S from '@/features/message/schemas/messageBuilderSchema'
 
 export default {
   global: {
-    backgroundColor: 'white',
-    overflow: 'hidden',
-    borderRadius: 16,
-    borderColor: '#EEF0F2',
-    borderWidth: 1,
-    borderStyle: 'solid',
+    container: {
+      // overflow: 'hidden',
+    },
+    item: {
+      wrapper: {
+        overflow: 'hidden',
+        backgroundColor: 'white',
+        borderColor: '#EEF0F2',
+        borderStyle: 'solid',
+        // paddingHorizontal: 40,
+      },
+      trailing: {
+        borderWidth: 1,
+        borderTopWidth: 0,
+        borderBottomRightRadius: 16,
+        borderBottomLeftRadius: 16,
+      },
+      leading: {
+        borderWidth: 1,
+        borderBottomWidth: 0,
+        borderTopRightRadius: 16,
+        borderTopLeftRadius: 16,
+      },
+      middle: {
+        borderWidth: 1,
+        borderTopWidth: 0,
+        borderBottomWidth: 0,
+      },
+
+      alone: {
+        borderWidth: 1,
+        borderRadius: 16,
+      },
+    },
   },
   image: {
     frame: {
       container: {
-        padding: 16,
+        paddingVertical: 16,
+        paddingHorizontal: 40,
       },
       base: {
         borderRadius: 8,
       },
     },
+    borderless: {
+      container: {},
+      base: {},
+    },
   },
   richtext: {
     global: {
       container: {
-        padding: 16,
+        paddingVertical: 16,
+        paddingHorizontal: 40,
       },
     },
   },
@@ -35,6 +69,7 @@ export default {
         justifyContent: 'center',
         alignItems: 'center',
         margin: 16,
+        marginHorizontal: 40,
       },
       base: {
         fontSize: 16,

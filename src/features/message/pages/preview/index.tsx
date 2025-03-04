@@ -28,14 +28,14 @@ const MessagePreviewPage: React.FC = () => {
   )
 }
 
-const RenderNode = (props: { data: S.Node }) => {
+const RenderNode = (props: { data: S.Node; edgePosition?: 'leading' | 'trailing' | 'alone'; id: string }) => {
   switch (props.data.type) {
     case 'image':
-      return <ImageRenderer data={props.data} />
+      return <ImageRenderer data={props.data} edgePosition={props.edgePosition} />
     case 'button':
-      return <ButtonRenderer data={props.data} />
-    case 'doc':
-      return <RichTextRenderer data={props.data} />
+      return <ButtonRenderer data={props.data} edgePosition={props.edgePosition} />
+    case 'richtext':
+      return <RichTextRenderer id={props.id} data={props.data} edgePosition={props.edgePosition} />
 
     default:
       return null
@@ -45,7 +45,25 @@ const RenderNode = (props: { data: S.Node }) => {
 const data = dataTest.success ? dataTest.data : undefined
 
 const RenderFields = (props: { data: S.Message }) => {
-  const RenderItem = useCallback(({ item }: ListRenderItemInfo<S.Node>) => <RenderNode data={item} />, [])
+  const getFieldEdge = useCallback(
+    (index: number) => {
+      if (!data?.content) return undefined
+      if (index === 0 && data?.content.length === 1) {
+        return 'alone'
+      } else if (index === 0) {
+        return 'leading'
+      } else if (index === data?.content.length - 1) {
+        return 'trailing'
+      }
+      return undefined
+    },
+    [data?.content.length],
+  )
+
+  const RenderItem = useCallback(
+    ({ item, index }: ListRenderItemInfo<S.Node>) => <RenderNode data={item} id={index + 'id'} edgePosition={getFieldEdge(index)} />,
+    [],
+  )
   const keyExtractor = useCallback((props: S.Node, index: number) => `${props.type}-${index}`, [])
   return <FlatList data={props.data.content} renderItem={RenderItem} keyExtractor={keyExtractor} />
 }

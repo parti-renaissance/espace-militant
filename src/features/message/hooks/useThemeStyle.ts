@@ -18,13 +18,20 @@ const flatNodeStyle = <T extends S.NodeType, M extends 'container' | 'base'>(mod
 }
 
 export function useThemeStyle(): ViewStyle
-export function useThemeStyle(node: S.Node): { containerStyle: ViewStyle; baseStyle: ViewStyle | TextStyle }
-export function useThemeStyle(node?: S.Node) {
+export function useThemeStyle(
+  node: S.Node,
+  edgePosition?: 'leading' | 'trailing' | 'alone',
+): { containerStyle: ViewStyle; baseStyle: ViewStyle | TextStyle; wrapperStyle: ViewStyle }
+export function useThemeStyle(node?: S.Node, edgePosition?: 'leading' | 'trailing' | 'alone') {
   const theme = useContext(styleRendererContext)
-  if (!node) return theme.global
+  if (!node) return theme.global.container
+  const wrapperStyle = [theme.global.item?.wrapper, theme.global.item?.[edgePosition ?? 'middle']].reduce((acc, style) => {
+    if (style) acc = { ...acc, ...style }
+    return acc
+  }, {} as ViewStyle)
   const nodeTheme = theme[node.type]
-  if (!nodeTheme) return {}
+  if (!nodeTheme) return { container: {}, base: {}, wrapperStyle } as const
   const containerStyle = nodeHasMarks(node) ? flatNodeStyle('container', node, nodeTheme) : (nodeTheme.global?.container ?? {})
   const baseStyle = nodeHasMarks(node) ? flatNodeStyle('base', node, nodeTheme) : (nodeTheme.global?.base ?? {})
-  return { containerStyle, baseStyle }
+  return { containerStyle, baseStyle, wrapperStyle }
 }
