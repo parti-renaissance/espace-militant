@@ -72,7 +72,7 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="message/creer"
+            name="messages/creer"
             options={{
               headerShown: false,
               gestureEnabled: false,

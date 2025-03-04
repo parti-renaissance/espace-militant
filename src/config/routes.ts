@@ -3,7 +3,7 @@ import { Calendar, CircleUser, DoorOpen, GraduationCap, Home, Link, Send, Zap } 
 import { ThemeName } from 'tamagui'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'message'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages'
   screenName: string
   icon: typeof HomeIcon
   hidden?: boolean
@@ -48,8 +48,8 @@ export const ROUTES: TabRoute[] = [
     hiddenMobile: true,
   },
   {
-    name: 'message',
-    screenName: 'Message',
+    name: 'messages',
+    screenName: 'Messages',
     icon: Send,
     theme: 'gray',
     hidden: true,

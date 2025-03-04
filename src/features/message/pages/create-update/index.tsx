@@ -106,7 +106,7 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
             <VoxHeader borderRadius={20}>
               <XStack alignItems="center" flex={1} width="100%">
                 <XStack alignContent="flex-start">
-                  <Link href={router.canGoBack() ? '../' : '/message'} replace asChild={!isWeb}>
+                  <Link href={router.canGoBack() ? '../' : '/messages'} replace asChild={!isWeb}>
                     <VoxButton size="lg" variant="text" theme="orange">
                       Annuler
                     </VoxButton>
