@@ -41,7 +41,13 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
   if (viewport.gtSm && isWeb) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
-        <View style={styles.centeredView} onPress={(e) => e.stopPropagation()}>
+        <View
+          style={styles.centeredView}
+          onPress={(e) => {
+            e.stopPropagation()
+            e.target == e.currentTarget && onClose?.()
+          }}
+        >
           <View style={styles.modalView}>
             <CardFrame width={width}>
               {header ? header : null}
@@ -54,7 +60,7 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
   }
 
   return (
-    <BottomSheetModal ref={sheetModalRef} backdropComponent={renderBackdrop} detached enablePanDownToClose={false} onDismiss={onClose} enableDismissOnClose>
+    <BottomSheetModal ref={sheetModalRef} backdropComponent={renderBackdrop} onDismiss={onClose} enableDismissOnClose>
       <BottomSheetScrollView stickyHeaderIndices={[0]} style={{ flex: 1 }}>
         {header}
         {children}

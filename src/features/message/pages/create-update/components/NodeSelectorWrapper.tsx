@@ -1,13 +1,15 @@
 import { memo, ReactNode, useMemo, useRef } from 'react'
 import { GestureResponderEvent } from 'react-native'
+import Text from '@/components/base/Text'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
 import { useLazyRef } from '@/hooks/useLazyRef'
 import { Control, Controller } from 'react-hook-form'
 import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
 
-const wrapperContext = createStyledContext<{ selected: boolean; edgePosition?: 'trailing' | 'leading' | 'alone' }>({
+const wrapperContext = createStyledContext<{ selected: boolean; edgePosition?: 'trailing' | 'leading' | 'alone'; error?: boolean }>({
   selected: false,
   edgePosition: undefined,
+  error: false,
 })
 
 const WrapperFrame = styled(ThemeableStack, {
@@ -55,6 +57,12 @@ const SelectOverlay = styled(ThemeableStack, {
         borderColor: 'black',
       },
     },
+    error: {
+      true: {
+        borderColor: '$orange5',
+        backgroundColor: '$orange/16',
+      },
+    },
     editMode: {
       true: {
         borderWidth: 1,
@@ -81,26 +89,35 @@ const SelectOverlay = styled(ThemeableStack, {
   } as const,
 })
 
-const SelectOverlayLayer2 = styled(ThemeableStack, {
+const SelectErrorBanner = styled(ThemeableStack, {
   context: wrapperContext,
-  flex: 1,
-  width: '100%',
-  borderRadius: 11,
+  position: 'absolute',
+  padding: '$medium',
+  display: 'none',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  backgroundColor: '$orange5',
   variants: {
     selected: {
       true: {
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: 'black',
+        bottom: -5,
+        left: -5,
+        right: -5,
       },
     },
-  } as const,
+    error: {
+      true: {
+        display: 'flex',
+      },
+    },
+  },
 })
 
 const Wrapper = withStaticProperties(WrapperFrame, {
   Props: wrapperContext.Provider,
   Overlay: SelectOverlay,
-  OverlayContainer: SelectOverlayLayer2,
+  ErrorBanner: SelectErrorBanner,
 })
 
 type NodeSelectorProps = {
@@ -108,6 +125,7 @@ type NodeSelectorProps = {
   children: ReactNode
   control: Control<S.GlobalForm>
   edgePosition?: 'trailing' | 'leading' | 'alone'
+  error?: string
 }
 
 const MemoWrapper = memo(
@@ -118,11 +136,16 @@ const MemoWrapper = memo(
     onWrapperDoublePress: (e: GestureResponderEvent) => void
     children: ReactNode
     edgePosition?: 'trailing' | 'leading' | 'alone'
+    error?: string
   }) => {
     return (
-      <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition}>
+      <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition} error={Boolean(props.error)}>
         <Wrapper id={props.htmlId} onPress={props.selected ? props.onWrapperDoublePress : props.onWrapperPress}>
-          <Wrapper.Overlay />
+          <Wrapper.Overlay>
+            <Wrapper.ErrorBanner>
+              <Text.MD color="white">{props.error}</Text.MD>
+            </Wrapper.ErrorBanner>
+          </Wrapper.Overlay>
           {props.children}
         </Wrapper>
       </Wrapper.Props>
@@ -167,6 +190,7 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps) => {
           onWrapperDoublePress={handleDoublePressSetter.current(field.onChange)}
           htmlId={`field-${props.field.type}-${props.field.id}`}
           children={content}
+          error={props.error}
           edgePosition={props.edgePosition}
         />
       )}

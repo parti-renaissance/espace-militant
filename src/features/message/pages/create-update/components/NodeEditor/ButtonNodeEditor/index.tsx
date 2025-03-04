@@ -5,7 +5,8 @@ import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
-import { Save } from '@tamagui/lucide-icons'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Link, Save } from '@tamagui/lucide-icons'
 import { Controller, useForm } from 'react-hook-form'
 import { getTokenValue, isWeb, useMedia, XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
@@ -25,6 +26,7 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
         text: '',
       },
     },
+    resolver: zodResolver(S.ButtonNodeValidationSchema),
   })
 
   const onSubmit = useDebouncedCallback(
@@ -37,13 +39,13 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
 
   return (
     <ViewportModal
-      onClose={props.onBlur}
+      onClose={() => props.onBlur()}
       open={props.present}
       header={
         <VoxHeader.NoSafeFrame height={56} backgroundColor="white">
           <XStack alignItems="center" flex={1} width="100%">
             <XStack flexGrow={1}>
-              <VoxHeader.Title>{props.value.content ? 'Modifier le bouton' : 'Nouveau bouton'}</VoxHeader.Title>
+              <VoxHeader.Title icon={Link}>{props.value.content ? 'Modifier le bouton' : 'Nouveau bouton'}</VoxHeader.Title>
             </XStack>
             <XStack flex={1} justifyContent="flex-end">
               <VoxButton size="sm" iconLeft={Save} theme="blue" alignSelf="flex-end" variant="text" onPress={onSubmit}>

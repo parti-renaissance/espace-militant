@@ -19,7 +19,7 @@ export const RichTextNodeEditor = (props: NodeEditorProps) => {
   })
 
   const onSubmit = handleSubmit((data) => {
-    props.onChange(data)
+    props.onChange(data.content.pure.length === 0 ? { ...data, content: null } : data)
     props.onBlur()
   })
 

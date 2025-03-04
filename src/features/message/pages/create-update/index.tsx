@@ -1,12 +1,16 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
+import { VoxButton } from '@/components/Button'
+import { VoxHeader } from '@/components/Header/Header'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import TestMessage from '@/features/message/data/test'
 import * as S from '@/features/message/schemas/messageBuilderSchema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Link, router } from 'expo-router'
 import { uniqueId } from 'lodash'
 import { useForm } from 'react-hook-form'
-import { YStack } from 'tamagui'
+import { isWeb, XStack, YStack } from 'tamagui'
 import { StyleRendererContextProvider } from '../../context/styleRenderContext'
 import headingImagePlaceholderNode from '../../data/headingImagePlaceholder'
 import defaultTheme from '../../themes/default-theme'
@@ -51,9 +55,13 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
         } as S.MessageFormValues,
       }
 
-  const { control, handleSubmit, setValue, unregister } = useForm<S.GlobalForm>({
+  const { control, handleSubmit, setValue, unregister, formState } = useForm<S.GlobalForm>({
     defaultValues: { formValues: defaultData.states, selectedField: null },
+    resolver: zodResolver(S.MessageFormValuesValidatorSchema),
   })
+
+  const { errors } = formState
+  console.log(errors)
 
   const renderFieldsRef = useRef<RenderFieldRef>(null)
   const toolbarRef = useRef<MessageEditorToolBarRef>(null)
@@ -89,26 +97,39 @@ const Editor = forwardRef<EditorMethods, object>(function Editor(_, ref) {
   const onSubmit = handleSubmit((x) => console.log(x, zipMessage(x.formValues, renderFieldsRef.current!.getFields())))
   return (
     <>
-      <PageLayout.MainSingleColumn alignItems="center">
-        <YStack maxWidth={500} width="100%" flexGrow={1}>
-          <YStack flex={1} gap="$medium" position="relative">
-            <StyleRendererContextProvider value={defaultTheme}>
-              <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} />
-            </StyleRendererContextProvider>
+      <PageLayout.MainSingleColumn>
+        <YStack $gtSm={{ marginVertical: '$large', borderRadius: 50, overflow: 'hidden' }}>
+          <VoxHeader borderRadius={20}>
+            <XStack alignItems="center" flex={1} width="100%">
+              <XStack alignContent="flex-start">
+                <Link href={router.canGoBack() ? '../' : '/message'} replace asChild={!isWeb}>
+                  <VoxButton size="lg" variant="soft" theme="orange">
+                    Annuler
+                  </VoxButton>
+                </Link>
+              </XStack>
+              <XStack flexGrow={1} justifyContent="center">
+                <VoxHeader.Title>{!data ? 'Créer un message' : 'Editer le message'}</VoxHeader.Title>
+              </XStack>
+              <XStack>
+                <VoxButton size="lg" variant="text" theme="blue" onPress={onSubmit}>
+                  {!data ? 'Créer' : 'Editer'}
+                </VoxButton>
+              </XStack>
+            </XStack>
+          </VoxHeader>
+        </YStack>
+        <YStack alignItems="center" flex={1}>
+          <YStack maxWidth={500} width="100%" flexGrow={1}>
+            <YStack flex={1} gap="$medium" position="relative">
+              <StyleRendererContextProvider value={defaultTheme}>
+                <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} />
+              </StyleRendererContextProvider>
+            </YStack>
           </YStack>
         </YStack>
         <MessageEditorToolbar ref={toolbarRef} control={control} editorMethods={editorMethods} />
       </PageLayout.MainSingleColumn>
-      {/* <PageLayout.SideBarRight width={500} showOn="gtSm">
-        <YStack onPress={(e) => e.stopPropagation()}>
-          <VoxButton onPress={onSubmit}>handle submit</VoxButton>
-          <VoxCard>
-            <VoxCard.Content>
-              <NodeEditor control={control} />
-            </VoxCard.Content>
-          </VoxCard>
-        </YStack>
-      </PageLayout.SideBarRight> */}
     </>
   )
 })

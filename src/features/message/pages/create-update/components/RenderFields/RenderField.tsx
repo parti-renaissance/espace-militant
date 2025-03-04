@@ -10,6 +10,7 @@ import { Image as ImageIcon, Text as TextIcon } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
 import { ButtonNodeEditor } from '../NodeEditor/ButtonNodeEditor'
+import { ImageNodeEditor } from '../NodeEditor/ImageNodeEditor'
 import { RichTextNodeEditor } from '../NodeEditor/RichTextNodeEditor'
 
 const EmptyImageRenderer = () => {
@@ -57,22 +58,42 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
   switch (props.field.type) {
     case 'image':
       return (
-        <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition}>
-          <Controller
-            control={props.control}
-            name={`formValues.image.${props.field.id}`}
-            render={({ field }) => (field.value.content ? <ImageRenderer data={field.value} /> : <EmptyImageRenderer />)}
-          />
-        </NodeSelectorWrapper>
+        <Controller
+          control={props.control}
+          name={`formValues.image.${props.field.id}`}
+          render={({ field, fieldState }) => {
+            return (
+              <>
+                <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition} error={fieldState.error?.message}>
+                  {field.value.content ? <ImageRenderer data={field.value} /> : <EmptyImageRenderer />}
+                </NodeSelectorWrapper>
+                <Controller
+                  control={props.control}
+                  render={({ field: { value, onChange } }) => {
+                    return (
+                      <ImageNodeEditor
+                        onBlur={() => onChange({ edit: false, field: props.field })}
+                        onChange={field.onChange}
+                        present={Boolean(value?.field.id === props.field.id) && value?.edit === true}
+                        value={field.value}
+                      />
+                    )
+                  }}
+                  name="selectedField"
+                />
+              </>
+            )
+          }}
+        />
       )
     case 'button':
       return (
         <Controller
           control={props.control}
           name={`formValues.button.${props.field.id}`}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <>
-              <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition}>
+              <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition} error={fieldState.error?.message}>
                 {field.value.content ? <ButtonRenderer data={field.value} /> : <EmptyButtonRenderer />}
               </NodeSelectorWrapper>
               <Controller
@@ -98,9 +119,9 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
         <Controller
           control={props.control}
           name={`formValues.richtext.${props.field.id}`}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <>
-              <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition}>
+              <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition} error={fieldState.error?.message}>
                 {field.value.content && field.value.content.pure.length > 0 ? (
                   <RichTextRenderer id={props.field.id} data={field.value} />
                 ) : (
