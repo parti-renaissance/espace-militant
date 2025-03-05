@@ -214,7 +214,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
   const DynInput = useMemo(() => (bottomSheetInput ? BottomSheetTextInput : TextInput), [])
 
   return (
-    <YStack gap="$xsmall" ref={frameRef}>
+    <YStack gap="$xsmall" flex={1} ref={frameRef}>
       <InputFrame
         disabled={disabled}
         color={color ?? 'white'}

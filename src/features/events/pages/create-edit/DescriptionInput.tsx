@@ -115,7 +115,7 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
 const parseJsonEditorContent = (x: string) => {
   try {
     return JSON.parse(x)
-  } catch (e) {
+  } catch (_) {
     return x
   }
 }
@@ -148,7 +148,7 @@ export const MyRenderer = (props: { value: string; matchContent?: boolean; prima
   )
 }
 
-export default function (props: { onChange: (x: Payloads) => void; onBlur: () => void; value: Payloads; label: string; error?: string }) {
+export default function (props: { onChange: () => void; onBlur: () => void; value: Payloads; label: string; error?: string }) {
   const [open, setOpen] = useState(false)
 
   const handleOnClose = () => {
@@ -188,18 +188,13 @@ export default function (props: { onChange: (x: Payloads) => void; onBlur: () =>
   )
 }
 
-export type Payloads = {
+type Payloads = {
   html: string
   pure: string
   json: string
 }
 
-type Payloads2 = {
-  pure: string
-  json: object
-}
-
-export type EditorRef = {
+type EditorRef = {
   getData: () => Promise<{
     html: string
     pure: string
@@ -207,12 +202,11 @@ export type EditorRef = {
   }>
 }
 
-export const MyEditor2 = forwardRef<EditorRef, { onChange?: () => void; value: Payloads2 }>((props, ref) => {
+const MyEditor = forwardRef<EditorRef, { onChange: (x: Payloads) => void; onBlur: () => void; value: Payloads; label: string }>((props, ref) => {
   const editor = useEditorBridge({
     autofocus: true,
     avoidIosKeyboard: false,
-    initialContent: props.value.json,
-    onChange: props.onChange,
+    initialContent: parseJsonEditorContent(props.value.json),
     bridgeExtensions: [
       // It is important to spread StarterKit BEFORE our extended plugin,
       // as plugin duplicated will be ignored
@@ -254,55 +248,6 @@ export const MyEditor2 = forwardRef<EditorRef, { onChange?: () => void; value: P
     </KeyboardAvoidingView>
   )
 })
-
-export const MyEditor = forwardRef<EditorRef, { onChange: (x: Payloads) => void; onBlur: () => void; value: Payloads; label: string; placeholder?: string }>(
-  (props, ref) => {
-    const editor = useEditorBridge({
-      autofocus: true,
-      avoidIosKeyboard: false,
-      initialContent: parseJsonEditorContent(props.value.json),
-      bridgeExtensions: [
-        // It is important to spread StarterKit BEFORE our extended plugin,
-        // as plugin duplicated will be ignored
-        ...TenTapStartKit,
-        CoreBridge.configureCSS(customFontEdit), // Custom font
-        PlaceholderBridge.configureExtension({
-          placeholder: props.placeholder ?? 'Décrivez votre événement...',
-        }),
-      ],
-    })
-
-    useImperativeHandle(ref, () => {
-      return {
-        getData: async () => ({
-          html: await editor.getHTML(),
-          pure: await editor.getText(),
-          json: await editor.getJSON(),
-        }),
-      }
-    })
-
-    return (
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-        <YStack flex={1}>
-          {isWeb ? (
-            <XStack paddingVertical="$small" borderBottomColor="$textOutline" borderBottomWidth={1}>
-              <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
-            </XStack>
-          ) : null}
-          <YStack flex={1} padding="$medium">
-            <RichText editor={editor} />
-          </YStack>
-          {isWeb ? null : (
-            <YStack height={46}>
-              <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
-            </YStack>
-          )}
-        </YStack>
-      </KeyboardAvoidingView>
-    )
-  },
-)
 
 function ModalEditor(props: { onChange: (x: Payloads) => void; onBlur: () => void; value: Payloads; label: string; open: boolean }) {
   const editorRef = useRef<EditorRef | null>(null)

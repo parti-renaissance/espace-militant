@@ -1,9 +1,9 @@
 import { HomeIcon } from '@/assets/icons/nav'
-import { Calendar, CircleUser, DoorOpen, GraduationCap, Home, Link, Send, Zap } from '@tamagui/lucide-icons'
+import { Calendar, CircleUser, DoorOpen, GraduationCap, Home, Link, Zap } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil'
   screenName: string
   icon: typeof HomeIcon
   hidden?: boolean
@@ -43,14 +43,6 @@ export const ROUTES: TabRoute[] = [
     name: 'formations',
     screenName: 'Formations',
     icon: GraduationCap,
-    theme: 'gray',
-    hidden: true,
-    hiddenMobile: true,
-  },
-  {
-    name: 'messages',
-    screenName: 'Messages',
-    icon: Send,
     theme: 'gray',
     hidden: true,
     hiddenMobile: true,
