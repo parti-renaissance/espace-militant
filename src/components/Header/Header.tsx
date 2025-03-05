@@ -287,7 +287,7 @@ const VoxHeaderLeftButton = (
 const VoxHeaderTitle = (props: { children: string; icon?: React.NamedExoticComponent<IconProps> }) => {
   return (
     <XStack alignItems="center" gap={10}>
-      {props.icon ? <props.icon size={24} color="$textPrimary" /> : null}
+      {props.icon ? <props.icon size={20} color="$textPrimary" /> : null}
       <Text.LG semibold>{props.children}</Text.LG>
     </XStack>
   )
@@ -295,6 +295,7 @@ const VoxHeaderTitle = (props: { children: string; icon?: React.NamedExoticCompo
 
 export const VoxHeader = withStaticProperties(VoxHeaderFrameRouter, {
   ModalFrame: VoxHeaderFrameModal,
+  NoSafeFrame: VoxHeaderContainerStyled,
   LeftButtonFrame: VoxHeaderLeftButtonFrame,
   LeftButton: VoxHeaderLeftButton,
   Title: VoxHeaderTitle,
