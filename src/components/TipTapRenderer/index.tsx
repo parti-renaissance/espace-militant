@@ -106,37 +106,36 @@ const RenderOrderedList: RenderFn<S.TipOrderedList> = ({ data: { content } }) =>
   )
 }
 
-export const RenderContent: RenderFn<S.TipContent[], { id?: string }> = ({ data, ...props }) => {
-  const id = props.id ?? 'no-id'
+const RenderContent: RenderFn<S.TipContent[]> = ({ data }) => {
   return data.map((x, i) => {
     if (U.isTipNonSupported(x)) {
-      return <RenderNonSupported key={id + i + x.type} data={x} />
+      return <RenderNonSupported key={i + x.type} data={x} />
     }
 
     if (U.isTipParagraph(x)) {
-      return <RenderParagraph key={id + i + x.type} data={x} />
+      return <RenderParagraph key={i + x.type} data={x} />
     }
 
     if (U.isTipBulletList(x)) {
-      return <RenderBulletList key={id + i + x.type} data={x} />
+      return <RenderBulletList key={i + x.type} data={x} />
     }
 
     if (U.isTipOrderedList(x)) {
-      return <RenderOrderedList key={id + i + x.type} data={x} />
+      return <RenderOrderedList key={i + x.type} data={x} />
     }
 
     return null
   })
 }
 
-export const TipTapRenderer = (props: { content: string; id?: string }) => {
+export const TipTapRenderer = (props: { content: string }) => {
   const { content, type } = U.parseJsonEditorContent(props.content)
   if (type === 'string') {
     return <VoxCard.Description markdown>{content}</VoxCard.Description>
   } else {
     return (
       <YStack>
-        <RenderContent id={props.id} data={content.content} />
+        <RenderContent data={content.content} />
       </YStack>
     )
   }
