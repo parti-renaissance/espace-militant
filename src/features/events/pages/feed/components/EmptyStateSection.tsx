@@ -10,18 +10,9 @@ import { Image, isWeb, XStack, YStack } from 'tamagui'
 // eslint-disable-next-line
 const EventIllustration = require('@/features/events/assets/images/event_illustration.png')
 
-export const EmptyStateSection = () => {
+const PowerUserEmptyState = () => {
   const { hasFeature } = useGetExecutiveScopes()
-  if (hasFeature('events') === false) {
-    return (
-      <VoxCard.Content paddingTop="$xxlarge">
-        <XStack flex={1}>
-          <EmptyEvent />
-        </XStack>
-      </VoxCard.Content>
-    )
-  }
-  return (
+  return hasFeature('events') ? (
     <VoxCard.Content padding="$xlarge">
       <YStack gap="$large" alignItems="center">
         <Image src={EventIllustration} />
@@ -34,6 +25,25 @@ export const EmptyStateSection = () => {
           </Link>
         </XStack>
       </YStack>
+    </VoxCard.Content>
+  ) : (
+    <VoxCard.Content paddingTop="$xxlarge">
+      <XStack flex={1}>
+        <EmptyEvent />
+      </XStack>
+    </VoxCard.Content>
+  )
+}
+
+export const EmptyStateSection = (props: { isAuth?: boolean }) => {
+  if (props.isAuth) {
+    return <PowerUserEmptyState />
+  }
+  return (
+    <VoxCard.Content paddingTop="$xxlarge">
+      <XStack flex={1}>
+        <EmptyEvent />
+      </XStack>
     </VoxCard.Content>
   )
 }
