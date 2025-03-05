@@ -8,9 +8,7 @@ import MyProfileCard from '@/components/ProfileCards/ProfileCard/MyProfileCard'
 import ProfileLoginCTA from '@/components/ProfileCards/ProfileLoginCTA/ProfileLoginCTA'
 import AuthFallbackWrapper from '@/components/Skeleton/AuthFallbackWrapper'
 import StickyBox from '@/components/StickyBox/StickyBox'
-import VoxCard from '@/components/VoxCard/VoxCard'
 import { useSession } from '@/ctx/SessionProvider'
-import EmptyEvent from '@/features/events/components/EmptyEvent'
 import EventListItem from '@/features/events/components/EventListItem'
 import { eventFiltersState } from '@/features/events/store/filterStore'
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
@@ -48,7 +46,7 @@ const splitEvents = (events: RestItemEvent[] | RestPublicItemEvent[]) => {
 
 const EventList = () => {
   const media = useMedia()
-  const { session } = useSession()
+  const { session, isAuth } = useSession()
   const user = useGetSuspenseProfil({ enabled: Boolean(session) })
   const listRef = useRef<SectionList>(null)
   useScrollToTop(listRef)
@@ -144,8 +142,8 @@ const EventList = () => {
               renderSectionHeader={({ section }) => {
                 return (
                   <YStack>
-                    {section.data.length === 0 ? (
-                      <EmptyStateSection />
+                    {section.data.length === 0 && !isFetching ? (
+                      <EmptyStateSection isAuth={isAuth} />
                     ) : (
                       <XStack justifyContent="center">
                         <XStack gap="$small" $md={{ paddingLeft: '$medium' }} $gtLg={{ paddingVertical: section.index === 0 ? '$large' : 0 }}>
@@ -160,17 +158,7 @@ const EventList = () => {
                   </YStack>
                 )
               }}
-              ListEmptyComponent={
-                isFetching ? (
-                  <EventsListSkeleton />
-                ) : (
-                  <VoxCard.Content paddingTop="$xxlarge">
-                    <XStack flex={1}>
-                      <EmptyEvent />
-                    </XStack>
-                  </VoxCard.Content>
-                )
-              }
+              ListEmptyComponent={isFetching ? <EventsListSkeleton /> : feedData.length === 0 ? <EmptyStateSection isAuth={isAuth} /> : null}
               keyboardDismissMode="on-drag"
               keyExtractor={(item) => item.uuid}
               refreshing={isRefetching}
