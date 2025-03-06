@@ -1,7 +1,7 @@
 import { memo, ReactNode, useMemo, useRef } from 'react'
 import { GestureResponderEvent } from 'react-native'
 import Text from '@/components/base/Text'
-import * as S from '@/features/message/schemas/messageBuilderSchema'
+import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { useLazyRef } from '@/hooks/useLazyRef'
 import { Control, Controller } from 'react-hook-form'
 import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'

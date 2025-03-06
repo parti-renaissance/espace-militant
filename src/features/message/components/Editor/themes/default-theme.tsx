@@ -2,16 +2,28 @@ import * as S from '@/features/message/components/Editor/schemas/messageBuilderS
 
 export default {
   global: {
-    container: {
-      // overflow: 'hidden',
+    wrapper: {
+      margin: 0,
+      marginLeft: 16,
+      marginRight: 16,
+      backgroundColor: '#f9f9fa',
     },
+    container: {
+      paddingTop: 16,
+      paddingBottom: 16,
+      maxWidth: 500,
+    },
+
     item: {
       wrapper: {
         overflow: 'hidden',
         backgroundColor: 'white',
         borderColor: '#EEF0F2',
         borderStyle: 'solid',
-        // paddingHorizontal: 40,
+        paddingTop: 16,
+        paddingBottom: 16,
+        paddingLeft: 40,
+        paddingRight: 40,
       },
       trailing: {
         borderWidth: 1,
@@ -39,41 +51,40 @@ export default {
   },
   image: {
     frame: {
-      container: {
-        paddingVertical: 16,
-        paddingHorizontal: 40,
-      },
+      container: {},
       base: {
         borderRadius: 8,
+        width: '100%',
       },
     },
     borderless: {
+      wrapper: { padding: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
       container: {},
-      base: {},
+      base: {
+        width: '100%',
+      },
     },
   },
   richtext: {
     global: {
-      container: {
-        paddingVertical: 16,
-        paddingHorizontal: 40,
-      },
+      container: {},
     },
   },
   button: {
     global: {
       container: {
+        width: '100%',
         borderRadius: 28,
         cursor: 'pointer',
-        height: 56,
-        justifyContent: 'center',
-        alignItems: 'center',
-        margin: 16,
-        marginHorizontal: 40,
+
+        paddingTop: 19,
+        paddingBottom: 19,
+        paddingRight: 12,
+        paddingLeft: 12,
       },
       base: {
         fontSize: 16,
-        lineHeight: 24,
+        textAlign: 'center',
         fontWeight: 'bold',
         color: 'hsl(211,24%, 17%)',
       },

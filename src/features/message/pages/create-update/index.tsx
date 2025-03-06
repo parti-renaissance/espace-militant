@@ -10,7 +10,7 @@ import TestMessage from '@/features/message/data/test'
 import { MailPlus } from '@tamagui/lucide-icons'
 import { Link, router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
-import MessageEditor, { MessageEditorRef } from '../../components/Editor'
+import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
 
 const dataTest = S.MessageSchema.safeParse(TestMessage)
 
@@ -19,6 +19,10 @@ const data = dataTest.success ? dataTest.data : undefined
 const MessageEditorPage: React.FC = () => {
   const editorRef = useRef<MessageEditorRef>(null)
   const media = useMedia()
+
+  const handleSubmit = (x: S.Message) => {
+    console.log(x, getHTML(defaultTheme, x))
+  }
   return (
     <PageLayout
       webScrollable
@@ -43,7 +47,7 @@ const MessageEditorPage: React.FC = () => {
                     <VoxHeader.Title icon={MailPlus}>Message</VoxHeader.Title>
                   </XStack>
                   <XStack>
-                    <VoxButton size="lg" variant="text" theme="purple" onPress={editorRef.current?.submit}>
+                    <VoxButton size="lg" variant="text" theme="purple" onPress={() => editorRef.current?.submit()}>
                       Suivant
                     </VoxButton>
                   </XStack>
@@ -51,7 +55,7 @@ const MessageEditorPage: React.FC = () => {
               </VoxHeader>
             </YStack>
           </StickyBox>
-          <MessageEditor ref={editorRef} defaultValue={data} onSubmit={(x) => console.log(x)} />
+          <MessageEditor theme={defaultTheme} ref={editorRef} defaultValue={data} onSubmit={handleSubmit} />
         </PageLayout.MainSingleColumn>
       </BoundarySuspenseWrapper>
     </PageLayout>

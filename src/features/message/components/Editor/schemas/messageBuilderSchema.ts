@@ -97,7 +97,7 @@ export const MessageFormValuesValidatorSchema = z.object({
     z.enum(nodeTypesArray),
     z.record(
       z.string(),
-      z.object({ content: z.any() }).refine(
+      z.object({ type: z.string(), content: z.any(), marks: z.array(z.string()).optional() }).refine(
         (x) => {
           return x.content !== null && x.content !== undefined
         },
@@ -137,12 +137,14 @@ export type ExtractMarks<T extends NodeType> = Extract<Node, { type: T }> extend
 
 export type NodeStyle<T extends NodeType> = {
   global?: {
+    wrapper?: ViewStyle
     container?: ViewStyle
     base?: T extends 'button' ? TextStyle : ViewStyle
   }
 } & (ExtractMarks<T> extends string // si la node a des marks, on ajoute les styles pour chacun d'eux
   ? {
       [K in ExtractMarks<T>]?: {
+        wrapper?: ViewStyle
         container?: ViewStyle
         base?: T extends 'button' ? TextStyle : ViewStyle
       }
@@ -151,6 +153,7 @@ export type NodeStyle<T extends NodeType> = {
 
 export type MessageStyle = {
   global: {
+    wrapper?: ViewStyle
     container?: ViewStyle
     item?: {
       wrapper?: ViewStyle
