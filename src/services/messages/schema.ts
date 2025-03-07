@@ -27,4 +27,13 @@ export const RestPostMessageResponseSchema = z.object({
   preview_link: z.string().nullable(),
 })
 
+export const RestGetMessageContentResponseSchema = z.object({
+  uuid: z.string(),
+  content: z.string(),
+  subject: z.string(),
+  json_content: z.string(),
+})
+
+export type RestGetMessageContentResponse = z.infer<typeof RestGetMessageContentResponseSchema>
+
 export type RestPostMessageResponse = z.infer<typeof RestPostMessageResponseSchema>

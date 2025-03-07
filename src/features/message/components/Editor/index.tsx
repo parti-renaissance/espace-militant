@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { uniqueId } from 'lodash'
 import { useForm } from 'react-hook-form'
 import { getTokenValue, isWeb, YStack } from 'tamagui'
-import headingImagePlaceholderNode from '../../data/headingImagePlaceholder'
 import { StyleRendererContextProvider } from './context/styleRenderContext'
 import { getHTML } from './HtmlOneRenderer'
 import { RenderFields } from './RenderFields'
@@ -27,26 +26,21 @@ export type MessageEditorRef = {
 }
 
 const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, ref) => {
-  const defaultField = {
-    type: 'image',
-    id: uniqueId(),
-  } as const
-
   const defaultData = props.defaultValue
     ? unZipMessage(props.defaultValue)
     : {
         metaData: {
-          object: '',
+          subject: '',
+          scope: undefined,
         },
-        struct: [defaultField] as S.FieldsArray,
+        struct: [] as S.FieldsArray,
         states: {
           ...getDefaultFormValues(),
-          ['image']: { [defaultField.id]: headingImagePlaceholderNode },
         } as S.MessageFormValues,
       }
 
   const { control, handleSubmit, setValue, unregister } = useForm<S.GlobalForm>({
-    defaultValues: { formValues: defaultData.states, selectedField: null },
+    defaultValues: { formValues: defaultData.states, metaData: defaultData.metaData, selectedField: null },
     resolver: zodResolver(S.MessageFormValuesValidatorSchema),
   })
 

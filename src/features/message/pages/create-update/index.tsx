@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { Keyboard } from 'react-native'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
@@ -6,21 +7,16 @@ import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import StickyBox from '@/components/StickyBox/StickyBox'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
-import TestMessage from '@/features/message/data/test'
 import { useCreateMessage } from '@/services/messages/hook'
 import * as types from '@/services/messages/schema'
-import { MailPlus } from '@tamagui/lucide-icons'
+import { MailPlus, PenLine } from '@tamagui/lucide-icons'
 import { Link, router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
 import ModalSender from '../../components/ModalSender'
-import ViewportModalSheet, { ViewportModalRef } from '../../components/ModalSender/ViewportModalSheet'
+import { ViewportModalRef } from '../../components/ModalSender/ViewportModalSheet'
 
-const dataTest = S.MessageSchema.safeParse(TestMessage)
-
-const data = dataTest.success ? dataTest.data : undefined
-
-const MessageEditorPage: React.FC = (props?: { edit?: types.RestPostMessageResponse }) => {
+const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse; scope?: string }) => {
   const editorRef = useRef<MessageEditorRef>(null)
   const modalSendRef = useRef<ViewportModalRef>(null)
   const media = useMedia()
@@ -30,7 +26,7 @@ const MessageEditorPage: React.FC = (props?: { edit?: types.RestPostMessageRespo
         scope: string
       }
     | undefined
-  >(undefined)
+  >(props?.edit ? { messageId: props.edit.uuid!, scope: props.scope! } : undefined)
 
   const messageQuery = useCreateMessage({ uuid: props?.edit?.uuid })
 
@@ -49,6 +45,7 @@ const MessageEditorPage: React.FC = (props?: { edit?: types.RestPostMessageRespo
       .then((result) => {
         setMessage({ messageId: result.uuid, scope: x.metaData.scope })
         modalSendRef.current?.present()
+        Keyboard.dismiss()
       })
   }
   return (
@@ -70,14 +67,14 @@ const MessageEditorPage: React.FC = (props?: { edit?: types.RestPostMessageRespo
               <VoxHeader borderRadius={20}>
                 <XStack alignItems="center" flex={1} width="100%">
                   <XStack alignContent="flex-start">
-                    <Link href={router.canGoBack() ? '../' : '/messages'} replace asChild={!isWeb}>
-                      <VoxButton size="lg" variant="text" theme="orange">
-                        Annuler
+                    <Link href={router.canGoBack() ? '../' : '/'} replace asChild={!isWeb}>
+                      <VoxButton size="lg" variant="text" theme={!props?.edit ? 'orange' : undefined}>
+                        {props?.edit ? 'Quitter' : 'Annuler'}
                       </VoxButton>
                     </Link>
                   </XStack>
                   <XStack flexGrow={1} justifyContent="center">
-                    <VoxHeader.Title icon={MailPlus}>Message</VoxHeader.Title>
+                    <VoxHeader.Title icon={props?.edit ? PenLine : MailPlus}>{props?.edit ? 'Editer Message' : 'Message'}</VoxHeader.Title>
                   </XStack>
                   <XStack>
                     <VoxButton
@@ -95,7 +92,12 @@ const MessageEditorPage: React.FC = (props?: { edit?: types.RestPostMessageRespo
               </VoxHeader>
             </YStack>
           </StickyBox>
-          <MessageEditor theme={defaultTheme} ref={editorRef} defaultValue={data} onSubmit={handleSubmit} />
+          <MessageEditor
+            theme={defaultTheme}
+            ref={editorRef}
+            defaultValue={props?.edit?.json_content ? JSON.parse(props.edit.json_content) : undefined}
+            onSubmit={handleSubmit}
+          />
         </PageLayout.MainSingleColumn>
       </BoundarySuspenseWrapper>
     </PageLayout>

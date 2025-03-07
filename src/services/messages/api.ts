@@ -11,6 +11,15 @@ export const getMessage = (props: { messageId: string; scope: string }) =>
     type: 'private',
   })()
 
+export const getMessageContent = (props: { messageId: string; scope: string }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherent_messages/${props.messageId}/content?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestGetMessageContentResponseSchema,
+    type: 'private',
+  })()
+
 export const createMessage = (props: { payload: schemas.RestPostMessageRequest; scope: string }) =>
   api({
     method: 'post',

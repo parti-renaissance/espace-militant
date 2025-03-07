@@ -4,7 +4,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { RestPostMessageResponse } from '@/services/files/schema'
 import { useGetIsMessageTilSync, useSendMessage } from '@/services/messages/hook'
 import { Eye, Send } from '@tamagui/lucide-icons'
-import { Href, Link } from 'expo-router'
+import { Href, Link, router } from 'expo-router'
 import { isWeb, Spinner, YStack } from 'tamagui'
 import ViewportModalSheet, { ViewportModalRef } from './ViewportModalSheet'
 
@@ -23,7 +23,7 @@ const SenderView = (props: { payload: RestPostMessageResponse; scope: string }) 
 
   return (
     <YStack flex={1} minHeight={300}>
-      <Link href={props.payload.preview_link! as Href} asChild={isWeb}>
+      <Link href={props.payload.preview_link! as Href} asChild={!isWeb}>
         <VoxButton variant="outlined" iconLeft={Eye}>
           Prévisualiser
         </VoxButton>
@@ -44,8 +44,17 @@ const ModalSender = forwardRef<ViewportModalRef, { payload?: { messageId: string
 
   useImperativeHandle(ref, () => modalSheetRef.current!)
 
+  const handleCancel = () => {
+    router.replace({
+      pathname: '/messages/[id]/editer',
+      params: {
+        id: props.payload?.messageId ?? '',
+      },
+    })
+  }
+
   return (
-    <ViewportModalSheet ref={modalSheetRef}>
+    <ViewportModalSheet ref={modalSheetRef} onClose={handleCancel}>
       <VoxCard.Content>
         {!query.data ? (
           <YStack justifyContent="center" alignItems="center" flex={1} minHeight={300}>

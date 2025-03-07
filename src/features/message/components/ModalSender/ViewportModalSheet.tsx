@@ -28,6 +28,7 @@ const ViewportModal = forwardRef<ViewportModalRef, ViewportModalSheet>(({ childr
     },
     dismiss: () => {
       setOpen(false)
+      onClose?.()
     },
   }))
 

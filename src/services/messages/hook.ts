@@ -63,6 +63,15 @@ export const useGetMessage = (props: { messageId: string; scope: string; enabled
   })
 }
 
+export const useGetMessageContent = (props: { messageId?: string; scope?: string; enabled: boolean }) => {
+  return useQuery({
+    queryKey: ['message', props.messageId],
+    queryFn: () => (props.messageId && props.scope ? api.getMessageContent({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined)),
+    enabled: Boolean(props.messageId && props.scope) && props.enabled,
+    refetchOnMount: true,
+  })
+}
+
 class MessageNotSynchronizedError extends Error {
   constructor(messageId?: string) {
     super(`Message ${messageId} n'est pas synchronisé`)
