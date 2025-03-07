@@ -16,8 +16,6 @@ export const ImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leadin
     [width, height],
   )
 
-  console.log(url)
-
   return (
     <YStack style={wrapperStyle}>
       <View style={[containerStyle]}>

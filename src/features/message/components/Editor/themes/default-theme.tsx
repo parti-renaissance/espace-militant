@@ -50,18 +50,27 @@ export default {
     },
   },
   image: {
-    frame: {
+    global: {
       container: {},
       base: {
         borderRadius: 8,
         width: '100%',
       },
     },
-    borderless: {
+    leading: {
       wrapper: { padding: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
       container: {},
       base: {
         width: '100%',
+        borderRadius: 0,
+      },
+    },
+    alone: {
+      wrapper: { padding: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+      container: {},
+      base: {
+        width: '100%',
+        borderRadius: 0,
       },
     },
   },

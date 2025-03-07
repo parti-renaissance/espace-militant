@@ -42,8 +42,7 @@ const ImageLibraryStateTrigger = (props: { onChange: (x: S.ImageNode['content'])
     mutateAsync()
       .then((payload) => {
         if (payload) {
-          return uploadFile({ uri: payload.url, filename: payload.filename ?? 'image.png' }).then((x) => {
-            console.log(x)
+          return uploadFile({ uri: payload.url, filename: payload.filename ?? 'image.png', dataType: 'image/png' }).then((x) => {
             props.onChange({ ...payload, url: x.url })
           })
         }

@@ -7,7 +7,7 @@ import { createUploadTask, FileSystemUploadType } from 'expo-file-system'
 import { z } from 'zod'
 import { parseError } from '../common/errors/utils'
 
-const API_URL = `${clientEnv.API_BASE_URL}/api/v3/upload-file?scope=president_departmental_assembly`
+const API_URL = `${clientEnv.API_BASE_URL}/api/v3/upload-file`
 
 export const uploadFile = async (
   props: { uri: string; filename: string; dataType?: string },

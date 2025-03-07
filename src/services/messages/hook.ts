@@ -1,7 +1,8 @@
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/messages/api'
 import { useToastController } from '@tamagui/toast'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { RestPostMessageResponse } from '../files/schema'
 import { RestPostMessageRequest } from './schema'
 
 export const useCreateMessage = (props: { uuid?: string }) => {
@@ -50,6 +51,46 @@ export const useSendMessage = (props: { uuid: string }) => {
       }
       return error
     },
+  })
+}
+
+export const useGetMessage = (props: { messageId: string; scope: string; enabled: boolean }) => {
+  return useQuery({
+    queryKey: ['message', props.messageId],
+    queryFn: () => api.getMessage({ messageId: props.messageId, scope: props.scope }),
+    enabled: props.enabled,
+    refetchOnMount: true,
+  })
+}
+
+class MessageNotSynchronizedError extends Error {
+  constructor(messageId?: string) {
+    super(`Message ${messageId} n'est pas synchronisé`)
+  }
+}
+
+export const useGetIsMessageTilSync = (props: { payload?: { messageId: string; scope: string } }) => {
+  return useQuery({
+    queryKey: ['message', props?.payload?.messageId],
+    queryFn: () =>
+      props.payload?.messageId && props.payload?.scope
+        ? api.getMessage({ messageId: props.payload.messageId, scope: props.payload.scope }).then((x) => {
+            if (x.synchronized) {
+              return x as Omit<RestPostMessageResponse, 'synchronized'> & { synchronized: true }
+            }
+            throw new MessageNotSynchronizedError(props.payload?.messageId)
+          })
+        : Promise.resolve(undefined),
+    enabled: Boolean(props.payload?.messageId && props.payload?.scope),
+    refetchOnMount: true,
+    retry: (attempts, error) => {
+      if (attempts > 20) return false
+      if (error instanceof MessageNotSynchronizedError) {
+        return true
+      }
+      return false
+    },
+    retryDelay: 1000,
   })
 }
 

@@ -21,14 +21,19 @@ const flatNodeStyle = <T extends S.NodeType, M extends 'container' | 'base' | 'w
     : styles.global?.[mode]
 }
 
-export function useThemeStyle(): ViewStyle
-export function useThemeStyle(
+export function getThemeStyle(theme: S.MessageStyle): { containerStyle: ViewStyle; wrapperStyle: ViewStyle }
+export function getThemeStyle(
+  theme: S.MessageStyle,
   node: S.Node,
   edgePosition?: 'leading' | 'trailing' | 'alone',
 ): { containerStyle: ViewStyle; baseStyle: ViewStyle | TextStyle; wrapperStyle: ViewStyle }
-export function useThemeStyle(node?: S.Node, edgePosition?: 'leading' | 'trailing' | 'alone') {
-  const theme = useContext(styleRendererContext)
-  if (!node) return theme.global.container
+export function getThemeStyle(theme: S.MessageStyle, _node?: S.Node, edgePosition?: 'leading' | 'trailing' | 'alone') {
+  if (!_node)
+    return {
+      containerStyle: theme.global?.container,
+      wrapperStyle: theme.global?.wrapper,
+    }
+  const node = { ..._node, marks: [...(_node.marks ?? []), edgePosition ?? 'middle'] } as S.Node
   const wrapperStyle = [theme.global.item?.wrapper, theme.global.item?.[edgePosition ?? 'middle']].reduce((acc, style) => {
     if (style) acc = { ...acc, ...style }
     return acc
@@ -41,26 +46,12 @@ export function useThemeStyle(node?: S.Node, edgePosition?: 'leading' | 'trailin
   return { containerStyle, baseStyle, wrapperStyle: nodeWrapperStyle }
 }
 
-export function getThemeStyle(theme: S.MessageStyle): { containerStyle: ViewStyle; wrapperStyle: ViewStyle }
-export function getThemeStyle(
-  theme: S.MessageStyle,
+export function useThemeStyle(): { containerStyle: ViewStyle; wrapperStyle: ViewStyle }
+export function useThemeStyle(
   node: S.Node,
   edgePosition?: 'leading' | 'trailing' | 'alone',
 ): { containerStyle: ViewStyle; baseStyle: ViewStyle | TextStyle; wrapperStyle: ViewStyle }
-export function getThemeStyle(theme: S.MessageStyle, node?: S.Node, edgePosition?: 'leading' | 'trailing' | 'alone') {
-  if (!node)
-    return {
-      containerStyle: theme.global?.container,
-      wrapperStyle: theme.global?.wrapper,
-    }
-  const wrapperStyle = [theme.global.item?.wrapper, theme.global.item?.[edgePosition ?? 'middle']].reduce((acc, style) => {
-    if (style) acc = { ...acc, ...style }
-    return acc
-  }, {} as ViewStyle)
-  const nodeTheme = theme[node.type]
-  if (!nodeTheme) return { containerStyle: {}, baseStyle: {}, wrapperStyle } as const
-  const containerStyle = nodeHasMarks(node) ? flatNodeStyle('container', node, nodeTheme) : (nodeTheme.global?.container ?? {})
-  const baseStyle = nodeHasMarks(node) ? flatNodeStyle('base', node, nodeTheme) : (nodeTheme.global?.base ?? {})
-  const nodeWrapperStyle = { ...wrapperStyle, ...(nodeHasMarks(node) ? flatNodeStyle('wrapper', node, nodeTheme) : (nodeTheme.global?.wrapper ?? {})) }
-  return { containerStyle, baseStyle, wrapperStyle: nodeWrapperStyle }
+export function useThemeStyle(node?: S.Node, edgePosition?: 'leading' | 'trailing' | 'alone') {
+  const theme = useContext(styleRendererContext)
+  return node ? getThemeStyle(theme, node, edgePosition) : getThemeStyle(theme)
 }

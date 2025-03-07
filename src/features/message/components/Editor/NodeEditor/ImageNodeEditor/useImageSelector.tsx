@@ -1,6 +1,6 @@
 import { Platform } from 'react-native'
 import { useMutation } from '@tanstack/react-query'
-import { ImageManipulator } from 'expo-image-manipulator'
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator'
 import * as ImagePicker from 'expo-image-picker'
 import { last } from 'lodash'
 
@@ -21,6 +21,7 @@ const compressImage = async (x: { uri: string; height: number; width: number }) 
   const img = await ctx.renderAsync()
   return img.saveAsync({
     compress: 0.75,
+    format: SaveFormat.PNG,
   })
 }
 export const useImageSelector = () => {

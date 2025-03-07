@@ -5,7 +5,7 @@ export const nodeTypesArray = ['image', 'richtext', 'button'] as const satisfies
 
 export const ImageNodeSchema = z.object({
   type: z.literal('image'),
-  marks: z.array(z.union([z.literal('borderless'), z.literal('frame')]).or(z.string().transform(() => 'unsupported' as const))).optional(),
+  marks: z.array(z.string()).optional(),
   content: z
     .object({
       url: z.string(),
@@ -19,6 +19,7 @@ export type ImageNode = z.infer<typeof ImageNodeSchema>
 
 export const RichTextNodeSchema = z.object({
   type: z.literal('richtext'),
+  marks: z.array(z.string()).optional(),
   content: z
     .object({
       pure: z.string(),
@@ -31,7 +32,7 @@ export type RichTextNode = z.infer<typeof RichTextNodeSchema>
 
 export const ButtonNodeSchema = z.object({
   type: z.literal('button'),
-  marks: z.array(z.union([z.literal('primary'), z.literal('secondary')]).or(z.string().transform(() => 'unsupported' as const))).optional(),
+  marks: z.array(z.string()).optional(),
   content: z
     .object({
       text: z.string(),
@@ -82,7 +83,8 @@ export type NodeType = z.infer<typeof NodeSchema>['type']
 
 export const MessageFormValuesValidatorSchema = z.object({
   metaData: z.object({
-    object: z
+    scope: z.string({ required_error: 'le rôle est obligatoire' }),
+    subject: z
       .string({
         required_error: "L'objet est obligatoire",
       })
@@ -108,7 +110,8 @@ export const MessageFormValuesValidatorSchema = z.object({
 })
 
 export const MessageMetaDataSchema = z.object({
-  object: z.string(),
+  subject: z.string(),
+  scope: z.string(),
 })
 
 export type MessageMetaData = z.infer<typeof MessageMetaDataSchema>
