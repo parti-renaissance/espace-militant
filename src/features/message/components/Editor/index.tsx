@@ -4,15 +4,18 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { uniqueId } from 'lodash'
 import { useForm } from 'react-hook-form'
 import { getTokenValue, isWeb, YStack } from 'tamagui'
-import headingImagePlaceholderNode from '../../data/headingImagePlaceholder'
 import { StyleRendererContextProvider } from './context/styleRenderContext'
+import { getHTML } from './HtmlOneRenderer'
 import { RenderFields } from './RenderFields'
 import defaultTheme from './themes/default-theme'
 import MessageEditorToolbar, { MessageEditorToolBarRef } from './ToolBar'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
 
+export { getHTML, defaultTheme }
+
 type MessageEditorProps = {
+  theme: S.MessageStyle
   defaultValue?: S.Message
   onSubmit: (x: S.Message) => void
 }
@@ -23,26 +26,21 @@ export type MessageEditorRef = {
 }
 
 const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, ref) => {
-  const defaultField = {
-    type: 'image',
-    id: uniqueId(),
-  } as const
-
   const defaultData = props.defaultValue
     ? unZipMessage(props.defaultValue)
     : {
         metaData: {
-          object: '',
+          subject: '',
+          scope: undefined,
         },
-        struct: [defaultField] as S.FieldsArray,
+        struct: [] as S.FieldsArray,
         states: {
           ...getDefaultFormValues(),
-          ['image']: { [defaultField.id]: headingImagePlaceholderNode },
         } as S.MessageFormValues,
       }
 
   const { control, handleSubmit, setValue, unregister } = useForm<S.GlobalForm>({
-    defaultValues: { formValues: defaultData.states, selectedField: null },
+    defaultValues: { formValues: defaultData.states, metaData: defaultData.metaData, selectedField: null },
     resolver: zodResolver(S.MessageFormValuesValidatorSchema),
   })
 
@@ -76,7 +74,9 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   } satisfies EditorMethods)
 
   useImperativeHandle(ref, () => ({
-    submit: handleSubmit((x) => props.onSubmit(zipMessage(x.formValues, renderFieldsRef.current!.getFields(), x.metaData))),
+    submit: handleSubmit((x) => {
+      props.onSubmit(zipMessage(x.formValues, renderFieldsRef.current!.getFields(), x.metaData))
+    }),
     unSelect: () => setValue('selectedField', null),
   }))
 
@@ -96,7 +96,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
         }
       >
         <YStack flex={1} gap="$medium" position="relative">
-          <StyleRendererContextProvider value={defaultTheme}>
+          <StyleRendererContextProvider value={props.theme}>
             <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} />
           </StyleRendererContextProvider>
         </YStack>

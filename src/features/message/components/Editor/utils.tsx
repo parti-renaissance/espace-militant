@@ -6,7 +6,6 @@ type NodeCreator<I extends S.Node> = () => I
 const createImage: NodeCreator<S.ImageNode> = () => {
   return {
     type: 'image',
-    marks: ['frame'],
     content: null,
   }
 }

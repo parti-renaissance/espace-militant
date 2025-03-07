@@ -19,7 +19,7 @@ export const ImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leadin
   return (
     <YStack style={wrapperStyle}>
       <View style={[containerStyle]}>
-        <Image contentFit={'cover'} source={{ uri: url }} style={[styles.image, dynStyle, baseStyle as ImageStyle]} />
+        <Image contentFit={'cover'} source={url} style={[styles.image, dynStyle, baseStyle as ImageStyle]} />
       </View>
     </YStack>
   )

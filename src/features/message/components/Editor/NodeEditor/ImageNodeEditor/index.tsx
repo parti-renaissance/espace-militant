@@ -1,10 +1,17 @@
 import React, { Fragment, useEffect } from 'react'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
+import ProgressBar from '@/screens/shared/ProgressBar'
+import { useUploadFile } from '@/services/files/hook'
 import { useForm } from 'react-hook-form'
 import { Spinner, YStack } from 'tamagui'
 import { useImageSelector } from './useImageSelector'
 
-type NodeEditorProps = { value: S.ImageNode; onChange: (node: S.ImageNode) => void; onBlur: () => void; present: boolean }
+type NodeEditorProps = {
+  value: S.ImageNode
+  onChange: (node: S.ImageNode) => void
+  onBlur: () => void
+  present: boolean
+}
 
 export const ImageNodeEditor = (props: NodeEditorProps) => {
   const { handleSubmit, setValue } = useForm({
@@ -29,22 +36,26 @@ export const ImageNodeEditor = (props: NodeEditorProps) => {
 
 const ImageLibraryStateTrigger = (props: { onChange: (x: S.ImageNode['content']) => void; onBlur: () => void }) => {
   const { mutateAsync } = useImageSelector()
+  const { mutateAsync: uploadFile, progress, isPending } = useUploadFile()
 
   useEffect(() => {
     mutateAsync()
       .then((payload) => {
         if (payload) {
-          props.onChange(payload)
+          return uploadFile({ uri: payload.url, filename: payload.filename ?? 'image.png', dataType: 'image/png' }).then((x) => {
+            props.onChange({ ...payload, url: x.url })
+          })
         }
       })
-      .finally(() => {
-        props.onBlur()
-      })
+      .finally(props.onBlur)
   }, [])
 
   return (
-    <YStack position="absolute" justifyContent="center" alignItems="center" right={0} left={0} bottom={0} top={0}>
+    <YStack position="absolute" gap="$medium" justifyContent="center" alignItems="center" right={0} left={0} bottom={0} top={0}>
       <Spinner />
+      <YStack position="absolute" gap="$medium" right={0} left={0} bottom={0} justifyContent="flex-end">
+        {isPending ? <ProgressBar progress={progress} color="$blue5" /> : null}
+      </YStack>
     </YStack>
   )
 }

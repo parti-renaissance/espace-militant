@@ -2,11 +2,11 @@ import { forwardRef, RefObject, useCallback, useImperativeHandle, useState } fro
 import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { VoxButton } from '@/components/Button'
-import * as S from '@/features/message/schemas/messageBuilderSchema'
+import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { ArrowLeft, BetweenHorizontalEnd, ChevronDown, ChevronUp, ImagePlus, Pencil, PlusSquare, TextSelect, Trash2, X } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { getTokenValue, isWeb, ScrollView, styled, ThemeableStack, XStack } from 'tamagui'
-import { EditorMethods } from '../types'
+import { EditorMethods } from './types'
 
 const ToolBarPositioner = styled(ThemeableStack, {
   position: 'fixed',
