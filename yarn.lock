@@ -13381,9 +13381,11 @@ __metadata:
   linkType: hard
 
 "basic-auth-connect@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "basic-auth-connect@npm:1.0.0"
-  checksum: 10c0/ed870b7d05efced0981e2799948bf353fa2807dd5763304a8631a3010ed59905aaf94e55659de212ede65aaf5046f8fee245c35c6bdf0661f07b975697ceeec7
+  version: 1.1.0
+  resolution: "basic-auth-connect@npm:1.1.0"
+  dependencies:
+    tsscmp: "npm:^1.0.6"
+  checksum: 10c0/bd229e1339d9025c6cd08371860160072c97eb0323b79330daae51ef4d7fe9768b46c730779516d835ceb3f6295bc1fd73594100cc295dc2d0405724cdc3a7e6
   languageName: node
   linkType: hard
 
@@ -29445,6 +29447,13 @@ __metadata:
   version: 2.6.3
   resolution: "tslib@npm:2.6.3"
   checksum: 10c0/2598aef53d9dbe711af75522464b2104724d6467b26a60f2bdac8297d2b5f1f6b86a71f61717384aa8fd897240467aaa7bcc36a0700a0faf751293d1331db39a
+  languageName: node
+  linkType: hard
+
+"tsscmp@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "tsscmp@npm:1.0.6"
+  checksum: 10c0/2f79a9455e7e3e8071995f98cdf3487ccfc91b760bec21a9abb4d90519557eafaa37246e87c92fa8bf3fef8fd30cfd0cc3c4212bb929baa9fb62494bfa4d24b2
   languageName: node
   linkType: hard
 
