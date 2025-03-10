@@ -1858,9 +1858,9 @@ __metadata:
   linkType: hard
 
 "@blakeembrey/template@npm:^1.0.0":
-  version: 1.1.0
-  resolution: "@blakeembrey/template@npm:1.1.0"
-  checksum: 10c0/4ac8b48ec84f33ffd468ebb7082cc28ee257c20f428b0e64239053a4e0c81200c3c119efd659e215d7c7ffac8309ae6d5edd8c249a96f972893efb45df124a45
+  version: 1.2.0
+  resolution: "@blakeembrey/template@npm:1.2.0"
+  checksum: 10c0/63f0eff2a28ad83c5c1f14e1fce201e3835703d7c93929d438d431b4ebc0ea2f119c9d9ca7b058ddd15987c377b1d974ed42f53afb9b4948e9df796cce7c8d94
   languageName: node
   linkType: hard
 
