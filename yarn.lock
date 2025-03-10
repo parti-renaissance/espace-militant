@@ -27562,6 +27562,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"semver@npm:^7.7.0":
+  version: 7.7.1
+  resolution: "semver@npm:7.7.1"
+  bin:
+    semver: bin/semver.js
+  checksum: 10c0/fd603a6fb9c399c6054015433051bdbe7b99a940a8fb44b85c2b524c4004b023d7928d47cb22154f8d054ea7ee8597f586605e05b52047f048278e4ac56ae958
+  languageName: node
+  linkType: hard
+
 "semver@npm:~7.5.4":
   version: 7.5.4
   resolution: "semver@npm:7.5.4"
@@ -30413,7 +30422,7 @@ __metadata:
     react-stickynode: "npm:^4.1.1"
     react-style-stringify: "npm:^1.1.0"
     react-test-renderer: "npm:18.1.0"
-    semver: "npm:^7.6.0"
+    semver: "npm:^7.7.0"
     tamagui: "npm:1.98.0"
     timezones-list: "npm:^3.1.0"
     tinycolor2: "npm:^1.6.0"
