@@ -23,16 +23,14 @@ const RestProfilInstancesSchema = z
         name: z.string(),
       })
       .nullish(),
-    committee: z
-      .object({
-        name: z.string(),
-        uuid: z.string().uuid(),
-        members_count: z.number(),
-        assembly_committees_count: z.number(),
-        can_change_committee: z.boolean(),
-        message: z.string().nullable(),
-      })
-      .nullish(),
+    committee: z.object({
+      name: z.string().nullable(),
+      uuid: z.string().uuid().nullable(),
+      members_count: z.number().nullable(),
+      assembly_committees_count: z.number(),
+      can_change_committee: z.boolean(),
+      message: z.string().nullable(),
+    }),
   })
   .nullable()
 
