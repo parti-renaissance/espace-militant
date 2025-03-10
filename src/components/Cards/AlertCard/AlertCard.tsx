@@ -87,7 +87,7 @@ const AlertMeetingShareCard = ({ payload, ...props }: AlertVoxCardProps) => {
           </XStack>
 
           <XStack flexShrink={1}>
-            <Text.MD multiline>Vous êtes inscrit. Et si vous le partagiez autour de vous ?</Text.MD>
+            <Text.MD multiline>{payload.description}</Text.MD>
           </XStack>
         </YStack>
         <XStack gap="$small">
