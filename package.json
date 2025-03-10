@@ -174,7 +174,6 @@
     "onchange": "^7.1.0",
     "prettier": "^3.1.1",
     "react-devtools": "^5.0.0",
-    "semver": "^7.6.0",
     "ts-node": "^10.9.2",
     "vite": "^5.1.5",
     "vite-tsconfig-paths": "^4.3.1"
