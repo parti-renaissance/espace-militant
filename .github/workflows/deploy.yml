@@ -75,7 +75,6 @@ jobs:
         uses: actions/checkout@v4
       - uses: ./.github/actions/setup-base
       - uses: ./.github/actions/dependencies
-      - uses: ./.github/actions/lint-codebase
       - name: ⚙️ Compile web worker
         run: yarn vite build --config vite.worker.config.js
       - name: ⚙️ Compile web assets

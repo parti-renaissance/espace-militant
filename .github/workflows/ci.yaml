@@ -1,0 +1,19 @@
+name: CI
+
+on:
+    push:
+
+concurrency:
+    group: ${{ github.ref_name }}
+    cancel-in-progress: true
+
+jobs:
+    lint:
+        name: Lint
+        runs-on: ubuntu-24.04
+
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/setup-base
+            - uses: ./.github/actions/dependencies
+            - run: yarn lint

@@ -1,6 +1,4 @@
-// import { Image } from 'react-native'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
-// import { Image } from 'expo-image'
 import { Link, router } from 'expo-router'
 import { Image, View, YStack } from 'tamagui'
 import Text from '../base/Text'
