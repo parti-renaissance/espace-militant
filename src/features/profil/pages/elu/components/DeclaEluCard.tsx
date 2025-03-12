@@ -40,7 +40,7 @@ const EluOkExempte = () => {
 }
 
 const EluExempteNonAdh = () => {
-  const { isPending, open: handlePress } = useOpenExternalContent({ slug: 'adhesion' })
+  const { isPending, open: handlePress } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'elu' })
   return (
     <FrameElu badgeTitle="Exempté de cotisation élu si à jour de cotisation adhérent">
       <Text.MD semibold>

@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React from 'react'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import { usePageLayoutScroll } from '@/components/layouts/PageLayout/usePageLayoutScroll'
 import { ScrollView, ScrollViewProps, useMedia } from 'tamagui'

@@ -13,7 +13,7 @@ const HeaderFrame = styled(XStack, {
 })
 
 export default function (props: CommonMembershipCardProps) {
-  const { isPending, open: openAdh } = useOpenExternalContent({ slug: 'adhesion' })
+  const { isPending, open: openAdh } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil' })
   return (
     <VoxCard bg={props.full ? 'white' : '$yellow1'} inside>
       <HeaderFrame>
