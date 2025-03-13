@@ -3,7 +3,7 @@ import * as types from '@/services/magic-link/schema'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 
-function useOpenExternalContent(props: { slug: types.Slugs }) {
+function useOpenExternalContent(props: { slug: types.Slugs; utm_source?: string; utm_campaign?: string }) {
   const queryLink = useGetMagicLink(props)
 
   return {

@@ -201,7 +201,7 @@ const Button = withStaticProperties(ButtonFrame, {
 
 export default Button
 
-type VoxButtonProps = {
+export type VoxButtonProps = {
   iconLeft?: NamedExoticComponent<IconProps>
   iconRight?: NamedExoticComponent<IconProps>
   textColor?: string

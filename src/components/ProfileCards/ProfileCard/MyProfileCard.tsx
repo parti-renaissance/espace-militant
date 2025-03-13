@@ -4,6 +4,7 @@ import InfoCard from '@/components/InfoCard/InfoCard'
 import Menu from '@/components/menu/Menu'
 import ProfilBlock from '@/components/ProfilBlock'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import RenewMembershipButton from '@/features/profil/pages/donations/components/RenewMembershipButton'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
@@ -85,7 +86,7 @@ const MembershipCard = ({ status }: { status: 'renew' | 'tofinish' }) => {
   const icon = status === 'renew' ? History : UserPlus
 
   return (
-    <InfoCard buttonText={buttonText} icon={icon} href="/profil/cotisations-et-dons" theme="yellow">
+    <InfoCard button={<RenewMembershipButton text={buttonText} page="accueil-connecte" full inverse bg="white" />} icon={icon} theme="yellow">
       {text}
     </InfoCard>
   )

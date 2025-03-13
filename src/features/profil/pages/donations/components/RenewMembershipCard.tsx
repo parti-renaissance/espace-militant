@@ -1,16 +1,15 @@
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { getHumanFormattedDate } from '@/utils/date'
 import { Download, RotateCw } from '@tamagui/lucide-icons'
 import { getYear } from 'date-fns'
 import { Link } from 'expo-router'
 import { isWeb, XStack, YStack } from 'tamagui'
+import RenewMembershipButton from './RenewMembershipButton'
 import type { CommonMembershipCardProps } from './types'
 
 export default function (props: CommonMembershipCardProps) {
-  const { isPending, open: handleAdhesionLink } = useOpenExternalContent({ slug: 'adhesion' })
   return (
     <>
       <VoxCard inside backgroundColor="$yellow1">
@@ -29,9 +28,7 @@ export default function (props: CommonMembershipCardProps) {
                 ) : null}
               </YStack>
               <XStack gap="$small" flexWrap="wrap" alignContent="center" alignItems="center">
-                <VoxButton size="lg" theme="yellow" disabled={isPending} onPress={handleAdhesionLink()}>
-                  Me mettre à jour
-                </VoxButton>
+                <RenewMembershipButton page="profil" />
                 <Link href="https://doc.parti.re/bulletin-adhesion.pdf" target="_blank" asChild={!isWeb}>
                   <VoxButton size="sm" theme="yellow" variant="text" iconLeft={Download}>
                     Bulletin papier
