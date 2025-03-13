@@ -26,7 +26,8 @@ export const EventSubscribePremiumLockButton = ({ isDue, slug, variant, ...butto
       text={isDue ? 'Me mettre à jour et m’inscrire' : 'J’adhère pour m’inscrire'}
       iconLeft={HelpingHand}
       variant={dynVariant}
-      page={`event_${slug}`}
+      source="evenement"
+      page={slug ?? 'event'}
       testID="event-subscribe-lock-button"
       style={{
         width: buttonProps.full ? '100%' : undefined,
