@@ -21,7 +21,7 @@ const getType = (x: RestDonationsResponse[number]) => {
 
 const EmptyState = () => {
   const donationLink = useOpenExternalContent({ slug: 'donation' })
-  const subscriptionLink = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'donation' })
+  const subscriptionLink = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil' })
 
   return (
     <_EmptyState>

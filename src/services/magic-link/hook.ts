@@ -3,10 +3,10 @@ import * as api from '@/services/magic-link/api'
 import * as types from '@/services/magic-link/schema'
 import { useMutation } from '@tanstack/react-query'
 
-export const useGetMagicLink = ({ slug, utm_campaign }: { slug: types.Slugs; utm_campaign?: string }) => {
+export const useGetMagicLink = ({ slug, utm_source = 'app', utm_campaign }: { slug: types.Slugs; utm_source?: string; utm_campaign?: string }) => {
   const { isAuth } = useSession()
 
-  const queryParams = utm_campaign ? { utm_source: 'app', utm_campaign } : undefined
+  const queryParams = utm_campaign ? { utm_source, utm_campaign } : undefined
 
   return useMutation({
     mutationKey: ['magicLink', slug],
