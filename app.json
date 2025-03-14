@@ -118,7 +118,7 @@
       ]
     ],
     "extra": {
-      "eas_update_version": "4",
+      "eas_update_version": "5",
       "router": {
         "origin": false
       },

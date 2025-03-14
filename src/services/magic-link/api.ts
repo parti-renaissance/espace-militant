@@ -14,7 +14,7 @@ export const getMagicLink = async ({
 }): Promise<RestGetMagicLinkResponse> => {
   return api({
     method: 'get',
-    path: `/api/v3/app-link/${slug}${queryParams ? `?${qs.stringify(queryParams)}` : null}`,
+    path: `/api/v3/app-link/${slug}${queryParams ? `?${qs.stringify(queryParams)}` : ''}`,
     requestSchema: schema.RestGetMagicLinkRequestSchema,
     responseSchema: schema.RestGetMagicLinkResponseSchema,
     type: 'private',
