@@ -25,25 +25,26 @@ export default function ReferralCode() {
     <VoxCard bg="#F9F9FA" borderColor="#E9ECEE" borderWidth={1} inside>
       <VoxCard.Content pr="$large">
         <Text.SM bold>Partagez votre lien de parrainage</Text.SM>
+
         <Text.SM color="$textSecondary" lineHeight={20}>
           Le lien ci-dessous est votre lien d’adhésion personnel. Si celui-ci est utilisé pour adhérer, vous serez automatiquement reconnu comme le parrain.
         </Text.SM>
 
-        <XStack gap={'$8'} mt={'$4'}>
-          <YStack flex={11}>
-            <Button variant="outlined" bg="$white1" size="xl" width="100%" justifyContent="space-between">
+        <XStack gap={'$8'} $xs={{ gap: '$4' }} mt={'$4'}>
+          <YStack $xs={{ flex: 2 }}>
+            <Button variant="outlined" bg={'$white1'} theme={'gray'} size="xl" width="100%" justifyContent="space-between" onPress={onCopyURL}>
               <XStack flexShrink={1}>
                 <Text.MD secondary numberOfLines={1} flex={1} textDecorationLine="underline">
                   {user.data?.referral_link?.replace('https://', '')}
                 </Text.MD>
               </XStack>
-              <XStack justifyContent="flex-end" onPress={onCopyURL}>
+              <XStack justifyContent="flex-end">
                 <Copy color="$textSecondary" size={24} />
               </XStack>
             </Button>
           </YStack>
 
-          <YStack flex={1}>
+          <YStack>
             <VoxButton variant="outlined" iconRight={Share2} bg={'$white1'} size={'xl'} onPress={shareURL}>
               Partager
             </VoxButton>
