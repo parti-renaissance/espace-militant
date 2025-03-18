@@ -9,9 +9,9 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { useGetCommittees, useSetMyCommittee } from '@/services/committee/hook'
 import { Diamond, X } from '@tamagui/lucide-icons'
 import { useMedia, YStack } from 'tamagui'
+import { InstanceCardHeader } from '../../../../../components/InstanceCard/InstanceCard'
 import CommitteeCard from './CommitteeCard'
 import { DoubleDiamond } from './icons'
-import { InstanceCardHeader } from './InstanceCard'
 
 const MemoizedCommitteeCard = memo(CommitteeCard)
 

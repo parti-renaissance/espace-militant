@@ -1,7 +1,7 @@
 import React from 'react'
 import Text from '@/components/base/Text'
+import InstanceCard from '@/components/InstanceCard/InstanceCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import InstanceCard from '@/features/profil/pages/instances/components/InstanceCard'
 import InviteCard from '@/features/profil/pages/referrals/components/InviteCard'
 import ReferralCode from '@/features/profil/pages/referrals/components/ReferralCode'
 import { HeartHandshake } from '@tamagui/lucide-icons'

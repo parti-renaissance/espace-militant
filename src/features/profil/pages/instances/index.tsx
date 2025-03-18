@@ -10,10 +10,10 @@ import { RestInstancesResponse } from '@/services/profile/schema'
 import { Info, UserPlus } from '@tamagui/lucide-icons'
 import { Link } from 'expo-router'
 import { isWeb, YStack } from 'tamagui'
+import InstanceCard from '../../../../components/InstanceCard/InstanceCard'
 import ScrollView from '../../components/ScrollView'
 import ChangeCommitteeModal from './components/ChangeCommittee'
 import { DoubleCircle, DoubleDiamond, DoubleTriangle } from './components/icons'
-import InstanceCard from './components/InstanceCard'
 
 type Instance = RestInstancesResponse[number]
 
