@@ -1,5 +1,5 @@
 import { IconProps } from '@tamagui/helpers-icon'
-import { CircleUser, HelpingHand, KeyRound, LandPlot, MessageCircle, Settings2, Sparkle, TreeDeciduous } from '@tamagui/lucide-icons'
+import { CircleUser, HeartHandshake, HelpingHand, KeyRound, LandPlot, MessageCircle, Settings2, Sparkle, TreeDeciduous } from '@tamagui/lucide-icons'
 
 export type PageConfig = {
   title: string
@@ -20,6 +20,10 @@ export const pageConfigs: {
   'cotisations-et-dons': {
     title: 'Cotisations et dons',
     icon: HelpingHand,
+  },
+  parrainages: {
+    title: 'Parrainages',
+    icon: HeartHandshake,
   },
   'mes-instances': {
     title: 'Mes instances',

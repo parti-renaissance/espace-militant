@@ -28,7 +28,7 @@ export const InstanceCardHeader = (props: InstanceCardHeaderProps) => {
 type InstanceCardProps = {
   description: string
   children: React.ReactNode
-  footer: React.ReactNode
+  footer?: React.ReactNode
 } & InstanceCardHeaderProps
 
 const InstanceCard = (props: InstanceCardProps) => {
