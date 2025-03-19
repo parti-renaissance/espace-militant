@@ -94,7 +94,7 @@ export default function (props: Props) {
               Annuler
             </VoxButton>
             <VoxButton variant="outlined" theme="blue" onPress={onSubmit} loading={isPending} disabled={!isValid}>
-              Enregister
+              Enregistrer
             </VoxButton>
           </XStack>
         </VoxCard.Content>

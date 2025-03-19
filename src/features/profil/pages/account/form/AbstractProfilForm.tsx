@@ -61,7 +61,7 @@ const AbstractForm = <T extends z.Schema<any, any>, TF extends FieldValues>(
             Annuler
           </VoxButton>
           <VoxButton variant="outlined" theme="blue" onPress={onSubmit} loading={isPending} disabled={!isDirty || !isValid}>
-            Enregister
+            Enregistrer
           </VoxButton>
         </XStack>
       </VoxCard.Content>
