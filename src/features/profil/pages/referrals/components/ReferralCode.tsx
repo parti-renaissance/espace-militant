@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react'
 import Text from '@/components/base/Text'
+import Button, { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useSession } from '@/ctx/SessionProvider'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { Copy, Share2 } from '@tamagui/lucide-icons'
 import { XStack, YStack } from 'tamagui'
-import Button, { VoxButton } from '../../../../../components/Button'
 
 export default function ReferralCode() {
   const { user } = useSession()

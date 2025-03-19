@@ -1,10 +1,10 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Text from '@/components/base/Text'
+import Button from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { HeartHandshake } from '@tamagui/lucide-icons'
-import Button from '../../../../../components/Button'
 
 export default function InviteCard() {
   return (
