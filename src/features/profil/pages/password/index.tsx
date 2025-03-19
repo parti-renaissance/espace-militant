@@ -146,7 +146,7 @@ export default function ChangePasswordScreen() {
                 Annuler
               </VoxButton>
               <VoxButton variant="outlined" theme="blue" onPress={onSubmit} loading={isPending} disabled={!isDirty || !isValid}>
-                Enregister
+                Enregistrer
               </VoxButton>
             </XStack>
           </VoxCard.Content>
