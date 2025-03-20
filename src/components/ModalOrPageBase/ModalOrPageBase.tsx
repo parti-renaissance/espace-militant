@@ -1,4 +1,4 @@
-import { MutableRefObject, PropsWithChildren } from 'react'
+import { MutableRefObject, PropsWithChildren, ReactNode } from 'react'
 import { Modal, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Spacing } from '@/styles'
@@ -11,16 +11,30 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
   open?: boolean
   shouldDisplayCloseHeader?: boolean
-  header: React.ReactNode
+  header?: ReactNode
   scrollable?: boolean
   scrollRef?: MutableRefObject<ScrollView | null>
+  allowDrag?: boolean
+  mobileBackdrop?: boolean
+  snapPoints?: number[]
 }
 
 /**
  * This component create a centered modal in md and more viewport, or a page in small ones
  * @constructor
  */
-export default function ModalOrPageBase({ children, onClose, open, shouldDisplayCloseHeader, header, scrollable, scrollRef }: ModalOrPageBaseProps) {
+export default function ModalOrPageBase({
+  children,
+  onClose,
+  open,
+  shouldDisplayCloseHeader,
+  header,
+  scrollable,
+  scrollRef,
+  snapPoints,
+  allowDrag,
+  mobileBackdrop,
+}: ModalOrPageBaseProps) {
   const viewport = useMedia()
   const insets = useSafeAreaInsets()
 
@@ -38,9 +52,9 @@ export default function ModalOrPageBase({ children, onClose, open, shouldDisplay
     <Sheet
       modal
       open={!!open}
-      snapPoints={[100]}
-      snapPointsMode="percent"
-      disableDrag
+      snapPoints={snapPoints ?? [100]}
+      snapPointsMode={'percent'}
+      disableDrag={!allowDrag}
       moveOnKeyboardChange
       onOpenChange={(x) => {
         if (!x) {
@@ -48,6 +62,8 @@ export default function ModalOrPageBase({ children, onClose, open, shouldDisplay
         }
       }}
     >
+      {mobileBackdrop && <Sheet.Overlay animation="lazy" backgroundColor="$shadow6" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />}
+
       <Sheet.Frame>
         <BottomSheetModalProvider>
           {shouldDisplayCloseHeader && (

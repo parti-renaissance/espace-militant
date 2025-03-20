@@ -6,7 +6,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { HeartHandshake } from '@tamagui/lucide-icons'
 
-export default function InviteCard() {
+export default function InviteCard({ openModal }: { openModal: () => void }) {
   return (
     <VoxCard bg="$orange1" borderColor="$orange2" borderWidth={1} inside>
       <VoxCard.Content pr="$large">
@@ -19,7 +19,7 @@ export default function InviteCard() {
             </Text.SM>
 
             <Button theme="orange" size="xl">
-              <Button.Text color="$white1" bold>
+              <Button.Text color="$white1" onPress={openModal} bold>
                 J’envoie une invitation
               </Button.Text>
             </Button>
