@@ -71,7 +71,7 @@ export default function AppLayout() {
                 tabBarTheme: route.theme,
                 tabBarActiveTintColor: '$color5',
                 tabBarInactiveTintColor: '$textPrimary',
-                tabBarIcon: ({ focused, ...props }) => <route.icon {...props} />,
+                tabBarIcon: ({ ...props }) => <route.icon {...props} />,
                 tabBarLabel: route.screenName,
                 ...exectParams(route.name, media.sm),
               }}
