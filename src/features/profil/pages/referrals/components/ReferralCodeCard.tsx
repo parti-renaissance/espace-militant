@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import Text from '@/components/base/Text'
 import InstanceCard from '@/components/InstanceCard/InstanceCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import InviteCard from '@/features/profil/pages/referrals/components/InviteCard'
 import ReferralCode from '@/features/profil/pages/referrals/components/ReferralCode'
 import ReferralLockedCard from '@/features/profil/pages/referrals/components/ReferralLockedCard'
-import { useGetProfil } from '@/services/profile/hook'
+import { useIsAdherent } from '@/services/profile/hook'
 import { HeartHandshake } from '@tamagui/lucide-icons'
 import { useMedia } from 'tamagui'
 
@@ -13,10 +13,9 @@ const description = 'Parrainez de nouveaux adhérents qui feront notre force de 
 
 export default function ReferralCodeCard() {
   const { xs } = useMedia()
-  const profil = useGetProfil()
+  const isAdherent = useIsAdherent()
 
-  const isNotMember = useMemo(() => profil.data?.tags?.some((el) => el.code.includes('cotisation_nok')), [profil.data])
-  if (isNotMember) {
+  if (!isAdherent) {
     return <ReferralLockedCard hideHeader={xs} />
   }
 
