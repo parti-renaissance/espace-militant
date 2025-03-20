@@ -4,14 +4,13 @@ import { VoxButton } from '@/components/Button'
 import InstanceCard from '@/components/InstanceCard/InstanceCard'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { HeartHandshake } from '@tamagui/lucide-icons'
-import { Image, useMedia, View, YStack } from 'tamagui'
+import { Image, View, YStack } from 'tamagui'
 
-export default function ReferralLockedCard() {
-  const { xs } = useMedia()
+export default function ReferralLockedCard({ hideHeader }: { hideHeader?: boolean }) {
   const { isPending, open: openAdh } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil' })
 
   return (
-    <InstanceCard title="Parrainages" icon={HeartHandshake} hideTitle={xs}>
+    <InstanceCard title="Parrainages" icon={HeartHandshake} hideHeader={hideHeader}>
       <YStack alignItems={'center'} gap={'$8'} justifyContent={'center'}>
         <View margin={'$8'}>
           <Image source={require('../assets/lock.png')} width={88} height={153} objectFit={'contain'} />

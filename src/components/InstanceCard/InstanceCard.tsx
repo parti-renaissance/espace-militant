@@ -29,14 +29,14 @@ type InstanceCardProps = {
   description?: string
   children: ReactNode
   footer?: ReactNode
-  hideTitle?: boolean
+  hideHeader?: boolean
 } & InstanceCardHeaderProps
 
 const InstanceCard = (props: InstanceCardProps) => {
   return (
     <VoxCard>
       <VoxCard.Content>
-        {!props.hideTitle && <InstanceCardHeader {...props} />}
+        {!props.hideHeader && <InstanceCardHeader {...props} />}
         {!!props.description && <Text.P>{props.description}</Text.P>}
         {props.children}
         {props.footer}

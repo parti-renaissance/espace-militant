@@ -17,7 +17,7 @@ export default function ReferralCodeCard() {
 
   const isNotMember = useMemo(() => profil.data?.tags?.some((el) => el.code.includes('cotisation_nok')), [profil.data])
   if (isNotMember) {
-    return <ReferralLockedCard />
+    return <ReferralLockedCard hideHeader={xs} />
   }
 
   return xs ? (
