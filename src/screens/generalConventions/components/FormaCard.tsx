@@ -6,11 +6,21 @@ import { DoubleCircle, DoubleDiamond, DoubleTriangle } from '@/features/profil/p
 import { GeneralConventionOrganizerEnum } from '@/screens/generalConventions/types'
 import { RestGeneralConventionResponse } from '@/services/general-convention/schema'
 import { Eye, Users } from '@tamagui/lucide-icons'
-import { XStack, YStack, YStackProps } from 'tamagui'
+import { router } from 'expo-router'
+import { isWeb, XStack, YStack, YStackProps } from 'tamagui'
 
-const LinkBtn = (props: { uuid: string }) => {
+const LinkBtn = ({ uuid }: { uuid: string }) => {
   return (
-    <VoxButton variant="outlined" iconLeft={Eye} onPress={() => {}}>
+    <VoxButton
+      variant="outlined"
+      iconLeft={Eye}
+      onPress={() => {
+        router.navigate({
+          pathname: '/etats-generaux/[id]',
+          params: { id: uuid },
+        })
+      }}
+    >
       Lire
     </VoxButton>
   )
@@ -20,7 +30,7 @@ type Props = {
   payload: RestGeneralConventionResponse
 }
 
-const Icon = ({ organizer }: { organizer: GeneralConventionOrganizerEnum }) => {
+export const Icon = ({ organizer }: { organizer: GeneralConventionOrganizerEnum }) => {
   const getIcon = (): [NamedExoticComponent | null, string | null] => {
     switch (organizer) {
       case GeneralConventionOrganizerEnum.ASSEMBLY:
@@ -40,13 +50,10 @@ const Icon = ({ organizer }: { organizer: GeneralConventionOrganizerEnum }) => {
     return null
   }
 
-  return null
-  return <VoxCard.Chip icon={IconComponent}>{label}</VoxCard.Chip>
+  return <VoxCard.Chip icon={isWeb ? IconComponent : undefined}>{label}</VoxCard.Chip>
 }
 
-export const FormaCard = ({ payload, ...props }: Props & YStackProps) => {
-  // const { gtSm } = useMedia()
-
+export const Title = ({ payload }) => {
   const title = (() => {
     if (payload.organizer === GeneralConventionOrganizerEnum.ASSEMBLY) {
       return payload.department_zone ? `${payload.department_zone.name} (${payload.department_zone.code})` : ''
@@ -71,6 +78,14 @@ export const FormaCard = ({ payload, ...props }: Props & YStackProps) => {
   })()
 
   return (
+    <Text.MD primary semibold>
+      {title}
+    </Text.MD>
+  )
+}
+
+export const FormaCard = ({ payload, ...props }: Props & YStackProps) => {
+  return (
     <YStack
       $sm={{ borderRadius: 0 }}
       overflow="hidden"
@@ -91,10 +106,7 @@ export const FormaCard = ({ payload, ...props }: Props & YStackProps) => {
               </Text.SM>
             )}
           </XStack>
-          <Text.MD primary semibold>
-            {title}
-          </Text.MD>
-
+          <Title payload={payload} />
           <XStack gap={8} alignItems="center">
             <Users size={12} color="$textPrimary" />
             <Text.SM primary alignItems="center" gap={4}>

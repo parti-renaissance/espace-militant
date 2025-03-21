@@ -1,7 +1,7 @@
 import React from 'react'
 import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
-import Section from '@/screens/generalConventions/Section'
+import Section from '@/screens/generalConventions/components/Section'
 import { Image, YStack } from 'tamagui'
 import type { GeneralConventionScreenProps } from './types'
 

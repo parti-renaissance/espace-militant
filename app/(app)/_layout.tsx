@@ -31,14 +31,32 @@ export default function AppLayout() {
               headerShown: false,
               title: '',
             }}
-          ></Stack.Screen>
+          />
+
           <Stack.Screen
             name="profil"
             options={{
               headerShown: false,
               animation: media.sm ? 'slide_from_right' : 'none',
             }}
-          ></Stack.Screen>
+          />
+
+          <Stack.Screen
+            name="etats-generaux/[id]/index"
+            options={{
+              headerTransparent: true,
+              header: ({ navigation }) => {
+                return media.sm ? (
+                  <VoxHeader backgroundColor="transparent" borderWidth={0}>
+                    <Link href={navigation.canGoBack() ? '../' : '/etats-generaux'} replace asChild={!isWeb}>
+                      <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
+                    </Link>
+                  </VoxHeader>
+                ) : null
+              },
+            }}
+          />
+
           <Stack.Screen
             name="evenements/[id]/index"
             options={{

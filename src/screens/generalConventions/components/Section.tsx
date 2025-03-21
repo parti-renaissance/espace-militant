@@ -6,15 +6,15 @@ import { useGetSuspenseProfil } from '@/services/profile/hook'
 import { XStack } from 'tamagui'
 
 const Section = () => {
-  const { data } = useGetGeneralConventions()
   const { data: user } = useGetSuspenseProfil()
-  const isAdherent = user?.tags?.find((tag) => tag.code.startsWith('adherent:'))
+  const isAdherent = user?.tags?.find((tag) => tag.type === 'adherent')
+  const { data } = useGetGeneralConventions(!!isAdherent)
 
   if (!isAdherent) {
     return <GeneralConventionsDenyCard topVisual={0} />
   }
 
-  if (data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     return <EmptyFormaState />
   }
 
