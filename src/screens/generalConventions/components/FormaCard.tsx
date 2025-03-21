@@ -6,11 +6,21 @@ import { DoubleCircle, DoubleDiamond, DoubleTriangle } from '@/features/profil/p
 import { GeneralConventionOrganizerEnum } from '@/screens/generalConventions/types'
 import { RestGeneralConventionResponse } from '@/services/general-convention/schema'
 import { Eye, Users } from '@tamagui/lucide-icons'
-import { XStack, YStackProps } from 'tamagui'
+import { router } from 'expo-router'
+import { isWeb, XStack, YStack, YStackProps } from 'tamagui'
 
-const LinkBtn = (props: { uuid: string }) => {
+const LinkBtn = ({ uuid }: { uuid: string }) => {
   return (
-    <VoxButton variant="outlined" iconLeft={Eye} onPress={() => {}}>
+    <VoxButton
+      variant="outlined"
+      iconLeft={Eye}
+      onPress={() => {
+        router.navigate({
+          pathname: '/etats-generaux/[id]',
+          params: { id: uuid },
+        })
+      }}
+    >
       Lire
     </VoxButton>
   )
@@ -18,10 +28,9 @@ const LinkBtn = (props: { uuid: string }) => {
 
 type Props = {
   payload: RestGeneralConventionResponse
-  rounded: boolean
 }
 
-const Icon = ({ organizer }: { organizer: GeneralConventionOrganizerEnum }) => {
+export const Icon = ({ organizer }: { organizer: GeneralConventionOrganizerEnum }) => {
   const getIcon = (): [NamedExoticComponent | null, string | null] => {
     switch (organizer) {
       case GeneralConventionOrganizerEnum.ASSEMBLY:
@@ -35,16 +44,16 @@ const Icon = ({ organizer }: { organizer: GeneralConventionOrganizerEnum }) => {
     }
   }
 
-  const [Icon, label] = getIcon()
+  const [IconComponent, label] = getIcon()
 
-  if (!Icon || !label) {
+  if (!IconComponent || !label) {
     return null
   }
 
-  return <VoxCard.Chip icon={Icon}>{label}</VoxCard.Chip>
+  return <VoxCard.Chip icon={isWeb ? IconComponent : undefined}>{label}</VoxCard.Chip>
 }
 
-export const FormaCard = ({ payload, rounded, ...props }: Props & YStackProps) => {
+export const Title = ({ payload }) => {
   const title = (() => {
     if (payload.organizer === GeneralConventionOrganizerEnum.ASSEMBLY) {
       return payload.department_zone ? `${payload.department_zone.name} (${payload.department_zone.code})` : ''
@@ -67,39 +76,46 @@ export const FormaCard = ({ payload, rounded, ...props }: Props & YStackProps) =
 
     return ''
   })()
+
   return (
-    <VoxCard
-      style={{ borderRadius: rounded ? 16 : 0 }}
+    <Text.MD primary semibold>
+      {title}
+    </Text.MD>
+  )
+}
+
+export const FormaCard = ({ payload, ...props }: Props & YStackProps) => {
+  return (
+    <YStack
+      $sm={{ borderRadius: 0 }}
+      overflow="hidden"
       boxSizing={'border-box'}
       borderColor="$textOutline"
       borderWidth={1}
-      inside
       width={'100%'}
-      $gtSm={{ width: '45%' }}
+      $gtSm={{ width: '45%', borderRadius: 16 }}
       $gtMd={{ width: '30%' }}
     >
-      <VoxCard.Content padding={20} {...props}>
-        <XStack justifyContent="space-between" alignItems="center">
-          <Icon organizer={payload.organizer} />
-          {payload.department_zone && (
-            <Text.SM secondary medium>
-              {payload.department_zone.name} ({payload.department_zone.code})
+      <VoxCard style={{ borderRadius: '0' }} inside width={'100%'}>
+        <VoxCard.Content padding={20} {...props}>
+          <XStack justifyContent="space-between" alignItems="center">
+            <Icon organizer={payload.organizer} />
+            {payload.department_zone && (
+              <Text.SM secondary medium>
+                {payload.department_zone.name} ({payload.department_zone.code})
+              </Text.SM>
+            )}
+          </XStack>
+          <Title payload={payload} />
+          <XStack gap={8} alignItems="center">
+            <Users size={12} color="$textPrimary" />
+            <Text.SM primary alignItems="center" gap={4}>
+              {payload.members_count} contributeur{payload.members_count > 1 ? 's' : ''}
             </Text.SM>
-          )}
-        </XStack>
-        <Text.MD primary semibold>
-          {title}
-        </Text.MD>
-
-        <XStack gap={8} alignItems="center">
-          <Users size={12} color="$textPrimary" />
-          <Text.SM primary alignItems="center" gap={4}>
-            {payload.members_count} contributeur{payload.members_count > 1 ? 's' : ''}
-          </Text.SM>
-        </XStack>
-        {payload.general_summary && <VoxCard.Description markdown>{payload.general_summary}</VoxCard.Description>}
-        <LinkBtn uuid={payload.uuid} />
-      </VoxCard.Content>
-    </VoxCard>
+          </XStack>
+          <LinkBtn uuid={payload.uuid} />
+        </VoxCard.Content>
+      </VoxCard>
+    </YStack>
   )
 }
