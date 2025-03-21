@@ -76,7 +76,7 @@ export const NavBar = () => {
       {ROUTES.filter((x) => !x.hidden).map((route) => {
         const isIndex = route.name === '(home)'
         const focused = pathname.includes(route.name) || (isIndex && pathname === '/')
-        return <MemoizedNavItem key={route.name} route={route} isActive={focused} />
+        return <MemoizedNavItem key={route.name} route={route} isActive={focused || !!route.highlighted} />
       })}
     </XStack>
   ) : null

@@ -12,7 +12,7 @@ import * as types from '@/services/formations/schema'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
 import { getTokenValue, ScrollView, YStack } from 'tamagui'
 import { FormationDenyCard } from '../components/DenyCard'
-import FormationDesktopLayout from './ FormationDesktopLayout'
+import FormationDesktopLayout from './FormationDesktopLayout'
 import FormationSection, { FormationSectionSkeleton } from './FormationSection'
 
 type ScrollViewProps = {
