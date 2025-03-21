@@ -37,7 +37,7 @@ export const ROUTES: TabRoute[] = [
     screenName: 'États généraux',
     icon: ClipboardCheck,
     theme: 'orange',
-    highlighted: true,
+    hiddenMobile: true,
   },
   {
     name: 'formations',
