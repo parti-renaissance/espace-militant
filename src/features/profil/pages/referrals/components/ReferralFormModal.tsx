@@ -34,9 +34,10 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
       email_address: '',
     },
     resolver: zodResolver(isFullForm ? ReferralInviteRequestSchema : ReferralPreRegisterRequestSchema),
-    mode: 'onBlur',
+    mode: 'all',
     reValidateMode: 'onChange',
   })
+  const { isDirty, isValid } = formState
   const firstName = watch('first_name')
 
   const onSubmit: SubmitHandler<ReferralPreRegisterRequestType | ReferralInviteRequestType> = useCallback((data) => {
@@ -119,9 +120,8 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
             </YStack>
           </XStack>
         )}
-
         <View alignSelf={'flex-end'}>
-          <Button theme="orange" size="xl" disabled={!isChecked || !formState.isValid} onPress={handleSubmit(onSubmit)} loading={isInviting}>
+          <Button theme="orange" size="xl" disabled={!isChecked || !isValid || !isDirty} onPress={handleSubmit(onSubmit)} loading={isInviting}>
             <Button.Text color="$white1" bold>
               Envoyer l’email d’invitation
             </Button.Text>
