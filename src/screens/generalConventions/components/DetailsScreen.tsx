@@ -7,7 +7,9 @@ import EventMDXRenderer from '@/features/events/components/EventMDXRenderer'
 import { ScrollStack } from '@/features/events/pages/detail/EventComponents'
 import { Icon, Title } from '@/screens/generalConventions/components/FormaCard'
 import { RestGetGeneralConventionResponse } from '@/services/general-convention/schema'
-import { ArrowLeft } from '@tamagui/lucide-icons'
+import { ArrowLeft, Calendar } from '@tamagui/lucide-icons'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import { Link, useNavigation } from 'expo-router'
 import { isWeb, XStack, YStack } from 'tamagui'
 
@@ -56,11 +58,10 @@ export default function DetailsScreen({ data }: { data: RestGetGeneralConvention
                   <XStack justifyContent="space-between" alignItems="center">
                     <Icon organizer={data.organizer} />
 
-                    {data.department_zone && (
-                      <Text.SM secondary medium>
-                        {data.department_zone.name} ({data.department_zone.code})
-                      </Text.SM>
-                    )}
+                    <XStack gap={8} alignItems="center">
+                      <Calendar size={12} color="$textSecondary" />
+                      <Text.SM secondary>{data.reported_at ? format(data.reported_at, 'dd MMMM yyyy', { locale: fr }) : ''}</Text.SM>
+                    </XStack>
                   </XStack>
                   <Title payload={data} />
 

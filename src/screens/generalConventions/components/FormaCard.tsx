@@ -56,26 +56,7 @@ export const Icon = ({ organizer }: { organizer: GeneralConventionOrganizerEnum 
 
 export const Title = ({ payload }) => {
   const title = (() => {
-    if (payload.organizer === GeneralConventionOrganizerEnum.ASSEMBLY) {
-      return payload.department_zone ? `${payload.department_zone.name} (${payload.department_zone.code})` : ''
-    }
-
-    if (payload.organizer === GeneralConventionOrganizerEnum.COMMITTEE) {
-      return payload.committee?.name
-    }
-
-    if (payload.organizer === GeneralConventionOrganizerEnum.DISTRICT) {
-      const district = payload.district_zone
-      if (!district) {
-        return ''
-      }
-      const codeParts = district.code.split('-')
-      const number = parseInt(codeParts[1])
-
-      return `${number}${number > 1 ? 'e' : 'ère'} circonscription • ${district.name.split(' (')[0]} (${codeParts[0]})`
-    }
-
-    return ''
+    return payload.department_zone ? `${payload.department_zone.name} (${payload.department_zone.code})` : ''
   })()
 
   return (
