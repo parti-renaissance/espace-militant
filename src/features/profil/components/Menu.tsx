@@ -18,6 +18,7 @@ const mapPageConfigs = (config: typeof pageConfigs) =>
         icon: options.icon,
         children: options.title,
         pathname: ('/profil' + (screenName === 'index' ? '' : '/' + screenName)) as Href,
+        hidden: options?.environment ? clientEnv.ENVIRONMENT !== options.environment : false,
       }) as const,
   )
 
@@ -47,9 +48,11 @@ const ProfilMenu = () => {
   return (
     <YStack gap="$medium" key="profil-menu">
       <Menu>
-        {itemsData.map((item, index) => (
-          <Item item={item} index={index} key={item.key} />
-        ))}
+        {itemsData
+          .filter(({ hidden }) => !hidden)
+          .map((item, index) => (
+            <Item item={item} index={index} key={item.key} />
+          ))}
       </Menu>
       {clientEnv.ENVIRONMENT === 'staging' ? (
         <Menu>

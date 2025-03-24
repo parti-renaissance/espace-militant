@@ -4,11 +4,7 @@ export enum Gender {
   Other = 'Other',
 }
 
-export const AllGenders: Array<Gender> = [
-  Gender.Male,
-  Gender.Female,
-  Gender.Other,
-]
+export const AllGenders: Array<Gender> = [Gender.Male, Gender.Female, Gender.Other]
 
 export enum AgeRange {
   UpTo20 = 'UpTo20',
@@ -54,4 +50,11 @@ export interface UserProfile {
   gender: Gender | undefined
   age: AgeRange | undefined
   profession: Profession | undefined
+}
+
+export enum UserTagEnum {
+  SYMPATHISANT = 'sympathisant',
+  ADHERENT = 'adherent',
+  ELU = 'elu',
+  OTHER = 'other',
 }

@@ -5,6 +5,8 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import InviteCard from '@/features/profil/pages/referrals/components/InviteCard'
 import ReferralCode from '@/features/profil/pages/referrals/components/ReferralCode'
 import ReferralFormModal from '@/features/profil/pages/referrals/components/ReferralFormModal'
+import ReferralLockedCard from '@/features/profil/pages/referrals/components/ReferralLockedCard'
+import { useIsAdherent } from '@/services/profile/hook'
 import { HeartHandshake } from '@tamagui/lucide-icons'
 import { useMedia } from 'tamagui'
 
@@ -12,7 +14,13 @@ const description = 'Parrainez de nouveaux adhérents qui feront notre force de 
 
 export default function ReferralCodeCard() {
   const { xs } = useMedia()
+  const isAdherent = useIsAdherent()
+
   const [isOpen, setIsOpen] = useState(false)
+
+  if (!isAdherent) {
+    return <ReferralLockedCard hideHeader={xs} />
+  }
 
   const openModal = useCallback(() => setIsOpen(true), [])
   const closeModal = useCallback(() => setIsOpen(false), [])

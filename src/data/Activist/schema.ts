@@ -1,6 +1,7 @@
+import { UserTagEnum } from '@/core/entities/UserProfile'
 import { z } from 'zod'
 
-export const ActivistTagTypesSchema = z.union([z.literal('sympathisant'), z.literal('adherent'), z.literal('elu'), z.literal('other')])
+export const ActivistTagTypesSchema = z.nativeEnum(UserTagEnum)
 export type ActivistTagTypes = z.infer<typeof ActivistTagTypesSchema>
 
 export const activistTagSchema = z.object({
