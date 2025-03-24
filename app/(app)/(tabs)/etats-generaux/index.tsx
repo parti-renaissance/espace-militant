@@ -21,7 +21,7 @@ const Page: React.FC = () => {
   const topVisual = media.sm ? 270 : 500
 
   return (
-    <YStack flex={1} bg={media.sm ? 'white' : '$textSurface'}>
+    <YStack flex={1} bg={'$textSurface'}>
       <Head>
         <title>{metatags.createTitle('États généraux')}</title>
       </Head>
