@@ -21,10 +21,10 @@ export const pageConfigs: {
     title: 'Cotisations et dons',
     icon: HelpingHand,
   },
-  parrainages: {
-    title: 'Parrainages',
-    icon: HeartHandshake,
-  },
+  // parrainages: {
+  //   title: 'Parrainages',
+  //   icon: HeartHandshake,
+  // },
   'mes-instances': {
     title: 'Mes instances',
     icon: LandPlot,
