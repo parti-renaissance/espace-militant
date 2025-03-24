@@ -48,7 +48,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
     },
     resolver: zodResolver(isFullForm ? ReferralPreRegisterSchema : ReferralPreRegisterLightSchema),
     mode: 'all',
-    reValidateMode: 'onSubmit',
+    reValidateMode: 'onChange',
   })
   const { isDirty, isValid } = formState
   const firstName = watch('first_name')
