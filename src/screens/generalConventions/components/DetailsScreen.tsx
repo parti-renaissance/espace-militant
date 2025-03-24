@@ -43,7 +43,7 @@ export default function DetailsScreen({ data }: { data: RestGetGeneralConvention
   const combinedContent = contentFields.filter(Boolean).join('\n\n')
 
   return (
-    <ScrollStack>
+    <ScrollStack marginBottom={50}>
       <XStack alignItems="flex-start" alignSelf="flex-start" pb="$medium">
         <BackButton />
       </XStack>
@@ -53,7 +53,6 @@ export default function DetailsScreen({ data }: { data: RestGetGeneralConvention
             <PageLayout.MainSingleColumn height="100%">
               <VoxCard.Content pr={0} height="100%">
                 <VoxCard.Content height="100%" p={0} pr="$medium">
-                  <VoxCard.Image image={require('@/features/events/assets/images/event-fallback.png')} />
                   <XStack justifyContent="space-between" alignItems="center">
                     <Icon organizer={data.organizer} />
 

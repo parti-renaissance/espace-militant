@@ -13,6 +13,7 @@ const LinkBtn = ({ uuid }: { uuid: string }) => {
   return (
     <VoxButton
       variant="outlined"
+      alignSelf={'center'}
       iconLeft={Eye}
       onPress={() => {
         router.navigate({
@@ -98,22 +99,19 @@ export const FormaCard = ({ payload, ...props }: Props & YStackProps) => {
     >
       <VoxCard style={{ borderRadius: '0' }} inside width={'100%'}>
         <VoxCard.Content padding={20} {...props}>
-          <XStack justifyContent="space-between" alignItems="center">
-            <Icon organizer={payload.organizer} />
-            {payload.department_zone && (
-              <Text.SM secondary medium>
-                {payload.department_zone.name} ({payload.department_zone.code})
-              </Text.SM>
-            )}
+          <XStack justifyContent="space-between">
+            <YStack gap={16}>
+              <Icon organizer={payload.organizer} />
+              <Title payload={payload} />
+              <XStack gap={8} alignItems="center">
+                <Users size={12} color="$textPrimary" />
+                <Text.SM primary alignItems="center" gap={4}>
+                  {payload.members_count} contributeur{payload.members_count > 1 ? 's' : ''}
+                </Text.SM>
+              </XStack>
+            </YStack>
+            <LinkBtn uuid={payload.uuid} />
           </XStack>
-          <Title payload={payload} />
-          <XStack gap={8} alignItems="center">
-            <Users size={12} color="$textPrimary" />
-            <Text.SM primary alignItems="center" gap={4}>
-              {payload.members_count} contributeur{payload.members_count > 1 ? 's' : ''}
-            </Text.SM>
-          </XStack>
-          <LinkBtn uuid={payload.uuid} />
         </VoxCard.Content>
       </VoxCard>
     </YStack>
