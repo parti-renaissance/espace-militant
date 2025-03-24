@@ -1,9 +1,11 @@
+import { NamedExoticComponent } from 'react'
 import { IconProps } from '@tamagui/helpers-icon'
 import { CircleUser, HeartHandshake, HelpingHand, KeyRound, LandPlot, MessageCircle, Settings2, Sparkle, TreeDeciduous } from '@tamagui/lucide-icons'
 
 export type PageConfig = {
   title: string
-  icon: React.NamedExoticComponent<IconProps>
+  icon: NamedExoticComponent<IconProps>
+  environment?: string
 }
 
 export const pageConfigs: {
@@ -21,10 +23,11 @@ export const pageConfigs: {
     title: 'Cotisations et dons',
     icon: HelpingHand,
   },
-  // parrainages: {
-  //   title: 'Parrainages',
-  //   icon: HeartHandshake,
-  // },
+  parrainages: {
+    title: 'Parrainages',
+    icon: HeartHandshake,
+    environment: 'staging',
+  },
   'mes-instances': {
     title: 'Mes instances',
     icon: LandPlot,
