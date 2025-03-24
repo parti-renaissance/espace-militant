@@ -198,7 +198,7 @@ export const RestGetEventCategoriesResponseSchema = z.array(EventCategorySchema)
 
 // ------------ REST CREATE EVENT ---------------\
 
-const postAddressSchema = z.object({
+export const postAddressSchema = z.object({
   address: z.string().nullish(),
   postal_code: z.string().nullish(),
   city_name: z.string().nullish(),

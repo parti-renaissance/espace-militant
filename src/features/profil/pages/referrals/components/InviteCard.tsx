@@ -18,8 +18,8 @@ export default function InviteCard({ openModal }: { openModal: () => void }) {
               Afin de faire gagner du temps à une personne intéressée envoyez-lui, le formulaire d’adhésion par email ou pré-inscrivez là.
             </Text.SM>
 
-            <Button theme="orange" size="xl">
-              <Button.Text color="$white1" onPress={openModal} bold>
+            <Button theme="orange" size="xl" onPress={openModal}>
+              <Button.Text color="$white1" bold>
                 J’envoie une invitation
               </Button.Text>
             </Button>

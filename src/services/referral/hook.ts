@@ -28,13 +28,18 @@ export function useReferralsInvite() {
 }
 
 export function useReferralsPreRegister() {
+  const toast = useToastController()
   const client = useQueryClient()
+
   return useMutation({
     mutationFn: ReferralService.preRegister,
     onSettled: () => {
       client.invalidateQueries({
         queryKey: [referralServiceKey],
       })
+    },
+    onSuccess: () => {
+      toast.show('Succès', { message: 'La préinvitation a bien été envoyée.', type: 'success' })
     },
   })
 }

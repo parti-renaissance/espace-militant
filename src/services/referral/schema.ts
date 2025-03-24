@@ -1,4 +1,4 @@
-import { RestEventAddressSchema } from '@/services/events/schema'
+import { postAddressSchema, RestEventAddressSchema } from '@/services/events/schema'
 import { errorMessages } from '@/utils/errorMessages'
 import { z } from 'zod'
 
@@ -29,9 +29,10 @@ export type ReferralInviteRequestType = z.infer<typeof ReferralInviteRequestSche
 export const ReferralPreRegisterRequestSchema = z.object({
   email_address: z.string().email(errorMessages.email),
   first_name: z.string().min(1, errorMessages.emptyField),
-  last_name: z.null().optional(),
-  civility: z.null().optional(),
-  nationality: z.null().optional(),
-  phone: z.null().optional(),
+  last_name: z.string().optional(),
+  civility: z.string().optional(),
+  nationality: z.string().optional(),
+  phone: z.string().optional(),
+  post_address: postAddressSchema.optional(),
 })
 export type ReferralPreRegisterRequestType = z.infer<typeof ReferralPreRegisterRequestSchema>
