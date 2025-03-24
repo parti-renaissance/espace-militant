@@ -8,7 +8,7 @@ import SelectV3 from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import Button from '@/components/Button'
 import DatePickerField from '@/components/DatePicker'
-import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
+import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import NationalitySelect from '@/components/NationalitySelect/NationalitySelect'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { postAddressSchema } from '@/services/events/schema'
@@ -82,7 +82,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
   const toggleFullForm = useCallback(() => setIsFullForm((v) => !v), [])
 
   return (
-    <ModalOrPageBase mobileBackdrop allowDrag open={isOpen} onClose={closeModal} snapPoints={[isFullForm ? 90 : 65]}>
+    <ModalOrBottomSheet allowDrag open={isOpen} onClose={closeModal}>
       <YStack padding={'$8'} gap={'$8'}>
         <XStack alignItems={'center'} justifyContent={'space-between'}>
           <Text bold>Invitation</Text>
@@ -299,7 +299,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
           </Button>
         </View>
       </YStack>
-    </ModalOrPageBase>
+    </ModalOrBottomSheet>
   )
 }
 
