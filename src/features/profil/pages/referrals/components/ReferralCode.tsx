@@ -24,7 +24,7 @@ export default function ReferralCode() {
   return (
     <VoxCard bg="#F9F9FA" borderColor="#E9ECEE" borderWidth={1} inside>
       <VoxCard.Content pr="$large">
-        <Text.SM bold>Partagez votre lien de parrainage</Text.SM>
+        <Text.LG fontWeight={600}>Partagez votre lien de parrainage</Text.LG>
 
         <Text.SM color="$textSecondary" lineHeight={20}>
           Le lien ci-dessous est votre lien d’adhésion personnel. Si celui-ci est utilisé pour adhérer, vous serez automatiquement reconnu comme le parrain.
