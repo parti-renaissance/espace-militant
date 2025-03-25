@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Pressable } from 'react-native'
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import Checkbox from '@/components/base/Checkbox/Checkbox'
@@ -8,15 +8,18 @@ import SelectV3 from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import Button from '@/components/Button'
 import DatePickerField from '@/components/DatePicker'
+import { MessageCard } from '@/components/MessageCard/MessageCard'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import NationalitySelect from '@/components/NationalitySelect/NationalitySelect'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import { RestViolation } from '@/data/restObjects/RestUpdateProfileRequest'
 import { postAddressSchema } from '@/services/events/schema'
 import { useReferralsInvite, useReferralsPreRegister } from '@/services/referral/hook'
 import { errorMessages } from '@/utils/errorMessages'
 import { phoneCodes } from '@/utils/phoneCodes'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Info } from '@tamagui/lucide-icons'
+import { AlertTriangle, Info } from '@tamagui/lucide-icons'
+import axios from 'axios'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { View, XStack, YStack } from 'tamagui'
 import { z } from 'zod'
@@ -30,10 +33,22 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
   const [isChecked, setIsChecked] = useState(false)
   const [isFullForm, setIsFullForm] = useState(false)
 
-  const { mutateAsync: invite, isPending: isInviting } = useReferralsInvite()
-  const { mutateAsync: preRegister, isPending: isRegistering } = useReferralsPreRegister()
+  const { mutateAsync: invite, isPending: isInviting, error: inviteError } = useReferralsInvite()
+  const { mutateAsync: preRegister, isPending: isRegistering, error: preRegisterError } = useReferralsPreRegister()
 
-  const { control, watch, handleSubmit, formState, reset } = useForm<ReferralPreRegisterSchemaType | ReferralPreRegisterLightSchemaType>({
+  const apiErrors: RestViolation[] = useMemo(() => {
+    if (!inviteError && !preRegisterError) return []
+
+    if (!isFullForm && inviteError && axios.isAxiosError(inviteError) && inviteError.response?.status === 400) {
+      return inviteError.response.data.violations
+    }
+
+    if (isFullForm && preRegisterError && axios.isAxiosError(preRegisterError) && preRegisterError.response?.status === 400) {
+      return preRegisterError.response.data.violations
+    }
+  }, [inviteError, preRegisterError, isFullForm])
+
+  const { control, watch, handleSubmit, formState, reset, setError } = useForm<ReferralPreRegisterSchemaType | ReferralPreRegisterLightSchemaType>({
     defaultValues: {
       first_name: '',
       email_address: '',
@@ -50,6 +65,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
     mode: 'all',
     reValidateMode: 'onChange',
   })
+
   const { isDirty, isValid } = formState
   const firstName = watch('first_name')
 
@@ -92,6 +108,12 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
             </Button>
           )}
         </XStack>
+
+        {apiErrors?.map((error) => (
+          <MessageCard iconLeft={AlertTriangle} theme="orange" key={error.propertyPath}>
+            {error.message}
+          </MessageCard>
+        ))}
 
         {isFullForm && (
           <Controller
