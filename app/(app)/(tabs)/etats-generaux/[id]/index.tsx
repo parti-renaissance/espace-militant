@@ -5,7 +5,7 @@ import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import * as metatags from '@/config/metatags'
 import { GeneralConventionsDenyCard } from '@/screens/generalConventions/components/DenyCard'
 import DetailsScreen from '@/screens/generalConventions/components/DetailsScreen'
-import { useGetGeneralConvention } from '@/services/general-convention/hook'
+import { useDataStore } from '@/screens/generalConventions/store'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
 import { Stack as RouterStack, useLocalSearchParams } from 'expo-router'
 import Head from 'expo-router/head'
@@ -13,6 +13,7 @@ import { YStack } from 'tamagui'
 
 const HomeScreen: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
+  const data = useDataStore((state) => state.selectedData)
 
   if (!params.id) {
     return <Error404 />
@@ -21,17 +22,16 @@ const HomeScreen: React.FC = () => {
   return (
     <PageLayout webScrollable>
       <BoundarySuspenseWrapper>
-        <EventDetailScreen id={params.id} />
+        <EventDetailScreen data={data} />
       </BoundarySuspenseWrapper>
       <PageLayout.SideBarRight maxWidth={177} />
     </PageLayout>
   )
 }
 
-function EventDetailScreen(props: Readonly<{ id: string }>) {
+function EventDetailScreen({ data }) {
   const { data: user } = useGetSuspenseProfil()
   const isAdherent = user?.tags?.find((tag) => tag.type === 'adherent')
-  const { data } = useGetGeneralConvention(props.id, !!isAdherent)
 
   if (!isAdherent) {
     return (

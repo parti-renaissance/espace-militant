@@ -7,9 +7,6 @@ import Head from 'expo-router/head'
 import { ScrollView, useMedia, YStack } from 'tamagui'
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   imageBackground: {
     width: '100%',
     height: 500,
@@ -25,7 +22,7 @@ const Page: React.FC = () => {
       <Head>
         <title>{metatags.createTitle('États généraux')}</title>
       </Head>
-      <ScrollView style={styles.container} flex={1}>
+      <ScrollView flex={1}>
         <ImageBackground source={require('@/assets/images/bg-general-conventions.webp')} contentFit="cover" style={styles.imageBackground}>
           <GeneralConventionScreen topVisual={topVisual} />
         </ImageBackground>
