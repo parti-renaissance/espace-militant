@@ -27,7 +27,7 @@ export default function ReferralCodeCard() {
   return (
     <>
       {xs ? (
-        <VoxCard style={{ minHeight: '100%' }}>
+        <VoxCard>
           <VoxCard.Content>
             <Text.SM>{description}</Text.SM>
 
