@@ -1,3 +1,4 @@
+import { errorMessages } from '@/utils/errorMessages'
 import { getCountryCodeForRegionCode, parsePhoneNumber } from 'awesome-phonenumber'
 import { isBefore, subYears } from 'date-fns'
 import { z } from 'zod'
@@ -47,7 +48,7 @@ export const validateCoordFormSchema = z.object({
       },
     )
     .nullable(),
-  email_address: z.string().email('L’adresse email n’est pas valide'),
+  email_address: z.string().email(errorMessages.email),
 })
 
 export const validateLocationFormSchema = z.object({
@@ -101,7 +102,7 @@ export const validateAccountFormSchema = z.object({
         })
       }
     }),
-  email_address: z.string().email('L’adresse email n’est pas valide'),
+  email_address: z.string().email(errorMessages.email),
   facebook_page_url: z.string().url(buildLinkError('facebook')).optional().nullable(),
   twitter_page_url: z.string().url(buildLinkError('twitter')).optional().nullable(),
   linkedin_page_url: z.string().url(buildLinkError('linkedin')).optional().nullable(),

@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform } from 'react-native'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import InfoCard from '@/components/InfoCard/InfoCard'
+import InstanceCard from '@/components/InstanceCard/InstanceCard'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useGetInstances, useGetTags } from '@/services/profile/hook'
@@ -13,7 +14,6 @@ import { isWeb, YStack } from 'tamagui'
 import ScrollView from '../../components/ScrollView'
 import ChangeCommitteeModal from './components/ChangeCommittee'
 import { DoubleCircle, DoubleDiamond, DoubleTriangle } from './components/icons'
-import InstanceCard from './components/InstanceCard'
 
 type Instance = RestInstancesResponse[number]
 

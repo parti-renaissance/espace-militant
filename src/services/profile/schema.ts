@@ -35,6 +35,8 @@ const RestProfilInstancesSchema = z
   .nullable()
 
 export const RestProfilResponseSchema = z.object({
+  id: z.string(),
+  referral_link: z.string().nullable(),
   first_name: z.string(),
   last_name: z.string(),
   uuid: z.string().uuid(),
