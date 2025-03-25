@@ -8,5 +8,5 @@
     "strictNullChecks": true,
     "moduleSuffixes": [".ios", ".android", ".native", ""]
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "scripts/prepare-client-env.ts"]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "scripts/prepare-client-env.ts", "queryError.d.ts"]
 }
