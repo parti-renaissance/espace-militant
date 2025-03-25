@@ -1,5 +1,5 @@
 import { HomeIcon } from '@/assets/icons/nav'
-import { Calendar, CircleUser, ClipboardCheck, GraduationCap, Home, Link, Zap } from '@tamagui/lucide-icons'
+import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
 
 export type TabRoute = {
@@ -54,6 +54,14 @@ export const ROUTES: TabRoute[] = [
     theme: 'gray',
     hidden: true,
     hiddenMobile: true,
+  },
+  {
+    name: 'porte-a-porte',
+    screenName: 'Porte à Porte',
+    icon: DoorOpen,
+    theme: 'orange',
+    hiddenMobile: true,
+    hidden: true,
   },
   {
     name: 'profil',
