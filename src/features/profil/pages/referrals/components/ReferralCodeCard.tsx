@@ -8,7 +8,7 @@ import ReferralFormModal from '@/features/profil/pages/referrals/components/Refe
 import ReferralLockedCard from '@/features/profil/pages/referrals/components/ReferralLockedCard'
 import { useIsAdherent } from '@/services/profile/hook'
 import { HeartHandshake } from '@tamagui/lucide-icons'
-import { PortalProvider, useMedia } from 'tamagui'
+import { useMedia } from 'tamagui'
 
 const description = 'Parrainez de nouveaux adhérents qui feront notre force de demain.'
 
