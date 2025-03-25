@@ -75,6 +75,7 @@ export const FormaCard = ({ payload, ...props }: Props & YStackProps) => {
       borderColor="$textOutline"
       borderWidth={1}
       width={'100%'}
+      minWidth={300}
       $gtSm={{ width: '45%', borderRadius: 16 }}
       $gtMd={{ width: '30%' }}
     >
