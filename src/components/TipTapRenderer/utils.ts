@@ -9,7 +9,6 @@ export const parseJsonEditorContent = (x: string): { content: schemas.TipTapDocu
       type: 'json',
     }
   } catch (e) {
-    console.log('invalid json', e)
     return {
       content: x,
       type: 'string',

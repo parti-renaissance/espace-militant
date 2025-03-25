@@ -51,7 +51,7 @@ export const RestGeneralConventionResponseSchema = RestGeneralConventionSchema.m
   }),
 )
 
-export const RestGetGeneralConventionsResponseSchema = z.array(RestGeneralConventionSchema)
+export const RestGetGeneralConventionsResponseSchema = z.array(RestGeneralConventionResponseSchema)
 
 export type RestGeneralConventionResponse = z.infer<typeof RestGeneralConventionSchema>
 export type RestGetGeneralConventionsResponse = z.infer<typeof RestGetGeneralConventionsResponseSchema>

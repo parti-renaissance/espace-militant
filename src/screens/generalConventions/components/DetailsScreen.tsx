@@ -24,7 +24,7 @@ const BackButton = (props: { children?: React.ReactNode }) => {
   )
 }
 
-export default function DetailsScreen({ data }: { data: RestGetGeneralConventionResponse }) {
+export const generalConventionContent = (data) => {
   const contentFields = [
     data.party_definition_summary,
     data.unique_party_summary,
@@ -42,8 +42,10 @@ export default function DetailsScreen({ data }: { data: RestGetGeneralConvention
     data.additional_comments,
   ]
 
-  const combinedContent = contentFields.filter(Boolean).join('\n\n')
-
+  return contentFields.filter(Boolean).join('\n\n')
+}
+export default function DetailsScreen({ data }: { data: RestGetGeneralConventionResponse }) {
+  const combinedContent = generalConventionContent(data)
   return (
     <ScrollStack marginBottom={50}>
       <XStack alignItems="flex-start" alignSelf="flex-start" pb="$medium">
@@ -65,7 +67,7 @@ export default function DetailsScreen({ data }: { data: RestGetGeneralConvention
                   </XStack>
                   <Title payload={data} />
 
-                  {combinedContent && <EventMDXRenderer>{combinedContent}</EventMDXRenderer>}
+                  {combinedContent && <EventMDXRenderer children={combinedContent} />}
                 </VoxCard.Content>
               </VoxCard.Content>
             </PageLayout.MainSingleColumn>
