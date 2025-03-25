@@ -3,32 +3,15 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { DoubleCircle, DoubleDiamond, DoubleTriangle } from '@/features/profil/pages/instances/components/icons'
+import { useDataStore } from '@/screens/generalConventions/store'
 import { GeneralConventionOrganizerEnum } from '@/screens/generalConventions/types'
-import { RestGeneralConventionResponse } from '@/services/general-convention/schema'
+import { RestGetGeneralConventionResponse } from '@/services/general-convention/schema'
 import { Eye, Users } from '@tamagui/lucide-icons'
 import { router } from 'expo-router'
 import { isWeb, XStack, YStack, YStackProps } from 'tamagui'
 
-const LinkBtn = ({ uuid }: { uuid: string }) => {
-  return (
-    <VoxButton
-      variant="outlined"
-      alignSelf={'center'}
-      iconLeft={Eye}
-      onPress={() => {
-        router.navigate({
-          pathname: '/etats-generaux/[id]',
-          params: { id: uuid },
-        })
-      }}
-    >
-      Lire
-    </VoxButton>
-  )
-}
-
 type Props = {
-  payload: RestGeneralConventionResponse
+  payload: RestGetGeneralConventionResponse
 }
 
 export const Icon = ({ organizer }: { organizer: GeneralConventionOrganizerEnum }) => {
@@ -92,7 +75,20 @@ export const FormaCard = ({ payload, ...props }: Props & YStackProps) => {
                 </Text.SM>
               </XStack>
             </YStack>
-            <LinkBtn uuid={payload.uuid} />
+            <VoxButton
+              variant="outlined"
+              alignSelf={'center'}
+              iconLeft={Eye}
+              onPress={() => {
+                useDataStore.getState().setSelectedData(payload)
+                router.navigate({
+                  pathname: '/etats-generaux/[id]',
+                  params: { id: payload.uuid },
+                })
+              }}
+            >
+              Lire
+            </VoxButton>
           </XStack>
         </VoxCard.Content>
       </VoxCard>
