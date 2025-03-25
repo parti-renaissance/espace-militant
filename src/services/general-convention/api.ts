@@ -9,12 +9,3 @@ export const getGeneralConventions = api({
   responseSchema: schemas.RestGetGeneralConventionsResponseSchema,
   type: 'private',
 })
-
-export const getGeneralConvention = (uuid: string) =>
-  api({
-    method: 'GET',
-    path: `/api/v3/general_conventions/${uuid}`,
-    requestSchema: z.void(),
-    responseSchema: schemas.RestGeneralConventionResponseSchema,
-    type: 'private',
-  })()
