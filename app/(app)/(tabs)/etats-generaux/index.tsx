@@ -9,7 +9,7 @@ import { ScrollView, useMedia, YStack } from 'tamagui'
 const styles = StyleSheet.create({
   imageBackground: {
     width: '100%',
-    height: 500,
+    height: 455,
   },
 })
 
