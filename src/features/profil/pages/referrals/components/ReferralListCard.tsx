@@ -20,17 +20,18 @@ export default function ReferralListCard() {
       <>
         <Text.LG fontWeight={600}>Suivi des parrainages</Text.LG>
 
-        <XStack alignItems={'center'} alignContent={'space-between'} width={'100%'} gap={'$3'}>
-          <XStack flex={1}>
-            <StatsCard count={8} label={'Adhésions\nfinalisées'} backgroundColor={'$green1'} color={'$green5'} />
-          </XStack>
-          <XStack flex={1} justifyContent={'center'}>
-            <StatsCard count={8} label={'Invitations\nenvoyées'} backgroundColor={'$gray1'} color={'$gray5'} />
-          </XStack>
-          <XStack flex={1} justifyContent={'flex-end'}>
-            <StatsCard count={8} label={'Invitations\nsignalées'} backgroundColor={'$orange1'} color={'$orange5'} />
-          </XStack>
-        </XStack>
+        {/* Hide for now, needed on another ticket */}
+        {/*<XStack alignItems={'center'} alignContent={'space-between'} width={'100%'} gap={'$3'}>*/}
+        {/*  <XStack flex={1}>*/}
+        {/*    <StatsCard count={8} label={'Adhésions\nfinalisées'} backgroundColor={'$green1'} color={'$green5'} />*/}
+        {/*  </XStack>*/}
+        {/*  <XStack flex={1} justifyContent={'center'}>*/}
+        {/*    <StatsCard count={8} label={'Invitations\nenvoyées'} backgroundColor={'$gray1'} color={'$gray5'} />*/}
+        {/*  </XStack>*/}
+        {/*  <XStack flex={1} justifyContent={'flex-end'}>*/}
+        {/*    <StatsCard count={8} label={'Invitations\nsignalées'} backgroundColor={'$orange1'} color={'$orange5'} />*/}
+        {/*  </XStack>*/}
+        {/*</XStack>*/}
       </>
 
       <YStack padding={'$8'} borderRadius={'$4'} backgroundColor={'$gray1'}>
