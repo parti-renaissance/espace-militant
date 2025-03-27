@@ -1,5 +1,7 @@
+import React from 'react'
 import { ColorValue } from 'react-native/Libraries/StyleSheet/StyleSheet'
 import Text from '@/components/base/Text'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { YStack } from 'tamagui'
 
 interface Props {
@@ -7,9 +9,14 @@ interface Props {
   label: string
   backgroundColor?: ColorValue
   color?: ColorValue
+  isLoading?: boolean
 }
 
-export default function StatsCard({ count, label, backgroundColor, color }: Readonly<Props>) {
+export default function StatsCard({ count, label, backgroundColor, color, isLoading }: Readonly<Props>) {
+  if (isLoading) {
+    return <Skeleton />
+  }
+
   return (
     <YStack
       gap={'$4'}
@@ -33,3 +40,11 @@ export default function StatsCard({ count, label, backgroundColor, color }: Read
     </YStack>
   )
 }
+
+const Skeleton = () => (
+  <SkeCard width={150}>
+    <SkeCard.Content>
+      <SkeCard.Description />
+    </SkeCard.Content>
+  </SkeCard>
+)

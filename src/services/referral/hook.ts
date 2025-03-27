@@ -1,12 +1,19 @@
 import { ReferralService, referralServiceKey } from '@/services/referral/api'
-import { ReferralInviteRequestType } from '@/services/referral/schema'
+import { ReferralInviteRequestType, ReferralStatisticsType } from '@/services/referral/schema'
 import { useToastController } from '@tamagui/toast'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query'
 
 export function useReferrals() {
   return useQuery({
     queryFn: () => ReferralService.get(),
     queryKey: [referralServiceKey],
+  })
+}
+
+export function useReferralStatistics(): UseQueryResult<ReferralStatisticsType> {
+  return useQuery({
+    queryFn: () => ReferralService.statistics(),
+    queryKey: [referralServiceKey, 'statistics'],
   })
 }
 
