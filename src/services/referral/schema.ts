@@ -2,6 +2,20 @@ import { postAddressSchema, RestEventAddressSchema } from '@/services/events/sch
 import { errorMessages } from '@/utils/errorMessages'
 import { z } from 'zod'
 
+export enum ReferralStatusEnum {
+  INVITATION_SENT = 'invitation_sent',
+  ACCOUNT_CREATED = 'account_created',
+  ADHESION_FINISHED = 'adhesion_finished',
+  ADHESION_VIA_OTHER_LINK = 'adhesion_via_other_link',
+  REPORTED = 'reported',
+}
+
+export enum TypeReferralEnum {
+  LINK = 'link',
+  INVITATION = 'invitation',
+  PREREGISTRATION = 'preregistration',
+}
+
 export const ReferralSchema = z.object({
   email_address: z.string(),
   first_name: z.string(),
@@ -12,11 +26,14 @@ export const ReferralSchema = z.object({
   birthdate: z.null(),
   referred: z.null(),
   identifier: z.string(),
-  type: z.string(),
+  type: z.nativeEnum(TypeReferralEnum),
   mode: z.string(),
-  status: z.string(),
+  status: z.nativeEnum(ReferralStatusEnum),
+  status_label: z.string(),
   uuid: z.string(),
   post_address: RestEventAddressSchema,
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date().nullable(),
 })
 export type ReferralType = z.infer<typeof ReferralSchema>
 
