@@ -53,3 +53,10 @@ export const ReferralPreRegisterRequestSchema = z.object({
   post_address: postAddressSchema.optional(),
 })
 export type ReferralPreRegisterRequestType = z.infer<typeof ReferralPreRegisterRequestSchema>
+
+export const ReferralStatisticsSchema = z.object({
+  nb_referral_finished: z.number(),
+  nb_referral_sent: z.number(),
+  nb_referral_reported: z.number(),
+})
+export type ReferralStatisticsType = z.infer<typeof ReferralStatisticsSchema>

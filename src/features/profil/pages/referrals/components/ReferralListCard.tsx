@@ -1,15 +1,16 @@
 import React, { Fragment } from 'react'
-import { FlatList, Platform } from 'react-native'
+import { Platform } from 'react-native'
 import Text from '@/components/base/Text'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import StatsCard from '@/components/StatsCard/StatsCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import ReferralListItem from '@/features/profil/pages/referrals/components/ReferralListItem'
-import { useReferrals } from '@/services/referral/hook'
+import { useReferrals, useReferralStatistics } from '@/services/referral/hook'
 import { Separator, XStack, YStack } from 'tamagui'
 
 export default function ReferralListCard() {
   const { data, isLoading } = useReferrals()
+  const { data: statistics, isLoading: isLoadingStatistics } = useReferralStatistics()
 
   if (isLoading || !data) {
     return <Skeleton />
@@ -20,18 +21,35 @@ export default function ReferralListCard() {
       <>
         <Text.LG fontWeight={600}>Suivi des parrainages</Text.LG>
 
-        {/* Hide for now, needed on another ticket */}
-        {/*<XStack alignItems={'center'} alignContent={'space-between'} width={'100%'} gap={'$3'}>*/}
-        {/*  <XStack flex={1}>*/}
-        {/*    <StatsCard count={8} label={'Adhésions\nfinalisées'} backgroundColor={'$green1'} color={'$green5'} />*/}
-        {/*  </XStack>*/}
-        {/*  <XStack flex={1} justifyContent={'center'}>*/}
-        {/*    <StatsCard count={8} label={'Invitations\nenvoyées'} backgroundColor={'$gray1'} color={'$gray5'} />*/}
-        {/*  </XStack>*/}
-        {/*  <XStack flex={1} justifyContent={'flex-end'}>*/}
-        {/*    <StatsCard count={8} label={'Invitations\nsignalées'} backgroundColor={'$orange1'} color={'$orange5'} />*/}
-        {/*  </XStack>*/}
-        {/*</XStack>*/}
+        <XStack alignItems={'center'} alignContent={'space-between'} width={'100%'} gap={'$3'}>
+          <XStack flex={1}>
+            <StatsCard
+              count={statistics?.nb_referral_finished ?? 0}
+              label={'Adhésions\nfinalisées'}
+              backgroundColor={'$green1'}
+              color={'$green5'}
+              isLoading={isLoadingStatistics}
+            />
+          </XStack>
+          <XStack flex={1} justifyContent={'center'}>
+            <StatsCard
+              count={statistics?.nb_referral_sent ?? 0}
+              label={'Invitations\nenvoyées'}
+              backgroundColor={'$gray1'}
+              color={'$gray5'}
+              isLoading={isLoadingStatistics}
+            />
+          </XStack>
+          <XStack flex={1} justifyContent={'flex-end'}>
+            <StatsCard
+              count={statistics?.nb_referral_reported ?? 0}
+              label={'Invitations\nsignalées'}
+              backgroundColor={'$orange1'}
+              color={'$orange5'}
+              isLoading={isLoadingStatistics}
+            />
+          </XStack>
+        </XStack>
       </>
 
       <YStack padding={'$8'} borderRadius={'$4'} backgroundColor={'$gray1'}>
