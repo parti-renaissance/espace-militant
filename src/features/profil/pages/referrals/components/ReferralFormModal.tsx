@@ -3,7 +3,6 @@ import { Pressable } from 'react-native'
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
-import Select from '@/components/base/Select/SelectV3'
 import SelectV3 from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import Button from '@/components/Button'
@@ -30,12 +29,18 @@ interface Props {
   closeModal: () => void
 }
 
-export default function ReferralFormModal({ isOpen, closeModal }: Props) {
+export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props>) {
   const [isChecked, setIsChecked] = useState(false)
   const [isFullForm, setIsFullForm] = useState(false)
 
   const { mutate: invite, isPending: isInviting, isSuccess: isInviteSuccess, reset: resetInviteState, error: inviteError } = useReferralsInvite()
-  const { mutate: preRegister, isPending: isRegistering, isSuccess: isPreRegisterSuccess, reset: resetPreRegisterState, error: preRegisterError } = useReferralsPreRegister()
+  const {
+    mutate: preRegister,
+    isPending: isRegistering,
+    isSuccess: isPreRegisterSuccess,
+    reset: resetPreRegisterState,
+    error: preRegisterError,
+  } = useReferralsPreRegister()
   const isSuccess = isInviteSuccess || isPreRegisterSuccess
 
   const apiErrors: RestViolation[] = useMemo(() => {
@@ -50,7 +55,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
     }
   }, [inviteError, preRegisterError, isFullForm])
 
-  const { control, watch, handleSubmit, formState, reset, setError } = useForm<ReferralPreRegisterSchemaType | ReferralPreRegisterLightSchemaType>({
+  const { control, watch, handleSubmit, formState, reset } = useForm<ReferralPreRegisterSchemaType | ReferralPreRegisterLightSchemaType>({
     defaultValues: {
       first_name: '',
       email_address: '',
@@ -106,236 +111,234 @@ export default function ReferralFormModal({ isOpen, closeModal }: Props) {
       {isSuccess ? (
         <ReferralSuccess onClose={onClose} name={firstName} />
       ) : (
-        <>
-          <YStack padding={'$8'} gap={'$8'}>
-            <XStack alignItems={'center'} justifyContent={'space-between'}>
-              <Text bold>Invitation</Text>
-              {isFullForm && (
-                <Button variant={'text'} onPress={toggleFullForm}>
-                  <Text color="$orange6">Revenir à l'invitation simple</Text>
-                </Button>
-              )}
-            </XStack>
-
-            {apiErrors?.map((error) => (
-          <MessageCard iconLeft={AlertTriangle} theme="orange" key={error.propertyPath}>
-            {error.message}
-          </MessageCard>
-        ))}
-
-        {isFullForm && (
-              <Controller
-                name="civility"
-                control={control}
-                render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                  <Select
-                    placeholder="Civilité"
-                    onBlur={onBlur}
-                    color="gray"
-                    value={value}
-                    onChange={onChange}
-                    error={error?.message}
-                    options={[
-                      { value: 'male', label: 'Monsieur' },
-                      { value: 'female', label: 'Madame' },
-                    ]}
-                  />
-                )}
-              />
+        <YStack padding={'$8'} gap={'$8'}>
+          <XStack alignItems={'center'} justifyContent={'space-between'}>
+            <Text bold>Invitation</Text>
+            {isFullForm && (
+              <Button variant={'text'} onPress={toggleFullForm}>
+                <Text color="$orange6">Revenir à l'invitation simple</Text>
+              </Button>
             )}
+          </XStack>
 
-            <XStack gap={'$8'}>
-              <View flex={1}>
-                <Controller
-                  name="first_name"
-                  control={control}
-                  render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                    <Input color="gray" placeholder="Prénom" value={value ?? undefined} onBlur={onBlur} onChange={onChange} error={error?.message} />
-                  )}
-                />
-              </View>
-              {isFullForm && (
-                <View flex={1}>
-                  <Controller
-                    name="last_name"
-                    control={control}
-                    render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                      <Input color="gray" placeholder="Nom" value={value ?? undefined} onBlur={onBlur} onChange={onChange} error={error?.message} />
-                    )}
-                  />
-                </View>
-              )}
-            </XStack>
+          {apiErrors?.map((error) => (
+            <MessageCard iconLeft={AlertTriangle} theme="orange" key={error.propertyPath}>
+              {error.message}
+            </MessageCard>
+          ))}
 
+          {isFullForm && (
             <Controller
-              name="email_address"
+              name="civility"
               control={control}
               render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                <Input
+                <SelectV3
+                  placeholder="Civilité"
+                  onBlur={onBlur}
                   color="gray"
                   value={value}
-                  placeholder="Email"
-                  onBlur={onBlur}
                   onChange={onChange}
                   error={error?.message}
-                  style={{ width: '100%' }}
-                  keyboardType={'email-address'}
-                  autoCapitalize={'none'}
-                  autoCorrect={false}
+                  options={[
+                    { value: 'male', label: 'Monsieur' },
+                    { value: 'female', label: 'Madame' },
+                  ]}
                 />
               )}
             />
+          )}
 
+          <XStack gap={'$8'}>
+            <View flex={1}>
+              <Controller
+                name="first_name"
+                control={control}
+                render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+                  <Input color="gray" placeholder="Prénom" value={value ?? undefined} onBlur={onBlur} onChange={onChange} error={error?.message} />
+                )}
+              />
+            </View>
             {isFullForm && (
-              <>
+              <View flex={1}>
                 <Controller
-                  render={({ field, fieldState }) => {
-                    return (
-                      <AddressAutocomplete
-                        size="sm"
-                        color="gray"
-                        label="Localisation"
-                        error={fieldState.error?.message}
-                        onBlur={field.onBlur}
-                        setAddressComponents={(x) => {
-                          field.onChange({
-                            address: x.address,
-                            city_name: x.city,
-                            postal_code: x.postalCode,
-                            country: x.country,
-                          })
-                        }}
-                      />
-                    )
-                  }}
-                  control={control}
-                  name="post_address"
-                />
-
-                <Controller
-                  name="nationality"
+                  name="last_name"
                   control={control}
                   render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                    <NationalitySelect
-                      id="nationality"
-                      color="gray"
-                      value={value ?? 'FR'}
-                      placeholder="Nationalité"
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      error={error?.message}
-                    />
+                    <Input color="gray" placeholder="Nom" value={value ?? undefined} onBlur={onBlur} onChange={onChange} error={error?.message} />
                   )}
                 />
-              </>
+              </View>
             )}
+          </XStack>
 
-            <XStack alignItems={'center'}>
-              <YStack>
-                <Checkbox checked={isChecked} onPress={toggleCheck} />
+          <Controller
+            name="email_address"
+            control={control}
+            render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+              <Input
+                color="gray"
+                value={value}
+                placeholder="Email"
+                onBlur={onBlur}
+                onChange={onChange}
+                error={error?.message}
+                style={{ width: '100%' }}
+                keyboardType={'email-address'}
+                autoCapitalize={'none'}
+                autoCorrect={false}
+              />
+            )}
+          />
+
+          {isFullForm && (
+            <>
+              <Controller
+                render={({ field, fieldState }) => {
+                  return (
+                    <AddressAutocomplete
+                      size="sm"
+                      color="gray"
+                      label="Localisation"
+                      error={fieldState.error?.message}
+                      onBlur={field.onBlur}
+                      setAddressComponents={(x) => {
+                        field.onChange({
+                          address: x.address,
+                          city_name: x.city,
+                          postal_code: x.postalCode,
+                          country: x.country,
+                        })
+                      }}
+                    />
+                  )
+                }}
+                control={control}
+                name="post_address"
+              />
+
+              <Controller
+                name="nationality"
+                control={control}
+                render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+                  <NationalitySelect
+                    id="nationality"
+                    color="gray"
+                    value={value ?? 'FR'}
+                    placeholder="Nationalité"
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    error={error?.message}
+                  />
+                )}
+              />
+            </>
+          )}
+
+          <XStack alignItems={'center'}>
+            <YStack>
+              <Checkbox checked={isChecked} onPress={toggleCheck} />
+            </YStack>
+
+            <YStack>
+              <Pressable onPress={toggleCheck}>
+                <Text.MD multiline fontWeight={400} lineHeight={20}>
+                  Je certifie sur l’honneur avoir obtenu le consentement préalable de la personne que j’invite à adhérer.
+                </Text.MD>
+              </Pressable>
+            </YStack>
+          </XStack>
+
+          {firstName.length > 0 && !isFullForm && (
+            <XStack padding={'$6'} borderRadius={'$8'} backgroundColor={'$gray1'} alignItems={'center'} gap={'$4'}>
+              <XStack flex={1} $gtSm={{ flex: 1 }}>
+                <Info />
+              </XStack>
+              <YStack flex={7} $gtSm={{ flex: 3 }}>
+                <Text bold>Connaissez-vous son adresse postale ?</Text>
+                <Text>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
               </YStack>
-
-              <YStack>
-                <Pressable onPress={toggleCheck}>
-                  <Text.MD multiline fontWeight={400} lineHeight={20}>
-                    Je certifie sur l’honneur avoir obtenu le consentement préalable de la personne que j’invite à adhérer.
-                  </Text.MD>
-                </Pressable>
+              <YStack flex={5} $gtSm={{ flex: 3 }} justifyContent={'center'}>
+                <Button variant={'text'} onPress={toggleFullForm}>
+                  <Text color="$orange6">Préinscrire</Text>
+                </Button>
               </YStack>
             </XStack>
+          )}
 
-            {firstName.length > 0 && !isFullForm && (
-              <XStack padding={'$6'} borderRadius={'$8'} backgroundColor={'$gray1'} alignItems={'center'} gap={'$4'}>
-                <XStack flex={1} $gtSm={{ flex: 1 }}>
-                  <Info />
-                </XStack>
-                <YStack flex={7} $gtSm={{ flex: 3 }}>
-                  <Text bold>Connaissez-vous son adresse postale ?</Text>
-                  <Text>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
-                </YStack>
-                <YStack flex={5} $gtSm={{ flex: 3 }} justifyContent={'center'}>
-                  <Button variant={'text'} onPress={toggleFullForm}>
-                    <Text color="$orange6">Préinscrire</Text>
-                  </Button>
-                </YStack>
+          {isFullForm && (
+            <>
+              <XStack gap="$medium" alignContent="center" alignItems="center">
+                <Text.MD secondary>Optionnel</Text.MD>
+                <VoxCard.Separator />
               </XStack>
-            )}
 
-            {isFullForm && (
-              <>
-                <XStack gap="$medium" alignContent="center" alignItems="center">
-                  <Text.MD secondary>Optionnel</Text.MD>
-                  <VoxCard.Separator />
-                </XStack>
+              <Controller
+                name="birthdate"
+                control={control}
+                render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+                  <DatePickerField
+                    color="gray"
+                    label="Date de naissance"
+                    type="date"
+                    value={value ?? undefined}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    error={error?.message}
+                  />
+                )}
+              />
 
-                <Controller
-                  name="birthdate"
-                  control={control}
-                  render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                    <DatePickerField
-                      color="gray"
-                      label="Date de naissance"
-                      type="date"
-                      value={value ?? undefined}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      error={error?.message}
-                    />
-                  )}
-                />
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+                  <XStack gap="$medium">
+                    <View width={130}>
+                      <SelectV3
+                        searchable={true}
+                        color="gray"
+                        value={value?.country ?? 'FR'}
+                        size="lg"
+                        options={phoneCodes}
+                        onChange={(x) => onChange({ number: value?.number, country: x })}
+                      />
+                    </View>
+                    <View flexGrow={1}>
+                      <Input
+                        value={value?.number}
+                        color="gray"
+                        placeholder="Téléphone"
+                        onBlur={onBlur}
+                        onChange={(x) => {
+                          if (!x) {
+                            onChange(null)
+                          } else {
+                            onChange({ number: x, country: value?.country })
+                          }
+                        }}
+                        error={error?.message}
+                      />
+                    </View>
+                  </XStack>
+                )}
+              />
+            </>
+          )}
 
-                <Controller
-                  name="phone"
-                  control={control}
-                  render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                    <XStack gap="$medium">
-                      <View width={130}>
-                        <SelectV3
-                          searchable={true}
-                          color="gray"
-                          value={value?.country ?? 'FR'}
-                          size="lg"
-                          options={phoneCodes}
-                          onChange={(x) => onChange({ number: value?.number, country: x })}
-                        />
-                      </View>
-                      <View flexGrow={1}>
-                        <Input
-                          value={value?.number}
-                          color="gray"
-                          placeholder="Téléphone"
-                          onBlur={onBlur}
-                          onChange={(x) => {
-                            if (!x) {
-                              onChange(null)
-                            } else {
-                              onChange({ number: x, country: value?.country })
-                            }
-                          }}
-                          error={error?.message}
-                        />
-                      </View>
-                    </XStack>
-                  )}
-                />
-              </>
-            )}
-
-            <View alignSelf={'flex-end'}>
-              <Button
-                theme="orange"
-                size="xl"
-                disabled={!isChecked || !isValid || !isDirty}
-                onPress={handleSubmit(onSubmit)}
-                loading={isRegistering || isInviting}
-              >
-                <Button.Text color="$white1" bold>
-                  {isFullForm ? 'Envoyer l’email de préinvitation' : 'Envoyer l’email d’invitation'}
-                </Button.Text>
-              </Button>
-            </View>
-          </YStack>
-        </>
+          <View alignSelf={'flex-end'}>
+            <Button
+              theme="orange"
+              size="xl"
+              disabled={!isChecked || !isValid || !isDirty}
+              onPress={handleSubmit(onSubmit)}
+              loading={isRegistering || isInviting}
+            >
+              <Button.Text color="$white1" bold>
+                {isFullForm ? 'Envoyer l’email de préinvitation' : 'Envoyer l’email d’invitation'}
+              </Button.Text>
+            </Button>
+          </View>
+        </YStack>
       )}
     </ModalOrBottomSheet>
   )
