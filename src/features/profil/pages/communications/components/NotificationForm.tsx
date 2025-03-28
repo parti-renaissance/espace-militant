@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react'
 import { WebView } from 'react-native-webview'
-import { FormFrame } from '@/components/base/FormFrames'
 import SwitchGroup from '@/components/base/SwitchGroup/SwitchGroup'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
@@ -291,9 +290,11 @@ const NotificationForm = (props: { cardProps?: React.ComponentProps<typeof VoxCa
           )}
         </VoxCard.Content>
       </VoxCard>
-      <Text.MD link={true} onPress={() => unsubscribe.mutateAsync()} textDecorationLine="none" color="$textSecondary" fontWeight="$6" padding="$medium">
-        Me désabonner de toutes les communications
-      </Text.MD>
+      {!!userData?.email_subscribed && (
+        <VoxButton variant="text" onPress={() => unsubscribe.mutateAsync()} loading={unsubscribe.isPending}>
+          Me désabonner de toutes les communications
+        </VoxButton>
+      )}
     </>
   )
 }

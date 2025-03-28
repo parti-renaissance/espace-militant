@@ -1,5 +1,6 @@
 import * as api from '@/services/notifications/api'
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { PROFIL_QUERY_KEY } from '@/services/profile/hook'
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
 export const useGetNotificationList = () => {
   return useSuspenseQuery({
@@ -10,8 +11,11 @@ export const useGetNotificationList = () => {
 }
 
 export const useUnsubscribe = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: () => api.unsubscribe(),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [PROFIL_QUERY_KEY] }),
   })
 }
 

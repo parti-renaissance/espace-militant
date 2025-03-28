@@ -14,7 +14,7 @@ export const unsubscribe = api({
   method: 'POST',
   path: '/api/v3/profile/unsubscribe',
   requestSchema: z.void(),
-  responseSchema: z.void(),
+  responseSchema: z.any(),
   type: 'private',
 })
 
