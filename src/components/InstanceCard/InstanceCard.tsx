@@ -1,4 +1,4 @@
-import { NamedExoticComponent } from 'react'
+import { NamedExoticComponent, ReactNode } from 'react'
 import EmptyStateInstanceIllustration from '@/assets/illustrations/EmptyStateInstanceIllustration'
 import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture'
@@ -10,7 +10,7 @@ type InstanceCardHeaderProps = {
   title: string
   icon: NamedExoticComponent<IconProps>
   middleIconOffset?: number
-  headerLeft?: React.ReactNode
+  headerLeft?: ReactNode
 }
 
 export const InstanceCardHeader = (props: InstanceCardHeaderProps) => {
@@ -26,17 +26,18 @@ export const InstanceCardHeader = (props: InstanceCardHeaderProps) => {
 }
 
 type InstanceCardProps = {
-  description: string
-  children: React.ReactNode
-  footer: React.ReactNode
+  description?: string
+  children: ReactNode
+  footer?: ReactNode
+  hideHeader?: boolean
 } & InstanceCardHeaderProps
 
 const InstanceCard = (props: InstanceCardProps) => {
   return (
     <VoxCard>
       <VoxCard.Content>
-        <InstanceCardHeader {...props} />
-        <Text.P>{props.description}</Text.P>
+        {!props.hideHeader && <InstanceCardHeader {...props} />}
+        {!!props.description && <Text.P>{props.description}</Text.P>}
         {props.children}
         {props.footer}
       </VoxCard.Content>

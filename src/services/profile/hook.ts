@@ -1,4 +1,5 @@
 import clientEnv from '@/config/clientEnv'
+import { UserTagEnum } from '@/core/entities/UserProfile'
 import * as api from '@/services/profile/api'
 import { RestProfilResponse, RestProfilResponseTagTypes, RestUpdateProfileRequest } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
@@ -216,6 +217,11 @@ export const useGetElectProfil = () => {
 export const useGetTags = ({ tags }: { tags: RestProfilResponseTagTypes[] }) => {
   const profil = useGetProfil()
   return { tags: profil.data?.tags?.filter((x) => tags.includes(x.type)), ...profil }
+}
+
+export const useIsAdherent = () => {
+  const profil = useGetProfil()
+  return profil.data?.tags?.some((el) => el.type === UserTagEnum.ADHERENT)
 }
 
 export const usePostElectPayment = () => {

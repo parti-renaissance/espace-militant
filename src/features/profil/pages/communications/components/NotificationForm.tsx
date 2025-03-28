@@ -5,7 +5,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useGetNotificationList, useGetReSubscribeConfig } from '@/services/notifications/hook'
+import { useGetNotificationList, useGetReSubscribeConfig, useUnsubscribe } from '@/services/notifications/hook'
 import { useGetResubscribeLoop, useGetSuspenseProfil, useMutationUpdateProfil } from '@/services/profile/hook'
 import { RestDetailedProfileResponse } from '@/services/profile/schema'
 import { AlertTriangle, Info } from '@tamagui/lucide-icons'
@@ -54,9 +54,7 @@ const UnSubscribeCase = () => {
           const onTimeout = options.onTimeout || (() => {})
           const timeout = options.timeout || 10 // seconds
 
-          let timeoutTrigger: NodeJS.Timeout
-
-          timeoutTrigger = setTimeout(() => {
+          const timeoutTrigger: NodeJS.Timeout = setTimeout(() => {
             ;(window as any)[callbackName] = () => {}
             onTimeout()
           }, timeout * 1000)
@@ -78,7 +76,7 @@ const UnSubscribeCase = () => {
       setIsStartResub(true)
 
       jsonp.send(getUrl(), {
-        onSuccess: function (json) {
+        onSuccess: function () {
           setEnableLoop(true)
           setIsStartResub(false)
         },
@@ -149,7 +147,7 @@ const UnSubscribeCase = () => {
               </script></head></html>`,
           }}
           javaScriptEnabled={true}
-          onMessage={(e) => {
+          onMessage={() => {
             setEnableLoop(true)
             setIsStartResub(true)
             setExecWebView(false)
@@ -162,13 +160,7 @@ const UnSubscribeCase = () => {
           theme="orange"
           rightComponent={
             <YStack>
-              <VoxButton
-                loading={execWebView || isStartResub}
-                theme="orange"
-                onPress={() => {
-                  handlePress()
-                }}
-              >
+              <VoxButton loading={execWebView || isStartResub} theme="orange" onPress={handlePress}>
                 Me réabonner
               </VoxButton>
             </YStack>
@@ -201,6 +193,7 @@ const NotificationForm = (props: { cardProps?: React.ComponentProps<typeof VoxCa
   const shouldAutoCheck = autorun === '1' && userData && userData.email_subscribed
   const subscription_types = props.profile.subscription_types
   const isAutoRunHasBeenExecuted = useRef(false)
+  const unsubscribe = useUnsubscribe()
 
   const { data: _notificationList } = useGetNotificationList()
   const user_subscription_values = shouldAutoCheck ? _notificationList.map((n) => n.code) : subscription_types.map((st) => st.code)
@@ -262,40 +255,47 @@ const NotificationForm = (props: { cardProps?: React.ComponentProps<typeof VoxCa
   }
 
   return (
-    <VoxCard {...props.cardProps}>
-      <VoxCard.Content>
-        <Text.LG>Préférences de communication</Text.LG>
-        {userData && !userData.email_subscribed ? (
-          <UnSubscribeCase />
-        ) : (
-          <>
-            <SmsSection />
-            <Separator backgroundColor="$textOutlined" />
-            <YStack gap="$small">
-              <Text.MD multiline secondary semibold>
-                Par Email
-              </Text.MD>
-              <Text.P>En cochant ces cases j’accepte de recevoir les emails : </Text.P>
-            </YStack>
-            <Controller
-              name="subscription_email"
-              control={control}
-              render={({ field }) => {
-                return <SwitchGroup options={emailList} onChange={field.onChange} value={field.value} />
-              }}
-            />
-            <XStack justifyContent="flex-end" gap="$small">
-              <VoxButton variant="outlined" display={isDirty ? 'flex' : 'none'} onPress={() => reset()}>
-                Annuler
-              </VoxButton>
-              <VoxButton variant="outlined" theme="blue" loading={isPending} onPress={onSubmit} disabled={!isDirty || !isValid}>
-                Enregister
-              </VoxButton>
-            </XStack>
-          </>
-        )}
-      </VoxCard.Content>
-    </VoxCard>
+    <>
+      <VoxCard {...props.cardProps}>
+        <VoxCard.Content>
+          <Text.LG>Préférences de communication</Text.LG>
+          {userData && !userData.email_subscribed ? (
+            <UnSubscribeCase />
+          ) : (
+            <>
+              <SmsSection />
+              <Separator backgroundColor="$textOutlined" />
+              <YStack gap="$small">
+                <Text.MD multiline secondary semibold>
+                  Par Email
+                </Text.MD>
+                <Text.P>En cochant ces cases j’accepte de recevoir les emails : </Text.P>
+              </YStack>
+              <Controller
+                name="subscription_email"
+                control={control}
+                render={({ field }) => {
+                  return <SwitchGroup options={emailList} onChange={field.onChange} value={field.value} />
+                }}
+              />
+              <XStack justifyContent="flex-end" gap="$small">
+                <VoxButton variant="outlined" display={isDirty ? 'flex' : 'none'} onPress={() => reset()}>
+                  Annuler
+                </VoxButton>
+                <VoxButton variant="outlined" theme="blue" loading={isPending} onPress={onSubmit} disabled={!isDirty || !isValid}>
+                  Enregistrer
+                </VoxButton>
+              </XStack>
+            </>
+          )}
+        </VoxCard.Content>
+      </VoxCard>
+      {!!userData?.email_subscribed && (
+        <VoxButton variant="text" onPress={() => unsubscribe.mutateAsync()} loading={unsubscribe.isPending}>
+          Me désabonner de toutes les communications
+        </VoxButton>
+      )}
+    </>
   )
 }
 

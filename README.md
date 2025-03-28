@@ -15,7 +15,8 @@ To be able to run the application on iOS and Android:
 
 ### Building/Running the app locally
 
-- copy the `.env` file to `.env.*.local` and fill in the environment variables
+- copy the `.env` file to `.env.local` and fill in the environment variables
+- run `yarn prepare:env` to generate clientEnv.ts (this shall be done on every .env.local changes).
 - download the `GoogleService-Info.plist` and `google-services.json` files from the Firebase console and place them in the `config/` folder
 - run `yarn run start` to start the react-native bundler
 - run `yarn run ios` to start the iOS app

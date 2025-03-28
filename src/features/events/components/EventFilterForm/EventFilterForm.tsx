@@ -1,9 +1,9 @@
 import React, { memo, RefObject, useCallback } from 'react'
 import { TextInput } from 'react-native'
 import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
+import SearchBox from '@/components/Search/SearchBox'
 import { eventFiltersState } from '@/features/events/store/filterStore'
 import { YStack } from 'tamagui'
-import SearchBox from './SearchBox'
 
 type EventFiltersProps = {
   onSearchFocus?: () => void

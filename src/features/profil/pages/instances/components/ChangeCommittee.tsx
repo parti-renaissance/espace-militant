@@ -4,6 +4,7 @@ import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
+import { InstanceCardHeader } from '@/components/InstanceCard/InstanceCard'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useGetCommittees, useSetMyCommittee } from '@/services/committee/hook'
@@ -11,11 +12,10 @@ import { Diamond, X } from '@tamagui/lucide-icons'
 import { useMedia, YStack } from 'tamagui'
 import CommitteeCard from './CommitteeCard'
 import { DoubleDiamond } from './icons'
-import { InstanceCardHeader } from './InstanceCard'
 
 const MemoizedCommitteeCard = memo(CommitteeCard)
 
-const ChangeCommiteeList = ({ currentUuid, ...props }: { currentUuid: string | null; onClose?: () => void }) => {
+const ChangeCommitteeList = ({ currentUuid, ...props }: { currentUuid: string | null; onClose?: () => void }) => {
   const { data } = useGetCommittees()
   const { mutateAsync, isPending } = useSetMyCommittee()
 
@@ -103,7 +103,7 @@ export default function ChangeCommitteeModal({
           ) : null}
           <View style={{ flex: 1 }}>
             <BoundarySuspenseWrapper>
-              <ChangeCommiteeList currentUuid={currentCommitteeUuid} onClose={modalProps.onClose} />
+              <ChangeCommitteeList currentUuid={currentCommitteeUuid} onClose={modalProps.onClose} />
             </BoundarySuspenseWrapper>
           </View>
         </YStack>
