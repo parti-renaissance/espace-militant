@@ -17,7 +17,7 @@ const SearchBox = forwardRef<TextInput, SearchBoxProps>(({ label, value, onChang
   const IconRight = useCallback((props: { isInputFill: boolean }) => {
     return props.isInputFill ? (
       <Pressable onPress={() => onChange('')}>
-        <XCircle color="$blue9" />
+        <XCircle color="$blue9" width={20} height={20} />
       </Pressable>
     ) : (
       <DefaultIcon />

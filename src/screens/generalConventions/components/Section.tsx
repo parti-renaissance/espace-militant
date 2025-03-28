@@ -5,19 +5,20 @@ import { generalConventionContent } from '@/screens/generalConventions/component
 import { FormaCard } from '@/screens/generalConventions/components/FormaCard'
 import { Filter } from '@/screens/generalConventions/store'
 import { useGetGeneralConventions } from '@/services/general-convention/hook'
-import { XStack } from 'tamagui'
+import { sortBy } from 'lodash'
+import { ScrollView, XStack } from 'tamagui'
 
 const Section = ({ filter }: { filter: Filter }) => {
   const { data } = useGetGeneralConventions()
 
   const filteredItems = useMemo(() => {
-    const items = data ?? []
+    const items = sortBy(data ?? [], (item) => parseInt(item.department_zone?.code ?? '0', 10))
 
     if (!filter.search && !filter.assembly) {
       return items
     }
 
-    return (data ?? []).filter((item) => {
+    return items.filter((item) => {
       let content = ''
       if (filter.search) {
         content = generalConventionContent(item)
@@ -31,19 +32,21 @@ const Section = ({ filter }: { filter: Filter }) => {
   }, [filter, data])
 
   return (
-    <XStack flexWrap="wrap" alignItems={'flex-start'} maxWidth={1200} gap={'$4'} $gtSm={{ gap: '$8' }} justifyContent="center">
-      {filteredItems.length ? (
-        filteredItems.map((generalConvention, index) => <FormaCard key={index} payload={generalConvention} />)
-      ) : (
-        <XStack background={'white'} borderRadius={12} width={300} justifyContent={'center'} paddingHorizontal={16} paddingVertical={32}>
-          <EmptyState>
-            <Text.MD textAlign={'center'} medium>
-              Aucun élément
-            </Text.MD>
-          </EmptyState>
-        </XStack>
-      )}
-    </XStack>
+    <ScrollView>
+      <XStack flexWrap="wrap" alignItems={'flex-start'} maxWidth={1200} gap={'$4'} $gtSm={{ gap: '$8' }} justifyContent="center">
+        {filteredItems.length ? (
+          filteredItems.map((generalConvention, index) => <FormaCard key={index} payload={generalConvention} />)
+        ) : (
+          <XStack background={'white'} borderRadius={12} width={300} justifyContent={'center'} paddingHorizontal={16} paddingVertical={32}>
+            <EmptyState>
+              <Text.MD textAlign={'center'} medium>
+                Aucun élément
+              </Text.MD>
+            </EmptyState>
+          </XStack>
+        )}
+      </XStack>
+    </ScrollView>
   )
 }
 

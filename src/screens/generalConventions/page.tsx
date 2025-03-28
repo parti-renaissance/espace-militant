@@ -37,8 +37,8 @@ const GeneralConventionScreen: GeneralConventionScreenProps = () => {
           >
             <YStack flex={1} minWidth={260}>
               <AssemblySelect
-                defaultValue={'all'}
-                resetable={!!filter.assembly}
+                label="Département"
+                resetable={!!filter.assembly && filter.assembly !== 'all'}
                 size="sm"
                 id="filter-dept"
                 color="white"
