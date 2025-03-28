@@ -148,14 +148,14 @@ const ButtonFrame = forwardRef<
   React.ComponentPropsWithoutRef<typeof ButtonFrameStyled> & { variant?: 'outlined' | 'text' | 'soft' | 'contained'; inverse?: boolean }
 >(({ variant, inverse, ...props }, ref) => {
   const Frame = getFrame(props.asChip ? 'text' : variant, inverse)
-  const outlinedExeption =
+  const outlinedException =
     variant === 'outlined' && (props.theme === 'gray' || !props.theme)
       ? {
           borderColor: '$textOutline32',
         }
       : {}
 
-  return <Frame ref={ref} {...props} {...outlinedExeption} />
+  return <Frame ref={ref} {...props} {...outlinedException} />
 })
 
 const ButtonSpinner = styled(Spinner, {
