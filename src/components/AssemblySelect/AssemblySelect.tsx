@@ -54,7 +54,7 @@ function AssemblySelect({ id, onChange, onDetailChange, value, defaultValue, ...
 
   return (
     <Select
-      label="Assemblée"
+      label={props.label ?? 'Assemblée'}
       key={id}
       searchable
       resetable={props.resetable}
