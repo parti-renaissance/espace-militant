@@ -15,7 +15,7 @@ import { DoubleDiamond } from './icons'
 
 const MemoizedCommitteeCard = memo(CommitteeCard)
 
-const ChangeCommiteeList = ({ currentUuid, ...props }: { currentUuid: string | null; onClose?: () => void }) => {
+const ChangeCommitteeList = ({ currentUuid, ...props }: { currentUuid: string | null; onClose?: () => void }) => {
   const { data } = useGetCommittees()
   const { mutateAsync, isPending } = useSetMyCommittee()
 
@@ -103,7 +103,7 @@ export default function ChangeCommitteeModal({
           ) : null}
           <View style={{ flex: 1 }}>
             <BoundarySuspenseWrapper>
-              <ChangeCommiteeList currentUuid={currentCommitteeUuid} onClose={modalProps.onClose} />
+              <ChangeCommitteeList currentUuid={currentCommitteeUuid} onClose={modalProps.onClose} />
             </BoundarySuspenseWrapper>
           </View>
         </YStack>
