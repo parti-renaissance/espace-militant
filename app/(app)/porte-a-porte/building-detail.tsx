@@ -37,7 +37,7 @@ enum Tab {
 
 const BuildingDetailScreen = () => {
   const isFocused = useIsFocused()
-  const [isLoading, setIsloading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [tab, setTab] = useState(Tab.LAYOUT)
   const [history, setHistory] = useState<BuildingHistoryPoint[]>([])
@@ -108,7 +108,6 @@ const BuildingDetailScreen = () => {
     if (isFocused) {
       refreshData()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused])
 
   const showHistory = () => {
@@ -164,11 +163,11 @@ const BuildingDetailScreen = () => {
     const block = layout.find((item) => item.id === buildingBlockId)
     if (!block) return
     if (block.status === 'completed') {
-      setIsloading(true)
+      setIsLoading(true)
       DoorToDoorRepository.getInstance()
         .openBuildingBlock(campaignStatistics.campaignId, address.building.id, block.name)
         .then(() => refreshData())
-        .finally(() => setIsloading(false))
+        .finally(() => setIsLoading(false))
     } else {
       AlertUtils.showDestructiveAlert(
         i18n.t('building.layout.close_building_alert.title'),
@@ -176,11 +175,11 @@ const BuildingDetailScreen = () => {
         i18n.t('building.layout.close_building_alert.action'),
         i18n.t('building.layout.close_building_alert.cancel'),
         () => {
-          setIsloading(true)
+          setIsLoading(true)
           DoorToDoorRepository.getInstance()
             .closeBuildingBlock(campaignStatistics.campaignId, address.building.id, block.name)
             .then(() => refreshData())
-            .finally(() => setIsloading(false))
+            .finally(() => setIsLoading(false))
         },
       )
     }
@@ -193,7 +192,7 @@ const BuildingDetailScreen = () => {
       i18n.t('building.change_type_alert.action'),
       i18n.t('building.change_type_alert.cancel'),
       () => {
-        setIsloading(true)
+        setIsLoading(true)
         let newBuildingType: BuildingType
         if (address.building.type === 'house') {
           newBuildingType = 'building'
@@ -203,7 +202,7 @@ const BuildingDetailScreen = () => {
         DoorToDoorRepository.getInstance()
           .updateBuildingType(address.building.id, newBuildingType)
           .then(refreshData)
-          .finally(() => setIsloading(false))
+          .finally(() => setIsLoading(false))
       },
     )
   }
@@ -215,13 +214,13 @@ const BuildingDetailScreen = () => {
       i18n.t('building.close_address.alert.action'),
       i18n.t('building.close_address.alert.cancel'),
       () => {
-        setIsloading(true)
+        setIsLoading(true)
         DoorToDoorRepository.getInstance()
           .closeBuilding(campaignStatistics.campaignId, address.building.id)
           .then(() => {
             refreshData()
           })
-          .finally(() => setIsloading(false))
+          .finally(() => setIsLoading(false))
       },
     )
   }
@@ -233,13 +232,13 @@ const BuildingDetailScreen = () => {
       i18n.t('building.close_address.alert.action'),
       i18n.t('building.close_address.alert.cancel'),
       () => {
-        setIsloading(true)
+        setIsLoading(true)
         DoorToDoorRepository.getInstance()
           .sendLeaflet(campaignStatistics.campaignId, address!.building.id, n)
           .then(() => {
             refreshData()
           })
-          .finally(() => setIsloading(false))
+          .finally(() => setIsLoading(false))
       },
     )
   }
@@ -251,13 +250,13 @@ const BuildingDetailScreen = () => {
       i18n.t('building.open_address.alert.action'),
       i18n.t('building.open_address.alert.cancel'),
       () => {
-        setIsloading(true)
+        setIsLoading(true)
         DoorToDoorRepository.getInstance()
           .openBuilding(campaignStatistics.campaignId, address.building.id)
           .then(() => {
             refreshData()
           })
-          .finally(() => setIsloading(false))
+          .finally(() => setIsLoading(false))
       },
     )
   }

@@ -10,7 +10,21 @@ import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Link, router, usePathname, useSegments } from 'expo-router'
 import { capitalize } from 'lodash'
-import { isWeb, Spinner, Stack, styled, ThemeableStack, useMedia, useStyle, View, ViewProps, withStaticProperties, XStack, YStack, YStackProps } from 'tamagui'
+import {
+  isWeb,
+  Spinner,
+  Stack,
+  styled,
+  ThemeableStack,
+  useMedia,
+  useStyle,
+  View,
+  withStaticProperties,
+  XStack,
+  XStackProps,
+  YStack,
+  YStackProps,
+} from 'tamagui'
 import Text from '../base/Text'
 import { SignInButton, SignUpButton } from '../Buttons/AuthButton'
 import Container from '../layouts/Container'
@@ -54,7 +68,7 @@ const NavItem = (props: { route: (typeof ROUTES)[number]; isActive: boolean }) =
   return (
     <Link href={path} asChild={!isWeb} key={props.route.name}>
       <ButtonNav onHoverIn={() => setIsHover(true)} onHoverOut={() => setIsHover(false)} theme={props.route.theme} active={props.isActive}>
-        <props.route.icon color={activeColor} size={16} active={[props.isActive, isHover].some(Boolean)} />
+        <props.route.icon color={activeColor} size={16} />
 
         <Text.MD color={activeColor} fontWeight={'500'}>
           {props.route.screenName}
@@ -118,7 +132,7 @@ const LoginView = () => (
   </View>
 )
 
-export const ProfileNav = (props: ViewProps) => {
+export const ProfileNav = (props: XStackProps) => {
   return (
     <AuthFallbackWrapper fallback={<LoginView />}>
       <XStack {...props}>
@@ -255,7 +269,7 @@ const VoxHeaderFrameRouter = ({
 
 const VoxHeaderFrameModal = (props: React.ComponentProps<typeof VoxHeaderFrameStyled>) => {
   const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
-  const SAVProps: any = Platform.OS !== 'ios' ? { edges: ['top'] } : {}
+  const SAVProps: object = Platform.OS !== 'ios' ? { edges: ['top'] } : {}
   return (
     <SAV style={{ backgroundColor: 'white' }} {...SAVProps}>
       <VoxHeaderContainerStyled>
