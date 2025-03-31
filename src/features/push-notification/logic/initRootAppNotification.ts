@@ -13,6 +13,10 @@ export default () => {
     })
   }
 
+  if (!navigator.serviceWorker) {
+    return
+  }
+
   FB.messaging.setBackgroundMessageHandler((message) => {
     return new Promise<void>((resolve) => {
       console.log('Message handled in background', message)

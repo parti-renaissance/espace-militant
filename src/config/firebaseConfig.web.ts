@@ -10,6 +10,11 @@ export { AuthorizationStatus }
 type Mess = FirebaseMessagingTypes.Module
 
 function initFirebase() {
+  if (!navigator.serviceWorker) {
+    // Service worker is not available on some browser private browsing or embedded mobile navigator.
+    return
+  }
+
   const app = initializeApp(firebaseConfig)
 
   const Messaging = wMessaging.getMessaging(app)
