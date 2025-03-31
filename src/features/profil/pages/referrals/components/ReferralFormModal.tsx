@@ -14,12 +14,12 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { RestViolation } from '@/data/restObjects/RestUpdateProfileRequest'
 import ReferralSuccess from '@/features/profil/pages/referrals/components/ReferralSuccess'
 import { postAddressSchema } from '@/services/events/schema'
+import { ReferralFormError } from '@/services/referral/error'
 import { useReferralsInvite, useReferralsPreRegister } from '@/services/referral/hook'
 import { errorMessages } from '@/utils/errorMessages'
 import { phoneCodes } from '@/utils/phoneCodes'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, Info } from '@tamagui/lucide-icons'
-import axios from 'axios'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { View, XStack, YStack } from 'tamagui'
 import { z } from 'zod'
@@ -43,15 +43,15 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
   } = useReferralsPreRegister()
   const isSuccess = isInviteSuccess || isPreRegisterSuccess
 
-  const apiErrors: RestViolation[] = useMemo(() => {
+  const apiErrors: RestViolation[] | undefined = useMemo(() => {
     if (!inviteError && !preRegisterError) return []
 
-    if (!isFullForm && inviteError && axios.isAxiosError(inviteError) && inviteError.response?.status === 400) {
-      return inviteError.response.data.violations
+    if (!isFullForm && inviteError instanceof ReferralFormError) {
+      return inviteError.violations
     }
 
-    if (isFullForm && preRegisterError && axios.isAxiosError(preRegisterError) && preRegisterError.response?.status === 400) {
-      return preRegisterError.response.data.violations
+    if (isFullForm && preRegisterError instanceof ReferralFormError) {
+      return preRegisterError.violations
     }
   }, [inviteError, preRegisterError, isFullForm])
 
