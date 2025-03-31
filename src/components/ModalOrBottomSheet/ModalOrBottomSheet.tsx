@@ -26,6 +26,8 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
     if (bottomSheetModalRef.current) {
       if (open) {
         bottomSheetModalRef.current.present()
+      } else {
+        bottomSheetModalRef.current.close()
       }
     }
   }, [open])

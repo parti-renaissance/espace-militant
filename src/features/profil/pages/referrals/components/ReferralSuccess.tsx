@@ -10,7 +10,7 @@ interface Props {
 
 export default function ReferralSuccess({ onClose, name }: Props) {
   return (
-    <YStack gap={'$8'} padding={'$8'} alignItems={'center'} maxWidth={480}>
+    <YStack gap={'$8'} paddingHorizontal={'$8'} paddingBottom={'$12'} paddingTop={'$10'} alignItems={'center'} maxWidth={480}>
       <Image source={require('@/assets/illustrations/sent.png')} />
       <Text.LG bold textAlign={'center'}>
         Et hop,{'\n'}une invitation envoyée à {name} !
