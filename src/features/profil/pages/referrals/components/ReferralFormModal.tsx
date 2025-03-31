@@ -5,7 +5,7 @@ import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
 import SelectV3 from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
-import Button from '@/components/Button'
+import Button, { VoxButton } from '@/components/Button'
 import DatePickerField from '@/components/DatePicker'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
@@ -30,7 +30,6 @@ interface Props {
 }
 
 export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props>) {
-  const [isChecked, setIsChecked] = useState(false)
   const [isFullForm, setIsFullForm] = useState(false)
 
   const { mutate: invite, isPending: isInviting, isSuccess: isInviteSuccess, reset: resetInviteState, error: inviteError } = useReferralsInvite()
@@ -55,7 +54,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
     }
   }, [inviteError, preRegisterError, isFullForm])
 
-  const { control, watch, handleSubmit, formState, reset } = useForm<ReferralPreRegisterSchemaType | ReferralPreRegisterLightSchemaType>({
+  const { control, watch, handleSubmit, reset } = useForm<ReferralPreRegisterSchemaType | ReferralPreRegisterLightSchemaType>({
     defaultValues: {
       first_name: '',
       email_address: '',
@@ -67,14 +66,16 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
       },
       nationality: 'FR',
       birthdate: undefined,
+      consent: false,
     },
     resolver: zodResolver(isFullForm ? ReferralPreRegisterSchema : ReferralPreRegisterLightSchema),
-    mode: 'all',
+    mode: 'onSubmit',
     reValidateMode: 'onChange',
   })
 
-  const { isDirty, isValid } = formState
   const firstName = watch('first_name')
+  const email = watch('email_address')
+  const isChecked = watch('consent')
 
   const onClose = useCallback(() => {
     closeModal()
@@ -93,6 +94,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
       } else {
         // We cast for simplicity as it is checked before by form validator
         const fullData = data as ReferralPreRegisterSchemaType
+
         preRegister({
           ...fullData,
           phone: fullData.phone?.number && fullData.phone.number.length > 1 ? fullData.phone?.number : undefined,
@@ -103,7 +105,6 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
     [isFullForm, onClose],
   )
 
-  const toggleCheck = useCallback(() => setIsChecked((v) => !v), [])
   const toggleFullForm = useCallback(() => setIsFullForm((v) => !v), [])
 
   return (
@@ -111,9 +112,9 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
       {isSuccess ? (
         <ReferralSuccess onClose={onClose} name={firstName} />
       ) : (
-        <YStack padding={'$8'} gap={'$8'}>
+        <YStack padding={'$8'} gap={'$8'} $gtSm={{ width: 500 }}>
           <XStack alignItems={'center'} justifyContent={'space-between'}>
-            <Text bold>Invitation</Text>
+            <Text.LG bold>Invitation</Text.LG>
             {isFullForm && (
               <Button variant={'text'} onPress={toggleFullForm}>
                 <Text color="$orange6">Revenir à l'invitation simple</Text>
@@ -154,7 +155,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
                 name="first_name"
                 control={control}
                 render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                  <Input color="gray" placeholder="Prénom" value={value ?? undefined} onBlur={onBlur} onChange={onChange} error={error?.message} />
+                  <Input color="gray" autoFocus placeholder="Prénom" value={value ?? undefined} onBlur={onBlur} onChange={onChange} error={error?.message} />
                 )}
               />
             </View>
@@ -234,30 +235,40 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
             </>
           )}
 
-          <XStack alignItems={'center'}>
-            <YStack>
-              <Checkbox checked={isChecked} onPress={toggleCheck} />
-            </YStack>
+          <Controller
+            name="consent"
+            control={control}
+            render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+              <YStack>
+                <XStack alignItems={'center'} maxWidth={'100%'}>
+                  <Checkbox checked={value} onPress={() => onChange(!value)} onBlur={onBlur} />
 
-            <YStack>
-              <Pressable onPress={toggleCheck}>
-                <Text.MD multiline fontWeight={400} lineHeight={20}>
-                  Je certifie sur l’honneur avoir obtenu le consentement préalable de la personne que j’invite à adhérer.
-                </Text.MD>
-              </Pressable>
-            </YStack>
-          </XStack>
+                  <Pressable onPress={() => onChange(!value)} style={{ maxWidth: '93%' }}>
+                    <Text.MD multiline fontWeight={400} lineHeight={20}>
+                      Je certifie sur l’honneur avoir obtenu le consentement préalable de la personne que j’invite à adhérer.
+                    </Text.MD>
+                  </Pressable>
+                </XStack>
 
-          {firstName.length > 0 && !isFullForm && (
+                {error && (
+                  <XStack gap="$small" alignItems="center" pl="$medium">
+                    <Text.XSM color="$orange5">{error.message}</Text.XSM>
+                  </XStack>
+                )}
+              </YStack>
+            )}
+          />
+
+          {firstName.length > 0 && email.includes('@') && !isFullForm && (
             <XStack padding={'$6'} borderRadius={'$8'} backgroundColor={'$gray1'} alignItems={'center'} gap={'$4'}>
               <XStack flex={1} $gtSm={{ flex: 1 }}>
                 <Info />
               </XStack>
-              <YStack flex={7} $gtSm={{ flex: 3 }}>
+              <YStack flex={7} $gtSm={{ flex: 4, flexShrink: 1, minWidth: 0 }}>
                 <Text bold>Connaissez-vous son adresse postale ?</Text>
-                <Text>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
+                <Text style={{ wordBreak: 'break-all' }}>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
               </YStack>
-              <YStack flex={5} $gtSm={{ flex: 3 }} justifyContent={'center'}>
+              <YStack justifyContent="center" alignItems="flex-end" overflow={'hidden'}>
                 <Button variant={'text'} onPress={toggleFullForm}>
                   <Text color="$orange6">Préinscrire</Text>
                 </Button>
@@ -326,17 +337,9 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
           )}
 
           <View alignSelf={'flex-end'}>
-            <Button
-              theme="orange"
-              size="xl"
-              disabled={!isChecked || !isValid || !isDirty}
-              onPress={handleSubmit(onSubmit)}
-              loading={isRegistering || isInviting}
-            >
-              <Button.Text color="$white1" bold>
-                {isFullForm ? 'Envoyer l’email de préinvitation' : 'Envoyer l’email d’invitation'}
-              </Button.Text>
-            </Button>
+            <VoxButton theme="orange" size="xl" onPress={handleSubmit(onSubmit)} loading={isRegistering || isInviting}>
+              {isFullForm ? 'Envoyer l’email de préinvitation' : 'Envoyer l’email d’invitation'}
+            </VoxButton>
           </View>
         </YStack>
       )}
@@ -347,6 +350,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
 const ReferralPreRegisterLightSchema = z.object({
   email_address: z.string().email(errorMessages.email),
   first_name: z.string().min(1, errorMessages.emptyField),
+  consent: z.boolean().refine(Boolean, { message: errorMessages.needChecked }),
 })
 
 const ReferralPreRegisterSchema = z.object({
@@ -364,6 +368,7 @@ const ReferralPreRegisterSchema = z.object({
     .optional()
     .nullable(),
   post_address: postAddressSchema,
+  consent: z.boolean().refine(Boolean, { message: errorMessages.needChecked }),
 })
 
 type ReferralPreRegisterSchemaType = z.infer<typeof ReferralPreRegisterSchema>
