@@ -75,7 +75,6 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
 
   const firstName = watch('first_name')
   const email = watch('email_address')
-  const isChecked = watch('consent')
 
   const onClose = useCallback(() => {
     closeModal()
@@ -197,7 +196,6 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
                 render={({ field, fieldState }) => {
                   return (
                     <AddressAutocomplete
-                      size="sm"
                       color="gray"
                       label="Localisation"
                       error={fieldState.error?.message}
@@ -240,10 +238,10 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
             control={control}
             render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
               <YStack>
-                <XStack alignItems={'center'} maxWidth={'100%'}>
+                <XStack alignItems={'center'} maxWidth={'100%'} gap={'$4'}>
                   <Checkbox checked={value} onPress={() => onChange(!value)} onBlur={onBlur} />
 
-                  <Pressable onPress={() => onChange(!value)} style={{ maxWidth: '93%' }}>
+                  <Pressable onPress={() => onChange(!value)} style={{ maxWidth: '90%' }}>
                     <Text.MD multiline fontWeight={400} lineHeight={20}>
                       Je certifie sur l’honneur avoir obtenu le consentement préalable de la personne que j’invite à adhérer.
                     </Text.MD>
