@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+import React, { ReactElement, useMemo } from 'react'
+import { FlatList } from 'react-native'
 import Text from '@/components/base/Text'
 import EmptyState from '@/components/EmptyStates/EmptyState'
 import { generalConventionContent } from '@/screens/generalConventions/components/DetailsScreen'
@@ -6,10 +7,11 @@ import { FormaCard } from '@/screens/generalConventions/components/FormaCard'
 import { Filter } from '@/screens/generalConventions/store'
 import { useGetGeneralConventions } from '@/services/general-convention/hook'
 import { sortBy } from 'lodash'
-import { ScrollView, XStack } from 'tamagui'
+import { Spinner, useMedia } from 'tamagui'
 
-const Section = ({ filter }: { filter: Filter }) => {
-  const { data } = useGetGeneralConventions()
+const Section = ({ filter, headerComponent }: { filter: Filter; headerComponent: ReactElement }) => {
+  const media = useMedia()
+  const { data, isFetching } = useGetGeneralConventions()
 
   const filteredItems = useMemo(() => {
     const items = sortBy(data ?? [], (item) => parseInt(item.department_zone?.code ?? '0', 10))
@@ -32,21 +34,33 @@ const Section = ({ filter }: { filter: Filter }) => {
   }, [filter, data])
 
   return (
-    <ScrollView>
-      <XStack flexWrap="wrap" alignItems={'flex-start'} maxWidth={1200} gap={'$4'} $gtSm={{ gap: '$8' }} justifyContent="center">
-        {filteredItems.length ? (
-          filteredItems.map((generalConvention, index) => <FormaCard key={index} payload={generalConvention} />)
-        ) : (
-          <XStack background={'white'} borderRadius={12} width={300} justifyContent={'center'} paddingHorizontal={16} paddingVertical={32}>
-            <EmptyState>
-              <Text.MD textAlign={'center'} medium>
-                Aucun élément
-              </Text.MD>
-            </EmptyState>
-          </XStack>
-        )}
-      </XStack>
-    </ScrollView>
+    <FlatList
+      style={{ flex: 1 }}
+      key={media.gtMd ? 'gtMd' : media.gtSm ? 'gtSm' : 'sm'}
+      numColumns={media.gtMd ? 3 : media.gtSm ? 2 : undefined}
+      data={filteredItems}
+      keyExtractor={(item) => item.uuid}
+      renderItem={({ item }) => <FormaCard payload={item} />}
+      contentContainerStyle={{
+        paddingVertical: media.gtSm ? 40 : 20,
+        gap: media.gtSm ? 24 : 8,
+        maxWidth: 1200,
+        alignSelf: 'center',
+        marginBottom: 24,
+        width: '100%',
+      }}
+      columnWrapperStyle={media.gtSm ? { gap: 24, justifyContent: 'center' } : undefined}
+      ListHeaderComponent={headerComponent}
+      ListHeaderComponentStyle={{ marginBottom: media.gtSm ? 16 : 8 }}
+      ListFooterComponent={isFetching ? <Spinner /> : undefined}
+      ListEmptyComponent={
+        <EmptyState>
+          <Text.MD textAlign={'center'} medium>
+            Aucun élément
+          </Text.MD>
+        </EmptyState>
+      }
+    />
   )
 }
 
