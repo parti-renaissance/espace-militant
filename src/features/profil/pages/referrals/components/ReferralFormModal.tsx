@@ -97,7 +97,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
         preRegister({
           ...fullData,
           phone: fullData.phone?.number && fullData.phone.number.length > 1 ? fullData.phone?.number : undefined,
-          civility: fullData.civility === 'male' ? 'Madame' : 'Monsieur',
+          civility: fullData.civility === 'male' ? 'Monsieur' : 'Madame',
         })
       }
     },
