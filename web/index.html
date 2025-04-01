@@ -81,7 +81,7 @@
       }*/
     </style>
     <script>
-      if ('serviceWorker' in navigator) {
+      if ('serviceWorker' in navigator && navigator.serviceWorker !== undefined) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
             .register('/firebase-messaging-sw.js')

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Platform } from 'react-native'
 import FB, { AuthorizationStatus } from '@/config/firebaseConfig'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { isSupported } from '@firebase/messaging'
 import { useToastController } from '@tamagui/toast'
 import { useQuery } from '@tanstack/react-query'
 import * as Notifications from 'expo-notifications'
@@ -15,6 +16,10 @@ const usePermission = (options: { enable: boolean }) => {
   return useQuery({
     queryKey: ['permission', SOURCE],
     queryFn: async () => {
+      if (!(await isSupported())) {
+        return false
+      }
+
       const authStatus = await FB.messaging.requestPermission({
         sound: true,
         alert: true,
@@ -36,7 +41,7 @@ export const useInitPushNotification = (props: { enable: boolean }) => {
     let expoNotificationSubscription: Notifications.Subscription | null = null
     let fbNotificationSubscription: (() => void) | null = null
 
-    postPushToken()
+    isSupported().then(() => postPushToken())
 
     if (Platform.OS !== 'web') {
       expoNotificationSubscription = Notifications.addNotificationResponseReceivedListener((e) => {

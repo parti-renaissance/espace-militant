@@ -11,6 +11,7 @@ import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScr
 import useImportFont from '@/hooks/useImportFont'
 import TamaguiProvider from '@/tamagui/provider'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { isSupported } from '@firebase/messaging'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import { ToastProvider } from '@tamagui/toast'
@@ -24,7 +25,7 @@ if (isWeb) {
   require('@tamagui/core/reset.css')
 }
 
-initRootAppNotification()
+isSupported().then(() => initRootAppNotification())
 
 const { navigationIntegration } = ErrorMonitor.configure()
 
