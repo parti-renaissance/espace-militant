@@ -56,11 +56,11 @@ export const FormaCard = ({ payload }: Props) => {
       boxSizing={'border-box'}
       borderColor="$textOutline"
       width={'100%'}
-      minWidth={300}
+      minWidth={350}
       $gtSm={{ width: '45%' }}
       $gtMd={{ width: '30%' }}
     >
-      <VoxCard>
+      <VoxCard boxShadow={'none'}>
         <VoxCard.Content padding={20}>
           <XStack justifyContent="space-between">
             <YStack gap={16}>

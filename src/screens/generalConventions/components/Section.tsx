@@ -7,11 +7,12 @@ import { FormaCard } from '@/screens/generalConventions/components/FormaCard'
 import { Filter } from '@/screens/generalConventions/store'
 import { useGetGeneralConventions } from '@/services/general-convention/hook'
 import { sortBy } from 'lodash'
-import { Spinner, useMedia } from 'tamagui'
+import { getThemes, useMedia, View } from 'tamagui'
 
 const Section = ({ filter, headerComponent }: { filter: Filter; headerComponent: ReactElement }) => {
   const media = useMedia()
-  const { data, isFetching } = useGetGeneralConventions()
+  const { data } = useGetGeneralConventions()
+  const themes = getThemes()
 
   const filteredItems = useMemo(() => {
     const items = sortBy(data ?? [], (item) => parseInt(item.department_zone?.code ?? '0', 10))
@@ -40,19 +41,26 @@ const Section = ({ filter, headerComponent }: { filter: Filter; headerComponent:
       numColumns={media.gtMd ? 3 : media.gtSm ? 2 : undefined}
       data={filteredItems}
       keyExtractor={(item) => item.uuid}
-      renderItem={({ item }) => <FormaCard payload={item} />}
+      renderItem={({ item }) => (
+        <View
+          $sm={{
+            backgroundColor: themes.light[`gray3Light`].val,
+            paddingBottom: media.gtSm ? 24 : 8,
+          }}
+          $gtMd={{ backgroundColor: 'transparent' }}
+        >
+          <FormaCard payload={item} />
+        </View>
+      )}
       contentContainerStyle={{
-        paddingVertical: media.gtSm ? 40 : 20,
-        gap: media.gtSm ? 24 : 8,
+        gap: media.gtSm ? 24 : 0,
         maxWidth: 1200,
         alignSelf: 'center',
-        marginBottom: 24,
         width: '100%',
       }}
       columnWrapperStyle={media.gtSm ? { gap: 24, justifyContent: 'center' } : undefined}
       ListHeaderComponent={headerComponent}
-      ListHeaderComponentStyle={{ marginBottom: media.gtSm ? 16 : 8 }}
-      ListFooterComponent={isFetching ? <Spinner /> : undefined}
+      ListHeaderComponentStyle={{ marginBottom: 16 }}
       ListEmptyComponent={
         <EmptyState>
           <Text.MD textAlign={'center'} medium>

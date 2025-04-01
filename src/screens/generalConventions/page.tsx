@@ -1,6 +1,7 @@
 import React from 'react'
 import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
 import Text from '@/components/base/Text'
+import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import SearchBox from '@/components/Search/SearchBox'
 import { GeneralConventionsDenyCard } from '@/screens/generalConventions/components/DenyCard'
 import Section from '@/screens/generalConventions/components/Section'
@@ -26,32 +27,34 @@ const GeneralConventionScreen: GeneralConventionScreenProps = () => {
   )
 
   return isAdherent ? (
-    <Section
-      filter={filter}
-      headerComponent={
-        <YStack flex={1} alignItems={'center'} gap={'$6'} $gtSm={{ gap: '$8' }}>
-          {header}
-          <XStack gap="$6" flexWrap="wrap" $gtSm={{ gap: '$8', flexWrap: 'nowrap', maxWidth: 550 }}>
-            <YStack flex={1} minWidth={260}>
-              <AssemblySelect
-                label="Département"
-                resetable={!!filter.assembly && filter.assembly !== 'all'}
-                size="sm"
-                id="filter-dept"
-                color="white"
-                value={filter.assembly}
-                onDetailChange={(x) => {
-                  setFilter({ ...filter, assembly: x === undefined ? 'all' : (x?.value ?? '') })
-                }}
-              />
-            </YStack>
-            <YStack flex={1} minWidth={260}>
-              <SearchBox value={filter.search} onChange={(value) => setFilter({ ...filter, search: value })} />
-            </YStack>
-          </XStack>
-        </YStack>
-      }
-    />
+    <BoundarySuspenseWrapper>
+      <Section
+        filter={filter}
+        headerComponent={
+          <YStack flex={1} alignItems={'center'} gap={'$6'} $gtSm={{ gap: '$8' }} paddingHorizontal={'$8'}>
+            {header}
+            <XStack gap="$6" flexWrap="wrap" $gtSm={{ gap: '$8', flexWrap: 'nowrap', maxWidth: 550 }}>
+              <YStack flex={1} minWidth={260}>
+                <AssemblySelect
+                  label="Département"
+                  resetable={!!filter.assembly && filter.assembly !== 'all'}
+                  size="sm"
+                  id="filter-dept"
+                  color="white"
+                  value={filter.assembly}
+                  onDetailChange={(x) => {
+                    setFilter({ ...filter, assembly: x === undefined ? 'all' : (x?.value ?? '') })
+                  }}
+                />
+              </YStack>
+              <YStack flex={1} minWidth={260}>
+                <SearchBox value={filter.search} onChange={(value) => setFilter({ ...filter, search: value })} />
+              </YStack>
+            </XStack>
+          </YStack>
+        }
+      />
+    </BoundarySuspenseWrapper>
   ) : (
     <>
       {header}
