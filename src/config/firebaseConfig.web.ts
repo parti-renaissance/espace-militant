@@ -1,3 +1,4 @@
+import { isSupported } from '@firebase/messaging'
 import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import { initializeApp } from 'firebase/app'
 import * as wMessaging from 'firebase/messaging'
@@ -19,7 +20,9 @@ function initFirebase() {
 
   const Messaging = wMessaging.getMessaging(app)
 
-  const logNotImplemented = (x: string, payload?: unknown) => console.warn('Firebase Web - not implemented', x, payload)
+  const logNotImplemented = (x: string, payload?: unknown) => {
+    if (__DEV__) console.warn('Firebase Web - not implemented', x, payload)
+  }
 
   return {
     messaging: {
@@ -30,6 +33,10 @@ function initFirebase() {
       subscribeToTopic: (x: unknown) => logNotImplemented('subscribeToTopic', x),
       setBackgroundMessageHandler: (x: unknown) => logNotImplemented('setBackgroundMessageHandler', x),
       requestPermission: async (_?: FirebaseMessagingTypes.IOSPermissions): Promise<AuthorizationStatus> => {
+        if (!(await isSupported())) {
+          return AuthorizationStatus.DENIED
+        }
+
         const permission = await Notification.requestPermission()
         switch (permission) {
           case 'granted':

@@ -1,8 +1,13 @@
 import { Platform } from 'react-native'
 import FB from '@/config/firebaseConfig'
+import { isSupported } from '@firebase/messaging'
 import * as Notifications from 'expo-notifications'
 
-export default () => {
+export default async function initRootAppNotification() {
+  if (!(await isSupported())) {
+    return
+  }
+
   if (Platform.OS !== 'web') {
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
