@@ -8,7 +8,7 @@ import { GeneralConventionOrganizerEnum } from '@/screens/generalConventions/typ
 import { RestGetGeneralConventionResponse } from '@/services/general-convention/schema'
 import { Eye, Users } from '@tamagui/lucide-icons'
 import { router } from 'expo-router'
-import { isWeb, XStack, YStack, YStackProps } from 'tamagui'
+import { isWeb, XStack, YStack } from 'tamagui'
 
 type Props = {
   payload: RestGetGeneralConventionResponse
@@ -49,21 +49,19 @@ export const Title = ({ payload }) => {
   )
 }
 
-export const FormaCard = ({ payload, ...props }: Props & YStackProps) => {
+export const FormaCard = ({ payload }: Props) => {
   return (
     <YStack
-      $sm={{ borderRadius: 0 }}
       overflow="hidden"
       boxSizing={'border-box'}
       borderColor="$textOutline"
-      borderWidth={1}
       width={'100%'}
-      minWidth={300}
-      $gtSm={{ width: '45%', borderRadius: 16 }}
+      minWidth={350}
+      $gtSm={{ width: '45%' }}
       $gtMd={{ width: '30%' }}
     >
-      <VoxCard style={{ borderRadius: '0' }} inside width={'100%'}>
-        <VoxCard.Content padding={20} {...props}>
+      <VoxCard boxShadow={'none'}>
+        <VoxCard.Content padding={20}>
           <XStack justifyContent="space-between">
             <YStack gap={16}>
               <Icon organizer={payload.organizer} />

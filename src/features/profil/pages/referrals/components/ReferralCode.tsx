@@ -34,7 +34,7 @@ export default function ReferralCode() {
           <YStack $xs={{ flex: 2 }}>
             <Button variant="outlined" bg={'$white1'} theme={'gray'} size="xl" width="100%" justifyContent="space-between" onPress={onCopyURL}>
               <XStack flexShrink={1}>
-                <Text.MD secondary numberOfLines={1} flex={1} textDecorationLine="underline">
+                <Text.MD secondary numberOfLines={1} flex={1}>
                   {user.data?.referral_link?.replace('https://', '')}
                 </Text.MD>
               </XStack>

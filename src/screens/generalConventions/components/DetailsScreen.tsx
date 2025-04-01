@@ -4,14 +4,13 @@ import { VoxButton } from '@/components/Button'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import EventMDXRenderer from '@/features/events/components/EventMDXRenderer'
-import { ScrollStack } from '@/features/events/pages/detail/EventComponents'
 import { Icon, Title } from '@/screens/generalConventions/components/FormaCard'
 import { RestGetGeneralConventionResponse } from '@/services/general-convention/schema'
 import { ArrowLeft, Calendar } from '@tamagui/lucide-icons'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { Link, useNavigation } from 'expo-router'
-import { isWeb, XStack, YStack } from 'tamagui'
+import { isWeb, ScrollView, XStack, YStack } from 'tamagui'
 
 const BackButton = (props: { children?: React.ReactNode }) => {
   const { canGoBack } = useNavigation()
@@ -47,33 +46,30 @@ export const generalConventionContent = (data) => {
 export default function DetailsScreen({ data }: { data: RestGetGeneralConventionResponse }) {
   const combinedContent = generalConventionContent(data)
   return (
-    <ScrollStack marginBottom={50}>
-      <XStack alignItems="flex-start" alignSelf="flex-start" pb="$medium">
-        <BackButton />
-      </XStack>
-      <YStack gap="$medium" alignSelf={'center'} maxWidth={600}>
-        <VoxCard>
-          <XStack>
-            <PageLayout.MainSingleColumn height="100%">
-              <VoxCard.Content pr={0} height="100%">
-                <VoxCard.Content height="100%" p={0} pr="$medium">
-                  <XStack justifyContent="space-between" alignItems="center">
-                    <Icon organizer={data.organizer} />
+    <PageLayout>
+      <PageLayout.MainSingleColumn>
+        <ScrollView flex={1} paddingVertical={40} flexBasis={0}>
+          <YStack gap="$medium" marginBottom={40} alignSelf={'center'} width={'100%'} maxWidth={600}>
+            <XStack>
+              <BackButton />
+            </XStack>
+            <VoxCard inside>
+              <VoxCard.Content p={'$8'} pr="$medium">
+                <XStack justifyContent="space-between" alignItems="center">
+                  <Icon organizer={data.organizer} />
 
-                    <XStack gap={8} alignItems="center">
-                      <Calendar size={12} color="$textSecondary" />
-                      <Text.SM secondary>{data.reported_at ? format(data.reported_at, 'dd MMMM yyyy', { locale: fr }) : ''}</Text.SM>
-                    </XStack>
+                  <XStack gap={8} alignItems="center">
+                    <Calendar size={12} color="$textSecondary" />
+                    <Text.SM secondary>{data.reported_at ? format(data.reported_at, 'dd MMMM yyyy', { locale: fr }) : ''}</Text.SM>
                   </XStack>
-                  <Title payload={data} />
-
-                  {combinedContent && <EventMDXRenderer children={combinedContent} />}
-                </VoxCard.Content>
+                </XStack>
+                <Title payload={data} />
+                {combinedContent && <EventMDXRenderer children={combinedContent} />}
               </VoxCard.Content>
-            </PageLayout.MainSingleColumn>
-          </XStack>
-        </VoxCard>
-      </YStack>
-    </ScrollStack>
+            </VoxCard>
+          </YStack>
+        </ScrollView>
+      </PageLayout.MainSingleColumn>
+    </PageLayout>
   )
 }

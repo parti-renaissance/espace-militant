@@ -1,11 +1,13 @@
+import { ReactNode } from 'react'
 import EmptyStateIllustration from '@/assets/illustrations/EmptyStateIllustration'
+import { RNTamaguiViewNonStyleProps } from '@tamagui/core/src'
 import { View } from 'tamagui'
 
-export default function EmptyState(props: { children: React.ReactNode }) {
+export default function EmptyState({ children, ...otherProps }: { children: ReactNode } & RNTamaguiViewNonStyleProps) {
   return (
-    <View alignSelf="center" alignContent="center" gap="$medium">
+    <View alignSelf="center" alignContent="center" gap="$medium" {...otherProps}>
       <EmptyStateIllustration />
-      {props.children}
+      {children}
     </View>
   )
 }
