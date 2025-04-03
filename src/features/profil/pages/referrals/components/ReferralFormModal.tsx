@@ -12,6 +12,7 @@ import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomShe
 import NationalitySelect from '@/components/NationalitySelect/NationalitySelect'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { RestViolation } from '@/data/restObjects/RestUpdateProfileRequest'
+import { validateBirthdateFormSchema } from '@/features/profil/pages/account/form/schema'
 import ReferralSuccess from '@/features/profil/pages/referrals/components/ReferralSuccess'
 import { postAddressSchema } from '@/services/events/schema'
 import { ReferralFormError } from '@/services/referral/error'
@@ -357,7 +358,7 @@ const ReferralPreRegisterSchema = z.object({
   last_name: z.string().min(1, errorMessages.emptyField),
   civility: z.string().min(1, errorMessages.emptyField),
   nationality: z.string().min(1, errorMessages.emptyField),
-  birthdate: z.date().optional().nullable(),
+  birthdate: validateBirthdateFormSchema.optional().nullable(),
   phone: z
     .object({
       country: z.string(),
