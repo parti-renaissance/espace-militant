@@ -108,8 +108,8 @@ const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsRespo
             {payload.data?.ticket_custom_detail}
           </Text>
         )}
-        <Image src={payload.data?.ticket_url} width={200} height={200} resizeMode="contain" />
-        <VoxButton variant="outlined" iconRight={ExternalLink} onPress={createOnShow(payload.data?.info_url)}>
+        <Image src={payload.data?.ticket_url} width={240} height={240} resizeMode="contain" />
+        <VoxButton alignSelf={'center'} variant="outlined" iconRight={ExternalLink} onPress={createOnShow(payload.data?.info_url)}>
           Voir les infos pratiques
         </VoxButton>
       </YStack>
