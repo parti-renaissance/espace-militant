@@ -182,7 +182,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
                 onBlur={onBlur}
                 onChange={onChange}
                 error={error?.message}
-                style={{ width: '100%' }}
+                style={{ width: '100%', fontWeight: 500 }}
                 keyboardType={'email-address'}
                 autoCapitalize={'none'}
                 autoCorrect={false}
