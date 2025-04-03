@@ -626,6 +626,17 @@
       "mail": "Adresse e-mail",
       "mail_placeholder": "Entrez votre adresse e-mail",
       "action": "Recevoir mon lien de réinitialisation"
+    },
+    "referral": {
+      "finished_zero": "Adhésion\nfinalisée",
+      "finished_one": "Adhésion\nfinalisée",
+      "finished_other": "Adhésions\nfinalisées",
+      "sent_zero": "Adhésion\nenvoyée",
+      "sent_one": "Adhésion\nenvoyée",
+      "sent_other": "Adhésions\nenvoyées",
+      "reported_zero": "Adhésion\nsignalée",
+      "reported_one": "Adhésion\nsignalée",
+      "reported_other": "Adhésions\nsignalées"
     }
   }
 }

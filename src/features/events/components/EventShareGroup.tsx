@@ -1,7 +1,7 @@
 import React from 'react'
 import { Platform } from 'react-native'
-import Text from '@/components/base/Text'
-import Button, { VoxButton } from '@/components/Button'
+import { VoxButton } from '@/components/Button'
+import ShareButton from '@/components/Buttons/ShareButton'
 import { getFormatedVoxCardDate } from '@/components/utils'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import clientEnv from '@/config/clientEnv'
@@ -10,8 +10,7 @@ import useShareApi from '@/hooks/useShareApi'
 import useCreateEvent from '@/modules/Calendar/Calendar'
 import * as eventTypes from '@/services/events/schema'
 import { RestEvent } from '@/services/events/schema'
-import { CalendarPlus, Copy, Share2 } from '@tamagui/lucide-icons'
-import { XStack } from 'tamagui'
+import { CalendarPlus, Share2 } from '@tamagui/lucide-icons'
 import { isEventFull } from '../utils'
 
 type Props = {
@@ -89,16 +88,7 @@ export function EventShareGroup({ event }: Props) {
 
   return (
     <VoxCard.Section title="Partagez cet événement avec vos contacts pour maximiser sa portée.">
-      <Button variant="outlined" size="xl" theme="gray" width="100%" onPress={copyUrl} justifyContent="space-between">
-        <XStack flexShrink={1}>
-          <Text.MD secondary numberOfLines={1} flex={1}>
-            {shareUrl}
-          </Text.MD>
-        </XStack>
-        <XStack justifyContent="flex-end">
-          <Copy color="$textSecondary" size={24} />
-        </XStack>
-      </Button>
+      <ShareButton url={shareUrl} onPress={copyUrl} />
 
       {isShareAvailable && (
         <VoxButton variant="outlined" full size="xl" iconLeft={Share2} onPress={openShareDialog}>
