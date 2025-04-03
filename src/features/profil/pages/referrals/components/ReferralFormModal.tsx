@@ -78,10 +78,10 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
   const email = watch('email_address')
 
   const onClose = useCallback(() => {
-    closeModal()
-    reset()
     resetPreRegisterState()
     resetInviteState()
+    reset()
+    closeModal()
   }, [closeModal])
 
   const onSubmit: SubmitHandler<ReferralPreRegisterSchemaType | ReferralPreRegisterLightSchemaType> = useCallback(
@@ -108,7 +108,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
   const toggleFullForm = useCallback(() => setIsFullForm((v) => !v), [])
 
   return (
-    <ModalOrBottomSheet allowDrag open={isOpen} onClose={closeModal}>
+    <ModalOrBottomSheet allowDrag open={isOpen} onClose={onClose}>
       {isSuccess ? (
         <ReferralSuccess onClose={onClose} name={firstName} />
       ) : (
