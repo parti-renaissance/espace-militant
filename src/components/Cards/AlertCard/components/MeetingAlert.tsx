@@ -53,14 +53,16 @@ const MeetingAlert = ({ payload, onShow, onPressShare, ...props }: MeetingAlertP
               </Text.LG>
             </XStack>
 
-            {alreadySubscribed && (
+            {alreadySubscribed && payload.description && (
               <XStack flexShrink={1}>
-                <Text.SM color={themeColor}>Vous êtes inscrit. Et si vous le partagiez autour de vous ?</Text.SM>
+                <Text.SM color={themeColor} textAlign="center">
+                  {payload.description}
+                </Text.SM>
               </XStack>
             )}
           </YStack>
 
-          <XStack gap="$small">
+          <XStack gap="$small" justifyContent={alreadySubscribed ? 'center' : 'flex-start'}>
             {payload.share_url ? (
               <VoxButton
                 variant={alreadySubscribed ? 'outlined' : 'soft'}
@@ -99,12 +101,12 @@ const MeetingAlert = ({ payload, onShow, onPressShare, ...props }: MeetingAlertP
 const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsResponse[0]; isOpen: boolean; closeModal: () => void }) => {
   return (
     <ModalOrBottomSheet open={isOpen} onClose={closeModal}>
-      <YStack $sm={{ marginBottom: '$9' }} padding={'$11'} gap={'$8'} alignItems="center">
+      <YStack $sm={{ marginBottom: '$9' }} padding={'$11'} gap={'$8'} alignSelf={'center'} alignItems="center" maxWidth={480}>
         <Text semibold fontSize={'$6'} color="$textPrimary">
           {payload.data?.first_name} {payload.data?.last_name}
         </Text>
         {payload.data?.ticket_custom_detail && (
-          <Text semibold fontSize={40} color="$blue9">
+          <Text semibold fontSize={40} color="$blue9" textAlign="center">
             {payload.data?.ticket_custom_detail}
           </Text>
         )}
