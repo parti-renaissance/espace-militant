@@ -12,6 +12,7 @@ import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomShe
 import NationalitySelect from '@/components/NationalitySelect/NationalitySelect'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { RestViolation } from '@/data/restObjects/RestUpdateProfileRequest'
+import { validateBirthdateFormSchema } from '@/features/profil/pages/account/form/schema'
 import ReferralSuccess from '@/features/profil/pages/referrals/components/ReferralSuccess'
 import { postAddressSchema } from '@/services/events/schema'
 import { ReferralFormError } from '@/services/referral/error'
@@ -77,10 +78,10 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
   const email = watch('email_address')
 
   const onClose = useCallback(() => {
-    closeModal()
-    reset()
     resetPreRegisterState()
     resetInviteState()
+    reset()
+    closeModal()
   }, [closeModal])
 
   const onSubmit: SubmitHandler<ReferralPreRegisterSchemaType | ReferralPreRegisterLightSchemaType> = useCallback(
@@ -107,7 +108,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
   const toggleFullForm = useCallback(() => setIsFullForm((v) => !v), [])
 
   return (
-    <ModalOrBottomSheet allowDrag open={isOpen} onClose={closeModal}>
+    <ModalOrBottomSheet allowDrag open={isOpen} onClose={onClose}>
       {isSuccess ? (
         <ReferralSuccess onClose={onClose} name={firstName} />
       ) : (
@@ -182,7 +183,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
                 onBlur={onBlur}
                 onChange={onChange}
                 error={error?.message}
-                style={{ width: '100%' }}
+                style={{ width: '100%', fontWeight: 500 }}
                 keyboardType={'email-address'}
                 autoCapitalize={'none'}
                 autoCorrect={false}
@@ -357,7 +358,7 @@ const ReferralPreRegisterSchema = z.object({
   last_name: z.string().min(1, errorMessages.emptyField),
   civility: z.string().min(1, errorMessages.emptyField),
   nationality: z.string().min(1, errorMessages.emptyField),
-  birthdate: z.date().optional().nullable(),
+  birthdate: validateBirthdateFormSchema.optional().nullable(),
   phone: z
     .object({
       country: z.string(),

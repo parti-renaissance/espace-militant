@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react'
 import Text from '@/components/base/Text'
-import Button, { VoxButton } from '@/components/Button'
+import { VoxButton } from '@/components/Button'
+import ShareButton from '@/components/Buttons/ShareButton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useSession } from '@/ctx/SessionProvider'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
-import { Copy, Share2 } from '@tamagui/lucide-icons'
+import { Share2 } from '@tamagui/lucide-icons'
 import { XStack, YStack } from 'tamagui'
 
 export default function ReferralCode() {
@@ -32,16 +33,7 @@ export default function ReferralCode() {
 
         <XStack gap={'$8'} $xs={{ gap: '$4' }} mt={'$4'}>
           <YStack $xs={{ flex: 2 }}>
-            <Button variant="outlined" bg={'$white1'} theme={'gray'} size="xl" width="100%" justifyContent="space-between" onPress={onCopyURL}>
-              <XStack flexShrink={1}>
-                <Text.MD secondary numberOfLines={1} flex={1}>
-                  {user.data?.referral_link?.replace('https://', '')}
-                </Text.MD>
-              </XStack>
-              <XStack justifyContent="flex-end">
-                <Copy color="$textSecondary" size={24} />
-              </XStack>
-            </Button>
+            <ShareButton url={user.data?.referral_link} onPress={onCopyURL} />
           </YStack>
 
           <YStack>

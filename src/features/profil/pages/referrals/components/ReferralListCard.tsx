@@ -7,6 +7,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import ReferralListEmptyState from '@/features/profil/pages/referrals/components/ReferralListEmptyState'
 import ReferralListItem from '@/features/profil/pages/referrals/components/ReferralListItem'
 import { useReferrals, useReferralStatistics } from '@/services/referral/hook'
+import i18n from '@/utils/i18n'
 import { Separator, XStack, YStack } from 'tamagui'
 
 export default function ReferralListCard() {
@@ -29,7 +30,7 @@ export default function ReferralListCard() {
             <XStack flex={1}>
               <StatsCard
                 count={statistics?.nb_referral_finished ?? 0}
-                label={'Adhésions\nfinalisées'}
+                label={i18n.t('referral.finished', { count: statistics?.nb_referral_finished })}
                 backgroundColor={'$green1'}
                 color={'$green5'}
                 isLoading={isLoadingStatistics}
@@ -38,7 +39,7 @@ export default function ReferralListCard() {
             <XStack flex={1} justifyContent={'center'}>
               <StatsCard
                 count={statistics?.nb_referral_sent ?? 0}
-                label={'Invitations\nenvoyées'}
+                label={i18n.t('referral.sent', { count: statistics?.nb_referral_sent })}
                 backgroundColor={'$gray1'}
                 color={'$gray5'}
                 isLoading={isLoadingStatistics}
@@ -47,7 +48,7 @@ export default function ReferralListCard() {
             <XStack flex={1} justifyContent={'flex-end'}>
               <StatsCard
                 count={statistics?.nb_referral_reported ?? 0}
-                label={'Invitations\nsignalées'}
+                label={i18n.t('referral.reported', { count: statistics?.nb_referral_reported })}
                 backgroundColor={'$orange1'}
                 color={'$orange5'}
                 isLoading={isLoadingStatistics}

@@ -10,21 +10,7 @@ import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Link, router, usePathname, useSegments } from 'expo-router'
 import { capitalize } from 'lodash'
-import {
-  isWeb,
-  Spinner,
-  Stack,
-  styled,
-  ThemeableStack,
-  useMedia,
-  useStyle,
-  View,
-  withStaticProperties,
-  XStack,
-  XStackProps,
-  YStack,
-  YStackProps,
-} from 'tamagui'
+import { isWeb, Spinner, Stack, styled, ThemeableStack, useMedia, useStyle, View, withStaticProperties, XStack, XStackProps, YStackProps } from 'tamagui'
 import Text from '../base/Text'
 import { SignInButton, SignUpButton } from '../Buttons/AuthButton'
 import Container from '../layouts/Container'
@@ -233,18 +219,6 @@ const VoxHeaderContainerStyled = styled(Container, {
   },
 })
 
-const Wrapper = React.memo(
-  ({ children, backgroundColor, safeAreaView = true }: { children: React.ReactNode; backgroundColor: string; safeAreaView?: boolean }) => {
-    return safeAreaView ? (
-      <SafeAreaView edges={['top']} style={{ backgroundColor }}>
-        {children}
-      </SafeAreaView>
-    ) : (
-      <YStack style={{ backgroundColor }}>{children}</YStack>
-    )
-  },
-)
-
 const VoxHeaderFrameRouter = ({
   safeAreaView = true,
   borderWidth,
@@ -254,11 +228,13 @@ const VoxHeaderFrameRouter = ({
   const backgroundColor = (styles.backgroundColor as string) ?? 'white'
   const insets = useSafeAreaInsets()
   const height = safeAreaView ? insets.top + 56 : 56
+  const isWeb = Platform.OS === 'web'
 
   return (
     <VoxHeaderContainerStyled
-      height={height}
-      style={{ paddingTop: safeAreaView ? insets.top : 0, zIndex: 5 }}
+      // On désactive la hauteur définie et le style sur le web sinon en XS cela crée un padding inapproprié.
+      height={isWeb ? undefined : height}
+      style={isWeb ? undefined : { paddingTop: safeAreaView ? insets.top : 0, zIndex: 5 }}
       backgroundColor={backgroundColor}
       borderWidth={borderWidth}
     >
