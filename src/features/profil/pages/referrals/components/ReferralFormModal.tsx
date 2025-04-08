@@ -22,7 +22,7 @@ import { phoneCodes } from '@/utils/phoneCodes'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, Info } from '@tamagui/lucide-icons'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import { View, XStack, YStack } from 'tamagui'
+import { useMedia, View, XStack, YStack } from 'tamagui'
 import { z } from 'zod'
 
 interface Props {
@@ -32,6 +32,7 @@ interface Props {
 
 export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props>) {
   const [isFullForm, setIsFullForm] = useState(false)
+  const { gtMd } = useMedia()
 
   const { mutate: invite, isPending: isInviting, isSuccess: isInviteSuccess, reset: resetInviteState, error: inviteError } = useReferralsInvite()
   const {
@@ -108,11 +109,11 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
   const toggleFullForm = useCallback(() => setIsFullForm((v) => !v), [])
 
   return (
-    <ModalOrBottomSheet allowDrag open={isOpen} onClose={onClose}>
+    <ModalOrBottomSheet allowDrag open={isOpen} onClose={onClose} snapPoints={[100, 100]}>
       {isSuccess ? (
         <ReferralSuccess onClose={onClose} name={firstName} />
       ) : (
-        <YStack padding={'$8'} gap={'$8'} $gtSm={{ width: 500 }}>
+        <YStack padding={'$8'} gap={'$8'} $gtSm={{ width: 500 }} alignSelf={'center'}>
           <XStack alignItems={'center'} justifyContent={'space-between'}>
             <Text.LG bold>Invitation</Text.LG>
             {isFullForm && (
@@ -264,8 +265,10 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
                 <Info />
               </XStack>
               <YStack flex={7} $gtSm={{ flex: 4, flexShrink: 1, minWidth: 0 }}>
-                <Text bold>Connaissez-vous son adresse postale ?</Text>
-                <Text style={{ wordBreak: 'break-all' }}>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
+                <Text bold style={{ whiteSpace: 'nowrap' }}>
+                  Connaissez-vous son adresse postale ?
+                </Text>
+                <Text style={{ wordBreak: 'break-word' }}>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
               </YStack>
               <YStack justifyContent="center" alignItems="flex-end" overflow={'hidden'}>
                 <Button variant={'text'} onPress={toggleFullForm}>
@@ -340,6 +343,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
               {isFullForm ? 'Envoyer l’email de préinvitation' : 'Envoyer l’email d’invitation'}
             </VoxButton>
           </View>
+          {!gtMd && isFullForm && <YStack $sm={{ height: '$4' }} />}
         </YStack>
       )}
     </ModalOrBottomSheet>
