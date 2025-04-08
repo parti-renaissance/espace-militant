@@ -9,9 +9,18 @@ function useOpenExternalContent(props: { slug: types.Slugs; utm_source?: string;
   return {
     ...queryLink,
     open: (params: types.RestGetMagicLinkRequest) => () => {
+      let newWindow: WindowProxy | null = null
+      if (isWeb) {
+        newWindow = window.open('', '_blank')
+      }
+
       queryLink.mutateAsync(params).then(({ url }) => {
         if (isWeb) {
-          window.open(url, '_blank')
+          if (newWindow) {
+            newWindow.location.href = url
+          } else {
+            window.location.href = url
+          }
         } else {
           WebBrowser.openBrowserAsync(url)
         }
