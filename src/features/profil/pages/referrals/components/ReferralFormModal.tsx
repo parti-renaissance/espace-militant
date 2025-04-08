@@ -22,7 +22,7 @@ import { phoneCodes } from '@/utils/phoneCodes'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, Info } from '@tamagui/lucide-icons'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import { useMedia, View, XStack, YStack } from 'tamagui'
+import { isWeb, useMedia, View, XStack, YStack } from 'tamagui'
 import { z } from 'zod'
 
 interface Props {
@@ -109,7 +109,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
   const toggleFullForm = useCallback(() => setIsFullForm((v) => !v), [])
 
   return (
-    <ModalOrBottomSheet allowDrag open={isOpen} onClose={onClose} snapPoints={[100, 100]}>
+    <ModalOrBottomSheet allowDrag open={isOpen} onClose={onClose} snapPoints={isWeb ? [100, 100] : undefined}>
       {isSuccess ? (
         <ReferralSuccess onClose={onClose} name={firstName} />
       ) : (
@@ -343,7 +343,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
               {isFullForm ? 'Envoyer l’email de préinvitation' : 'Envoyer l’email d’invitation'}
             </VoxButton>
           </View>
-          {!gtMd && isFullForm && <YStack $sm={{ height: '$4' }} />}
+          {isWeb && !gtMd && isFullForm && <YStack $sm={{ height: '$4' }} />}
         </YStack>
       )}
     </ModalOrBottomSheet>
