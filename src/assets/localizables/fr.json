@@ -631,12 +631,12 @@
       "finished_zero": "Adhésion\nfinalisée",
       "finished_one": "Adhésion\nfinalisée",
       "finished_other": "Adhésions\nfinalisées",
-      "sent_zero": "Adhésion\nenvoyée",
-      "sent_one": "Adhésion\nenvoyée",
-      "sent_other": "Adhésions\nenvoyées",
-      "reported_zero": "Adhésion\nsignalée",
-      "reported_one": "Adhésion\nsignalée",
-      "reported_other": "Adhésions\nsignalées"
+      "sent_zero": "Invitation\nenvoyée",
+      "sent_one": "Invitation\nenvoyée",
+      "sent_other": "Invitations\nenvoyées",
+      "reported_zero": "Invitation\nsignalée",
+      "reported_one": "Invitation\nsignalée",
+      "reported_other": "Invitations\nsignalées"
     }
   }
 }
