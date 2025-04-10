@@ -11,7 +11,7 @@ import { RestUserScopesResponse } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Sparkle } from '@tamagui/lucide-icons'
-import { addHours, addMinutes, formatISO, isAfter, isBefore, isEqual, isValid, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
+import { addHours, addMinutes, formatISO, isAfter, isBefore, isEqual, isPast, isValid, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
 import { router, useNavigation } from 'expo-router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
@@ -80,6 +80,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const [mode, setMode] = useState(edit?.mode ?? 'meeting')
 
   const editMode = Boolean(edit)
+  const isPastEvent = editMode && !!edit?.begin_at && isPast(edit.begin_at)
 
   const navigation = useNavigation()
 
@@ -90,6 +91,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const editEventScope = edit?.organizer?.scope ?? 'national'
 
   const defaultValues = {
+    isPastEvent,
     scope: edit ? (edit.organizer?.scope ?? 'national') : scopes.data.default?.code,
     name: edit?.name ?? '',
     image: edit?.image,
@@ -258,6 +260,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     visibilityOptions,
     navigation,
     editMode,
+    isPastEvent,
     editEventScope,
     event: edit,
     isAuthor,

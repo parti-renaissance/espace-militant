@@ -20,7 +20,11 @@ const timezones = timezonesList.map((timeZone) => ({
   label: `${timeZone.tzCode} (${getTimezoneOffsetLabel(timeZone.tzCode)})`,
 }))
 
-const DatesField = (props: Pick<EventFormContext, 'control' | 'handleOnChangeBeginAt' | 'handleOnChangeFinishAt'>) => {
+interface DatesFieldProps extends Pick<EventFormContext, 'control' | 'handleOnChangeBeginAt' | 'handleOnChangeFinishAt'> {
+  disabled?: boolean
+}
+
+const DatesField = (props: DatesFieldProps) => {
   return (
     <FormFrame height="auto" flexDirection="column" paddingHorizontal={0} pt="$medium" overflow="hidden" theme="gray">
       <Controller
@@ -33,6 +37,7 @@ const DatesField = (props: Pick<EventFormContext, 'control' | 'handleOnChangeBeg
                 </XStack>
                 <XStack gap="$small" flex={1} justifyContent="flex-end">
                   <DatePickerField
+                    disabled={props.disabled}
                     error={fieldState.error?.message}
                     type="date"
                     value={field.value}
@@ -40,6 +45,7 @@ const DatesField = (props: Pick<EventFormContext, 'control' | 'handleOnChangeBeg
                     onBlur={field.onBlur}
                   />
                   <DatePickerField
+                    disabled={props.disabled}
                     error={fieldState.error?.message}
                     type="time"
                     value={field.value}
@@ -71,6 +77,7 @@ const DatesField = (props: Pick<EventFormContext, 'control' | 'handleOnChangeBeg
                 </XStack>
                 <XStack gap="$small" flex={1} justifyContent="flex-end">
                   <DatePickerField
+                    disabled={props.disabled}
                     error={fieldState.error?.message}
                     type="date"
                     value={field.value}
@@ -78,6 +85,7 @@ const DatesField = (props: Pick<EventFormContext, 'control' | 'handleOnChangeBeg
                     onBlur={field.onBlur}
                   />
                   <DatePickerField
+                    disabled={props.disabled}
                     error={fieldState.error?.message}
                     type="time"
                     value={field.value}

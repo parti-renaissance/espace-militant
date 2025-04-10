@@ -18,7 +18,7 @@ interface DatePickerFieldProps {
   type?: 'date' | 'time'
 }
 
-const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChange, error, type = 'date', onBlur }, ref) => {
+const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabled, onChange, error, type = 'date', onBlur }, ref) => {
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false)
 
   const inputRef = useRef(null)
@@ -80,13 +80,14 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChan
 
   const formatedValue = (type: 'date' | 'time', value: Date) => (type === 'date' ? getFormattedDate(value) : getFormattedTime(value))
   return Platform.OS === 'web' ? (
-    <FormFrame.Input error={Boolean(error)} ref={inputRef} value={webInputValue} onChangeText={handleChange} onBlur={() => onBlur?.()} />
+    <FormFrame.Input disabled={disabled} error={Boolean(error)} ref={inputRef} value={webInputValue} onChangeText={handleChange} onBlur={() => onBlur?.()} />
   ) : (
     <>
       <FormFrame.Button onPress={onShow} error={Boolean(error)}>
         <Text.MD color={error ? '$orange5' : '$textPrimary'}>{value ? formatedValue(type, value) : placeholder}</Text.MD>
       </FormFrame.Button>
       <DateTimePickerModal
+        disabled={disabled}
         locale="fr"
         date={value}
         confirmTextIOS="Valider"
