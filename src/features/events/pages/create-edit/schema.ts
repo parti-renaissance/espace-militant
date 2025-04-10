@@ -47,6 +47,7 @@ const postAddressSchema = z.object({
 export const createEventSchema = z
   .object({
     scope: requiredString('Le champ de la portée'),
+    isPastEvent: z.boolean().optional().default(false),
     image: z
       .object({
         url: z.string().nullable(),
@@ -134,15 +135,15 @@ export const createEventSchema = z
       })
     }
 
-    if (isAfter(new Date(), data.begin_at)) {
+    if (!data.isPastEvent && isAfter(new Date(), data.begin_at)) {
       ctx.addIssue({
         code: z.ZodIssueCode.invalid_date,
-        message: "L'évenement doit être dans le futur",
+        message: "L'événement doit être dans le futur",
         path: ['begin_at'],
       })
     }
 
-    if (isAfter(data.begin_at, data.finish_at)) {
+    if (!data.isPastEvent && isAfter(data.begin_at, data.finish_at)) {
       ctx.addIssue({
         code: z.ZodIssueCode.invalid_date,
         message: 'La date de fin doit être postérieure à la date de début.',
@@ -151,7 +152,7 @@ export const createEventSchema = z
     }
 
     if (data.mode === 'meeting') {
-      let errorMessage: string | null = null
+      let errorMessage: string | null
       if (!data.post_address) {
         errorMessage = 'L’adresse est obligatoire pour un événement en présentiel'
       } else {

@@ -27,7 +27,7 @@ export const CancelButton = (props: EventHandleButtonProps) => {
   )
 
   const { DestructiveAlertWrapper, present } = useDestructiveAlert({
-    title: `Voulez-vous vraiment annuler l'évenement ?`,
+    title: `Voulez-vous vraiment annuler l'événement ?`,
     description: (
       <YStack gap="$small">
         <Text.MD semibold color="$orange5">
