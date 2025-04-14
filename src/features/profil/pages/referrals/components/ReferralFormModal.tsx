@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { Pressable } from 'react-native'
+import { Platform, Pressable } from 'react-native'
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
@@ -156,7 +156,15 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
                 name="first_name"
                 control={control}
                 render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                  <Input color="gray" autoFocus placeholder="Prénom" value={value ?? undefined} onBlur={onBlur} onChange={onChange} error={error?.message} />
+                  <Input
+                    color="gray"
+                    autoFocus={Platform.OS === 'web'}
+                    placeholder="Prénom"
+                    value={value ?? undefined}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    error={error?.message}
+                  />
                 )}
               />
             </View>

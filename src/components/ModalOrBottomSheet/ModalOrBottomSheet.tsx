@@ -1,9 +1,9 @@
 import React, { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
-import { Modal, Pressable, StyleSheet } from 'react-native'
+import { Modal, Platform, Pressable, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { Spacing } from '@/styles'
-import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetModalProvider, BottomSheetScrollView } from '@gorhom/bottom-sheet'
-import { Portal } from '@gorhom/portal'
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { useMedia, View } from 'tamagui'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
@@ -21,6 +21,9 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
   const bottomSheetModalRef = useRef<BottomSheetModal>(null)
   const viewport = useMedia()
   const insets = useSafeAreaInsets()
+
+  // for iOS only
+  const keyboardHeight = useKeyboardHeight()
 
   useEffect(() => {
     if (bottomSheetModalRef.current) {
@@ -50,25 +53,29 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
   }
 
   return (
-    <Portal>
-      <BottomSheetModalProvider>
-        <BottomSheetModal
-          ref={bottomSheetModalRef}
-          backdropComponent={renderBackdrop}
-          enablePanDownToClose={allowDrag}
-          enableOverDrag={false}
-          onDismiss={onCloseModal}
-          topInset={insets.top}
-          snapPoints={snapPoints}
-          handleIndicatorStyle={{
-            backgroundColor: '#D2DCE5',
-            width: 48,
-          }}
-        >
-          <BottomSheetScrollView>{children}</BottomSheetScrollView>
-        </BottomSheetModal>
-      </BottomSheetModalProvider>
-    </Portal>
+    <BottomSheetModal
+      ref={bottomSheetModalRef}
+      backdropComponent={renderBackdrop}
+      enablePanDownToClose={allowDrag}
+      enableOverDrag={false}
+      onDismiss={onCloseModal}
+      topInset={insets.top}
+      snapPoints={snapPoints}
+      handleIndicatorStyle={{
+        backgroundColor: '#D2DCE5',
+        width: 48,
+      }}
+      style={{
+        paddingBottom: 0,
+      }}
+    >
+      <BottomSheetScrollView>
+        {children}
+
+        {/* In iOS we need to pass a view of specific height as paddingBottom won't work as expected. */}
+        {Platform.OS === 'ios' && <View style={{ height: keyboardHeight }} />}
+      </BottomSheetScrollView>
+    </BottomSheetModal>
   )
 }
 
