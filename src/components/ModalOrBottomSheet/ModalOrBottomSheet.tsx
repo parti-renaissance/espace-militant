@@ -65,9 +65,6 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
         backgroundColor: '#D2DCE5',
         width: 48,
       }}
-      style={{
-        paddingBottom: 0,
-      }}
     >
       <BottomSheetScrollView>
         {children}
