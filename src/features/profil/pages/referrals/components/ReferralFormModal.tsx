@@ -267,22 +267,20 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
           />
 
           {firstName.length > 0 && email.includes('@') && !isFullForm && (
-            <XStack padding={'$6'} borderRadius={'$8'} backgroundColor={'$gray1'} alignItems={'center'} gap={'$4'}>
-              <XStack flex={1} $gtSm={{ flex: 1 }}>
+            <View flexDirection={'row'} padding={'$6'} borderRadius={'$8'} backgroundColor={'$gray1'} alignItems={'center'} gap={'$4'}>
+              <XStack $gtSm={{ flex: 1 }}>
                 <Info />
               </XStack>
-              <YStack flex={7} $gtSm={{ flex: 4, flexShrink: 1, minWidth: 0 }}>
-                <Text bold style={{ whiteSpace: 'nowrap' }}>
-                  Connaissez-vous son adresse postale ?
-                </Text>
-                <Text style={{ wordBreak: 'break-word' }}>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
+              <YStack $gtSm={{ flex: 4, flexShrink: 1, minWidth: 0 }} flexShrink={1}>
+                <Text bold>Connaissez-vous son adresse postale ?</Text>
+                <Text>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
               </YStack>
               <YStack justifyContent="center" alignItems="flex-end" overflow={'hidden'}>
                 <Button variant={'text'} onPress={toggleFullForm}>
                   <Text color="$orange6">Préinscrire</Text>
                 </Button>
               </YStack>
-            </XStack>
+            </View>
           )}
 
           {isFullForm && (
