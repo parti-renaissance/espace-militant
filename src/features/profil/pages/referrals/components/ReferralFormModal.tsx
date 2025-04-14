@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { Pressable } from 'react-native'
+import { Platform, Pressable } from 'react-native'
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
@@ -22,7 +22,7 @@ import { phoneCodes } from '@/utils/phoneCodes'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, Info } from '@tamagui/lucide-icons'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
-import { isWeb, useMedia, View, XStack, YStack } from 'tamagui'
+import { View, XStack, YStack } from 'tamagui'
 import { z } from 'zod'
 
 interface Props {
@@ -32,7 +32,6 @@ interface Props {
 
 export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props>) {
   const [isFullForm, setIsFullForm] = useState(false)
-  const { gtMd } = useMedia()
 
   const { mutate: invite, isPending: isInviting, isSuccess: isInviteSuccess, reset: resetInviteState, error: inviteError } = useReferralsInvite()
   const {
@@ -109,7 +108,7 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
   const toggleFullForm = useCallback(() => setIsFullForm((v) => !v), [])
 
   return (
-    <ModalOrBottomSheet allowDrag open={isOpen} onClose={onClose} snapPoints={isWeb ? [100, 100] : undefined}>
+    <ModalOrBottomSheet allowDrag open={isOpen} onClose={onClose}>
       {isSuccess ? (
         <ReferralSuccess onClose={onClose} name={firstName} />
       ) : (
@@ -156,7 +155,15 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
                 name="first_name"
                 control={control}
                 render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                  <Input color="gray" autoFocus placeholder="Prénom" value={value ?? undefined} onBlur={onBlur} onChange={onChange} error={error?.message} />
+                  <Input
+                    color="gray"
+                    autoFocus={Platform.OS === 'web'}
+                    placeholder="Prénom"
+                    value={value ?? undefined}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    error={error?.message}
+                  />
                 )}
               />
             </View>
@@ -260,22 +267,20 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
           />
 
           {firstName.length > 0 && email.includes('@') && !isFullForm && (
-            <XStack padding={'$6'} borderRadius={'$8'} backgroundColor={'$gray1'} alignItems={'center'} gap={'$4'}>
-              <XStack flex={1} $gtSm={{ flex: 1 }}>
+            <View flexDirection={'row'} padding={'$6'} borderRadius={'$8'} backgroundColor={'$gray1'} alignItems={'center'} gap={'$4'}>
+              <XStack $gtSm={{ flex: 1 }}>
                 <Info />
               </XStack>
-              <YStack flex={7} $gtSm={{ flex: 4, flexShrink: 1, minWidth: 0 }}>
-                <Text bold style={{ whiteSpace: 'nowrap' }}>
-                  Connaissez-vous son adresse postale ?
-                </Text>
-                <Text style={{ wordBreak: 'break-word' }}>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
+              <YStack $gtSm={{ flex: 4, flexShrink: 1, minWidth: 0 }} flexShrink={1}>
+                <Text bold>Connaissez-vous son adresse postale ?</Text>
+                <Text>En préinscrivant entièrement {firstName}, vous multipliez par 10 ses chances d’adhérer.</Text>
               </YStack>
               <YStack justifyContent="center" alignItems="flex-end" overflow={'hidden'}>
                 <Button variant={'text'} onPress={toggleFullForm}>
                   <Text color="$orange6">Préinscrire</Text>
                 </Button>
               </YStack>
-            </XStack>
+            </View>
           )}
 
           {isFullForm && (
@@ -343,7 +348,6 @@ export default function ReferralFormModal({ isOpen, closeModal }: Readonly<Props
               {isFullForm ? 'Envoyer l’email de préinvitation' : 'Envoyer l’email d’invitation'}
             </VoxButton>
           </View>
-          {isWeb && !gtMd && isFullForm && <YStack $sm={{ height: '$4' }} />}
         </YStack>
       )}
     </ModalOrBottomSheet>
