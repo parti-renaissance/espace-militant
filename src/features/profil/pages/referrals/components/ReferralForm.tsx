@@ -340,6 +340,7 @@ export default function ReferralForm({ close }: Props) {
           onPress={handleSubmit(onSubmit)}
           loading={isRegistering || isInviting}
           alignSelf={isMobileWebSpecific ? 'center' : undefined}
+          full={isMobileWebSpecific}
         >
           {isFullForm ? 'Envoyer l’email de préinvitation' : 'Envoyer l’email d’invitation'}
         </VoxButton>
