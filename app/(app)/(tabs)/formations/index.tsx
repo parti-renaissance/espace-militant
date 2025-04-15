@@ -1,7 +1,6 @@
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import * as metatags from '@/config/metatags'
-import useIsFocused from '@/hooks/useIsFocused'
 import FormationScreen from '@/screens/formations/page'
 import { ImageBackground } from 'expo-image'
 import Head from 'expo-router/head'
@@ -17,11 +16,6 @@ const styles = StyleSheet.create({
 const ToolsScreen: React.FC = () => {
   const media = useMedia()
   const topVisual = media.sm ? 270 : 317
-  const isFocused = useIsFocused()
-
-  if (!isFocused) {
-    return null
-  }
 
   return (
     <YStack flex={1} bg={media.sm ? 'white' : '$textSurface'}>

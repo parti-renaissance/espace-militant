@@ -8,16 +8,10 @@ import StickyBox from '@/components/StickyBox/StickyBox'
 import * as metatags from '@/config/metatags'
 import HomeFeedList from '@/features/homefeed/HomeFeedList'
 import ScopeModal from '@/features/ScopesSelector'
-import useIsFocused from '@/hooks/useIsFocused'
 import Head from 'expo-router/head'
 import { YStack } from 'tamagui'
 
 const HomeScreen: React.FC = () => {
-  const isFocused = useIsFocused()
-  if (!isFocused) {
-    return null
-  }
-
   return (
     <>
       <Head>
