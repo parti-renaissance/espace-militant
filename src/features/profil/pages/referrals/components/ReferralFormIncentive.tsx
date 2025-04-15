@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.margin,
     borderRadius: spacing.margin,
-    backgroundColor: gray.gray1,
+    backgroundColor: gray.gray2,
   },
   iconContainer: {
     paddingRight: spacing.margin,
