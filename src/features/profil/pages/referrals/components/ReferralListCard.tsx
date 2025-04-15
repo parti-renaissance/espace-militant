@@ -27,7 +27,7 @@ export default function ReferralListCard() {
           <ReferralListEmptyState />
         ) : (
           <>
-            <XStack alignItems={'center'} alignContent={'space-between'} width={'100%'} gap={'$3'}>
+            <XStack alignItems={'center'} alignContent={'space-between'} width={'100%'} gap={'$medium'}>
               <XStack flex={1}>
                 <StatsCard
                   count={statistics?.nb_referral_finished ?? 0}

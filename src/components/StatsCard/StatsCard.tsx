@@ -27,9 +27,7 @@ export default function StatsCard({ count, label, backgroundColor, color, isLoad
       paddingHorizontal={'$6'}
       paddingVertical={'$8'}
       borderRadius={'$4'}
-      $gtXs={{
-        minWidth: 143,
-      }}
+      width={'100%'}
     >
       <Text fontSize={24} fontWeight={600}>
         {count}
