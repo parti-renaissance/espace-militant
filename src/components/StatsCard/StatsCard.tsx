@@ -21,11 +21,10 @@ export default function StatsCard({ count, label, backgroundColor, color, isLoad
     <YStack
       gap={'$4'}
       alignItems={'center'}
-      height={92}
       backgroundColor={backgroundColor}
       justifyContent={'center'}
-      paddingHorizontal={'$6'}
-      paddingVertical={'$8'}
+      paddingHorizontal={'$medium'}
+      paddingVertical={'$medium'}
       borderRadius={'$4'}
       width={'100%'}
     >
