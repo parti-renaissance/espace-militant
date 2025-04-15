@@ -21,15 +21,12 @@ export default function StatsCard({ count, label, backgroundColor, color, isLoad
     <YStack
       gap={'$4'}
       alignItems={'center'}
-      height={92}
       backgroundColor={backgroundColor}
       justifyContent={'center'}
-      paddingHorizontal={'$6'}
-      paddingVertical={'$8'}
+      paddingHorizontal={'$medium'}
+      paddingVertical={'$medium'}
       borderRadius={'$4'}
-      $gtXs={{
-        minWidth: 143,
-      }}
+      width={'100%'}
     >
       <Text fontSize={24} fontWeight={600}>
         {count}

@@ -6,6 +6,7 @@ export type PageConfig = {
   title: string
   icon: NamedExoticComponent<IconProps>
   environment?: string
+  hiddenInMenu?: boolean
 }
 
 export const pageConfigs: {
@@ -48,7 +49,12 @@ export const pageConfigs: {
     title: 'Mot de passe',
     icon: KeyRound,
   },
-
+  invitation: {
+    title: 'Invitation',
+    icon: HeartHandshake,
+    environment: 'staging',
+    hiddenInMenu: true,
+  },
   // certification: {
   //   title: 'Certification',
   //   icon: BadgeCheck,

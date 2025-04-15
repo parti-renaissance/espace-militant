@@ -23,8 +23,19 @@ import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
 
 const EventDesktopAside = () => {
-  const { scopeOptions, control, editMode, visibilityOptions, catOptions, mode, setMode, isAuthor, handleOnChangeBeginAt, handleOnChangeFinishAt } =
-    useEventFormContext()
+  const {
+    isPastEvent,
+    scopeOptions,
+    control,
+    editMode,
+    visibilityOptions,
+    catOptions,
+    mode,
+    setMode,
+    isAuthor,
+    handleOnChangeBeginAt,
+    handleOnChangeFinishAt,
+  } = useEventFormContext()
 
   return (
     <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
@@ -67,7 +78,12 @@ const EventDesktopAside = () => {
           control={control}
           name="category"
         />
-        <EventDatesField control={control} handleOnChangeBeginAt={handleOnChangeBeginAt} handleOnChangeFinishAt={handleOnChangeFinishAt} />
+        <EventDatesField
+          disabled={isPastEvent}
+          control={control}
+          handleOnChangeBeginAt={handleOnChangeBeginAt}
+          handleOnChangeFinishAt={handleOnChangeFinishAt}
+        />
         <Controller
           render={({ field }) => {
             return (
@@ -233,7 +249,7 @@ const EventDesktopFooter = () => {
               >
                 {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? `${editMode ? 'Modifier' : 'Créer'} l'événement` : null}
                 {isUploadImagePending ? "Envoi de l'image..." : null}
-                {isUploadDeletePending ? "Supression de l'image..." : null}
+                {isUploadDeletePending ? "Suppression de l'image..." : null}
                 {isPending ? `${editMode ? 'Modification' : 'Création'}...` : null}
               </VoxButton>
             </XStack>

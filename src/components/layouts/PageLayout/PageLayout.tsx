@@ -20,7 +20,7 @@ const LayoutFrame = ({ children, webScrollable, ...props }: ComponentProps<typeo
       pr={insets.right}
       $gtMd={{ pl: insets.left ?? padding }}
       $gtLg={{ pl: insets.left }}
-      overflowY={isWeb && webScrollable ? 'scroll' : undefined}
+      overflowY={isWeb && webScrollable ? 'auto' : undefined}
       {...props}
     >
       <ScrollContext.Provider value={{ layoutRef, scrollActive: Boolean(isWeb && webScrollable && media.gtSm) }}>

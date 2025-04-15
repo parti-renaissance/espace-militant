@@ -43,7 +43,7 @@ export default function ReferralListItem({ item }: Readonly<Props>) {
   }, [item.type])
 
   return (
-    <XStack justifyContent="space-between" alignItems="center" paddingVertical="$4" gap="$4" flexWrap="wrap">
+    <XStack justifyContent="space-between" alignItems="center" gap="$4" flexWrap="wrap">
       <YStack flex={1}>
         <Text fontWeight="500" lineHeight={lineHeight}>
           {capitalize(item.first_name)} {item.last_name && capitalize(item.last_name)}

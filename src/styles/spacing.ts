@@ -12,3 +12,20 @@ export const minWidthButton = 132
 export const rowVerticalMargin = 12
 export const separatorHeight = 1
 export const buttonElevation = 4
+
+export const spacing = {
+  unit,
+  margin,
+  small,
+  extraSmall,
+  largeMargin,
+  extraLargeMargin,
+  extraExtraLargeMargin,
+  mediumMargin,
+  inputTextBorder,
+  topMargin,
+  minWidthButton,
+  rowVerticalMargin,
+  separatorHeight,
+  buttonElevation,
+}

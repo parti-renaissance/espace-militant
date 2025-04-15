@@ -12,8 +12,8 @@ export default function ReferralLockedCard({ hideHeader }: { hideHeader?: boolea
 
   return (
     <InstanceCard title="Parrainages" icon={HeartHandshake} hideHeader={hideHeader}>
-      <YStack alignItems={'center'} gap={'$8'} justifyContent={'center'}>
-        <View margin={'$8'}>
+      <YStack alignItems={'center'} gap={'$medium'} justifyContent={'center'}>
+        <View margin={'$medium'}>
           <Image source={require('@/assets/illustrations/VisuCadnas.png')} contentFit={'contain'} style={{ height: 153, width: 88 }} />
         </View>
 

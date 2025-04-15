@@ -87,6 +87,7 @@ export default function EventFormMobileScreen() {
     isUploadImagePending,
     isUploadDeletePending,
     editMode,
+    isPastEvent,
     event,
     editEventScope,
     isAuthor,
@@ -204,7 +205,12 @@ export default function EventFormMobileScreen() {
                 />
                 <VoxCard.Separator />
 
-                <EventDatesField control={control} handleOnChangeBeginAt={handleOnChangeBeginAt} handleOnChangeFinishAt={handleOnChangeFinishAt} />
+                <EventDatesField
+                  disabled={isPastEvent}
+                  control={control}
+                  handleOnChangeBeginAt={handleOnChangeBeginAt}
+                  handleOnChangeFinishAt={handleOnChangeFinishAt}
+                />
 
                 <VoxCard.Separator />
                 <Controller

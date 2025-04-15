@@ -628,15 +628,15 @@
       "action": "Recevoir mon lien de réinitialisation"
     },
     "referral": {
-      "finished_zero": "Adhésion\nfinalisée",
-      "finished_one": "Adhésion\nfinalisée",
-      "finished_other": "Adhésions\nfinalisées",
-      "sent_zero": "Invitation\nenvoyée",
-      "sent_one": "Invitation\nenvoyée",
-      "sent_other": "Invitations\nenvoyées",
-      "reported_zero": "Invitation\nsignalée",
-      "reported_one": "Invitation\nsignalée",
-      "reported_other": "Invitations\nsignalées"
+      "finished_zero": "Adhésion finalisée",
+      "finished_one": "Adhésion finalisée",
+      "finished_other": "Adhésions finalisées",
+      "sent_zero": "Invitation envoyée",
+      "sent_one": "Invitation envoyée",
+      "sent_other": "Invitations envoyées",
+      "reported_zero": "Invitation signalée",
+      "reported_one": "Invitation signalée",
+      "reported_other": "Invitations signalées"
     }
   }
 }

@@ -42,4 +42,6 @@ module.exports = withTamagui(config, {
   components: ['tamagui'],
   config: './tamagui.config.ts',
   outputCSS: './tamagui-web.css',
+  disableExtraction: process.env.NODE_ENV === 'development',
+  disableFlattening: true,
 })
