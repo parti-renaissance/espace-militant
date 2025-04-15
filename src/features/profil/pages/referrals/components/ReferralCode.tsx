@@ -31,7 +31,7 @@ export default function ReferralCode() {
           Le lien ci-dessous est votre lien d’adhésion personnel. Si celui-ci est utilisé pour adhérer, vous serez automatiquement reconnu comme le parrain.
         </Text.SM>
 
-        <XStack gap={'$8'} $xs={{ gap: '$4' }} mt={'$4'}>
+        <XStack gap={'$medium'} $xs={{ gap: '$4' }} mt={'$4'}>
           <YStack $xs={{ flex: 2 }}>
             <ShareButton url={user.data?.referral_link} onPress={onCopyURL} />
           </YStack>
