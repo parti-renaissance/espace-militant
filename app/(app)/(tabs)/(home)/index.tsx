@@ -1,5 +1,4 @@
 import React from 'react'
-// import { Text } from 'react-native'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import AppDownloadCTA from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
@@ -9,10 +8,16 @@ import StickyBox from '@/components/StickyBox/StickyBox'
 import * as metatags from '@/config/metatags'
 import HomeFeedList from '@/features/homefeed/HomeFeedList'
 import ScopeModal from '@/features/ScopesSelector'
+import useIsFocused from '@/hooks/useIsFocused'
 import Head from 'expo-router/head'
 import { YStack } from 'tamagui'
 
 const HomeScreen: React.FC = () => {
+  const isFocused = useIsFocused()
+  if (!isFocused) {
+    return null
+  }
+
   return (
     <>
       <Head>

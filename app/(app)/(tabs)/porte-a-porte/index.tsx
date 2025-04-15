@@ -6,6 +6,7 @@ import { DoorToDoorCharterNotAccepted } from '@/core/entities/DoorToDoorCharterS
 import { GetDoorToDoorAddressesInteractor } from '@/core/interactor/GetDoorToDoorAddressesInteractor'
 import DoorToDoorRepository from '@/data/DoorToDoorRepository'
 import { useDoorToDoorStore } from '@/data/store/door-to-door'
+import useIsFocused from '@/hooks/useIsFocused'
 import { DoorToDoorDisplayMode, DoorToDoorFilterDisplay } from '@/screens/doorToDoor/DoorToDoor'
 import DoorToDoorCharterModal from '@/screens/doorToDoor/DoorToDoorCharterModal'
 import DoorToDoorFilter from '@/screens/doorToDoor/DoorToDoorFilter'
@@ -70,6 +71,7 @@ const _fetchAdresses = async (forcedRegion?: Region) => {
 }
 
 const DoorToDoorScreen = () => {
+  const isFocused = useIsFocused()
   const [rankingModalState, setRankingModalState] = useState<RankingModalState>({ visible: false })
   const [currentSearchRegion, _setCurrentSearchRegion] = useState<Region>()
   const [displayMode, setDisplayMode] = useState<DoorToDoorDisplayMode>('map')
@@ -159,6 +161,10 @@ const DoorToDoorScreen = () => {
     }
 
     return renderMap(currentSearchRegion)
+  }
+
+  if (!isFocused) {
+    return null
   }
 
   return (

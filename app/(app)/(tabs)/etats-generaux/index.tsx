@@ -1,5 +1,6 @@
 import React from 'react'
 import * as metatags from '@/config/metatags'
+import useIsFocused from '@/hooks/useIsFocused'
 import GeneralConventionScreen from '@/screens/generalConventions/page'
 import { ImageBackground } from 'expo-image'
 import Head from 'expo-router/head'
@@ -8,6 +9,11 @@ import { useMedia, View, YStack } from 'tamagui'
 const Page: React.FC = () => {
   const media = useMedia()
   const topVisual = media.sm ? 270 : 500
+  const isFocused = useIsFocused()
+
+  if (!isFocused) {
+    return null
+  }
 
   return (
     <>

@@ -4,6 +4,7 @@ import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import MyProfileCard from '@/components/ProfileCards/ProfileCard/MyProfileCard'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import * as metatags from '@/config/metatags'
+import useIsFocused from '@/hooks/useIsFocused'
 import ResourcesList from '@/screens/tools/ResourcesList'
 import Head from 'expo-router/head'
 import { View, YStack } from 'tamagui'
@@ -39,6 +40,11 @@ const ToolsSkeleton = () => {
 }
 
 const ToolsScreen: React.FC = () => {
+  const isFocused = useIsFocused()
+  if (!isFocused) {
+    return null
+  }
+
   return (
     <>
       <Head>
