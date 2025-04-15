@@ -57,7 +57,7 @@ export default function ReferralListCard() {
               </XStack>
             </XStack>
 
-            <YStack padding={'$8'} borderRadius={'$4'} backgroundColor={'$gray1'}>
+            <YStack padding={'$medium'} borderRadius={'$4'} backgroundColor={'$gray1'}>
               {data.items.map((item, index) => (
                 <Fragment key={item.uuid}>
                   <ReferralListItem item={item} />

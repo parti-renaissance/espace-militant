@@ -18,7 +18,7 @@ const mapPageConfigs = (config: typeof pageConfigs) =>
         icon: options.icon,
         children: options.title,
         pathname: ('/profil' + (screenName === 'index' ? '' : '/' + screenName)) as Href,
-        hidden: options?.environment ? clientEnv.ENVIRONMENT !== options.environment : false,
+        hidden: options.hiddenInMenu ?? (options?.environment ? clientEnv.ENVIRONMENT !== options.environment : false),
       }) as const,
   )
 

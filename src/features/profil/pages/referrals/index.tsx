@@ -13,7 +13,7 @@ export default function ReferralsPage() {
   return (
     <ScrollView>
       {isAdherent ? (
-        <YStack gap={'$8'}>
+        <YStack gap={'$medium'}>
           <ReferralCodeCard />
           <ReferralListCard />
         </YStack>
