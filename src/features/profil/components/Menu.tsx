@@ -2,7 +2,8 @@ import { useMemo } from 'react'
 import Menu from '@/components/menu/Menu'
 import clientEnv from '@/config/clientEnv'
 import { useSession } from '@/ctx/SessionProvider'
-import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
+import { RestProfilResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
 import { LogOut, PenLine, Send } from '@tamagui/lucide-icons'
 import { Href, Link, usePathname } from 'expo-router'
@@ -10,7 +11,7 @@ import omit from 'lodash/omit'
 import { isWeb, useMedia, YStack } from 'tamagui'
 import { pageConfigs } from '../configs'
 
-const mapPageConfigs = (config: typeof pageConfigs) =>
+const mapPageConfigs = (config: typeof pageConfigs, profile?: RestProfilResponse) =>
   Object.entries(config).map(
     ([screenName, options]) =>
       ({
@@ -18,24 +19,19 @@ const mapPageConfigs = (config: typeof pageConfigs) =>
         icon: options.icon,
         children: options.title,
         pathname: ('/profil' + (screenName === 'index' ? '' : '/' + screenName)) as Href,
-        hidden: options.hiddenInMenu ?? (options?.environment ? clientEnv.ENVIRONMENT !== options.environment : false),
+        hidden: typeof options.hiddenInMenu === 'function' ? options.hiddenInMenu(profile) : !!options.hiddenInMenu,
       }) as const,
   )
-
-export const dektopNavConfig = mapPageConfigs(pageConfigs)
-export const mobileNavConfig = mapPageConfigs(omit(pageConfigs, ['index']))
 
 const ProfilMenu = () => {
   const media = useMedia()
   const pathname = usePathname()
-  const { signOut, user } = useSession()
+  const { signOut } = useSession()
   const { hasFeature } = useGetExecutiveScopes()
+  const { data: profile } = useGetProfil({ enabled: true })
   const itemsData = useMemo(
-    () =>
-      (media.gtSm ? dektopNavConfig : mobileNavConfig).filter((x) => {
-        return x.key !== 'acces-cadre' || user.data?.cadre_access
-      }),
-    [media.gtSm, user.data?.cadre_access],
+    () => (media.gtSm ? mapPageConfigs(pageConfigs, profile) : mapPageConfigs(omit(pageConfigs, ['index']), profile)),
+    [media.gtSm, profile],
   )
   const { user: credentials } = useUserStore()
   const Item = ({ item, index }: { item: (typeof itemsData)[number]; index: number }) => (
