@@ -7,6 +7,7 @@ import { VoxButton } from '@/components/Button'
 import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import { UserTagEnum } from '@/core/entities/UserProfile'
 import ExecutiveRoleSelector from '@/features/profil/components/ExecutiveRoleSelector'
 import { useDeleteProfilPicture, useGetProfil, useGetTags, usePostProfilPicture } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
@@ -121,7 +122,7 @@ const UploadPP = (props: { profil: RestProfilResponse }) => {
 
 export default function ({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
   const { data: profil } = useGetProfil()
-  const { tags } = useGetTags({ tags: ['elu', 'sympathisant', 'adherent'] })
+  const { tags } = useGetTags({ tags: [UserTagEnum.ELU, UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] })
   return profil ? (
     <VoxCard $sm={{ bg: 'transparent' }} {...props}>
       <VoxCard.Content>
