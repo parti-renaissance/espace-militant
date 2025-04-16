@@ -14,28 +14,36 @@ const baseConfig: CreateAxiosDefaults = {
   withCredentials: true,
 }
 
-export const instanceWithoutInterceptors = axios.create(baseConfig)
+export const publicInstance = axios.create(baseConfig)
+export const authInstance = axios.create(baseConfig)
 
-export const instance = axios.create(baseConfig)
+const errorMonitor = (error: AxiosError) => {
+  return Promise.reject(error)
+}
 
-instance.interceptors.request.use(
-  function (config) {
-    const accessToken = useUserStore.getState().user?.accessToken
+const appVersionInterceptor = (config: CustomAxiosRequestConfig) => {
+  config.headers['X-App-version'] = getFullVersion()
 
-    config.headers['X-App-version'] = getFullVersion()
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`
-    }
+  return config
+}
 
-    return config
-  },
-  function (error) {
-    return Promise.reject(error)
-  },
-)
+const authInterceptor = (config: CustomAxiosRequestConfig) => {
+  const accessToken = useUserStore.getState().user?.accessToken
+
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`
+  }
+
+  return config
+}
+
+publicInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
+authInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
+authInstance.interceptors.request.use(authInterceptor, errorMonitor)
+
 let refreshing_token: Promise<Awaited<ReturnType<ReturnType<typeof getRefreshToken>>> | undefined> | null = null
 
-instance.interceptors.response.use(identity, async function (error: AxiosError) {
+authInstance.interceptors.response.use(identity, async function (error: AxiosError) {
   const originalRequest: CustomAxiosRequestConfig | undefined = error.config
 
   if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
@@ -49,7 +57,7 @@ instance.interceptors.response.use(identity, async function (error: AxiosError) 
 
       refreshing_token =
         refreshing_token ??
-        getRefreshToken({ instance, instanceWithoutInterceptors })({
+        getRefreshToken({ authInstance, publicInstance })({
           client_id: clientEnv.OAUTH_CLIENT_ID,
           grant_type: 'refresh_token',
           refresh_token: refreshToken,
@@ -66,7 +74,7 @@ instance.interceptors.response.use(identity, async function (error: AxiosError) 
         originalRequest.headers.Authorization = `Bearer ${response.access_token}`
       }
 
-      return instance(originalRequest)
+      return authInstance(originalRequest)
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 403) {
         useUserStore.getState().removeCredentials()

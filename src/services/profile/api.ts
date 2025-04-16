@@ -7,6 +7,7 @@ import {
 import * as schemas from '@/services/profile/schema'
 import type * as Types from '@/services/profile/schema'
 import { api } from '@/utils/api'
+import { z } from 'zod'
 
 export const getProfile = api({
   method: 'GET',
@@ -157,5 +158,13 @@ export const getInstances = api({
   path: '/api/v3/profile/instances',
   requestSchema: schemas.RestInstancesRequestSchema,
   responseSchema: schemas.RestInstancesResponseSchema,
+  type: 'private',
+})
+
+export const logout = api({
+  method: 'POST',
+  path: '/api/v3/logout',
+  requestSchema: z.void(),
+  responseSchema: z.void(),
   type: 'private',
 })

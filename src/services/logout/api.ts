@@ -2,6 +2,7 @@ import { Linking } from 'react-native'
 import clientEnv from '@/config/clientEnv'
 import discoveryDocument from '@/config/discoveryDocument'
 import { REDIRECT_URI } from '@/hooks/useLogin'
+import { logout } from '@/services/profile/api'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -11,7 +12,8 @@ export function useLogOut() {
   const queryClient = useQueryClient()
   const { removeCredentials, user } = useUserStore()
   return useMutation<WebBrowser.WebBrowserAuthSessionResult | void, Error>({
-    mutationFn: async () => {
+    mutationFn: () => logout(),
+    onSuccess: async () => {
       removeCredentials()
       queryClient.clear()
       await queryClient.invalidateQueries()
@@ -29,9 +31,6 @@ export function useLogOut() {
       })
 
       return WebBrowser.openAuthSessionAsync(`${discoveryDocument.endSessionEndpoint}?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`, REDIRECT_URI)
-    },
-    onSuccess: async () => {
-      // router.replace({ pathname: '/(tabs)/evenements/' })
     },
     onError: (error) => {
       ErrorMonitor.log('Cannot open web browser on disconnect', {

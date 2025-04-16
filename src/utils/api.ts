@@ -1,4 +1,4 @@
-import { instance, instanceWithoutInterceptors } from '@/lib/axios'
+import { authInstance, publicInstance } from '@/lib/axios'
 import { createApi } from './constructApi'
 
-export const api = createApi({ instance, instanceWithoutInterceptors })
+export const api = createApi({ authInstance, publicInstance })
