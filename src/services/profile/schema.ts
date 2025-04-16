@@ -43,6 +43,7 @@ export const RestProfilResponseSchema = z.object({
   postal_code: z.string(),
   email_address: z.string().email(),
   cadre_access: z.boolean(),
+  canary_tester: z.boolean(),
   cadre_auth_path: z.string().nullish(),
   certified: z.boolean(),
   country: z.string(),
