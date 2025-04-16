@@ -1,21 +1,17 @@
 import clientEnv from '@/config/clientEnv'
 import { createApi } from '@/utils/constructApi'
-import axios, { CreateAxiosDefaults } from 'axios'
+import axios from 'axios'
 import { z } from 'zod'
 import { MatomoDefaultRequestSchema, MatomoDefaultResponseSchema, MatomoEventRequestSchema } from './schema'
 
-const baseConfig: CreateAxiosDefaults = {
+const instance = axios.create({
   baseURL: 'https://matomo.parti-renaissance.fr/matomo.php',
-}
-
-export const instance = axios.create(baseConfig)
-
-export const api = createApi({ instance, instanceWithoutInterceptors: instance })
+})
 
 export const matomoApi =
   <Request extends z.ZodRawShape>(requestSchema: z.ZodObject<Request>) =>
   (payload: z.infer<z.ZodObject<Request>> & { userId?: string }) =>
-    api({
+    createApi({ authInstance: instance, publicInstance: instance })({
       path: '',
       useParams: true,
       requestSchema: MatomoDefaultRequestSchema(requestSchema),

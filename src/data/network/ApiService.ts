@@ -1,5 +1,5 @@
 import { Poll } from '@/core/entities/Poll'
-import { instance, instanceWithoutInterceptors } from '@/lib/axios'
+import { authInstance, publicInstance } from '@/lib/axios'
 import { AxiosRequestConfig, Method } from 'axios'
 import { stringify } from 'qs'
 import { RestBuildingEventRequest } from '../restObjects/RestBuildingEventRequest'
@@ -44,11 +44,11 @@ import { mapAssociatedToken, mapPhonePollError, mapPhoningSessionError } from '.
 import { genericErrorMapping } from './utils'
 
 const api = <Response>(method: Method, path: string, opt?: AxiosRequestConfig) =>
-  instance<Response>({ ...opt, url: path, method })
+  authInstance<Response>({ ...opt, url: path, method })
     .then((res) => res.data)
     .catch(genericErrorMapping)
 const publicApi = <Response>(method: Method, path: string, opt?: AxiosRequestConfig) =>
-  instanceWithoutInterceptors<Response>({ ...opt, url: path, method })
+  publicInstance<Response>({ ...opt, url: path, method })
     .then((res) => res.data)
     .catch(genericErrorMapping)
 

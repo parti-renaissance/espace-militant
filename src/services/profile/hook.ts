@@ -216,7 +216,7 @@ export const useGetElectProfil = () => {
 
 export const useGetTags = ({ tags }: { tags: RestProfilResponseTagTypes[] }) => {
   const profil = useGetProfil()
-  return { tags: profil.data?.tags?.filter((x) => tags.includes(x.type)), ...profil }
+  return { tags: profil.data?.tags?.filter((x) => tags.includes(x.type as UserTagEnum)), ...profil }
 }
 
 export const useIsAdherent = () => {
@@ -351,7 +351,7 @@ export const useGetTaxReceiptFile = () => {
   })
 }
 
-export const usetPostChangePassword = () => {
+export const usePostChangePassword = () => {
   const toast = useToastController()
   return useMutation({
     mutationFn: api.postChangePassword,
