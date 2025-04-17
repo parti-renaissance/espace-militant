@@ -1,9 +1,11 @@
+import { getUserAgent } from 'react-native-device-info'
 import clientEnv from '@/config/clientEnv'
 import { getRefreshToken } from '@/services/refresh-token/api'
 import { useUserStore } from '@/store/user-store'
 import { getFullVersion } from '@/utils/version'
 import axios, { AxiosError, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios'
 import { identity } from 'fp-ts/lib/function'
+import { isWeb } from 'tamagui'
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
@@ -21,8 +23,11 @@ const errorMonitor = (error: AxiosError) => {
   return Promise.reject(error)
 }
 
-const appVersionInterceptor = (config: CustomAxiosRequestConfig) => {
+const appVersionInterceptor = async (config: CustomAxiosRequestConfig) => {
   config.headers['X-App-version'] = getFullVersion()
+  if (!isWeb) {
+    config.headers['User-Agent'] = await getUserAgent()
+  }
 
   return config
 }

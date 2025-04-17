@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
 import clientEnv from '@/config/clientEnv'
-import discoveryDocument from '@/config/discoveryDocument'
+import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
 import * as AuthSession from 'expo-auth-session'
-import { maybeCompleteAuthSession } from 'expo-web-browser'
+import { DiscoveryDocument } from 'expo-auth-session'
 import * as WebBrowser from 'expo-web-browser'
+import { maybeCompleteAuthSession } from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 import useBrowserWarmUp from './useBrowserWarmUp'
 
@@ -11,54 +13,58 @@ maybeCompleteAuthSession()
 export const REDIRECT_URI = AuthSession.makeRedirectUri()
 const BASE_REQUEST_CONFIG = { clientId: clientEnv.OAUTH_CLIENT_ID, redirectUri: REDIRECT_URI }
 
-export const useCodeAuthRequest = (props?: { register?: boolean }) => {
-  return AuthSession.useAuthRequest(
-    {
-      ...BASE_REQUEST_CONFIG,
-      scopes: ['jemarche_app', 'read:profile', 'write:profile'],
-      usePKCE: false,
-      extraParams: {
-        utm_source: 'app',
-      },
-    },
-    props?.register
-      ? {
-          authorizationEndpoint: discoveryDocument.registrationEndpoint,
-        }
-      : discoveryDocument,
-  )
+export const useDiscoveryDocument = (register?: boolean) => {
+  const [discovery, setDiscovery] = useState<DiscoveryDocument | null>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      const doc = register ? { authorizationEndpoint: REGISTRATION_ENDPOINT } : await getDiscoveryDocument()
+      setDiscovery(doc)
+    }
+
+    load()
+  }, [register])
+
+  return discovery
 }
 
-const exchangeCodeAsync = ({ code }: { code: string }) => {
-  if (!code) return null
-  return AuthSession.exchangeCodeAsync(
-    {
-      ...BASE_REQUEST_CONFIG,
-      code,
+export const useCodeAuthRequest = (props?: { register?: boolean }) => {
+  const discovery = useDiscoveryDocument(props?.register)
+
+  const requestConfig = {
+    ...BASE_REQUEST_CONFIG,
+    scopes: ['jemarche_app', 'read:profile', 'write:profile'],
+    usePKCE: false,
+    extraParams: {
+      utm_source: 'app',
     },
-    discoveryDocument,
-  )
+  }
+
+  return AuthSession.useAuthRequest(requestConfig, discovery)
+}
+
+const exchangeCodeAsync = async ({ code }: { code: string }) => {
+  if (!code) return null
+
+  return AuthSession.exchangeCodeAsync({ ...BASE_REQUEST_CONFIG, code }, await getDiscoveryDocument())
 }
 
 export const useLogin = () => {
   useBrowserWarmUp()
-  const [req, , promptAsync] = useCodeAuthRequest()
+  const [req, , promptAsync] = useCodeAuthRequest() ?? []
   return async (payload?: { code?: string; state?: string }) => {
     if (payload?.code) {
       WebBrowser.dismissAuthSession()
       return exchangeCodeAsync({ code: payload.code })
     }
-    if (payload?.state && req) {
-      req.state = payload.state
-    }
 
     if (isWeb) {
-      const url = new URL(discoveryDocument.authorizationEndpoint)
-      url.searchParams.set('redirect_uri', req?.redirectUri!)
-      url.searchParams.set('client_id', req?.clientId!)
+      const url = new URL(AUTHORIZATION_ENDPOINT)
+      url.searchParams.set('redirect_uri', req?.redirectUri ?? '')
+      url.searchParams.set('client_id', req?.clientId ?? '')
       url.searchParams.set('response_type', 'code')
-      if (req?.state) {
-        url.searchParams.set('state', req?.state)
+      if (payload?.state) {
+        url.searchParams.set('state', payload?.state)
       }
       req?.scopes!.forEach((scope) => url.searchParams.append('scope[]', scope))
       Object.entries(req?.extraParams ?? {}).forEach(([key, value]) => url.searchParams.set(key, value))
@@ -71,8 +77,7 @@ export const useLogin = () => {
       createTask: false,
     }).then((codeResult) => {
       if (codeResult.type === 'success') {
-        const code = codeResult.params.code
-        return exchangeCodeAsync({ code })
+        return exchangeCodeAsync({ code: codeResult.params.code })
       }
       throw new Error('Error during login', { cause: JSON.stringify(codeResult) })
     })
@@ -81,22 +86,19 @@ export const useLogin = () => {
 
 export const useRegister = () => {
   useBrowserWarmUp()
-  const [, , promptAsync] = useCodeAuthRequest({ register: true })
+  const [, , promptAsync] = useCodeAuthRequest({ register: true }) ?? []
   return () => {
     if (isWeb) {
-      window.location.href = discoveryDocument.registrationEndpoint + `?redirect_uri=${REDIRECT_URI}&utm_source=app`
+      window.location.href = REGISTRATION_ENDPOINT + `?redirect_uri=${REDIRECT_URI}&utm_source=app`
       return null
     }
 
-    return promptAsync({
-      createTask: false,
-    }).then((codeResult) => {
+    return promptAsync({ createTask: false }).then((codeResult) => {
       if (codeResult.type === 'success') {
-        const code = codeResult.params.code
-        return exchangeCodeAsync({ code })
-      } else {
-        throw new Error('Error during registration', { cause: JSON.stringify(codeResult) })
+        return exchangeCodeAsync({ code: codeResult.params.code })
       }
+
+      throw new Error('Error during registration', { cause: JSON.stringify(codeResult) })
     })
   }
 }
