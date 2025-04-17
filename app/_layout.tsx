@@ -8,6 +8,7 @@ import { useInitPushNotification } from '@/features/push-notification/hook'
 import initRootAppNotification from '@/features/push-notification/logic/initRootAppNotification'
 import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks/useAppUpdate'
 import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen'
+import useDeepLinkHandler from '@/hooks/useDeepLinkHandler'
 import useImportFont from '@/hooks/useImportFont'
 import TamaguiProvider from '@/tamagui/provider'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
@@ -43,6 +44,8 @@ const useRegisterRoutingInstrumentation = () => {
 
 const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: boolean }) => {
   useInitMatomo()
+  useDeepLinkHandler()
+
   const { isLoading, isAuth } = useSession()
   const { isAvailable: isUpdateAvailable, isError: isUpdateError } = useCheckStoreUpdate()
   const { isAvailable: isExpoUpdateAvailable, isError: isExpoUpdateError, isProcessing: isExpoUpdateProcessing } = useCheckExpoUpdate()
