@@ -26107,12 +26107,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-device-info@npm:^14.0.2":
-  version: 14.0.2
-  resolution: "react-native-device-info@npm:14.0.2"
+"react-native-device-info@npm:^14.0.4":
+  version: 14.0.4
+  resolution: "react-native-device-info@npm:14.0.4"
   peerDependencies:
     react-native: "*"
-  checksum: 10c0/ac1704cfccd563714ebe7f3abf076af2d26caca6a5bd4789edb1ea67b1d7ce2036924663a7a185d4f99b1730de96b7e69e36b363828b19159081109a8dc588c8
+  checksum: 10c0/3d89519b4e9f9f130b352f5243282f8b807aba0f55ccc0e1dc9f15b285215949751491ef2f11f1984a55f0f5e0ae76cd16620d2cdfcc118e2ca5f39d300d5524
   languageName: node
   linkType: hard
 
@@ -30488,7 +30488,7 @@ __metadata:
     react-map-gl: "npm:^7.1.7"
     react-native: "npm:0.76.7"
     react-native-check-version: "npm:^1.1.1"
-    react-native-device-info: "npm:^14.0.2"
+    react-native-device-info: "npm:^14.0.4"
     react-native-gesture-handler: "npm:~2.20.2"
     react-native-markdown-display: "npm:^7.0.2"
     react-native-reanimated: "npm:~3.16.1"

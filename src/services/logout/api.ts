@@ -1,6 +1,6 @@
 import { Linking } from 'react-native'
 import clientEnv from '@/config/clientEnv'
-import discoveryDocument from '@/config/discoveryDocument'
+import { END_SESSION_ENDPOINT } from '@/config/discoveryDocument'
 import { REDIRECT_URI } from '@/hooks/useLogin'
 import { logout } from '@/services/profile/api'
 import { useUserStore } from '@/store/user-store'
@@ -30,7 +30,7 @@ export function useLogOut() {
         }
       })
 
-      return WebBrowser.openAuthSessionAsync(`${discoveryDocument.endSessionEndpoint}?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`, REDIRECT_URI)
+      return WebBrowser.openAuthSessionAsync(`${END_SESSION_ENDPOINT}?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`, REDIRECT_URI)
     },
     onError: (error) => {
       ErrorMonitor.log('Cannot open web browser on disconnect', {
