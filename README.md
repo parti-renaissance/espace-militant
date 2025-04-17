@@ -55,3 +55,15 @@ To be able to run the application on iOS and Android:
   - use `console.log` for debugging
   - use `@ts-ignore` or `@ts-nocheck` to ignore typescript errors
   - use `classes` as much as possible
+
+## Test deep link
+
+To launch with link
+
+`adb shell am start -W -a android.intent.action.VIEW -d "exp+vox:///evenements/2025-04-16-ljzbecb" fr.en_marche.jecoute.development`
+
+Or using npx react native tools
+
+`npx uri-scheme open exp+vox:///evenements/2025-04-16-ljzbecb --android`
+
+`npx uri-scheme open exp+vox:///evenements/2025-04-16-ljzbecb --ios`
