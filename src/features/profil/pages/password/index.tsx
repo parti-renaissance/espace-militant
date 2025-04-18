@@ -4,7 +4,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { ProfilChangePasswordFormError } from '@/services/profile/error'
-import { usetPostChangePassword } from '@/services/profile/hook'
+import { usePostChangePassword } from '@/services/profile/hook'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
@@ -43,7 +43,7 @@ export default function ChangePasswordScreen() {
     },
   })
   const { isDirty, isValid } = formState
-  const { isPending, mutateAsync } = usetPostChangePassword()
+  const { isPending, mutateAsync } = usePostChangePassword()
 
   const onSubmit = handleSubmit((data) => {
     mutateAsync(data)
