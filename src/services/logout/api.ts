@@ -15,8 +15,7 @@ export function useLogOut() {
   const { mutateAsync: removePushToken } = useRemovePushToken()
 
   return useMutation<WebBrowser.WebBrowserAuthSessionResult | void, Error>({
-    mutationFn: () => logout(),
-    onSuccess: async () => {
+    mutationFn: async () => {
       // Remove notifications token before removing credentials to invalidate
       try {
         await removePushToken()
@@ -24,6 +23,9 @@ export function useLogOut() {
         //
       }
 
+      return logout()
+    },
+    onSuccess: async () => {
       removeCredentials()
       queryClient.clear()
       await queryClient.invalidateQueries()
