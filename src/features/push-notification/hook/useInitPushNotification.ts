@@ -16,7 +16,7 @@ const usePermission = (options: { enable: boolean }) => {
   return useQuery({
     queryKey: ['permission', SOURCE],
     queryFn: async () => {
-      if (!(await isSupported())) {
+      if (Platform.OS === 'web' && !(await isSupported())) {
         return false
       }
 
@@ -41,7 +41,11 @@ export const useInitPushNotification = (props: { enable: boolean }) => {
     let expoNotificationSubscription: Notifications.Subscription | null = null
     let fbNotificationSubscription: (() => void) | null = null
 
-    isSupported().then(() => postPushToken())
+    if (Platform.OS === 'web') {
+      isSupported().then(() => postPushToken())
+    } else {
+      postPushToken()
+    }
 
     if (Platform.OS !== 'web') {
       expoNotificationSubscription = Notifications.addNotificationResponseReceivedListener((e) => {
