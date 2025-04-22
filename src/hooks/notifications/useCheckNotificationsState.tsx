@@ -5,6 +5,7 @@ import FB, { AuthorizationStatus } from '@/config/firebaseConfig'
 import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
 import { isSupported } from '@firebase/messaging'
+import { isSafari } from '@firebase/util'
 import { useToastController } from '@tamagui/toast'
 import { openSettings } from 'expo-linking'
 import { getPermissionsAsync } from 'expo-notifications'
@@ -26,8 +27,15 @@ export default function useCheckNotificationsState() {
     setNotificationGranted(granted)
     setCanAsk(canAskAgain)
     setNotificationGrantState(status)
-    if (granted && hasBeenGrantedOnce.current === null) {
-      hasBeenGrantedOnce.current = await FB.messaging.getToken()
+
+    // In safari case, when user don't do gesture, the granted state is denied, but the token can be retrieved
+    if ((granted || isSafari()) && hasBeenGrantedOnce.current === null) {
+      try {
+        hasBeenGrantedOnce.current = await FB.messaging.getToken()
+        postPushToken({ token: hasBeenGrantedOnce.current })
+      } catch (e) {
+        // Trigger an error if safari but not requested permission
+      }
     }
 
     if (!granted && hasBeenGrantedOnce.current) {
@@ -44,7 +52,8 @@ export default function useCheckNotificationsState() {
         .requestPermission()
         .then((response) => {
           if (response === AuthorizationStatus.AUTHORIZED) {
-            postPushToken()
+            // We pass an empty object due to typing analysis default
+            postPushToken({})
           }
 
           return response
