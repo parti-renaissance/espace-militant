@@ -42,9 +42,9 @@ export const useInitPushNotification = (props: { enable: boolean }) => {
     let fbNotificationSubscription: (() => void) | null = null
 
     if (Platform.OS === 'web') {
-      isSupported().then(() => postPushToken())
+      isSupported().then(() => postPushToken({}))
     } else {
-      postPushToken()
+      postPushToken({})
     }
 
     if (Platform.OS !== 'web') {
