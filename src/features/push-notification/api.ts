@@ -8,3 +8,11 @@ export const addPushToken = api({
   responseSchema: schemas.RestPostPushTokenResponseSchema,
   type: 'private',
 })
+
+export const removePushToken = api({
+  method: 'delete',
+  path: '/api/v3/push-token',
+  requestSchema: schemas.RestPostPushTokenRequestSchema,
+  responseSchema: schemas.RestPostPushTokenResponseSchema,
+  type: 'private',
+})
