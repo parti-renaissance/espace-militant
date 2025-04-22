@@ -1,6 +1,7 @@
 import { Linking } from 'react-native'
 import clientEnv from '@/config/clientEnv'
 import { END_SESSION_ENDPOINT } from '@/config/discoveryDocument'
+import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
 import { REDIRECT_URI } from '@/hooks/useLogin'
 import { logout } from '@/services/profile/api'
 import { useUserStore } from '@/store/user-store'
@@ -11,8 +12,19 @@ import * as WebBrowser from 'expo-web-browser'
 export function useLogOut() {
   const queryClient = useQueryClient()
   const { removeCredentials, user } = useUserStore()
+  const { mutateAsync: removePushToken } = useRemovePushToken()
+
   return useMutation<WebBrowser.WebBrowserAuthSessionResult | void, Error>({
-    mutationFn: () => logout(),
+    mutationFn: async () => {
+      // Remove notifications token before removing credentials to invalidate
+      try {
+        await removePushToken()
+      } catch (e) {
+        //
+      }
+
+      return logout()
+    },
     onSuccess: async () => {
       removeCredentials()
       queryClient.clear()
