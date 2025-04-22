@@ -31,10 +31,7 @@ export default function useCheckNotificationsState() {
     }
 
     if (!granted && hasBeenGrantedOnce.current) {
-      removePushToken({
-        identifier: hasBeenGrantedOnce.current,
-        source: 'vox',
-      })
+      removePushToken()
       hasBeenGrantedOnce.current = null
     }
   }, [])

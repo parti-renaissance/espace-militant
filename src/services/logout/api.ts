@@ -1,7 +1,6 @@
 import { Linking } from 'react-native'
 import clientEnv from '@/config/clientEnv'
 import { END_SESSION_ENDPOINT } from '@/config/discoveryDocument'
-import FB from '@/config/firebaseConfig'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
 import { REDIRECT_URI } from '@/hooks/useLogin'
 import { logout } from '@/services/profile/api'
@@ -20,11 +19,7 @@ export function useLogOut() {
     onSuccess: async () => {
       // Remove notifications token before removing credentials to invalidate
       try {
-        const token = await FB.messaging.getToken()
-        await removePushToken({
-          identifier: token,
-          source: 'vox',
-        })
+        await removePushToken()
       } catch (e) {
         //
       }
