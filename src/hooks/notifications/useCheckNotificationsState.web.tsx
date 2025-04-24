@@ -1,18 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Platform } from 'react-native'
 import fb from '@/config/firebaseConfig'
 import FB, { AuthorizationStatus } from '@/config/firebaseConfig'
 import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
 import { isSupported } from '@firebase/messaging'
 import { useToastController } from '@tamagui/toast'
-import { openSettings } from 'expo-linking'
 
 export default function useCheckNotificationsState() {
-  const [notificationsSupported, setNotificationsSupported] = useState(Platform.OS !== 'web')
+  const [notificationsSupported, setNotificationsSupported] = useState(false)
   const [notificationGranted, setNotificationGranted] = useState<boolean | null>(null)
   const [notificationGrantState, setNotificationGrantState] = useState<string | null>(null)
-  const [canAsk, setCanAsk] = useState<boolean | null>(null)
   const hasBeenGrantedOnce = useRef<null | string>(null)
 
   const { mutate: postPushToken } = useAddPushToken()
@@ -26,7 +23,6 @@ export default function useCheckNotificationsState() {
 
     setNotificationGranted(granted)
     setNotificationGrantState(permission)
-    setCanAsk(permission !== 'denied')
 
     if (permission === 'granted' && hasBeenGrantedOnce.current === null) {
       try {
@@ -44,7 +40,7 @@ export default function useCheckNotificationsState() {
   }, [])
 
   const triggerNotificationRequest = useCallback(async () => {
-    if (canAsk) {
+    if (Notification.permission !== 'denied') {
       fb.messaging
         .requestPermission()
         .then((response) => {
@@ -59,8 +55,6 @@ export default function useCheckNotificationsState() {
         .catch(() => {
           //
         })
-    } else if (Platform.OS !== 'web') {
-      await openSettings()
     } else {
       toast.show('Autorisez dans les préférences.')
     }
@@ -68,9 +62,7 @@ export default function useCheckNotificationsState() {
 
   useEffect(() => {
     // Handle if firebase notifications is supported by peripheral or browser (otherwise it will throw an error in console)
-    if (Platform.OS === 'web') {
-      isSupported().then(setNotificationsSupported)
-    }
+    isSupported().then(setNotificationsSupported)
   }, [])
 
   useEffect(() => {
@@ -89,7 +81,6 @@ export default function useCheckNotificationsState() {
   return {
     notificationGranted,
     notificationGrantState,
-    canAsk,
     triggerNotificationRequest,
   }
 }

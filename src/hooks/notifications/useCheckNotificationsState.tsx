@@ -9,7 +9,6 @@ import { getPermissionsAsync } from 'expo-notifications'
 export default function useCheckNotificationsState() {
   const [notificationGranted, setNotificationGranted] = useState<boolean | null>(null)
   const [notificationGrantState, setNotificationGrantState] = useState<string | null>(null)
-  const [canAsk, setCanAsk] = useState<boolean | null>(null)
   const hasBeenGrantedOnce = useRef<null | string>(null)
 
   const { mutate: postPushToken } = useAddPushToken()
@@ -18,9 +17,8 @@ export default function useCheckNotificationsState() {
   const toast = useToastController()
 
   const checkPermissions = useCallback(async () => {
-    const { granted, canAskAgain, status } = await getPermissionsAsync()
+    const { granted, status } = await getPermissionsAsync()
     setNotificationGranted(granted)
-    setCanAsk(canAskAgain)
     setNotificationGrantState(status)
 
     if (granted && hasBeenGrantedOnce.current === null) {
@@ -75,7 +73,6 @@ export default function useCheckNotificationsState() {
   return {
     notificationGranted,
     notificationGrantState,
-    canAsk,
     triggerNotificationRequest,
   }
 }
