@@ -41,17 +41,21 @@ export const useInitPushNotification = (props: { enable: boolean }) => {
   const { data: hasPermission } = usePermission({ enable: props.enable })
   const toast = useToastController()
 
+  // Permission requests shall be dissociated from handlers themselves to do a proper routing on first launch.
   useEffect(() => {
     if (!hasPermission || !props.enable) return
-    let isMounted = true
-    let expoNotificationSubscription: Notifications.Subscription | null = null
-    let fbNotificationSubscription: (() => void) | null = null
 
     if (Platform.OS === 'web') {
       isSupported().then(() => postPushToken({}))
     } else {
       postPushToken({})
     }
+  }, [hasPermission, props.enable])
+
+  useEffect(() => {
+    let isMounted = true
+    let expoNotificationSubscription: Notifications.Subscription | null = null
+    let fbNotificationSubscription: (() => void) | null = null
 
     if (Platform.OS !== 'web') {
       expoNotificationSubscription = Notifications.addNotificationResponseReceivedListener((e) => {
@@ -111,5 +115,5 @@ export const useInitPushNotification = (props: { enable: boolean }) => {
       expoNotificationSubscription?.remove()
       fbNotificationSubscription?.()
     }
-  }, [hasPermission, props.enable])
+  }, [])
 }
