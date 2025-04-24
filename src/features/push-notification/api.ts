@@ -14,6 +14,6 @@ export const removePushToken = api({
   method: 'post',
   path: '/api/v3/push-token/unsubscribe',
   requestSchema: z.void(),
-  responseSchema: z.void(),
+  responseSchema: z.any(),
   type: 'private',
 })

@@ -7,4 +7,4 @@ export const RestPostPushTokenRequestSchema = z.object({
 })
 
 export type RestPostPushTokenResponse = z.infer<typeof RestPostPushTokenResponseSchema>
-export const RestPostPushTokenResponseSchema = z.array(z.any())
+export const RestPostPushTokenResponseSchema = z.any()
