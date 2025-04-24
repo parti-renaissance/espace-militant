@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Platform } from 'react-native'
 import FB, { AuthorizationStatus } from '@/config/firebaseConfig'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import isWebKit from '@/utils/isWebKit'
 import { isSupported } from '@firebase/messaging'
 import { useToastController } from '@tamagui/toast'
 import { useQuery } from '@tanstack/react-query'
@@ -18,6 +19,11 @@ const usePermission = (options: { enable: boolean }) => {
     queryFn: async () => {
       if (Platform.OS === 'web' && !(await isSupported())) {
         return false
+      }
+
+      // Special case for Safari and Edge where we can't ask notification permissions without user gesture
+      if (Platform.OS === 'web' && (await isSupported()) && isWebKit()) {
+        return Notification.permission === 'granted'
       }
 
       const authStatus = await FB.messaging.requestPermission({
