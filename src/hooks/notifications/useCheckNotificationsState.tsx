@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Alert, Linking } from 'react-native'
 import fb from '@/config/firebaseConfig'
 import FB, { AuthorizationStatus } from '@/config/firebaseConfig'
 import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
 import { useToastController } from '@tamagui/toast'
-import { getPermissionsAsync } from 'expo-notifications'
+import { getPermissionsAsync, PermissionStatus } from 'expo-notifications'
 
 export default function useCheckNotificationsState() {
   const [notificationGranted, setNotificationGranted] = useState<boolean | null>(null)
@@ -37,9 +38,9 @@ export default function useCheckNotificationsState() {
   }, [])
 
   const triggerNotificationRequest = useCallback(async () => {
-    const { canAskAgain } = await getPermissionsAsync()
+    const { canAskAgain, status } = await getPermissionsAsync()
 
-    if (canAskAgain) {
+    if (canAskAgain && status !== PermissionStatus.DENIED) {
       fb.messaging
         .requestPermission()
         .then((response) => {
@@ -55,7 +56,10 @@ export default function useCheckNotificationsState() {
           //
         })
     } else {
-      toast.show('Autorisez dans les préférences.')
+      Alert.alert('Notifications désactivées', 'Veuillez activer les notifications dans les paramètres pour rester informé.', [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Ouvrir les paramètres', onPress: Linking.openSettings },
+      ])
     }
   }, [postPushToken, checkPermissions])
 
