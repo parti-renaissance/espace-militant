@@ -44,7 +44,7 @@ export function useSession() {
 }
 
 export function SessionProvider(props: React.PropsWithChildren) {
-  const { user: session, setCredentials: setSession, _hasHydrated } = useUserStore()
+  const { user: existingSession, setCredentials: setSession, _hasHydrated } = useUserStore()
   const params = useGlobalSearchParams<{ code?: string; _switch_user?: string; redirect?: string; state?: string }>()
   const [onShotParams, setOneShotParams] = React.useState(params)
 
@@ -56,21 +56,20 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const login = useLogin()
   const { mutateAsync: logout } = useLogOut()
   const register = useRegister()
-  const user = useGetProfil({ enabled: !!session })
+  const user = useGetProfil({ enabled: !!existingSession })
   const scope = useGetUserScopes({ enabled: !!user.data })
 
   const isGlobalLoading = [isLoginInProgress, user.isLoading, scope.isLoading, !_hasHydrated].some(Boolean)
-  const isAuth = Boolean(session && !isGlobalLoading)
+  const isAuth = Boolean(existingSession && !isGlobalLoading)
 
   React.useEffect(() => {
     const { state } = params
-    if (session && [state].some(Boolean) && !isGlobalLoading) {
-      if (state?.startsWith('/'))
-        router.replace({
-          pathname: state,
-        } as Href)
+    if (existingSession && [state].some(Boolean) && !isGlobalLoading) {
+      if (state?.startsWith('/')) {
+        router.replace({ pathname: state } as Href)
+      }
     }
-  }, [session, params, isGlobalLoading])
+  }, [existingSession, params, isGlobalLoading])
 
   const handleSignIn: AuthContext['signIn'] = React.useCallback(
     async (props) => {
@@ -79,12 +78,12 @@ export function SessionProvider(props: React.PropsWithChildren) {
           return
         }
         setIsLoginInProgress(true)
-        const session = await login({ code: props?.code, state: props?.state })
+        const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
         if (!session) {
           return
         }
-        const { accessToken, refreshToken } = session
-        setSession({ accessToken, refreshToken, isAdmin: props?.isAdmin })
+        const { accessToken, refreshToken, idToken: sessionId } = session
+        setSession({ accessToken, refreshToken, sessionId, isAdmin: props?.isAdmin })
       } catch (e) {
         ErrorMonitor.log(e.message, { e })
         toast.show('Erreur lors de la connexion', { type: 'error' })
@@ -120,10 +119,9 @@ export function SessionProvider(props: React.PropsWithChildren) {
       if (!session) {
         return
       }
-      const { accessToken, refreshToken } = session
-      setSession({ accessToken, refreshToken })
+      const { accessToken, refreshToken, idToken: sessionId } = session
+      setSession({ accessToken, refreshToken, sessionId })
     } catch (e) {
-      console.log('error', e)
       ErrorMonitor.log(e.message, { e })
       toast.show('Erreur lors de la connexion', { type: 'error' })
     } finally {
@@ -141,13 +139,13 @@ export function SessionProvider(props: React.PropsWithChildren) {
         signIn: handleSignIn,
         signOut: handleSignOut,
         signUp: handleRegister,
-        session,
+        session: existingSession,
         isLoading: isGlobalLoading,
         isAuth,
         user,
         scope,
       }) satisfies AuthContext,
-    [handleSignIn, handleSignOut, session, isLoginInProgress, isGlobalLoading],
+    [handleSignIn, handleSignOut, existingSession, isLoginInProgress, isGlobalLoading],
   )
 
   return <AuthContext.Provider value={providerValue}>{props.children}</AuthContext.Provider>
