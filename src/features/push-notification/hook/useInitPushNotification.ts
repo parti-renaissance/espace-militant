@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Platform } from 'react-native'
 import FB, { AuthorizationStatus } from '@/config/firebaseConfig'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import isWebKit from '@/utils/isWebKit'
 import { isSupported } from '@firebase/messaging'
 import { useToastController } from '@tamagui/toast'
 import { useQuery } from '@tanstack/react-query'
@@ -16,8 +17,13 @@ const usePermission = (options: { enable: boolean }) => {
   return useQuery({
     queryKey: ['permission', SOURCE],
     queryFn: async () => {
-      if (!(await isSupported())) {
+      if (Platform.OS === 'web' && !(await isSupported())) {
         return false
+      }
+
+      // Special case for Safari and Edge where we can't ask notification permissions without user gesture
+      if (Platform.OS === 'web' && (await isSupported()) && isWebKit()) {
+        return Notification.permission === 'granted'
       }
 
       const authStatus = await FB.messaging.requestPermission({
@@ -35,13 +41,21 @@ export const useInitPushNotification = (props: { enable: boolean }) => {
   const { data: hasPermission } = usePermission({ enable: props.enable })
   const toast = useToastController()
 
+  // Permission requests shall be dissociated from handlers themselves to do a proper routing on first launch.
   useEffect(() => {
     if (!hasPermission || !props.enable) return
+
+    if (Platform.OS === 'web') {
+      isSupported().then(() => postPushToken({}))
+    } else {
+      postPushToken({})
+    }
+  }, [hasPermission, props.enable])
+
+  useEffect(() => {
     let isMounted = true
     let expoNotificationSubscription: Notifications.Subscription | null = null
     let fbNotificationSubscription: (() => void) | null = null
-
-    isSupported().then(() => postPushToken())
 
     if (Platform.OS !== 'web') {
       expoNotificationSubscription = Notifications.addNotificationResponseReceivedListener((e) => {
@@ -101,5 +115,5 @@ export const useInitPushNotification = (props: { enable: boolean }) => {
       expoNotificationSubscription?.remove()
       fbNotificationSubscription?.()
     }
-  }, [hasPermission, props.enable])
+  }, [])
 }

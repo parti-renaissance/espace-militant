@@ -54,7 +54,8 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.READ_CALENDAR",
         "android.permission.FOREGROUND_SERVICE",
-        "android.permission.WRITE_CALENDAR"
+        "android.permission.WRITE_CALENDAR",
+        "android.permission.POST_NOTIFICATIONS"
       ]
     },
     "web": {
@@ -118,7 +119,7 @@
       ]
     ],
     "extra": {
-      "eas_update_version": "14",
+      "eas_update_version": "15",
       "router": {
         "origin": false
       },

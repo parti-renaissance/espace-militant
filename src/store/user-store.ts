@@ -6,6 +6,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 export interface User {
   accessToken: string
   refreshToken?: string
+  sessionId?: string
   isAdmin?: boolean
 }
 

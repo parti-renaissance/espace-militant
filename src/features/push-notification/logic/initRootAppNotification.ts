@@ -4,7 +4,7 @@ import { isSupported } from '@firebase/messaging'
 import * as Notifications from 'expo-notifications'
 
 export default async function initRootAppNotification() {
-  if (!(await isSupported())) {
+  if (Platform.OS === 'web' && !(await isSupported())) {
     return
   }
 

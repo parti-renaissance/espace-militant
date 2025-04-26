@@ -43,19 +43,21 @@ export const useCodeAuthRequest = (props?: { register?: boolean }) => {
   return AuthSession.useAuthRequest(requestConfig, discovery)
 }
 
-const exchangeCodeAsync = async ({ code }: { code: string }) => {
-  if (!code) return null
+const exchangeCodeAsync = async ({ code, sessionId }: { code: string; sessionId?: string }) => {
+  if (!code) {
+    return null
+  }
 
-  return AuthSession.exchangeCodeAsync({ ...BASE_REQUEST_CONFIG, code }, await getDiscoveryDocument())
+  return AuthSession.exchangeCodeAsync({ ...BASE_REQUEST_CONFIG, code, extraParams: { session_id: sessionId ?? '' } }, await getDiscoveryDocument())
 }
 
 export const useLogin = () => {
   useBrowserWarmUp()
   const [req, , promptAsync] = useCodeAuthRequest() ?? []
-  return async (payload?: { code?: string; state?: string }) => {
+  return async (payload?: { code?: string; sessionId?: string; state?: string }) => {
     if (payload?.code) {
       WebBrowser.dismissAuthSession()
-      return exchangeCodeAsync({ code: payload.code })
+      return exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId })
     }
 
     if (isWeb) {

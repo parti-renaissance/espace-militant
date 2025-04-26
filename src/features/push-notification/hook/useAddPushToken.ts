@@ -6,13 +6,12 @@ import { TokenCannotBeSubscribedError } from '../errors'
 
 export function useAddPushToken() {
   return useMutation({
-    mutationFn: () =>
-      FB.messaging.getToken().then((identifier) =>
-        addPushToken({
-          identifier,
-          source: 'vox',
-        }),
-      ),
+    mutationFn: async (variables?: { token?: string }) => {
+      return addPushToken({
+        identifier: variables?.token ?? (await FB.messaging.getToken()),
+        source: 'vox',
+      })
+    },
     onError: (error) => {
       if (error instanceof TokenCannotBeSubscribedError) {
         ErrorMonitor.log('Error when add push token', {

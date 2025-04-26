@@ -2,6 +2,7 @@ import React from 'react'
 import { Platform, SafeAreaView as RNSafeAreaView, TouchableWithoutFeedback } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import DisabledNotificationBell from '@/components/DisabledNotificationBell/DisabledNotificationBell'
 import { ROUTES } from '@/config/routes'
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
@@ -86,27 +87,17 @@ export const ProfileView = () => {
   const { session } = useSession()
   const user = useGetProfil({ enabled: !!session })
   const profile = user?.data
-  return (
-    <View flexDirection="row" gap={'$medium'} justifyContent="space-between" alignItems="center">
-      {!user.isLoading ? (
-        <>
-          <Stack gap={4} flexDirection="column" alignContent="flex-end" alignItems="flex-end" display="none" $gtMd={{ display: 'flex' }}>
-            <Text fontFamily={'$PublicSans'} color="$textPrimary" fontWeight={'500'} fontSize={14}>
-              {profile?.first_name} {profile?.last_name}
-            </Text>
-          </Stack>
-          <ProfilePicture
-            fullName={`${profile?.first_name} ${profile?.last_name}`}
-            src={profile?.image_url ?? undefined}
-            alt="profile picture"
-            size="$3"
-            rounded
-          />
-        </>
-      ) : (
-        <Spinner size="small" />
-      )}
-    </View>
+  return !user.isLoading ? (
+    <ProfilePicture
+      fullName={`${profile?.first_name} ${profile?.last_name}`}
+      src={profile?.image_url ?? undefined}
+      alt="profile picture"
+      size="$3"
+      margin={Platform.OS === 'ios' ? -2 : undefined}
+      rounded
+    />
+  ) : (
+    <Spinner size="small" />
   )
 }
 const LoginView = () => (
@@ -121,11 +112,10 @@ const LoginView = () => (
 export const ProfileNav = (props: XStackProps) => {
   return (
     <AuthFallbackWrapper fallback={<LoginView />}>
-      <XStack {...props}>
+      <XStack alignItems={'center'} gap={'$medium'} {...props}>
+        <DisabledNotificationBell />
         <Link href="/profil">
-          <View>
-            <ProfileView />
-          </View>
+          <ProfileView />
         </Link>
       </XStack>
     </AuthFallbackWrapper>
