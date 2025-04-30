@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import fb from '@/config/firebaseConfig'
-import FB, { AuthorizationStatus } from '@/config/firebaseConfig'
+import FB from '@/config/firebaseConfig'
 import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
 import { isSupported } from '@firebase/messaging'
@@ -26,8 +26,9 @@ export default function useCheckNotificationsState() {
 
     if (permission === 'granted' && hasBeenGrantedOnce.current === null) {
       try {
-        hasBeenGrantedOnce.current = await FB.messaging.getToken()
-        postPushToken({ token: hasBeenGrantedOnce.current })
+        const token = await FB.messaging.getToken()
+        hasBeenGrantedOnce.current = token
+        postPushToken({ token })
       } catch (e) {
         // Trigger an error if safari but not requested permission
       }
@@ -41,20 +42,7 @@ export default function useCheckNotificationsState() {
 
   const triggerNotificationRequest = useCallback(async () => {
     if (Notification.permission !== 'denied') {
-      fb.messaging
-        .requestPermission()
-        .then((response) => {
-          if (response === AuthorizationStatus.AUTHORIZED) {
-            // We pass an empty object due to typing analysis default
-            postPushToken({})
-          }
-
-          return response
-        })
-        .then(checkPermissions)
-        .catch(() => {
-          //
-        })
+      fb.messaging.requestPermission().catch().finally(checkPermissions)
     } else {
       toast.show('Autorisez dans les préférences.')
     }
