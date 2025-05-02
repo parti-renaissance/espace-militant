@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, Linking } from 'react-native'
-import fb from '@/config/firebaseConfig'
 import FB from '@/config/firebaseConfig'
 import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
@@ -39,12 +38,11 @@ export default function useCheckNotificationsState() {
     const { canAskAgain, status } = await getPermissionsAsync()
 
     if (canAskAgain && status !== PermissionStatus.DENIED) {
-      fb.messaging
+      FB.messaging
         .requestPermission({
           sound: true,
           alert: true,
         })
-        .finally(checkPermissions)
         .catch(() => {
           //
         })

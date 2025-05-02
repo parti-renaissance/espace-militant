@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import fb from '@/config/firebaseConfig'
 import FB from '@/config/firebaseConfig'
 import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
@@ -42,7 +41,7 @@ export default function useCheckNotificationsState() {
 
   const triggerNotificationRequest = useCallback(async () => {
     if (Notification.permission !== 'denied') {
-      fb.messaging.requestPermission().catch().finally(checkPermissions)
+      FB.messaging.requestPermission().catch().finally(checkPermissions)
     } else {
       toast.show('Autorisez dans les préférences.')
     }
