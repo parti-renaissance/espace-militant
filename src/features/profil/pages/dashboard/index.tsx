@@ -21,7 +21,7 @@ const DashboardScreen = () => {
   const { data: me } = useGetProfil()
   const insets = useSafeAreaInsets()
 
-  const [showDeleteAccountModal, setShowDeleteAccountModel] = useState(false)
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false)
 
   const isAdherent = !!me?.tags?.find((tag) => tag.type === 'adherent')
   // const { signOut } = useSession()
@@ -32,22 +32,22 @@ const DashboardScreen = () => {
   //   return mutateAsync().then(() => signOut())
   // }
 
-  const removeAccount = () => {
-    // AlertUtils.showDestructiveAlert(
-    //   isAdherent ? 'Désadhésion' : 'Suppression du compte',
-    //   isAdherent ? 'Êtes-vous sûr de vouloir désadhérer et de supprimer votre compte ?' : 'Êtes-vous sûr de vouloir supprimer votre compte ?',
-    //   isAdherent ? 'Désadhérer' : 'Supprimer',
-    //   'Annuler',
-    //   onRemoveAccountConfirmed,
-    // )
-  }
+  // const removeAccount = () => {
+  // AlertUtils.showDestructiveAlert(
+  //   isAdherent ? 'Désadhésion' : 'Suppression du compte',
+  //   isAdherent ? 'Êtes-vous sûr de vouloir désadhérer et de supprimer votre compte ?' : 'Êtes-vous sûr de vouloir supprimer votre compte ?',
+  //   isAdherent ? 'Désadhérer' : 'Supprimer',
+  //   'Annuler',
+  //   onRemoveAccountConfirmed,
+  // )
+  // }
 
   const showModal = useCallback(() => {
-    setShowDeleteAccountModel(true)
+    setShowDeleteAccountModal(true)
   }, [])
 
   const hideModal = useCallback(() => {
-    setShowDeleteAccountModel(false)
+    setShowDeleteAccountModal(false)
   }, [])
 
   return (
