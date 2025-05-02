@@ -96,9 +96,9 @@ enum UnregistrationReason {
 }
 
 const UnregistrationReasonLabels: Record<UnregistrationReason, string> = {
-  [UnregistrationReason.Emails]: "Je reçois trop d'e-mails",
+  [UnregistrationReason.Emails]: 'Je reçois trop d’e-mails',
   [UnregistrationReason.Tools]: 'Je ne trouve plus d’utilité dans les outils développés par En Marche',
-  [UnregistrationReason.Support]: "J'avais uniquement adhéré pour soutenir la candidature d'Emmanuel Macron",
+  [UnregistrationReason.Support]: 'J’avais uniquement adhéré pour soutenir la candidature d’Emmanuel Macron',
   [UnregistrationReason.Government]: "Je ne suis plus d'accord avec le gouvernement",
   [UnregistrationReason.Elected]: 'Je suis déçu(e) par mon/les élu(e)s LaREM',
   [UnregistrationReason.Movement]: 'Je ne me reconnais plus dans les actions du mouvement En Marche !',
