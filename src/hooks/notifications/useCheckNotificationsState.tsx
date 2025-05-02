@@ -9,11 +9,15 @@ export default function useCheckNotificationsState() {
   const [notificationGranted, setNotificationGranted] = useState<boolean | null>(null)
   const [notificationGrantState, setNotificationGrantState] = useState<string | null>(null)
   const hasBeenGrantedOnce = useRef<null | string>(null)
+  const isCheckingPermissions = useRef(false)
 
   const { mutate: postPushToken } = useAddPushToken()
   const { mutate: removePushToken } = useRemovePushToken()
 
   const checkPermissions = useCallback(async () => {
+    if (isCheckingPermissions.current) return
+    isCheckingPermissions.current = true
+
     const { granted, status } = await getPermissionsAsync()
     setNotificationGranted(granted)
     setNotificationGrantState(status)
@@ -32,6 +36,8 @@ export default function useCheckNotificationsState() {
       removePushToken()
       hasBeenGrantedOnce.current = null
     }
+
+    isCheckingPermissions.current = false
   }, [postPushToken, removePushToken])
 
   const triggerNotificationRequest = useCallback(async () => {
@@ -64,6 +70,19 @@ export default function useCheckNotificationsState() {
       }
     }
   }, [])
+
+  useEffect(() => {
+    checkPermissions()
+      const interval = setInterval(() => {
+        if (!isCheckingPermissions.current) {
+          checkPermissions()
+        }
+      }, 10e3)
+
+      return () => {
+        clearInterval(interval)
+      }
+  }, [checkPermissions])
 
   return {
     notificationGranted,

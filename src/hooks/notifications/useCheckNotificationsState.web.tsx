@@ -10,6 +10,7 @@ export default function useCheckNotificationsState() {
   const [notificationGranted, setNotificationGranted] = useState<boolean | null>(null)
   const [notificationGrantState, setNotificationGrantState] = useState<string | null>(null)
   const hasBeenGrantedOnce = useRef<null | string>(null)
+  const isCheckingPermissions = useRef(false)
 
   const { mutate: postPushToken } = useAddPushToken()
   const { mutate: removePushToken } = useRemovePushToken()
@@ -17,6 +18,9 @@ export default function useCheckNotificationsState() {
   const toast = useToastController()
 
   const checkPermissions = useCallback(async () => {
+    if (isCheckingPermissions.current) return
+    isCheckingPermissions.current = true
+
     const permission = Notification.permission
     const granted = permission === 'granted'
 
@@ -37,7 +41,9 @@ export default function useCheckNotificationsState() {
       removePushToken()
       hasBeenGrantedOnce.current = null
     }
-  }, [])
+
+    isCheckingPermissions.current = false
+  }, [postPushToken, removePushToken])
 
   const triggerNotificationRequest = useCallback(async () => {
     if (Notification.permission !== 'denied') {
@@ -55,15 +61,17 @@ export default function useCheckNotificationsState() {
   useEffect(() => {
     if (notificationsSupported) {
       checkPermissions()
-      const interval = setInterval(checkPermissions, 10e3)
+      const interval = setInterval(() => {
+        if (!isCheckingPermissions.current) {
+          checkPermissions()
+        }
+      }, 10e3)
 
       return () => {
-        if (interval) {
-          clearInterval(interval)
-        }
+        clearInterval(interval)
       }
     }
-  }, [notificationsSupported])
+  }, [notificationsSupported, checkPermissions])
 
   return {
     notificationGranted,
