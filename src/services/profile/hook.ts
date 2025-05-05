@@ -1,7 +1,7 @@
 import clientEnv from '@/config/clientEnv'
 import { UserTagEnum } from '@/core/entities/UserProfile'
 import * as api from '@/services/profile/api'
-import { RestProfilResponse, RestProfilResponseTagTypes, RestUpdateProfileRequest } from '@/services/profile/schema'
+import { RestProfilResponse, RestProfilResponseTagTypes, RestUpdateProfileRequest, RestRemoveProfileRequest } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { getFullVersion } from '@/utils/version'
@@ -166,7 +166,7 @@ export const useDeleteProfil = () => {
   const toast = useToastController()
 
   return useMutation({
-    mutationFn: () => api.removeProfile(),
+    mutationFn: (data: RestRemoveProfileRequest) => api.removeProfile(data),
     onSuccess: () => {
       queryClient.clear()
       toast.show('Succès', { message: 'Compte supprimé avec succès', type: 'success' })

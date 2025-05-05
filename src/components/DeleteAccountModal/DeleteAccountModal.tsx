@@ -3,6 +3,7 @@ import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomShe
 import { View } from 'tamagui'
 import DeleteAccountModalStep1 from './Components/DeleteAccountModalStep1'
 import DeleteAccountModalStep2 from './Components/DeleteAccountModalStep2'
+import { useGetSuspenseProfil } from '@/services/profile/hook'
 
 interface Props {
   isOpen: boolean
@@ -25,7 +26,7 @@ export default function DeleteAccountModal({ isOpen, onClose, isDelete }: Readon
   return (
     <ModalOrBottomSheet open={isOpen} onClose={onClose} allowDrag>
       <View
-        $gtXs={{
+        $gtMd={{
           width: 480,
         }}
       >

@@ -2,9 +2,22 @@ import Input from '@/components/base/Input/Input'
 import RadioGroup from '@/components/base/RadioGroup/RadioGroup'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import { useDeleteProfil, useGetSuspenseProfil } from '@/services/profile/hook'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { styled, View, XStack, YStack } from 'tamagui'
 
+enum UnregistrationReason {
+  Emails = 'unregistration_reasons.emails',
+  Tools = 'unregistration_reasons.tools',
+  Support = 'unregistration_reasons.support',
+  Government = 'unregistration_reasons.government',
+  Elected = 'unregistration_reasons.elected',
+  Movement = 'unregistration_reasons.movement',
+  Committee = 'unregistration_reasons.committee',
+  Other = 'unregistration_reasons.other',
+}
 interface Props {
   onClose: () => void
   onConfirm: () => void
@@ -12,19 +25,44 @@ interface Props {
   isDelete: boolean
 }
 
-export default function DeleteAccountModalStep2({ onClose, isDelete }: Readonly<Props>) {
-  const { control, watch, handleSubmit } = useForm({
+const schema = z.object({
+  reason: z.nativeEnum(UnregistrationReason, {
+    errorMap: () => ({ message: 'Veuillez sélectionner une raison' }),
+  }),
+  comment: z
+    .string()
+    .max(1000, '1000 caractères maximum')
+    .optional()
+    .or(z.literal('')),
+})
+
+type FormValues = z.infer<typeof schema>
+
+export default function DeleteAccountModalStep2({ onClose, onConfirm, isDelete }: Readonly<Props>) {
+  const { mutate } = useDeleteProfil()
+  const { control, watch, handleSubmit } = useForm<FormValues>({
     defaultValues: {
-      reason: '',
+      reason: undefined,
       comment: '',
     },
+    resolver: zodResolver(schema),
   })
 
   const reason = watch('reason')
   const comment = watch('comment')
 
   const onSubmit = handleSubmit((values) => {
-    alert(`Not yet implemented ${JSON.stringify(values)}`)
+    mutate(
+      {
+        reasons: [values.reason],
+        comment: values.comment?.trim().slice(0, 1000) || '',
+      },
+      {
+        onSuccess: () => {
+          onConfirm()
+        },
+      }
+    )
   })
 
   return (
@@ -67,14 +105,14 @@ export default function DeleteAccountModalStep2({ onClose, isDelete }: Readonly<
           />
 
           <Text mt={'$2'} marginLeft={'$medium'} color="$textSecondary">
-            {comment.length}/1000 caractères maximum
+            {comment?.length ?? 0 }/1000 caractères maximum
           </Text>
         </View>
       )}
 
       <XStack gap="$medium" justifyContent="flex-end" paddingBottom={'$medium'} paddingHorizontal={'$medium'}>
-        <VoxButton variant="text" onPress={onClose}>
-          Annuler
+        <VoxButton variant="outlined" onPress={onClose}>
+          J’annule tout
         </VoxButton>
         <VoxButton variant="contained" theme="orange" onPress={onSubmit}>
           Je confirme ma {isDelete ? 'suppression' : 'désadhésion'}
@@ -82,17 +120,6 @@ export default function DeleteAccountModalStep2({ onClose, isDelete }: Readonly<
       </XStack>
     </YStack>
   )
-}
-
-enum UnregistrationReason {
-  Emails = 'unregistration_reasons.emails',
-  Tools = 'unregistration_reasons.tools',
-  Support = 'unregistration_reasons.support',
-  Government = 'unregistration_reasons.government',
-  Elected = 'unregistration_reasons.elected',
-  Movement = 'unregistration_reasons.movement',
-  Committee = 'unregistration_reasons.committee',
-  Other = 'unregistration_reasons.other',
 }
 
 const UnregistrationReasonLabels: Record<UnregistrationReason, string> = {

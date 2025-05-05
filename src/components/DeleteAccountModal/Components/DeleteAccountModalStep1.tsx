@@ -2,6 +2,9 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { Image, styled, View, XStack, YStack } from 'tamagui'
 
+const DELETE_ACCOUNT = require('../Assets/DeleteAccount/deleteAccount.png');
+const DELETE_ACCOUNT_ALT = require('../Assets/DeleteAccount/deleteAccountAlt.png');
+
 interface Props {
   onClose: () => void
   onConfirm: () => void
@@ -13,7 +16,7 @@ export default function DeleteAccountModalStep1({ onClose, onConfirm, isDelete }
   return (
     <>
       <View backgroundColor="#F9F9FA" alignItems="center" paddingVertical={48}>
-        <Image source={require('../Assets/DeleteAccount/deleteAccount.png')} />
+        <Image source={isDelete ? DELETE_ACCOUNT_ALT : DELETE_ACCOUNT} />
       </View>
 
       <YStack padding={'$medium'} gap={'$large'} paddingHorizontal={'$medium'}>
@@ -27,16 +30,30 @@ export default function DeleteAccountModalStep1({ onClose, onConfirm, isDelete }
         <JustificationText>
           Votre départ représente un soutien de moins dans cette aventure collective et nous espérons que nos chemins se croiseront à nouveau.
         </JustificationText>
-        <JustificationText>
-          Néanmoins, une fois votre {isDelete ? 'suppression' : 'désadhésion'} réalisée nous supprimerons votre compte ainsi que toutes vos données
-          personnelles. Vous ne recevrez plus aucun email de notre part, ainsi que de celle de nos instances locales.
-        </JustificationText>
-        <JustificationText>Vous pourrez bien entendu réadhérer plus tard, mais nous ne serons pas en mesure de restaurer votre historique.</JustificationText>
+        { isDelete 
+        ? (
+          <>
+            <JustificationText>
+              Néanmoins, une fois votre désadhésion réalisée nous supprimerons votre compte ainsi que toutes vos données personnelles.{' '}
+              Vous ne recevrez plus aucun email de notre part, ainsi que de celle de nos instances locales.
+            </JustificationText>
+            <JustificationText>Vous pourrez bien entendu réadhérer plus tard, mais nous ne serons pas en mesure de restaurer votre historique.</JustificationText>
+          </>
+        )
+        : (
+          <>
+            <JustificationText>
+            Néanmoins, une fois votre comte supprimé, nous effacerons toutes vos données personnelles.{' '}
+            Vous ne recevrez plus aucun email de notre part, ainsi que de celle de nos instances locales.
+            </JustificationText>
+            <JustificationText>Vous pourrez bien entendu recréer un comte plus tard, mais nous ne serons pas en mesure de restaurer votre historique.</JustificationText>
+          </>
+        )}
         <JustificationText>Vous en êtes vraiment certain ?</JustificationText>
       </YStack>
 
       <XStack gap="$medium" justifyContent="flex-end" paddingBottom={'$medium'} paddingHorizontal={'$medium'}>
-        <VoxButton variant="text" onPress={onClose}>
+        <VoxButton variant="outlined" onPress={onClose}>
           Annuler
         </VoxButton>
         <VoxButton variant="outlined" theme="orange" onPress={onConfirm}>
