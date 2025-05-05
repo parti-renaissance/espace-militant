@@ -43,6 +43,11 @@ const GoToButton = ({ eventUuid }: { eventUuid: string }) => {
 export const BaseEventListItem = ({ event, userUuid }: EventItemProps) => {
   const fallbackImage = getEventItemImageFallback(event)
   const isFull = isEventFull(event)
+  const participantsCount = event?.participants_count
+
+  console.log({participantsCount, if: participantsCount != null && participantsCount >= 10});
+  
+  
   return (
     <VoxCard>
       <VoxCard.Content>
@@ -57,6 +62,9 @@ export const BaseEventListItem = ({ event, userUuid }: EventItemProps) => {
         {fallbackImage ? <VoxCard.Image image={fallbackImage} imageData={event.image} /> : null}
         <DateItem showTime={isFull} begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} />
         <EventLocation event={event} />
+        {participantsCount != null && participantsCount >= 10 && (
+          <VoxCard.Attendees attendees={{ count: participantsCount }} />
+        )}
         <VoxCard.Author
           author={{
             role: event.organizer?.role,

@@ -56,6 +56,7 @@ export const RestTimelineFeedItemSchema = z.object({
   object_state: z.enum(['full', 'partial']).nullish(),
   visibility: z.string().nullish(),
   live_url: z.string().nullish(),
+  participants_count: z.number().nullish(),
 })
 
 export type RestTimelineFeedResponse = z.infer<typeof RestTimelineFeedResponseSchema>
