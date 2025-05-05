@@ -45,9 +45,6 @@ export const BaseEventListItem = ({ event, userUuid }: EventItemProps) => {
   const isFull = isEventFull(event)
   const participantsCount = event?.participants_count
 
-  console.log({participantsCount, if: participantsCount != null && participantsCount >= 10});
-  
-  
   return (
     <VoxCard>
       <VoxCard.Content>
