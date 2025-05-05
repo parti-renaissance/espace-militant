@@ -123,5 +123,5 @@ export const isEventHasNationalLive = (
     return false
   }
 
-  return event.live_url.startsWith('https://vimeo.com/event/') && Boolean(event.is_national)
+  return event.live_url.startsWith('https://vimeo.com/') && Boolean(event.is_national)
 }
