@@ -26,6 +26,7 @@ export const map = (x: RestTimelineFeedItem): Partial<RestFullEvent> & { uuid: s
     object_state: x.object_state,
     visibility: x.visibility as RestFullEvent['visibility'],
     mode: x.mode,
+    participants_count: x.participants_count ?? undefined,
   }
 }
 

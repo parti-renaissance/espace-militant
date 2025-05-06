@@ -66,6 +66,7 @@ export const RestBaseEventSchema = z.object({
     .nullable(),
   mode: z.enum(['online', 'meeting']).nullable(),
   category: RestEventCategorySchema.nullable(),
+  participants_count: z.number().nullish(),
 })
 
 export const RestFullEventSchema = z
@@ -74,7 +75,6 @@ export const RestFullEventSchema = z
     description: z.string(),
     json_description: z.string().optional(),
     committee: RestEventComitteeSchema.nullish(),
-    participants_count: z.number(),
     capacity: z.number().nullable(),
     visio_url: z.string().nullable(),
     live_url: z.string().nullable(),

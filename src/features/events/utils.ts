@@ -40,7 +40,7 @@ export const isEventFull = (
 }
 
 export const isEventCapacityReached = (event: Partial<RestItemEvent>) => {
-  if (isEventFull(event) && event.participants_count !== undefined) {
+  if (isEventFull(event) && event.participants_count != null) {
     return event.capacity && event.participants_count >= event.capacity
   }
   return false
