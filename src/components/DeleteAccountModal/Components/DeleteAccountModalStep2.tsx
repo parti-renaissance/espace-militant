@@ -2,7 +2,7 @@ import Input from '@/components/base/Input/Input'
 import RadioGroup from '@/components/base/RadioGroup/RadioGroup'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import { useDeleteProfil, useGetSuspenseProfil } from '@/services/profile/hook'
+import { useDeleteProfil } from '@/services/profile/hook'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
@@ -15,7 +15,6 @@ enum UnregistrationReason {
   Government = 'unregistration_reasons.government',
   Elected = 'unregistration_reasons.elected',
   Movement = 'unregistration_reasons.movement',
-  Committee = 'unregistration_reasons.committee',
   Other = 'unregistration_reasons.other',
 }
 interface Props {
@@ -123,14 +122,13 @@ export default function DeleteAccountModalStep2({ onClose, onConfirm, isDelete }
 }
 
 const UnregistrationReasonLabels: Record<UnregistrationReason, string> = {
-  [UnregistrationReason.Emails]: 'Je reçois trop d’e-mails',
-  [UnregistrationReason.Tools]: 'Je ne trouve plus d’utilité dans les outils développés par En Marche',
-  [UnregistrationReason.Support]: 'J’avais uniquement adhéré pour soutenir la candidature d’Emmanuel Macron',
+  [UnregistrationReason.Emails]: "Je reçois trop d'emails",
+  [UnregistrationReason.Support]: "J'avais uniquement créé ce compte pour soutenir la candidature d'Emmanuel Macron",
   [UnregistrationReason.Government]: "Je ne suis plus d'accord avec le gouvernement",
-  [UnregistrationReason.Elected]: 'Je suis déçu(e) par mon/les élu(e)s LaREM',
-  [UnregistrationReason.Movement]: 'Je ne me reconnais plus dans les actions du mouvement En Marche !',
-  [UnregistrationReason.Committee]: 'Je suis en désaccord avec l’activité de mon comité local',
-  [UnregistrationReason.Other]: 'Autre',
+  [UnregistrationReason.Movement]: "Je ne me reconnais plus dans les orientations nationales du Parti",
+  [UnregistrationReason.Elected]: "Je suis déçu(e) par mon/mes élu(e)s Renaissance",
+  [UnregistrationReason.Tools]: "Je ne trouve plus d’utilité dans les outils développés par Renaissance",
+  [UnregistrationReason.Other]: "Autre raison",
 }
 
 const JustificationText = styled(Text, {
