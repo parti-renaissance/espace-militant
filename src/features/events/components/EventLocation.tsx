@@ -6,7 +6,7 @@ export const EventLocation = ({ event }: { event: Partial<RestItemEvent> }) => {
   if (event.mode === 'online') {
     return (
       <YStack testID="event-location-visio">
-        <VoxCard.Visio />
+        <VoxCard.Visio url={event?.visio_url} asLink={!!event?.user_registered_at} />
       </YStack>
     )
   }

@@ -67,6 +67,7 @@ export const RestBaseEventSchema = z.object({
   mode: z.enum(['online', 'meeting']).nullable(),
   category: RestEventCategorySchema.nullable(),
   participants_count: z.number().nullish(),
+  visio_url: z.string().nullish(),
 })
 
 export const RestFullEventSchema = z
@@ -76,7 +77,6 @@ export const RestFullEventSchema = z
     json_description: z.string().optional(),
     committee: RestEventComitteeSchema.nullish(),
     capacity: z.number().nullable(),
-    visio_url: z.string().nullable(),
     live_url: z.string().nullable(),
     user_registered_at: z.string().nullable(),
     is_national: z.boolean(),
@@ -88,6 +88,7 @@ export const RestFullEventSchema = z
 export const RestPartialEventSchema = z
   .object({
     object_state: z.literal('partial'),
+    user_registered_at: z.string().optional(),
   })
   .merge(RestBaseEventSchema)
 
@@ -104,7 +105,6 @@ export const RestItemEventSchema = z.discriminatedUnion('object_state', [
 export const RestPublicItemEventSchema = z.discriminatedUnion('object_state', [
   RestFullEventSchema.omit({
     description: true,
-    user_registered_at: true,
   }),
   RestPartialEventSchema,
 ])
