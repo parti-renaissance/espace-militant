@@ -46,11 +46,11 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
   useInitMatomo()
   useDeepLinkHandler()
 
-  const { isLoading, isAuth } = useSession()
+  const { isLoading } = useSession()
   const { isAvailable: isUpdateAvailable, isError: isUpdateError } = useCheckStoreUpdate()
   const { isAvailable: isExpoUpdateAvailable, isError: isExpoUpdateError, isProcessing: isExpoUpdateProcessing } = useCheckExpoUpdate()
 
-  useInitPushNotification({ enable: isAuth && !isLoading && !props.isLoading })
+  useInitPushNotification()
 
   if (!props.isLoading) {
     SplashScreen.hideAsync()

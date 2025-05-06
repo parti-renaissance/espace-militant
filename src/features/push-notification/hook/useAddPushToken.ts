@@ -1,4 +1,3 @@
-import FB from '@/config/firebaseConfig'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { useMutation } from '@tanstack/react-query'
 import { addPushToken } from '../api'
@@ -6,9 +5,9 @@ import { TokenCannotBeSubscribedError } from '../errors'
 
 export function useAddPushToken() {
   return useMutation({
-    mutationFn: async (variables?: { token?: string }) => {
+    mutationFn: async (variables: { token: string }) => {
       return addPushToken({
-        identifier: variables?.token ?? (await FB.messaging.getToken()),
+        identifier: variables.token,
         source: 'vox',
       })
     },
