@@ -4,8 +4,8 @@ import Markdown from 'react-native-markdown-display'
 import Text from '@/components/base/Text'
 import Chip from '@/components/Chip/Chip'
 import ProfilePicture from '@/components/ProfilePicture'
-import { CalendarDays, CheckCircle, LockKeyhole, MapPin, UserCheck, Users, Video } from '@tamagui/lucide-icons'
-import { Separator, Stack, StackProps, styled, useTheme, withStaticProperties, XStack, YStack, ZStack } from 'tamagui'
+import { CalendarDays, CheckCircle, ExternalLink, LockKeyhole, MapPin, UserCheck, Users, Video } from '@tamagui/lucide-icons'
+import { Anchor, Separator, Stack, StackProps, styled, useTheme, withStaticProperties, XStack, YStack, ZStack } from 'tamagui'
 import AutoSizeImage from '../AutoSizeImage'
 import { getFormatedVoxCardDate } from '../utils'
 
@@ -245,12 +245,41 @@ const VoxCardDescription = ({ children, full, markdown }: VoxCardDescriptionProp
   )
 }
 
-const VoxCardVisio = () => {
-  return (
+type VoxCardVisioProps = {
+  url?: string | null
+  asLink?: boolean
+}
+
+const VoxCardVisio = ({ url, asLink = true }: VoxCardVisioProps) => {
+  const isLink = Boolean(url && asLink)
+
+  const Content = (
     <XStack gap="$small" alignItems="center">
       <Video size={16} color="$textPrimary" />
-      <Text.SM medium>Visioconférence</Text.SM>
+      <XStack gap="$xsmall" alignItems="center">
+        <Text.SM
+          medium
+          color={isLink ? '$blue6' : '$textPrimary'}
+          hoverStyle={isLink ? { color: '$blue7' } : undefined}
+        >
+          Visioconférence
+        </Text.SM>
+        {isLink && <ExternalLink size={12} color="$blue6" />}
+      </XStack>
     </XStack>
+  )
+
+  return isLink ? (
+    <Anchor
+      href={url!}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ textDecorationLine: 'none', cursor: 'pointer', lineHeight: 16 }}
+    >
+      {Content}
+    </Anchor>
+  ) : (
+    Content
   )
 }
 
