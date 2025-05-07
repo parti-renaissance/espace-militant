@@ -4,18 +4,22 @@ import Table from '@/components/base/Table'
 import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
-import { useSuspensePaginatedEventPartcipants } from '@/services/events/hook'
+import { usePaginatedEventPartcipants } from '@/services/events/hook'
 import { getHumanFormattedDate } from '@/utils/date'
 import { XStack, YStack } from 'tamagui'
 
 export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; scope: string }) => {
-  const { data, fetchNextPage, fetchPreviousPage, isFetchingNextPage, isFetchingPreviousPage } = useSuspensePaginatedEventPartcipants({
+  const [pageIndex, setPageIndex] = useState(0)
+  const { data, fetchNextPage, fetchPreviousPage, isFetchingNextPage, isFetchingPreviousPage, isLoading, error } = usePaginatedEventPartcipants({
     eventId,
     scope,
   })
 
-  const [pageIndex, setPageIndex] = useState(0)
-  const currentPage = data.pages[pageIndex]
+  if (isLoading) {
+    return <TableSkeleton/>
+  }
+
+  const currentPage = data?.pages[pageIndex]
 
   const handleFetchPreviousPage = () => {
     if (pageIndex === 0) return
@@ -42,7 +46,7 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
             <Table.Row.Header>
               <Text.SM semibold>Participants</Text.SM>
             </Table.Row.Header>
-            {currentPage.items.map(({ first_name, last_name, email_address, image_url, uuid }) => {
+            {currentPage?.items.map(({ first_name, last_name, email_address, image_url, uuid }) => {
               return (
                 <Table.Row key={'name' + uuid}>
                   <XStack gap="$medium" alignItems="center" flexShrink={1}>
@@ -69,7 +73,7 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
               <Text.SM semibold>Label(s)</Text.SM>
             </Table.Row.Header>
 
-            {currentPage.items.map(({ tags, uuid }) => {
+            {currentPage?.items.map(({ tags, uuid }) => {
               return (
                 <Table.Row key={'tags' + uuid}>
                   <ActivistTags
@@ -97,7 +101,7 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
                 Téléphone
               </Text.SM>
             </Table.Row.Header>
-            {currentPage.items.map(({ phone, uuid }) => {
+            {currentPage?.items.map(({ phone, uuid }) => {
               return (
                 <Table.Row key={'phone' + uuid}>
                   <Text.SM textAlign="center">{phone ?? 'Non indiqué'}</Text.SM>
@@ -112,7 +116,7 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
                 Code Postal
               </Text.SM>
             </Table.Row.Header>
-            {currentPage.items.map(({ postal_code, uuid }) => {
+            {currentPage?.items.map(({ postal_code, uuid }) => {
               return (
                 <Table.Row key={'postal_code' + uuid}>
                   <Text.SM textAlign="center">{postal_code ?? 'Non indiqué'}</Text.SM>
@@ -127,7 +131,7 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
                 Date inscription
               </Text.SM>
             </Table.Row.Header>
-            {currentPage.items.map(({ created_at, uuid }) => {
+            {currentPage?.items.map(({ created_at, uuid }) => {
               return (
                 <Table.Row key={'date' + uuid}>
                   <Text.SM>{created_at ? getHumanFormattedDate(new Date(created_at)) : ''}</Text.SM>
@@ -140,11 +144,18 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
       <Table splited="bottom">
         <Table.Row.Footer justifyContent="space-between" flex={1}>
           <Table.Col width={60}>
-            <Text.SM color="$textDisabled">{currentPage.metadata.total_items} Participant(s)</Text.SM>
+            <Text.SM color="$textDisabled">{currentPage?.metadata.total_items} Participant(s)</Text.SM>
           </Table.Col>
+          { error && (
+            <XStack flexGrow={1}>
+              <Text.XSM color="$textDanger">
+                {error?.message ?? 'Erreur Serveur' }
+              </Text.XSM>
+            </XStack>
+          )}
           <XStack gap="$medium" alignItems="center">
             <Text.SM>
-              Pages {currentPage.metadata.current_page} - {currentPage.metadata.last_page}
+              Pages {currentPage?.metadata.current_page} - {currentPage?.metadata.last_page}
             </Text.SM>
             <XStack gap="$small">
               <Table.NavItem
@@ -155,7 +166,7 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
               />
               <Table.NavItem
                 arrow="right"
-                disabled={pageIndex + 1 >= currentPage.metadata.last_page || isFetchingNextPage}
+                disabled={(currentPage != null && pageIndex + 1 >= currentPage.metadata.last_page) || isFetchingNextPage}
                 loading={isFetchingNextPage}
                 onPress={handleFetchNextPage}
               />

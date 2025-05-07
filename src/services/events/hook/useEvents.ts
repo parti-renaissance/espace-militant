@@ -5,7 +5,7 @@ import * as api from '@/services/events/api'
 import { eventPostFormError } from '@/services/events/error'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 import { useToastController } from '@tamagui/toast'
-import { useInfiniteQuery, useMutation, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { RestPostEventRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
 import { optimisticToggleSubscribe, optimisticUpdate } from './helpers'
@@ -112,8 +112,8 @@ export const useSubscribePublicEvent = ({ id: eventId, slug }: { id: string; slu
   })
 }
 
-export const useSuspensePaginatedEventPartcipants = (props: { eventId: string; scope: string }) => {
-  return useSuspenseInfiniteQuery({
+export const usePaginatedEventPartcipants = (props: { eventId: string; scope: string }) => {
+  return useInfiniteQuery({
     queryKey: ['eventParticipants', props.eventId],
     queryFn: ({ pageParam }) => api.getEventParticipants({ eventId: props.eventId, page: pageParam, scope: props.scope }),
     initialPageParam: 1,
