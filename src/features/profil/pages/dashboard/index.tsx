@@ -24,23 +24,6 @@ const DashboardScreen = () => {
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false)
 
   const isAdherent = !!me?.tags?.find((tag) => tag.type === 'adherent')
-  // const { signOut } = useSession()
-
-  // const { mutateAsync } = useDeleteProfil()
-
-  // const onRemoveAccountConfirmed = async () => {
-  //   return mutateAsync().then(() => signOut())
-  // }
-
-  // const removeAccount = () => {
-  // AlertUtils.showDestructiveAlert(
-  //   isAdherent ? 'Désadhésion' : 'Suppression du compte',
-  //   isAdherent ? 'Êtes-vous sûr de vouloir désadhérer et de supprimer votre compte ?' : 'Êtes-vous sûr de vouloir supprimer votre compte ?',
-  //   isAdherent ? 'Désadhérer' : 'Supprimer',
-  //   'Annuler',
-  //   onRemoveAccountConfirmed,
-  // )
-  // }
 
   const showModal = useCallback(() => {
     setShowDeleteAccountModal(true)

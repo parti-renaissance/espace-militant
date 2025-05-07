@@ -1,3 +1,4 @@
+import { UnregistrationReason } from '@/components/DeleteAccountModal/Components/DeleteAccountModalStep2'
 import { activistTagSchema, ActivistTagTypes } from '@/data/Activist/schema'
 import { z } from 'zod'
 
@@ -222,20 +223,10 @@ export type RestUpdateProfileResponse = z.infer<typeof RestUpdateProfileResponse
 // -----------------  RestRemoveProfile  -----------------
 export type RestRemoveProfileRequest = z.infer<typeof RestRemoveProfileRequestSchema>
 export const RestRemoveProfileRequestSchema = z.object({
-  reasons: z.array(z.enum([
-    'unregistration_reasons.emails',
-    'unregistration_reasons.tools',
-    'unregistration_reasons.support',
-    'unregistration_reasons.government',
-    'unregistration_reasons.elected',
-    'unregistration_reasons.movement',
-    'unregistration_reasons.committee',
-    'unregistration_reasons.other',
-  ])).optional(),
+  reasons: z.array(z.nativeEnum(UnregistrationReason)).optional(),
   comment: z.string().max(1000).optional(),
 })
 
-export type RestRemoveProfileResponse = z.infer<typeof RestRemoveProfileResponseSchema>
 export const RestRemoveProfileResponseSchema = z.void()
 
 // -----------------  RestDonations  -----------------

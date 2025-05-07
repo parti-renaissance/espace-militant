@@ -13,7 +13,7 @@ export default function DeleteAccountModalStep1({ onClose, onConfirm, isDelete }
   return (
     <>
       <View backgroundColor="#F9F9FA" alignItems="center" paddingVertical={48}>
-        <Image source={require(isDelete ? '../Assets/DeleteAccount/deleteAccountAlt.png' : '../Assets/DeleteAccount/deleteAccount.png')} />
+        <Image source={isDelete ? require('../Assets/DeleteAccount/deleteAccountAlt.png') : require('../Assets/DeleteAccount/deleteAccount.png')} />
       </View>
 
       <YStack padding={'$medium'} gap={'$large'} paddingHorizontal={'$medium'}>

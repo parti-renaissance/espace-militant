@@ -3,12 +3,12 @@ import RadioGroup from '@/components/base/RadioGroup/RadioGroup'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { useDeleteProfil } from '@/services/profile/hook'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { styled, View, XStack, YStack } from 'tamagui'
+import { z } from 'zod'
 
-enum UnregistrationReason {
+export enum UnregistrationReason {
   Emails = 'unregistration_reasons.emails',
   Tools = 'unregistration_reasons.tools',
   Support = 'unregistration_reasons.support',
@@ -28,11 +28,7 @@ const schema = z.object({
   reason: z.nativeEnum(UnregistrationReason, {
     errorMap: () => ({ message: 'Veuillez sélectionner une raison' }),
   }),
-  comment: z
-    .string()
-    .max(1000, '1000 caractères maximum')
-    .optional()
-    .or(z.literal('')),
+  comment: z.string().max(1000, '1000 caractères maximum').optional().or(z.literal('')),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -60,7 +56,7 @@ export default function DeleteAccountModalStep2({ onClose, onConfirm, isDelete }
         onSuccess: () => {
           onConfirm()
         },
-      }
+      },
     )
   })
 
@@ -104,7 +100,7 @@ export default function DeleteAccountModalStep2({ onClose, onConfirm, isDelete }
           />
 
           <Text mt={'$2'} marginLeft={'$medium'} color="$textSecondary">
-            {comment?.length ?? 0 }/1000 caractères maximum
+            {comment?.length ?? 0}/1000 caractères maximum
           </Text>
         </View>
       )}
@@ -125,10 +121,10 @@ const UnregistrationReasonLabels: Record<UnregistrationReason, string> = {
   [UnregistrationReason.Emails]: "Je reçois trop d'emails",
   [UnregistrationReason.Support]: "J'avais uniquement créé ce compte pour soutenir la candidature d'Emmanuel Macron",
   [UnregistrationReason.Government]: "Je ne suis plus d'accord avec le gouvernement",
-  [UnregistrationReason.Movement]: "Je ne me reconnais plus dans les orientations nationales du Parti",
-  [UnregistrationReason.Elected]: "Je suis déçu(e) par mon/mes élu(e)s Renaissance",
-  [UnregistrationReason.Tools]: "Je ne trouve plus d’utilité dans les outils développés par Renaissance",
-  [UnregistrationReason.Other]: "Autre raison",
+  [UnregistrationReason.Movement]: 'Je ne me reconnais plus dans les orientations nationales du Parti',
+  [UnregistrationReason.Elected]: 'Je suis déçu(e) par mon/mes élu(e)s Renaissance',
+  [UnregistrationReason.Tools]: 'Je ne trouve plus d’utilité dans les outils développés par Renaissance',
+  [UnregistrationReason.Other]: 'Autre raison',
 }
 
 const JustificationText = styled(Text, {
