@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import { useColorScheme } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import WaitingScreen from '@/components/WaitingScreen'
 import { SessionProvider, useSession } from '@/ctx/SessionProvider'
@@ -14,7 +13,7 @@ import TamaguiProvider from '@/tamagui/provider'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { isSupported } from '@firebase/messaging'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import { ToastProvider } from '@tamagui/toast'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BlurView } from 'expo-blur'
@@ -96,7 +95,6 @@ export const unstable_settings = {
 }
 
 function Root() {
-  const colorScheme = useColorScheme()
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -115,7 +113,7 @@ function Root() {
       <ToastProvider swipeDirection="up">
         <QueryClientProvider client={queryClient}>
           <TamaguiProvider>
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <ThemeProvider value={DefaultTheme}>
               <BottomSheetModalProvider>
                 <SessionProvider>
                   <WaitingRoomHoc isLoading={!isFontsLoaded}>
