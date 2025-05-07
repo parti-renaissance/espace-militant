@@ -1,7 +1,5 @@
-import { Suspense } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { EventItemProps } from '@/features/events/types'
 import { useFileDownload } from '@/hooks/useFileDownload'
