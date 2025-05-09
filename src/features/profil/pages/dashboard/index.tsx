@@ -86,7 +86,7 @@ const DashboardScreen = () => {
           </YStack>
         </YStack>
       </ScrollView>
-      {showDeleteAccountModal && <DeleteAccountModal isOpen={showDeleteAccountModal} onClose={hideModal} isDelete={!isAdherent} />}
+      {showDeleteAccountModal && <DeleteAccountModal isOpen={showDeleteAccountModal} onClose={hideModal} isAdherent={isAdherent} />}
     </>
   )
 }

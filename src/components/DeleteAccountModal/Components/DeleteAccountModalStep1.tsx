@@ -5,15 +5,14 @@ import { Image, styled, View, XStack, YStack } from 'tamagui'
 interface Props {
   onClose: () => void
   onConfirm: () => void
-  // Indicate if we should show "désadhésion" or "suppression"
-  isDelete: boolean
+  isAdherent: boolean
 }
 
-export default function DeleteAccountModalStep1({ onClose, onConfirm, isDelete }: Readonly<Props>) {
+export default function DeleteAccountModalStep1({ onClose, onConfirm, isAdherent }: Readonly<Props>) {
   return (
     <>
       <View backgroundColor="#F9F9FA" alignItems="center" paddingVertical={48}>
-        <Image source={isDelete ? require('../Assets/DeleteAccount/deleteAccountAlt.png') : require('../Assets/DeleteAccount/deleteAccount.png')} />
+        <Image source={isAdherent ? require('../Assets/DeleteAccount/deleteAccount.png') : require('../Assets/DeleteAccount/deleteAccountAlt.png')} />
       </View>
 
       <YStack padding={'$medium'} gap={'$large'} paddingHorizontal={'$medium'}>
@@ -27,7 +26,7 @@ export default function DeleteAccountModalStep1({ onClose, onConfirm, isDelete }
         <JustificationText>
           Votre départ représente un soutien de moins dans cette aventure collective et nous espérons que nos chemins se croiseront à nouveau.
         </JustificationText>
-        {isDelete ? (
+        {isAdherent ? (
           <>
             <JustificationText>
               Néanmoins, une fois votre désadhésion réalisée nous supprimerons votre compte ainsi que toutes vos données personnelles. Vous ne recevrez plus
