@@ -7,11 +7,10 @@ import DeleteAccountModalStep2 from './Components/DeleteAccountModalStep2'
 interface Props {
   isOpen: boolean
   onClose: () => void
-  // Indicate if we should show "désadhésion" or "suppression"
-  isDelete: boolean
+  isAdherent: boolean
 }
 
-export default function DeleteAccountModal({ isOpen, onClose, isDelete }: Readonly<Props>) {
+export default function DeleteAccountModal({ isOpen, onClose, isAdherent }: Readonly<Props>) {
   const [step, setStep] = useState(1)
 
   const goToNextStep = useCallback(() => {
@@ -29,8 +28,8 @@ export default function DeleteAccountModal({ isOpen, onClose, isDelete }: Readon
           width: 480,
         }}
       >
-        {step === 1 && <DeleteAccountModalStep1 onClose={onClose} onConfirm={goToNextStep} isDelete={isDelete} />}
-        {step === 2 && <DeleteAccountModalStep2 onClose={onClose} onConfirm={goToNextStep} isDelete={isDelete} />}
+        {step === 1 && <DeleteAccountModalStep1 onClose={onClose} onConfirm={goToNextStep} isAdherent={isAdherent} />}
+        {step === 2 && <DeleteAccountModalStep2 onClose={onClose} onConfirm={goToNextStep} isAdherent={isAdherent} />}
       </View>
     </ModalOrBottomSheet>
   )

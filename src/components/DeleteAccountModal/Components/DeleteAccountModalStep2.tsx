@@ -20,8 +20,7 @@ export enum UnregistrationReason {
 interface Props {
   onClose: () => void
   onConfirm: () => void
-  // Indicate if we should show "désadhésion" or "suppression"
-  isDelete: boolean
+  isAdherent: boolean
 }
 
 const schema = z.object({
@@ -33,7 +32,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>
 
-export default function DeleteAccountModalStep2({ onClose, onConfirm, isDelete }: Readonly<Props>) {
+export default function DeleteAccountModalStep2({ onClose, onConfirm, isAdherent }: Readonly<Props>) {
   const { mutate } = useDeleteProfil()
   const { control, watch, handleSubmit } = useForm<FormValues>({
     defaultValues: {
@@ -110,7 +109,7 @@ export default function DeleteAccountModalStep2({ onClose, onConfirm, isDelete }
           J’annule tout
         </VoxButton>
         <VoxButton variant="contained" theme="orange" onPress={onSubmit}>
-          Je confirme ma {isDelete ? 'suppression' : 'désadhésion'}
+          Je confirme ma {isAdherent ? 'désadhésion' : 'suppression'}
         </VoxButton>
       </XStack>
     </YStack>
