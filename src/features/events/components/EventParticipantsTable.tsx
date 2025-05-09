@@ -143,35 +143,39 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
       </XStack>
       <Table splited="bottom">
         <Table.Row.Footer justifyContent="space-between" flex={1}>
-          <Table.Col width={60}>
-            <Text.SM color="$textDisabled">{currentPage?.metadata.total_items} Participant(s)</Text.SM>
-          </Table.Col>
-          { error && (
-            <XStack flexGrow={1}>
-              <Text.XSM color="$textDanger">
-                {error?.message ?? 'Erreur Serveur' }
+          { error ? (
+            <XStack flex={1}>
+              <Text.XSM flex={1} color="$textDanger" textAlign='center'>
+                Impossible de récupérer la liste des participants
+                {error?.code && ` (Erreur ${error?.code})`}
               </Text.XSM>
             </XStack>
+          ) : (
+            <>
+              <Table.Col width={60}>
+                <Text.SM color="$textDisabled">{currentPage?.metadata.total_items} Participant(s)</Text.SM>
+              </Table.Col>
+              <XStack gap="$medium" alignItems="center">
+                <Text.SM>
+                  Pages {currentPage?.metadata.current_page} - {currentPage?.metadata.last_page}
+                </Text.SM>
+                <XStack gap="$small">
+                  <Table.NavItem
+                    arrow="left"
+                    disabled={pageIndex <= 0 || isFetchingPreviousPage}
+                    loading={isFetchingPreviousPage}
+                    onPress={handleFetchPreviousPage}
+                  />
+                  <Table.NavItem
+                    arrow="right"
+                    disabled={(currentPage != null && pageIndex + 1 >= currentPage.metadata.last_page) || isFetchingNextPage}
+                    loading={isFetchingNextPage}
+                    onPress={handleFetchNextPage}
+                  />
+                </XStack>
+              </XStack>
+            </>
           )}
-          <XStack gap="$medium" alignItems="center">
-            <Text.SM>
-              Pages {currentPage?.metadata.current_page} - {currentPage?.metadata.last_page}
-            </Text.SM>
-            <XStack gap="$small">
-              <Table.NavItem
-                arrow="left"
-                disabled={pageIndex <= 0 || isFetchingPreviousPage}
-                loading={isFetchingPreviousPage}
-                onPress={handleFetchPreviousPage}
-              />
-              <Table.NavItem
-                arrow="right"
-                disabled={(currentPage != null && pageIndex + 1 >= currentPage.metadata.last_page) || isFetchingNextPage}
-                loading={isFetchingNextPage}
-                onPress={handleFetchNextPage}
-              />
-            </XStack>
-          </XStack>
         </Table.Row.Footer>
       </Table>
     </YStack>
