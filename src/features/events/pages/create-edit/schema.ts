@@ -3,15 +3,16 @@ import { isAfter } from 'date-fns'
 import { z } from 'zod'
 
 const partialUrlSchema = z.string().refine((value) => {
-  if (!value) return true // autorise les chaînes vides
+  if (!value) return true
   try {
-    new URL(value.startsWith('http') ? value : `http://${value}`)
-    return true
+    const withProtocol = value.startsWith('http') ? value : `http://${value}`
+    const url = new URL(withProtocol)
+    return /\./.test(url.hostname) && /^[a-zA-Z0-9.-]+$/.test(url.hostname)
   } catch {
-    return false
+    return false 
   }
 }, {
-  message: 'Le lien doit être valide',
+  message: 'Le lien doit être une URL valide',
 })
 const parsePartialUrl = (url: unknown) => {
   return partialUrlSchema.safeParse(url)
