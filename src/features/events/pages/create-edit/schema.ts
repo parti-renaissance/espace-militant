@@ -2,7 +2,15 @@ import { EventVisibilitySchema } from '@/services/events/schema'
 import { isAfter } from 'date-fns'
 import { z } from 'zod'
 
-const partialUrlSchema = z.string().refine((value) => !value || /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w.-]*)*\/?$/.test(value), {
+const partialUrlSchema = z.string().refine((value) => {
+  if (!value) return true // autorise les chaînes vides
+  try {
+    new URL(value.startsWith('http') ? value : `http://${value}`)
+    return true
+  } catch {
+    return false
+  }
+}, {
   message: 'Le lien doit être valide',
 })
 const parsePartialUrl = (url: unknown) => {
