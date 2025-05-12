@@ -119,9 +119,10 @@ export const isEventHasNationalLive = (
   if (!isEventFull(event)) {
     return false
   }
-  if (!event.live_url) {
+
+  if (!event.is_national) {
     return false
   }
 
-  return event.live_url.startsWith('https://vimeo.com/') && Boolean(event.is_national)
+  return !!event.live_url && (event.live_url.startsWith('https://vimeo.com/') || event.live_url.startsWith('https://player.vimeo.com/'))
 }
