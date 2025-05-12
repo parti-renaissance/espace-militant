@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import fb from '@/config/firebaseConfig'
-import FB, { AuthorizationStatus } from '@/config/firebaseConfig'
+import FB from '@/config/firebaseConfig'
 import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
 import { isSupported } from '@firebase/messaging'
@@ -11,6 +10,7 @@ export default function useCheckNotificationsState() {
   const [notificationGranted, setNotificationGranted] = useState<boolean | null>(null)
   const [notificationGrantState, setNotificationGrantState] = useState<string | null>(null)
   const hasBeenGrantedOnce = useRef<null | string>(null)
+  const isCheckingPermissions = useRef(false)
 
   const { mutate: postPushToken } = useAddPushToken()
   const { mutate: removePushToken } = useRemovePushToken()
@@ -18,6 +18,9 @@ export default function useCheckNotificationsState() {
   const toast = useToastController()
 
   const checkPermissions = useCallback(async () => {
+    if (isCheckingPermissions.current) return
+    isCheckingPermissions.current = true
+
     const permission = Notification.permission
     const granted = permission === 'granted'
 
@@ -26,8 +29,9 @@ export default function useCheckNotificationsState() {
 
     if (permission === 'granted' && hasBeenGrantedOnce.current === null) {
       try {
-        hasBeenGrantedOnce.current = await FB.messaging.getToken()
-        postPushToken({ token: hasBeenGrantedOnce.current })
+        const token = await FB.messaging.getToken()
+        hasBeenGrantedOnce.current = token
+        postPushToken({ token })
       } catch (e) {
         // Trigger an error if safari but not requested permission
       }
@@ -37,24 +41,13 @@ export default function useCheckNotificationsState() {
       removePushToken()
       hasBeenGrantedOnce.current = null
     }
-  }, [])
+
+    isCheckingPermissions.current = false
+  }, [postPushToken, removePushToken])
 
   const triggerNotificationRequest = useCallback(async () => {
     if (Notification.permission !== 'denied') {
-      fb.messaging
-        .requestPermission()
-        .then((response) => {
-          if (response === AuthorizationStatus.AUTHORIZED) {
-            // We pass an empty object due to typing analysis default
-            postPushToken({})
-          }
-
-          return response
-        })
-        .then(checkPermissions)
-        .catch(() => {
-          //
-        })
+      FB.messaging.requestPermission().catch().finally(checkPermissions)
     } else {
       toast.show('Autorisez dans les préférences.')
     }
@@ -68,15 +61,17 @@ export default function useCheckNotificationsState() {
   useEffect(() => {
     if (notificationsSupported) {
       checkPermissions()
-      const interval = setInterval(checkPermissions, 10e3)
+      const interval = setInterval(() => {
+        if (!isCheckingPermissions.current) {
+          checkPermissions()
+        }
+      }, 10e3)
 
       return () => {
-        if (interval) {
-          clearInterval(interval)
-        }
+        clearInterval(interval)
       }
     }
-  }, [notificationsSupported])
+  }, [notificationsSupported, checkPermissions])
 
   return {
     notificationGranted,

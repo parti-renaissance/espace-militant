@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { Spacing } from '@/styles'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
-import { useMedia, View } from 'tamagui'
+import { ScrollView, useMedia, View } from 'tamagui'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
@@ -46,7 +46,13 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
-          <View style={styles.modalView}>{children}</View>
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.modalView}>{children}</View>
+          </ScrollView>
         </Pressable>
       </Modal>
     )
@@ -100,4 +106,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
 })

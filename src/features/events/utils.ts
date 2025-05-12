@@ -40,7 +40,7 @@ export const isEventFull = (
 }
 
 export const isEventCapacityReached = (event: Partial<RestItemEvent>) => {
-  if (isEventFull(event) && event.participants_count !== undefined) {
+  if (isEventFull(event) && event.participants_count != null) {
     return event.capacity && event.participants_count >= event.capacity
   }
   return false
@@ -119,9 +119,10 @@ export const isEventHasNationalLive = (
   if (!isEventFull(event)) {
     return false
   }
-  if (!event.live_url) {
+
+  if (!event.is_national) {
     return false
   }
 
-  return event.live_url.startsWith('https://vimeo.com/event/') && Boolean(event.is_national)
+  return !!event.live_url && (event.live_url.startsWith('https://vimeo.com/') || event.live_url.startsWith('https://player.vimeo.com/'))
 }

@@ -7,6 +7,7 @@ import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import MapboxGl from '@/components/Mapbox/Mapbox'
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
+import useIsFocused from '@/hooks/useIsFocused'
 import { LocationPermissionError, QUERY_KEY_LOCATION, useLocation, useLocationPermission } from '@/hooks/useLocation'
 import {
   ActionBottomSheet,
@@ -54,6 +55,11 @@ const ErrorFallback = (props: FallbackProps) => {
 export default function ActionsScreen() {
   const { isAuth } = useSession()
   const media = useMedia()
+
+  const isFocused = useIsFocused()
+  if (!isFocused) {
+    return null
+  }
 
   if (!isAuth) {
     return <Redirect href={'/(tabs)/evenements/'} />

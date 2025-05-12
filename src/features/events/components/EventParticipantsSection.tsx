@@ -1,14 +1,12 @@
-import { Suspense } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { EventItemProps } from '@/features/events/types'
 import { useFileDownload } from '@/hooks/useFileDownload'
 import { getEventParticipantsFileEndpoint } from '@/services/events/api'
 import { Download, Sparkle } from '@tamagui/lucide-icons'
 import { XStack } from 'tamagui'
-import { EventParticipantsTable, TableSkeleton } from '../components/EventParticipantsTable'
+import { EventParticipantsTable } from '../components/EventParticipantsTable'
 import { isEventFull } from '../utils'
 import EventHandleActions from './EventHandleActions'
 
@@ -35,23 +33,7 @@ const EventParticipantsSection = ({ event }: EventItemProps) => {
       publicDownload: false,
     })
   return (
-    <Suspense
-      fallback={
-        <SkeCard>
-          <SkeCard.Content>
-            <XStack justifyContent="space-between">
-              <XStack gap="$small" alignItems="center">
-                <SkeCard.Author />
-                <SkeCard.Line width={100} />
-              </XStack>
-              <SkeCard.Button />
-            </XStack>
-            <TableSkeleton />
-          </SkeCard.Content>
-        </SkeCard>
-      }
-    >
-      <VoxCard>
+    <VoxCard>
         <VoxCard.Content>
           <XStack justifyContent="space-between">
             <XStack gap="$small" alignItems="center">
@@ -94,7 +76,6 @@ const EventParticipantsSection = ({ event }: EventItemProps) => {
           </XStack>
         </VoxCard.Content>
       </VoxCard>
-    </Suspense>
   )
 }
 
