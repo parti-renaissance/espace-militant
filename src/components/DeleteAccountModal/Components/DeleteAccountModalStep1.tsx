@@ -20,17 +20,17 @@ export default function DeleteAccountModalStep1({ onClose, onConfirm, isAdherent
           Nous sommes désolés de vous voir partir...
         </Text>
         <JustificationText>
-          Renaissance a été fondé sur la conviction que chaque voix compte, et que l’engagement de chacun d’entre vous est essentiel pour faire vivre nos
+          Renaissance a été fondé sur la conviction que chaque voix compte et que l’engagement de chacun d’entre vous est essentiel pour faire vivre nos
           valeurs et renforcer notre démocratie.
         </JustificationText>
         <JustificationText>
-          Votre départ représente un soutien de moins dans cette aventure collective et nous espérons que nos chemins se croiseront à nouveau.
+          Votre départ représente un soutien de moins dans cette aventure collective, et nous espérons que nos chemins se croiseront à nouveau.
         </JustificationText>
         {isAdherent ? (
           <>
             <JustificationText>
-              Néanmoins, une fois votre désadhésion réalisée nous supprimerons votre compte ainsi que toutes vos données personnelles. Vous ne recevrez plus
-              aucun email de notre part, ainsi que de celle de nos instances locales.
+              Néanmoins, une fois votre désadhésion réalisée, nous supprimerons votre compte ainsi que toutes vos données personnelles. Vous ne recevrez plus 
+              aucun email de notre part, ni de celle de nos instances locales.
             </JustificationText>
             <JustificationText>
               Vous pourrez bien entendu réadhérer plus tard, mais nous ne serons pas en mesure de restaurer votre historique.
@@ -39,15 +39,15 @@ export default function DeleteAccountModalStep1({ onClose, onConfirm, isAdherent
         ) : (
           <>
             <JustificationText>
-              Néanmoins, une fois votre comte supprimé, nous effacerons toutes vos données personnelles. Vous ne recevrez plus aucun email de notre part, ainsi
-              que de celle de nos instances locales.
+              Néanmoins, une fois votre compte supprimé, nous effacerons toutes vos données personnelles. Vous ne recevrez plus aucun email de notre part, 
+              ni de celle de nos instances locales.
             </JustificationText>
             <JustificationText>
-              Vous pourrez bien entendu recréer un comte plus tard, mais nous ne serons pas en mesure de restaurer votre historique.
+              Vous pourrez bien entendu recréer un compte plus tard, mais nous ne serons pas en mesure de restaurer votre historique.
             </JustificationText>
           </>
         )}
-        <JustificationText>Vous en êtes vraiment certain ?</JustificationText>
+        <JustificationText>Êtes-vous vraiment certain(e) de votre décision ?</JustificationText>
       </YStack>
 
       <XStack gap="$medium" justifyContent="flex-end" paddingBottom={'$medium'} paddingHorizontal={'$medium'}>
