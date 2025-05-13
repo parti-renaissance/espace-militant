@@ -15,7 +15,7 @@ export default function ReferralListItem({ item }: Readonly<Props>) {
   const color = useMemo(() => {
     switch (item.status) {
       case ReferralStatusEnum.ACCOUNT_CREATED:
-        return '$blue6'
+        return '$orange9'
       case ReferralStatusEnum.ADHESION_FINISHED:
         return '$green6'
       case ReferralStatusEnum.ADHESION_VIA_OTHER_LINK:
