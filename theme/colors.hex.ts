@@ -35,8 +35,8 @@ export const green = {
 }
 
 export const orange = {
-  orange1: '#FFF1F2',
-  orange2: '#FCE7E9',
+  orange1: '#FEF3F1',
+  orange2: '#FEE0D8',
   orange3: '#FCD8DB',
   orange4: '#FA954B',
   orange5: '#D26A4A',
@@ -44,6 +44,18 @@ export const orange = {
   orange7: '#A34A2F',
   orange8: '#92381C',
   orange9: '#F86B3F',
+}
+
+export const red = {
+  red1: '#FFEAEA',
+  red2: '#FFD8D8',
+  red3: '#FFC1C1',
+  red4: '#FF9C9C',
+  red5: '#F76A6A',
+  red6: '#D74343',
+  red7: '#B33434',
+  red8: '#932A2A',
+  red9: '#F25461',
 }
 
 export const yellow = {

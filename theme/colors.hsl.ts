@@ -21,15 +21,26 @@ export const purple = {
   purple9: 'hsl(266, 83%, 66%)',
 }
 export const orange = {
-  orange1: 'hsl(356, 100%, 97%)',
-  orange2: 'hsl(354, 78%, 95%)',
-  orange3: 'hsl(355, 86%, 92%)',
+  orange1: 'hsl(13, 100%, 97%)',
+  orange2: 'hsl(13, 78%, 95%)',
+  orange3: 'hsl(13, 95%, 92%)',
   orange4: 'hsl(25, 95%, 64%)',
   orange5: 'hsl(14, 60%, 56%)',
   orange6: 'hsl(14, 56%, 51%)',
   orange7: 'hsl(14, 55%, 41%)',
   orange8: 'hsl(14, 68%, 34%)',
   orange9: 'hsl(14, 93%, 61%)',
+}
+export const red = {
+  red1: 'hsl(356, 100%, 97%)',
+  red2: 'hsl(356, 100%, 94%)',
+  red3: 'hsl(355, 90%, 89%)',
+  red4: 'hsl(355, 85%, 75%)',
+  red5: 'hsl(355, 70%, 60%)',
+  red6: 'hsl(355, 60%, 48%)',
+  red7: 'hsl(355, 65%, 40%)',
+  red8: 'hsl(355, 70%, 32%)',
+  red9: 'hsl(355, 93%, 61%)',
 }
 export const green = {
   green1: 'hsl(120, 48%, 95%)',
