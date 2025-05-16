@@ -16,7 +16,7 @@ export default function (props: CommonMembershipCardProps) {
   const { isPending, open: openAdh } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil' })
   return (
     <VoxCard bg={props.full ? 'white' : '$yellow1'} inside>
-      <HeaderFrame bg="$yellow1" borderRadius="$medium">
+      <HeaderFrame bg="$yellow1" borderRadius="$small">
         <Image
           source={require('@/features/profil/assets/cotisation-illu.png')}
           contentFit="contain"
@@ -38,7 +38,7 @@ export default function (props: CommonMembershipCardProps) {
         </YStack>
       </HeaderFrame>
       <VoxCard.Content p={0} display={props.full ? 'flex' : 'none'}>
-        <VoxCard bg="$gray1" borderColor={'$colorTransparent'}>
+        <VoxCard bg="$gray1" borderColor={'$colorTransparent'} inside>
           <VoxCard.Content>
             <Text.MD bold>Pourquoi adhérer à Renaissance ?</Text.MD>
             <Text>Je finance notre ancrage local</Text>
