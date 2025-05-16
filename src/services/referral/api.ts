@@ -1,6 +1,6 @@
 import { createRestPaginationSchema } from '@/services/common/schema'
 import { ReferralFormErrorThrower } from '@/services/referral/error'
-import { ReferralInviteRequestSchema, ReferralPreRegisterRequestSchema, ReferralSchema, ReferralStatisticsSchema } from '@/services/referral/schema'
+import { ReferralInviteRequestSchema, ReferralPreRegisterRequestSchema, ReferralSchema, ReferralStatisticsSchema, ReferralScoreboardSchema } from '@/services/referral/schema'
 import { api } from '@/utils/api'
 import z from 'zod'
 
@@ -33,5 +33,11 @@ export const ReferralService = {
     path: `${base}/statistics`,
     requestSchema: z.void(),
     responseSchema: ReferralStatisticsSchema,
+  }),
+  scoreboard: api({
+    method: 'GET',
+    path: `${base}/scoreboard`,
+    requestSchema: z.void(),
+    responseSchema: ReferralScoreboardSchema,
   }),
 }

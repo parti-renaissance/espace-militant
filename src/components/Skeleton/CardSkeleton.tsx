@@ -109,7 +109,7 @@ export type SkeCardDescritionProps = {
   full?: boolean
 }
 
-const SkeCardLine = ({ width }: { width: number }) => <Stack height="$1" bg={SkeletonColor} width={width} />
+const SkeCardLine = ({ width }: { width: number | string }) => <Stack height="$1" bg={SkeletonColor} width={width} />
 const SkeCardDescription = ({ full }: SkeCardDescritionProps) => {
   return (
     <YStack gap="$small">

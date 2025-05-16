@@ -1,5 +1,5 @@
 import { ReferralService, referralServiceKey } from '@/services/referral/api'
-import { ReferralInviteRequestType, ReferralStatisticsType } from '@/services/referral/schema'
+import { ReferralInviteRequestType, ReferralScoreboardType, ReferralStatisticsType } from '@/services/referral/schema'
 import { useMutation, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query'
 
 export function useReferrals() {
@@ -39,5 +39,12 @@ export function useReferralsPreRegister() {
         queryKey: [referralServiceKey],
       })
     },
+  })
+}
+
+export function useReferralScoreboard(): UseQueryResult<ReferralScoreboardType> {
+  return useQuery({
+    queryFn: () => ReferralService.scoreboard(),
+    queryKey: [referralServiceKey, 'scoreboard'],
   })
 }
