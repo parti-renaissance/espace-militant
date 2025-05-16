@@ -53,11 +53,6 @@ export const pageConfigs: { [key: string]: PageConfig } = {
     icon: HeartHandshake,
     hiddenInMenu: true,
   },
-  'parrainages-classement': {
-    title: 'Classement',
-    icon: Medal,
-    hiddenInMenu: true,
-  },
   // certification: {
   //   title: 'Certification',
   //   icon: BadgeCheck,
