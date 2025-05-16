@@ -24,7 +24,7 @@ export default function ReferralScoreboardTable({ data }: ReferralScoreboardTabl
       </XStack>
 
       {data.map((entry, index) => {
-        const rowBackground = entry.is_current_user  ? '$orange1' : index % 2 ? '$white1' : '$textSurface'
+        const rowBackground = entry.is_current_user ? '$orange1' : index % 2 ? '$white1' : '$textSurface'
 
         return (
           <XStack
