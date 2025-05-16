@@ -1,7 +1,7 @@
 import { NamedExoticComponent } from 'react'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { IconProps } from '@tamagui/helpers-icon'
-import { CircleUser, HeartHandshake, HelpingHand, KeyRound, LandPlot, MessageCircle, Settings2, Sparkle, TreeDeciduous, Medal } from '@tamagui/lucide-icons'
+import { CircleUser, HeartHandshake, HelpingHand, KeyRound, LandPlot, MessageCircle, Settings2, Sparkle, TreeDeciduous } from '@tamagui/lucide-icons'
 
 export type PageConfig = {
   title: string

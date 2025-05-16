@@ -1,12 +1,9 @@
 import React from 'react'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import Screen from '@/features/profil/pages/referrals-scoreboard'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 
 export default function ReferralsScreen() {
-  const insets = useSafeAreaInsets()
-
   return (
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn
