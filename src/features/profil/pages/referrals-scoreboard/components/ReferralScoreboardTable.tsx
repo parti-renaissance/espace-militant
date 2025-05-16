@@ -42,6 +42,7 @@ export default function ReferralScoreboardTable({ data }: ReferralScoreboardTabl
 
             <XStack gap="$medium" flexGrow={1} alignItems="center" minWidth={0}>
               <ProfilePicture
+                src={entry?.profile_image ?? undefined}
                 fullName={`${entry.first_name} ${entry.last_name}`}
                 alt="profile picture"
                 size="$4"

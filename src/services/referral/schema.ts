@@ -68,6 +68,7 @@ export const ReferralScoreboardItemSchema = z.object({
   assembly: z.string(),
   position: z.number(),
   is_current_user: z.boolean().nullish(),
+  profile_image: z.string().nullish(),
 })
 
 export const ReferralScoreboardSchema = z.object({
