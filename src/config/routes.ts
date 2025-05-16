@@ -1,9 +1,9 @@
 import { HomeIcon } from '@/assets/icons/nav'
-import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap } from '@tamagui/lucide-icons'
+import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap, HeartHandshake } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux' | 'parrainages-classement'
   screenName: string
   highlighted?: boolean
   icon: typeof HomeIcon
@@ -25,6 +25,14 @@ export const ROUTES: TabRoute[] = [
     screenName: 'Événements',
     icon: Calendar,
     theme: 'blue',
+  },
+  {
+    name: 'parrainages-classement',
+    screenName: 'Parrainages',
+    icon: HeartHandshake,
+    theme: 'orange',
+    hidden: true,
+    hiddenMobile: false,
   },
   {
     name: 'actions',

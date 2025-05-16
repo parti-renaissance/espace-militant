@@ -43,6 +43,11 @@ const exectParams = (x: string, canShowHeader: boolean) => {
         header: () => <PageHeader title="Messages" icon={Send} backArrow={true} />,
         headerShown: canShowHeader,
       }
+    case 'parrainages-classement':
+      return {
+        header: () => <HomeHeader />,
+        headerShown: canShowHeader,
+      }
     default:
       return {
         headerShown: false,

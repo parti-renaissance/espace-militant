@@ -8,7 +8,7 @@ import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
 import { NativeStackHeaderProps } from '@react-navigation/native-stack'
 import type { IconProps } from '@tamagui/helpers-icon'
-import { ArrowLeft } from '@tamagui/lucide-icons'
+import { ArrowLeft, HeartHandshake } from '@tamagui/lucide-icons'
 import { Link, router, usePathname, useSegments } from 'expo-router'
 import { capitalize } from 'lodash'
 import { isWeb, Spinner, Stack, styled, ThemeableStack, useMedia, useStyle, View, withStaticProperties, XStack, XStackProps, YStackProps } from 'tamagui'
@@ -17,6 +17,7 @@ import { SignInButton, SignUpButton } from '../Buttons/AuthButton'
 import Container from '../layouts/Container'
 import ProfilePicture from '../ProfilePicture'
 import AuthFallbackWrapper from '../Skeleton/AuthFallbackWrapper'
+import { VoxButton } from '../Button'
 
 const ButtonNav = styled(ThemeableStack, {
   tag: 'button',
@@ -110,9 +111,16 @@ const LoginView = () => (
 )
 
 export const ProfileNav = (props: XStackProps) => {
+  const media = useMedia()
+
   return (
     <AuthFallbackWrapper fallback={<LoginView />}>
       <XStack alignItems={'center'} gap={'$medium'} {...props}>
+        { media.gtSm && (
+          <Link href="/parrainages-classement" asChild>
+            <VoxButton theme='orange' variant='soft' size='sm' iconLeft={HeartHandshake}>{media.gtMd && 'Parrainages'}</VoxButton>
+          </Link>
+        )}
         <DisabledNotificationBell />
         <Link href="/profil">
           <ProfileView />

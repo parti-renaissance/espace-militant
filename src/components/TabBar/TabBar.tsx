@@ -96,7 +96,7 @@ const Tab = ({ isFocus, options, name, onPress, onLayout }: TabProps) => {
     </Animated.View>
   ) : null
   return (
-    <TabBar.Tab theme={options.tabBarTheme} onPress={handlePress} group onLayout={onLayout}>
+    <TabBar.Tab theme={options.tabBarTheme} onPress={handlePress} group onLayout={onLayout} flex={1} width={50}>
       {tabBarIcon}
       <Animated.View style={[animatedTextStyle]}>
         <Text.XSM semibold color={activeColor}>
