@@ -214,7 +214,7 @@ export const RestPostEventRequestSchema = z.object({
   committee: z.string().uuid().nullable(),
   begin_at: z.string(),
   finish_at: z.string(),
-  capacity: z.number().optional(),
+  capacity: z.number().nullable().optional(),
   mode: z.enum(['online', 'meeting']),
   visio_url: z.string().optional(),
   post_address: postAddressSchema.optional(),
