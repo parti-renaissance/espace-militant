@@ -1,4 +1,5 @@
 import { HomeIcon } from '@/assets/icons/nav'
+import { RestProfilResponse } from '@/services/profile/schema'
 import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap, HeartHandshake } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
 
@@ -7,8 +8,8 @@ export type TabRoute = {
   screenName: string
   highlighted?: boolean
   icon: typeof HomeIcon
-  hidden?: boolean
-  hiddenMobile?: boolean
+  hidden?: boolean | ((profile?: RestProfilResponse) => boolean)
+  hiddenMobile?: boolean | ((profile?: RestProfilResponse) => boolean)
   href?: string
   theme: ThemeName
 }
@@ -32,7 +33,7 @@ export const ROUTES: TabRoute[] = [
     icon: HeartHandshake,
     theme: 'orange',
     hidden: true,
-    hiddenMobile: false,
+    hiddenMobile: (profile) => !profile?.tags?.find((tag) => tag.code.startsWith('adherent:')),
   },
   {
     name: 'actions',
