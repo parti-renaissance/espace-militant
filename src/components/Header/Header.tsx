@@ -84,21 +84,22 @@ export const NavBar = () => {
   ) : null
 }
 
-export const ProfileView = () => {
-  const { session } = useSession()
-  const user = useGetProfil({ enabled: !!session })
-  const profile = user?.data
-  return !user.isLoading ? (
+export const ProfileView = ({
+  fullName,
+  imageUrl,
+}: {
+  fullName: string
+  imageUrl?: string
+}) => {
+  return (
     <ProfilePicture
-      fullName={`${profile?.first_name} ${profile?.last_name}`}
-      src={profile?.image_url ?? undefined}
+      fullName={fullName}
+      src={imageUrl}
       alt="profile picture"
       size="$3"
       margin={Platform.OS === 'ios' ? -2 : undefined}
       rounded
     />
-  ) : (
-    <Spinner size="small" />
   )
 }
 const LoginView = () => (
@@ -111,21 +112,42 @@ const LoginView = () => (
 )
 
 export const ProfileNav = (props: XStackProps) => {
+  const { session } = useSession()
+  const { data: profile, isLoading: profilIsLoading } = useGetProfil({ enabled: !!session })
   const media = useMedia()
 
   return (
     <AuthFallbackWrapper fallback={<LoginView />}>
-      <XStack alignItems={'center'} gap={'$medium'} {...props}>
-        { media.gtSm && (
-          <Link href="/parrainages-classement" asChild>
-            <VoxButton theme='orange' variant='soft' size='sm' iconLeft={HeartHandshake}>{media.gtMd && 'Parrainages'}</VoxButton>
+      {!profilIsLoading ? (
+        <XStack alignItems="center" gap="$medium" {...props}>
+          {media.gtSm && profile?.tags?.find((tag) => tag.code.startsWith('adherent:')) && (
+            <View>
+              <Link href="/parrainages-classement" asChild>
+                <VoxButton
+                  theme="orange"
+                  variant="soft"
+                  size="sm"
+                  p={media.md ? 0 : undefined}
+                  w={media.md ? 38 : undefined}
+                  h={media.md ? 38 : undefined}
+                  iconLeft={HeartHandshake}
+                >
+                  {media.gtMd && 'Parrainages'}
+                </VoxButton>
+              </Link>
+            </View>
+          )}
+          <DisabledNotificationBell />
+          <Link href="/profil">
+            <ProfileView
+              fullName={`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`}
+              imageUrl={profile?.image_url ?? undefined}
+            />
           </Link>
-        )}
-        <DisabledNotificationBell />
-        <Link href="/profil">
-          <ProfileView />
-        </Link>
-      </XStack>
+        </XStack>
+      ) : (
+        <Spinner size="small" />
+      )}
     </AuthFallbackWrapper>
   )
 }

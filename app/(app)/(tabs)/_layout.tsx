@@ -8,6 +8,7 @@ import PageHeader from '@/features/profil/components/PageHeader'
 import { Link2, Send } from '@tamagui/lucide-icons'
 import { Link, Slot, Tabs } from 'expo-router'
 import { isWeb, useMedia, View, XStack } from 'tamagui'
+import { useGetProfil } from '@/services/profile/hook'
 
 const HomeHeader = () => {
   return (
@@ -57,32 +58,38 @@ const exectParams = (x: string, canShowHeader: boolean) => {
 
 export default function AppLayout() {
   const media = useMedia()
-  const { isAuth } = useSession()
+  const { isAuth, session } = useSession()
+  const { data: profile } = useGetProfil({ enabled: !!session })
 
   return (
     <View style={{ height: isWeb ? '100svh' : '100%' }} position="relative">
       {!isAuth ? (
         <Slot />
       ) : (
-        <Tabs tabBar={(props) => <TabBar {...props} hide={media.gtSm} />} screenOptions={{}}>
-          {ROUTES.map((route) => (
-            <Tabs.Screen
-              key={route.name}
-              name={route.name}
-              options={{
-                title: route.screenName,
-                // @ts-expect-error custom property
-                tabBarVisible: !route.hiddenMobile,
-                tabBarTheme: route.theme,
-                tabBarActiveTintColor: '$color5',
-                tabBarInactiveTintColor: '$textPrimary',
-                // remove focused from props to avoid warning on Icon component
-                tabBarIcon: ({ focused, ...props }) => <route.icon {...props} />,
-                tabBarLabel: route.screenName,
-                ...exectParams(route.name, media.sm),
-              }}
-            />
-          ))}
+        <Tabs
+          tabBar={(props) => <TabBar {...props} hide={media.gtSm} />}
+          screenOptions={{}}
+        >
+          {ROUTES.map((route) => {
+            const isHiddenMobile = typeof route.hiddenMobile === 'function' ? route.hiddenMobile(profile) : route.hiddenMobile
+            return (
+              <Tabs.Screen
+                key={route.name}
+                name={route.name}
+                options={{
+                  title: route.screenName,
+                  // @ts-expect-error custom property
+                  tabBarVisible: !isHiddenMobile,
+                  tabBarTheme: route.theme,
+                  tabBarActiveTintColor: '$color5',
+                  tabBarInactiveTintColor: '$textPrimary',
+                  tabBarIcon: ({ focused, ...props }) => <route.icon {...props} />,
+                  tabBarLabel: route.screenName,
+                  ...exectParams(route.name, media.sm),
+                }}
+              />
+            )
+          })}
         </Tabs>
       )}
     </View>
