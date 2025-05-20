@@ -43,21 +43,28 @@ export default function ReferralListItem({ item }: Readonly<Props>) {
   }, [item.type])
 
   return (
-    <XStack justifyContent="space-between" alignItems="center" gap="$4" flexWrap="wrap">
-      <YStack flex={1}>
+    <XStack justifyContent="space-between" alignItems="center" gap="$4">
+      <YStack flex={1} minWidth={0}>
         <Text fontWeight="500" lineHeight={lineHeight}>
           {capitalize(item.first_name)} {item.last_name && capitalize(item.last_name)}
         </Text>
+
         <Text color="$textSecondary" lineHeight={lineHeight}>
           {referralType} • {getHumanFormattedDateShort(item.created_at)}
         </Text>
-        <Text color="$textDisabled" lineHeight={lineHeight}>
+
+        <Text color="$textDisabled" lineHeight={lineHeight} numberOfLines={1} ellipsizeMode="tail">
           {item.email_address}
         </Text>
-        {item.phone && <Text color="$textDisabled">{item.phone}</Text>}
+
+        {item.phone && (
+          <Text color="$textDisabled" numberOfLines={1} ellipsizeMode="tail">
+            {item.phone}
+          </Text>
+        )}
       </YStack>
 
-      <YStack alignItems="flex-end" flexShrink={0}>
+      <YStack alignItems="flex-end" flexShrink={0} minWidth={100}>
         <Text color={color} lineHeight={lineHeight} fontWeight={500}>
           {item.status_label}
         </Text>
@@ -68,5 +75,6 @@ export default function ReferralListItem({ item }: Readonly<Props>) {
         )}
       </YStack>
     </XStack>
+
   )
 }

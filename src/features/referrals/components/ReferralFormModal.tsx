@@ -1,6 +1,6 @@
 import React from 'react'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
-import ReferralForm from '@/features/profil/pages/referrals/components/ReferralForm'
+import ReferralForm from '@/features/referrals/components/ReferralForm'
 import { Redirect } from 'expo-router'
 import { isWeb, useMedia } from 'tamagui'
 

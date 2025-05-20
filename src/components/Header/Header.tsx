@@ -114,29 +114,11 @@ const LoginView = () => (
 export const ProfileNav = (props: XStackProps) => {
   const { session } = useSession()
   const { data: profile, isLoading: profilIsLoading } = useGetProfil({ enabled: !!session })
-  const media = useMedia()
 
   return (
     <AuthFallbackWrapper fallback={<LoginView />}>
       {!profilIsLoading ? (
         <XStack alignItems="center" gap="$medium" {...props}>
-          {media.gtSm && profile?.tags?.find((tag) => tag.code.startsWith('adherent:')) && (
-            <View>
-              <Link href="/parrainages-classement" asChild>
-                <VoxButton
-                  theme="orange"
-                  variant="soft"
-                  size="sm"
-                  p={media.md ? 0 : undefined}
-                  w={media.md ? 38 : undefined}
-                  h={media.md ? 38 : undefined}
-                  iconLeft={HeartHandshake}
-                >
-                  {media.gtMd && 'Parrainages'}
-                </VoxButton>
-              </Link>
-            </View>
-          )}
           <DisabledNotificationBell />
           <Link href="/profil">
             <ProfileView

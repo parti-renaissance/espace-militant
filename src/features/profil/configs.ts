@@ -23,11 +23,6 @@ export const pageConfigs: { [key: string]: PageConfig } = {
     title: 'Cotisations et dons',
     icon: HelpingHand,
   },
-  parrainages: {
-    title: 'Parrainages',
-    icon: HeartHandshake,
-    hiddenInMenu: (profile) => !profile?.canary_tester,
-  },
   'mes-instances': {
     title: 'Mes instances',
     icon: LandPlot,

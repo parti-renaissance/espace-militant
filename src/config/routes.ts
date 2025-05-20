@@ -4,7 +4,7 @@ import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Li
 import { ThemeName } from 'tamagui'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux' | 'parrainages-classement'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux' | 'parrainages'
   screenName: string
   highlighted?: boolean
   icon: typeof HomeIcon
@@ -28,11 +28,11 @@ export const ROUTES: TabRoute[] = [
     theme: 'blue',
   },
   {
-    name: 'parrainages-classement',
+    name: 'parrainages',
     screenName: 'Parrainages',
     icon: HeartHandshake,
     theme: 'orange',
-    hidden: true,
+    hidden: false,
     hiddenMobile: (profile) => !profile?.tags?.find((tag) => tag.code.startsWith('adherent:')),
   },
   {
@@ -46,6 +46,7 @@ export const ROUTES: TabRoute[] = [
     screenName: 'États généraux',
     icon: ClipboardCheck,
     theme: 'orange',
+    hidden: true,
     hiddenMobile: true,
   },
   {
