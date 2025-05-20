@@ -1,7 +1,7 @@
 import React from 'react'
 import Text from '@/components/base/Text'
 import { Image, YStack } from 'tamagui'
-import Button from '../../../../../components/Button'
+import Button from '../../../components/Button'
 
 interface Props {
   onClose?: () => void

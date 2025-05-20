@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { LayoutChangeEvent, LayoutRectangle, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
 import Text from '@/components/base/Text'
-import { createStyledContext, styled, TamaguiElement, ThemeableStack, withStaticProperties } from 'tamagui'
+import { createStyledContext, styled, TamaguiElement, ThemeableStack, withStaticProperties, XStack } from 'tamagui'
 
 function clamp(val: number, min: number, max: number) {
   return Math.min(Math.max(val, min), max)
@@ -98,6 +98,7 @@ export const BreadCrumb = <ID extends string>(
       {
         id: ID
         label: string
+        icon?: React.ReactNode
       }[]
     >
     value: ID
@@ -179,7 +180,10 @@ export const BreadCrumb = <ID extends string>(
         ref={setRef(item.id)}
         onPress={handlePress(item.id)}
       >
-        <Text.MD semibold> {item.label}</Text.MD>
+        <XStack>
+          {item?.icon}
+          <Text.MD semibold> {item.label}</Text.MD>
+        </XStack>  
       </BreadCrumbApi.Item>
     )
   })
