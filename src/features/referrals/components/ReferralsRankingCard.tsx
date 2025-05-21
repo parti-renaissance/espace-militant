@@ -1,7 +1,7 @@
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import Text from '@/components/base/Text'
-import ReferralScoreboardTable from '@/features/referrals/components/ReferralScoreboardTable'
+import ReferralScoreboardTable, { ReferralScoreboardTableEmptyState } from '@/features/referrals/components/ReferralScoreboardTable'
 
 interface ReferralsRankingCardProps {
   title: string
@@ -9,7 +9,17 @@ interface ReferralsRankingCardProps {
 }
 
 const ReferralsRankingCard = ({ title, data }: ReferralsRankingCardProps) => {
-  if (!data?.length) return null
+  if (!data) return null
+
+  if (data.length === 0) {
+    return (
+      <VoxCard>
+        <VoxCard.Content>
+          <ReferralScoreboardTableEmptyState />
+        </VoxCard.Content>
+      </VoxCard>
+    )
+  }
 
   return (
     <VoxCard overflow="hidden" gap={0}>
@@ -26,14 +36,14 @@ export const ReferralsRankingCardLoading = () => {
     <SkeCard>
       <SkeCard.Content>
         <SkeCard.Line width={150} />
-        <SkeCard.Separator py={0}/>
-        <SkeCard.Title/>
-        <SkeCard.Separator/>
-        <SkeCard.Title/>
-        <SkeCard.Separator/>
-        <SkeCard.Title/>
-        <SkeCard.Separator/>
-        <SkeCard.Title/>
+        <SkeCard.Separator py={0} />
+        <SkeCard.Title />
+        <SkeCard.Separator />
+        <SkeCard.Title />
+        <SkeCard.Separator />
+        <SkeCard.Title />
+        <SkeCard.Separator />
+        <SkeCard.Title />
       </SkeCard.Content>
     </SkeCard>
   )

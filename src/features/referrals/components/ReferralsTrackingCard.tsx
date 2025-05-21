@@ -14,15 +14,13 @@ const ReferralsTrackingCard = () => {
   return (
     <VoxCard>
       <VoxCard.Content>
-        <Text.MD semibold $sm={{
-           display: 'none'
-          }}>Suivi des parrainages</Text.MD>
-        
-
         {referrals?.items.length === 0 ? (
           <ReferralListEmptyState />
         ) : (
           <>
+            <Text.MD semibold $sm={{
+              display: 'none'
+            }}>Suivi des parrainages</Text.MD>
             <XStack alignItems="center" gap="$medium">
               <XStack flex={1}>
                 <StatsCard
