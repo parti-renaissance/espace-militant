@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import BreadCrumb from '@/components/BreadCrumb/BreadCrumb'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { getTokenValue, ScrollView, View, XStack, YStack } from 'tamagui'
+import { ScrollView, View, YStack } from 'tamagui'
 import { useGetProfil, useGetSuspenseProfil } from '@/services/profile/hook'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
@@ -23,22 +23,28 @@ const ReferralsMobileScreenAllow = () => {
 
   const [activeSection, setActiveSection] = useState<'cl' | 'suivi'>('cl')
 
-  if (isLoadingScoreboard && isLoadingScoreboard) {
+  if (isLoadingScoreboard && isLoadingStatistics) {
     return (
       <ReferralsMobileScreenSkeleton />
     )
   }
-  
+
+  const isInTop5National = (scoreboard?.global_rank ?? Infinity) <= 5
+  const hasAssemblyRanking = (scoreboard?.assembly?.length ?? 0) >= 3
+  const shouldShowAssemblyFirst = !isInTop5National && hasAssemblyRanking
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 100, backgroundColor: '$textSurface' }}>
       <View backgroundColor="$white1" mb="$xxlarge">
         <View maxWidth={480} width="100%" margin="auto" px="$medium" gap="$medium" py="$medium">
-          <Text.MD>Participez à notre grande campagne de{'\n'}parrainage jusqu’à la rentrée !</Text.MD>
+          <Text.MD>Participez à notre grande campagne de parrainage.</Text.MD>
           <ReferralScoreCard
             fullName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}
-            rank={scoreboard?.global_rank}
-            referralCount={statistics?.nb_referral_finished ?? 0}
+            globalRank={!shouldShowAssemblyFirst ? scoreboard?.global_rank : undefined}
+            assemblyRank={shouldShowAssemblyFirst ? scoreboard?.assembly_rank : undefined}
+            nbReferralFinished={statistics?.nb_referral_finished ?? 0}
+            nbReferralSent={statistics?.nb_referral_sent ?? 0}
+            assemblyName={scoreboard?.assembly?.[0]?.assembly ?? undefined}
             profileImage={user?.image_url}
           />
           <ReferralsLinkCard />
@@ -56,8 +62,25 @@ const ReferralsMobileScreenAllow = () => {
         <View gap="$medium">
           {activeSection === 'cl' && (
             <View gap="$medium">
-              <ReferralsRankingCard title="National" data={scoreboard?.global} />
-              <ReferralsRankingCard title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'} data={scoreboard?.assembly} />
+              {shouldShowAssemblyFirst ? (
+                <>
+                  <ReferralsRankingCard
+                    title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'}
+                    data={scoreboard?.assembly}
+                  />
+                  <ReferralsRankingCard title="National" data={scoreboard?.global} />
+                </>
+              ) : (
+                <>
+                  <ReferralsRankingCard title="National" data={scoreboard?.global} />
+                  {hasAssemblyRanking && (
+                    <ReferralsRankingCard
+                      title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'}
+                      data={scoreboard?.assembly}
+                    />
+                  )}
+                </>
+              )}
             </View>
           )}
           {activeSection === 'suivi' && (

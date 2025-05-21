@@ -6,7 +6,7 @@ import { ScrollView, View, XStack, YStack } from 'tamagui'
 import { useGetProfil, useGetSuspenseProfil } from '@/services/profile/hook'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
-import {useReferralScoreboard, useReferralStatistics } from '@/services/referral/hook'
+import { useReferralScoreboard, useReferralStatistics } from '@/services/referral/hook'
 import ReferralScoreCard from '@/features/referrals/components/ReferralScoreCard'
 import StickyBox from '@/components/StickyBox/StickyBox'
 import ReferralsInviteCard from '../components/ReferralsInviteCard'
@@ -27,6 +27,12 @@ const ReferralsDesktopScreenAllow = () => {
   const rankingLayout = useRef<LayoutRectangle | null>(null)
   const trackingLayout = useRef<LayoutRectangle | null>(null)
 
+  if (isLoadingScoreboard && isLoadingStatistics) {
+    return (
+      <ReferralsDesktopScreenSkeleton />
+    )
+  }
+  
   const scrollToLayout = (layout: LayoutRectangle | null) => {
     if (layout && scrollViewRef?.current) {
       scrollViewRef.current.scrollTo({ y: layout.y, animated: true })
@@ -49,12 +55,10 @@ const ReferralsDesktopScreenAllow = () => {
     }
   }, [])
 
-  if (isLoadingScoreboard && isLoadingStatistics) {
-    return (
-      <ReferralsDesktopScreenSkeleton />
-    )
-  }
-  
+  const isInTop5National = (scoreboard?.global_rank ?? Infinity) <= 5
+  const hasAssemblyRanking = (scoreboard?.assembly?.length ?? 0) >= 3
+  const shouldShowAssemblyFirst = !isInTop5National && hasAssemblyRanking
+
 
   return (
     <ScrollView
@@ -67,8 +71,11 @@ const ReferralsDesktopScreenAllow = () => {
         <View maxWidth={480} width="100%" margin="auto">
           <ReferralScoreCard
             fullName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}
-            rank={scoreboard?.global_rank}
-            referralCount={statistics?.nb_referral_finished ?? 0}
+            globalRank={!shouldShowAssemblyFirst ? scoreboard?.global_rank : undefined}
+            assemblyRank={shouldShowAssemblyFirst ? scoreboard?.assembly_rank : undefined}
+            nbReferralFinished={statistics?.nb_referral_finished ?? 0}
+            nbReferralSent={statistics?.nb_referral_sent ?? 0}
+            assemblyName={scoreboard?.assembly?.[0]?.assembly ?? undefined}
             profileImage={user?.image_url}
           />
         </View>
@@ -107,8 +114,25 @@ const ReferralsDesktopScreenAllow = () => {
           {/* Section Classement */}
           <YStack onLayout={(e) => { rankingLayout.current = e.nativeEvent.layout }} gap="$medium">
             <YStack gap="$medium">
-              <ReferralsRankingCard title="National" data={scoreboard?.global} />
-              <ReferralsRankingCard title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'} data={scoreboard?.assembly} />
+              {shouldShowAssemblyFirst ? (
+                <>
+                  <ReferralsRankingCard
+                    title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'}
+                    data={scoreboard?.assembly}
+                  />
+                  <ReferralsRankingCard title="National" data={scoreboard?.global} />
+                </>
+              ) : (
+                <>
+                  <ReferralsRankingCard title="National" data={scoreboard?.global} />
+                  {hasAssemblyRanking && (
+                    <ReferralsRankingCard
+                      title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'}
+                      data={scoreboard?.assembly}
+                    />
+                  )}
+                </>
+              )}
             </YStack>
           </YStack>
           {/* Section Suivi */}
@@ -168,10 +192,10 @@ export const ReferralsDesktopScreenSkeleton = () => {
         <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
           <View pr="$medium" width={200}>
             <SkeCard>
-        <SkeCard.Content>
-          <SkeCard.Line width={100}/>
-          <SkeCard.Line width={100}/>
-        </SkeCard.Content>
+              <SkeCard.Content>
+                <SkeCard.Line width={100} />
+                <SkeCard.Line width={100} />
+              </SkeCard.Content>
             </SkeCard>
           </View>
         </StickyBox>
