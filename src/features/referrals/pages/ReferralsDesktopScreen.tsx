@@ -54,7 +54,7 @@ const ReferralsDesktopScreenAllow = () => {
       <ReferralsDesktopScreenSkeleton />
     )
   }
-  
+
   const isInTop5National = (scoreboard?.global_rank ?? Infinity) <= 5
   const hasAssemblyRanking = (scoreboard?.assembly?.length ?? 0) >= 3
   const shouldShowAssemblyFirst = !isInTop5National && hasAssemblyRanking
@@ -124,7 +124,7 @@ const ReferralsDesktopScreenAllow = () => {
                 </>
               ) : (
                 <>
-                  <ReferralsRankingCard title="National" data={scoreboard?.global} />
+                  <ReferralsRankingCard title="National" data={[]} />
                   {hasAssemblyRanking && (
                     <ReferralsRankingCard
                       title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'}

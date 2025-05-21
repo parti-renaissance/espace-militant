@@ -1,5 +1,5 @@
 import React from 'react'
-import { XStack, YStack } from 'tamagui'
+import { Image, View, XStack, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture'
 import { ReferralScoreboardItemType } from '@/services/referral/schema'
@@ -62,5 +62,25 @@ export default function ReferralScoreboardTable({ data }: ReferralScoreboardTabl
         )
       })}
     </YStack>
+  )
+}
+
+export function ReferralScoreboardTableEmptyState() {
+  return (
+    <View
+      width={'100%'}
+      height={300}
+      backgroundColor={'$gray1'}
+      padding={'$medium'}
+      borderRadius={'$4'}
+      justifyContent={'center'}
+      alignItems={'center'}
+      gap={'$medium'}
+    >
+      <Image source={require('@/assets/illustrations/empty-state.png')} />
+      <Text.MD fontWeight={500} color={'$textSecondary'}>
+        Parrainez un nouveau pour participer au classement
+      </Text.MD>
+    </View>
   )
 }
