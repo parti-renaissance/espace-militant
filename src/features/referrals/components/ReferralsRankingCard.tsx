@@ -1,3 +1,4 @@
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import Text from '@/components/base/Text'
 import ReferralScoreboardTable from '@/features/referrals/components/ReferralScoreboardTable'
@@ -17,6 +18,24 @@ const ReferralsRankingCard = ({ title, data }: ReferralsRankingCardProps) => {
       </Text.MD>
       <ReferralScoreboardTable data={data} />
     </VoxCard>
+  )
+}
+
+export const ReferralsRankingCardLoading = () => {
+  return (
+    <SkeCard>
+      <SkeCard.Content>
+        <SkeCard.Line width={150} />
+        <SkeCard.Separator py={0}/>
+        <SkeCard.Title/>
+        <SkeCard.Separator/>
+        <SkeCard.Title/>
+        <SkeCard.Separator/>
+        <SkeCard.Title/>
+        <SkeCard.Separator/>
+        <SkeCard.Title/>
+      </SkeCard.Content>
+    </SkeCard>
   )
 }
 

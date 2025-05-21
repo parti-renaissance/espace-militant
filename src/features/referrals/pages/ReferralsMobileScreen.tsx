@@ -10,7 +10,7 @@ import { useReferrals, useReferralScoreboard, useReferralStatistics } from '@/se
 import ReferralScoreCard from '@/features/referrals/components/ReferralScoreCard'
 import ReferralsLinkCard from '../components/ReferralsLinkCard'
 import ReferralsInviteCard from '../components/ReferralsInviteCard'
-import ReferralsRankingCard from '../components/ReferralsRankingCard'
+import ReferralsRankingCard, { ReferralsRankingCardLoading } from '../components/ReferralsRankingCard'
 import ReferralsTrackingCard from '../components/ReferralsTrackingCard'
 import { ListTodo, Medal } from '@tamagui/lucide-icons'
 import ReferralLockedCard from '@/features/referrals/components/ReferralLockedCard'
@@ -23,10 +23,17 @@ const ReferralsMobileScreenAllow = () => {
 
   const [activeSection, setActiveSection] = useState<'cl' | 'suivi'>('cl')
 
+  if (isLoadingScoreboard && isLoadingScoreboard) {
+    return (
+      <ReferralsMobileScreenSkeleton />
+    )
+  }
+  
+
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 100, backgroundColor: '$textSurface' }}>
-      <View backgroundColor="$white1"  mb="$xxlarge">
-      <View maxWidth={480} width="100%" margin="auto" px="$medium" gap="$medium" py="$medium">
+      <View backgroundColor="$white1" mb="$xxlarge">
+        <View maxWidth={480} width="100%" margin="auto" px="$medium" gap="$medium" py="$medium">
           <Text.MD>Participez à notre grande campagne de{'\n'}parrainage jusqu’à la rentrée !</Text.MD>
           <ReferralScoreCard
             fullName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}
@@ -47,13 +54,13 @@ const ReferralsMobileScreenAllow = () => {
           />
         </View>
         <View gap="$medium">
-          { activeSection === 'cl' && (
+          {activeSection === 'cl' && (
             <View gap="$medium">
               <ReferralsRankingCard title="National" data={scoreboard?.global} />
               <ReferralsRankingCard title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'} data={scoreboard?.assembly} />
             </View>
           )}
-          { activeSection === 'suivi' && (
+          {activeSection === 'suivi' && (
             <View>
               <ReferralsTrackingCard />
             </View>
@@ -67,16 +74,38 @@ const ReferralsMobileScreenAllow = () => {
 export const ReferralsMobileScreenDeny = () => {
   return (
     <View maxWidth={580} width="100%" mx="auto" mt="$medium">
-      <ReferralLockedCard/>
+      <ReferralLockedCard />
     </View>
   )
 }
 
 export const ReferralsMobileScreenSkeleton = () => {
   return (
-    <SkeCard>
-      <SkeCard.Image></SkeCard.Image>
-    </SkeCard>
+    <View style={{ paddingBottom: 100, backgroundColor: '$textSurface' }}>
+      <View backgroundColor="$white1" mb="$xxlarge">
+        <View maxWidth={480} width="100%" margin="auto" px="$medium" gap="$medium" py="$medium">
+          <SkeCard>
+            <SkeCard.Content>
+              <SkeCard.Title />
+              <SkeCard.Image />
+              <SkeCard.Line width="100%" />
+              <SkeCard.Image />
+              <SkeCard.Image />
+            </SkeCard.Content>
+          </SkeCard>
+        </View>
+      </View>
+      <YStack>
+        <View>
+          <SkeCard>
+            <SkeCard.Image />
+          </SkeCard>
+        </View>
+        <View gap="$medium">
+          <ReferralsRankingCardLoading />
+        </View>
+      </YStack>
+    </View>
   )
 }
 
