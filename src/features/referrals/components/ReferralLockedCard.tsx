@@ -8,7 +8,7 @@ import { Image } from 'expo-image'
 import { View, YStack } from 'tamagui'
 
 export default function ReferralLockedCard({ hideHeader }: { hideHeader?: boolean }) {
-  const { isPending, open: openAdh } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil' })
+  const { isPending, open: openAdh } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'parrainages' })
 
   return (
     <InstanceCard title="Parrainages" icon={HeartHandshake} hideHeader={hideHeader}>

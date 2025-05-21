@@ -16,7 +16,7 @@ const ReferralsLinkCard = () => {
   const onCopyURL = () => copyURL(user?.referral_link ?? '')
   const onShare = () => {
     if (!user?.referral_link) return
-    return handleShareOrCopy({ url: user.referral_link, message: 'Lien de parrainage' })
+    return handleShareOrCopy({ url: user.referral_link, message: 'Rejoignez le camp de l’espoir !' })
   }
 
   return (
