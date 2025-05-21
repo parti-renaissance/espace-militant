@@ -1,72 +1,60 @@
-import { Component, useCallback, useRef, useState } from 'react'
-import type { ScrollView as RNScrollView, View as RNView } from 'react-native'
+import { useCallback, useRef, useState } from 'react'
+import type { LayoutRectangle, NativeScrollEvent, NativeSyntheticEvent, ScrollView as RNScrollView, View as RNView } from 'react-native'
 import BreadCrumb from '@/components/BreadCrumb/BreadCrumb'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { ScrollView, View, XStack, YStack } from 'tamagui'
 import { useGetProfil, useGetSuspenseProfil } from '@/services/profile/hook'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
-import Text from '@/components/base/Text'
-import { useReferrals, useReferralScoreboard, useReferralStatistics } from '@/services/referral/hook'
+import {useReferralScoreboard, useReferralStatistics } from '@/services/referral/hook'
 import ReferralScoreCard from '@/features/referrals/components/ReferralScoreCard'
 import StickyBox from '@/components/StickyBox/StickyBox'
-import { findNodeHandle, StyleSheet } from 'react-native'
 import ReferralsInviteCard from '../components/ReferralsInviteCard'
 import ReferralsLinkCard from '../components/ReferralsLinkCard'
 import ReferralsTrackingCard from '../components/ReferralsTrackingCard'
-import ReferralsRankingCard from '../components/ReferralsRankingCard'
+import ReferralsRankingCard, { ReferralsRankingCardLoading } from '../components/ReferralsRankingCard'
 import ReferralLockedCard from '@/features/referrals/components/ReferralLockedCard'
+import { ListTodo, Medal } from '@tamagui/lucide-icons'
 
 const ReferralsDesktopScreenAllow = () => {
   const { data: scoreboard, isLoading: isLoadingScoreboard } = useReferralScoreboard()
   const { data: statistics, isLoading: isLoadingStatistics } = useReferralStatistics()
   const { data: user } = useGetProfil()
 
-  const scrollViewRef = useRef<RNScrollView>(null)
-  const rankingRef = useRef<RNView>(null)
-  const trackingRef = useRef<RNView>(null)
+  const [activeSection, setActiveSection] = useState('cl')
 
-  const scrollToRef = (ref: any) => {
-    if (ref?.current) {
-      ref.current.measureLayout(
-        findNodeHandle(scrollViewRef.current as unknown as Component),
-        (x, y) => {
-          scrollViewRef.current?.scrollTo({ y, animated: true })
-        },
-        () => { }
-      )
+  const scrollViewRef = useRef<RNScrollView>(null)
+  const rankingLayout = useRef<LayoutRectangle | null>(null)
+  const trackingLayout = useRef<LayoutRectangle | null>(null)
+
+  const scrollToLayout = (layout: LayoutRectangle | null) => {
+    if (layout && scrollViewRef?.current) {
+      scrollViewRef.current.scrollTo({ y: layout.y, animated: true })
     }
   }
 
-  const [activeSection, setActiveSection] = useState<'cl' | 'suivi'>('cl')
+  const scrollToRanking = () => scrollToLayout(rankingLayout?.current)
+  const scrollToTracking = () => scrollToLayout(trackingLayout?.current)
 
-  const handleScroll = useCallback((event: any) => {
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const scrollY = event.nativeEvent.contentOffset.y
 
-    if (rankingRef.current && trackingRef.current && scrollViewRef.current) {
-      const scrollViewNode = findNodeHandle(scrollViewRef.current)
-      if (!scrollViewNode) return
+    const rankingY = rankingLayout.current?.y ?? 0
+    const trackingY = trackingLayout.current?.y ?? 0
 
-      rankingRef.current.measureLayout(
-        scrollViewNode,
-        (_x, yRanking) => {
-          trackingRef.current?.measureLayout(
-            scrollViewNode,
-            (_x, yTracking) => {
-              if (scrollY >= yTracking - 100) {
-                setActiveSection('suivi')
-              } else if (scrollY >= yRanking - 100) {
-                setActiveSection('cl')
-              }
-            },
-            () => { }
-          )
-        },
-        () => { }
-      )
+    if (scrollY >= trackingY - 100) {
+      setActiveSection('suivi')
+    } else if (scrollY >= rankingY - 100) {
+      setActiveSection('cl')
     }
   }, [])
 
+  if (isLoadingScoreboard && isLoadingStatistics) {
+    return (
+      <ReferralsDesktopScreenSkeleton />
+    )
+  }
+  
 
   return (
     <ScrollView
@@ -105,26 +93,26 @@ const ReferralsDesktopScreenAllow = () => {
         <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
           <View pl="$medium" pt="$medium" width={200}>
             <BreadCrumb
-              items={[{ id: "cl", label: 'Classement' }, { id: "suivi", label: 'Suivi' }]}
+              items={[{ id: "cl", label: 'Classement', icon: <Medal size={16} /> }, { id: "suivi", label: 'Suivi', icon: <ListTodo size={16} /> }]}
               value={activeSection}
               vertical
               onChange={(value) => {
-                if (value === 'cl') scrollToRef(rankingRef)
-                if (value === 'suivi') scrollToRef(trackingRef)
+                if (value === 'cl') scrollToRanking()
+                if (value === 'suivi') scrollToTracking()
               }}
             />
           </View>
         </StickyBox>
         <YStack gap="$medium" flex={1}>
           {/* Section Classement */}
-          <YStack ref={rankingRef} gap="$medium">
-            <YStack ref={rankingRef} gap="$medium">
+          <YStack onLayout={(e) => { rankingLayout.current = e.nativeEvent.layout }} gap="$medium">
+            <YStack gap="$medium">
               <ReferralsRankingCard title="National" data={scoreboard?.global} />
               <ReferralsRankingCard title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'} data={scoreboard?.assembly} />
             </YStack>
           </YStack>
           {/* Section Suivi */}
-          <YStack flex={1} ref={trackingRef}>
+          <YStack flex={1} onLayout={(e) => { trackingLayout.current = e.nativeEvent.layout }}>
             <ReferralsTrackingCard />
           </YStack>
         </YStack>
@@ -136,16 +124,71 @@ const ReferralsDesktopScreenAllow = () => {
 export const ReferralsDesktopScreenDeny = () => {
   return (
     <View maxWidth={580} width="100%" mx="auto" mt="$medium">
-      <ReferralLockedCard/>
+      <ReferralLockedCard />
     </View>
   )
 }
 
 export const ReferralsDesktopScreenSkeleton = () => {
   return (
-    <SkeCard>
-      <SkeCard.Image></SkeCard.Image>
-    </SkeCard>
+    <View
+      style={{ paddingBottom: 100, backgroundColor: '$textSurface' }}
+    >
+      <View backgroundColor="$orange1" pt="$6" pb={48 + 32}>
+        <View maxWidth={480} width="100%" margin="auto">
+          <SkeCard height={280}>
+            <SkeCard.Content>
+              <SkeCard.Image />
+              <SkeCard.Line width="100%" />
+            </SkeCard.Content>
+          </SkeCard>
+        </View>
+      </View>
+      <View mt={-48}>
+        <View maxWidth={780} width="100%" margin="auto">
+          <VoxCard>
+            <VoxCard.Content>
+              <XStack gap="$medium">
+                <YStack flex={1}>
+                  <SkeCard>
+                    <SkeCard.Image />
+                  </SkeCard>
+                </YStack>
+                <YStack flex={1}>
+                  <SkeCard>
+                    <SkeCard.Image />
+                  </SkeCard>
+                </YStack>
+              </XStack>
+            </VoxCard.Content>
+          </VoxCard>
+        </View>
+      </View>
+      <XStack maxWidth={780} py="$medium" width="100%" margin="auto" height="auto">
+        <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
+          <View pr="$medium" width={200}>
+            <SkeCard>
+        <SkeCard.Content>
+          <SkeCard.Line width={100}/>
+          <SkeCard.Line width={100}/>
+        </SkeCard.Content>
+            </SkeCard>
+          </View>
+        </StickyBox>
+        <YStack gap="$medium" flex={1}>
+          {/* Section Classement */}
+          <YStack gap="$medium">
+            <YStack gap="$medium">
+              <ReferralsRankingCardLoading />
+            </YStack>
+          </YStack>
+          {/* Section Suivi */}
+          <YStack flex={1}>
+            <ReferralsRankingCardLoading />
+          </YStack>
+        </YStack>
+      </XStack>
+    </View>
   )
 }
 
