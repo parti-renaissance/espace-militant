@@ -33,7 +33,7 @@ export const ROUTES: TabRoute[] = [
     icon: HeartHandshake,
     theme: 'orange',
     hidden: false,
-    hiddenMobile: (profile) => !profile?.tags?.find((tag) => tag.code.startsWith('adherent:')),
+    hiddenMobile: false,
   },
   {
     name: 'actions',

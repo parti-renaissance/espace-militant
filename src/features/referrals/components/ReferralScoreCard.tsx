@@ -37,7 +37,7 @@ function ReferralScoreCardBadge({ globalRank, assemblyRank, assemblyName }: Refe
       <Text.MD color="$orange8" fontWeight="700" textAlign="center">
         {label}
       </Text.MD>
-      {isGlobalRanked || isAssemblyRanked && (
+      {(isGlobalRanked || isAssemblyRanked) && (
         <Text.SM color="$orange6" semibold textAlign="center">
           {subLabel}
         </Text.SM>
