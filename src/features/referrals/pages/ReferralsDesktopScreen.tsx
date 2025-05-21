@@ -27,12 +27,6 @@ const ReferralsDesktopScreenAllow = () => {
   const rankingLayout = useRef<LayoutRectangle | null>(null)
   const trackingLayout = useRef<LayoutRectangle | null>(null)
 
-  if (isLoadingScoreboard && isLoadingStatistics) {
-    return (
-      <ReferralsDesktopScreenSkeleton />
-    )
-  }
-  
   const scrollToLayout = (layout: LayoutRectangle | null) => {
     if (layout && scrollViewRef?.current) {
       scrollViewRef.current.scrollTo({ y: layout.y, animated: true })
@@ -55,6 +49,12 @@ const ReferralsDesktopScreenAllow = () => {
     }
   }, [])
 
+  if (isLoadingScoreboard && isLoadingStatistics) {
+    return (
+      <ReferralsDesktopScreenSkeleton />
+    )
+  }
+  
   const isInTop5National = (scoreboard?.global_rank ?? Infinity) <= 5
   const hasAssemblyRanking = (scoreboard?.assembly?.length ?? 0) >= 3
   const shouldShowAssemblyFirst = !isInTop5National && hasAssemblyRanking
