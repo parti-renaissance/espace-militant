@@ -1,14 +1,15 @@
 import { HomeIcon } from '@/assets/icons/nav'
-import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap } from '@tamagui/lucide-icons'
+import { RestProfilResponse } from '@/services/profile/schema'
+import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap, HeartHandshake } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux' | 'parrainages'
   screenName: string
   highlighted?: boolean
   icon: typeof HomeIcon
-  hidden?: boolean
-  hiddenMobile?: boolean
+  hidden?: boolean | ((profile?: RestProfilResponse) => boolean)
+  hiddenMobile?: boolean | ((profile?: RestProfilResponse) => boolean)
   href?: string
   theme: ThemeName
 }
@@ -27,6 +28,14 @@ export const ROUTES: TabRoute[] = [
     theme: 'blue',
   },
   {
+    name: 'parrainages',
+    screenName: 'Parrainages',
+    icon: HeartHandshake,
+    theme: 'orange',
+    hidden: false,
+    hiddenMobile: false,
+  },
+  {
     name: 'actions',
     screenName: 'Actions',
     icon: Zap,
@@ -37,6 +46,7 @@ export const ROUTES: TabRoute[] = [
     screenName: 'États généraux',
     icon: ClipboardCheck,
     theme: 'orange',
+    hidden: true,
     hiddenMobile: true,
   },
   {

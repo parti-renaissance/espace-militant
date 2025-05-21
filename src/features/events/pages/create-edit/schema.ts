@@ -94,7 +94,7 @@ export const createEventSchema = z
     finish_at: z.date({
       required_error: 'La date de fin est obligatoire.',
     }),
-    capacity: z.number().optional(),
+    capacity: z.number().nullable().optional(),
     mode: z.enum(['online', 'meeting']),
     visio_url: z
       .string()

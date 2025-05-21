@@ -2,7 +2,7 @@ import { NamedExoticComponent } from 'react'
 import { VoxHeader } from '@/components/Header/Header'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowLeft } from '@tamagui/lucide-icons'
-import { Link } from 'expo-router'
+import { useNavigation, useRouter } from 'expo-router'
 
 type ProfilHeaderProps = {
   icon: NamedExoticComponent<IconProps>
@@ -11,12 +11,21 @@ type ProfilHeaderProps = {
 }
 
 const ProfilHeader = ({ icon, title, backArrow = true }: ProfilHeaderProps) => {
+  const router = useRouter()
+  const navigation = useNavigation()
+
+  const handleBack = () => {
+    if (navigation.canGoBack?.()) {
+      router.back()
+    } else {
+      router.push('/profil')
+    }
+  }
+
   return (
     <VoxHeader justifyContent="space-between" backgroundColor="white" $gtMd={{ display: 'none' }}>
       {backArrow ? (
-        <Link href="/profil">
-          <VoxHeader.LeftButton icon={ArrowLeft} />
-        </Link>
+        <VoxHeader.LeftButton icon={ArrowLeft} onPress={handleBack} />
       ) : (
         <VoxHeader.LeftButton opacity={0} icon={ArrowLeft} />
       )}

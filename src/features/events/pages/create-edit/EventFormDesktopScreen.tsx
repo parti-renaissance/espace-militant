@@ -188,7 +188,7 @@ const EventDesktopAside = () => {
 
         <YStack>
           <Controller
-            render={({ field }) => {
+            render={({ field, fieldState }) => {
               return (
                 <YStack height={44}>
                   <Input
@@ -199,7 +199,11 @@ const EventDesktopAside = () => {
                     inputMode="numeric"
                     defaultValue={field.value?.toString()}
                     onBlur={field.onBlur}
-                    onChange={(x) => field.onChange(Number(x))}
+                    error={fieldState.error?.message}
+                    onChange={(x) => {
+                      const value = x.trim()
+                      field.onChange(value === '' ? null : Number(value))
+                    }}
                     iconRight={<Users size={20} color="$gray4" />}
                   />
                 </YStack>

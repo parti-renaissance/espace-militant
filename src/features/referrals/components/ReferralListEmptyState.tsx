@@ -15,7 +15,7 @@ export default function ReferralListEmptyState() {
     >
       <Image source={require('@/assets/illustrations/empty-list.png')} />
       <Text.MD fontWeight={500} color={'$textSecondary'}>
-        Aucun parrainage pour le moment.
+        Vous pourrez suivre vos parrainages ici. Faites une première invitation
       </Text.MD>
     </View>
   )

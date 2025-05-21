@@ -23,6 +23,8 @@ export const CardFrame = styled(YStack, {
         },
       },
       false: {
+        borderWidth: 1,
+        borderColor: '$textOutline',
         elevation: 1,
         shadowColor: '$gray1',
       },

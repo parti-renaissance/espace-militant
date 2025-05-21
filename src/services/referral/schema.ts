@@ -60,3 +60,23 @@ export const ReferralStatisticsSchema = z.object({
   nb_referral_reported: z.number(),
 })
 export type ReferralStatisticsType = z.infer<typeof ReferralStatisticsSchema>
+
+export const ReferralScoreboardItemSchema = z.object({
+  referrals_count: z.number(),
+  first_name: z.string(),
+  last_name: z.string(),
+  assembly: z.string(),
+  position: z.number(),
+  is_current_user: z.boolean().nullish(),
+  profile_image: z.string().nullable(),
+})
+
+export const ReferralScoreboardSchema = z.object({
+  global: z.array(ReferralScoreboardItemSchema),
+  global_rank: z.number(),
+  assembly: z.array(ReferralScoreboardItemSchema),
+  assembly_rank: z.number(),
+})
+
+export type ReferralScoreboardItemType = z.infer<typeof ReferralScoreboardItemSchema>
+export type ReferralScoreboardType = z.infer<typeof ReferralScoreboardSchema>
