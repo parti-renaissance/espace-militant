@@ -1,6 +1,6 @@
 import { UnregistrationReason } from '@/components/DeleteAccountModal/Components/DeleteAccountModalStep2'
 import { activistTagSchema, ActivistTagTypes } from '@/data/Activist/schema'
-import { z } from 'zod'
+import { string, z } from 'zod'
 
 // -----------------  RestProfil  -----------------
 
@@ -353,6 +353,17 @@ export const RestChangePasswordResponseSchema = z.any()
 
 export const propertyPathChangePasswordSchema = z.enum(['old_password', 'new_password', 'new_password_confirmation'])
 
+// -----------------  RestInstances  -----------------
+
+const managerSchema = z.object({
+  uuid: z.string().nullable(),
+  public_id: z.string().nullable(),
+  first_name: z.string().nullable(),
+  last_name: z.string().nullable(),
+  image_url: z.string().nullable(),
+  role: z.string().nullable(),
+}).nullable()
+
 export const RestInstancesRequestSchema = z.void()
 
 export type RestInstancesRequest = z.infer<typeof RestInstancesRequestSchema>
@@ -372,6 +383,16 @@ export const RestInstancesResponseSchema = z.array(
       assembly_committees_count: z.number(),
       can_change_committee: z.boolean(),
       message: z.string().nullable(),
+    }),
+    z.object({
+      uuid: z.string().uuid().nullable(),
+      type: z.literal('agora'),
+      name: z.string().nullable(),
+      slug: z.string().nullable(),
+      description: z.string().nullable(),
+      max_members_count: z.number().nullable(),
+      members_count: z.number().nullable(),
+      manager: managerSchema
     }),
   ]),
 )

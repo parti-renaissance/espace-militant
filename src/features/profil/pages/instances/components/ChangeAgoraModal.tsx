@@ -7,59 +7,66 @@ import { VoxHeader } from '@/components/Header/Header'
 import { InstanceCardHeader } from '@/components/InstanceCard/InstanceCard'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useGetCommittees, useSetMyCommittee } from '@/services/committee/hook'
+import { usePaginatedAgoras, useSetMyAgora } from '@/services/agoras/hook'
 import { Diamond, X } from '@tamagui/lucide-icons'
 import { useMedia, YStack } from 'tamagui'
-import { DoubleDiamond } from './icons'
 import { MembershipCard } from './MembershipCard'
+import { DoubleDiamond } from './icons'
 
 const MemoizedMembershipCard = memo(MembershipCard)
 
-const ChangeCommitteeList = ({ currentUuid, ...props }: { currentUuid: string | null; onClose?: () => void }) => {
-  const { data } = useGetCommittees()
-  const { mutateAsync, isPending } = useSetMyCommittee()
+const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; onClose?: () => void }) => {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = usePaginatedAgoras()
+  const { mutateAsync, isPending } = useSetMyAgora()
 
-  const list = useMemo(() => {
-    if (currentUuid) {
-      const index = data.findIndex((x) => x.uuid === currentUuid)
-      if (index !== -1) {
-        const [selected] = data.splice(index, 1)
-        data.unshift(selected)
-      }
+  const agoras = useMemo(() => {
+    const all = data?.pages.flatMap((page) => page.items) ?? []
+    if (currentUuids.length > 0) {
+      const matching = all.filter((a) => currentUuids.includes(a.uuid))
+      const others = all.filter((a) => !currentUuids.includes(a.uuid))
+      return [...matching, ...others]
     }
-    return data
-  }, [data, currentUuid])
+    return all
+  }, [data, currentUuids])
 
-  const [selected, setSelected] = useState<string | null>(currentUuid)
   const [pendingSelected, setPendingSelected] = useState<string | null>(null)
+
   const { current: handlePress } = useRef((uuid: string) => () => {
     setPendingSelected(uuid)
     mutateAsync(uuid)
       .then(() => {
-        setSelected(uuid)
-        props.onClose?.()
+        onClose?.()
       })
       .finally(() => {
         setPendingSelected(null)
       })
   })
+
   const media = useMedia()
   const key = media.gtSm ? 'gtSm' : 'sm'
+
   return (
     <FlatList
       style={{ flex: 1 }}
-      data={list}
+      data={agoras}
       key={key}
       numColumns={media.gtSm ? 2 : undefined}
-      ListHeaderComponent={<Text.P $gtSm={{ pb: 16 }}>Vous pouvez seulement changer de comité au sein de votre Assemblée.</Text.P>}
-      renderItem={({ item: committee }) => (
+      onEndReached={() => hasNextPage && fetchNextPage()}
+      onEndReachedThreshold={0.5}
+      ListHeaderComponent={
+        <Text.P $gtSm={{ pb: 16 }}>
+          Vous pouvez appartenir à plusieurs agoras et en changer à tout moment.
+        </Text.P>
+      }
+      renderItem={({ item: agora }) => (
         <MemoizedMembershipCard
-          title={committee.name}
-          subtitle={`${committee.members_count} adhérents`}
-          selected={selected === committee.uuid}
-          onPress={handlePress(committee.uuid)}
-          loading={pendingSelected === committee.uuid && isPending}
-          isMember={selected === committee.uuid}
+          title={agora.name}
+          subtitle={`${agora.members_count ?? '-'}/${agora.max_members_count ?? '999'} Adhérents`}
+          selected={currentUuids.includes(agora.uuid)}
+          onPress={handlePress(agora.uuid)}
+          loading={pendingSelected === agora.uuid && isPending}
+          isMember={currentUuids.includes(agora.uuid)}
+          disabled={agora?.members_count >= agora?.max_members_count}
         />
       )}
       keyExtractor={(item) => item.uuid}
@@ -69,11 +76,15 @@ const ChangeCommitteeList = ({ currentUuid, ...props }: { currentUuid: string | 
   )
 }
 
+
 const windowSize = Dimensions.get('window')
-export default function ChangeCommitteeModal({
-  currentCommitteeUuid,
+
+export default function ChangeAgoraModal({
+  currentAgoraUuids,
   ...modalProps
-}: Omit<ComponentPropsWithoutRef<typeof ModalOrPageBase>, 'header'> & { currentCommitteeUuid: string | null }) {
+}: Omit<ComponentPropsWithoutRef<typeof ModalOrPageBase>, 'header'> & {
+  currentAgoraUuids: string[]
+}) {
   const media = useMedia()
   const maxHeight = media.sm ? windowSize.height - 56 : windowSize.height * 0.8
   const width = !media.gtMd ? '100%' : 616
@@ -85,7 +96,7 @@ export default function ChangeCommitteeModal({
       header={
         <YStack>
           <VoxHeader justifyContent="space-between">
-            <VoxHeader.Title icon={Diamond}>Changer de comité</VoxHeader.Title>
+            <VoxHeader.Title icon={Diamond}>Changer d’agora</VoxHeader.Title>
             <VoxButton onPress={modalProps.onClose} variant="text" shrink iconLeft={X} size="lg" />
           </VoxHeader>
         </YStack>
@@ -97,14 +108,14 @@ export default function ChangeCommitteeModal({
             <VoxCard.Content pb={0}>
               <InstanceCardHeader
                 icon={DoubleDiamond}
-                title="Changer de comité"
+                title="Changer d’agora"
                 headerLeft={<VoxButton onPress={modalProps.onClose} variant="text" shrink iconLeft={X} size="lg" />}
               />
             </VoxCard.Content>
           ) : null}
           <View style={{ flex: 1 }}>
             <BoundarySuspenseWrapper>
-              <ChangeCommitteeList currentUuid={currentCommitteeUuid} onClose={modalProps.onClose} />
+              <ChangeAgoraList currentUuids={currentAgoraUuids} onClose={modalProps.onClose} />
             </BoundarySuspenseWrapper>
           </View>
         </YStack>
