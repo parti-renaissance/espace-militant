@@ -1,6 +1,6 @@
 import { UnregistrationReason } from '@/components/DeleteAccountModal/Components/DeleteAccountModalStep2'
 import { activistTagSchema, ActivistTagTypes } from '@/data/Activist/schema'
-import { string, z } from 'zod'
+import { z } from 'zod'
 
 // -----------------  RestProfil  -----------------
 
