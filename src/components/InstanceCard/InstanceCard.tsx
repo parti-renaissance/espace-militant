@@ -4,7 +4,7 @@ import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { IconProps } from '@tamagui/helpers-icon'
-import { withStaticProperties, XStack, YStack } from 'tamagui'
+import { Separator, withStaticProperties, XStack, YStack } from 'tamagui'
 
 type InstanceCardHeaderProps = {
   title: string
@@ -47,8 +47,8 @@ const InstanceCard = (props: InstanceCardProps) => {
 
 type AuthorContentProps = {
   name: string
-  avatar: string
-  role: string
+  avatar?: string
+  role?: string
 }
 
 type InstanceCardContentProps = {
@@ -59,11 +59,11 @@ type InstanceCardContentProps = {
 
 export const AuthorContent = (props: AuthorContentProps) => {
   return (
-    <XStack>
-      <ProfilePicture rounded src={props.avatar} fullName={props.name} alt={`Avatar de ${props.name}`} />
-      <YStack>
-        <Text.SM>{props.name}</Text.SM>
-        <Text.P>{props.role}</Text.P>
+    <XStack alignItems="center">
+      <ProfilePicture rounded src={props?.avatar ?? undefined} fullName={props.name} alt={`Avatar de ${props.name}`} size="$4"/>
+      <YStack ml="$small">
+        {props?.name && <Text.SM>{props.name}</Text.SM>}
+        {props?.role && <Text.P>{props.role}</Text.P>}
       </YStack>
     </XStack>
   )
@@ -77,7 +77,12 @@ const InstanceCardContent = (props: InstanceCardContentProps) => {
           <Text.MD semibold>{props.title}</Text.MD>
           {props.description ? <Text.SM color="$textSecondary">{props.description}</Text.SM> : null}
         </YStack>
-        {props.author && <AuthorContent {...props.author} />}
+        {props.author && (
+          <>
+            <Separator borderColor={'$textOutline'} borderRadius={1} />
+            <AuthorContent {...props.author} />
+          </>
+        )}
       </VoxCard.Content>
     </VoxCard>
   )
@@ -98,4 +103,4 @@ const EmptyState = (props: InstanceCardEmptyStateProps) => {
   )
 }
 
-export default withStaticProperties(InstanceCard, { Content: InstanceCardContent, EmptyState })
+export default withStaticProperties(InstanceCard, { Content: InstanceCardContent, EmptyState, AuthorContent })
