@@ -13,7 +13,7 @@ import { useMedia, YStack } from 'tamagui'
 import { DoubleDiamond } from './icons'
 import { MembershipCard } from './MembershipCard'
 
-const MemoizedMembershipCard = memo(MembershipCard)
+const MemorizedMembershipCard = memo(MembershipCard)
 
 const ChangeCommitteeList = ({ currentUuid, ...props }: { currentUuid: string | null; onClose?: () => void }) => {
   const { data } = useGetCommittees()
@@ -53,10 +53,9 @@ const ChangeCommitteeList = ({ currentUuid, ...props }: { currentUuid: string | 
       numColumns={media.gtSm ? 2 : undefined}
       ListHeaderComponent={<Text.P $gtSm={{ pb: 16 }}>Vous pouvez seulement changer de comité au sein de votre Assemblée.</Text.P>}
       renderItem={({ item: committee }) => (
-        <MemoizedMembershipCard
+        <MemorizedMembershipCard
           title={committee.name}
           subtitle={`${committee.members_count} adhérents`}
-          selected={selected === committee.uuid}
           onPress={handlePress(committee.uuid)}
           loading={pendingSelected === committee.uuid && isPending}
           isMember={selected === committee.uuid}

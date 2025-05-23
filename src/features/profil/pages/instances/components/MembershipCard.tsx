@@ -64,7 +64,6 @@ const MembershipCardFrame = styled(VoxCardFrame, {
 type MembershipCardProps = {
   title: string
   subtitle: string
-  selected?: boolean
   loading?: boolean
   onPress?: () => void
   showJoinButton?: boolean
@@ -75,7 +74,6 @@ type MembershipCardProps = {
 export function MembershipCard({
     title,
     subtitle,
-    selected,
     loading,
     onPress,
     showJoinButton = true,
@@ -89,12 +87,12 @@ export function MembershipCard({
     const buttonTheme = isTrulyDisabled ? 'gray' : 'blue'
   
     // Le onPress pour le card wrapper, seulement si pas de bouton join visible
-    const cardPressable = !selected && !isTrulyDisabled && !showJoinButton && onPress ? onPress : undefined
+    const cardPressable = !isMember && !isTrulyDisabled && !showJoinButton && onPress ? onPress : undefined
   
     return (
       <MembershipCardFrame
         inside
-        selected={selected}
+        selected={isMember}
         disabled={isTrulyDisabled}
         onPress={cardPressable}
         focusable={!isTrulyDisabled}

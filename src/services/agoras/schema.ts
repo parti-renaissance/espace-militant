@@ -1,4 +1,5 @@
 import z from 'zod'
+import { createRestPaginationSchema } from '../common/schema'
 
 export const AgoraMemberSchema = z.object({
   uuid: z.string().uuid(),
@@ -22,16 +23,7 @@ export const AgoraSchema = z.object({
   general_secretaries: z.array(AgoraMemberSchema),
 })
 
-export const RestGetAgorasResponseSchema = z.object({
-  metadata: z.object({
-    total_items: z.number(),
-    items_per_page: z.number(),
-    count: z.number(),
-    current_page: z.number(),
-    last_page: z.number(),
-  }),
-  items: z.array(AgoraSchema),
-})
+export const RestGetAgorasResponseSchema = createRestPaginationSchema(AgoraSchema)
 export type RestGetAgorasResponse = z.infer<typeof RestGetAgorasResponseSchema>
 
 export const RestGetAgorasRequestSchema = z.object({

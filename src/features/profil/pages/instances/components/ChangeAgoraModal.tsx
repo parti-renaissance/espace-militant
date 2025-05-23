@@ -12,6 +12,7 @@ import { Diamond, X } from '@tamagui/lucide-icons'
 import { Spinner, useMedia, YStack } from 'tamagui'
 import { MembershipCard } from './MembershipCard'
 import { DoubleDiamond } from './icons'
+import { sortBy } from 'lodash'
 
 const MemorizedMembershipCard = memo(MembershipCard)
 
@@ -21,12 +22,8 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
 
   const agoras = useMemo(() => {
     const all = data?.pages.flatMap((page) => page.items) ?? []
-    if (currentUuids.length > 0) {
-      const matching = all.filter((a) => currentUuids.includes(a.uuid))
-      const others = all.filter((a) => !currentUuids.includes(a.uuid))
-      return [...matching, ...others]
-    }
-    return all
+  
+    return sortBy(all, (a) => (currentUuids.includes(a.uuid) ? 0 : 1))
   }, [data, currentUuids])
 
   const [pendingSelected, setPendingSelected] = useState<string | null>(null)
@@ -68,10 +65,9 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
         </Text.P>
       }
       renderItem={({ item: agora }) => (
-        <MemoizedMembershipCard
+        <MemorizedMembershipCard
           title={agora.name}
           subtitle={`${agora.members_count ?? '-'}/${agora.max_members_count ?? '999'} Adhérents`}
-          selected={currentUuids.includes(agora.uuid)}
           onPress={handlePress(agora.uuid)}
           loading={pendingSelected === agora.uuid && isPending}
           isMember={currentUuids.includes(agora.uuid)}
