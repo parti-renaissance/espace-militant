@@ -13,7 +13,7 @@ import { Spinner, useMedia, YStack } from 'tamagui'
 import { MembershipCard } from './MembershipCard'
 import { DoubleDiamond } from './icons'
 
-const MemoizedMembershipCard = memo(MembershipCard)
+const MemorizedMembershipCard = memo(MembershipCard)
 
 const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; onClose?: () => void }) => {
   const { data, fetchNextPage, hasNextPage, isLoading } = usePaginatedAgoras()
