@@ -27,14 +27,14 @@ export const useSetMyAgora = () => {
       api.setMyAgora(uuid),
     onSuccess: () => {
       toast.show('Succès', {
-        message: 'Agora mise à jour',
+        message: 'Vous êtes maintenant membre de cette agora',
         type: 'success',
       })
       queryClient.invalidateQueries({ queryKey: ['profil', 'instances'] })
     },
     onError: () => {
       toast.show('Erreur', {
-        message: 'Impossible de mettre à jour le profil',
+        message: 'Nous n’avons pas pu vous ajouter à cette agora',
         type: 'error',
       })
     },

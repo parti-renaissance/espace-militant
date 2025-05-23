@@ -9,14 +9,14 @@ import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { usePaginatedAgoras, useSetMyAgora } from '@/services/agoras/hook'
 import { Diamond, X } from '@tamagui/lucide-icons'
-import { useMedia, YStack } from 'tamagui'
+import { Spinner, useMedia, YStack } from 'tamagui'
 import { MembershipCard } from './MembershipCard'
 import { DoubleDiamond } from './icons'
 
 const MemoizedMembershipCard = memo(MembershipCard)
 
 const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; onClose?: () => void }) => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = usePaginatedAgoras()
+  const { data, fetchNextPage, hasNextPage, isLoading } = usePaginatedAgoras()
   const { mutateAsync, isPending } = useSetMyAgora()
 
   const agoras = useMemo(() => {
@@ -31,19 +31,28 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
 
   const [pendingSelected, setPendingSelected] = useState<string | null>(null)
 
-  const { current: handlePress } = useRef((uuid: string) => () => {
-    setPendingSelected(uuid)
-    mutateAsync(uuid)
-      .then(() => {
-        onClose?.()
-      })
-      .finally(() => {
-        setPendingSelected(null)
-      })
+  const { current: handlePress } = useRef((uuid: string) => async () => {
+    try {
+      setPendingSelected(uuid)
+      await mutateAsync(uuid)
+    } catch (err) {
+      // error is already handled by `onError`
+    } finally {
+      onClose?.()
+      setPendingSelected(null)
+    }
   })
 
   const media = useMedia()
   const key = media.gtSm ? 'gtSm' : 'sm'
+
+  if (isLoading) {
+    return (
+      <YStack justifyContent="center" alignItems="center" flex={1} width="100%">
+        <Spinner size="large" color="$blue6" />
+      </YStack>
+    )
+  }
 
   return (
     <FlatList
@@ -55,7 +64,7 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
       onEndReachedThreshold={0.5}
       ListHeaderComponent={
         <Text.P $gtSm={{ pb: 16 }}>
-          Vous pouvez appartenir à plusieurs agoras et en changer à tout moment.
+          Vous ne pouvez être membre que d’une seule agora.
         </Text.P>
       }
       renderItem={({ item: agora }) => (
