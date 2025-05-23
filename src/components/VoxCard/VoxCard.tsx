@@ -276,7 +276,7 @@ const VoxCardVisio = ({ url, asLink = true }: VoxCardVisioProps) => {
       href={url!}
       target="_blank"
       rel="noopener noreferrer"
-      style={{ textDecorationLine: 'none', cursor: 'pointer', lineHeight: 16 }}
+      style={{ textDecorationLine: 'none', lineHeight: 16 }}
     >
       {Content}
     </Anchor>
