@@ -72,6 +72,11 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
           loading={pendingSelected === agora.uuid && isPending}
           isMember={currentUuids.includes(agora.uuid)}
           disabled={agora?.members_count >= agora?.max_members_count}
+          manager={agora?.president ? {
+            role: agora?.president?.role ?? "Président",
+            name: `${agora?.president?.first_name} ${agora?.president?.last_name}`,
+            avatar: agora?.president?.image_url
+          } : undefined }
         />
       )}
       keyExtractor={(item) => item.uuid}

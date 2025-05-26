@@ -49,7 +49,19 @@ const InstancesScreen = () => {
     }
     if (committee && committee.name) {
       return {
-        content: <InstanceCard.Content title={committee.name} description={`${committee.members_count ?? 0} Adhérents`} />,
+        content: <InstanceCard.Content
+          title={committee.name}
+          description={`${committee.members_count ?? 0} Adhérents`}
+          author={
+            committee?.manager
+              ? {
+                name: `${committee?.manager.first_name ?? ''} ${committee?.manager.last_name ?? ''}`,
+                avatar: committee?.manager.image_url ?? undefined,
+                role: committee?.manager.role ?? undefined,
+              }
+              : undefined
+          }
+        />,
         footerText: <Text.P>Vous êtes rattaché à ce comité par défaut. Vous pouvez en changer pour un autre comité de votre département.</Text.P>,
         button: (
           <>
@@ -220,7 +232,7 @@ const InstancesScreen = () => {
                     {agorasContent.button}
                   </YStack>
                 ) : null
-              }              
+              }
             >
               {agorasContent.content}
             </InstanceCard>

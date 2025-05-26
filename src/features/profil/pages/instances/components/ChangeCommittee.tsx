@@ -59,6 +59,11 @@ const ChangeCommitteeList = ({ currentUuid, ...props }: { currentUuid: string | 
           onPress={handlePress(committee.uuid)}
           loading={pendingSelected === committee.uuid && isPending}
           isMember={selected === committee.uuid}
+          manager={committee.animator ? {
+            role: committee.animator?.role ?? "Responsable comité local",
+            name: `${committee.animator?.first_name} ${committee.animator?.last_name}`,
+            avatar: committee.animator?.image_url
+          } : undefined }
         />
       )}
       keyExtractor={(item) => item.uuid}

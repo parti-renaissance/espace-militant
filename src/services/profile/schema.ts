@@ -389,6 +389,7 @@ export const RestInstancesResponseSchema = z.array(
       assembly_committees_count: z.number(),
       can_change_committee: z.boolean(),
       message: z.string().nullable(),
+      manager: managerSchema
     }),
     z.object({
       uuid: z.string().uuid().nullable(),
