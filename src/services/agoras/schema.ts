@@ -6,6 +6,7 @@ export const AgoraMemberSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
   id: z.string(),
+  role: z.string().nullable(),
   image_url: z.string().url().nullable(),
 })
 
@@ -20,7 +21,6 @@ export const AgoraSchema = z.object({
   created_at: z.string(),
   updated_at: z.string(),
   president: AgoraMemberSchema,
-  general_secretaries: z.array(AgoraMemberSchema),
 })
 
 export const RestGetAgorasResponseSchema = createRestPaginationSchema(AgoraSchema)
