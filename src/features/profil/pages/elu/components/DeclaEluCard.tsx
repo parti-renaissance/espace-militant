@@ -53,7 +53,7 @@ const EluExempteNonAdh = () => {
   )
 }
 
-const EluOkSoumis = (props: { declaration: number; cotisation: number; onPressDeclaForm: () => void }) => {
+const EluOkSoumis = (props: { declaration: number; cotisation: number; onPressDeclaForm: () => void; onPressIbanForm: () => void }) => {
   return (
     <FrameElu badgeTitle="À jour de cotisation" badgeColor="green">
       <VoxCard inside bg="$textSurface">
@@ -69,9 +69,13 @@ const EluOkSoumis = (props: { declaration: number; cotisation: number; onPressDe
           <Text.SM>Vous avez déclaré une indemnitée d’élu de {props.declaration} €.</Text.SM>
         </VoxCard.Content>
       </VoxCard>
-      <XStack gap="$medium" justifyContent="flex-end">
-        {/*  <VoxButton variant="outlined">Annuler ma cotisation</VoxButton> */}
-        <ButtonDeclaration onPress={props.onPressDeclaForm}>Modifier ma déclaration</ButtonDeclaration>
+      <XStack gap="$medium" justifyContent="space-between">
+        <ButtonDeclaration theme="gray" alignSelf="flex-start" onPress={props.onPressDeclaForm}>
+          Modifier ma declaration
+        </ButtonDeclaration>
+        <VoxButton theme="gray" variant="outlined" alignSelf="flex-end" onPress={props.onPressIbanForm}>
+          Modifier mon IBAN
+        </VoxButton>
       </XStack>
     </FrameElu>
   )
@@ -134,7 +138,7 @@ export const EluBlock = ({
   if (code.includes('elu:cotisation_ok:exempte')) {
     return <EluOkExempte />
   } else if (code.includes('elu:cotisation_ok:soumis')) {
-    return <EluOkSoumis declaration={declaration ?? 0} cotisation={cotisation ?? 0} onPressDeclaForm={onPressDeclaForm} />
+    return <EluOkSoumis declaration={declaration ?? 0} cotisation={cotisation ?? 0}onPressIbanForm={onPressIbanForm} onPressDeclaForm={onPressDeclaForm} />
   } else if (code.includes('elu:cotisation_ok:non_soumis')) {
     return <EluOkNonSoumis declaration={declaration ?? 0} onPressDeclaForm={onPressDeclaForm} />
   } else if (code.includes('elu:attente_declaration')) {

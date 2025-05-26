@@ -300,6 +300,12 @@ export const RestElectPaymentRequestSchema = z.object({
 export type RestElectPaymentResponse = z.infer<typeof RestElectPaymentResponseSchema>
 export const RestElectPaymentResponseSchema = z.any()
 
+export type RestElectPaymentStopRequest = z.infer<typeof RestElectPaymentStopRequestSchema>
+export const RestElectPaymentStopRequestSchema = z.void()
+
+export type RestElectPaymentStopResponse = z.infer<typeof RestElectPaymentStopResponseSchema>
+export const RestElectPaymentStopResponseSchema = z.any()
+
 export const propertyPathElectPaymentSchema = z.enum(['account_name', 'iban', 'account_country'])
 
 export type RestElectDeclarationRequest = z.infer<typeof RestElectDeclarationRequestSchema>
