@@ -251,6 +251,43 @@ export const usePostElectPayment = () => {
   })
 }
 
+export const usePostElectPaymentStop = () => {
+  const toast = useToastController()
+  const queryClient = useQueryClient()
+  const user = useGetProfil()
+  const userUuid = user?.data?.uuid
+
+  return useMutation({
+    mutationFn: api.postElectPaymentStop,
+    onSuccess: () => {
+      toast.show('Succès', {
+        message: 'Les prélèvements ont été arrêtés',
+        type: 'success',
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['electProfile', userUuid],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [PROFIL_QUERY_KEY],
+      })
+    },
+    onError: (e) => {
+      if (e instanceof GenericResponseError) {
+        toast.show('Erreur', {
+          message: e.message,
+          type: 'error',
+        })
+      } else {
+        toast.show('Erreur', {
+          message: 'Impossible de stopper les prélèvements',
+          type: 'error',
+        })
+      }
+      return e
+    },
+  })
+}
+
 export const usePostElectDeclaration = () => {
   const toast = useToastController()
   const queryClient = useQueryClient()
