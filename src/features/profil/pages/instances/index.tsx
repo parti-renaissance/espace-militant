@@ -13,22 +13,27 @@ import { Link } from 'expo-router'
 import { isWeb, YStack } from 'tamagui'
 import ScrollView from '../../components/ScrollView'
 import ChangeCommitteeModal from './components/ChangeCommittee'
-import { DoubleCircle, DoubleDiamond, DoubleTriangle } from './components/icons'
+import { DoubleCircle, DoubleDiamond, DoubleTriangle, DoubleSquare } from './components/icons'
+import { UserTagEnum } from '@/core/entities/UserProfile'
+import ChangeAgoraModal from './components/ChangeAgoraModal'
 
 type Instance = RestInstancesResponse[number]
 
 const isCommittee = (instance: any): instance is Instance & { type: 'committee' } => instance.type === 'committee'
 const isAssembly = (instance: any): instance is Instance & { type: 'assembly' } => instance.type === 'assembly'
 const isCirconscription = (instance: any): instance is Instance & { type: 'circonscription' } => instance.type === 'circonscription'
+const isAgora = (instance: any): instance is Instance & { type: 'agora' } => instance.type === 'agora'
 
 const InstancesScreen = () => {
   const { data } = useGetInstances()
-  const { tags } = useGetTags({ tags: ['sympathisant'] })
+  const { tags } = useGetTags({ tags: [UserTagEnum.SYMPATHISANT] })
   const [openChange, setOpenChange] = useState(false)
+  const [openChangeAgora, setOpenChangeAgora] = useState(false)
   const isSympathisant = tags && tags.length > 0
   const [assembly] = data.filter(isAssembly)
   const [committee] = data.filter(isCommittee)
   const [circonscription] = data.filter(isCirconscription)
+  const agoras = data.filter(isAgora)
 
   const committeeContent = useMemo(() => {
     if (isSympathisant) {
@@ -73,9 +78,68 @@ const InstancesScreen = () => {
     }
   }, [committee])
 
+  const agorasContent = useMemo(() => {
+    if (isSympathisant) {
+      return {
+        content: (
+          <InfoCard theme="yellow" icon={UserPlus} buttonText="J’adhère pour accéder aux agoras" href="/profil/cotisations-et-dons">
+            Les agoras sont réservées aux adhérents. Adhérez pour y accéder.
+          </InfoCard>
+        ),
+        footerText: null,
+      }
+    }
+
+    if (agoras?.length > 0) {
+      return {
+        content: (
+          <YStack gap="$2">
+            {agoras.map((agora) => {
+              const manager = agora.manager
+
+              return (
+                <InstanceCard.Content
+                  key={agora.uuid ?? agora.name}
+                  title={agora?.name ?? 'Agora sans nom'}
+                  description={`${agora?.members_count ?? '-'} membres`}
+                  author={
+                    manager
+                      ? {
+                        name: `${manager.first_name ?? ''} ${manager.last_name ?? ''}`,
+                        avatar: manager.image_url ?? undefined,
+                        role: manager.role ?? undefined,
+                      }
+                      : undefined
+                  }
+                />
+              )
+            })}
+          </YStack>
+        ),
+        footerText: null,
+      }
+    }
+
+    return {
+      content: <InstanceCard.EmptyState message="Vous n’êtes rattaché à aucune agora." />,
+      footerText: null,
+      button: (
+        <VoxButton variant="outlined" onPress={() => setOpenChangeAgora(true)}>
+          Rejoindre une agora
+        </VoxButton>
+      ),
+    }
+  }, [isSympathisant, agoras])
+
+
   return (
     <>
       <ChangeCommitteeModal currentCommitteeUuid={committee?.uuid ?? null} open={openChange} onClose={() => setOpenChange(false)} />
+      <ChangeAgoraModal
+        currentAgoraUuids={agoras.map((a) => a.uuid).filter((uuid): uuid is string => uuid !== null)}
+        open={openChangeAgora}
+        onClose={() => setOpenChangeAgora(false)}
+      />
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
         <ScrollView>
           <YStack gap="$medium" flex={1} $sm={{ pt: 8, gap: 8 }}>
@@ -142,6 +206,23 @@ const InstancesScreen = () => {
               }
             >
               {committeeContent.content}
+            </InstanceCard>
+
+            <InstanceCard
+              title={agoras?.length > 1 ? "Mes agoras thématiques" : "Mon agora thématique"}
+              icon={DoubleSquare}
+              description="Les agoras thématiques sont un espace d’échange et de travail réservé aux adhérents Renaissance."
+              headerLeft={isSympathisant ? <VoxCard.AdhLock /> : null}
+              footer={
+                agorasContent.footerText || agorasContent.button ? (
+                  <YStack gap="$medium">
+                    {agorasContent.footerText}
+                    {agorasContent.button}
+                  </YStack>
+                ) : null
+              }              
+            >
+              {agorasContent.content}
             </InstanceCard>
           </YStack>
         </ScrollView>
