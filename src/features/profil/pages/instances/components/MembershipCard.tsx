@@ -2,7 +2,6 @@ import Text from "@/components/base/Text"
 import { VoxButton } from "@/components/Button"
 import ProfilePicture from "@/components/ProfilePicture"
 import VoxCard, { VoxCardFrame } from "@/components/VoxCard/VoxCard"
-import { AgoraMemberSchema } from "@/services/agoras/schema"
 import { styled, XStack, YStack } from "tamagui"
 
 const MembershipCardFrame = styled(VoxCardFrame, {
