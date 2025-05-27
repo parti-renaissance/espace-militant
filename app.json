@@ -2,7 +2,7 @@
   "expo": {
     "slug": "vox",
     "scheme": "vox",
-    "version": "5.15.0",
+    "version": "5.16.0",
     "owner": "parti-renaissance",
     "runtimeVersion": {
       "policy": "appVersion"
@@ -119,7 +119,7 @@
       ]
     ],
     "extra": {
-      "eas_update_version": "18",
+      "eas_update_version": "1",
       "router": {
         "origin": false
       },
