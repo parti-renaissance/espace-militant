@@ -36,37 +36,39 @@ export const useInitPushNotification = () => {
       })
     }
 
-    fbNotificationSubscription = FB.messaging.onMessage((message) => {
-      if (message.data?.local) return
+    fbNotificationSubscription = FB
+      ? FB.messaging.onMessage((message) => {
+          if (message.data?.local) return
 
-      if (Platform.OS !== 'web') {
-        Notifications.scheduleNotificationAsync({
-          content: {
-            title: message.notification?.title,
-            body: message.notification?.body,
-            data: {
-              link: message.data?.link,
-              local: true,
-            },
-          },
-          trigger: null,
+          if (Platform.OS !== 'web') {
+            Notifications.scheduleNotificationAsync({
+              content: {
+                title: message.notification?.title,
+                body: message.notification?.body,
+                data: {
+                  link: message.data?.link,
+                  local: true,
+                },
+              },
+              trigger: null,
+            })
+          } else {
+            if (message?.notification?.title) {
+              const link = parseHref(message?.data?.link)
+              toast.show(message.notification?.title, {
+                message: message.notification?.body,
+                type: 'info',
+                action: link
+                  ? {
+                      onPress: () => router.replace(link),
+                      altText: 'Voir',
+                    }
+                  : undefined,
+              })
+            }
+          }
         })
-      } else {
-        if (message?.notification?.title) {
-          const link = parseHref(message?.data?.link)
-          toast.show(message.notification?.title, {
-            message: message.notification?.body,
-            type: 'info',
-            action: link
-              ? {
-                  onPress: () => router.replace(link),
-                  altText: 'Voir',
-                }
-              : undefined,
-          })
-        }
-      }
-    })
+      : null
 
     return () => {
       isMounted = false
