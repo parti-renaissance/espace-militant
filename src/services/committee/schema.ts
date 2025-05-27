@@ -1,5 +1,14 @@
 import z from 'zod'
 
+export const AnimatorSchema = z.object({
+  uuid: z.string().uuid(),
+  first_name: z.string(),
+  last_name: z.string(),
+  id: z.string(),
+  role: z.string().nullable(),
+  image_url: z.string().url().nullable(),
+})
+
 export type RestGetComitteesResponse = z.infer<typeof RestGetComitteesResponseSchema>
 export const RestGetComitteesResponseSchema = z.array(
   z.object({
@@ -7,6 +16,7 @@ export const RestGetComitteesResponseSchema = z.array(
     description: z.string(),
     uuid: z.string().uuid(),
     name: z.string(),
+    animator: AnimatorSchema,
   }),
 )
 

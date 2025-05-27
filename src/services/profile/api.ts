@@ -95,6 +95,14 @@ export const postElectPayment = api({
   type: 'private',
 })
 
+export const postElectPaymentStop = api({
+  method: 'POST',
+  path: '/api/v3/profile/elect-payment/stop',
+  requestSchema: schemas.RestElectPaymentStopRequestSchema,
+  responseSchema: schemas.RestElectPaymentStopResponseSchema,
+  type: 'private',
+})
+
 export const postElectDeclaration = api({
   method: 'POST',
   path: '/api/v3/profile/elect-declaration',
