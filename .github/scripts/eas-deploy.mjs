@@ -46,7 +46,7 @@ async function actionHandler() {
         }
         if (process.env.WORKFLOW_ENVIRONMENT === 'staging') {
           console.log(chalk.blue('Will do a build on staging env...'))
-          const promise = aExec(`${expoCommandBase} --profile staging`)
+          const promise = aExec(`${expoCommandBase} --profile staging --clear-cache`)
           const child  = promise.child
           child.stdout.on('data', function(data) {
               console.log(data);
