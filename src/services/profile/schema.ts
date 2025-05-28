@@ -380,6 +380,7 @@ export const RestInstancesResponseSchema = z.array(
     z.object({
       type: z.enum(['assembly', 'circonscription']),
       name: z.string(),
+      manager: managerSchema,
     }),
     z.object({
       uuid: z.string().uuid().nullable(),
