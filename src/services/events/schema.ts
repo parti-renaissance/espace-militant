@@ -78,7 +78,7 @@ export const RestFullEventSchema = z
     committee: RestEventComitteeSchema.nullish(),
     capacity: z.number().nullable(),
     live_url: z.string().nullable(),
-    user_registered_at: z.string().nullable(),
+    user_registered_at: z.string().nullish(),
     is_national: z.boolean(),
     editable: z.boolean(),
     edit_link: z.string().optional(),
