@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import BreadCrumb from '@/components/BreadCrumb/BreadCrumb'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { ScrollView, View, YStack } from 'tamagui'
@@ -23,6 +23,14 @@ const ReferralsMobileScreenAllow = () => {
 
   const [activeSection, setActiveSection] = useState<'cl' | 'suivi'>('cl')
 
+  const assemblyTitle = useMemo(() => {
+      const assembly = scoreboard?.assembly?.[0]
+      return assembly?.assembly_name && assembly?.assembly_code
+        ? `${assembly.assembly_name} (${assembly.assembly_code})`
+        : 'Assemblée'
+    }, [scoreboard?.assembly])
+
+
   if (isLoadingScoreboard && isLoadingStatistics) {
     return (
       <ReferralsMobileScreenSkeleton />
@@ -44,7 +52,7 @@ const ReferralsMobileScreenAllow = () => {
             assemblyRank={shouldShowAssemblyFirst ? scoreboard?.assembly_rank : undefined}
             nbReferralFinished={statistics?.nb_referral_finished ?? 0}
             nbReferralSent={statistics?.nb_referral_sent ?? 0}
-            assemblyName={scoreboard?.assembly?.[0]?.assembly ?? undefined}
+            assemblyName={scoreboard?.assembly?.[0]?.assembly_name ?? undefined}
             profileImage={user?.image_url}
           />
           <ReferralsLinkCard />
@@ -65,7 +73,7 @@ const ReferralsMobileScreenAllow = () => {
               {shouldShowAssemblyFirst ? (
                 <>
                   <ReferralsRankingCard
-                    title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'}
+                    title={assemblyTitle}
                     data={scoreboard?.assembly}
                   />
                   <ReferralsRankingCard title="National" data={scoreboard?.global} />
@@ -75,7 +83,7 @@ const ReferralsMobileScreenAllow = () => {
                   <ReferralsRankingCard title="National" data={scoreboard?.global} />
                   {hasAssemblyRanking && (
                     <ReferralsRankingCard
-                      title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'}
+                      title={assemblyTitle}
                       data={scoreboard?.assembly}
                     />
                   )}
