@@ -65,17 +65,19 @@ const InstancesScreen = () => {
               : undefined
           }
         >
-          <>
-            <Separator borderColor={'$textOutline'} borderRadius={1} />
-            <XStack gap="$medium" alignItems="center">
-              <Text.SM flex={1} color="$textSecondary" >
-                Ce comité n’a pas de Responsable. Vous pouvez informer votre Assemblée que vous souhaitez rejoindre la future équipe d’animation.
-              </Text.SM>
-              <View>
-                <CommitteeCandidateButton profile={profile} assemblyName={assembly.name} committeeName={committee.name} />
-              </View>
-            </XStack>
-          </>
+          {committee?.manager === null && (
+            <>
+              <Separator borderColor={'$textOutline'} borderRadius={1} />
+              <XStack gap="$medium" alignItems="center">
+                <Text.SM flex={1} color="$textSecondary" >
+                  Ce comité n’a pas de Responsable. Vous pouvez informer votre Assemblée que vous souhaitez rejoindre la future équipe d’animation.
+                </Text.SM>
+                <View>
+                  <CommitteeCandidateButton profile={profile} assemblyName={assembly.name} committeeName={committee.name} />
+                </View>
+              </XStack>
+            </>
+          )}
         </InstanceCard.Content>,
         footerText: <Text.P>Vous êtes rattaché à ce comité par défaut. Vous pouvez en changer pour un autre comité de votre département.</Text.P>,
         button: (
