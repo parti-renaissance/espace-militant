@@ -70,6 +70,7 @@ export const RestDetailedProfileRequestSchema = z.void()
 export type RestDetailedProfileResponse = z.infer<typeof RestDetailedProfileResponseSchema>
 export const RestDetailedProfileResponseSchema = z.object({
   uuid: z.string().uuid(),
+  id: z.string(),
   first_name: z.string(),
   last_name: z.string(),
   gender: z.string(),
@@ -380,6 +381,7 @@ export const RestInstancesResponseSchema = z.array(
     z.object({
       type: z.enum(['assembly', 'circonscription']),
       name: z.string(),
+      manager: managerSchema,
     }),
     z.object({
       uuid: z.string().uuid().nullable(),

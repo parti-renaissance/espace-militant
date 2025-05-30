@@ -26,7 +26,7 @@ const ReferralsRankingCard = ({ title, data }: ReferralsRankingCardProps) => {
       <Text.MD pt="$medium" px="$medium" semibold>
         {title}
       </Text.MD>
-      <ReferralScoreboardTable data={data} />
+      <ReferralScoreboardTable data={data} national={title === 'National'} />
     </VoxCard>
   )
 }
