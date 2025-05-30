@@ -52,7 +52,8 @@ export default function ReferralScoreboardTable({ data, national }: ReferralScor
                 textColor="$textDisabled"
               />
               <Text color="$textPrimaire" numberOfLines={1} ellipsizeMode="tail">
-                {`${entry.first_name} ${entry.last_name} ${national ? `(${entry.assembly_code})`: ''}`}
+                {`${entry.first_name} ${entry.last_name}`}
+                <Text.SM color="$textSecondary">{` ${national ? `(${entry.assembly_code})`: ''}`}</Text.SM>
               </Text>
             </XStack>
 
