@@ -11,7 +11,7 @@ import { usePaginatedAgoras, useSetMyAgora } from '@/services/agoras/hook'
 import { Diamond, X } from '@tamagui/lucide-icons'
 import { Spinner, useMedia, YStack } from 'tamagui'
 import { MembershipCard } from './MembershipCard'
-import { DoubleDiamond } from './icons'
+import { DoubleSquare } from './icons'
 import { sortBy } from 'lodash'
 
 const MemorizedMembershipCard = memo(MembershipCard)
@@ -117,7 +117,7 @@ export default function ChangeAgoraModal({
           {media.gtMd ? (
             <VoxCard.Content pb={0}>
               <InstanceCardHeader
-                icon={DoubleDiamond}
+                icon={DoubleSquare}
                 title="Changer d’agora"
                 headerLeft={<VoxButton onPress={modalProps.onClose} variant="text" shrink iconLeft={X} size="lg" />}
               />

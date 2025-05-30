@@ -170,7 +170,18 @@ const InstancesScreen = () => {
               }
             >
               {assembly ? (
-                <InstanceCard.Content title={assembly.name} />
+                <InstanceCard.Content 
+                title={assembly.name}
+                author={
+                  assembly?.manager
+                    ? {
+                      name: `${assembly?.manager.first_name ?? ''} ${assembly?.manager.last_name ?? ''}`,
+                      avatar: assembly?.manager.image_url ?? undefined,
+                      role: assembly?.manager.role ?? undefined,
+                    }
+                    : undefined
+                }
+                 />
               ) : (
                 <InstanceCard.EmptyState message="Vous n’avez pas d’Assemblée rattachée. Il s’agit certainement d’un bug, contactez adherents@parti-renaissance.fr." />
               )}
@@ -192,7 +203,18 @@ const InstancesScreen = () => {
               }
             >
               {circonscription ? (
-                <InstanceCard.Content title={circonscription.name} />
+                <InstanceCard.Content 
+                title={circonscription.name} 
+                author={
+                  circonscription?.manager
+                    ? {
+                      name: `${circonscription?.manager.first_name ?? ''} ${circonscription?.manager.last_name ?? ''}`,
+                      avatar: circonscription?.manager.image_url ?? undefined,
+                      role: circonscription?.manager.role ?? undefined,
+                    }
+                    : undefined
+                }
+                />
               ) : (
                 <InstanceCard.EmptyState message="Vous n’avez pas de circonscription rattachée." />
               )}
