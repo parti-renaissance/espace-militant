@@ -5,9 +5,6 @@ import ProfilePicture from '@/components/ProfilePicture'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { IconProps } from '@tamagui/helpers-icon'
 import { Separator, withStaticProperties, XStack, YStack } from 'tamagui'
-import { CommitteeCandidateButton } from '@/features/profil/pages/instances/components/CommitteeCandidateButton'
-import { RestDetailedProfileResponseSchema } from '@/services/profile/schema'
-import { z } from 'zod'
 
 type InstanceCardHeaderProps = {
   title: string
