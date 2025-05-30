@@ -70,6 +70,7 @@ export const RestDetailedProfileRequestSchema = z.void()
 export type RestDetailedProfileResponse = z.infer<typeof RestDetailedProfileResponseSchema>
 export const RestDetailedProfileResponseSchema = z.object({
   uuid: z.string().uuid(),
+  id: z.string(),
   first_name: z.string(),
   last_name: z.string(),
   gender: z.string(),

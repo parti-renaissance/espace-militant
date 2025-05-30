@@ -5,6 +5,9 @@ import ProfilePicture from '@/components/ProfilePicture'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { IconProps } from '@tamagui/helpers-icon'
 import { Separator, withStaticProperties, XStack, YStack } from 'tamagui'
+import { CommitteeCandidateButton } from '@/features/profil/pages/instances/components/CommitteeCandidateButton'
+import { RestDetailedProfileResponseSchema } from '@/services/profile/schema'
+import { z } from 'zod'
 
 type InstanceCardHeaderProps = {
   title: string
@@ -55,12 +58,13 @@ type InstanceCardContentProps = {
   title: string
   description?: string
   author?: AuthorContentProps
+  children?: React.ReactNode
 }
 
 export const AuthorContent = (props: AuthorContentProps) => {
   return (
     <XStack alignItems="center">
-      <ProfilePicture rounded src={props?.avatar ?? undefined} fullName={props.name} alt={`Avatar de ${props.name}`} size="$4"/>
+      <ProfilePicture rounded src={props?.avatar ?? undefined} fullName={props.name} alt={`Avatar de ${props.name}`} size="$4" />
       <YStack ml="$small">
         {props?.name && <Text.SM>{props.name}</Text.SM>}
         {props?.role && <Text.P>{props.role}</Text.P>}
@@ -82,7 +86,8 @@ const InstanceCardContent = (props: InstanceCardContentProps) => {
             <Separator borderColor={'$textOutline'} borderRadius={1} />
             <AuthorContent {...props.author} />
           </>
-        )}
+        )} 
+        { props?.children }
       </VoxCard.Content>
     </VoxCard>
   )
