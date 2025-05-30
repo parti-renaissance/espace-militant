@@ -21,14 +21,14 @@ const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
     icon: Lock,
     theme: 'yellow',
     label: 'Réservé aux adhérents',
-    subLabel: 'Les adhérents non-à-jour et les sympathisants ne pourront pas s’y inscrire sans cotiser cette année. Il ne sera pas visible publiquement.',
+    subLabel: 'Les sympathisants ne pourront pas s’y inscrire sans adhérer. Il ne sera pas visible publiquement.',
   },
   {
     value: 'adherent_dues',
     icon: LockKeyhole,
     theme: 'yellow',
     label: 'Réservé aux adhérents à jour',
-    subLabel: 'Les sympathisants ne pourront pas s’y inscrire sans adhérer. Il ne sera pas visible publiquement.',
+    subLabel: 'Les adhérents non-à-jour et les sympathisants ne pourront pas s’y inscrire sans cotiser cette année. Il ne sera pas visible publiquement.',
   },
 ]
 
