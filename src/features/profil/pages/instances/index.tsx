@@ -6,16 +6,18 @@ import InfoCard from '@/components/InfoCard/InfoCard'
 import InstanceCard from '@/components/InstanceCard/InstanceCard'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useGetInstances, useGetTags } from '@/services/profile/hook'
+import { useGetDetailProfil, useGetInstances, useGetTags } from '@/services/profile/hook'
 import { RestInstancesResponse } from '@/services/profile/schema'
 import { Info, UserPlus } from '@tamagui/lucide-icons'
 import { Link } from 'expo-router'
-import { isWeb, YStack } from 'tamagui'
+import { isWeb, Separator, View, XStack, YStack } from 'tamagui'
 import ScrollView from '../../components/ScrollView'
 import ChangeCommitteeModal from './components/ChangeCommittee'
 import { DoubleCircle, DoubleDiamond, DoubleTriangle, DoubleSquare } from './components/icons'
 import { UserTagEnum } from '@/core/entities/UserProfile'
 import ChangeAgoraModal from './components/ChangeAgoraModal'
+import { CommitteeCreationButton } from './components/CommitteeCreationButton'
+import { CommitteeCandidateButton } from './components/CommitteeCandidateButton'
 
 type Instance = RestInstancesResponse[number]
 
@@ -34,6 +36,7 @@ const InstancesScreen = () => {
   const [committee] = data.filter(isCommittee)
   const [circonscription] = data.filter(isCirconscription)
   const agoras = data.filter(isAgora)
+  const { data: profile } = useGetDetailProfil()
 
   const committeeContent = useMemo(() => {
     if (isSympathisant) {
@@ -61,7 +64,19 @@ const InstancesScreen = () => {
               }
               : undefined
           }
-        />,
+        >
+          <>
+            <Separator borderColor={'$textOutline'} borderRadius={1} />
+            <XStack gap="$medium" alignItems="center">
+              <Text.SM flex={1} color="$textSecondary" >
+                Ce comité n’a pas de Responsable. Vous pouvez informer votre Assemblée que vous souhaitez rejoindre la future équipe d’animation.
+              </Text.SM>
+              <View>
+                <CommitteeCandidateButton profile={profile} assemblyName={assembly.name} committeeName={committee.name} />
+              </View>
+            </XStack>
+          </>
+        </InstanceCard.Content>,
         footerText: <Text.P>Vous êtes rattaché à ce comité par défaut. Vous pouvez en changer pour un autre comité de votre département.</Text.P>,
         button: (
           <>
@@ -74,18 +89,29 @@ const InstancesScreen = () => {
     } else if (committee && !committee.uuid && committee.assembly_committees_count > 0) {
       return {
         content: <InstanceCard.EmptyState message={'Vous n’êtes rattaché à aucun comité.'} />,
-        footerText: <Text.P>Vous pouvez choisir parmi les {committee.assembly_committees_count} comités de votre Assemblée.</Text.P>,
+        footerText: <Text.P>Vous pouvez choisir parmi les {committee?.assembly_committees_count} comités de votre Assemblée.</Text.P>,
         button: (
-          <VoxButton variant="outlined" onPress={() => setOpenChange(true)} disabled={!committee.can_change_committee}>
-            Choisir parmi {committee.assembly_committees_count} comités
-          </VoxButton>
+          <XStack justifyContent="space-between">
+            <VoxButton variant="outlined" onPress={() => setOpenChange(true)} disabled={!committee?.can_change_committee}>
+              Choisir parmi {committee?.assembly_committees_count} comités
+            </VoxButton>
+            <CommitteeCreationButton
+              profile={profile}
+              assemblyName={assembly?.name}
+            />
+          </XStack>
         ),
       }
     } else {
       return {
         content: <InstanceCard.EmptyState message={'Malheureusement, votre Assemblée ne dispose d’aucun comité.'} />,
         footerText: null,
-        button: null,
+        button: (
+          <CommitteeCreationButton
+            profile={profile}
+            assemblyName={assembly?.name}
+          />
+        ),
       }
     }
   }, [committee])
@@ -170,18 +196,18 @@ const InstancesScreen = () => {
               }
             >
               {assembly ? (
-                <InstanceCard.Content 
-                title={assembly.name}
-                author={
-                  assembly?.manager
-                    ? {
-                      name: `${assembly?.manager.first_name ?? ''} ${assembly?.manager.last_name ?? ''}`,
-                      avatar: assembly?.manager.image_url ?? undefined,
-                      role: assembly?.manager.role ?? undefined,
-                    }
-                    : undefined
-                }
-                 />
+                <InstanceCard.Content
+                  title={assembly.name}
+                  author={
+                    assembly?.manager
+                      ? {
+                        name: `${assembly?.manager.first_name ?? ''} ${assembly?.manager.last_name ?? ''}`,
+                        avatar: assembly?.manager.image_url ?? undefined,
+                        role: assembly?.manager.role ?? undefined,
+                      }
+                      : undefined
+                  }
+                />
               ) : (
                 <InstanceCard.EmptyState message="Vous n’avez pas d’Assemblée rattachée. Il s’agit certainement d’un bug, contactez adherents@parti-renaissance.fr." />
               )}
@@ -203,17 +229,17 @@ const InstancesScreen = () => {
               }
             >
               {circonscription ? (
-                <InstanceCard.Content 
-                title={circonscription.name} 
-                author={
-                  circonscription?.manager
-                    ? {
-                      name: `${circonscription?.manager.first_name ?? ''} ${circonscription?.manager.last_name ?? ''}`,
-                      avatar: circonscription?.manager.image_url ?? undefined,
-                      role: circonscription?.manager.role ?? undefined,
-                    }
-                    : undefined
-                }
+                <InstanceCard.Content
+                  title={circonscription.name}
+                  author={
+                    circonscription?.manager
+                      ? {
+                        name: `${circonscription?.manager.first_name ?? ''} ${circonscription?.manager.last_name ?? ''}`,
+                        avatar: circonscription?.manager.image_url ?? undefined,
+                        role: circonscription?.manager.role ?? undefined,
+                      }
+                      : undefined
+                  }
                 />
               ) : (
                 <InstanceCard.EmptyState message="Vous n’avez pas de circonscription rattachée." />
