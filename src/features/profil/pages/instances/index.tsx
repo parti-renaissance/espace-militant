@@ -83,7 +83,7 @@ const InstancesScreen = () => {
       }
     } else {
       return {
-        content: <InstanceCard.EmptyState message={'Malheureusement, votre comité ne dispose d’aucun comité.'} />,
+        content: <InstanceCard.EmptyState message={'Malheureusement, votre Assemblée ne dispose d’aucun comité.'} />,
         footerText: null,
         button: null,
       }
