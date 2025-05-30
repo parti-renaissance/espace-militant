@@ -5,10 +5,11 @@ import ProfilePicture from '@/components/ProfilePicture'
 import { ReferralScoreboardItemType } from '@/services/referral/schema'
 
 type ReferralScoreboardTableProps = {
-  data: ReferralScoreboardItemType[]
+  data: ReferralScoreboardItemType[],
+  national: boolean
 }
 
-export default function ReferralScoreboardTable({ data }: ReferralScoreboardTableProps) {
+export default function ReferralScoreboardTable({ data, national }: ReferralScoreboardTableProps) {
   return (
     <YStack>
       <XStack gap="$medium" p="$large" justifyContent="space-between">
@@ -51,7 +52,7 @@ export default function ReferralScoreboardTable({ data }: ReferralScoreboardTabl
                 textColor="$textDisabled"
               />
               <Text color="$textPrimaire" numberOfLines={1} ellipsizeMode="tail">
-                {`${entry.first_name} ${entry.last_name}`}
+                {`${entry.first_name} ${entry.last_name} ${national ? `(${entry.assembly_code})`: ''}`}
               </Text>
             </XStack>
 

@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from 'react'
-import type { LayoutRectangle, NativeScrollEvent, NativeSyntheticEvent, ScrollView as RNScrollView, View as RNView } from 'react-native'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import type { LayoutRectangle, NativeScrollEvent, NativeSyntheticEvent, ScrollView as RNScrollView } from 'react-native'
 import BreadCrumb from '@/components/BreadCrumb/BreadCrumb'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { ScrollView, View, XStack, YStack } from 'tamagui'
@@ -49,6 +49,13 @@ const ReferralsDesktopScreenAllow = () => {
     }
   }, [])
 
+  const assemblyTitle = useMemo(() => {
+    const assembly = scoreboard?.assembly?.[0]
+    return assembly?.assembly_name && assembly?.assembly_code
+      ? `${assembly.assembly_name} (${assembly.assembly_code})`
+      : 'Assemblée'
+  }, [scoreboard?.assembly])
+
   if (isLoadingScoreboard && isLoadingStatistics) {
     return (
       <ReferralsDesktopScreenSkeleton />
@@ -75,7 +82,7 @@ const ReferralsDesktopScreenAllow = () => {
             assemblyRank={shouldShowAssemblyFirst ? scoreboard?.assembly_rank : undefined}
             nbReferralFinished={statistics?.nb_referral_finished ?? 0}
             nbReferralSent={statistics?.nb_referral_sent ?? 0}
-            assemblyName={scoreboard?.assembly?.[0]?.assembly ?? undefined}
+            assemblyName={scoreboard?.assembly?.[0]?.assembly_name ?? undefined}
             profileImage={user?.image_url}
           />
         </View>
@@ -117,7 +124,7 @@ const ReferralsDesktopScreenAllow = () => {
               {shouldShowAssemblyFirst ? (
                 <>
                   <ReferralsRankingCard
-                    title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'}
+                    title={assemblyTitle}
                     data={scoreboard?.assembly}
                   />
                   <ReferralsRankingCard title="National" data={scoreboard?.global} />
@@ -127,7 +134,7 @@ const ReferralsDesktopScreenAllow = () => {
                   <ReferralsRankingCard title="National" data={scoreboard?.global} />
                   {hasAssemblyRanking && (
                     <ReferralsRankingCard
-                      title={scoreboard?.assembly?.[0]?.assembly ?? 'Assemblée'}
+                      title={assemblyTitle}
                       data={scoreboard?.assembly}
                     />
                   )}
