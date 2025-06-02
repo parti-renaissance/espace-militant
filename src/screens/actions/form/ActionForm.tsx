@@ -177,7 +177,7 @@ function _ActionForm({ onCancel, onClose, uuid, scope, data }: Props & { data: A
             render={({ field, fieldState }) => (
               <DatePicker
                 label={'Heure'}
-                error={fieldState.error?.message}
+                error={fieldState.error?.message ?  ' ' : undefined}
                 onBlur={field.onBlur}
                 value={field.value}
                 color="gray"
