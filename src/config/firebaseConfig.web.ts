@@ -18,10 +18,21 @@ function initFirebase() {
 
   const app = initializeApp(firebaseConfig)
 
-  const Messaging = wMessaging.getMessaging(app)
+  
 
   const logNotImplemented = (x: string, payload?: unknown) => {
     if (__DEV__) console.warn('Firebase Web - not implemented', x, payload)
+  }
+
+  let Messaging: ReturnType<typeof wMessaging.getMessaging> | null = null
+
+  try {
+    Messaging = wMessaging.getMessaging(app)
+  } catch (err) {
+    if (__DEV__) {
+      console.warn('Firebase Messaging not supported or failed to initialize:', err)
+    }
+    return null
   }
 
   return {

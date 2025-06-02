@@ -24,7 +24,7 @@ export default function useCheckNotificationsState() {
 
     if (granted && hasBeenGrantedOnce.current === null) {
       try {
-        const token = await FB.messaging.getToken()
+        const token = await FB?.messaging.getToken()
         hasBeenGrantedOnce.current = token
         postPushToken({ token })
       } catch (e) {
@@ -44,7 +44,7 @@ export default function useCheckNotificationsState() {
     const { canAskAgain, status } = await getPermissionsAsync()
 
     if (canAskAgain && status !== PermissionStatus.DENIED) {
-      FB.messaging
+      FB?.messaging
         .requestPermission({
           sound: true,
           alert: true,
