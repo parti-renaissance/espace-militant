@@ -249,6 +249,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   return {
     control,
+    setValue,
     onSubmit,
     isPending,
     isUploadImagePending,

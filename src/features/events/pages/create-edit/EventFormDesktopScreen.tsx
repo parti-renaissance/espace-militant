@@ -14,19 +14,21 @@ import DescriptionInput from '@/features/events/pages/create-edit/DescriptionInp
 import { EventFormData } from '@/features/events/pages/create-edit/schema'
 import { ArrowLeft, Calendar, Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
-import { Controller } from 'react-hook-form'
+import { Controller, useWatch } from 'react-hook-form'
 import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 import EventHandleActions from '../../components/EventHandleActions'
 import { ScrollStack } from '../../pages/detail/EventComponents'
 import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
+import { useEffect } from 'react'
 
 const EventDesktopAside = () => {
   const {
     isPastEvent,
     scopeOptions,
     control,
+    setValue,
     editMode,
     visibilityOptions,
     catOptions,
@@ -37,6 +39,19 @@ const EventDesktopAside = () => {
     handleOnChangeFinishAt,
   } = useEventFormContext()
 
+  const selectedScope = useWatch({
+    control,
+    name: 'scope',
+  })
+
+  useEffect(() => {
+    if (selectedScope === 'agora_manager') {
+      setValue('mode', 'online')
+      setValue('category', 'reunion-d-equipe')
+      setMode('online') 
+    }
+  }, [selectedScope])
+  
   return (
     <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
       <VoxCard.Content>
@@ -68,6 +83,7 @@ const EventDesktopAside = () => {
                 size="sm"
                 color="gray"
                 label="Catégorie"
+                disabled={selectedScope === 'agora_manager'}
                 value={field.value}
                 options={catOptions}
                 onChange={field.onChange}
@@ -94,10 +110,12 @@ const EventDesktopAside = () => {
                 variant="soft"
                 switchMode
                 options={[
-                  { value: 'meeting', label: 'En Présentiel' },
+                  { value: 'meeting', label: 'En Présentiel', disabled: selectedScope === 'agora_manager' },
                   { value: 'online', label: 'En ligne' },
                 ]}
                 onChange={(x) => {
+                  console.log({mode: x});
+                  
                   field.onChange(x)
                   setMode(x as EventFormData['mode'])
                 }}

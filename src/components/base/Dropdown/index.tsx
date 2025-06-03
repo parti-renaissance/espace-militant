@@ -66,7 +66,7 @@ export const DropdownItem = ({ title, subtitle, color = '$textPrimary', theme, .
     <DropdownItemFrame {...props}>
       <YStack flex={1} gap="$small">
         <XStack alignSelf="flex-start" theme={theme} gap="$small">
-          {props?.icon ? <props.icon color={theme ? '$color5' : color} size={16} /> : null}
+          {props?.icon ? <XStack width={16}><props.icon color={theme ? '$color5' : color} size={16} /></XStack> : null}
           <Text.MD textAlign="left" color={theme ? '$color5' : color}>
             {title}
           </Text.MD>
