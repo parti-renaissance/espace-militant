@@ -29,7 +29,7 @@ export default function useCheckNotificationsState() {
 
     if (permission === 'granted' && hasBeenGrantedOnce.current === null) {
       try {
-        const token = await FB.messaging.getToken()
+        const token = await FB?.messaging.getToken()
         hasBeenGrantedOnce.current = token
         postPushToken({ token })
       } catch (e) {
@@ -47,7 +47,7 @@ export default function useCheckNotificationsState() {
 
   const triggerNotificationRequest = useCallback(async () => {
     if (Notification.permission !== 'denied') {
-      FB.messaging.requestPermission().catch().finally(checkPermissions)
+      FB?.messaging.requestPermission().catch().finally(checkPermissions)
     } else {
       toast.show('Autorisez dans les préférences.')
     }

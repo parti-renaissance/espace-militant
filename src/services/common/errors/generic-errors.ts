@@ -45,6 +45,9 @@ export const genericErrorThrower = (error: unknown) => {
         default:
           throw error
       }
+    } else if (error.message === 'Network Error') {
+      logDefaultError(error)
+      return error
     } else {
       logDefaultError(error)
       throw error
