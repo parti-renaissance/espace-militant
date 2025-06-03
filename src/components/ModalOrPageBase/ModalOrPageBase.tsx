@@ -11,6 +11,7 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
   open?: boolean
   shouldDisplayCloseHeader?: boolean
+  shouldDisplayCloseButton?: boolean
   header?: ReactNode
   scrollable?: boolean
   scrollRef?: MutableRefObject<ScrollView | null>
@@ -28,6 +29,7 @@ export default function ModalOrPageBase({
   onClose,
   open,
   shouldDisplayCloseHeader,
+  shouldDisplayCloseButton,
   header,
   scrollable,
   scrollRef,
@@ -42,7 +44,16 @@ export default function ModalOrPageBase({
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
-          <View style={styles.modalView}>{children}</View>
+          <View style={styles.modalView}>
+            {children}
+            {shouldDisplayCloseButton
+              ? (
+                <TouchableOpacity style={{ position: 'absolute', top: 0, right: 0, padding: 14 }} onPress={onClose}>
+                  <X />
+                </TouchableOpacity>
+              ) : null
+            }
+          </View>
         </Pressable>
       </Modal>
     )

@@ -116,3 +116,24 @@ export const useUnsubscribeAction = (id?: string) => {
     },
   })
 }
+
+export const useCancelAction = () => {
+  const toast = useToastController()
+  const user = useGetSuspenseProfil()
+  if (!user.data) {
+    throw new Error("L'utilisateur est introuvable")
+  }
+  return useMutation({
+    mutationFn: ({uuid}: {uuid: string}) => (api.cancelAction(uuid)),
+    onSuccess: () => {
+      toast.show('Succès', { message: 'L’action a bien été annuler', type: 'success' })
+    },
+    onError: (e) => {
+      if (e instanceof GenericResponseError) {
+        toast.show('Erreur', { message: e.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: 'Impossible d’annuler cette action', type: 'error' })
+      }
+    },
+  })
+}

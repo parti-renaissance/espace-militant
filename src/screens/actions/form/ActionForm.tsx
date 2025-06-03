@@ -10,24 +10,23 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 import SpacedContainer from '@/components/SpacedContainer/SpacedContainer'
 import ActionTypeEntry from '@/screens/actions/ActionTypeEntry'
 import { ActionFormError } from '@/services/actions/error'
-import { useAction } from '@/services/actions/hook/useActions'
+import { useAction, useCancelAction } from '@/services/actions/hook/useActions'
 import { useCreateOrEditAction } from '@/services/actions/hook/useCreateOrEditAction'
 import { Action, ActionType, ActionTypeIcon, isFullAction, ReadableActionType } from '@/services/actions/schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PenLine } from '@tamagui/lucide-icons'
+import { PenLine, Ban } from '@tamagui/lucide-icons'
 import { addHours, formatISO } from 'date-fns'
 import { Controller, useForm } from 'react-hook-form'
 import { useMedia, View } from 'tamagui'
 import { validateActionFormSchema } from './schema'
 
 interface Props {
-  onCancel?: () => void
   onClose?: () => void
   uuid?: string
   scope?: string
 }
 
-export default function ActionForm({ onCancel, onClose, uuid, scope }: Props) {
+export default function ActionForm({ onClose, uuid, scope }: Props) {
   const media = useMedia()
   const webViewPort = media.gtXs
 
@@ -55,14 +54,14 @@ export default function ActionForm({ onCancel, onClose, uuid, scope }: Props) {
             <SkeCard.Description />
           </SkeCard>
         ) : (
-          <_ActionForm onCancel={onCancel} onClose={onClose} uuid={uuid} scope={scope} data={uuid ? data : undefined} />
+          <_ActionForm onClose={onClose} uuid={uuid} scope={scope} data={uuid ? data : undefined} />
         )}
       </View>
     </View>
   )
 }
 
-function _ActionForm({ onCancel, onClose, uuid, scope, data }: Props & { data: Action | undefined }) {
+function _ActionForm({ onClose, uuid, scope, data }: Props & { data: Action | undefined }) {
   const media = useMedia()
   const webViewPort = media.gtXs
 
@@ -89,6 +88,15 @@ function _ActionForm({ onCancel, onClose, uuid, scope, data }: Props & { data: A
     uuid,
     scope,
   })
+
+  const { mutateAsync: cancelAction, isPending } = useCancelAction()
+
+  const handleCancel = () => {
+    if (uuid) {
+      cancelAction({uuid})
+    } 
+    
+  }
 
   const onSubmit = handleSubmit((data) => {
     $postAction
@@ -296,7 +304,7 @@ function _ActionForm({ onCancel, onClose, uuid, scope, data }: Props & { data: A
       </SpacedContainer>
 
       <View flexDirection={'row'} justifyContent={'flex-end'} gap={'$medium'}>
-        <VoxButton variant={'text'} onPress={onCancel}>
+        <VoxButton variant={'text'} iconLeft={Ban} theme="orange" onPress={handleCancel}>
           Annuler
         </VoxButton>
         <VoxButton variant="contained" onPress={onSubmit} iconLeft={PenLine} loading={$postAction.isPending}>
