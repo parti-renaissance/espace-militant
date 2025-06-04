@@ -5,6 +5,7 @@ import ProfilePicture from '@/components/ProfilePicture'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { IconProps } from '@tamagui/helpers-icon'
 import { Separator, withStaticProperties, XStack, YStack } from 'tamagui'
+import { VoxButton } from '../Button'
 
 type InstanceCardHeaderProps = {
   title: string
@@ -56,6 +57,7 @@ type InstanceCardContentProps = {
   description?: string
   author?: AuthorContentProps
   children?: React.ReactNode
+  onLeave?: () => void
 }
 
 export const AuthorContent = (props: AuthorContentProps) => {
@@ -74,10 +76,16 @@ const InstanceCardContent = (props: InstanceCardContentProps) => {
   return (
     <VoxCard inside borderWidth={1} borderColor="$textOutline32">
       <VoxCard.Content>
+        <XStack justifyContent="space-between">
         <YStack gap={8}>
           <Text.MD semibold>{props.title}</Text.MD>
           {props.description ? <Text.SM color="$textSecondary">{props.description}</Text.SM> : null}
         </YStack>
+        { props.onLeave 
+        ?<VoxButton variant="text" theme="orange" onPress={props.onLeave}>Quitter</VoxButton>
+        : null}
+        </XStack>
+       
         {props.author && (
           <>
             <Separator borderColor={'$textOutline'} borderRadius={1} />
