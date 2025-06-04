@@ -59,16 +59,39 @@ function AddressAutocomplete({
       return
     }
     setValue(id)
+  
+    // Trouver la prédiction sélectionnée dans les résultats autocomplete
+    const selectedPrediction = autocompleteResults?.find(x => x.place_id === id)
+  
     mutateAsync(id)
       .then((placeDetails) => {
         if (placeDetails?.formatted && placeDetails.details && placeDetails.geometry) {
-          setAddressComponents?.(googleAddressMapper(placeDetails))
+          const fallback = selectedPrediction ? !isProbablyAddress(selectedPrediction) : false
+          setAddressComponents?.(
+            googleAddressMapper({ placeDetails, addressFallback: fallback })
+          )
         }
       })
       .finally(() => {
         onBlur?.()
       })
   }
+
+  const isProbablyAddress = (prediction: google.maps.places.AutocompletePrediction): boolean => {
+    const types = prediction.types || [];
+    const mainText = prediction.structured_formatting?.main_text || '';
+    const secondaryText = prediction.structured_formatting?.secondary_text || '';
+  
+    const hasAddressLikeType = types.some(t =>
+      ['street_address', 'premise', 'subpremise', 'route', 'establishment'].includes(t)
+    );
+  
+    const containsStreetInSecondary = /(rue|avenue|boulevard|chemin|impasse|route|place)/i.test(secondaryText);
+  
+    const startsWithNumber = /^\d+/.test(mainText);
+  
+    return hasAddressLikeType || containsStreetInSecondary || startsWithNumber;
+  };  
 
   return (
     <YStack minWidth={minWidth} maxWidth={maxWidth}>
@@ -87,7 +110,7 @@ function AddressAutocomplete({
         options={[
           ...(autocompleteResults?.map((x) => ({
             value: x.place_id,
-            label: x.description,
+            label: !isProbablyAddress(x) ? `Lieu communiqué bientôt, ${x.description}` : x.description,
           })) ?? []),
           ...(defaultValue ? [{ value: 'default', label: defaultValue }] : []),
         ]}
