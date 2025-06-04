@@ -1,6 +1,14 @@
 import { type GoogleAddressPlaceResult } from '../network/ApiService'
 
-export default function googleAddressMapper(data: GoogleAddressPlaceResult): {
+type GoogleAddressMapperParams = {
+  placeDetails: GoogleAddressPlaceResult
+  addressFallback?: boolean
+}
+
+export default function googleAddressMapper({
+  placeDetails,
+  addressFallback = false,
+}: GoogleAddressMapperParams): {
   address: string
   city: string
   postalCode: string
@@ -10,7 +18,7 @@ export default function googleAddressMapper(data: GoogleAddressPlaceResult): {
     lng: number
   }
 } {
-  const res = data.details!
+  const res = placeDetails.details!
   const extract = (el: string) => res.find(({ types }) => types.includes(el))
   const country = extract('country')
 
@@ -23,13 +31,13 @@ export default function googleAddressMapper(data: GoogleAddressPlaceResult): {
   }, {} as PlaceData)
 
   return {
-    address: getAddressValue(place),
+    address: getAddressValue(place) || (addressFallback ? 'Lieu communiqué bientôt' : ''),
     city: getCityName(place),
     postalCode: getPostalCode(place),
     country: country?.short_name ?? '',
     location: {
-      lat: data.geometry!.location.lat as unknown as number,
-      lng: data.geometry!.location.lng as unknown as number,
+      lat: placeDetails.geometry!.location.lat as unknown as number,
+      lng: placeDetails.geometry!.location.lng as unknown as number,
     },
   }
 }
