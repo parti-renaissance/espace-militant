@@ -18,6 +18,8 @@ import { UserTagEnum } from '@/core/entities/UserProfile'
 import ChangeAgoraModal from './components/ChangeAgoraModal'
 import { CommitteeCreationButton } from './components/CommitteeCreationButton'
 import { CommitteeCandidateButton } from './components/CommitteeCandidateButton'
+import { useLeaveMyAgora } from '@/services/agoras/hook'
+import { uuid } from 'expo-modules-core'
 
 type Instance = RestInstancesResponse[number]
 
@@ -37,6 +39,16 @@ const InstancesScreen = () => {
   const [circonscription] = data.filter(isCirconscription)
   const agoras = data.filter(isAgora)
   const { data: profile } = useGetDetailProfil()
+
+  const { mutateAsync } = useLeaveMyAgora()
+
+  const handleLeave = (uuid: string) => {
+    try {
+      mutateAsync(uuid)
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   const committeeContent = useMemo(() => {
     if (isSympathisant) {
@@ -142,6 +154,7 @@ const InstancesScreen = () => {
                   key={agora.uuid ?? agora.name}
                   title={agora?.name ?? 'Agora sans nom'}
                   description={`${agora?.members_count ?? '-'} membres`}
+                  onLeave={agora?.uuid ? () => {handleLeave(agora.uuid!)} : undefined}
                   author={
                     manager
                       ? {
@@ -157,6 +170,11 @@ const InstancesScreen = () => {
           </YStack>
         ),
         footerText: null,
+        button: (
+          <VoxButton variant="outlined" onPress={() => setOpenChangeAgora(true)}>
+            Changer d’agora
+          </VoxButton>
+        ),
       }
     }
 

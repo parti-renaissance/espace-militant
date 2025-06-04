@@ -18,3 +18,12 @@ export const setMyAgora = (uuid: string) =>
     responseSchema: schemas.RestSetMyAgoraResponseSchema,
     type: 'private',
   })()
+
+export const leavetMyAgora = (uuid: string) =>
+  api({
+    method: 'DELETE',
+    path: `/api/v3/agoras/${uuid}/leave`,
+    requestSchema: schemas.RestLeaveMyAgoraRequestSchema,
+    responseSchema: schemas.RestLeaveMyAgoraResponseSchema,
+    type: 'private',
+  })()

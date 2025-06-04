@@ -40,3 +40,26 @@ export const useSetMyAgora = () => {
     },
   })
 }
+
+export const useLeaveMyAgora = () => {
+  const queryClient = useQueryClient()
+  const toast = useToastController()
+
+  return useMutation({
+    mutationKey: ['leaveMyAgora'],
+    mutationFn: (uuid: string) => api.leavetMyAgora(uuid),
+    onSuccess: () => {
+      toast.show('Succès', {
+        message: 'Vous avez quitté cette agora',
+        type: 'success',
+      })
+      queryClient.invalidateQueries({ queryKey: ['profil', 'instances'] })
+    },
+    onError: () => {
+      toast.show('Erreur', {
+        message: 'Nous n’avons pas pu vous retirer de cette agora',
+        type: 'error',
+      })
+    },
+  })
+}
