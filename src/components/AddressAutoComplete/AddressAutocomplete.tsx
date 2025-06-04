@@ -77,7 +77,7 @@ function AddressAutocomplete({
       })
   }
 
-  const isProbablyAddress = (prediction: any): boolean => {
+  const isProbablyAddress = (prediction: google.maps.places.AutocompletePrediction): boolean => {
     const types = prediction.types || [];
     const mainText = prediction.structured_formatting?.main_text || '';
     const secondaryText = prediction.structured_formatting?.secondary_text || '';
