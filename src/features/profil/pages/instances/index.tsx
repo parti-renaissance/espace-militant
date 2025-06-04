@@ -19,7 +19,6 @@ import ChangeAgoraModal from './components/ChangeAgoraModal'
 import { CommitteeCreationButton } from './components/CommitteeCreationButton'
 import { CommitteeCandidateButton } from './components/CommitteeCandidateButton'
 import { useLeaveMyAgora } from '@/services/agoras/hook'
-import { uuid } from 'expo-modules-core'
 
 type Instance = RestInstancesResponse[number]
 
