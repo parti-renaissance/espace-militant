@@ -9,13 +9,14 @@ import { XStack } from 'tamagui'
 import { EventParticipantsTable } from '../components/EventParticipantsTable'
 import { isEventFull } from '../utils'
 import EventHandleActions from './EventHandleActions'
+import { UserScopesEnum } from '@/services/profile/schema'
 
 const EventParticipantsSection = ({ event }: EventItemProps) => {
   const { handleDownload, isPending } = useFileDownload()
-  if (!isEventFull(event) || !event.editable || !event.organizer) {
+  if (!isEventFull(event) || !event.editable) {
     return null
   }
-  const scope = event.organizer.scope
+  const scope = event?.organizer?.scope ?? UserScopesEnum.National
 
   if (!scope) {
     return null

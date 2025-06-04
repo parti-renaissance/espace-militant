@@ -23,6 +23,7 @@ import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
 import { useEffect } from 'react'
+import { UserScopesEnum } from '@/services/profile/schema'
 
 export const EventFormMobileScreenSkeleton = (props?: { editMode?: boolean }) => {
   const navigation = useNavigation()
@@ -106,7 +107,7 @@ export default function EventFormMobileScreen() {
     })
   
     useEffect(() => {
-      if (selectedScope === 'agora_manager') {
+      if (selectedScope === UserScopesEnum.AgoraManager) {
         setValue('mode', 'online')
         setValue('category', 'reunion-d-equipe')
         setMode('online') 
@@ -208,7 +209,7 @@ export default function EventFormMobileScreen() {
                         size="sm"
                         color="gray"
                         label="Catégorie"
-                        disabled={selectedScope === 'agora_manager'}
+                        disabled={selectedScope === UserScopesEnum.AgoraManager}
                         value={field.value}
                         options={catOptions}
                         onChange={field.onChange}
@@ -239,7 +240,7 @@ export default function EventFormMobileScreen() {
                         variant="soft"
                         switchMode
                         options={[
-                          { value: 'meeting', label: 'En Présentiel', disabled: selectedScope === 'agora_manager' },
+                          { value: 'meeting', label: 'En Présentiel', disabled: selectedScope === UserScopesEnum.AgoraManager },
                           { value: 'online', label: 'En ligne' },
                         ]}
                         onChange={(x) => {
