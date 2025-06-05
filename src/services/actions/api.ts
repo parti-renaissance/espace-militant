@@ -40,3 +40,7 @@ export const subscribeToAction = (id: string) => {
 export const unsubscribeFromAction = (id: string) => {
   return api({ method: 'delete', path: `api/v3/actions/${id}/register`, requestSchema: z.void(), responseSchema: z.any() })()
 }
+
+export const cancelAction = (uuid: string, scope?: string) => {
+  return api({ method: 'put', path: `api/v3/actions/${uuid}/cancel?scope=${scope}`, requestSchema: z.void(), responseSchema: z.any() })()
+}

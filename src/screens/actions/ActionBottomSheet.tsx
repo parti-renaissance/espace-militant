@@ -7,7 +7,7 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useLazyRef } from '@/hooks/useLazyRef'
 import { useAction } from '@/services/actions/hook'
-import { isFullAction } from '@/services/actions/schema'
+import { ActionStatus, isFullAction } from '@/services/actions/schema'
 import { ArrowLeft, PenLine } from '@tamagui/lucide-icons'
 import { isBefore } from 'date-fns'
 import { ScrollView, Sheet, XStack, YStack } from 'tamagui'
@@ -63,7 +63,7 @@ export const SideActionList = ({ actionQuery, onEdit, onOpenChange }: Readonly<A
         >
           {payload && action ? (
             <ActionCard payload={payload} asFull $gtSm={{ borderWidth: 0, borderColor: '$white1' }}>
-              {!isBefore(action.date, new Date()) && !isMyAction ? <SubscribeButton large isRegister={!!action?.user_registered_at} id={action.uuid} /> : null}
+              {!isBefore(action.date, new Date()) && !isMyAction ? <SubscribeButton disabled={action.status === ActionStatus.CANCELLED} large isRegister={!!action?.user_registered_at} id={action.uuid} /> : null}
               {!isBefore(action.date, new Date()) && isMyAction ? (
                 <VoxButton theme="purple" full size="lg" variant="soft" iconLeft={PenLine} pop onPress={onEdit}>
                   Editer
@@ -162,7 +162,7 @@ export function ActionBottomSheet({ actionQuery, onPositionChange, onOpenChange,
         >
           {payload && action ? (
             <ActionCard payload={payload} inside asFull>
-              {!isBefore(action.date, new Date()) && !isMyAction ? <SubscribeButton large isRegister={!!action?.user_registered_at} id={action.uuid} /> : null}
+              {!isBefore(action.date, new Date()) && !isMyAction ? <SubscribeButton disabled={action.status === ActionStatus.CANCELLED} large isRegister={!!action?.user_registered_at} id={action.uuid} /> : null}
               {!isBefore(action.date, new Date()) && isMyAction ? (
                 <VoxButton theme="purple" size="lg" variant="soft" iconLeft={PenLine} pop onPress={onEdit}>
                   Editer

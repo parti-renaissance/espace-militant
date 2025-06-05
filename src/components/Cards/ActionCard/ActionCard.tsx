@@ -42,7 +42,7 @@ const ActionCard = ({
           </VoxCard.Chip>
           {isCancelled && (
             <VoxCard.Chip theme="orange" icon={XCircle}>
-              Annulée.
+              Annulée
             </VoxCard.Chip>
           )}
           {!isCancelled && isPassed && <VoxCard.Chip icon={Clock9}>Terminé</VoxCard.Chip>}

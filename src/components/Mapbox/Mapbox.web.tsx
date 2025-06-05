@@ -167,7 +167,7 @@ export const Images = (props: ComponentProps<typeof Img>) => {
   const { current: map } = useMap()
   const imageRefs = useRef({})
   const imgs = props.images ? Object.entries(props.images) : []
-  const urls = Object.entries(imageRefs.current).map(([id, ref]) => [id, ref.nativeViewRef.current?.src])
+  const urls = Object.entries(imageRefs.current).map(([id, ref]) => [id, ref?.nativeViewRef?.current?.src])
 
   useEffect(() => {
     urls.forEach(([id, url]) => {
