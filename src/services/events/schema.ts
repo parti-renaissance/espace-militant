@@ -81,7 +81,7 @@ export const RestFullEventSchema = z
     description: z.string(),
     json_description: z.string().optional(),
     committee: RestEventCommitteeSchema.nullish(),
-    agora: RestEventAgoraSchema.nullish(),
+    agoras: z.array(RestEventAgoraSchema).nullish(),
     capacity: z.number().nullable(),
     live_url: z.string().nullable(),
     user_registered_at: z.string().nullish(),

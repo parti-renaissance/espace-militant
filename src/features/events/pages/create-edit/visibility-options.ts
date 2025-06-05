@@ -1,8 +1,8 @@
 import { SelectOption } from '@/components/base/Select/SelectV3'
 import { EventFormData } from '@/features/events/pages/create-edit/schema'
-import { Lock, LockKeyhole, Unlock } from '@tamagui/lucide-icons'
+import { Lock, LockKeyhole, Unlock, Ticket } from '@tamagui/lucide-icons'
 
-const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
+const ALL_VISIBILITY_OPTIONS: SelectOption<EventFormData['visibility']>[] = [
   {
     value: 'public',
     icon: Unlock,
@@ -32,10 +32,23 @@ const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
   },
   {
     value: 'invitation_agora',
-    icon: Unlock,
-    label: 'Réservé aux membres de l’Agora',
-    subLabel: '...',
+    icon: Ticket,
+    theme: 'orange',
+    label: 'Réservé aux membres',
+    subLabel: 'Seules les personnes invitées nominativement peuvent voir et s’inscrire à l’événement.',
   },
 ]
 
-export default visibilityOptions
+export const getVisibilityOptions = (scope?: string): SelectOption<EventFormData['visibility']>[] => {
+  if (!scope) {
+    return ALL_VISIBILITY_OPTIONS
+  }
+
+  if (scope.startsWith('agora_')) {
+    return ALL_VISIBILITY_OPTIONS.filter((opt) => opt.value === 'invitation_agora')
+  }
+
+  return ALL_VISIBILITY_OPTIONS.filter((opt) => opt.value !== 'invitation_agora')
+}
+
+export default getVisibilityOptions

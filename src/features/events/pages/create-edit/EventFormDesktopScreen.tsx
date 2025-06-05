@@ -21,7 +21,7 @@ import { ScrollStack } from '../../pages/detail/EventComponents'
 import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { UserScopesEnum } from '@/services/profile/schema'
 
 const EventDesktopAside = () => {
@@ -38,21 +38,9 @@ const EventDesktopAside = () => {
     isAuthor,
     handleOnChangeBeginAt,
     handleOnChangeFinishAt,
+    isAgoraLeader,
   } = useEventFormContext()
 
-  const selectedScope = useWatch({
-    control,
-    name: 'scope',
-  })
-
-  useEffect(() => {
-    if (selectedScope === UserScopesEnum.AgoraManager) {
-      setValue('mode', 'online')
-      setValue('category', 'reunion-d-equipe')
-      setMode('online') 
-    }
-  }, [selectedScope])
-  
   return (
     <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
       <VoxCard.Content>
@@ -84,7 +72,7 @@ const EventDesktopAside = () => {
                 size="sm"
                 color="gray"
                 label="Catégorie"
-                disabled={selectedScope === UserScopesEnum.AgoraManager}
+                disabled={isAgoraLeader}
                 value={field.value}
                 options={catOptions}
                 onChange={field.onChange}
@@ -111,12 +99,12 @@ const EventDesktopAside = () => {
                 variant="soft"
                 switchMode
                 options={[
-                  { value: 'meeting', label: 'En Présentiel', disabled: selectedScope === UserScopesEnum.AgoraManager },
+                  { value: 'meeting', label: 'En Présentiel', disabled: isAgoraLeader },
                   { value: 'online', label: 'En ligne' },
                 ]}
                 onChange={(x) => {
-                  console.log({mode: x});
-                  
+                  console.log({ mode: x });
+
                   field.onChange(x)
                   setMode(x as EventFormData['mode'])
                 }}
@@ -176,62 +164,70 @@ const EventDesktopAside = () => {
           </YStack>
         )}
 
-        <XStack gap="$medium" alignContent="center" alignItems="center">
-          <Text.MD secondary>Optionnel</Text.MD>
-          <VoxCard.Separator />
-        </XStack>
+        {!isAgoraLeader ? (
+          <>
+            <XStack gap="$medium" alignContent="center" alignItems="center">
+              <Text.MD secondary>Optionnel</Text.MD>
+              <VoxCard.Separator />
+            </XStack>
 
-        <YStack>
-          <Controller
-            render={({ field, fieldState }) => {
-              return (
-                <YStack height={44}>
-                  <Input
-                    size="sm"
-                    color="gray"
-                    placeholder="Lien du live"
-                    inputMode="url"
-                    defaultValue={field.value}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    error={fieldState.error?.message}
-                    iconRight={<Video size={20} color="$gray4" />}
-                  />
-                </YStack>
-              )
-            }}
-            control={control}
-            name="live_url"
-          />
-        </YStack>
+            <YStack>
+              <Controller
+                render={({ field, fieldState }) => {
+                  return (
+                    <YStack height={44}>
+                      <Input
+                        size="sm"
+                        color="gray"
+                        placeholder="Lien du live"
+                        inputMode="url"
+                        defaultValue={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        error={fieldState.error?.message}
+                        iconRight={<Video size={20} color="$gray4" />}
+                      />
+                    </YStack>
+                  )
+                }}
+                control={control}
+                name="live_url"
+              />
+            </YStack>
 
-        <YStack>
-          <Controller
-            render={({ field, fieldState }) => {
-              return (
-                <YStack height={44}>
-                  <Input
-                    size="sm"
-                    color="gray"
-                    placeholder="Capacité"
-                    type="number"
-                    inputMode="numeric"
-                    defaultValue={field.value?.toString()}
-                    onBlur={field.onBlur}
-                    error={fieldState.error?.message}
-                    onChange={(x) => {
-                      const value = x.trim()
-                      field.onChange(value === '' ? null : Number(value))
-                    }}
-                    iconRight={<Users size={20} color="$gray4" />}
-                  />
-                </YStack>
-              )
-            }}
-            control={control}
-            name="capacity"
-          />
-        </YStack>
+            <YStack>
+              <Controller
+                render={({ field, fieldState }) => {
+                  return (
+                    <YStack height={44}>
+                      <Input
+                        size="sm"
+                        color="gray"
+                        placeholder="Capacité"
+                        type="number"
+                        inputMode="numeric"
+                        defaultValue={field.value?.toString()}
+                        onBlur={field.onBlur}
+                        error={fieldState.error?.message}
+                        onChange={(x) => {
+                          const value = x.trim()
+                          field.onChange(value === '' ? null : Number(value))
+                        }}
+                        iconRight={<Users size={20} color="$gray4" />}
+                      />
+                    </YStack>
+                  )
+                }}
+                control={control}
+                name="capacity"
+              />
+            </YStack>
+          </>
+        ) : null
+
+        }
+
+
       </VoxCard.Content>
     </PageLayout.SideBarRight>
   )
