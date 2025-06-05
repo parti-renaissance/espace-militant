@@ -118,6 +118,7 @@ export const useUnsubscribeAction = (id?: string) => {
 }
 
 export const useCancelAction = () => {
+  const queryClient = useQueryClient()
   const toast = useToastController()
   const user = useGetSuspenseProfil()
   if (!user.data) {
@@ -127,6 +128,14 @@ export const useCancelAction = () => {
     mutationFn: ({uuid}: {uuid: string}) => (api.cancelAction(uuid)),
     onSuccess: () => {
       toast.show('Succès', { message: 'L’action a bien été annuler', type: 'success' })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY_ACTIONS],
+        refetchType: 'active',
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY_PAGINATED_ACTIONS],
+        refetchType: 'active',
+      })
     },
     onError: (e) => {
       if (e instanceof GenericResponseError) {

@@ -93,9 +93,13 @@ function _ActionForm({ onClose, uuid, scope, data }: Props & { data: Action | un
 
   const handleCancel = () => {
     if (uuid) {
-      cancelAction({uuid})
-    } 
-    
+      cancelAction({ uuid }).then(() => {
+      }).catch((e) => {
+        console.warn(e);
+      }).finally(() => {
+        onClose?.()
+      })
+    }
   }
 
   const onSubmit = handleSubmit((data) => {
@@ -304,9 +308,13 @@ function _ActionForm({ onClose, uuid, scope, data }: Props & { data: Action | un
       </SpacedContainer>
 
       <View flexDirection={'row'} justifyContent={'flex-end'} gap={'$medium'}>
-        <VoxButton variant={'text'} iconLeft={Ban} theme="orange" onPress={handleCancel}>
-          Annuler
-        </VoxButton>
+        {uuid
+          ? (
+            <VoxButton variant={'text'} iconLeft={Ban} theme="orange" onPress={handleCancel}>
+              Annuler
+            </VoxButton>
+          ) : null
+        }
         <VoxButton variant="contained" onPress={onSubmit} iconLeft={PenLine} loading={$postAction.isPending}>
           {uuid ? 'Modifier l’action' : 'Créer l’action'}
         </VoxButton>
