@@ -14,22 +14,19 @@ import DescriptionInput from '@/features/events/pages/create-edit/DescriptionInp
 import { EventFormData } from '@/features/events/pages/create-edit/schema'
 import { ArrowLeft, Calendar, Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
-import { Controller, useWatch } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 import EventHandleActions from '../../components/EventHandleActions'
 import { ScrollStack } from '../../pages/detail/EventComponents'
 import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
-import { useEffect, useMemo } from 'react'
-import { UserScopesEnum } from '@/services/profile/schema'
 
 const EventDesktopAside = () => {
   const {
     isPastEvent,
     scopeOptions,
     control,
-    setValue,
     editMode,
     visibilityOptions,
     catOptions,

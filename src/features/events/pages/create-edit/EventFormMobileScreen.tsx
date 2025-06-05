@@ -16,14 +16,12 @@ import { EventFormData } from '@/features/events/pages/create-edit/schema'
 import ScrollView from '@/features/profil/components/ScrollView'
 import { Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
-import { Controller, useWatch } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 import EventHandleActions from '../../components/EventHandleActions'
 import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
-import { useEffect, useMemo } from 'react'
-import { UserScopesEnum } from '@/services/profile/schema'
 
 export const EventFormMobileScreenSkeleton = (props?: { editMode?: boolean }) => {
   const navigation = useNavigation()
@@ -81,7 +79,6 @@ export default function EventFormMobileScreen() {
     onSubmit,
     scopeOptions,
     control,
-    setValue,
     visibilityOptions,
     catOptions,
     mode,
