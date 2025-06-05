@@ -156,7 +156,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const finalSubmit: SubmitHandler<EventFormData> = async (data) => {
     const { scope, image, mode, visio_url, post_address, ...payload } = data
-    const fullScope = scopes.data?.list?.find((x) => x.code === scope) ?? { attributes: { committees: edit?.committee } }
+    const fullScope = scopes.data?.list?.find((x) => x.code === scope) ?? { attributes: { committees: edit?.committee, agora: edit?.agora } }
     try {
       const newEvent = await mutateAsync({
         payload: {
@@ -169,6 +169,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           visio_url: mode === 'online' ? visio_url : undefined,
           post_address: mode === 'meeting' ? post_address : undefined,
           committee: fullScope?.attributes?.committees?.[0]?.uuid ?? null,
+          agora: fullScope?.attributes?.agoras?.[0]?.uuid ?? null,
         },
         scope,
       })
