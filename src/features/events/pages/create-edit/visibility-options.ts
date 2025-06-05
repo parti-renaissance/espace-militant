@@ -30,6 +30,12 @@ const visibilityOptions: SelectOption<EventFormData['visibility']>[] = [
     label: 'Réservé aux adhérents à jour',
     subLabel: 'Les adhérents non-à-jour et les sympathisants ne pourront pas s’y inscrire sans cotiser cette année. Il ne sera pas visible publiquement.',
   },
+  {
+    value: 'invitation_agora',
+    icon: Unlock,
+    label: 'Réservé aux membres de l’Agora',
+    subLabel: '...',
+  },
 ]
 
 export default visibilityOptions
