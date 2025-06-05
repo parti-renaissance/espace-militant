@@ -110,7 +110,7 @@ function AddressAutocomplete({
         options={[
           ...(autocompleteResults?.map((x) => ({
             value: x.place_id,
-            label: !isProbablyAddress(x) ? `Lieu communiqué bientôt, ${x.description}` : x.description,
+            label: !isProbablyAddress(x) ? `🔜 Lieu communiqué bientôt, ${x.description}` : x.description,
           })) ?? []),
           ...(defaultValue ? [{ value: 'default', label: defaultValue }] : []),
         ]}
