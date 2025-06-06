@@ -187,6 +187,8 @@ export const RestEventParticipantsResponse = createRestPaginationSchema(
     email_address: z.string().email(),
     phone: z.string().nullable(),
     tags: z.array(activistTagSchema).nullable(),
+    confirmed_at: z.string().nullable(),
+    status: z.string().nullable(),
   }),
 )
 
