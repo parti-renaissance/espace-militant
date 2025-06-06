@@ -53,7 +53,7 @@ const EventParticipantsSection = ({ event }: EventItemProps) => {
           </VoxButton>
         </XStack>
 
-        <EventParticipantsTable eventId={event.uuid} />
+        <EventParticipantsTable eventId={event.uuid} displayInvitationStatus={event?.visibility?.startsWith('invitation')} />
         <VoxCard.Separator />
         <XStack justifyContent="space-between">
           <XStack gap="$small" alignItems="center">

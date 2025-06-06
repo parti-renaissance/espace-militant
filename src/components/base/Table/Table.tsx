@@ -17,6 +17,13 @@ const style = {
         borderRightWidth: 1,
         borderTopWidth: 1,
       },
+      top: {
+        borderTopWidth: 1,
+        borderRightWidth: 1,
+        borderLeftWidth: 1,
+        borderTopLeftRadius: '$space.small',
+        borderTopRightRadius: '$space.small',
+      },
       bottom: {
         borderBlockEndWidth: 1,
         borderBottomLeftRadius: '$space.small',
