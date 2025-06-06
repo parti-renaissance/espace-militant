@@ -174,7 +174,7 @@ export const RestPostPublicEventSubsciptionRequest = z.object({
 })
 
 // ------------ Rest Event Participants --------------
-export const RestEventParticipantsRequest = z.object({ page: z.number(), scope: z.string() })
+export const RestEventParticipantsRequest = z.object({ page: z.number() })
 export const RestEventParticipantsResponse = createRestPaginationSchema(
   z.object({
     uuid: z.string().uuid(),

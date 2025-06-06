@@ -24,10 +24,7 @@ const EventParticipantsSection = ({ event }: EventItemProps) => {
 
   const handlePress = () =>
     handleDownload({
-      url: getEventParticipantsFileEndpoint({
-        eventId: event.uuid,
-        scope: scope,
-      }),
+      url: getEventParticipantsFileEndpoint({ eventId: event.uuid }),
       fileName: `liste_des_participants_${event.slug}`,
       mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       UTI: 'org.openxmlformats.spreadsheetml.sheet',
@@ -35,48 +32,48 @@ const EventParticipantsSection = ({ event }: EventItemProps) => {
     })
   return (
     <VoxCard>
-        <VoxCard.Content>
-          <XStack justifyContent="space-between">
-            <XStack gap="$small" alignItems="center">
-              <Sparkle size={16} color="$purple6" />
-              <Text.LG color="$purple6" semibold>
-                Gestion
-              </Text.LG>
-            </XStack>
+      <VoxCard.Content>
+        <XStack justifyContent="space-between">
+          <XStack gap="$small" alignItems="center">
+            <Sparkle size={16} color="$purple6" />
+            <Text.LG color="$purple6" semibold>
+              Gestion
+            </Text.LG>
           </XStack>
+        </XStack>
 
-          <XStack justifyContent="space-between">
-            <XStack gap="$small" alignItems="center">
-              <Text.MD color="$purple6" semibold>
-                Liste des participants
-              </Text.MD>
-            </XStack>
-            <VoxButton variant="soft" theme="purple" size="sm" iconRight={Download} onPress={handlePress} loading={isPending}>
-              Télécharger la liste
-            </VoxButton>
+        <XStack justifyContent="space-between">
+          <XStack gap="$small" alignItems="center">
+            <Text.MD color="$purple6" semibold>
+              Liste des participants
+            </Text.MD>
           </XStack>
+          <VoxButton variant="soft" theme="purple" size="sm" iconRight={Download} onPress={handlePress} loading={isPending}>
+            Télécharger la liste
+          </VoxButton>
+        </XStack>
 
-          <EventParticipantsTable eventId={event.uuid} scope={scope} />
-          <VoxCard.Separator />
-          <XStack justifyContent="space-between">
-            <XStack gap="$small" alignItems="center">
-              <Text.MD color="$purple6" semibold>
-                Gérer l'événement
-              </Text.MD>
-            </XStack>
-            <EventHandleActions
-              scope={scope}
-              //@ts-expect-error wrong type
-              event={event}
-              buttonProps={{
-                theme: 'orange',
-                size: 'sm',
-                variant: 'soft',
-              }}
-            />
+        <EventParticipantsTable eventId={event.uuid} />
+        <VoxCard.Separator />
+        <XStack justifyContent="space-between">
+          <XStack gap="$small" alignItems="center">
+            <Text.MD color="$purple6" semibold>
+              Gérer l'événement
+            </Text.MD>
           </XStack>
-        </VoxCard.Content>
-      </VoxCard>
+          <EventHandleActions
+            scope={scope}
+            //@ts-expect-error wrong type
+            event={event}
+            buttonProps={{
+              theme: 'orange',
+              size: 'sm',
+              variant: 'soft',
+            }}
+          />
+        </XStack>
+      </VoxCard.Content>
+    </VoxCard>
   )
 }
 
