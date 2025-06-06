@@ -77,7 +77,7 @@ export const DeleteButton = (props: EventHandleButtonProps) => {
 export default function (props: Omit<EventHandleButtonProps, 'eventId'> & { event: RestFullEvent }) {
   return isEventCancelled(props.event) ? null : (
     <XStack gap="$small">
-      {props.event.participants_count < 2 ? <DeleteButton {...props} eventId={props.event.uuid} /> : <CancelButton {...props} eventId={props.event.uuid} />}
+      {props?.event?.participants_count && props.event.participants_count < 2 ? <DeleteButton {...props} eventId={props.event.uuid} /> : <CancelButton {...props} eventId={props.event.uuid} />}
     </XStack>
   )
 }

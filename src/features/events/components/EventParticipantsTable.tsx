@@ -8,15 +8,12 @@ import { usePaginatedEventPartcipants } from '@/services/events/hook'
 import { getHumanFormattedDate } from '@/utils/date'
 import { XStack, YStack } from 'tamagui'
 
-export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; scope: string }) => {
+export const EventParticipantsTable = ({ eventId }: { eventId: string }) => {
   const [pageIndex, setPageIndex] = useState(0)
-  const { data, fetchNextPage, fetchPreviousPage, isFetchingNextPage, isFetchingPreviousPage, isLoading, error } = usePaginatedEventPartcipants({
-    eventId,
-    scope,
-  })
+  const { data, fetchNextPage, fetchPreviousPage, isFetchingNextPage, isFetchingPreviousPage, isLoading, error } = usePaginatedEventPartcipants({ eventId })
 
   if (isLoading) {
-    return <TableSkeleton/>
+    return <TableSkeleton />
   }
 
   const currentPage = data?.pages[pageIndex]
@@ -82,12 +79,12 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
                       tags && tags.length > 0
                         ? tags
                         : [
-                            {
-                              type: 'other',
-                              label: 'Citoyen',
-                              code: '',
-                            },
-                          ]
+                          {
+                            type: 'other',
+                            label: 'Citoyen',
+                            code: '',
+                          },
+                        ]
                     }
                   />
                 </Table.Row>
@@ -143,7 +140,7 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
       </XStack>
       <Table splited="bottom">
         <Table.Row.Footer justifyContent="space-between" flex={1}>
-          { error ? (
+          {error ? (
             <XStack flex={1}>
               <Text.XSM flex={1} color="$textDanger" textAlign='center'>
                 Impossible de récupérer la liste des participants
