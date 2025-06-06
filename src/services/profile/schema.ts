@@ -163,6 +163,8 @@ export const RestUserScopesResponseSchema = z.array(
 export enum UserScopesEnum {
   National = 'national',
   AgoraManager = 'agora_manager',
+  AgoraPresident = 'agora_president',
+  AgoraGeneralSecretary = 'agora_general_secretary',
 }
 
 // -----------------  RestUpdateProfile  -----------------

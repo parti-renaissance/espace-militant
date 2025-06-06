@@ -16,14 +16,12 @@ import { EventFormData } from '@/features/events/pages/create-edit/schema'
 import ScrollView from '@/features/profil/components/ScrollView'
 import { Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
-import { Controller, useWatch } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 import EventHandleActions from '../../components/EventHandleActions'
 import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
-import { useEffect } from 'react'
-import { UserScopesEnum } from '@/services/profile/schema'
 
 export const EventFormMobileScreenSkeleton = (props?: { editMode?: boolean }) => {
   const navigation = useNavigation()
@@ -81,7 +79,6 @@ export default function EventFormMobileScreen() {
     onSubmit,
     scopeOptions,
     control,
-    setValue,
     visibilityOptions,
     catOptions,
     mode,
@@ -97,22 +94,10 @@ export default function EventFormMobileScreen() {
     handleOnChangeBeginAt,
     handleOnChangeFinishAt,
     ConfirmAlert,
+    isAgoraLeader,
   } = useEventFormContext()
 
   const globalPending = isPending || isUploadImagePending || isUploadDeletePending
-
-  const selectedScope = useWatch({
-      control,
-      name: 'scope',
-    })
-  
-    useEffect(() => {
-      if (selectedScope === UserScopesEnum.AgoraManager) {
-        setValue('mode', 'online')
-        setValue('category', 'reunion-d-equipe')
-        setMode('online') 
-      }
-    }, [selectedScope])
 
   return (
     <>
@@ -209,7 +194,7 @@ export default function EventFormMobileScreen() {
                         size="sm"
                         color="gray"
                         label="Catégorie"
-                        disabled={selectedScope === UserScopesEnum.AgoraManager}
+                        disabled={isAgoraLeader}
                         value={field.value}
                         options={catOptions}
                         onChange={field.onChange}
@@ -240,7 +225,7 @@ export default function EventFormMobileScreen() {
                         variant="soft"
                         switchMode
                         options={[
-                          { value: 'meeting', label: 'En Présentiel', disabled: selectedScope === UserScopesEnum.AgoraManager },
+                          { value: 'meeting', label: 'En Présentiel', disabled: isAgoraLeader },
                           { value: 'online', label: 'En ligne' },
                         ]}
                         onChange={(x) => {

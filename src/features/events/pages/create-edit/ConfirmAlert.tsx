@@ -9,7 +9,7 @@ import { EventFormData } from '@/features/events/pages/create-edit/schema'
 import { BellDot, Mail } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { Theme, XStack, YStack } from 'tamagui'
-import visibilityOptions from './visibility-options'
+import getVisibilityOptions from './visibility-options'
 
 type ConfirmAlertProps = {
   onAccept: () => void | Promise<unknown>
@@ -22,6 +22,7 @@ type ConfirmAlertProps = {
 type ModalRef = ComponentRef<typeof VoxSimpleModal>
 
 const VisibilityReview = (props: { visibility: string }) => {
+  const visibilityOptions = getVisibilityOptions()
   const visuOption = visibilityOptions.find((x) => x.value === props.visibility)
   return visuOption ? (
     <XStack gap="$small" alignItems="center">
