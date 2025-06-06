@@ -4,7 +4,6 @@ import clientEnv from '@/config/clientEnv'
 import { ActionStatus, ActionType } from '@/services/actions/schema'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import * as turf from '@turf/turf'
-import { isWeb } from 'tamagui'
 import markersImage from '../../../assets/images/generated-markers-lib'
 
 const getMarkerIcon = (type: ActionType) => [['==', ['get', 'type'], type], type]
@@ -98,7 +97,7 @@ export const ActionMapView = forwardRef<MapViewRef, ActionMapViewProps>(({ coord
           filter={['has', 'type']}
           style={{
             iconImage: getDynamicMarkerIcon,
-            iconSize: isWeb ? 0.5 : 1,
+            iconSize: 0.5,
             iconAllowOverlap: true,
             iconOffset: [1, -20],
             symbolSortKey: ['to-number', ['get', 'priority']],
