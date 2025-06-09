@@ -326,53 +326,59 @@ export default function EventFormMobileScreen() {
                   control={control}
                   name="image"
                 />
-                <YStack>
-                  <Controller
-                    render={({ field, fieldState }) => {
-                      return (
-                        <YStack height={44}>
-                          <Input
-                            size="sm"
-                            color="gray"
-                            placeholder="Lien du live"
-                            inputMode="url"
-                            defaultValue={field.value}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            error={fieldState.error?.message}
-                            iconRight={<Video size={20} color="$gray4" />}
-                          />
-                        </YStack>
-                      )
-                    }}
-                    control={control}
-                    name="live_url"
-                  />
-                </YStack>
 
-                <YStack>
-                  <Controller
-                    render={({ field }) => {
-                      return (
-                        <YStack height={44}>
-                          <Input
-                            size="sm"
-                            color="gray"
-                            placeholder="Capacité"
-                            type="number"
-                            inputMode="numeric"
-                            defaultValue={field.value?.toString()}
-                            onBlur={field.onBlur}
-                            onChange={(x) => field.onChange(Number(x))}
-                            iconRight={<Users size={20} color="$gray4" />}
-                          />
-                        </YStack>
-                      )
-                    }}
-                    control={control}
-                    name="capacity"
-                  />
-                </YStack>
+                {!isAgoraLeader ? (
+                  <>
+                    <YStack>
+                      <Controller
+                        render={({ field, fieldState }) => {
+                          return (
+                            <YStack height={44}>
+                              <Input
+                                size="sm"
+                                color="gray"
+                                placeholder="Lien du live"
+                                inputMode="url"
+                                defaultValue={field.value}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                error={fieldState.error?.message}
+                                iconRight={<Video size={20} color="$gray4" />}
+                              />
+                            </YStack>
+                          )
+                        }}
+                        control={control}
+                        name="live_url"
+                      />
+                    </YStack>
+
+                    <YStack>
+                      <Controller
+                        render={({ field }) => {
+                          return (
+                            <YStack height={44}>
+                              <Input
+                                size="sm"
+                                color="gray"
+                                placeholder="Capacité"
+                                type="number"
+                                inputMode="numeric"
+                                defaultValue={field.value?.toString()}
+                                onBlur={field.onBlur}
+                                onChange={(x) => field.onChange(Number(x))}
+                                iconRight={<Users size={20} color="$gray4" />}
+                              />
+                            </YStack>
+                          )
+                        }}
+                        control={control}
+                        name="capacity"
+                      />
+                    </YStack>
+                  </>
+                ) : null}
+
               </VoxCard.Content>
             </VoxCard>
             <VoxCard.Content>
