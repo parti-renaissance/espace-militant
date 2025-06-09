@@ -102,7 +102,6 @@ export function MembershipCard({
       disabled={isTrulyDisabled}
       onPress={cardPressable}
       focusable={!isTrulyDisabled}
-      flexBasis={0}
     >
       <VoxCard.Content px={0} pb={0} flexShrink={1} height={148} overflow="hidden">
         <XStack justifyContent="space-between" alignItems="center" gap="$medium" px="$medium" flexGrow={1}>
