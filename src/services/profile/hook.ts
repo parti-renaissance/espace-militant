@@ -224,6 +224,17 @@ export const useIsAdherent = () => {
   return profil.data?.tags?.some((el) => el.type === UserTagEnum.ADHERENT)
 }
 
+export const useIsAdherentDues = () => {
+  const profil = useGetProfil()
+  const currentYear = new Date().getFullYear()
+
+  return profil.data?.tags?.some(
+    (tag) =>
+      tag.type === UserTagEnum.ADHERENT &&
+      tag.code?.startsWith(`adherent:a_jour_${currentYear}`)
+  )
+}
+
 export const usePostElectPayment = () => {
   const toast = useToastController()
   const queryClient = useQueryClient()
