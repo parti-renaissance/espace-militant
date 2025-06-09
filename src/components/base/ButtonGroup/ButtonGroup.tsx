@@ -10,6 +10,7 @@ type ButtonGroupProps<VALUE extends string> = {
   options: {
     label: string
     value: VALUE
+    disabled?: boolean
   }[]
   value?: VALUE
   onChange: (value?: VALUE) => void
@@ -46,7 +47,7 @@ export default function ButtonGroup<VALUE extends string>({
   return (
     <ButtonGroupFrame {...props}>
       {options.map((option) => (
-        <Button size={size} variant={variant} key={option.value} theme={theme} inverse={!isChecked(option.value)} onPress={handlePress(option.value)}>
+        <Button size={size} variant={variant} key={option.value} theme={theme} disabled={option.disabled} inverse={!isChecked(option.value)} onPress={handlePress(option.value)}>
           {option.label}
         </Button>
       ))}

@@ -5,18 +5,16 @@ import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { usePaginatedEventPartcipants } from '@/services/events/hook'
-import { getHumanFormattedDate } from '@/utils/date'
+import { getHumanFormattedDate, getHumanFormattedDateShort } from '@/utils/date'
 import { XStack, YStack } from 'tamagui'
+import StatusBadge from './EventParticipantsStatusBadge'
 
-export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; scope: string }) => {
+export const EventParticipantsTable = ({ eventId, displayInvitationStatus = false }: { eventId: string, displayInvitationStatus?: boolean }) => {
   const [pageIndex, setPageIndex] = useState(0)
-  const { data, fetchNextPage, fetchPreviousPage, isFetchingNextPage, isFetchingPreviousPage, isLoading, error } = usePaginatedEventPartcipants({
-    eventId,
-    scope,
-  })
+  const { data, fetchNextPage, fetchPreviousPage, isFetchingNextPage, isFetchingPreviousPage, isLoading, error } = usePaginatedEventPartcipants({ eventId })
 
   if (isLoading) {
-    return <TableSkeleton/>
+    return <TableSkeleton />
   }
 
   const currentPage = data?.pages[pageIndex]
@@ -37,16 +35,14 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
   return (
     <YStack flex={1}>
       <XStack flex={1} width="100%" theme="purple">
-        <Table splited="start" flex={1}>
+        <Table.ScrollView splited="top" flex={1} horizontal>
           <Table.Col
-            $sm={{
-              width: 200,
-            }}
+            maxWidth={250}
           >
             <Table.Row.Header>
               <Text.SM semibold>Participants</Text.SM>
             </Table.Row.Header>
-            {currentPage?.items.map(({ first_name, last_name, email_address, image_url, uuid }) => {
+            {currentPage?.items.map(({ first_name, last_name, email_address, phone, image_url, uuid }) => {
               return (
                 <Table.Row key={'name' + uuid}>
                   <XStack gap="$medium" alignItems="center" flexShrink={1}>
@@ -56,8 +52,13 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
                         {first_name} {last_name}
                       </Text.SM>
                       {email_address ? (
-                        <Text.SM numberOfLines={2} secondary>
+                        <Text.SM fontSize={10} numberOfLines={1} secondary>
                           {email_address}
+                        </Text.SM>
+                      ) : null}
+                      {phone ? (
+                        <Text.SM fontSize={9} numberOfLines={1} secondary>
+                          {phone}
                         </Text.SM>
                       ) : null}
                     </YStack>
@@ -66,8 +67,25 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
               )
             })}
           </Table.Col>
-        </Table>
-        <Table.ScrollView splited="end" flex={1} horizontal>
+          {displayInvitationStatus
+            ? (
+              <Table.Col maxWidth={100}>
+                <Table.Row.Header>
+                  <Text.SM semibold>Statut</Text.SM>
+                </Table.Row.Header>
+
+                {currentPage?.items.map(({ status, confirmed_at, uuid }) => {
+                  return (
+                    <Table.Row key={'tags' + uuid}>
+                      <YStack>
+                        <StatusBadge status={status} />
+                      </YStack>
+                    </Table.Row>
+                  )
+                })}
+              </Table.Col>
+            ) : null
+          }
           <Table.Col maxWidth={340}>
             <Table.Row.Header>
               <Text.SM semibold>Label(s)</Text.SM>
@@ -82,29 +100,14 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
                       tags && tags.length > 0
                         ? tags
                         : [
-                            {
-                              type: 'other',
-                              label: 'Citoyen',
-                              code: '',
-                            },
-                          ]
+                          {
+                            type: 'other',
+                            label: 'Citoyen',
+                            code: '',
+                          },
+                        ]
                     }
                   />
-                </Table.Row>
-              )
-            })}
-          </Table.Col>
-
-          <Table.Col minWidth={140}>
-            <Table.Row.Header>
-              <Text.SM textAlign="center" semibold>
-                Téléphone
-              </Text.SM>
-            </Table.Row.Header>
-            {currentPage?.items.map(({ phone, uuid }) => {
-              return (
-                <Table.Row key={'phone' + uuid}>
-                  <Text.SM textAlign="center">{phone ?? 'Non indiqué'}</Text.SM>
                 </Table.Row>
               )
             })}
@@ -125,25 +128,45 @@ export const EventParticipantsTable = ({ eventId, scope }: { eventId: string; sc
             })}
           </Table.Col>
 
-          <Table.Col flex={1}>
-            <Table.Row.Header>
-              <Text.SM textAlign="center" semibold>
-                Date inscription
-              </Text.SM>
-            </Table.Row.Header>
-            {currentPage?.items.map(({ created_at, uuid }) => {
-              return (
-                <Table.Row key={'date' + uuid}>
-                  <Text.SM>{created_at ? getHumanFormattedDate(new Date(created_at)) : ''}</Text.SM>
-                </Table.Row>
-              )
-            })}
-          </Table.Col>
+          {displayInvitationStatus
+            ? (
+              <Table.Col flex={1}>
+                <Table.Row.Header>
+                  <Text.SM textAlign="center" semibold>
+                    Confirmé le
+                  </Text.SM>
+                </Table.Row.Header>
+                {currentPage?.items.map(({ confirmed_at, uuid }) => {
+                  return (
+                    <Table.Row key={'date' + uuid}>
+                      <Text.SM>{confirmed_at ? getHumanFormattedDate(new Date(confirmed_at)) : ''}</Text.SM>
+                    </Table.Row>
+                  )
+                })}
+              </Table.Col>
+            ) : (
+              <Table.Col flex={1}>
+                <Table.Row.Header>
+                  <Text.SM textAlign="center" semibold>
+                    Date inscription
+                  </Text.SM>
+                </Table.Row.Header>
+                {currentPage?.items.map(({ created_at, uuid }) => {
+                  return (
+                    <Table.Row key={'date' + uuid}>
+                      <Text.SM>{created_at ? getHumanFormattedDate(new Date(created_at)) : ''}</Text.SM>
+                    </Table.Row>
+                  )
+                })}
+              </Table.Col>
+            )
+
+          }
         </Table.ScrollView>
       </XStack>
       <Table splited="bottom">
         <Table.Row.Footer justifyContent="space-between" flex={1}>
-          { error ? (
+          {error ? (
             <XStack flex={1}>
               <Text.XSM flex={1} color="$textDanger" textAlign='center'>
                 Impossible de récupérer la liste des participants

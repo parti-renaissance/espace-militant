@@ -1,7 +1,5 @@
 import { memo } from 'react'
-import { VoxHeader } from '@/components/Header/Header'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
-import { X } from '@tamagui/lucide-icons'
 import ActionForm from './form/ActionForm'
 
 type CreateEditModalProps = {
@@ -16,13 +14,10 @@ const CreateEditModal = (props: CreateEditModalProps) => {
     <ModalOrPageBase
       open={props.open}
       onClose={props.onClose}
-      header={
-        <VoxHeader>
-          <VoxHeader.LeftButton onPress={props.onClose} icon={X} backTitle="Annuler" />
-        </VoxHeader>
-      }
+      shouldDisplayCloseHeader
+      shouldDisplayCloseButton
     >
-      {props.open && <ActionForm onCancel={props.onClose} onClose={props.onClose} uuid={props.activeAction} scope={props.scope} />}
+      {props.open && <ActionForm onClose={props.onClose} uuid={props.activeAction} scope={props.scope} />}
     </ModalOrPageBase>
   )
 }

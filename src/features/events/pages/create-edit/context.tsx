@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { SelectOption, SF } from '@/components/base/Select/SelectV3'
 import { createEventSchema, EventFormData } from '@/features/events/pages/create-edit/schema'
 import { getFormatedScope as getFormatedScopeData } from '@/features/ScopesSelector/utils'
@@ -7,17 +7,17 @@ import { eventPostFormError } from '@/services/events/error'
 import { useCreateEvent, useDeleteEventImage, useMutationEventImage, useSuspenseGetCategories } from '@/services/events/hook'
 import { EventCategory } from '@/services/events/schema'
 import { useGetExecutiveScopes, useGetSuspenseProfil } from '@/services/profile/hook'
-import { RestUserScopesResponse } from '@/services/profile/schema'
+import { RestUserScopesResponse, UserScopesEnum } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { addHours, addMinutes, formatISO, isAfter, isBefore, isEqual, isPast, isValid, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
 import { router, useNavigation } from 'expo-router'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 import { useConfirmAlert } from './ConfirmAlert'
 import { EventFormProps } from './types'
-import visibilityOptions from './visibility-options'
+import getVisibilityOptions from './visibility-options'
 
 export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<string> => {
   const { name, description } = getFormatedScopeData(scope)
@@ -154,9 +154,33 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     [],
   )
 
+  const selectedScope = useWatch({
+      control,
+      name: 'scope',
+    })
+  
+    const isAgoraLeader = useMemo(() =>
+      selectedScope === UserScopesEnum.AgoraPresident ||
+      selectedScope === UserScopesEnum.AgoraGeneralSecretary,
+      [selectedScope])
+  
+    useEffect(() => {
+      if (isAgoraLeader) {
+        setValue('mode', 'online')
+        setValue('category', 'reunion-d-equipe')
+        setValue('visibility', 'invitation_agora')
+        setMode('online') 
+      } else {
+        setValue('visibility', 'public')
+      }
+    }, [isAgoraLeader])
+
+  const currentScope = useWatch({ control, name: 'scope' })
+  const visibilityOptions = useMemo(() => getVisibilityOptions(currentScope), [currentScope])
+
   const finalSubmit: SubmitHandler<EventFormData> = async (data) => {
     const { scope, image, mode, visio_url, post_address, ...payload } = data
-    const fullScope = scopes.data?.list?.find((x) => x.code === scope) ?? { attributes: { committees: edit?.committee } }
+    const fullScope = scopes.data?.list?.find((x) => x.code === scope) ?? { attributes: { committees: edit?.committee, agoras: edit?.agoras } }
     try {
       const newEvent = await mutateAsync({
         payload: {
@@ -169,6 +193,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           visio_url: mode === 'online' ? visio_url : undefined,
           post_address: mode === 'meeting' ? post_address : undefined,
           committee: fullScope?.attributes?.committees?.[0]?.uuid ?? null,
+          agora: fullScope?.attributes?.agoras?.[0]?.uuid ?? null,
         },
         scope,
       })
@@ -249,6 +274,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   return {
     control,
+    setValue,
     onSubmit,
     isPending,
     isUploadImagePending,
@@ -267,6 +293,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     handleOnChangeFinishAt,
     handleOnChangeBeginAt,
     ConfirmAlert,
+    isAgoraLeader,
   }
 }
 

@@ -4,7 +4,7 @@ import Markdown from 'react-native-markdown-display'
 import Text from '@/components/base/Text'
 import Chip from '@/components/Chip/Chip'
 import ProfilePicture from '@/components/ProfilePicture'
-import { CalendarDays, CheckCircle, ExternalLink, LockKeyhole, MapPin, UserCheck, Users, Video } from '@tamagui/lucide-icons'
+import { CalendarDays, CheckCircle, ExternalLink, LockKeyhole, MapPin, Ticket, UserCheck, Users, Video } from '@tamagui/lucide-icons'
 import { Anchor, Separator, Stack, StackProps, styled, useTheme, withStaticProperties, XStack, YStack, ZStack } from 'tamagui'
 import AutoSizeImage from '../AutoSizeImage'
 import { getFormatedVoxCardDate } from '../utils'
@@ -301,17 +301,26 @@ const VoxCardSection = ({ title, ...props }: StackProps & { title: string }) => 
 
 const VoxCardSeparator = (props: StackProps) => <Separator {...props} borderColor={props.backgroundColor ?? '$textOutline32'} borderRadius={1} />
 
-const VoxCardAdhLock = (props?: { lock?: boolean; due?: boolean; isPrivate?: boolean }) => {
-  const { lock = true, due = false, isPrivate = false } = props ?? {}
-  const color = isPrivate ? '$gray5' : '$yellow5'
+const VoxCardAdhLock = (props?: { lock?: boolean; due?: boolean; isPrivate?: boolean; isInvitationAgora?: boolean; }) => {
+  const { lock = true, due = false, isPrivate = false, isInvitationAgora = false } = props ?? {}
+
+  const color = isInvitationAgora ? '$orange5' : isPrivate ? '$gray5' : '$yellow5'
+
   const text = (() => {
+    if (isInvitationAgora) return 'Réservé aux membres de l’agora'
     if (isPrivate) return 'Réservé aux militants'
     if (due) return 'Réservé aux adhérents à jour'
     return 'Réservé aux adhérents'
   })()
+
+  const Icon = (() => {
+    if (isInvitationAgora) return Ticket
+    return lock ? LockKeyhole : CheckCircle
+  })()
+
   return (
     <XStack gap="$xsmall" paddingVertical="$xsmall" alignItems="center">
-      {lock ? <LockKeyhole color={color} size={12} /> : <CheckCircle color={color} size={12} />}
+      <Icon color={color} size={12} />
       <Text.SM semibold color={color}>
         {text}
       </Text.SM>

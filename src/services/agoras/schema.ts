@@ -36,3 +36,9 @@ export type RestSetMyAgoraRequest = z.infer<typeof RestSetMyAgoraRequestSchema>
 
 export const RestSetMyAgoraResponseSchema = z.any()
 export type RestSetMyAgoraResponse = z.infer<typeof RestSetMyAgoraResponseSchema>
+
+export const RestLeaveMyAgoraRequestSchema = z.void()
+export type RestLeaveMyAgoraRequest = z.infer<typeof RestSetMyAgoraRequestSchema>
+
+export const RestLeaveMyAgoraResponseSchema = z.any()
+export type RestLeaveMyAgoraResponse = z.infer<typeof RestSetMyAgoraResponseSchema>

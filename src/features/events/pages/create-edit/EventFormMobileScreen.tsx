@@ -94,6 +94,7 @@ export default function EventFormMobileScreen() {
     handleOnChangeBeginAt,
     handleOnChangeFinishAt,
     ConfirmAlert,
+    isAgoraLeader,
   } = useEventFormContext()
 
   const globalPending = isPending || isUploadImagePending || isUploadDeletePending
@@ -193,6 +194,7 @@ export default function EventFormMobileScreen() {
                         size="sm"
                         color="gray"
                         label="Catégorie"
+                        disabled={isAgoraLeader}
                         value={field.value}
                         options={catOptions}
                         onChange={field.onChange}
@@ -223,7 +225,7 @@ export default function EventFormMobileScreen() {
                         variant="soft"
                         switchMode
                         options={[
-                          { value: 'meeting', label: 'En Présentiel' },
+                          { value: 'meeting', label: 'En Présentiel', disabled: isAgoraLeader },
                           { value: 'online', label: 'En ligne' },
                         ]}
                         onChange={(x) => {

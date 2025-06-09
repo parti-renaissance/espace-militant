@@ -1,5 +1,6 @@
 import { UnregistrationReason } from '@/components/DeleteAccountModal/Components/DeleteAccountModalStep2'
 import { activistTagSchema, ActivistTagTypes } from '@/data/Activist/schema'
+import { RestEventAgoraSchema, RestEventCommitteeSchema } from '@/services/events/schema'
 import { z } from 'zod'
 
 // -----------------  RestProfil  -----------------
@@ -149,7 +150,8 @@ export const RestUserScopesResponseSchema = z.array(
     ),
     attributes: z
       .object({
-        committees: z.array(z.object({ name: z.string(), uuid: z.string().uuid() })),
+        committees: z.array(RestEventCommitteeSchema),
+        agoras: z.array(RestEventAgoraSchema),
         dpt: z.string(),
       })
       .nullable(),
@@ -157,6 +159,13 @@ export const RestUserScopesResponseSchema = z.array(
     features: z.array(z.string()),
   }),
 )
+
+export enum UserScopesEnum {
+  National = 'national',
+  AgoraManager = 'agora_manager',
+  AgoraPresident = 'agora_president',
+  AgoraGeneralSecretary = 'agora_general_secretary',
+}
 
 // -----------------  RestUpdateProfile  -----------------
 
@@ -362,14 +371,16 @@ export const propertyPathChangePasswordSchema = z.enum(['old_password', 'new_pas
 
 // -----------------  RestInstances  -----------------
 
-const managerSchema = z.object({
-  uuid: z.string().nullable(),
-  public_id: z.string().nullable(),
-  first_name: z.string().nullable(),
-  last_name: z.string().nullable(),
-  image_url: z.string().nullable(),
-  role: z.string().nullable(),
-}).nullable()
+const managerSchema = z
+  .object({
+    uuid: z.string().nullable(),
+    public_id: z.string().nullable(),
+    first_name: z.string().nullable(),
+    last_name: z.string().nullable(),
+    image_url: z.string().nullable(),
+    role: z.string().nullable(),
+  })
+  .nullable()
 
 export const RestInstancesRequestSchema = z.void()
 
@@ -391,7 +402,7 @@ export const RestInstancesResponseSchema = z.array(
       assembly_committees_count: z.number(),
       can_change_committee: z.boolean(),
       message: z.string().nullable(),
-      manager: managerSchema
+      manager: managerSchema,
     }),
     z.object({
       uuid: z.string().uuid().nullable(),
@@ -401,7 +412,7 @@ export const RestInstancesResponseSchema = z.array(
       description: z.string().nullable(),
       max_members_count: z.number().nullable(),
       members_count: z.number().nullable(),
-      manager: managerSchema
+      manager: managerSchema,
     }),
   ]),
 )

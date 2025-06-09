@@ -4,7 +4,7 @@ import { createRestPaginationSchema } from '../common/schema'
 
 // ------- Event Schemas ----------
 
-export const EventVisibilitySchema = z.enum(['public', 'private', 'adherent', 'adherent_dues'])
+export const EventVisibilitySchema = z.enum(['public', 'private', 'adherent', 'adherent_dues', 'invitation_agora'])
 
 export const RestEventParentCategorySchema = z.object({
   name: z.string(),
@@ -31,7 +31,12 @@ export const RestEventOrganizerSchema = z.object({
   scope: z.string().nullable(),
 })
 
-export const RestEventComitteeSchema = z.object({
+export const RestEventCommitteeSchema = z.object({
+  name: z.string(),
+  uuid: z.string(),
+})
+
+export const RestEventAgoraSchema = z.object({
   name: z.string(),
   uuid: z.string(),
 })
@@ -75,7 +80,8 @@ export const RestFullEventSchema = z
     object_state: z.literal('full'),
     description: z.string(),
     json_description: z.string().optional(),
-    committee: RestEventComitteeSchema.nullish(),
+    committee: RestEventCommitteeSchema.nullish(),
+    agoras: z.array(RestEventAgoraSchema).nullish(),
     capacity: z.number().nullable(),
     live_url: z.string().nullable(),
     user_registered_at: z.string().nullish(),
@@ -168,7 +174,7 @@ export const RestPostPublicEventSubsciptionRequest = z.object({
 })
 
 // ------------ Rest Event Participants --------------
-export const RestEventParticipantsRequest = z.object({ page: z.number(), scope: z.string() })
+export const RestEventParticipantsRequest = z.object({ page: z.number() })
 export const RestEventParticipantsResponse = createRestPaginationSchema(
   z.object({
     uuid: z.string().uuid(),
@@ -181,6 +187,8 @@ export const RestEventParticipantsResponse = createRestPaginationSchema(
     email_address: z.string().email(),
     phone: z.string().nullable(),
     tags: z.array(activistTagSchema).nullable(),
+    confirmed_at: z.string().nullable(),
+    status: z.string().nullable(),
   }),
 )
 
@@ -212,6 +220,7 @@ export const RestPostEventRequestSchema = z.object({
   description: z.string(),
   json_description: z.string().optional(),
   committee: z.string().uuid().nullable(),
+  agora: z.string().uuid().nullable(),
   begin_at: z.string(),
   finish_at: z.string(),
   capacity: z.number().nullable().optional(),

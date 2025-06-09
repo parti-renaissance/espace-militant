@@ -3,7 +3,7 @@ import Text from '@/components/base/Text'
 import { IconProps } from '@tamagui/helpers-icon'
 import { ChevronsUpDown, XCircle } from '@tamagui/lucide-icons'
 import { GestureReponderEvent } from '@tamagui/web'
-import { createStyledContext, styled, useGetThemedIcon, withStaticProperties, XStack, XStackProps } from 'tamagui'
+import { createStyledContext, styled, useGetThemedIcon, View, withStaticProperties, XStack, XStackProps } from 'tamagui'
 
 export const SelectContext = createStyledContext<{
   themedText: boolean
@@ -123,7 +123,7 @@ const SelectResetIcon = styled(XCircle, {
 const SelectIconContainer = ({ icon, themedText }: { icon: NamedExoticComponent<IconProps>; themedText?: boolean }) => {
   const ctx = SelectContext.useStyledContext()
   const isThemed = ctx.themedText || themedText
-  const getIcon = useGetThemedIcon({ color: isThemed ? '$color4' : '$gray4', size: 20 })
+  const getIcon = useGetThemedIcon({ color: isThemed ? '$color4' : '$gray4', size: 20, })
   return getIcon(icon)
 }
 
@@ -179,7 +179,11 @@ const SelectIconValue = ({ icon, themedText }: { icon: NamedExoticComponent<Icon
   const ctx = SelectContext.useStyledContext()
   const isThemed = ctx.themedText || themedText
   const getIcon = useGetThemedIcon({ color: isThemed ? '$color6' : '$textPrimary', size: 14 })
-  return getIcon(icon)
+  return (
+    <View width={16}>
+      {getIcon(icon)}
+    </View>
+  )
 }
 
 const SelectValueContainer = styled(XStack, { gap: '$xsmall', flexShrink: 1, alignItems: 'center', alignSelf: 'flex-end' })
