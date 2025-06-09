@@ -94,7 +94,7 @@ export const RestFullEventSchema = z
 export const RestPartialEventSchema = z
   .object({
     object_state: z.literal('partial'),
-    user_registered_at: z.string().optional(),
+    user_registered_at: z.string().nullish(),
   })
   .merge(RestBaseEventSchema)
 
