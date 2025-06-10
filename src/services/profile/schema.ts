@@ -150,9 +150,9 @@ export const RestUserScopesResponseSchema = z.array(
     ),
     attributes: z
       .object({
-        committees: z.array(RestEventCommitteeSchema),
-        agoras: z.array(RestEventAgoraSchema),
-        dpt: z.string(),
+        committees: z.array(RestEventCommitteeSchema).optional(),
+        agoras: z.array(RestEventAgoraSchema).optional(),
+        dpt: z.string().optional(),
       })
       .nullable(),
     apps: z.array(z.string()),

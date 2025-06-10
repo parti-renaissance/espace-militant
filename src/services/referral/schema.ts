@@ -17,21 +17,21 @@ export enum TypeReferralEnum {
 }
 
 export const ReferralSchema = z.object({
-  email_address: z.string(),
+  email_address: z.string().nullable(),
   first_name: z.string(),
-  last_name: z.null(),
-  civility: z.null(),
-  nationality: z.null(),
-  phone: z.null(),
-  birthdate: z.null(),
-  referred: z.null(),
+  last_name: z.string().nullable(),
+  civility: z.string().nullable(),
+  nationality: z.string().nullable(),
+  phone: z.string().nullable(),
+  birthdate: z.string().nullable(),
+  referred: z.object({}).nullable(),
   identifier: z.string(),
   type: z.nativeEnum(TypeReferralEnum),
-  mode: z.string(),
+  mode: z.string().nullable(),
   status: z.nativeEnum(ReferralStatusEnum),
   status_label: z.string(),
   uuid: z.string(),
-  post_address: RestEventAddressSchema,
+  post_address: RestEventAddressSchema.nullable(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date().nullable(),
 })
@@ -74,9 +74,9 @@ export const ReferralScoreboardItemSchema = z.object({
 
 export const ReferralScoreboardSchema = z.object({
   global: z.array(ReferralScoreboardItemSchema),
-  global_rank: z.number(),
+  global_rank: z.number().nullable(),
   assembly: z.array(ReferralScoreboardItemSchema),
-  assembly_rank: z.number(),
+  assembly_rank: z.number().nullable(),
 })
 
 export type ReferralScoreboardItemType = z.infer<typeof ReferralScoreboardItemSchema>

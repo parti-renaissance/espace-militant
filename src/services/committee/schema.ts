@@ -16,7 +16,7 @@ export const RestGetComitteesResponseSchema = z.array(
     description: z.string(),
     uuid: z.string().uuid(),
     name: z.string(),
-    animator: AnimatorSchema,
+    animator: AnimatorSchema.nullable(),
   }),
 )
 
