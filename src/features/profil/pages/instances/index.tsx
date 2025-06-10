@@ -19,6 +19,7 @@ import ChangeAgoraModal from './components/ChangeAgoraModal'
 import { CommitteeCreationButton } from './components/CommitteeCreationButton'
 import { CommitteeCandidateButton } from './components/CommitteeCandidateButton'
 import { useLeaveMyAgora } from '@/services/agoras/hook'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
 type Instance = RestInstancesResponse[number]
 
@@ -39,6 +40,8 @@ const InstancesScreen = () => {
   const [circonscription] = data.filter(isCirconscription)
   const agoras = data.filter(isAgora)
   const { data: profile } = useGetDetailProfil()
+  const { isPending: isPendingAgora, open: openAdhAgora } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil_instances_agoras' })
+  const { isPending: isPendingCommitee, open: openAdhCommitee } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil_instances_comités' })
 
   const { mutateAsync } = useLeaveMyAgora()
 
@@ -54,7 +57,13 @@ const InstancesScreen = () => {
     if (isSympathisant) {
       return {
         content: (
-          <InfoCard theme="yellow" icon={UserPlus} buttonText="J’adhère" href="/profil/cotisations-et-dons">
+          <InfoCard theme="yellow" icon={UserPlus} 
+            button={
+              <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingCommitee} onPress={openAdhCommitee()}>
+                J’adhère
+              </VoxButton>
+            }
+          >
             La vie militante liée aux comités est réservée aux adhérents. Adhérez pour devenir membre d’un comité.
           </InfoCard>
         ),
@@ -134,7 +143,13 @@ const InstancesScreen = () => {
     if (isSympathisant) {
       return {
         content: (
-          <InfoCard theme="yellow" icon={UserPlus} buttonText="J’adhère" href="/profil/cotisations-et-dons">
+          <InfoCard theme="yellow" icon={UserPlus}
+            button={
+              <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
+                J’adhère
+              </VoxButton>
+            }
+          >
             Les agoras sont réservées aux adhérents. Adhérez pour y accéder.
           </InfoCard>
         ),
@@ -154,7 +169,7 @@ const InstancesScreen = () => {
                   key={agora.uuid ?? agora.name}
                   title={agora?.name ?? 'Agora sans nom'}
                   description={`${agora?.members_count ?? '-'} membres`}
-                  onLeave={agora?.uuid ? () => {handleLeave(agora.uuid!)} : undefined}
+                  onLeave={agora?.uuid ? () => { handleLeave(agora.uuid!) } : undefined}
                   author={
                     manager
                       ? {
@@ -181,7 +196,13 @@ const InstancesScreen = () => {
     if (!isAdherentDues) {
       return {
         content: (
-          <InfoCard theme="yellow" icon={UserPlus} buttonText="Je cotise" href="/profil/cotisations-et-dons">
+          <InfoCard theme="yellow" icon={UserPlus}
+            button={
+              <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
+                Je cotise
+              </VoxButton>
+            }
+          >
             La vie militante liée aux agoras est réservée aux adhérents à jour.
           </InfoCard>
         ),
