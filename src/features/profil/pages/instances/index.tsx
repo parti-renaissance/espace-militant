@@ -6,7 +6,7 @@ import InfoCard from '@/components/InfoCard/InfoCard'
 import InstanceCard from '@/components/InstanceCard/InstanceCard'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useGetDetailProfil, useGetInstances, useGetTags } from '@/services/profile/hook'
+import { useGetDetailProfil, useGetInstances, useGetTags, useIsAdherentDues } from '@/services/profile/hook'
 import { RestInstancesResponse } from '@/services/profile/schema'
 import { Info, UserPlus } from '@tamagui/lucide-icons'
 import { Link } from 'expo-router'
@@ -19,6 +19,7 @@ import ChangeAgoraModal from './components/ChangeAgoraModal'
 import { CommitteeCreationButton } from './components/CommitteeCreationButton'
 import { CommitteeCandidateButton } from './components/CommitteeCandidateButton'
 import { useLeaveMyAgora } from '@/services/agoras/hook'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
 type Instance = RestInstancesResponse[number]
 
@@ -30,6 +31,7 @@ const isAgora = (instance: any): instance is Instance & { type: 'agora' } => ins
 const InstancesScreen = () => {
   const { data } = useGetInstances()
   const { tags } = useGetTags({ tags: [UserTagEnum.SYMPATHISANT] })
+  const isAdherentDues = useIsAdherentDues()
   const [openChange, setOpenChange] = useState(false)
   const [openChangeAgora, setOpenChangeAgora] = useState(false)
   const isSympathisant = tags && tags.length > 0
@@ -38,6 +40,8 @@ const InstancesScreen = () => {
   const [circonscription] = data.filter(isCirconscription)
   const agoras = data.filter(isAgora)
   const { data: profile } = useGetDetailProfil()
+  const { isPending: isPendingAgora, open: openAdhAgora } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil_instances_agoras' })
+  const { isPending: isPendingCommitee, open: openAdhCommitee } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil_instances_comités' })
 
   const { mutateAsync } = useLeaveMyAgora()
 
@@ -53,7 +57,13 @@ const InstancesScreen = () => {
     if (isSympathisant) {
       return {
         content: (
-          <InfoCard theme="yellow" icon={UserPlus} buttonText="J’adhère pour devenir membre" href="/profil/cotisations-et-dons">
+          <InfoCard theme="yellow" icon={UserPlus} 
+            button={
+              <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingCommitee} onPress={openAdhCommitee()}>
+                J’adhère
+              </VoxButton>
+            }
+          >
             La vie militante liée aux comités est réservée aux adhérents. Adhérez pour devenir membre d’un comité.
           </InfoCard>
         ),
@@ -133,7 +143,13 @@ const InstancesScreen = () => {
     if (isSympathisant) {
       return {
         content: (
-          <InfoCard theme="yellow" icon={UserPlus} buttonText="J’adhère pour accéder aux agoras" href="/profil/cotisations-et-dons">
+          <InfoCard theme="yellow" icon={UserPlus}
+            button={
+              <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
+                J’adhère
+              </VoxButton>
+            }
+          >
             Les agoras sont réservées aux adhérents. Adhérez pour y accéder.
           </InfoCard>
         ),
@@ -153,7 +169,7 @@ const InstancesScreen = () => {
                   key={agora.uuid ?? agora.name}
                   title={agora?.name ?? 'Agora sans nom'}
                   description={`${agora?.members_count ?? '-'} membres`}
-                  onLeave={agora?.uuid ? () => {handleLeave(agora.uuid!)} : undefined}
+                  onLeave={agora?.uuid ? () => { handleLeave(agora.uuid!) } : undefined}
                   author={
                     manager
                       ? {
@@ -169,11 +185,28 @@ const InstancesScreen = () => {
           </YStack>
         ),
         footerText: null,
-        button: (
+        button: isAdherentDues ? (
           <VoxButton variant="outlined" onPress={() => setOpenChangeAgora(true)}>
             Changer d’agora
           </VoxButton>
+        ) : null,
+      }
+    }
+
+    if (!isAdherentDues) {
+      return {
+        content: (
+          <InfoCard theme="yellow" icon={UserPlus}
+            button={
+              <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
+                Je cotise
+              </VoxButton>
+            }
+          >
+            La vie militante liée aux agoras est réservée aux adhérents à jour.
+          </InfoCard>
         ),
+        footerText: null,
       }
     }
 
@@ -291,7 +324,7 @@ const InstancesScreen = () => {
               title={agoras?.length > 1 ? "Mes agoras thématiques" : "Mon agora thématique"}
               icon={DoubleSquare}
               description="Les agoras thématiques sont un espace d’échange et de travail réservé aux adhérents Renaissance."
-              headerLeft={isSympathisant ? <VoxCard.AdhLock /> : null}
+              headerLeft={isSympathisant || !isAdherentDues ? <VoxCard.AdhLock due={!isAdherentDues} /> : null}
               footer={
                 agorasContent.footerText || agorasContent.button ? (
                   <YStack gap="$medium">
