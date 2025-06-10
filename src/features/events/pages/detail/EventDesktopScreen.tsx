@@ -21,7 +21,8 @@ import EventParticipantsSection from '../../components/EventParticipantsSection'
 import { EventToggleSubscribeButton } from '../../components/EventToggleSubscribeButton'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
 import { ScrollStack } from './EventComponents'
-import { LockPublicAuthAdhCard } from './SubscribeCard'
+import { LockForbiddenContent, LockPublicAuthAdhCard } from './SubscribeCard'
+import { DetailedAPIErrorPayload, ForbiddenError, UnauthorizedError } from '@/core/errors'
 
 const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 'time_zone'>> & { showTime?: boolean }) => {
   if (!props.begin_at) {
@@ -210,12 +211,13 @@ export const EventDesktopScreenSkeleton = () => {
   )
 }
 
-const EventDesktopAsideDeny = () => {
+const EventDesktopAsideDeny = ({ error }: {error: DetailedAPIErrorPayload}) => {
   return (
     <PageLayout.SideBarRight alwaysShow paddingTop={0}>
       <VoxCard.Content height="100%">
         <YStack flex={1} justifyContent="center" alignItems="center" height="100%">
-          <LockPublicAuthAdhCard />
+          {error instanceof ForbiddenError ? <LockForbiddenContent error={error} /> : null}
+          {error instanceof UnauthorizedError ? <LockPublicAuthAdhCard /> : null}
         </YStack>
       </VoxCard.Content>
     </PageLayout.SideBarRight>
@@ -232,7 +234,7 @@ const EventDesktopMainDeny = () => {
   )
 }
 
-export const EventDesktopScreenDeny = () => {
+export const EventDesktopScreenDeny = ({ error }: {error: DetailedAPIErrorPayload}) => {
   return (
     <ScrollStack>
       <XStack alignItems="flex-start" alignSelf="flex-start" pb="$medium">
@@ -241,7 +243,7 @@ export const EventDesktopScreenDeny = () => {
       <VoxCard overflow="hidden">
         <XStack>
           <EventDesktopMainDeny />
-          <EventDesktopAsideDeny />
+          <EventDesktopAsideDeny error={error} />
         </XStack>
       </VoxCard>
     </ScrollStack>
