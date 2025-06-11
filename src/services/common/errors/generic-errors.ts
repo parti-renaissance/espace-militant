@@ -1,4 +1,4 @@
-import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError, ServerTimeoutError, UnauthorizedError } from '@/core/errors'
+import { BadRequestError, DetailedAPIErrorPayload, ForbiddenError, InternalServerError, NotFoundError, ServerTimeoutError, UnauthorizedError } from '@/core/errors'
 import { logDefaultError, logHttpError, logTimeoutError, logTypeError } from '@/data/network/NetworkLogger'
 import axios from 'axios'
 import { z } from 'zod'
@@ -31,13 +31,15 @@ export const genericErrorThrower = (error: unknown) => {
     } else if (error.response) {
       logHttpError(error)
 
+      const payload = error?.response?.data as DetailedAPIErrorPayload
+
       switch (error.response.status) {
         case 400:
-          throw new BadRequestError(error.message)
+          throw new BadRequestError(payload)
         case 401:
-          throw new UnauthorizedError(error.message)
+          throw new UnauthorizedError(payload)
         case 403:
-          throw new ForbiddenError(error.message)
+          throw new ForbiddenError(payload)
         case 404:
           throw new NotFoundError(error.message)
         case 500:
