@@ -5,14 +5,12 @@ import { Poll } from '../../core/entities/Poll'
 import PollsRepository from '../../data/PollsRepository'
 import { PollDetailModalNavigatorScreenProps } from '../../navigation/pollDetailModal/PollDetailModalNavigatorScreenProps'
 import i18n from '../../utils/i18n'
-import ModalOverlay from '../shared/ModalOverlay'
-import { CloseButton, NavigationHeaderButton } from '../shared/NavigationHeaderButton'
+import { CloseButton } from '../shared/NavigationHeaderButton'
 import { StatefulView } from '../shared/StatefulView'
 import { useBackHandler } from '../shared/useBackHandler.hook'
 import { ViewState } from '../shared/ViewState'
 import { ViewStateUtils } from '../shared/ViewStateUtils'
 import PollDetailScreenLoaded from './PollDetailScreenLoaded'
-import PollDetailTools from './PollDetailTools'
 
 type PollDetailScreenProps = PollDetailModalNavigatorScreenProps<'PollDetail'>
 
