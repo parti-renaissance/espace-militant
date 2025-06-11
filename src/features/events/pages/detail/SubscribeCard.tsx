@@ -9,10 +9,11 @@ import { LandPlot } from '@tamagui/lucide-icons'
 import { DetailedAPIErrorPayload } from '@/core/errors'
 
 const AdhButton = (props: { bgColor?: string; children?: string; variant?: ComponentProps<typeof VoxButton>['variant'] }) => {
-  const { isPending, open: handleClick } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'event' })
+  const { isPending, open: handleClick } = useOpenExternalContent({ slug: 'adhesion' })
+  const { signUp, isAuth } = useSession()
 
   return (
-    <VoxButton variant={props.variant} size="lg" width="100%" theme="yellow" onPress={handleClick()} loading={isPending}>
+    <VoxButton variant={props.variant} size="lg" width="100%" theme="yellow" onPress={isAuth ? handleClick() : signUp} loading={isPending}>
       {props.children ?? 'Adhérer'}
     </VoxButton>
   )

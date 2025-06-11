@@ -126,7 +126,7 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
     () =>
       state.routes.filter((route) => {
         const { options } = descriptors[route.key]
-        return options.tabBarVisible === false
+        return options.tabBarVisible === false && !options?.disabled
       }),
     [state.routes, descriptors],
   )

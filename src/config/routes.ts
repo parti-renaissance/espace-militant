@@ -4,12 +4,13 @@ import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Li
 import { ThemeName } from 'tamagui'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux' | 'parrainages'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux' | 'parrainages' | 'questionnaires'
   screenName: string
   highlighted?: boolean
   icon: typeof HomeIcon
   hidden?: boolean | ((profile?: RestProfilResponse) => boolean)
   hiddenMobile?: boolean | ((profile?: RestProfilResponse) => boolean)
+  disabled?: boolean
   href?: string
   theme: ThemeName
 }
@@ -72,6 +73,15 @@ export const ROUTES: TabRoute[] = [
     theme: 'orange',
     hiddenMobile: true,
     hidden: true,
+  },
+  {
+    name: 'questionnaires',
+    screenName: 'Questionnaires',
+    icon: ClipboardCheck,
+    theme: 'gray',
+    hidden: true,
+    hiddenMobile: true,
+    disabled: !(!process.env.EAS_BUILD_PROFILE || process.env.EAS_BUILD_PROFILE === 'development' || process.env.EAS_BUILD_PROFILE === 'staging')
   },
   {
     name: 'profil',
