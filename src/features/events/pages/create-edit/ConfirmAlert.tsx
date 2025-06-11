@@ -6,10 +6,11 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import VoxSimpleModal from '@/components/VoxSimpleModal'
 import { EventFormData } from '@/features/events/pages/create-edit/schema'
-import { BellDot, Mail } from '@tamagui/lucide-icons'
+import { BellDot, Mail, Send } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { Theme, XStack, YStack } from 'tamagui'
 import getVisibilityOptions from './visibility-options'
+import { useCountInvitationsEvent } from '@/services/events/hook'
 
 type ConfirmAlertProps = {
   onAccept: () => void | Promise<unknown>
@@ -17,14 +18,32 @@ type ConfirmAlertProps = {
   isPending?: boolean
   title: string
   control: Control<EventFormData>
+  isAgoraLeader?: boolean
+  agoraUuid?: string | null
+  scope?: string | null
 }
 
 type ModalRef = ComponentRef<typeof VoxSimpleModal>
 
-const VisibilityReview = (props: { visibility: string }) => {
+const VisibilityReview = (props: {
+  visibility: string
+  agoraUuid?: string | null
+  scope?: string | null
+}) => {
   const visibilityOptions = getVisibilityOptions()
   const visuOption = visibilityOptions.find((x) => x.value === props.visibility)
-  return visuOption ? (
+
+  const shouldCount = props.visibility === 'invitation_agora' && !!props.agoraUuid && !!props.scope
+
+  const { data } = useCountInvitationsEvent({
+    roles: undefined,
+    agora: shouldCount ? props.agoraUuid! : undefined,
+    scope: shouldCount ? props.scope! : '',
+  })
+
+  const count = shouldCount && data?.count
+
+  const VisibilityDescription = visuOption ? (
     <XStack gap="$small" alignItems="center">
       <Theme name={visuOption.theme}>
         {visuOption.icon ? (
@@ -33,11 +52,33 @@ const VisibilityReview = (props: { visibility: string }) => {
           </XStack>
         ) : null}
         <YStack flexShrink={1}>
-          <Text.MD color={visuOption.theme ? '$color5' : '$textPrimary'}>{visuOption.subLabel}</Text.MD>
+          <Text.MD color={visuOption.theme ? '$color5' : '$textPrimary'}>
+            {visuOption.subLabel}
+          </Text.MD>
         </YStack>
       </Theme>
     </XStack>
   ) : null
+
+  return (
+    <>
+      {VisibilityDescription}
+      {shouldCount && typeof count === 'number' && (
+        <XStack gap="$small" alignItems="center">
+          <XStack paddingHorizontal="$medium">
+            <Send size={20} />
+          </XStack>
+          <Text.MD>
+            {`${
+              count === 1
+                ? `1 membre de l’agora recevra une invitation`
+                : `${count} membres de l’agora recevront une invitation`
+            }`}
+          </Text.MD>
+        </XStack>
+      )}
+    </>
+  )
 }
 
 const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
@@ -65,7 +106,7 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
       <VoxCard.Content justifyContent="space-between" gap="$large" $sm={{ maxWidth: 350 }} maxWidth={500}>
         <YStack gap="$medium">
           <Text.LG semibold>{props.title}</Text.LG>
-          <Controller name="visibility" render={({ field }) => <VisibilityReview visibility={field.value} />} control={props.control} />
+          <Controller name="visibility" render={({ field }) => <VisibilityReview visibility={field.value} agoraUuid={props.agoraUuid} scope={props.scope} />} control={props.control} />
           <XStack gap="$small" alignItems="center">
             <XStack flexGrow={1} paddingHorizontal="$medium">
               <BellDot size={20} color="$textPrimary" />

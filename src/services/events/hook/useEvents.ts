@@ -5,9 +5,9 @@ import * as api from '@/services/events/api'
 import { eventPostFormError } from '@/services/events/error'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 import { useToastController } from '@tamagui/toast'
-import { useInfiniteQuery, useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { RestPostEventRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
+import { RestPostCountInvitationsEventRequest, RestPostEventRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
 import { optimisticToggleSubscribe, optimisticUpdate } from './helpers'
 import { QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
 
@@ -281,5 +281,21 @@ export const useCancelEvent = () => {
       }
       return error
     },
+  })
+}
+
+export const useCountInvitationsEvent = ({
+  roles,
+  agora,
+  scope,
+}: RestPostCountInvitationsEventRequest & { scope: string }) => {
+  return useQuery({
+    queryKey: [QUERY_KEY_SINGLE_EVENT, roles, agora, scope],
+    queryFn: () =>
+      api.countInvitationsEvent({
+        payload: { roles, agora },
+        scope,
+      }),
+    refetchOnMount: true,
   })
 }

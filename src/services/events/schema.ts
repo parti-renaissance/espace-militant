@@ -255,3 +255,15 @@ export const propertyPathPostEventSchema = z.enum([
   'visibility',
   'live_url',
 ])
+
+// ------------ REST COUNT INVITATIONS EVENT ---------------\
+
+export type RestPostCountInvitationsEventRequest = z.infer<typeof RestPostCountInvitationsEventRequestSchema>
+export const RestPostCountInvitationsEventRequestSchema = z.object({
+  roles: z.array(z.enum(['agora_president', 'animator', 'deputy', 'communication_manager', 'treasurer'])).nullish(),
+  agora: z.string().nullish(),
+})
+
+export const RestPostCountInvitationsEventResponseSchema = z.object({
+  count: z.number(),
+})
