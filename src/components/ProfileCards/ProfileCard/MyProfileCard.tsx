@@ -115,6 +115,8 @@ export default function MyProfileCard() {
     return null
   }
 
+  const eas_profile = process.env.EAS_BUILD_PROFILE
+
   return (
     <VoxCard bg="$white" overflow="hidden">
       <YStack>
@@ -149,9 +151,19 @@ export default function MyProfileCard() {
             Formations
           </Menu.Item>
         </Link>
-        <Menu.Item size="sm" icon={ClipboardCheck} showArrow disabled>
-          Questionnaires (bientôt disponible)
-        </Menu.Item>
+        {!eas_profile || eas_profile === 'development' || eas_profile === 'staging'
+          ? (
+            <Link href="/questionnaires" asChild={!isWeb}>
+              <Menu.Item size="sm" icon={ClipboardCheck} showArrow >
+                Questionnaires (Staging)
+              </Menu.Item>
+            </Link>
+          ) : (
+            <Menu.Item size="sm" icon={ClipboardCheck} showArrow disabled>
+              Questionnaires (bientôt disponible)
+            </Menu.Item>
+          )
+        }
       </YStack>
     </VoxCard>
   )
