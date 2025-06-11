@@ -4,22 +4,21 @@ import { Colors, Spacing, Typography } from '../../styles'
 import i18n from '../../utils/i18n'
 import CircularIcon from '../shared/CircularIcon'
 import { StatefulView } from '../shared/StatefulView'
-import PollHighlightedRow from './PollHighlightedRow'
+import PageHeader from '@/features/profil/components/PageHeader'
 import PollRow from './PollRow'
 import { PollRowViewModel } from './PollRowViewModel'
 import PollsHeader from './PollsHeader'
 import { PollsScreenViewModel } from './PollsScreenViewModel'
 import { usePollsScreen } from './usePollsScreen.hook'
+import { ClipboardCheck } from '@tamagui/lucide-icons'
+import { useMedia } from 'tamagui'
 
 const PollsScreen = () => {
   const { statefulState, isRefreshing, onPollSelected, onRefresh } = usePollsScreen()
+  const media = useMedia()
 
   const renderItem = ({ item, index }: ListRenderItemInfo<PollRowViewModel>) => {
-    if (index === 0) {
-      return <PollHighlightedRow viewModel={item} onPress={() => onPollSelected(item.id)} />
-    } else {
       return <PollRow viewModel={item} onPress={() => onPollSelected(item.id)} />
-    }
   }
 
   const PollContent = (viewModel: PollsScreenViewModel) => {
@@ -43,6 +42,7 @@ const PollsScreen = () => {
 
   return (
     <View style={styles.container}>
+      {media.sm ? <PageHeader title="Questionnaires" icon={ClipboardCheck} backArrow={false} /> : null}
       <StatefulView state={statefulState} contentComponent={PollContent} />
     </View>
   )
@@ -50,11 +50,20 @@ const PollsScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.defaultBackground,
+    backgroundColor: '#f9f9fa',
     flex: 1,
+    
   },
   contentContainer: {
     flexGrow: 1,
+    width: '100%',
+    maxWidth: 520,
+    marginHorizontal: 'auto',
+    backgroundColor: '#fff',
+    marginTop: 40,
+    paddingVertical: 10,
+    borderRadius: 16,
+    marginBottom: 150,
   },
   emptyContainer: {
     flex: 1,

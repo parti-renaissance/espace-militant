@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { FlatList, StyleSheet, View } from 'react-native'
+import { FlatList, ScrollView, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { Poll } from '../../core/entities/Poll'
@@ -81,7 +81,7 @@ const PollDetailScreenLoaded: FunctionComponent<Props> = ({ poll }) => {
     PollsRepository.getInstance()
       .sendPollAnswers(poll, provider.getResult(), location)
       .then(() => {
-        router.replace({ pathname: '/(tabs)/actions/polls/[id]/success', params: { id: poll.uuid, title: poll.name } })
+        router.replace({ pathname: '/questionnaires/[id]/success', params: { id: poll.uuid, title: poll.name } })
 
       })
       .catch((error) => {
@@ -91,9 +91,9 @@ const PollDetailScreenLoaded: FunctionComponent<Props> = ({ poll }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <LoadingOverlay visible={isLoading} />
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={styles.content}>
         <PollDetailProgressBar
           style={styles.progress}
           viewModel={progressViewModel}
@@ -126,14 +126,16 @@ const PollDetailScreenLoaded: FunctionComponent<Props> = ({ poll }) => {
             windowSize={5}
           />
         </View>
+        <View style={{position: 'absolute', bottom: 0, left: 0, right: 0}}>
         <PollDetailNavigationButtons
-          viewModel={navigationViewModel}
-          onPrevious={() => setStep(currentStep - 1)}
-          onNext={() => setStep(currentStep + 1)}
-          onSubmit={postAnswers}
-        />
-      </View>
-    </SafeAreaView>
+            viewModel={navigationViewModel}
+            onPrevious={() => setStep(currentStep - 1)}
+            onNext={() => setStep(currentStep + 1)}
+            onSubmit={postAnswers}
+          />
+        </View>
+      </ScrollView>
+    </View>
   )
 }
 
@@ -141,6 +143,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.defaultBackground,
     flex: 1,
+    paddingTop: 16,
   },
   content: {
     flex: 1,
@@ -151,6 +154,9 @@ const styles = StyleSheet.create({
   },
   questionContainer: {
     flexGrow: 1,
+    width: '100%',
+    maxWidth: 520,
+    marginHorizontal: 'auto',
   },
 })
 

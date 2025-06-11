@@ -48,7 +48,9 @@ const styles = StyleSheet.create({
   },
   center: {
     flexGrow: 1,
-    marginHorizontal: Spacing.margin,
+    width: '100%',
+    maxWidth: 520,
+    marginHorizontal: 'auto',
   },
   left: {
     marginStart: Spacing.unit,
