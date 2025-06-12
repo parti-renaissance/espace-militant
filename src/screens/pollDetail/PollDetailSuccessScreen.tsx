@@ -46,7 +46,7 @@ const PollDetailSuccess: FunctionComponent<PollDetailSuccessScreenProps> = ({
             title={i18n.t('polldetail.success.restart')}
             onPress={() =>
               router.replace({
-                pathname: '/(tabs)/actions/polls/[id]/',
+                pathname: '/questionnaires/[id]',
                 params: { id },
               })
             }

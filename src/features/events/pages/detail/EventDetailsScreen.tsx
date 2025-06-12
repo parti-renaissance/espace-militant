@@ -27,7 +27,7 @@ export function EventDetailsScreenSkeleton() {
   return media.sm ? <EventMobileScreenSkeleton /> : <EventDesktopScreenSkeleton />
 }
 
-export function EventDetailsScreenDeny() {
+export function EventDetailsScreenDeny({error}) {
   const media = useMedia()
-  return media.sm ? <EventMobileScreenDeny /> : <EventDesktopScreenDeny />
+  return media.sm ? <EventMobileScreenDeny error={error} /> : <EventDesktopScreenDeny error={error} />
 }

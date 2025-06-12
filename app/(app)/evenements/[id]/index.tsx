@@ -3,7 +3,7 @@ import Error404 from '@/components/404/Error404'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import * as metatags from '@/config/metatags'
-import { UnauthorizedError } from '@/core/errors'
+import { ForbiddenError, UnauthorizedError } from '@/core/errors'
 import EventDetailsScreen, { EventDetailsScreenDeny, EventDetailsScreenSkeleton } from '@/features/events/pages/detail/EventDetailsScreen'
 import { useGetEvent } from '@/services/events/hook'
 import { Stack as RouterStack, useLocalSearchParams } from 'expo-router'
@@ -18,8 +18,8 @@ const HomeScreen: React.FC = () => {
       <BoundarySuspenseWrapper
         fallback={<EventDetailsScreenSkeleton />}
         errorChildren={(payload) => {
-          if (payload.error instanceof UnauthorizedError) {
-            return <EventDetailsScreenDeny />
+          if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
+            return <EventDetailsScreenDeny error={payload.error} />
           } else {
             return (
               <PageLayout.StateFrame>
