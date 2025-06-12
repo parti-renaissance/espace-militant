@@ -7,6 +7,7 @@ import { Link, usePathname } from 'expo-router'
 import { XStack, YStack } from 'tamagui'
 import { LandPlot } from '@tamagui/lucide-icons'
 import { DetailedAPIErrorPayload } from '@/core/errors'
+import { useSession } from '@/ctx/SessionProvider'
 
 const AdhButton = (props: { bgColor?: string; children?: string; variant?: ComponentProps<typeof VoxButton>['variant'] }) => {
   const { isPending, open: handleClick } = useOpenExternalContent({ slug: 'adhesion' })
