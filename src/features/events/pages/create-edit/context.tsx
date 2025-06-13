@@ -272,7 +272,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     control,
     isAgoraLeader, 
     agoraUuid,
-    scope: selectedScope
+    scope: selectedScope,
   })
 
   const modalBeforeSubmit = handleSubmit(() => present())

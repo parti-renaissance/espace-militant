@@ -34,7 +34,7 @@ const ALL_VISIBILITY_OPTIONS: SelectOption<EventFormData['visibility']>[] = [
     value: 'invitation_agora',
     icon: Ticket,
     theme: 'orange',
-    label: 'Réservé aux membres',
+    label: 'Réservé aux membres de l’agora',
     subLabel: 'Seules les personnes invitées nominativement peuvent voir et s’inscrire à l’événement.',
   },
 ]

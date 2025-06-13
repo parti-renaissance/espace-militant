@@ -297,5 +297,6 @@ export const useCountInvitationsEvent = ({
         scope,
       }),
     refetchOnMount: true,
+    staleTime: 60 * 1000,
   })
 }
