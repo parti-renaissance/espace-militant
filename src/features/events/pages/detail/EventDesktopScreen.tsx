@@ -241,7 +241,7 @@ export const EventDesktopScreenDeny = ({ error }: {error: DetailedAPIErrorPayloa
         <BackButton>Événements</BackButton>
       </XStack>
       <VoxCard overflow="hidden">
-        <XStack>
+        <XStack height={500}>
           <EventDesktopMainDeny />
           <EventDesktopAsideDeny error={error} />
         </XStack>
