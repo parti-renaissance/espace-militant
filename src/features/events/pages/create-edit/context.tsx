@@ -177,6 +177,9 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const currentScope = useWatch({ control, name: 'scope' })
   const visibilityOptions = useMemo(() => getVisibilityOptions(currentScope), [currentScope])
+  const agoraUuid = useMemo(() => {
+    return scopes.data?.list.find((x) => x.code === selectedScope)?.attributes?.agoras?.[0]?.uuid ?? null
+  }, [selectedScope, scopes.data])
 
   const finalSubmit: SubmitHandler<EventFormData> = async (data) => {
     const { scope, image, mode, visio_url, post_address, ...payload } = data
@@ -193,7 +196,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           visio_url: mode === 'online' ? visio_url : undefined,
           post_address: mode === 'meeting' ? post_address : undefined,
           committee: fullScope?.attributes?.committees?.[0]?.uuid ?? null,
-          agora: fullScope?.attributes?.agoras?.[0]?.uuid ?? null,
+          agora: agoraUuid,
         },
         scope,
       })
@@ -267,6 +270,9 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     title: 'Créer l’événement ?',
     onAccept: finalOnSubmit,
     control,
+    isAgoraLeader, 
+    agoraUuid,
+    scope: selectedScope,
   })
 
   const modalBeforeSubmit = handleSubmit(() => present())
