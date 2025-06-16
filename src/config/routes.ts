@@ -2,6 +2,7 @@ import { HomeIcon } from '@/assets/icons/nav'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap, HeartHandshake } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
+import clientEnv from './clientEnv'
 
 export type TabRoute = {
   name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux' | 'parrainages' | 'questionnaires'
@@ -81,7 +82,7 @@ export const ROUTES: TabRoute[] = [
     theme: 'gray',
     hidden: true,
     hiddenMobile: true,
-    disabled: !(!process.env.EAS_BUILD_PROFILE || process.env.EAS_BUILD_PROFILE === 'development' || process.env.EAS_BUILD_PROFILE === 'staging')
+    disabled: !(clientEnv.ENVIRONMENT === 'staging')
   },
   {
     name: 'profil',
