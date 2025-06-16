@@ -1,18 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Alert, StyleSheet, View } from 'react-native'
+import { Alert, Platform, StyleSheet, View } from 'react-native'
 import { router, Stack, useLocalSearchParams } from 'expo-router'
 import { Poll } from '../../core/entities/Poll'
 import PollsRepository from '../../data/PollsRepository'
 import { PollDetailModalNavigatorScreenProps } from '../../navigation/pollDetailModal/PollDetailModalNavigatorScreenProps'
 import i18n from '../../utils/i18n'
-import ModalOverlay from '../shared/ModalOverlay'
-import { CloseButton, NavigationHeaderButton } from '../shared/NavigationHeaderButton'
+import { CloseButton } from '../shared/NavigationHeaderButton'
 import { StatefulView } from '../shared/StatefulView'
 import { useBackHandler } from '../shared/useBackHandler.hook'
 import { ViewState } from '../shared/ViewState'
 import { ViewStateUtils } from '../shared/ViewStateUtils'
 import PollDetailScreenLoaded from './PollDetailScreenLoaded'
-import PollDetailTools from './PollDetailTools'
 
 type PollDetailScreenProps = PollDetailModalNavigatorScreenProps<'PollDetail'>
 
@@ -22,22 +20,34 @@ const PollDetailScreen = ({ navigation }: PollDetailScreenProps) => {
   const [isModalVisible, setModalVisible] = useState(false)
 
   const askConfirmationBeforeLeaving = useCallback(() => {
-    Alert.alert(
-      i18n.t('polldetail.leave_alert.title'),
-      i18n.t('polldetail.leave_alert.message'),
-      [
-        {
-          text: i18n.t('polldetail.leave_alert.action'),
-          onPress: () => router.push('..'),
-          style: 'destructive',
-        },
-        {
-          text: i18n.t('polldetail.leave_alert.cancel'),
-          style: 'cancel',
-        },
-      ],
-      { cancelable: false },
-    )
+    const title = i18n.t('polldetail.leave_alert.title')
+    const message = i18n.t('polldetail.leave_alert.message')
+    const confirmText = i18n.t('polldetail.leave_alert.action')
+    const cancelText = i18n.t('polldetail.leave_alert.cancel')
+  
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(`${title}\n\n${message}`)
+      if (confirmed) {
+        router.push('/questionnaires')
+      }
+    } else {
+      Alert.alert(
+        title,
+        message,
+        [
+          {
+            text: confirmText,
+            onPress: () => router.back(),
+            style: 'destructive',
+          },
+          {
+            text: cancelText,
+            style: 'cancel',
+          },
+        ],
+        { cancelable: false }
+      )
+    }
   }, [navigation])
 
   useBackHandler(askConfirmationBeforeLeaving)
@@ -61,15 +71,9 @@ const PollDetailScreen = ({ navigation }: PollDetailScreenProps) => {
       <Stack.Screen
         options={{
           title: statefulState.state === 'content' ? statefulState.content.name : '',
-          headerRight: () => (
-            <NavigationHeaderButton onPress={() => setModalVisible(true)} source={require('../../assets/images/navigationBarLeftAccessoriesOutils.png')} />
-          ),
           headerLeft: () => <CloseButton onPress={() => askConfirmationBeforeLeaving()} />,
         }}
       />
-      <ModalOverlay modalVisible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
-        <PollDetailTools />
-      </ModalOverlay>
       <StatefulView state={statefulState} contentComponent={(poll) => <PollDetailScreenLoaded poll={poll} />} />
     </View>
   )

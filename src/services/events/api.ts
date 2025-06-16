@@ -147,3 +147,12 @@ export const deleteEventImage = (props: { eventId: string; scope: string }) =>
     responseSchema: z.any(),
     type: 'private',
   })()
+
+  export const countInvitationsEvent = (props: { payload: schemas.RestPostCountInvitationsEventRequest; scope: string }) =>
+    api({
+      method: 'post',
+      path: '/api/v3/events/count-invitations?scope=' + props.scope,
+      requestSchema: schemas.RestPostCountInvitationsEventRequestSchema,
+      responseSchema: schemas.RestPostCountInvitationsEventResponseSchema,
+      type: 'private',
+    })(props.payload)

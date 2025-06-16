@@ -10,4 +10,4 @@ export type TabBarNavDescriptors = BottomTabBarProps['descriptors'] & {
   [key: string]: { options: TabNavOptions }
 }
 
-export type TabNavOptions = BottomTabNavigationOptions & { tabBarTheme?: ThemeName; tabBarVisible?: boolean }
+export type TabNavOptions = BottomTabNavigationOptions & { tabBarTheme?: ThemeName; tabBarVisible?: boolean; disabled?: boolean }

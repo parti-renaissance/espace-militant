@@ -60,7 +60,7 @@ export const usePollsScreen = (): {
 
   const onPollSelected = (pollId: string) => {
     router.push({
-      pathname: '/(tabs)/actions/polls/[id]/',
+      pathname: '/questionnaires/[id]',
       params: { id: pollId },
     })
   }

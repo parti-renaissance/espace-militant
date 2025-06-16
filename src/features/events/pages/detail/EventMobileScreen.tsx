@@ -20,7 +20,8 @@ import EventMDXRenderer from '../../components/EventMDXRenderer'
 import EventParticipantsSection from '../../components/EventParticipantsSection'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
 import { ScrollStack } from './EventComponents'
-import { LockPublicAuthAdhCard } from './SubscribeCard'
+import { LockForbiddenContent, LockPublicAuthAdhCard } from './SubscribeCard'
+import { DetailedAPIErrorPayload, ForbiddenError, UnauthorizedError } from '@/core/errors'
 
 const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 'time_zone'>> & { showTime?: boolean }) => {
   if (!props.begin_at) {
@@ -163,7 +164,7 @@ export const EventMobileScreenSkeleton = () => {
   )
 }
 
-export const EventMobileScreenDeny = () => {
+export const EventMobileScreenDeny = ({ error }: {error: DetailedAPIErrorPayload}) => {
   const insets = useSafeAreaInsets()
   return (
     <PageLayout.MainSingleColumn backgroundColor="#ECF1F5">
@@ -171,7 +172,8 @@ export const EventMobileScreenDeny = () => {
         <Image src={require('@/assets/illustrations/VisuCadnas.png')} />
       </YStack>
       <YStack padding="$xlarge" pb={getTokenValue('$xlarge') + insets.bottom} bg="white" justifyContent="center" alignItems="center">
-        <LockPublicAuthAdhCard />
+        { error instanceof ForbiddenError ? <LockForbiddenContent error={error}/> : null }
+        { error instanceof UnauthorizedError ? <LockPublicAuthAdhCard /> : null }
       </YStack>
     </PageLayout.MainSingleColumn>
   )

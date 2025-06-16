@@ -24,6 +24,9 @@ const PollDetailProgressBar: FunctionComponent<Props> = ({
 const styles = StyleSheet.create({
   container: {
     paddingVertical: Spacing.unit,
+    width: '100%',
+    maxWidth: 520,
+    marginHorizontal: 'auto',
   },
   text: {
     marginBottom: Spacing.unit,

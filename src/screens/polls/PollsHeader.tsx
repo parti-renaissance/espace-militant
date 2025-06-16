@@ -30,6 +30,7 @@ const styles = StyleSheet.create({
   },
   title: {
     ...Typography.highlightedLargeTitle,
+    fontSize: 30,
     marginBottom: Spacing.mediumMargin,
   },
 })
