@@ -1,6 +1,8 @@
 import * as api from './api'
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToastController } from '@tamagui/toast'
+import { PAGINATED_QUERY_FEED } from '../timeline-feed/hook'
+import { QUERY_KEY_PAGINATED_SHORT_EVENTS } from '../events/hook/queryKeys'
 
 export const usePaginatedAgoras = () => {
   return useInfiniteQuery({
@@ -30,7 +32,7 @@ export const useSetMyAgora = () => {
         message: 'Vous êtes maintenant membre de cette agora',
         type: 'success',
       })
-      queryClient.invalidateQueries({ queryKey: ['profil', 'instances'] })
+      queryClient.invalidateQueries({ queryKey: ['profil', 'instances', PAGINATED_QUERY_FEED, QUERY_KEY_PAGINATED_SHORT_EVENTS] })
     },
     onError: () => {
       toast.show('Erreur', {
@@ -53,7 +55,7 @@ export const useLeaveMyAgora = () => {
         message: 'Vous avez quitté cette agora',
         type: 'success',
       })
-      queryClient.invalidateQueries({ queryKey: ['profil', 'instances'] })
+      queryClient.invalidateQueries({ queryKey: ['profil', 'instances', PAGINATED_QUERY_FEED, QUERY_KEY_PAGINATED_SHORT_EVENTS] })
     },
     onError: () => {
       toast.show('Erreur', {
