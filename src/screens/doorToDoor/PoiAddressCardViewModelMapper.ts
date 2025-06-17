@@ -13,11 +13,11 @@ export const PoiAddressCardViewModelMapper = {
   ): PoiAddressCardViewModel | undefined => {
     return poiAddress
       ? {
-          id: poiAddress.id,
+          id: poiAddress.id ?? '',
           interactable: poiAddress.building.campaignStatistics !== null,
           formattedAddress: i18n.t('doorToDoor.address', {
-            number: poiAddress.number,
-            street: poiAddress.address,
+            number: poiAddress.number ?? '',
+            street: poiAddress.address ?? '',
           }),
           icon:
             poiAddress.building.type === 'house'
@@ -29,7 +29,7 @@ export const PoiAddressCardViewModelMapper = {
           ),
           passage: mapLastPassage(poiAddress.building.campaignStatistics),
           doorsOrVotersLabel:
-            poiAddress.building.campaignStatistics?.numberOfDoors.toString() ??
+            poiAddress.building.campaignStatistics?.numberOfDoors?.toString() ??
             '-',
           label: i18n.t('doorToDoor.doorKnocked', {
             count: poiAddress.building.campaignStatistics?.numberOfDoors ?? 0,

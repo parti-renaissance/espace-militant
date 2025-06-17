@@ -4,7 +4,7 @@ import { YStack } from 'tamagui'
 
 const EventsListSkeleton: React.FC = () => {
   return (
-    <YStack gap="$medium" padding="$medium" $sm={{ paddingHorizontal: 0 }}>
+    <YStack gap="$medium" $sm={{ paddingHorizontal: 0 }}>
       <SkeCard>
         <SkeCard.Content>
           <SkeCard.Chip />

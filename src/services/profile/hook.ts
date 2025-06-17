@@ -30,6 +30,7 @@ function useGetSuspenseProfil(props?: { enabled?: boolean }) {
   }
   return useSuspenseQuery({
     queryKey: [PROFIL_QUERY_KEY],
+    staleTime: 1000 * 60 * 5,
     queryFn: () => api.getProfile(),
   })
 }
@@ -39,6 +40,7 @@ export { useGetSuspenseProfil }
 export const useGetUserScopes = ({ enabled }: { enabled?: boolean } = {}) => {
   return useQuery({
     queryKey: ['userScopes'],
+    staleTime: 1000 * 60 * 5,
     queryFn: () => api.getUserScopes(),
     enabled,
   })
@@ -47,6 +49,7 @@ export const useGetUserScopes = ({ enabled }: { enabled?: boolean } = {}) => {
 export const useGetSuspenseUserScopes = () => {
   return useSuspenseQuery({
     queryKey: ['userScopes'],
+    staleTime: 1000 * 60 * 5,
     queryFn: () => api.getUserScopes(),
   })
 }
@@ -54,9 +57,9 @@ export const useGetSuspenseUserScopes = () => {
 export const useGetExecutiveScopes = () => {
   const { data, ...rest } = useGetSuspenseUserScopes()
   const { defaultScope: localDefaultScopeCode, lastAvailableScopes } = useUserStore()
-  const cadre_scopes = data.filter((s) => s.apps.includes('data_corner'))
-  const [scopeWithMoreFeatures] = cadre_scopes.sort((a, b) => (b.features.length > a.features.length ? 1 : -1)) || []
-  const localDefaultScope = localDefaultScopeCode ? cadre_scopes.find((s) => s.code === localDefaultScopeCode) : undefined
+  const cadre_scopes = data?.filter((s) => s.apps.includes('data_corner'))
+  const [scopeWithMoreFeatures] = cadre_scopes?.sort((a, b) => (b.features.length > a.features.length ? 1 : -1)) || []
+  const localDefaultScope = localDefaultScopeCode ? cadre_scopes?.find((s) => s.code === localDefaultScopeCode) : undefined
   const defaultScope = localDefaultScope ?? scopeWithMoreFeatures
   return {
     data: {
