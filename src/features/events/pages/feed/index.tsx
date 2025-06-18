@@ -132,7 +132,7 @@ const EventList = () => {
               removeClippedSubviews={true}
               contentContainerStyle={{
                 gap: getToken('$medium', 'space'),
-                paddingTop: media.gtLg ? getToken('$xlarge', 'space') : 195,
+                paddingTop: media.gtLg ? getToken('$xlarge', 'space') : 155,
                 paddingLeft: media.gtSm ? getToken('$xxlarge', 'space') : undefined,
                 paddingRight: media.gtSm ? getToken('$xxlarge', 'space') : undefined,
                 paddingBottom: getToken('$11', 'space'),

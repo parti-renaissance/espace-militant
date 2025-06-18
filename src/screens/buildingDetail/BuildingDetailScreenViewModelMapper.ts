@@ -18,19 +18,25 @@ export const BuildingDetailScreenViewModelMapper = {
           return require('../../assets/images/imageHouse.png')
         case 'building':
           return require('../../assets/images/imageBuilding.png')
+        default:
+          return require('../../assets/images/imageBuilding.png')
       }
     }
     return {
       address: i18n.t('doorToDoor.address', {
-        number: address.number,
-        street: address.address,
+        number: address.number ?? '',
+        street: address.address ?? '',
       }),
       lastVisit: lastVisit(address.building.campaignStatistics) ?? i18n.t('common.noDataPlaceholder'),
       illustration: illustration(),
       leafletsDistributed: address.building.campaignStatistics?.leafletsDistributed ?? null,
       status: BuildingStatusViewModelMapper.map(address),
-      history: BuildingHistoryViewModelMapper.map(history),
-      buildingLayout: BuildingLayoutViewModelMapper.map(address.building.type, address.building.campaignStatistics?.status ?? 'todo', layout),
+      history: BuildingHistoryViewModelMapper.map(history ?? []),
+      buildingLayout: BuildingLayoutViewModelMapper.map(
+        address.building.type ?? 'building',
+        address.building.campaignStatistics?.status ?? 'todo',
+        layout ?? []
+      ),
       campaignId: address.building.campaignStatistics?.campaignId ?? '',
     }
   },

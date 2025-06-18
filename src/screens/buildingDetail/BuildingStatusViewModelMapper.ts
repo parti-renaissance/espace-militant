@@ -26,7 +26,7 @@ export const BuildingStatusViewModelMapper = {
     return {
       statusTile: statusTile,
       statusIcon: statusIcon,
-      estimatedDoorsStatBlock: estimatedDoorsStatBlock(address.votersCount),
+      estimatedDoorsStatBlock: estimatedDoorsStatBlock(address.votersCount ?? 0),
       doorKnockedStatBlock: doorKnockedStatBlock(
         address.building.campaignStatistics?.numberOfDoors ?? 0,
       ),
@@ -49,7 +49,7 @@ function estimatedDoorsStatBlock(votersCount: number): StatBlockViewModel {
 function doorKnockedStatBlock(visitedDoors: number): StatBlockViewModel {
   return {
     title: i18n.t('building.stats.doorKnocked', {
-      count: visitedDoors,
+      count: visitedDoors ?? 0,
     }),
     stat: dataOrPlaceholder(visitedDoors),
   }
@@ -58,7 +58,7 @@ function doorKnockedStatBlock(visitedDoors: number): StatBlockViewModel {
 function completedQuestionnairesStatBlock(surveys: number): StatBlockViewModel {
   return {
     title: i18n.t('building.stats.completedQuestionnaires', {
-      count: surveys,
+      count: surveys ?? 0,
     }),
     stat: dataOrPlaceholder(surveys),
   }

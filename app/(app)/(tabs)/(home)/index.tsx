@@ -32,7 +32,7 @@ const HomeScreen: React.FC = () => {
         <PageLayout.MainSingleColumn>
           <BoundarySuspenseWrapper
             fallback={
-              <YStack gap="$medium" padding="$medium" $sm={{ paddingHorizontal: 0 }}>
+              <YStack gap="$xxlarge" padding="$xxlarge" $sm={{ paddingHorizontal: 0 }}>
                 <SkeCard>
                   <SkeCard.Content>
                     <SkeCard.Chip />
