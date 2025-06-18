@@ -10,11 +10,11 @@ import { DetailedAPIErrorPayload } from '@/core/errors'
 import { useSession } from '@/ctx/SessionProvider'
 
 const AdhButton = (props: { bgColor?: string; children?: string; variant?: ComponentProps<typeof VoxButton>['variant'] }) => {
-  const { isPending, open: handleClick } = useOpenExternalContent({ slug: 'adhesion' })
+  const { isPending, open: handleClick } = useOpenExternalContent({ slug: 'adhesion', utm_source: "app", utm_campaign: "event" })
   const { signUp, isAuth } = useSession()
 
   return (
-    <VoxButton variant={props.variant} size="lg" width="100%" theme="yellow" onPress={isAuth ? handleClick() : signUp} loading={isPending}>
+    <VoxButton variant={props.variant} size="lg" width="100%" theme="yellow" onPress={isAuth ? handleClick() : () => signUp({utm_campaign: "event"})} loading={isPending}>
       {props.children ?? 'Adhérer'}
     </VoxButton>
   )
