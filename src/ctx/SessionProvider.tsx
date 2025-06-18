@@ -12,7 +12,7 @@ import { isWeb } from 'tamagui'
 type AuthContext = {
   signIn: (props?: { code?: string; isAdmin?: boolean; state?: string }) => Promise<void>
   signOut: () => Promise<void>
-  signUp: () => Promise<void>
+  signUp: (props?: { utm_campaign?: string }) => Promise<void>
   isAuth: boolean
   session?: User | null
   isLoading: boolean
@@ -23,7 +23,7 @@ type AuthContext = {
 export const AuthContext = React.createContext<AuthContext>({
   signIn: () => Promise.resolve(),
   signOut: () => Promise.resolve(),
-  signUp: () => Promise.resolve(),
+  signUp: (props?: { utm_campaign?: string }) => Promise.resolve(),
   isAuth: false,
   session: null,
   isLoading: false,
@@ -112,10 +112,9 @@ export function SessionProvider(props: React.PropsWithChildren) {
     }
   }, [])
 
-  const handleRegister = React.useCallback(async () => {
+  const handleRegister = React.useCallback(async (props?: { utm_campaign?: string }) => {
     try {
-      setIsLoginInProgress(true)
-      const session = await register()
+      const session = await register(props)
       if (!session) {
         return
       }
@@ -124,8 +123,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
     } catch (e) {
       ErrorMonitor.log(e.message, { e })
       toast.show('Erreur lors de la connexion', { type: 'error' })
-    } finally {
-      setIsLoginInProgress(false)
     }
   }, [isLoginInProgress])
 

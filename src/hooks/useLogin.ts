@@ -28,7 +28,7 @@ export const useDiscoveryDocument = (register?: boolean) => {
   return discovery
 }
 
-export const useCodeAuthRequest = (props?: { register?: boolean }) => {
+export const useCodeAuthRequest = (props?: { register?: boolean; utm_campaign?: string }) => {
   const discovery = useDiscoveryDocument(props?.register)
 
   const requestConfig = {
@@ -37,6 +37,7 @@ export const useCodeAuthRequest = (props?: { register?: boolean }) => {
     usePKCE: false,
     extraParams: {
       utm_source: 'app',
+      ...(props?.utm_campaign ? { utm_campaign: props.utm_campaign } : {}),
     },
   }
 
@@ -89,9 +90,13 @@ export const useLogin = () => {
 export const useRegister = () => {
   useBrowserWarmUp()
   const [, , promptAsync] = useCodeAuthRequest({ register: true }) ?? []
-  return () => {
+  return ({ utm_campaign }: { utm_campaign?: string } = {}) => {
     if (isWeb) {
-      window.location.href = REGISTRATION_ENDPOINT + `?redirect_uri=${REDIRECT_URI}&utm_source=app`
+      let url = REGISTRATION_ENDPOINT + `?redirect_uri=${REDIRECT_URI}&utm_source=app`
+      if (utm_campaign) {
+        url += `&utm_campaign=${encodeURIComponent(utm_campaign)}`
+      }
+      window.location.href = url
       return null
     }
 
