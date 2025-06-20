@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import { AlertTriangle, Check, ChevronDown, Cross, QrCode, Share2, Ticket, X } from '@tamagui/lucide-icons'
+import { AlertTriangle, Check, ChevronDown, QrCode, Share2, Ticket, X } from '@tamagui/lucide-icons'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import type { AlertVoxCardProps } from '@/components/Cards'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
@@ -115,7 +115,7 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
                   theme={alreadySubscribed ? 'blue' : 'gray'}
                   size="sm"
                   iconLeft={Share2}
-                  onPress={e => {
+                  onPress={() => {
                     onPressShare();
                   }}
                 >
@@ -129,8 +129,12 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
                   disabled={!payload.cta_url}
                   iconLeft={alreadySubscribed ? QrCode : Ticket}
                   theme={alreadySubscribed ? 'gray' : 'blue'}
-                  onPress={e => {
-                    alreadySubscribed ? setIsTicketOpen(true) : onShow()
+                  onPress={() => {
+                    if (alreadySubscribed) {
+                      setIsTicketOpen(true)
+                    } else {
+                      onShow()
+                    }
                   }}
                 >
                   {payload.cta_label}
