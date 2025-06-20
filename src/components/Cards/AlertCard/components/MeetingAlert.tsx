@@ -1,100 +1,45 @@
-import { ReactNode, useState } from 'react'
+import { useState } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import { AlertVoxCardProps, createOnShow } from '@/components/Cards'
-import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
+import { AlertTriangle, Check, ChevronDown, Cross, QrCode, Share2, Ticket, X } from '@tamagui/lucide-icons'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import type { AlertVoxCardProps } from '@/components/Cards'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
-import { ExternalLink, QrCode, Share2, Ticket } from '@tamagui/lucide-icons'
-import { ImageBackground } from 'expo-image'
-import { LinearGradient } from 'expo-linear-gradient'
-import { Image, XStack, YStack } from 'tamagui'
+import { Image, XStack, YStack, View } from 'tamagui'
+import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
+import { ExternalLink } from '@tamagui/lucide-icons'
+import { createOnShow } from '@/components/Cards'
+import { Animated } from 'react-native'
+import { useRef, useEffect } from 'react'
 
-type MeetingAlertProps = {
+export type MeetingAlertCollapsedProps = {
+  payload: RestAlertsResponse[0]
   onShow: () => void
   onPressShare: () => void
 } & AlertVoxCardProps
 
-const MeetingAlertLayout = ({ alreadySubscribed, payload, children }: { alreadySubscribed: boolean; payload: RestAlertsResponse[0]; children: ReactNode }) => {
-  return alreadySubscribed ? (
-    <VoxCard.Content gap="$medium" alignItems="center">
-      {payload.image_url && <Image src={payload.image_url} height={100} width="100%" resizeMode="contain" />}
-      {children}
-    </VoxCard.Content>
-  ) : (
-    <ImageBackground source={payload.image_url} contentFit="cover" style={{ flex: 1 }}>
-      <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={{ flex: 1 }}>
-        <VoxCard.Content gap="$medium" minHeight={165} justifyContent="flex-end">
-          {children}
-        </VoxCard.Content>
-      </LinearGradient>
-    </ImageBackground>
-  )
-}
+const AnimatedMeetingImage = ({ src, size }: { src: string, size: number }) => {
+  const animatedValue = useRef(new Animated.Value(size)).current
 
-const MeetingAlert = ({ payload, onShow, onPressShare, ...props }: MeetingAlertProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-
-  const alreadySubscribed = !!payload.data
-  let themeColor = '$white1'
-
-  if (alreadySubscribed) {
-    themeColor = '$textPrimaire'
-  }
+  useEffect(() => {
+    Animated.spring(animatedValue, {
+      toValue: size,
+      useNativeDriver: false, // width/height ne sont pas supportés par le driver natif
+      friction: 7,
+      tension: 40,
+    }).start()
+  }, [size])
 
   return (
-    <VoxCard {...props} overflow="hidden">
-      <MeetingAlertLayout alreadySubscribed={alreadySubscribed} payload={payload}>
-        <YStack gap="$medium">
-          <YStack gap="$small" alignItems={alreadySubscribed ? 'center' : 'flex-start'}>
-            <XStack flexShrink={1}>
-              <Text.LG multiline color={themeColor}>
-                {payload.title}
-              </Text.LG>
-            </XStack>
-
-            {alreadySubscribed && payload.description && (
-              <XStack flexShrink={1}>
-                <Text.SM color={themeColor} textAlign="center">
-                  {payload.description}
-                </Text.SM>
-              </XStack>
-            )}
-          </YStack>
-
-          <XStack gap="$small" justifyContent={alreadySubscribed ? 'center' : 'flex-start'}>
-            {payload.share_url ? (
-              <VoxButton
-                variant={alreadySubscribed ? 'outlined' : 'soft'}
-                size="sm"
-                iconLeft={Share2}
-                shrink={!alreadySubscribed}
-                textColor={themeColor}
-                backgroundColor="$white/32"
-                onPress={onPressShare}
-              >
-                Partager
-              </VoxButton>
-            ) : null}
-            {payload.cta_label && (
-              <VoxButton
-                variant={alreadySubscribed ? 'contained' : 'soft'}
-                size="sm"
-                disabled={!payload.cta_url}
-                iconLeft={alreadySubscribed ? QrCode : Ticket}
-                theme={alreadySubscribed ? 'blue' : 'gray'}
-                textColor={alreadySubscribed ? '$white1' : themeColor}
-                backgroundColor={alreadySubscribed ? '$blue5' : '$white/32'}
-                onPress={alreadySubscribed ? () => setIsOpen(true) : onShow}
-              >
-                {payload.cta_label}
-              </VoxButton>
-            )}
-          </XStack>
-        </YStack>
-        <TicketModal payload={payload} isOpen={isOpen} closeModal={() => setIsOpen(false)} />
-      </MeetingAlertLayout>
-    </VoxCard>
+    <Animated.View style={{ width: animatedValue, height: animatedValue }}>
+      <Image
+        src={src}
+        width="100%"
+        height="100%"
+        borderRadius="$4"
+        objectFit="cover"
+      />
+    </Animated.View>
   )
 }
 
@@ -118,4 +63,86 @@ const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsRespo
     </ModalOrBottomSheet>
   )
 }
-export default MeetingAlert
+
+const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: MeetingAlertCollapsedProps) => {
+  const [open, setOpen] = useState(true)
+  const [isTicketOpen, setIsTicketOpen] = useState(false)
+  const imageSize = open ? 91 : 48
+  const alreadySubscribed = !!payload.data
+
+  console.log('payload', payload);
+  
+
+  return (
+    <VoxCard
+      {...props}
+      overflow="hidden"
+      borderColor="$gray3"
+    >
+      <VoxCard.Content gap="0">
+        <XStack gap="$medium" onPress={() => setOpen(!open)}>
+          {payload.image_url && (
+            <AnimatedMeetingImage src={payload.image_url} size={imageSize} />
+          )}
+          <YStack gap="$small" flexShrink={1} flexGrow={1}>
+            <XStack alignItems="center" gap="$small" flexShrink={1} justifyContent="space-between">
+              <Text.LG numberOfLines={2} pt={6} flexShrink={1}>{payload.title}</Text.LG>
+              {open
+                ? <View width={32} height={32}><X size={32} /></View>
+                : <View width={32} height={32}><ChevronDown size={32} /></View>
+              }
+            </XStack>
+            {open && (
+              <YStack animation="quick" enterStyle={{ opacity: 0, scaleY: 0.8 }} exitStyle={{ opacity: 0, scaleY: 0.8 }} animateOnly={['opacity', 'scaleY']}>
+                {alreadySubscribed
+                  ? <VoxCard.Chip outlined icon={Check} theme="green">Inscrit</VoxCard.Chip>
+                  : <VoxCard.Chip outlined icon={AlertTriangle} theme="yellow">Non inscrit</VoxCard.Chip>
+                }
+              </YStack>
+            )}
+          </YStack>
+        </XStack>
+        {open && (
+          <YStack key="desc" animation="quick" enterStyle={{ opacity: 0, scaleY: 0.8 }} exitStyle={{ opacity: 0, scaleY: 0.8 }} animateOnly={['opacity', 'scaleY']}>
+            {alreadySubscribed
+              ? <Text.SM my="$medium">Donnez de la visibilité à l'événement et contribuez à son succès en le partageant autour&nbsp;de&nbsp;vous&nbsp;!</Text.SM>
+              : <Text.SM my="$medium">{payload.description}</Text.SM>
+            }
+            <XStack key="actions" gap="$small">
+              {payload.share_url ? (
+                <VoxButton
+                  variant={alreadySubscribed ? 'contained' : 'outlined'}
+                  theme={alreadySubscribed ? 'blue' : 'gray'}
+                  size="sm"
+                  iconLeft={Share2}
+                  onPress={e => {
+                    onPressShare();
+                  }}
+                >
+                  Partager
+                </VoxButton>
+              ) : null}
+              {payload.cta_label && (
+                <VoxButton
+                  variant={alreadySubscribed ? 'soft' : 'contained'}
+                  size="sm"
+                  disabled={!payload.cta_url}
+                  iconLeft={alreadySubscribed ? QrCode : Ticket}
+                  theme={alreadySubscribed ? 'gray' : 'blue'}
+                  onPress={e => {
+                    alreadySubscribed ? setIsTicketOpen(true) : onShow()
+                  }}
+                >
+                  {payload.cta_label}
+                </VoxButton>
+              )}
+            </XStack>
+          </YStack>
+        )}
+      </VoxCard.Content>
+      <TicketModal payload={payload} isOpen={isTicketOpen} closeModal={() => setIsTicketOpen(false)} />
+    </VoxCard>
+  )
+}
+
+export default MeetingAlertCollapsed
