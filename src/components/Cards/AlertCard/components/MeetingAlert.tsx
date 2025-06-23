@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { AlertTriangle, Check, ChevronDown, QrCode, Share2, Ticket, X } from '@tamagui/lucide-icons'
@@ -70,14 +70,12 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
   const imageSize = open ? 91 : 48
   const alreadySubscribed = !!payload.data
 
-  console.log('payload', payload);
-  
-
   return (
     <VoxCard
       {...props}
       overflow="hidden"
       borderColor="$gray3"
+      key={`meeting-alert-${payload.title}`}
     >
       <VoxCard.Content gap="0">
         <XStack gap="$medium" onPress={() => setOpen(!open)}>
