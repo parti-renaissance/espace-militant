@@ -1,3 +1,4 @@
+import React from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import MeetingAlert from '@/components/Cards/AlertCard/components/MeetingAlert'
@@ -38,7 +39,13 @@ const AlertMeetingCard = (props: AlertVoxCardProps) => {
     return handleShareOrCopy({ url: props.payload.share_url, message: props.payload.title })
   }
 
-  return <MeetingAlert onShow={createOnShow(props.payload.cta_url)} onPressShare={onPressShare} {...props} />
+  return (
+    <MeetingAlert
+      onShow={createOnShow(props.payload.cta_url)}
+      onPressShare={onPressShare}
+      payload={props.payload}
+    />
+  )
 }
 
 const AlertOnLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {

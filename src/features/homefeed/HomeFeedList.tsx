@@ -1,4 +1,4 @@
-import { memo, useCallback, useRef } from 'react'
+import { memo, useCallback, useRef, useMemo } from 'react'
 import { FlatList } from 'react-native'
 import { AlertCard, FeedCard } from '@/components/Cards'
 import { usePageLayoutScroll } from '@/components/layouts/PageLayout/usePageLayoutScroll'
@@ -62,6 +62,20 @@ const HomeFeedList = () => {
   const renderFeedItem = useCallback(({ item }: { item: RestTimelineFeedItem }) => {
     return <TimelineFeedCard {...item} />
   }, [])
+
+  const header = useMemo(() => (
+    alerts.length > 0 || shouldShowNotificationCard
+      ? (
+          <YStack gap={8} $gtSm={{ gap: 16, marginBottom: '$large' }}>
+            {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
+            {alerts.map((alert, i) => (
+              <AlertCard key={i} payload={alert} />
+            ))}
+          </YStack>
+        )
+      : null
+  ), [alerts, shouldShowNotificationCard])
+
   return (
     <FlatList
       ref={flatListRef}
@@ -75,18 +89,7 @@ const HomeFeedList = () => {
         paddingBottom: getToken('$11', 'space'),
         justifyContent: 'space-around',
       }}
-      ListHeaderComponent={
-        alerts.length > 0 || shouldShowNotificationCard
-          ? () => (
-              <YStack gap={8} $gtSm={{ gap: 16, marginBottom: '$large' }}>
-                {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
-                {alerts.map((alert, i) => (
-                  <AlertCard key={`${i}-alert`} payload={alert} />
-                ))}
-              </YStack>
-            )
-          : undefined
-      }
+      ListHeaderComponent={header}
       data={feedData}
       renderItem={renderFeedItem}
       keyExtractor={(item) => item.objectID}
