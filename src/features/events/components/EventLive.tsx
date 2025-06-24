@@ -47,7 +47,7 @@ export const EventLive = ({ event }: EventItemProps) => {
 
   if (started && isEventHasNationalLive(event)) {
     return (
-      <VoxCard backgroundColor="black" overflow="hidden">
+      <VoxCard backgroundColor="black" overflow="hidden" $sm={{paddingTop: 90}}>
         <VimeoPlayer url={`${clientEnv.OAUTH_BASE_URL}/live-event/${event.slug}?token=${session?.accessToken}`} height={500} />
       </VoxCard>
     )
