@@ -1,16 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import { AlertTriangle, Check, ChevronDown, QrCode, Share2, Ticket, X } from '@tamagui/lucide-icons'
+import { AlertTriangle, Check, QrCode, Share2, Ticket } from '@tamagui/lucide-icons'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import type { AlertVoxCardProps } from '@/components/Cards'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
-import { Image, XStack, YStack, View } from 'tamagui'
+import { Image, XStack, YStack } from 'tamagui'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import { ExternalLink } from '@tamagui/lucide-icons'
 import { createOnShow } from '@/components/Cards'
 import { Animated } from 'react-native'
-import { useRef, useEffect } from 'react'
 
 export type MeetingAlertCollapsedProps = {
   payload: RestAlertsResponse[0]
@@ -65,82 +64,77 @@ const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsRespo
 }
 
 const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: MeetingAlertCollapsedProps) => {
-  const [open, setOpen] = useState(true)
   const [isTicketOpen, setIsTicketOpen] = useState(false)
-  const imageSize = open ? 91 : 48
   const alreadySubscribed = !!payload.data
 
   return (
     <VoxCard
       {...props}
+      borderRadius="$medium"
       overflow="hidden"
       borderColor="$gray3"
       key={`meeting-alert-${payload.title}`}
     >
       <VoxCard.Content gap="0">
-        <XStack gap="$medium" onPress={() => setOpen(!open)}>
+        <XStack gap="$medium">
           {payload.image_url && (
-            <AnimatedMeetingImage src={payload.image_url} size={imageSize} />
+            <Image
+            src={payload.image_url}
+            width={91}
+            height={91}
+            borderRadius="$4"
+            objectFit="cover"
+          />
           )}
           <YStack gap="$small" flexShrink={1} flexGrow={1}>
-            <XStack alignItems="center" gap="$small" flexShrink={1} justifyContent="space-between">
-              <Text.LG numberOfLines={2} pt={6} flexShrink={1}>{payload.title}</Text.LG>
-              {open
-                ? <View width={32} height={32}><X size={32} /></View>
-                : <View width={32} height={32}><ChevronDown size={32} /></View>
+            <Text.LG numberOfLines={2} pt={6} flexShrink={1}>{payload.title}</Text.LG>
+            <YStack animation="quick" enterStyle={{ opacity: 0, scaleY: 0.8 }} exitStyle={{ opacity: 0, scaleY: 0.8 }} animateOnly={['opacity', 'scaleY']}>
+              {alreadySubscribed
+                ? <VoxCard.Chip outlined icon={Check} theme="green">Inscrit</VoxCard.Chip>
+                : <VoxCard.Chip outlined icon={AlertTriangle} theme="yellow">Non inscrit</VoxCard.Chip>
               }
-            </XStack>
-            {open && (
-              <YStack animation="quick" enterStyle={{ opacity: 0, scaleY: 0.8 }} exitStyle={{ opacity: 0, scaleY: 0.8 }} animateOnly={['opacity', 'scaleY']}>
-                {alreadySubscribed
-                  ? <VoxCard.Chip outlined icon={Check} theme="green">Inscrit</VoxCard.Chip>
-                  : <VoxCard.Chip outlined icon={AlertTriangle} theme="yellow">Non inscrit</VoxCard.Chip>
-                }
-              </YStack>
-            )}
+            </YStack>
           </YStack>
         </XStack>
-        {open && (
-          <YStack key="desc" animation="quick" enterStyle={{ opacity: 0, scaleY: 0.8 }} exitStyle={{ opacity: 0, scaleY: 0.8 }} animateOnly={['opacity', 'scaleY']}>
-            {alreadySubscribed
-              ? <Text.SM my="$medium">Donnez de la visibilité à l'événement et contribuez à son succès en le partageant autour&nbsp;de&nbsp;vous&nbsp;!</Text.SM>
-              : <Text.SM my="$medium">{payload.description}</Text.SM>
-            }
-            <XStack key="actions" gap="$small">
-              {payload.share_url ? (
-                <VoxButton
-                  variant={alreadySubscribed ? 'contained' : 'outlined'}
-                  theme={alreadySubscribed ? 'blue' : 'gray'}
-                  size="sm"
-                  iconLeft={Share2}
-                  onPress={() => {
-                    onPressShare();
-                  }}
-                >
-                  Partager
-                </VoxButton>
-              ) : null}
-              {payload.cta_label && (
-                <VoxButton
-                  variant={alreadySubscribed ? 'soft' : 'contained'}
-                  size="sm"
-                  disabled={!payload.cta_url}
-                  iconLeft={alreadySubscribed ? QrCode : Ticket}
-                  theme={alreadySubscribed ? 'gray' : 'blue'}
-                  onPress={() => {
-                    if (alreadySubscribed) {
-                      setIsTicketOpen(true)
-                    } else {
-                      onShow()
-                    }
-                  }}
-                >
-                  {payload.cta_label}
-                </VoxButton>
-              )}
-            </XStack>
-          </YStack>
-        )}
+        <YStack key="desc" animation="quick" enterStyle={{ opacity: 0, scaleY: 0.8 }} exitStyle={{ opacity: 0, scaleY: 0.8 }} animateOnly={['opacity', 'scaleY']}>
+          {alreadySubscribed
+            ? <Text.SM my="$medium">Donnez de la visibilité à l'événement et contribuez à son succès en le partageant autour&nbsp;de&nbsp;vous&nbsp;!</Text.SM>
+            : <Text.SM my="$medium">{payload.description}</Text.SM>
+          }
+          <XStack key="actions" gap="$small">
+            {payload.share_url ? (
+              <VoxButton
+                variant={alreadySubscribed ? 'contained' : 'outlined'}
+                theme={alreadySubscribed ? 'blue' : 'gray'}
+                size="sm"
+                iconLeft={Share2}
+                onPress={() => {
+                  onPressShare();
+                }}
+              >
+                Partager
+              </VoxButton>
+            ) : null}
+            {payload.cta_label && (
+              <VoxButton
+                variant={alreadySubscribed ? 'soft' : 'contained'}
+                size="sm"
+                disabled={!payload.cta_url}
+                iconLeft={alreadySubscribed ? QrCode : Ticket}
+                theme={alreadySubscribed ? 'gray' : 'blue'}
+                onPress={() => {
+                  if (alreadySubscribed) {
+                    setIsTicketOpen(true)
+                  } else {
+                    onShow()
+                  }
+                }}
+              >
+                {payload.cta_label}
+              </VoxButton>
+            )}
+          </XStack>
+        </YStack>
       </VoxCard.Content>
       <TicketModal payload={payload} isOpen={isTicketOpen} closeModal={() => setIsTicketOpen(false)} />
     </VoxCard>
