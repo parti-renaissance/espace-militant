@@ -1,16 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import { AlertTriangle, Check, ChevronDown, QrCode, Share2, Ticket, X } from '@tamagui/lucide-icons'
+import { AlertTriangle, Check, QrCode, Share2, Ticket, X } from '@tamagui/lucide-icons'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import type { AlertVoxCardProps } from '@/components/Cards'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
-import { Image, XStack, YStack, View } from 'tamagui'
+import { Image, XStack, YStack } from 'tamagui'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import { ExternalLink } from '@tamagui/lucide-icons'
 import { createOnShow } from '@/components/Cards'
 import { Animated } from 'react-native'
-import { useRef, useEffect } from 'react'
 
 export type MeetingAlertCollapsedProps = {
   payload: RestAlertsResponse[0]

@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useRef, Children } from 'react'
-import { YStack, XStack, useMedia, AnimatePresence, Button } from 'tamagui'
+import React, { useState, useRef, Children } from 'react'
+import { YStack, XStack, useMedia, AnimatePresence } from 'tamagui'
 import { ChevronUp, Eye } from '@tamagui/lucide-icons'
 import AlertCard from '../AlertCard'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
