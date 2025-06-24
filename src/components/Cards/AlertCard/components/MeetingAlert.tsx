@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import { AlertTriangle, Check, QrCode, Share2, Ticket, X } from '@tamagui/lucide-icons'
+import { AlertTriangle, Check, QrCode, Share2, Ticket } from '@tamagui/lucide-icons'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import type { AlertVoxCardProps } from '@/components/Cards'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
