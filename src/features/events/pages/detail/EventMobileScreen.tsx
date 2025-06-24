@@ -94,7 +94,7 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
       <ScrollStack marginTop={insets.top} backgroundColor="$textSurface">
         <YStack>
           <EventLive event={event} userUuid={userUuid} />
-          <VoxCard overflow="hidden" pb={66}>
+          <VoxCard overflow="hidden" pb={66} borderWidth={0}>
             {fallbackImage ? <VoxCard.Image large={true} image={fallbackImage} imageData={event.image} /> : null}
             <VoxCard.Content pt={fallbackImage ? 0 : undefined}>
               <EventItemHeader>
