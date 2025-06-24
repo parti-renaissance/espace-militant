@@ -1,6 +1,6 @@
 import { memo, useCallback, useRef, useMemo } from 'react'
 import { FlatList } from 'react-native'
-import { AlertCard, FeedCard } from '@/components/Cards'
+import { FeedCard } from '@/components/Cards'
 import { usePageLayoutScroll } from '@/components/layouts/PageLayout/usePageLayoutScroll'
 import { transformFeedItemToProps } from '@/helpers/homeFeed'
 import { useAlerts } from '@/services/alerts/hook'
@@ -12,6 +12,7 @@ import { getToken, Spinner, useMedia, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
+import AlertList from '@/components/Cards/AlertCard/components/AlertStack'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 
@@ -68,9 +69,7 @@ const HomeFeedList = () => {
       ? (
           <YStack gap={8} $gtSm={{ gap: 16, marginBottom: '$large' }}>
             {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
-            {alerts.map((alert, i) => (
-              <AlertCard key={i} payload={alert} />
-            ))}
+            {alerts.length > 0 ? <AlertList alerts={alerts} /> : null}
           </YStack>
         )
       : null

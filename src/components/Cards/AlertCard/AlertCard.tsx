@@ -51,7 +51,11 @@ const AlertMeetingCard = (props: AlertVoxCardProps) => {
 const AlertOnLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
   const onShow = createOnShow(payload.cta_url)
   return (
-    <VoxCard {...props} backgroundColor="$orange1">
+    <VoxCard
+      {...props}
+      backgroundColor="$orange1"
+      borderRadius="$medium"
+    >
       <VoxCard.Content gap="$small">
         <XStack justifyContent="space-between">
           <VoxCard.Chip alert icon={Radio}>
@@ -79,7 +83,11 @@ const AlertOnLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
 const AlertAnnonceLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
   const onShow = createOnShow(payload.cta_url)
   return (
-    <VoxCard {...props} backgroundColor="$textOutline20">
+    <VoxCard
+    {...props}
+    backgroundColor="$textOutline20"
+    borderRadius="$medium"
+    >
       <VoxCard.Content gap="$small">
         <XStack justifyContent="space-between">
           <VoxCard.Chip alert icon={Radio}>
@@ -106,7 +114,10 @@ const AlertAnnonceLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
 const AlertBasicCard = ({ payload, ...props }: AlertVoxCardProps) => {
   const onShow = createOnShow(payload.cta_url)
   return (
-    <VoxCard {...props}>
+    <VoxCard
+      {...props}
+      borderRadius="$medium"
+    >
       <VoxCard.Content>
         <XStack justifyContent="space-between">
           <VoxCard.Chip theme="orange" icon={BellElectric}>
