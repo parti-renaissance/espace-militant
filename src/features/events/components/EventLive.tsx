@@ -25,7 +25,7 @@ export const EventLive = ({ event }: EventItemProps) => {
 
   if (!started && isEventHasNationalLive(event)) {
     return (
-      <VoxCard backgroundColor="black">
+      <VoxCard backgroundColor="black" borderWidth={0}>
         <VoxCard.Content
           height={50}
           $sm={{
@@ -47,7 +47,7 @@ export const EventLive = ({ event }: EventItemProps) => {
 
   if (started && isEventHasNationalLive(event)) {
     return (
-      <VoxCard backgroundColor="black" overflow="hidden">
+      <VoxCard backgroundColor="black" overflow="hidden" borderWidth={0} $sm={{paddingTop: 90}}>
         <VimeoPlayer url={`${clientEnv.OAUTH_BASE_URL}/live-event/${event.slug}?token=${session?.accessToken}`} height={500} />
       </VoxCard>
     )

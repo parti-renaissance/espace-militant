@@ -60,7 +60,7 @@ const VoxCardChip = (props: ComponentProps<typeof Chip>) => {
 export type VoxCardTitleProps = { children: string | string[] | ReactNode }
 const VoxCardTitle = ({ children, underline = true }: VoxCardTitleProps & { underline?: boolean }) => {
   return (
-    <XStack borderBottomWidth={underline ? 1 : 0} pb={underline ? 8 : 0} borderColor="$textOutline32" flex={1}>
+    <XStack borderBottomWidth={underline ? 1 : 0} pb={underline ? 8 : 0} borderColor="$textOutline32">
       <Text.MD multiline semibold lineBreakStrategyIOS="push-out">
         {children}
       </Text.MD>

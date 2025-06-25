@@ -7,7 +7,7 @@ import EventFilterForm from '@/features/events/components/EventFilterForm/EventF
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { Link } from 'expo-router'
-import { getTokenValue, isWeb, XStack, YStack, YStackProps } from 'tamagui'
+import { getTokenValue, isWeb, XStack, YStack, YStackProps, useMedia } from 'tamagui'
 
 const options = [
   { label: 'Tous', value: 'events' },
@@ -16,9 +16,7 @@ const options = [
 
 const NewEventBtn = ({ children, ...props }: YStackProps & { children: string }) => {
   const { hasFeature } = useGetExecutiveScopes()
-  if (hasFeature('events') === false) {
-    return null
-  }
+  if (!hasFeature('events')) return null
   return (
     <YStack {...props}>
       <Link href="/evenements/creer" asChild={!isWeb}>
@@ -30,9 +28,16 @@ const NewEventBtn = ({ children, ...props }: YStackProps & { children: string })
   )
 }
 
-const EventsHeader = ({ mode, ...props }: { mode: 'list' | 'aside'; value: 'events' | 'myEvents'; onChange: (x: 'events' | 'myEvents') => void }) => {
+const EventsHeader = ({ mode, value, onChange }: { mode: 'list' | 'aside'; value: 'events' | 'myEvents'; onChange: (x: 'events' | 'myEvents') => void }) => {
   const insets = useSafeAreaInsets()
   const { isAuth } = useSession()
+  const hasFeature = isAuth ? useGetExecutiveScopes().hasFeature : undefined
+  const canCreate = isAuth && hasFeature ? hasFeature('events') : false
+  const media = useMedia()
+
+  // Responsive padding horizontal selon le mode et la présence du bouton
+  const paddingLeft = mode === 'list' ? (media.sm ? '$small' : '$xxlarge') : undefined
+  const paddingRight = media.sm ? '$small' : '$xxlarge'
 
   return (
     <YStack
@@ -41,27 +46,26 @@ const EventsHeader = ({ mode, ...props }: { mode: 'list' | 'aside'; value: 'even
       pb="$medium"
       paddingTop={mode === 'list' ? (isAuth ? insets.top : 0) + getTokenValue('$medium', 'space') : undefined}
     >
-      <XStack
-        pl={mode === 'list' ? '$medium' : undefined}
-        pr={mode === 'aside' ? '$medium' : undefined}
-        gap={mode === 'aside' ? '$medium' : '$small'}
-        display={isAuth ? 'flex' : 'none'}
-        flexDirection={mode === 'aside' ? 'column-reverse' : 'row'}
-      >
-        {isAuth ? (
+      {isAuth && (
+        <XStack
+          pl={paddingLeft}
+          pr={paddingRight}
+          gap={mode === 'aside' ? '$medium' : '$small'}
+          flexDirection={mode === 'aside' ? 'column-reverse' : 'row'}
+        >
           <XStack flex={2}>
-            <BigSwitch options={options} value={props.value} onChange={props.onChange} />
+            <BigSwitch options={options} value={value} onChange={onChange} />
           </XStack>
-        ) : null}
-        {isAuth ? (
-          <Suspense>
-            <NewEventBtn paddingRight={mode === 'list' ? '$medium' : undefined} paddingBottom={mode === 'aside' ? '$medium' : undefined}>
-              {mode === 'list' ? ' Créer' : 'Organiser un événement'}
-            </NewEventBtn>
-          </Suspense>
-        ) : null}
-      </XStack>
-      <YStack pl={mode === 'list' ? '$medium' : undefined} pr="$medium" height={50}>
+          {canCreate && (
+            <Suspense>
+              <NewEventBtn paddingBottom={mode === 'aside' ? '$medium' : undefined}>
+                {mode === 'list' ? 'Créer' : 'Organiser un événement'}
+              </NewEventBtn>
+            </Suspense>
+          )}
+        </XStack>
+      )}
+      <YStack pl={mode === 'list' ? (media.sm ? '$small' : '$xxlarge') : undefined} pr={media.sm ? '$small' : '$xxlarge'} height={50}>
         <EventFilterForm />
       </YStack>
     </YStack>

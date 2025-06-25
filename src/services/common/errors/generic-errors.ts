@@ -18,7 +18,7 @@ export class GenericResponseError extends Error {
 export const genericErrorThrower = (error: unknown) => {
   if (axios.isAxiosError(error)) {
     if (error.response?.data) {
-      const { success, data } = GenericErrorResponseSchema.safeParse(error.response.data)
+      const { success, data } = GenericErrorResponseSchema.safeParse(error?.response?.data)
 
       if (success) {
         throw new GenericResponseError(data)

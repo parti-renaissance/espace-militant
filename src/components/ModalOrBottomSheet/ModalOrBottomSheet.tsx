@@ -42,7 +42,7 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
 
   const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={1} />, [])
 
-  if (viewport.gtMd) {
+  if (viewport.gtSm) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>

@@ -4,30 +4,29 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { EventItemProps } from '@/features/events/types'
 import { Copy, Share2, X } from '@tamagui/lucide-icons'
-import { Image, XStack, YStack } from 'tamagui'
+import { Image, useMedia, XStack, YStack } from 'tamagui'
 import { useEventSharing } from '../EventShareGroup'
-import ViewportModal from './ViewportModal'
+import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 
 // eslint-disable-next-line
 const EventIllustration = require('@/features/events/assets/images/event_illustration.png')
 
-export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof ViewportModal> } & EventItemProps) => {
+export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof ModalOrBottomSheet> } & EventItemProps) => {
   const { copyUrl, isShareAvailable, openShareDialog } = useEventSharing({ event: props.event })
+  const media = useMedia()
+
   return (
-    <ViewportModal
-      {...props.modalProps}
-      containerProps={{
-        backgroundColor: '$blue1',
-        minWidth: 300,
-      }}
-      header={
-        <XStack justifyContent="flex-end" width={50} zIndex={10} height={50} position="absolute" right="$small" top="$small">
-          <VoxButton onPress={props.modalProps.onClose} variant="text" shrink iconLeft={X} size="lg" />
-        </XStack>
+    <ModalOrBottomSheet open={props.modalProps?.open} onClose={props.modalProps?.onClose} allowDrag>
+      {media.gtSm
+        ? (
+          <XStack justifyContent="flex-end" width={50} zIndex={10} height={50} position="absolute" right="$small" top="$small">
+            <VoxButton onPress={props.modalProps.onClose} variant="text" shrink iconLeft={X} size="lg" />
+          </XStack>
+        )
+        : null
       }
-    >
-      <VoxCard>
-        <VoxCard.Content padding="$xlarge" backgroundColor="white">
+      <VoxCard borderColor="$colorTransparent">
+        <VoxCard.Content padding="$xlarge">
           <YStack gap="$medium" alignItems="center">
             <Image src={EventIllustration} />
             <Text.LG textAlign="center">Nouvel événement créé </Text.LG>
@@ -52,6 +51,6 @@ export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof V
           </VoxCard.Content>
         </YStack>
       </VoxCard>
-    </ViewportModal>
+    </ModalOrBottomSheet>
   )
 }

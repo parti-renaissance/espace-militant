@@ -151,8 +151,8 @@ const ButtonFrame = forwardRef<
   const outlinedException =
     variant === 'outlined' && (props.theme === 'gray' || !props.theme)
       ? {
-          borderColor: '$textOutline32',
-        }
+        borderColor: '$textOutline32',
+      }
       : {}
 
   return <Frame ref={ref} {...props} {...outlinedException} />
