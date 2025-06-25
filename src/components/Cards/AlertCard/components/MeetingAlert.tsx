@@ -90,8 +90,8 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
             <Text.LG numberOfLines={2} pt={6} flexShrink={1}>{payload.title}</Text.LG>
             <YStack animation="quick" enterStyle={{ opacity: 0, scaleY: 0.8 }} exitStyle={{ opacity: 0, scaleY: 0.8 }} animateOnly={['opacity', 'scaleY']}>
               {alreadySubscribed
-                ? <VoxCard.Chip outlined icon={Check} theme="green">Inscrit</VoxCard.Chip>
-                : <VoxCard.Chip outlined icon={AlertTriangle} theme="yellow">Non inscrit</VoxCard.Chip>
+                ? <VoxCard.Chip icon={Check} theme="green">Inscrit</VoxCard.Chip>
+                : <VoxCard.Chip icon={AlertTriangle} theme="yellow">Non inscrit</VoxCard.Chip>
               }
             </YStack>
           </YStack>

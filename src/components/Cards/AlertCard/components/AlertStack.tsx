@@ -62,7 +62,7 @@ export function AnimatedStack({ children, isOpen }: { children: React.ReactNode[
             const a = animateds[i]
             const isFirst = i === 0
             const isHidden = i > 2
-           
+
             return (
               <Animated.View
                 key={i}
@@ -72,22 +72,22 @@ export function AnimatedStack({ children, isOpen }: { children: React.ReactNode[
                   left: 0,
                   transform: [
                     { scale: isFirst ? 1 : a.interpolate({ inputRange: [0, 1], outputRange: [collapseSize[Math.min(i, collapseSize.length - 1)], 1] }) },
-                    { translateY: isFirst ? 0 : a.interpolate({ inputRange: [0, 1], outputRange: [(media.sm ? -62 : -60) * i - 8 * (i - 1), 0] }) }
+                    { translateY: isFirst ? 0 : a.interpolate({ inputRange: [0, 1], outputRange: [(media.sm ? -68 : -66) * i - 8 * (i - 1), 0] }) }
                   ],
                   backgroundColor: '#fcfcfc',
-                  borderRadius: 15,
+                  borderRadius: 16,
                   borderWidth: isFirst || isOpen ? 0 : 1,
                   borderColor: isFirst || isOpen ? 'transparent' : 'rgba(0,0,0,0.1)',
                   height: isFirst
                     ? (childHeights[i] || 150)
                     : a.interpolate({ inputRange: [0, 1], outputRange: [64, childHeights[i] || 150] }),
-                  marginBottom: 10,
+                  marginBottom: 16,
                   zIndex: 5 - i,
                   top: 0,
                   overflow: 'hidden',
                   shadowColor: 'rgba(220, 224, 228, 0.40)',
                   shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 1,
+                  shadowOpacity: a,
                   shadowRadius: 8,
                   elevation: 4,
                 }}
@@ -116,8 +116,8 @@ const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed }) => 
   )
 
   return (
-    <YStack gap={8} $gtSm={{ gap: 16, marginBottom: '$large' }} animation="quick" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }}>
-      <XStack justifyContent="space-between" alignItems="flex-end" flexShrink={1} height={32} px={media.gtSm ? 0 : '$medium'}>
+    <YStack gap={8} $gtSm={{ gap: 16 }} $sm={{ marginBottom: '$medium' }} animation="quick" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }}>
+      <XStack justifyContent="space-between" alignItems="center" flexShrink={1} height={32} px={media.gtSm ? 0 : '$medium'} $gtSm={{ mb: -8 }}>
         <Text.MD color="$gray4" semibold>
           {alerts.length > 1 ? `Infos à la une` : 'Info à la une'}
         </Text.MD>
@@ -125,7 +125,7 @@ const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed }) => 
           {(hasMultiple && !collapsed) ? (
             <VoxButton
               size="sm"
-              variant="outlined"
+              variant="soft"
               theme="blue"
               iconLeft={ChevronUp}
               onPress={() => setCollapsed((c) => !c)}
@@ -141,32 +141,40 @@ const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed }) => 
         </AnimatePresence>
       </XStack>
       <YStack margin="$medium" $gtSm={{ margin: 0 }}>
-        <AnimatedStack isOpen={!collapsed}>
-          {[...alerts].map((alert, i) => (
+        {alerts.length === 1 ? (
+          alerts.map((alert, i) => (
             <AlertCard key={i} payload={alert} />
-          ))}
-        </AnimatedStack>
+          ))
+        ) : (
+          <AnimatedStack isOpen={!collapsed}>
+            {alerts.map((alert, i) => (
+              <AlertCard key={i} payload={alert} />
+            ))}
+          </AnimatedStack>
+        )}
       </YStack>
-      <YStack height={36}>
-        <AnimatePresence>
-          {(hasMultiple && collapsed) ? (
-            <XStack justifyContent="center" mt="$2" zIndex={100}>
-              <VoxButton
-                variant="text"
-                theme="blue"
-                iconLeft={Eye}
-                onPress={() => setCollapsed((c) => !c)}
-                animation="quick"
-                enterStyle={{ opacity: 0 }}
-                exitStyle={{ opacity: 0 }}
-                animateOnly={['opacity']}
-              >
-                {`${alerts.length} infos à la une`}
-              </VoxButton>
-            </XStack>
-          ) : null}
-        </AnimatePresence>
-      </YStack>
+      {alerts.length > 1 ? (
+        <YStack height={36}>
+          <AnimatePresence>
+            {(hasMultiple && collapsed) ? (
+              <XStack justifyContent="center" mt="$2" zIndex={100}>
+                <VoxButton
+                  variant="text"
+                  theme="blue"
+                  iconLeft={Eye}
+                  onPress={() => setCollapsed((c) => !c)}
+                  animation="quick"
+                  enterStyle={{ opacity: 0 }}
+                  exitStyle={{ opacity: 0 }}
+                  animateOnly={['opacity']}
+                >
+                  {`${alerts.length} infos à la une`}
+                </VoxButton>
+              </XStack>
+            ) : null}
+          </AnimatePresence>
+        </YStack>
+      ) : <YStack />}
     </YStack>
   )
 }
