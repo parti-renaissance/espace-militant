@@ -12,7 +12,8 @@ import { getToken, Spinner, useMedia, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
-import AlertList from '@/components/Cards/AlertCard/components/AlertStack'
+import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
+import Text from '@/components/base/Text'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 
@@ -67,9 +68,14 @@ const HomeFeedList = () => {
   const header = useMemo(() => (
     alerts.length > 0 || shouldShowNotificationCard
       ? (
-          <YStack gap={8} $gtSm={{ gap: 16, marginBottom: '$large' }}>
+          <YStack gap={8} $gtSm={{ gap: 16, }}>
             {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
-            {alerts.length > 0 ? <AlertList alerts={alerts} /> : null}
+            {alerts.length > 0 ? <AlertStack alerts={alerts} /> : null}
+            {alerts.length > 0 ? (
+              <Text.MD color="$gray4" semibold px="$medium" $gtSm={{ px: 0 }}>
+              Dernières actualités
+            </Text.MD>
+            ) : null}
           </YStack>
         )
       : null
