@@ -17,31 +17,6 @@ export type MeetingAlertCollapsedProps = {
   onPressShare: () => void
 } & AlertVoxCardProps
 
-const AnimatedMeetingImage = ({ src, size }: { src: string, size: number }) => {
-  const animatedValue = useRef(new Animated.Value(size)).current
-
-  useEffect(() => {
-    Animated.spring(animatedValue, {
-      toValue: size,
-      useNativeDriver: false, // width/height ne sont pas supportés par le driver natif
-      friction: 7,
-      tension: 40,
-    }).start()
-  }, [size])
-
-  return (
-    <Animated.View style={{ width: animatedValue, height: animatedValue }}>
-      <Image
-        src={src}
-        width="100%"
-        height="100%"
-        borderRadius="$4"
-        objectFit="cover"
-      />
-    </Animated.View>
-  )
-}
-
 const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsResponse[0]; isOpen: boolean; closeModal: () => void }) => {
   return (
     <ModalOrBottomSheet open={isOpen} onClose={closeModal}>
@@ -72,7 +47,6 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
       {...props}
       borderRadius="$medium"
       overflow="hidden"
-      borderColor="$gray3"
       key={`meeting-alert-${payload.title}`}
     >
       <VoxCard.Content gap="0">
