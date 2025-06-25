@@ -74,10 +74,10 @@ export function AnimatedStack({ children, isOpen }: { children: React.ReactNode[
                     { scale: isFirst ? 1 : a.interpolate({ inputRange: [0, 1], outputRange: [collapseSize[Math.min(i, collapseSize.length - 1)], 1] }) },
                     { translateY: isFirst ? 0 : a.interpolate({ inputRange: [0, 1], outputRange: [(media.sm ? -68 : -66) * i - 8 * (i - 1), 0] }) }
                   ],
-                  backgroundColor: '#fcfcfc',
+                  backgroundColor: '#fdfdfd',
                   borderRadius: 16,
                   borderWidth: isFirst || isOpen ? 0 : 1,
-                  borderColor: isFirst || isOpen ? 'transparent' : 'rgba(0,0,0,0.1)',
+                  borderColor: isFirst || isOpen ? 'transparent' : 'hsl(210, 13%, 94%)',
                   height: isFirst
                     ? (childHeights[i] || 150)
                     : a.interpolate({ inputRange: [0, 1], outputRange: [64, childHeights[i] || 150] }),
