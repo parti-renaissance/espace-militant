@@ -4,11 +4,15 @@ import * as S from '@/features/message/components/Editor/schemas/messageBuilderS
 import { stringifyCSSProperties } from 'react-style-stringify'
 
 export const richTextRenderer = (props: { theme: S.MessageStyle; data: S.RichTextNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
-  const { wrapperStyle } = getThemeStyle(props.theme, props.data, props.edgePosition)
+  const { wrapperStyle, containerStyle } = getThemeStyle(props.theme, props.data, props.edgePosition)
   if (!props.data.content) return ''
   const { html } = props.data.content
 
-  return `<table
+  // Ajout du style inline min-height:20px à chaque <p>
+  const minHeightStyle = 'min-height:20px;';
+  const htmlWithMinHeight = html.replace(/<p(.*?)>/g, `<p$1 style="${minHeightStyle}">`);
+
+  const content = `<table
       align="center"
       width="100%"
       border="0"
@@ -18,11 +22,15 @@ export const richTextRenderer = (props: { theme: S.MessageStyle; data: S.RichTex
       style="${stringifyCSSProperties(wrapperStyle as CSSProperties)}"
   >
     <tbody>
-      <tr style="width:100%">
-        <td>
-        ${html}
+      <tr style="width:100%;" >
+        <td style="${stringifyCSSProperties(containerStyle as CSSProperties)}">
+        ${htmlWithMinHeight}
         </td>
       </tr>
     </tbody>
   </table>`
+
+  console.log({content});
+
+  return content;
 }

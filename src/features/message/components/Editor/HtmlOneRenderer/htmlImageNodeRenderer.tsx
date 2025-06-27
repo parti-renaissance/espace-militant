@@ -31,7 +31,7 @@ export const imageRenderer = (props: { theme: S.MessageStyle; data: S.ImageNode;
               <td data-id="__react-email-column" style="${stringifyCSSProperties(containerStyle as CSSProperties)}">
                   <img
                       src="${url}"
-                      style="${stringifyCSSProperties({ ...dynStyle, ...baseStyle } as CSSProperties)}"
+                      style="${stringifyCSSProperties({ ...dynStyle, ...baseStyle } as CSSProperties)}; margin: 0 !important;"
                   />
               </td>
           </tr>

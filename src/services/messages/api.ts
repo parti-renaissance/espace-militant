@@ -40,7 +40,7 @@ export const updateMessage = (props: { messageId: string; payload: schemas.RestP
 
 export const sendMessage = (props: { messageId: string; scope: string }) =>
   api({
-    method: 'put',
+    method: 'post',
     path: `/api/v3/adherent_messages/${props.messageId}/send?scope=${props.scope}`,
     requestSchema: z.void(),
     responseSchema: z.void(),
@@ -49,7 +49,7 @@ export const sendMessage = (props: { messageId: string; scope: string }) =>
 
 export const sendTestMessage = (props: { messageId: string; scope: string }) =>
   api({
-    method: 'put',
+    method: 'post',
     path: `/api/v3/adherent_messages/${props.messageId}/send-test?scope=${props.scope}`,
     requestSchema: z.void(),
     responseSchema: z.void(),

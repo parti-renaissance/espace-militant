@@ -15,6 +15,8 @@ export const buttonRenderer = (props: { theme: S.MessageStyle; data: S.ButtonNod
   const { containerStyle, baseStyle, wrapperStyle } = getThemeStyle(props.theme, props.data, props.edgePosition)
   if (!props.data.content) return ''
 
+  console.log(props.data.content.text, props.data.content.link, props.data.type);
+
   return `<table
       align="center"
       width="100%"
@@ -26,15 +28,16 @@ export const buttonRenderer = (props: { theme: S.MessageStyle; data: S.ButtonNod
   >
       <tbody style="width: 100%">
           <tr style="width: 100%">
-              <td data-id="__react-email-column">
+              <td data-id="__react-email-column" style="padding: 16px;">
                   <a
-                      href="www.google.fr"
+                      href="${props.data.content.link ?? 'parti.re'}"
                       style="
                           line-height: 100%;
                           text-decoration: none;
                           display: inline-block;
                           max-width: 100%;
                           mso-padding-alt: 0px;
+                              box-sizing: border-box;
                           ${stringifyCSSProperties({ ...containerStyle, ...baseStyle } as CSSProperties)}
                       "
                       target="_blank"
@@ -57,7 +60,7 @@ export const buttonRenderer = (props: { theme: S.MessageStyle; data: S.ButtonNod
                               mso-padding-alt: 0px;
                               mso-text-raise: 14.25px;
                           "
-                          >wergewrgwerg</span
+                          >${props.data.content.text ?? ''}</span
                       ><span
                           ><!--[if mso
                               ]><i style="mso-font-width: 300%" hidden

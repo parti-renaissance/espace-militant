@@ -11,47 +11,52 @@ export default {
     container: {
       paddingTop: 16,
       paddingBottom: 16,
-      maxWidth: 500,
+      maxWidth: 550,
     },
 
     item: {
       wrapper: {
         overflow: 'hidden',
         backgroundColor: 'white',
-        borderColor: '#EEF0F2',
-        borderStyle: 'solid',
-        paddingTop: 16,
-        paddingBottom: 16,
-        paddingLeft: 40,
-        paddingRight: 40,
+        // borderColor: '#EEF0F2',
+        // borderStyle: 'solid',
+        // paddingTop: 16,
+        // paddingBottom: 16,
+        // paddingLeft: 40,
+        // paddingRight: 40,
       },
       trailing: {
-        borderWidth: 1,
+        // borderWidth: 1,
         borderTopWidth: 0,
         borderBottomRightRadius: 16,
         borderBottomLeftRadius: 16,
       },
       leading: {
-        borderWidth: 1,
+        // borderWidth: 1,
         borderBottomWidth: 0,
         borderTopRightRadius: 16,
         borderTopLeftRadius: 16,
       },
       middle: {
-        borderWidth: 1,
+        // borderWidth: 1,
         borderTopWidth: 0,
         borderBottomWidth: 0,
       },
 
       alone: {
-        borderWidth: 1,
+        // borderWidth: 1,
         borderRadius: 16,
       },
     },
   },
   image: {
     global: {
-      container: {},
+      container: {
+        paddingBottom: 24,
+        paddingTop: 24,
+        paddingLeft: 24,
+        paddingRight: 24,
+      },
       base: {
         borderRadius: 8,
         width: '100%',
@@ -59,7 +64,12 @@ export default {
     },
     leading: {
       wrapper: { padding: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-      container: {},
+      container: {
+        paddingBottom: 24,
+        paddingTop: 0,
+        paddingLeft: 0,
+        paddingRight: 0,
+      },
       base: {
         width: '100%',
         borderRadius: 0,
@@ -76,8 +86,20 @@ export default {
   },
   richtext: {
     global: {
-      container: {},
+      container: { minHeight: 20 },
     },
+    leading: {
+      container: { paddingTop: 16, paddingBottom: 0, paddingLeft: 16, paddingRight: 16 },
+    },
+    trailing: {
+      container: { paddingTop: 0, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
+    },
+    middle: {
+      container: { paddingLeft: 16, paddingRight: 16 },
+    },
+    alone: {
+      container: { paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
+    }
   },
   button: {
     global: {

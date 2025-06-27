@@ -9,7 +9,7 @@ export const ButtonRenderer = (props: { data: S.ButtonNode; edgePosition?: 'lead
   if (!props.data.content) return null
 
   return (
-    <YStack style={wrapperStyle}>
+    <YStack style={wrapperStyle} padding={16}>
       <Link asChild href={props.data.content.link as Href} target="_blank">
         <View tag="button" style={containerStyle}>
           <Text style={baseStyle as TextStyle}>{props.data.content.text}</Text>

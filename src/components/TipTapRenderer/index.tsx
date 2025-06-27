@@ -1,3 +1,4 @@
+import React from 'react'
 import Text from '@/components/base/Text'
 import { Href, Link } from 'expo-router'
 import { isWeb, XStack, YStack } from 'tamagui'
@@ -25,7 +26,7 @@ const RenderText: RenderFn<S.TipText> = ({ data }) => {
   if (link) {
     return (
       <Link href={link.attrs.href as Href} target="_blank">
-        <Text.SM
+        <Text.MD
           color="$blue5"
           textDecorationLine="underline"
           multiline
@@ -33,29 +34,29 @@ const RenderText: RenderFn<S.TipText> = ({ data }) => {
           fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}
         >
           {data.text}
-        </Text.SM>
+        </Text.MD>
       </Link>
     )
   }
   return (
-    <Text.SM multiline secondary semibold={marks?.includes('bold')} fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}>
+    <Text.MD multiline color="$gray8" semibold={marks?.includes('bold')} fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}>
       {data.text}
-    </Text.SM>
+    </Text.MD>
   )
 }
 
 const RenderParagraph: RenderFn<S.TipParagraph> = ({ data }) => {
   return data.content ? (
-    <Text.SM tag="p">
+    <Text.MD tag="p" marginVertical={4} color="$gray8">
       {data.content.map((x, i) => {
         if (U.isTipNonSupported(x)) return <RenderNonSupported key={x.type + i} data={x} />
         if (U.isTipText(x)) return <RenderText key={x.type + i} data={x} />
         if (U.isTipHardBreak(x)) return <RenderHardBreak key={x.type + i} data={x} />
         return null
       })}
-    </Text.SM>
+    </Text.MD>
   ) : (
-    <Text.SM tag="p">{isWeb ? <Text.BR /> : null}</Text.SM>
+    <Text.MD tag="p">{isWeb ? <Text.BR /> : null}</Text.MD>
   )
 }
 
