@@ -1,7 +1,7 @@
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/messages/api'
 import { useToastController } from '@tamagui/toast'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { RestPostMessageResponse } from '../files/schema'
 import { RestPostMessageRequest } from './schema'
 
@@ -9,13 +9,22 @@ export const useCreateMessage = (props: { uuid?: string }) => {
   const toast = useToastController()
   const successMessage = props.uuid ? 'Message modifié avec succès' : 'Message créé avec succès'
   const errorMessage = props.uuid ? 'Impossible de modifier ce message' : 'Impossible de créer ce message'
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn:
       props.uuid !== undefined
         ? ({ payload, scope }: { payload: RestPostMessageRequest; scope: string }) => api.updateMessage({ payload, messageId: props.uuid!, scope })
         : api.createMessage,
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       toast.show('Succès', { message: successMessage, type: 'success' })
+      // Invalider les queries liées au message et à son contenu
+      if (props.uuid) {
+        queryClient.invalidateQueries({ queryKey: ['message', props.uuid] })
+        queryClient.invalidateQueries({ queryKey: ['message-content', props.uuid] })
+      } else if (data?.uuid) {
+        queryClient.invalidateQueries({ queryKey: ['message', data.uuid] })
+        queryClient.invalidateQueries({ queryKey: ['message-content', data.uuid] })
+      }
     },
     onError: (error) => {
       if (error instanceof GenericResponseError) {
@@ -65,7 +74,7 @@ export const useGetMessage = (props: { messageId: string; scope: string; enabled
 
 export const useGetMessageContent = (props: { messageId?: string; scope?: string; enabled: boolean }) => {
   return useQuery({
-    queryKey: ['message', props.messageId],
+    queryKey: ['message-content', props.messageId],
     queryFn: () => (props.messageId && props.scope ? api.getMessageContent({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined)),
     enabled: Boolean(props.messageId && props.scope) && props.enabled,
     refetchOnMount: true,
@@ -80,7 +89,7 @@ class MessageNotSynchronizedError extends Error {
 
 export const useGetIsMessageTilSync = (props: { payload?: { messageId: string; scope: string } }) => {
   return useQuery({
-    queryKey: ['message', props?.payload?.messageId],
+    queryKey: ['message-til-sync', props?.payload?.messageId],
     queryFn: () =>
       props.payload?.messageId && props.payload?.scope
         ? api.getMessage({ messageId: props.payload.messageId, scope: props.payload.scope }).then((x) => {

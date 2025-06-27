@@ -21,13 +21,18 @@ const SenderView = (props: { payload: RestPostMessageResponse; scope: string }) 
     mutate({ scope: props.scope, test: true })
   }
 
+  console.log(props.payload);
+
   return (
     <YStack flex={1} minHeight={300}>
-      <Link href={props.payload.preview_link! as Href} asChild={!isWeb}>
-        <VoxButton variant="outlined" iconLeft={Eye}>
-          Prévisualiser
-        </VoxButton>
-      </Link>
+      {props.payload.preview_link ? (
+        <Link href={props.payload.preview_link! as Href} asChild={!isWeb} target="_blank">
+          <VoxButton variant="outlined" iconLeft={Eye}>
+            Prévisualiser
+          </VoxButton>
+        </Link>
+      ) : null
+      }
       <VoxButton variant="outlined" iconLeft={Send} loading={isPending} disabled={isPending} onPress={handleSendTestMessage}>
         Envoyer test
       </VoxButton>
