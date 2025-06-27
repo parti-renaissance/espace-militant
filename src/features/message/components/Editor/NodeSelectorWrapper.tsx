@@ -52,9 +52,9 @@ const SelectOverlay = styled(ThemeableStack, {
   variants: {
     selected: {
       true: {
-        borderWidth: 5,
+        borderWidth: 2,
         borderStyle: 'solid',
-        borderColor: 'black',
+        borderColor: '$blue5',
       },
     },
     error: {

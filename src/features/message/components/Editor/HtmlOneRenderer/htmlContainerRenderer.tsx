@@ -5,5 +5,9 @@ import * as S from '@/features/message/components/Editor/schemas/messageBuilderS
 // import { stringifyCSSProperties } from 'react-style-stringify'
 
 export const containerRenderer = (props: { data: string; theme: S.MessageStyle }) => {
-  return props.data
+  return (
+    `<div style="padding: 16px;">
+      ${props.data}
+    </div>`
+  )
 }
