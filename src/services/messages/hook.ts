@@ -1,7 +1,7 @@
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/messages/api'
 import { useToastController } from '@tamagui/toast'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { RestPostMessageResponse } from '../files/schema'
 import { RestPostMessageRequest } from './schema'
 
@@ -9,7 +9,7 @@ export const useCreateMessage = (props: { uuid?: string }) => {
   const toast = useToastController()
   const successMessage = props.uuid ? 'Message modifié avec succès' : 'Message créé avec succès'
   const errorMessage = props.uuid ? 'Impossible de modifier ce message' : 'Impossible de créer ce message'
-  const queryClient = require('@tanstack/react-query').useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn:
       props.uuid !== undefined
@@ -19,11 +19,11 @@ export const useCreateMessage = (props: { uuid?: string }) => {
       toast.show('Succès', { message: successMessage, type: 'success' })
       // Invalider les queries liées au message et à son contenu
       if (props.uuid) {
-        queryClient.invalidateQueries(['message', props.uuid])
-        queryClient.invalidateQueries(['message-content', props.uuid])
+        queryClient.invalidateQueries({ queryKey: ['message', props.uuid] })
+        queryClient.invalidateQueries({ queryKey: ['message-content', props.uuid] })
       } else if (data?.uuid) {
-        queryClient.invalidateQueries(['message', data.uuid])
-        queryClient.invalidateQueries(['message-content', data.uuid])
+        queryClient.invalidateQueries({ queryKey: ['message', data.uuid] })
+        queryClient.invalidateQueries({ queryKey: ['message-content', data.uuid] })
       }
     },
     onError: (error) => {
