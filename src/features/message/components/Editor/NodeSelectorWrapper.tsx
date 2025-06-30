@@ -150,6 +150,7 @@ const MemoWrapper = memo(
     addBarOpenForFieldId: string | null
     onChangeAddBarOpenFieldId: (id: string | null) => void
     onCloseAddBar: () => void
+    displayToolbar: boolean
   }) => {
     const topKey = props.field.id + ':top'
     const bottomKey = props.field.id + ':bottom'
@@ -158,7 +159,8 @@ const MemoWrapper = memo(
     const showAddBarBottom = props.addBarOpenForFieldId === bottomKey
     return (
       <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition} error={Boolean(props.error)}>
-        <AddFieldButton
+        {props.displayToolbar && (
+          <AddFieldButton
             control={props.control}
             editorMethods={props.editorMethods}
             field={props.field}
@@ -167,8 +169,9 @@ const MemoWrapper = memo(
             onShowAddBar={() => props.onChangeAddBarOpenFieldId(topKey)}
             onCloseAddBar={props.onCloseAddBar}
           />
+        )}
         <Wrapper id={props.htmlId} onPress={props.selected ? props.onWrapperDoublePress : props.onWrapperPress}>
-          {props.selected ? (
+          {props.selected && props.displayToolbar ? (
             <MessageEditorEditToolbar control={props.control} editorMethods={props.editorMethods}/>
           ) : null}
 
@@ -179,7 +182,7 @@ const MemoWrapper = memo(
           </Wrapper.Overlay>
           {props.children}
         </Wrapper>
-        {displayBottomAddBar && (
+        {displayBottomAddBar && props.displayToolbar && (
           <AddFieldButton
             control={props.control}
             editorMethods={props.editorMethods}
@@ -198,7 +201,7 @@ const MemoWrapper = memo(
 
 MemoWrapper.displayName = 'MemoWrapper'
 
-export const NodeSelectorWrapper = memo((props: NodeSelectorProps) => {
+export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToolbar?: boolean }) => {
   const content = useMemo(() => props.children, [props.children])
 
   return (
@@ -240,6 +243,7 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps) => {
                 addBarOpenForFieldId={typeof addBarField.value === 'string' || addBarField.value === null ? addBarField.value : null}
                 onChangeAddBarOpenFieldId={handleShowAddBar}
                 onCloseAddBar={handleCloseAddBar}
+                displayToolbar={props.displayToolbar ?? true}
               />
             )
           }}

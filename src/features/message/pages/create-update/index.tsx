@@ -15,6 +15,7 @@ import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
 import ModalSender from '../../components/ModalSender'
 import { ViewportModalRef } from '../../components/ModalSender/ViewportModalSheet'
+import BigSwitch from '@/components/base/BigSwitch'
 
 const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse; scope?: string }) => {
   const editorRef = useRef<MessageEditorRef>(null)
@@ -22,12 +23,12 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
   const media = useMedia()
   const [message, setMessage] = useState<
     | {
-        messageId: string
-        scope: string
-      }
+      messageId: string
+      scope: string
+    }
     | undefined
   >(props?.edit ? { messageId: props.edit.uuid!, scope: props.scope! } : undefined)
-
+  const [mode, setMode] = useState<'edit' | 'preview'>('edit')
 
   const messageQuery = useCreateMessage({ uuid: props?.edit?.uuid })
 
@@ -107,12 +108,23 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
                 </XStack>
               </VoxHeader>
             </YStack>
+            <YStack maxWidth={550} marginHorizontal='auto' width="100%" height={76} $sm={{ px: '$medium', py: '$small', height: 60 }} backgroundColor="$textSurface" justifyContent='center' py="$medium">
+              <BigSwitch
+                options={[
+                  { label: 'Édition', value: 'edit' },
+                  { label: 'Aperçu', value: 'preview' },
+                ]}
+                value={mode}
+                onChange={x => setMode(x as 'edit' | 'preview')}
+              />
+            </YStack>
           </StickyBox>
           <MessageEditor
             theme={defaultTheme}
             ref={editorRef}
             defaultValue={props?.edit?.json_content ? JSON.parse(props.edit.json_content) : undefined}
             onSubmit={handleSubmit}
+            displayToolbar={mode === 'edit'}
           />
         </PageLayout.MainSingleColumn>
       </BoundarySuspenseWrapper>

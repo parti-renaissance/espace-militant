@@ -13,10 +13,11 @@ import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from
 
 export { getHTML, defaultTheme }
 
-type MessageEditorProps = {
+export type MessageEditorProps = {
   theme: S.MessageStyle
   defaultValue?: S.Message
   onSubmit: (x: S.Message) => void
+  displayToolbar?: boolean
 }
 
 export type MessageEditorRef = {
@@ -98,7 +99,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       >
         <YStack flex={1} gap="$medium" position="relative">
           <StyleRendererContextProvider value={props.theme}>
-            <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} editorMethods={editorMethods} />
+            <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} editorMethods={editorMethods} displayToolbar={props.displayToolbar} />
           </StyleRendererContextProvider>
         </YStack>
       </YStack>
