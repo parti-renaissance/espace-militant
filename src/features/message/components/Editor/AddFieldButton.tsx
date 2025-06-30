@@ -4,33 +4,60 @@ import { memo, RefObject } from "react"
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { Control } from "react-hook-form"
 import MessageEditorAddToolbar from "./AddToolBar"
-import { TouchableOpacity } from "react-native"
+import { TouchableOpacity, Platform } from "react-native"
 import { Plus } from "@tamagui/lucide-icons"
 
 const AddFieldButtonContainer = styled(ThemeableStack, {
     height: 28,
     position: 'relative',
     zIndex: 1000,
+    alignItems: 'center',
+    justifyContent: 'center',
   })
   
-  const AddFieldButtonSeparator = styled(ThemeableStack, {
-    position: 'absolute',
-    top: '50%',
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: 'transparent',
-    borderTopWidth: 2,
-    borderBottomWidth: 0,
-    borderColor: '$gray3',
-    borderStyle: 'dashed',
-  })
+  const AddFieldButtonSeparator = () => {
+    if (Platform.OS === 'web') {
+      return (
+        <ThemeableStack
+          position="absolute"
+          top={28/2}
+          left={0}
+          right={0}
+          height={1}
+          backgroundColor="transparent"
+          borderTopWidth={2}
+          borderBottomWidth={0}
+          borderColor="$gray3"
+          borderStyle="dashed"
+        />
+      )
+    }
+    return (
+      <ThemeableStack
+        position="absolute"
+        top={28/2}
+        left={0}
+        right={0}
+        height={2}
+        flexDirection="row"
+        alignItems="center"
+        justifyContent="space-between"
+        pointerEvents="none"
+      >
+        {Array.from({ length: 60 }).map((_, i) => (
+          <ThemeableStack
+            key={i}
+            width={6}
+            height={2}
+            backgroundColor={i % 2 === 0 ? '$gray3' : 'transparent'}
+            borderRadius={1}
+          />
+        ))}
+      </ThemeableStack>
+    )
+  }
   
   const AddFieldButtonCircle = styled(ThemeableStack, {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
     backgroundColor: 'rgba(145,158,171,0.3)',
     height: 52,
     width: 52,

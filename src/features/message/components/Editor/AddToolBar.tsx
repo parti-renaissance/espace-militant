@@ -3,7 +3,7 @@ import { VoxButton } from '@/components/Button'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { ImagePlus, PlusSquare, TextSelect, X } from '@tamagui/lucide-icons'
 import { Control } from 'react-hook-form'
-import { ScrollView, styled, ThemeableStack } from 'tamagui'
+import { styled, ThemeableStack } from 'tamagui'
 import { EditorMethods } from './types'
 
 const ToolBarPositioner = styled(ThemeableStack, {
@@ -17,15 +17,12 @@ const ToolBarPositioner = styled(ThemeableStack, {
 const ToolBarFrame = styled(ThemeableStack, {
   padding: 8,
   borderRadius: 100,
+  height: 48,
   justifyContent: 'space-between',
   alignItems: 'center',
-  alignContent: 'center',
   flexDirection: 'row',
   backgroundColor: 'rgba(145,158,171,0.3)',
   gap: '$small',
-  $gtSm: {
-    borderRadius: 68 / 2,
-  },
 })
 
 type MessageEditorToolBarProps = {
@@ -60,21 +57,19 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
   return (
     <ToolBarPositioner onPress={(e) => e.stopPropagation()}>
       <ToolBarFrame>
-            <ScrollView horizontal contentContainerStyle={{ gap: '$small', justifyContent: 'space-between', flexGrow: 1 }} flex={1}>
-              <VoxButton size="sm" variant="soft" iconLeft={TextSelect} onPress={() => handleAddField('richtext')}>
-                Text
-              </VoxButton>
-              <VoxButton size="sm" variant="soft" iconLeft={PlusSquare} onPress={() => handleAddField('button')}>
-                Bouton
-              </VoxButton>
-              <VoxButton size="sm" variant="soft" iconLeft={ImagePlus} onPress={() => handleAddField('image')}>
-                Image
-              </VoxButton>
-              { props.onClose ? (
-                <VoxButton size="sm" variant="soft" shrink iconLeft={X} onPress={props.onClose}></VoxButton>
-              ) : null }
-            </ScrollView>
-          </ToolBarFrame>
+        <VoxButton size="sm" variant="soft" iconLeft={TextSelect} onPress={() => handleAddField('richtext')}>
+          Text
+        </VoxButton>
+        <VoxButton size="sm" variant="soft" iconLeft={PlusSquare} onPress={() => handleAddField('button')}>
+          Bouton
+        </VoxButton>
+        <VoxButton size="sm" variant="soft" iconLeft={ImagePlus} onPress={() => handleAddField('image')}>
+          Image
+        </VoxButton>
+        {props.onClose ? (
+          <VoxButton size="sm" variant="soft" shrink iconLeft={X} onPress={props.onClose}></VoxButton>
+        ) : null}
+      </ToolBarFrame>
     </ToolBarPositioner >
   )
 })

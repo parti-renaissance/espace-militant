@@ -223,7 +223,7 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps) => {
               field.onChange(null)
             }
             const handleCloseAddBar = () => {
-              field.onChange(null)
+              addBarField.onChange(null)
             }
             return (
               <MemoWrapper
