@@ -30,7 +30,5 @@ export const richTextRenderer = (props: { theme: S.MessageStyle; data: S.RichTex
     </tbody>
   </table>`
 
-  console.log({content});
-
   return content;
 }

@@ -107,6 +107,7 @@ export const MessageFormValuesValidatorSchema = z.object({
       ),
     ),
   ),
+  addBarOpenForFieldId: z.string().nullable().optional(),
 })
 
 export const MessageMetaDataSchema = z.object({
@@ -131,6 +132,7 @@ export type GlobalForm = {
   selectedField: { edit: boolean; field: FieldsArray[number] } | null
   formValues: MessageFormValues
   metaData: MessageMetaData
+  addBarOpenForFieldId?: string | null
 }
 
 export type FieldsArray = { type: NodeType; id: string }[]

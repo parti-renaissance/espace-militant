@@ -1,10 +1,12 @@
-import { memo, ReactNode, useMemo, useRef } from 'react'
+import { memo, ReactNode, RefObject, useMemo } from 'react'
 import { GestureResponderEvent } from 'react-native'
 import Text from '@/components/base/Text'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
-import { useLazyRef } from '@/hooks/useLazyRef'
 import { Control, Controller } from 'react-hook-form'
-import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
+import { createStyledContext, styled, ThemeableStack, View, withStaticProperties } from 'tamagui'
+import { EditorMethods } from './types'
+import MessageEditorEditToolbar from './EditToolBar'
+import { AddFieldButton } from './AddFieldButton'
 
 const wrapperContext = createStyledContext<{ selected: boolean; edgePosition?: 'trailing' | 'leading' | 'alone'; error?: boolean }>({
   selected: false,
@@ -15,7 +17,11 @@ const wrapperContext = createStyledContext<{ selected: boolean; edgePosition?: '
 const WrapperFrame = styled(ThemeableStack, {
   context: wrapperContext,
   variants: {
-    selected: {},
+    selected: {
+      true: {
+        minHeight: 120,
+      },
+    },
     edgePosition: {
       trailing: {
         overflow: 'hidden',
@@ -126,6 +132,7 @@ type NodeSelectorProps = {
   control: Control<S.GlobalForm>
   edgePosition?: 'trailing' | 'leading' | 'alone'
   error?: string
+  editorMethods: RefObject<EditorMethods>
 }
 
 const MemoWrapper = memo(
@@ -137,10 +144,34 @@ const MemoWrapper = memo(
     children: ReactNode
     edgePosition?: 'trailing' | 'leading' | 'alone'
     error?: string
+    editorMethods: RefObject<EditorMethods>
+    field: S.FieldsArray[number]
+    control: Control<S.GlobalForm>
+    addBarOpenForFieldId: string | null
+    onChangeAddBarOpenFieldId: (id: string | null) => void
+    onCloseAddBar: () => void
   }) => {
+    const topKey = props.field.id + ':top'
+    const bottomKey = props.field.id + ':bottom'
+    const displayBottomAddBar = props.edgePosition === 'alone' || props.edgePosition === 'trailing'
+    const showAddBarTop = props.addBarOpenForFieldId === topKey
+    const showAddBarBottom = props.addBarOpenForFieldId === bottomKey
     return (
       <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition} error={Boolean(props.error)}>
+        <AddFieldButton
+            control={props.control}
+            editorMethods={props.editorMethods}
+            field={props.field}
+            display={true}
+            showAddBar={showAddBarTop}
+            onShowAddBar={() => props.onChangeAddBarOpenFieldId(topKey)}
+            onCloseAddBar={props.onCloseAddBar}
+          />
         <Wrapper id={props.htmlId} onPress={props.selected ? props.onWrapperDoublePress : props.onWrapperPress}>
+          {props.selected ? (
+            <MessageEditorEditToolbar control={props.control} editorMethods={props.editorMethods}/>
+          ) : null}
+
           <Wrapper.Overlay>
             <Wrapper.ErrorBanner>
               <Text.MD color="white">{props.error}</Text.MD>
@@ -148,6 +179,18 @@ const MemoWrapper = memo(
           </Wrapper.Overlay>
           {props.children}
         </Wrapper>
+        {displayBottomAddBar && (
+          <AddFieldButton
+            control={props.control}
+            editorMethods={props.editorMethods}
+            field={props.field}
+            asLast={true}
+            display={true}
+            showAddBar={showAddBarBottom}
+            onShowAddBar={() => props.onChangeAddBarOpenFieldId(bottomKey)}
+            onCloseAddBar={props.onCloseAddBar}
+          />
+        )}
       </Wrapper.Props>
     )
   },
@@ -157,41 +200,49 @@ MemoWrapper.displayName = 'MemoWrapper'
 
 export const NodeSelectorWrapper = memo((props: NodeSelectorProps) => {
   const content = useMemo(() => props.children, [props.children])
-  //trick to avoid rerenders, avoid to create a new function each time, props.field can't change and field.onChange is a setter, and can't change
-  const handlePress = useRef<{ fn: ((e: GestureResponderEvent) => void) | null }>({ fn: null })
-  const handleDoublePress = useRef<{ fn: ((e: GestureResponderEvent) => void) | null }>({ fn: null })
-
-  const handleDoublePressSetter = useLazyRef(() => (fn: (x: S.GlobalForm['selectedField']) => void) => {
-    if (handleDoublePress.current.fn === null) {
-      handleDoublePress.current.fn = (e) => {
-        e.stopPropagation()
-        fn({ edit: true, field: props.field })
-      }
-    }
-    return handleDoublePress.current.fn
-  })
-
-  const handlePressSetter = useLazyRef(() => (fn: (x: S.GlobalForm['selectedField']) => void) => {
-    if (handlePress.current.fn === null) {
-      handlePress.current.fn = (e: GestureResponderEvent) => {
-        e.stopPropagation()
-        fn({ edit: false, field: props.field })
-      }
-    }
-    return handlePress.current.fn
-  })
 
   return (
     <Controller
       render={({ field }) => (
-        <MemoWrapper
-          selected={field.value?.field.id === props.field.id}
-          onWrapperPress={handlePressSetter.current(field.onChange)}
-          onWrapperDoublePress={handleDoublePressSetter.current(field.onChange)}
-          htmlId={`field-${props.field.type}-${props.field.id}`}
-          children={content}
-          error={props.error}
-          edgePosition={props.edgePosition}
+        <Controller
+          name="addBarOpenForFieldId"
+          control={props.control}
+          render={({ field: addBarField }) => {
+            const handleDoublePress = (e: GestureResponderEvent) => {
+              e.stopPropagation()
+              field.onChange({ edit: true, field: props.field })
+              addBarField.onChange(null)
+            }
+            const handlePress = (e: GestureResponderEvent) => {
+              e.stopPropagation()
+              field.onChange({ edit: false, field: props.field })
+              addBarField.onChange(null)
+            }
+            const handleShowAddBar = (key: string) => {
+              addBarField.onChange(key)
+              field.onChange(null)
+            }
+            const handleCloseAddBar = () => {
+              field.onChange(null)
+            }
+            return (
+              <MemoWrapper
+                selected={field.value?.field.id === props.field.id}
+                onWrapperPress={handlePress}
+                onWrapperDoublePress={handleDoublePress}
+                htmlId={`field-${props.field.type}-${props.field.id}`}
+                children={content}
+                error={props.error}
+                edgePosition={props.edgePosition}
+                editorMethods={props.editorMethods}
+                field={props.field}
+                control={props.control}
+                addBarOpenForFieldId={typeof addBarField.value === 'string' || addBarField.value === null ? addBarField.value : null}
+                onChangeAddBarOpenFieldId={handleShowAddBar}
+                onCloseAddBar={handleCloseAddBar}
+              />
+            )
+          }}
         />
       )}
       control={props.control}
