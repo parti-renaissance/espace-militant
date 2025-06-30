@@ -9,7 +9,7 @@ import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/ind
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { useCreateMessage } from '@/services/messages/hook'
 import * as types from '@/services/messages/schema'
-import { MailPlus, PenLine } from '@tamagui/lucide-icons'
+import { PenLine, Speech } from '@tamagui/lucide-icons'
 import { Link, router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
@@ -27,6 +27,7 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
       }
     | undefined
   >(props?.edit ? { messageId: props.edit.uuid!, scope: props.scope! } : undefined)
+
 
   const messageQuery = useCreateMessage({ uuid: props?.edit?.uuid })
 
@@ -62,19 +63,34 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
           pointerEvents={messageQuery.isPending ? 'none' : 'auto'}
           cursor={messageQuery.isPending ? 'progress' : 'auto'}
         >
-          <StickyBox webOnly offsetTop={media.gtSm ? '$large' : undefined} style={{ zIndex: 10 }}>
-            <YStack $gtSm={{ marginVertical: '$large', borderRadius: 50, overflow: 'hidden', zIndex: 10 }}>
-              <VoxHeader borderRadius={20}>
+          <StickyBox webOnly style={{ zIndex: 10 }}>
+            <YStack $gtSm={{ overflow: 'hidden', zIndex: 10 }}>
+              <VoxHeader>
                 <XStack alignItems="center" flex={1} width="100%">
                   <XStack alignContent="flex-start">
-                    <Link href={router.canGoBack() ? '../' : '/'} replace asChild={!isWeb}>
-                      <VoxButton size="lg" variant="text" theme={!props?.edit ? 'orange' : undefined}>
+                    {router.canGoBack() ? (
+                      <VoxButton
+                        size="lg"
+                        variant="text"
+                        theme={!props?.edit ? 'orange' : undefined}
+                        onPress={() => router.back()}
+                      >
                         {props?.edit ? 'Quitter' : 'Annuler'}
                       </VoxButton>
-                    </Link>
+                    ) : (
+                      <Link href="/" replace asChild={!isWeb}>
+                        <VoxButton
+                          size="lg"
+                          variant="text"
+                          theme={!props?.edit ? 'orange' : undefined}
+                        >
+                          {props?.edit ? 'Quitter' : 'Annuler'}
+                        </VoxButton>
+                      </Link>
+                    )}
                   </XStack>
                   <XStack flexGrow={1} justifyContent="center">
-                    <VoxHeader.Title icon={props?.edit ? PenLine : MailPlus}>{props?.edit ? 'Editer Message' : 'Message'}</VoxHeader.Title>
+                    <VoxHeader.Title icon={props?.edit ? PenLine : media.gtSm ? Speech : undefined}>{props?.edit ? 'Editer publication' : media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
                   </XStack>
                   <XStack>
                     <VoxButton
