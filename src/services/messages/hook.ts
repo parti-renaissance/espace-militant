@@ -15,9 +15,8 @@ export const useCreateMessage = (props: { uuid?: string }) => {
       props.uuid !== undefined
         ? ({ payload, scope }: { payload: RestPostMessageRequest; scope: string }) => api.updateMessage({ payload, messageId: props.uuid!, scope })
         : api.createMessage,
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       toast.show('Succès', { message: successMessage, type: 'success' })
-      // Invalider les queries liées au message et à son contenu
       if (props.uuid) {
         queryClient.invalidateQueries({ queryKey: ['message', props.uuid] })
         queryClient.invalidateQueries({ queryKey: ['message-content', props.uuid] })

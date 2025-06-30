@@ -21,8 +21,6 @@ const SenderView = (props: { payload: RestPostMessageResponse; scope: string }) 
     mutate({ scope: props.scope, test: true })
   }
 
-  console.log(props.payload);
-
   return (
     <YStack flex={1} minHeight={300}>
       {props.payload.preview_link ? (

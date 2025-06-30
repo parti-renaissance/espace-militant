@@ -1,19 +1,21 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, RefObject, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { FlatList, ListRenderItemInfo, StyleSheet } from 'react-native'
 import Animated from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { usePageLayoutScroll } from '@/components/layouts/PageLayout/usePageLayoutScroll'
 import useFlatListHeader from '@/features/message/components/Editor/hooks/useFlatListHeader'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
-import { RenderFieldRef } from '@/features/message/components/Editor/types'
+import { RenderFieldRef, EditorMethods } from '@/features/message/components/Editor/types'
 import { Control } from 'react-hook-form'
 import { isWeb, YStack } from 'tamagui'
 import { MetaDataForm } from './MetaDataForm'
 import { RenderField } from './RenderField'
+import { AddFieldButton } from '../AddFieldButton'
 
 type RenderFieldsProps = {
   defaultStruct: S.FieldsArray
   control: Control<S.GlobalForm>
+  editorMethods: RefObject<EditorMethods>
 }
 
 export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function RenderFields(props, ref) {
@@ -55,8 +57,13 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
           })
         }
       },
-      addField: (newField, afterField) => {
+      addField: (newField, afterField, atStart) => {
         setFields((xs) => {
+          if (atStart) {
+            const newFields = [newField, ...xs]
+            fieldLength.current = newFields.length
+            return newFields
+          }
           if (!afterField) {
             const newFields = [...xs, newField]
             fieldLength.current = newFields.length
@@ -95,8 +102,15 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
   }, [fields])
 
   const RenderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<S.FieldsArray[number]>) => <RenderField control={props.control} field={item} edgePosition={getFieldEdge(index)} />,
-    [],
+    ({ item, index }: ListRenderItemInfo<S.FieldsArray[number]>) => (
+      <RenderField
+        control={props.control}
+        field={item}
+        edgePosition={getFieldEdge(index)}
+        editorMethods={props.editorMethods}
+      />
+    ),
+    [props.control, props.editorMethods],
   )
 
   const keyExtractor = useCallback((props: S.FieldsArray[number]) => props.id, [])
@@ -126,6 +140,17 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
           onScrollToIndexFailed={reTryScrollOnFail}
           renderItem={RenderItem}
           keyExtractor={keyExtractor}
+          ListEmptyComponent={
+            <AddFieldButton
+              control={props.control}
+              editorMethods={props.editorMethods}
+              field={undefined}
+              display={true}
+              showAddBar={true}
+              onShowAddBar={() => { }}
+              onCloseAddBar={undefined}
+            />
+          }
         />
       ) : null}
     </YStack>
@@ -136,5 +161,7 @@ const renderFieldsStyle = StyleSheet.create({
   flatlist: {
     flex: 1,
     backgroundColor: 'hsl(240, 9%, 98%)',
+    paddingTop: 12,
+    paddingBottom: 12,
   },
 })

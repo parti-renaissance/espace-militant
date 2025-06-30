@@ -15,8 +15,6 @@ export const buttonRenderer = (props: { theme: S.MessageStyle; data: S.ButtonNod
   const { containerStyle, baseStyle, wrapperStyle } = getThemeStyle(props.theme, props.data, props.edgePosition)
   if (!props.data.content) return ''
 
-  console.log(props.data.content.text, props.data.content.link, props.data.type);
-
   return `<table
       align="center"
       width="100%"

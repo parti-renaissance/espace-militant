@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, RefObject } from 'react'
 import { FormFrame } from '@/components/base/FormFrames'
 import Text from '@/components/base/Text'
 import { useThemeStyle } from '@/features/message/components/Editor/hooks/useThemeStyle'
@@ -7,6 +7,7 @@ import { ImageRenderer } from '@/features/message/components/Editor/NodeRenderer
 import { RichTextRenderer } from '@/features/message/components/Editor/NodeRenderer/RichTextRenderer'
 import { NodeSelectorWrapper } from '@/features/message/components/Editor/NodeSelectorWrapper'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
+import { EditorMethods } from '@/features/message/components/Editor/types'
 import { Image as ImageIcon, Text as TextIcon } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
@@ -58,7 +59,12 @@ const EmptyRichTextRender = (props: { data: S.RichTextNode; edgePosition?: 'lead
   )
 }
 
-export const RenderField = memo((props: { field: S.FieldsArray[number]; control: Control<S.GlobalForm>; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
+export const RenderField = memo((props: { 
+  field: S.FieldsArray[number]; 
+  control: Control<S.GlobalForm>; 
+  edgePosition?: 'leading' | 'trailing' | 'alone';
+  editorMethods: RefObject<EditorMethods>;
+}) => {
   switch (props.field.type) {
     case 'image':
       return (
@@ -68,15 +74,21 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
           render={({ field, fieldState }) => {
             return (
               <>
-                <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition} error={fieldState.error?.message}>
+                <NodeSelectorWrapper 
+                  control={props.control} 
+                  field={props.field} 
+                  edgePosition={props.edgePosition} 
+                  error={fieldState.error?.message}
+                  editorMethods={props.editorMethods}
+                >
                   {field.value.content ? <ImageRenderer data={field.value} edgePosition={props.edgePosition} /> : <EmptyImageRenderer data={field.value} />}
                 </NodeSelectorWrapper>
-                <Controller
+                <Controller 
                   control={props.control}
                   render={({ field: { value, onChange } }) => {
                     return (
                       <ImageNodeEditor
-                        onBlur={() => onChange({ edit: false, field: props.field })}
+                        onBlur={() => onChange(null)}
                         onChange={field.onChange}
                         present={Boolean(value?.field.id === props.field.id) && value?.edit === true}
                         value={field.value}
@@ -97,7 +109,13 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
           name={`formValues.button.${props.field.id}`}
           render={({ field, fieldState }) => (
             <>
-              <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition} error={fieldState.error?.message}>
+              <NodeSelectorWrapper 
+                control={props.control} 
+                field={props.field} 
+                edgePosition={props.edgePosition} 
+                error={fieldState.error?.message}
+                editorMethods={props.editorMethods}
+              >
                 {field.value.content ? (
                   <ButtonRenderer data={field.value} edgePosition={props.edgePosition} />
                 ) : (
@@ -109,7 +127,7 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
                 render={({ field: { value, onChange } }) => {
                   return (
                     <ButtonNodeEditor
-                      onBlur={() => onChange({ edit: false, field: props.field })}
+                      onBlur={() => onChange(null)}
                       present={value?.field.id === props.field.id && value.edit}
                       onChange={field.onChange}
                       value={field.value}
@@ -129,7 +147,13 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
           name={`formValues.richtext.${props.field.id}`}
           render={({ field, fieldState }) => (
             <>
-              <NodeSelectorWrapper control={props.control} field={props.field} edgePosition={props.edgePosition} error={fieldState.error?.message}>
+              <NodeSelectorWrapper 
+                control={props.control} 
+                field={props.field} 
+                edgePosition={props.edgePosition} 
+                error={fieldState.error?.message}
+                editorMethods={props.editorMethods}
+              >
                 {field.value.content && field.value.content.pure.length > 0 ? (
                   <RichTextRenderer id={props.field.id} data={field.value} edgePosition={props.edgePosition} />
                 ) : (
@@ -141,7 +165,7 @@ export const RenderField = memo((props: { field: S.FieldsArray[number]; control:
                 render={({ field: { value, onChange } }) => {
                   return (
                     <RichTextNodeEditor
-                      onBlur={() => onChange({ edit: false, field: props.field })}
+                      onBlur={() => onChange(null)}
                       present={value?.field.id === props.field.id && value.edit}
                       onChange={field.onChange}
                       value={field.value}

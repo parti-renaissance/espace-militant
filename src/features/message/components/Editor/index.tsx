@@ -8,7 +8,6 @@ import { StyleRendererContextProvider } from './context/styleRenderContext'
 import { getHTML } from './HtmlOneRenderer'
 import { RenderFields } from './RenderFields'
 import defaultTheme from './themes/default-theme'
-import MessageEditorToolbar, { MessageEditorToolBarRef } from './ToolBar'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
 
@@ -40,19 +39,17 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       }
 
   const { control, handleSubmit, setValue, unregister } = useForm<S.GlobalForm>({
-    defaultValues: { formValues: defaultData.states, metaData: defaultData.metaData, selectedField: null },
+    defaultValues: { formValues: defaultData.states, metaData: defaultData.metaData, selectedField: null, addBarOpenForFieldId: null },
     resolver: zodResolver(S.MessageFormValuesValidatorSchema),
   })
 
   const renderFieldsRef = useRef<RenderFieldRef>(null)
-  const toolbarRef = useRef<MessageEditorToolBarRef>(null)
   const editorMethods = useRef({
-    addField: (node: S.NodeType | S.Node, afterField?: S.FieldsArray[number]) => {
+    addField: (node: S.NodeType | S.Node, afterField?: S.FieldsArray[number], atStart?: boolean) => {
       const field = { id: uniqueId(), type: typeof node === 'string' ? node : node.type }
       setValue(`formValues.${field.type}.${field.id}`, typeof node === 'string' ? createNodeByType(node) : node)
       setValue(`selectedField`, { edit: true, field })
-      toolbarRef.current?.toggleAddBar(false)
-      renderFieldsRef.current?.addField(field, afterField)
+      renderFieldsRef.current?.addField(field, afterField, atStart)
       setTimeout(() => {
         renderFieldsRef.current?.scrollToField(field)
       }, 100)
@@ -75,9 +72,13 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
 
   useImperativeHandle(ref, () => ({
     submit: handleSubmit((x) => {
+      console.log('ref submit');
       props.onSubmit(zipMessage(x.formValues, renderFieldsRef.current!.getFields(), x.metaData))
     }),
-    unSelect: () => setValue('selectedField', null),
+    unSelect: () => {
+      setValue('selectedField', null)
+      setValue('addBarOpenForFieldId', null)
+    },
   }))
 
   return (
@@ -97,11 +98,10 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       >
         <YStack flex={1} gap="$medium" position="relative">
           <StyleRendererContextProvider value={props.theme}>
-            <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} />
+            <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} editorMethods={editorMethods} />
           </StyleRendererContextProvider>
         </YStack>
       </YStack>
-      <MessageEditorToolbar ref={toolbarRef} control={control} editorMethods={editorMethods} />
     </YStack>
   )
 })
