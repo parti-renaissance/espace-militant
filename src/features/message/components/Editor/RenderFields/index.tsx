@@ -16,6 +16,7 @@ type RenderFieldsProps = {
   defaultStruct: S.FieldsArray
   control: Control<S.GlobalForm>
   editorMethods: RefObject<EditorMethods>
+  displayToolbar?: boolean
 }
 
 export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function RenderFields(props, ref) {
@@ -108,9 +109,10 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
         field={item}
         edgePosition={getFieldEdge(index)}
         editorMethods={props.editorMethods}
+        displayToolbar={props.displayToolbar ?? true}
       />
     ),
-    [props.control, props.editorMethods],
+    [props.control, props.editorMethods, props.displayToolbar],
   )
 
   const keyExtractor = useCallback((props: S.FieldsArray[number]) => props.id, [])

@@ -64,6 +64,7 @@ export const RenderField = memo((props: {
   control: Control<S.GlobalForm>; 
   edgePosition?: 'leading' | 'trailing' | 'alone';
   editorMethods: RefObject<EditorMethods>;
+  displayToolbar?: boolean;
 }) => {
   switch (props.field.type) {
     case 'image':
@@ -80,6 +81,7 @@ export const RenderField = memo((props: {
                   edgePosition={props.edgePosition} 
                   error={fieldState.error?.message}
                   editorMethods={props.editorMethods}
+                  displayToolbar={props.displayToolbar ?? true}
                 >
                   {field.value.content ? <ImageRenderer data={field.value} edgePosition={props.edgePosition} /> : <EmptyImageRenderer data={field.value} />}
                 </NodeSelectorWrapper>
@@ -115,6 +117,7 @@ export const RenderField = memo((props: {
                 edgePosition={props.edgePosition} 
                 error={fieldState.error?.message}
                 editorMethods={props.editorMethods}
+                displayToolbar={props.displayToolbar ?? true}
               >
                 {field.value.content ? (
                   <ButtonRenderer data={field.value} edgePosition={props.edgePosition} />
@@ -153,6 +156,7 @@ export const RenderField = memo((props: {
                 edgePosition={props.edgePosition} 
                 error={fieldState.error?.message}
                 editorMethods={props.editorMethods}
+                displayToolbar={props.displayToolbar ?? true}
               >
                 {field.value.content && field.value.content.pure.length > 0 ? (
                   <RichTextRenderer id={props.field.id} data={field.value} edgePosition={props.edgePosition} />
