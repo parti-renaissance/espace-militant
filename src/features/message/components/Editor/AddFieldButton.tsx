@@ -15,7 +15,7 @@ const AddFieldButtonContainer = styled(ThemeableStack, {
     justifyContent: 'center',
   })
   
-  const AddFieldButtonSeparator = (props: any) => {
+  const AddFieldButtonSeparator = () => {
     if (Platform.OS === 'web') {
       return (
         <ThemeableStack
@@ -29,7 +29,6 @@ const AddFieldButtonContainer = styled(ThemeableStack, {
           borderBottomWidth={0}
           borderColor="$gray3"
           borderStyle="dashed"
-          {...props}
         />
       )
     }
@@ -44,7 +43,6 @@ const AddFieldButtonContainer = styled(ThemeableStack, {
         alignItems="center"
         justifyContent="space-between"
         pointerEvents="none"
-        {...props}
       >
         {Array.from({ length: 60 }).map((_, i) => (
           <ThemeableStack
