@@ -6,6 +6,7 @@ import { PortalLayout } from '@/components/layouts/PortalLayout'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Link, Stack } from 'expo-router'
 import { isWeb, useMedia, View, XStack } from 'tamagui'
+import ProfilHeader from '@/features/profil/components/PageHeader'
 
 export default function AppLayout() {
   const media = useMedia()
@@ -86,6 +87,14 @@ export default function AppLayout() {
             options={{
               headerShown: false,
               gestureEnabled: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="messages/index"
+            options={{
+              headerShown: media.sm,
+              header: () => { return <ProfilHeader title="Publication" />}
             }}
           />
 

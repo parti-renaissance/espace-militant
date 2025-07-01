@@ -5,7 +5,7 @@ import { ArrowLeft } from '@tamagui/lucide-icons'
 import { useNavigation, useRouter } from 'expo-router'
 
 type ProfilHeaderProps = {
-  icon: NamedExoticComponent<IconProps>
+  icon?: NamedExoticComponent<IconProps>
   title: string
   backArrow?: boolean
 }

@@ -66,7 +66,7 @@ const ProfilMenu = () => {
       </Menu>
       {hasFeature('messages_vox') ? (
         <Menu>
-          <Link href="/messages/creer" asChild={!isWeb}>
+          <Link href="/messages" asChild={!isWeb}>
             <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} icon={Send} last={true}>
               Beta: créer un message
             </Menu.Item>

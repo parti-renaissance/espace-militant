@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useMemo } from 'react'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uniqueId } from 'lodash'
@@ -10,6 +10,7 @@ import { RenderFields } from './RenderFields'
 import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
+import { useLocalSearchParams } from 'expo-router'
 
 export { getHTML, defaultTheme }
 
@@ -26,18 +27,42 @@ export type MessageEditorRef = {
 }
 
 const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, ref) => {
-  const defaultData = props.defaultValue
-    ? unZipMessage(props.defaultValue)
-    : {
-        metaData: {
-          subject: '',
-          scope: undefined,
-        },
-        struct: [] as S.FieldsArray,
-        states: {
-          ...getDefaultFormValues(),
-        } as S.MessageFormValues,
+  const searchParams = useLocalSearchParams<{ scope?: string; template?: string }>()
+  const scopeFromQuery = searchParams?.scope
+  const templateFromQuery = searchParams?.template
+
+  const defaultData = useMemo(() => {
+    if (props.defaultValue) {
+      return unZipMessage(props.defaultValue)
+    }
+    let struct: S.FieldsArray = []
+    let states: S.MessageFormValues = getDefaultFormValues()
+    if (templateFromQuery) {
+      try {
+        const template = JSON.parse(templateFromQuery)
+        struct = template.map((field: { type: string }, idx: number) => ({
+          id: `field_${idx}`,
+          type: field.type,
+        }))
+        struct.forEach((field) => {
+          if (!states[field.type]) states[field.type] = {}
+          const node = createNodeByType(field.type)
+          states[field.type][field.id] = node
+        })
+      } catch (e) {
+        struct = []
+        states = getDefaultFormValues()
       }
+    }
+    return {
+      metaData: {
+        subject: '',
+        scope: scopeFromQuery ?? undefined,
+      },
+      struct,
+      states,
+    }
+  }, [props.defaultValue, templateFromQuery, scopeFromQuery])
 
   const { control, handleSubmit, setValue, unregister } = useForm<S.GlobalForm>({
     defaultValues: { formValues: defaultData.states, metaData: defaultData.metaData, selectedField: null, addBarOpenForFieldId: null },
@@ -73,7 +98,6 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
 
   useImperativeHandle(ref, () => ({
     submit: handleSubmit((x) => {
-      console.log('ref submit');
       props.onSubmit(zipMessage(x.formValues, renderFieldsRef.current!.getFields(), x.metaData))
     }),
     unSelect: () => {
