@@ -12,6 +12,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { getTokenValue, useMedia, XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import ViewportModal from './ViewportModal'
+import { useRef } from 'react'
 
 type NodeEditorProps = { value: S.ButtonNode; onChange: (node: S.ButtonNode) => void; onBlur: () => void; present: boolean }
 
@@ -19,6 +20,7 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
   const insets = useSafeAreaInsets()
   const media = useMedia()
   const isIosMobile = media.sm && Platform.OS === 'ios'
+  const linkInputRef = useRef<any>(null)
   const { control, handleSubmit } = useForm({
     defaultValues: {
       ...props.value,
@@ -73,6 +75,8 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
                   onBlur={field.onBlur}
                   onChange={field.onChange}
                   error={fieldState.error?.message}
+                  returnKeyType="next"
+                  onSubmitEditing={() => linkInputRef.current?.focus()}
                 />
               )
             }}
@@ -93,6 +97,10 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
                   onBlur={field.onBlur}
                   onChange={field.onChange}
                   error={fieldState.error?.message}
+                  returnKeyType="done"
+                  onSubmitEditing={onSubmit}
+                  ref={linkInputRef as any}
+                  autoCapitalize="none"
                 />
               )
             }}
