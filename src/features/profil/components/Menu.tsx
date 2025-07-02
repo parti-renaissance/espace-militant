@@ -64,7 +64,7 @@ const ProfilMenu = () => {
           {credentials?.isAdmin ? 'Quitter l’impersonnification' : 'Me déconnecter'}
         </Menu.Item>
       </Menu>
-      {hasFeature('messages_vox') ? (
+      {hasFeature('publications') ? (
         <Menu>
           <Link href="/messages" asChild={!isWeb}>
             <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} icon={Send} last={true}>

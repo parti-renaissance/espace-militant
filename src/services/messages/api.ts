@@ -55,3 +55,15 @@ export const sendTestMessage = (props: { messageId: string; scope: string }) =>
     responseSchema: z.void(),
     type: 'private',
   })()
+
+export const getMessages = (props: { scope: string; page?: number; perPage?: number; status?: 'draft' | 'sent' }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherent_messages?scope=${props.scope}` +
+      (props.page ? `&page=${props.page}` : '') +
+      (props.perPage ? `&per_page=${props.perPage}` : '') +
+      (props.status ? `&status=${props.status}` : ''),
+    requestSchema: z.void(),
+    responseSchema: schemas.RestMessageListResponseSchema,
+    type: 'private',
+  })()

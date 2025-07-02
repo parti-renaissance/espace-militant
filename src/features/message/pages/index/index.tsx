@@ -52,13 +52,13 @@ const MessagePageIndex = () => {
   const [selectedScope, setSelectedScope] = useState<string | undefined>(() => {
     if (!scopes?.default?.code) return undefined;
     const available = (scopes?.list || [])
-      .filter((scope) => scope.features.includes("messages_vox"))
+      .filter((scope) => scope.features.includes("publications"))
       .map((scope) => scope.code);
     return available.includes(scopes.default.code) ? scopes.default.code : undefined;
   });
 
   const scopeOptions = (scopes?.list || [])
-    .filter((scope) => scope.features.includes("messages_vox"))
+    .filter((scope) => scope.features.includes("publications"))
     .map((scope) => ({ value: scope.code, label: scope.name }));
 
   return (
@@ -70,6 +70,13 @@ const MessagePageIndex = () => {
             {scopeOptions.length > 0 && (
               <MessageScopeSelector value={selectedScope} onChange={setSelectedScope} />
             )}
+            <Link 
+              href="/messages/draft"
+              asChild>
+              <VoxButton theme="blue" variant="soft" size="lg">
+                Mes brouillons
+              </VoxButton>
+            </Link>
             <Text.MD semibold secondary>Démarrer à partir d’un template</Text.MD>
             <Link 
               href={selectedScope ? `/messages/creer?scope=${selectedScope}&template=${encodeURIComponent(JSON.stringify([{type:'richtext'}]))}` : "/messages/creer"} 
