@@ -30,7 +30,7 @@ const MessageScopeSelector: React.FC<MessageScopeSelectorProps> = ({ value, onCh
   const { data: scopes } = useGetExecutiveScopes();
   const scopeOptions = useMemo(
     () => (scopes?.list || [])
-      .filter((scope) => scope.features.includes("messages_vox"))
+      .filter((scope) => scope.features.includes("publications"))
       .map(getFormatedScope),
     [scopes?.list]
   );

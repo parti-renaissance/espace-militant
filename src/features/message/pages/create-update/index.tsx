@@ -51,84 +51,89 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
       })
   }
   return (
-    <PageLayout
-      webScrollable
-      onPress={() => {
-        editorRef.current?.unSelect()
-      }}
-    >
-      <ModalSender ref={modalSendRef} payload={message} />
-      <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton />}>
-        <PageLayout.MainSingleColumn
-          opacity={messageQuery.isPending ? 0.5 : 1}
-          pointerEvents={messageQuery.isPending ? 'none' : 'auto'}
-          cursor={messageQuery.isPending ? 'progress' : 'auto'}
-        >
-          <StickyBox webOnly style={{ zIndex: 10 }}>
-            <YStack $gtSm={{ overflow: 'hidden', zIndex: 10 }}>
-              <VoxHeader>
-                <XStack alignItems="center" flex={1} width="100%">
-                  <XStack alignContent="flex-start">
-                    {router.canGoBack() ? (
-                      <VoxButton
-                        size="lg"
-                        variant="text"
-                        theme={!props?.edit ? 'orange' : undefined}
-                        onPress={() => router.back()}
-                      >
-                        {props?.edit ? 'Quitter' : 'Annuler'}
-                      </VoxButton>
-                    ) : (
-                      <Link href="/" replace asChild={!isWeb}>
-                        <VoxButton
-                          size="lg"
-                          variant="text"
-                          theme={!props?.edit ? 'orange' : undefined}
-                        >
-                          {props?.edit ? 'Quitter' : 'Annuler'}
-                        </VoxButton>
-                      </Link>
-                    )}
-                  </XStack>
-                  <XStack flexGrow={1} justifyContent="center">
-                    <VoxHeader.Title icon={props?.edit ? PenLine : media.gtSm ? Speech : undefined}>{props?.edit ? 'Editer publication' : media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
-                  </XStack>
-                  <XStack>
+    <>
+      <StickyBox webOnly style={{ zIndex: 10 }}>
+        <YStack $gtSm={{ overflow: 'hidden', zIndex: 10 }}>
+          <VoxHeader>
+            <XStack alignItems="center" flex={1} width="100%">
+              <XStack alignContent="flex-start">
+                {router.canGoBack() ? (
+                  <VoxButton
+                    size="lg"
+                    variant="text"
+                    theme={!props?.edit ? 'orange' : undefined}
+                    onPress={() => router.back()}
+                  >
+                    {props?.edit ? 'Quitter' : 'Annuler'}
+                  </VoxButton>
+                ) : (
+                  <Link href="/" replace asChild={!isWeb}>
                     <VoxButton
                       size="lg"
                       variant="text"
-                      loading={messageQuery.isPending}
-                      disabled={messageQuery.isPending}
-                      theme="purple"
-                      onPress={() => editorRef.current?.submit()}
+                      theme={!props?.edit ? 'orange' : undefined}
                     >
-                      Suivant
+                      {props?.edit ? 'Quitter' : 'Annuler'}
                     </VoxButton>
-                  </XStack>
-                </XStack>
-              </VoxHeader>
-            </YStack>
-            <YStack maxWidth={550} marginHorizontal='auto' width="100%" height={76} $sm={{ px: '$medium', py: '$small', height: 60 }} backgroundColor="$textSurface" justifyContent='center' py="$medium">
-              <BigSwitch
-                options={[
-                  { label: 'Édition', value: 'edit' },
-                  { label: 'Aperçu', value: 'preview' },
-                ]}
-                value={mode}
-                onChange={x => setMode(x as 'edit' | 'preview')}
-              />
-            </YStack>
-          </StickyBox>
-          <MessageEditor
-            theme={defaultTheme}
-            ref={editorRef}
-            defaultValue={props?.edit?.json_content ? JSON.parse(props.edit.json_content) : undefined}
-            onSubmit={handleSubmit}
-            displayToolbar={mode === 'edit'}
-          />
-        </PageLayout.MainSingleColumn>
-      </BoundarySuspenseWrapper>
-    </PageLayout>
+                  </Link>
+                )}
+              </XStack>
+              <XStack flexGrow={1} justifyContent="center">
+                <VoxHeader.Title icon={props?.edit ? PenLine : media.gtSm ? Speech : undefined}>{props?.edit ? 'Editer publication' : media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
+              </XStack>
+              <XStack>
+                <VoxButton
+                  size="lg"
+                  variant="text"
+                  loading={messageQuery.isPending}
+                  disabled={messageQuery.isPending}
+                  theme="purple"
+                  onPress={() => editorRef.current?.submit()}
+                >
+                  Suivant
+                </VoxButton>
+              </XStack>
+            </XStack>
+          </VoxHeader>
+        </YStack>
+        <YStack backgroundColor="$textSurface">
+          <YStack maxWidth={550} marginHorizontal='auto' width="100%" height={76} $sm={{ px: '$medium', py: '$small', height: 60 }} justifyContent='center' py="$medium">
+            <BigSwitch
+              options={[
+                { label: 'Édition', value: 'edit' },
+                { label: 'Aperçu', value: 'preview' },
+              ]}
+              value={mode}
+              onChange={x => setMode(x as 'edit' | 'preview')}
+            />
+          </YStack>
+        </YStack>
+      </StickyBox>
+      <PageLayout
+        webScrollable
+        onPress={() => {
+          editorRef.current?.unSelect()
+        }}
+      >
+        <ModalSender ref={modalSendRef} payload={message} />
+        <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton />}>
+          <PageLayout.MainSingleColumn
+            opacity={messageQuery.isPending ? 0.5 : 1}
+            pointerEvents={messageQuery.isPending ? 'none' : 'auto'}
+            cursor={messageQuery.isPending ? 'progress' : 'auto'}
+          >
+            <MessageEditor
+              theme={defaultTheme}
+              ref={editorRef}
+              defaultValue={props?.edit?.json_content ? JSON.parse(props.edit.json_content) : undefined}
+              onSubmit={handleSubmit}
+              displayToolbar={mode === 'edit'}
+            />
+          </PageLayout.MainSingleColumn>
+        </BoundarySuspenseWrapper>
+      </PageLayout>
+    </>
+
   )
 }
 

@@ -1,7 +1,7 @@
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/messages/api'
 import { useToastController } from '@tamagui/toast'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { RestPostMessageResponse } from '../files/schema'
 import { RestPostMessageRequest } from './schema'
 
@@ -144,4 +144,19 @@ export const useMutationEventImage = () => {
   //     return error
   //   },
   // })
+}
+
+export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') => {
+  return useInfiniteQuery({
+    queryKey: ['messages', scope, status],
+    queryFn: ({ pageParam = 1 }) => api.getMessages({ scope, page: pageParam, status }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.metadata.current_page < lastPage.metadata.last_page
+        ? lastPage.metadata.current_page + 1
+        : undefined,
+    getPreviousPageParam: (firstPage) =>
+      firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined,
+    placeholderData: (prev) => prev,
+  })
 }

@@ -4,15 +4,24 @@ import { VoxButton } from '@/components/Button'
 import { NavBar, ProfileNav, VoxHeader } from '@/components/Header/Header'
 import { PortalLayout } from '@/components/layouts/PortalLayout'
 import { ArrowLeft } from '@tamagui/lucide-icons'
-import { Link, Stack } from 'expo-router'
+import { Link, Stack, usePathname, useSegments } from 'expo-router'
 import { isWeb, useMedia, View, XStack } from 'tamagui'
 import ProfilHeader from '@/features/profil/components/PageHeader'
 
 export default function AppLayout() {
   const media = useMedia()
+  const pathname = usePathname()
+  const segments = useSegments()
+  const hideHeaderRoutes = [
+    '/messages/creer',
+    '/messages/draft',
+  ]
+  const isEditRoute = segments[1] === 'messages' && segments[3] === 'editer'
+  
+  const shouldShowHeader = media.gtSm && !hideHeaderRoutes.includes(pathname) && !isEditRoute
   return (
     <PortalLayout>
-      {media.gtSm ? (
+      {shouldShowHeader ? (
         <VoxHeader justifyContent="space-between" display="none" $gtSm={{ display: 'flex' }} safeAreaView={true}>
           <XStack flex={1} flexBasis={0}>
             <Link href="/" replace>
@@ -113,6 +122,14 @@ export default function AppLayout() {
               gestureEnabled: false,
             }}
           />
+
+          <Stack.Screen
+            name="messages/draft"
+            options={{
+              header: () => { return <ProfilHeader title="Brouillons" hideOnMdUp={false} />}
+            }}
+          />
+
           <Stack.Screen name="porte-a-porte/building-detail" options={{ title: '' }} />
           <Stack.Screen name="porte-a-porte/tunnel" options={{ presentation: 'fullScreenModal', headerShown: false }} />
           <Stack.Screen name="questionnaires/index" options={{ headerShown: false }} />

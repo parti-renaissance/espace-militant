@@ -8,9 +8,10 @@ type ProfilHeaderProps = {
   icon?: NamedExoticComponent<IconProps>
   title: string
   backArrow?: boolean
+  hideOnMdUp?: boolean
 }
 
-const ProfilHeader = ({ icon, title, backArrow = true }: ProfilHeaderProps) => {
+const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true }: ProfilHeaderProps) => {
   const router = useRouter()
   const navigation = useNavigation()
 
@@ -23,7 +24,11 @@ const ProfilHeader = ({ icon, title, backArrow = true }: ProfilHeaderProps) => {
   }
 
   return (
-    <VoxHeader justifyContent="space-between" backgroundColor="white" $gtMd={{ display: 'none' }}>
+    <VoxHeader
+      justifyContent="space-between"
+      backgroundColor="white"
+      {...(hideOnMdUp ? { $gtMd: { display: 'none' } } : {})}
+    >
       {backArrow ? (
         <VoxHeader.LeftButton icon={ArrowLeft} onPress={handleBack} />
       ) : (
