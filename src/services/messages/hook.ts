@@ -149,7 +149,7 @@ export const useMutationEventImage = () => {
 export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') => {
   return useInfiniteQuery({
     queryKey: ['messages', scope, status],
-    queryFn: ({ pageParam = 1 }) => api.getMessages({ scope, page: pageParam, status }),
+    queryFn: ({ pageParam = 1 }) => api.getMessages({ scope, page: pageParam, status, orderCreatedAt: 'desc' }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.metadata.current_page < lastPage.metadata.last_page
