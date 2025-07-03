@@ -160,3 +160,12 @@ export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') =
     placeholderData: (prev) => prev,
   })
 }
+
+export const useGetMessageCountRecipients = (props: { messageId?: string; scope?: string; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['message-count-recipients', props.messageId],
+    queryFn: () => (props.messageId && props.scope ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined)),
+    enabled: Boolean(props.messageId && props.scope) && props.enabled,
+    refetchOnMount: true,
+  })
+}
