@@ -67,3 +67,12 @@ export const getMessages = (props: { scope: string; page?: number; perPage?: num
     responseSchema: schemas.RestMessageListResponseSchema,
     type: 'private',
   })()
+
+export const getMessageCountRecipients = (props: { messageId: string; scope: string }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherent_messages/${props.messageId}/count-recipients?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestMessageCountRecipientsResponseSchema,
+    type: 'private',
+  })()
