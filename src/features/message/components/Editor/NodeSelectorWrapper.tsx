@@ -31,13 +31,12 @@ const WrapperFrame = styled(ThemeableStack, {
 
       leading: {
         overflow: 'hidden',
-        borderTopRightRadius: 16,
-        borderTopLeftRadius: 16,
       },
 
       alone: {
         overflow: 'hidden',
-        borderRadius: 16,
+        borderBottomRightRadius: 16,
+        borderBottomLeftRadius: 16,
       },
     },
   } as const,
@@ -83,13 +82,12 @@ const SelectOverlay = styled(ThemeableStack, {
 
       leading: {
         overflow: 'hidden',
-        borderTopRightRadius: 16,
-        borderTopLeftRadius: 16,
       },
 
       alone: {
         overflow: 'hidden',
-        borderRadius: 16,
+        borderBottomRightRadius: 16,
+        borderBottomLeftRadius: 16,
       },
     },
   } as const,

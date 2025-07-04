@@ -2,8 +2,7 @@ import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/messages/api'
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { RestPostMessageResponse } from '../files/schema'
-import { RestPostMessageRequest } from './schema'
+import { RestGetMessageResponse, RestPostMessageRequest } from './schema'
 
 export const useCreateMessage = (props: { uuid?: string }) => {
   const toast = useToastController()
@@ -93,7 +92,7 @@ export const useGetIsMessageTilSync = (props: { payload?: { messageId: string; s
       props.payload?.messageId && props.payload?.scope
         ? api.getMessage({ messageId: props.payload.messageId, scope: props.payload.scope }).then((x) => {
             if (x.synchronized) {
-              return x as Omit<RestPostMessageResponse, 'synchronized'> & { synchronized: true }
+              return x as Omit<RestGetMessageResponse, 'synchronized'> & { synchronized: true }
             }
             throw new MessageNotSynchronizedError(props.payload?.messageId)
           })
@@ -149,7 +148,7 @@ export const useMutationEventImage = () => {
 export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') => {
   return useInfiniteQuery({
     queryKey: ['messages', scope, status],
-    queryFn: ({ pageParam = 1 }) => api.getMessages({ scope, page: pageParam, status }),
+    queryFn: ({ pageParam = 1 }) => api.getMessages({ scope, page: pageParam, status, orderCreatedAt: 'desc' }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.metadata.current_page < lastPage.metadata.last_page
@@ -167,5 +166,14 @@ export const useGetMessageCountRecipients = (props: { messageId?: string; scope?
     queryFn: () => (props.messageId && props.scope ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined)),
     enabled: Boolean(props.messageId && props.scope) && props.enabled,
     refetchOnMount: true,
+  })
+}
+
+export const useGetAvailableSenders = (props: { scope: string; }) => {
+  return useQuery({
+    queryKey: ['available-senders', props.scope],
+    queryFn: () => api.getAvailableSenders({ scope: props.scope }),
+    refetchOnMount: true,
+    staleTime: 60 * 1000,
   })
 }

@@ -128,6 +128,7 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
               defaultValue={props?.edit?.json_content ? JSON.parse(props.edit.json_content) : undefined}
               onSubmit={handleSubmit}
               displayToolbar={mode === 'edit'}
+              messageId={props?.edit?.uuid}
             />
           </PageLayout.MainSingleColumn>
         </BoundarySuspenseWrapper>

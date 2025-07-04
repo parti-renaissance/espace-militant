@@ -34,8 +34,8 @@ export default {
       leading: {
         // borderWidth: 1,
         borderBottomWidth: 0,
-        borderTopRightRadius: 16,
-        borderTopLeftRadius: 16,
+        // borderTopRightRadius: 16,
+        //borderTopLeftRadius: 16,
       },
       middle: {
         // borderWidth: 1,
@@ -45,7 +45,9 @@ export default {
 
       alone: {
         // borderWidth: 1,
-        borderRadius: 16,
+        borderRadius: 0,
+        borderBottomRightRadius: 16,
+        borderBottomLeftRadius: 16,
       },
     },
   },
@@ -108,8 +110,8 @@ export default {
         borderRadius: 28,
         cursor: 'pointer',
 
-        paddingTop: 19,
-        paddingBottom: 19,
+        paddingTop: 12,
+        paddingBottom: 12,
         paddingRight: 12,
         paddingLeft: 12,
       },
