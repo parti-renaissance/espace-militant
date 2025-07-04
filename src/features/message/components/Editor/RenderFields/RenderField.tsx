@@ -22,7 +22,7 @@ const EmptyImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leading'
       <YStack flex={1} justifyContent="center" alignItems="center" paddingVertical="$large">
         <XStack gap="$small">
           <ImageIcon size={16} color="$blue5" />
-          <Text.MD color="$blue5">Aucune image</Text.MD>
+          <Text.MD color="$blue5">Ajouter une image</Text.MD>
         </XStack>
       </YStack>
     </FormFrame>
@@ -48,12 +48,9 @@ const EmptyButtonRenderer = (props: { edgePosition?: 'leading' | 'trailing' | 'a
 const EmptyRichTextRender = (props: { data: S.RichTextNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
   const { wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
   return (
-    <FormFrame borderRadius={0} height={250} backgroundColor="white" style={wrapperStyle}>
+    <FormFrame borderRadius={0} height={120} backgroundColor="white" style={wrapperStyle}>
       <YStack flex={1} justifyContent="center" alignItems="center" paddingVertical="$large">
-        <XStack gap="$small">
-          <TextIcon size={16} color="$blue5" />
-          <Text.MD color="$blue5">Aucun text</Text.MD>
-        </XStack>
+      <Text.MD secondary lineHeight={22}>Ajoutez ici le contenu que vous souhaitez partager avec vos destinataires</Text.MD>
       </YStack>
     </FormFrame>
   )

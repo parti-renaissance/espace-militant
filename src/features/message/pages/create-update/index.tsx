@@ -7,7 +7,7 @@ import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import StickyBox from '@/components/StickyBox/StickyBox'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
-import { useCreateMessage } from '@/services/messages/hook'
+import { useCreateMessage, useGetAvailableSenders } from '@/services/messages/hook'
 import * as types from '@/services/messages/schema'
 import { PenLine, Speech } from '@tamagui/lucide-icons'
 import { Link, router } from 'expo-router'
@@ -128,6 +128,7 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
               defaultValue={props?.edit?.json_content ? JSON.parse(props.edit.json_content) : undefined}
               onSubmit={handleSubmit}
               displayToolbar={mode === 'edit'}
+              messageId={props?.edit?.uuid}
             />
           </PageLayout.MainSingleColumn>
         </BoundarySuspenseWrapper>

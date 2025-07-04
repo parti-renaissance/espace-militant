@@ -7,7 +7,7 @@ export const getMessage = (props: { messageId: string; scope: string }) =>
     method: 'get',
     path: `/api/v3/adherent_messages/${props.messageId}?scope=${props.scope}`,
     requestSchema: z.void(),
-    responseSchema: schemas.RestPostMessageResponseSchema,
+    responseSchema: schemas.RestGetMessageResponseSchema,
     type: 'private',
   })()
 
@@ -75,5 +75,14 @@ export const getMessageCountRecipients = (props: { messageId: string; scope: str
     path: `/api/v3/adherent_messages/${props.messageId}/count-recipients?scope=${props.scope}`,
     requestSchema: z.void(),
     responseSchema: schemas.RestMessageCountRecipientsResponseSchema,
+    type: 'private',
+  })()
+
+export const getAvailableSenders = (props: { scope: string }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherent_messages/available-senders?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestAvailableSendersResponseSchema,
     type: 'private',
   })()

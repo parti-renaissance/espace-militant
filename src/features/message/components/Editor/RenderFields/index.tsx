@@ -1,4 +1,4 @@
-import React, { forwardRef, RefObject, useCallback, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, RefObject, useCallback, useImperativeHandle, useRef, useState, useMemo } from 'react'
 import { FlatList, ListRenderItemInfo, StyleSheet } from 'react-native'
 import Animated from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -11,12 +11,15 @@ import { isWeb, YStack } from 'tamagui'
 import { MetaDataForm } from './MetaDataForm'
 import { RenderField } from './RenderField'
 import { AddFieldButton } from '../AddFieldButton'
+import { RestAvailableSendersResponse, RestGetMessageResponse } from '@/services/messages/schema'
 
 type RenderFieldsProps = {
   defaultStruct: S.FieldsArray
   control: Control<S.GlobalForm>
   editorMethods: RefObject<EditorMethods>
   displayToolbar?: boolean
+  availableSenders?: RestAvailableSendersResponse
+  message?: RestGetMessageResponse
 }
 
 export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function RenderFields(props, ref) {
@@ -24,6 +27,10 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
   const scrollRef = useRef<FlatList>(null)
   const insets = useSafeAreaInsets()
   const fieldLength = useRef(fields.length)
+
+  console.log('RenderFields render - message:', props.message)
+  const memoizedAvailableSenders = useMemo(() => props.availableSenders, [props.availableSenders])
+  const memoizedMessage = useMemo(() => props.message, [props.message])
 
   const getFieldEdge = useCallback((index: number) => {
     if (index === 0 && fieldLength.current === 1) {
@@ -123,25 +130,31 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
     })
   }, [])
 
-  const { scrollHandler, handleHeaderLayout, headerStyle, headerHeight } = useFlatListHeader()
+  const memoizedHeaderComponent = useMemo(() => (
+    <MetaDataForm 
+      control={props.control} 
+      availableSenders={memoizedAvailableSenders} 
+      message={memoizedMessage} 
+      displayToolbar={props.displayToolbar} 
+    />
+  ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar])
+
+  const { scrollHandler } = useFlatListHeader()
   const { isWebPageLayoutScrollActive } = usePageLayoutScroll()
 
   return (
-    <YStack flex={1} overflow="hidden">
-      <Animated.View style={!isWebPageLayoutScrollActive ? headerStyle : undefined} onLayout={handleHeaderLayout}>
-        <MetaDataForm control={props.control} />
-      </Animated.View>
-      {headerHeight > 0 ? (
-        <Animated.FlatList
+    <YStack flex={1} overflow="hidden" backgroundColor="red">
+      <Animated.FlatList
           style={renderFieldsStyle.flatlist}
           scrollEnabled={!isWebPageLayoutScrollActive}
           onScroll={scrollHandler}
           ref={scrollRef}
-          contentContainerStyle={[!isWebPageLayoutScrollActive ? { paddingBottom: insets.bottom + 96, paddingTop: headerHeight } : undefined]}
+          contentContainerStyle={[!isWebPageLayoutScrollActive ? { paddingBottom: insets.bottom + 96 } : undefined]}
           data={fields}
           onScrollToIndexFailed={reTryScrollOnFail}
           renderItem={RenderItem}
           keyExtractor={keyExtractor}
+          ListHeaderComponent={memoizedHeaderComponent}
           ListEmptyComponent={
             <AddFieldButton
               control={props.control}
@@ -154,7 +167,6 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
             />
           }
         />
-      ) : null}
     </YStack>
   )
 })

@@ -8,6 +8,7 @@ import { X } from "@tamagui/lucide-icons";
 import { ExternalLink } from "@/screens/shared/ExternalLink";
 import VoxCard from "@/components/VoxCard/VoxCard";
 import { useGetExecutiveScopes } from "@/services/profile/hook";
+import { useGetAvailableSenders } from "@/services/messages/hook";
 import MessageScopeSelector from "@/features/message/components/MessageScopeSelector";
 
 const HelpCard = () => {
@@ -55,6 +56,11 @@ const MessagePageIndex = () => {
       .filter((scope) => scope.features.includes("publications"))
       .map((scope) => scope.code);
     return available.includes(scopes.default.code) ? scopes.default.code : undefined;
+  });
+
+  // Preload senders for the selected scope
+  useGetAvailableSenders({ 
+    scope: selectedScope || '', 
   });
 
   const scopeOptions = (scopes?.list || [])

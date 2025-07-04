@@ -83,3 +83,49 @@ export const RestMessageCountRecipientsResponseSchema = z.object({
 })
 
 export type RestMessageCountRecipientsResponse = z.infer<typeof RestMessageCountRecipientsResponseSchema>
+
+export const RestAvailableSenderThemeSchema = z.object({
+  primary: z.string(),
+  soft: z.string(),
+  hover: z.string(),
+  active: z.string(),
+})
+
+export const RestSenderSchema = z.object({
+  uuid: z.string(),
+  first_name: z.string(),
+  last_name: z.string(),
+  image_url: z.string().nullish(),
+  scope: z.string().nullish(),
+  instance: z.string().nullish(),
+  zone: z.string().nullish(),
+  role: z.string().nullish(),
+  theme: RestAvailableSenderThemeSchema,
+})
+
+export const RestAvailableSendersResponseSchema = z.array(RestSenderSchema)
+
+export type RestAvailableSender = z.infer<typeof RestSenderSchema>
+export type RestAvailableSendersResponse = z.infer<typeof RestAvailableSendersResponseSchema>
+export type RestAvailableSenderTheme = z.infer<typeof RestAvailableSenderThemeSchema>
+
+export const RestGetMessageResponseSchema = z.object({
+  author: z.object({
+    uuid: z.string(),
+    first_name: z.string(),
+    last_name: z.string(),
+    scope: z.string().nullish(),
+  }),
+  sender: RestSenderSchema,
+  label: z.string(),
+  subject: z.string(),
+  status: z.string(),
+  recipient_count: z.number(),
+  source: z.string(),
+  uuid: z.string(),
+  updated_at: z.string(),
+  synchronized: z.boolean(),
+  preview_link: z.string(),
+})
+
+export type RestGetMessageResponse = z.infer<typeof RestGetMessageResponseSchema>

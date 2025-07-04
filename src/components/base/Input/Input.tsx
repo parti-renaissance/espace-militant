@@ -116,6 +116,11 @@ const InputFrame = styled(XStack, {
         borderRadius: 28,
       },
     },
+    withoutLabel: {
+      true: {
+        justifyContent: 'center',
+      },
+    },
   } as const,
 })
 
@@ -145,6 +150,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
   const [isFocused, setIsFocused] = useState(false)
   const inputRef = useForwardRef(ref)
   const isFailed = !!error
+  const hasLabel = !!label && label !== ''
   const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(true)
     onFocus?.(e)
@@ -224,6 +230,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
         size={inputProps.multiline ? undefined : (size ?? 'lg')}
         forceStyle={isFocused ? 'focus' : undefined}
         onPress={handlePress}
+        withoutLabel={!hasLabel}
       >
         {!loading && iconLeft && (
           <YStack height="100%" justifyContent="center">
@@ -232,9 +239,10 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
         )}
         <YStack height="auto" flex={1} paddingTop={inputProps.multiline ? '$medium' : 0}>
           <AnimatePresence>
-            {(label ||
-              (placeholder && inputProps.value && inputProps.value.length > 0) ||
-              (placeholder && inputProps.defaultValue && inputProps.defaultValue.length > 0)) && (
+            {hasLabel &&
+              (label ||
+                (placeholder && inputProps.value && inputProps.value.length > 0) ||
+                (placeholder && inputProps.defaultValue && inputProps.defaultValue.length > 0)) && (
               <XStack alignSelf="flex-start" width="100%">
                 <Text.XSM flex={1} color={error ? '$orange5' : '$textPrimary'} numberOfLines={1}>
                   {label ?? placeholder}

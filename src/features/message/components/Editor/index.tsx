@@ -11,6 +11,8 @@ import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
 import { useLocalSearchParams } from 'expo-router'
+import { useGetAvailableSenders, useGetMessage } from '@/services/messages/hook'
+import { RestAvailableSendersResponse } from '@/services/messages/schema'
 
 export { getHTML, defaultTheme }
 
@@ -19,6 +21,7 @@ export type MessageEditorProps = {
   defaultValue?: S.Message
   onSubmit: (x: S.Message) => void
   displayToolbar?: boolean
+  messageId?: string
 }
 
 export type MessageEditorRef = {
@@ -30,6 +33,22 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   const searchParams = useLocalSearchParams<{ scope?: string; template?: string }>()
   const scopeFromQuery = searchParams?.scope
   const templateFromQuery = searchParams?.template
+  
+  const messageQueryParams = useMemo(() => ({
+    messageId: props.messageId ?? '', 
+    scope: scopeFromQuery ?? '', 
+    enabled: !!props.messageId
+  }), [props.messageId, scopeFromQuery])
+  
+  const { data: message } = useGetMessage(messageQueryParams)
+  
+  const availableSendersQueryParams = useMemo(() => ({
+    scope: message?.author.scope ?? scopeFromQuery ?? ''
+  }), [message?.author.scope, scopeFromQuery])
+  
+  const { data: availableSenders } = useGetAvailableSenders(availableSendersQueryParams)
+
+  console.log('mode edit:', props.displayToolbar)
 
   const defaultData = useMemo(() => {
     if (props.defaultValue) {
@@ -115,15 +134,22 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
         $gtSm={
           isWeb
             ? {
-                paddingTop: '$large',
-                paddingBottom: 170 + getTokenValue('$medium'),
-              }
+              paddingTop: '$large',
+              paddingBottom: 170 + getTokenValue('$medium'),
+            }
             : undefined
         }
       >
         <YStack flex={1} gap="$medium" position="relative">
           <StyleRendererContextProvider value={props.theme}>
-            <RenderFields ref={renderFieldsRef} control={control} defaultStruct={defaultData.struct} editorMethods={editorMethods} displayToolbar={props.displayToolbar} />
+            <RenderFields
+              ref={renderFieldsRef}
+              control={control}
+              defaultStruct={defaultData.struct} editorMethods={editorMethods}
+              displayToolbar={props.displayToolbar}
+              availableSenders={availableSenders}
+              message={message}
+            />
           </StyleRendererContextProvider>
         </YStack>
       </YStack>
