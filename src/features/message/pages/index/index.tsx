@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 import PageLayout from "@/components/layouts/PageLayout/PageLayout";
-import { ScrollView, XStack, YStack } from "tamagui";
+import { Image, ScrollView, XStack, YStack } from "tamagui";
 import { VoxButton } from "@/components/Button";
 import { Link } from "expo-router";
 import Text from "@/components/base/Text";
-import { X } from "@tamagui/lucide-icons";
+import { ChevronRight, FileEdit, FileText, X } from "@tamagui/lucide-icons";
 import { ExternalLink } from "@/screens/shared/ExternalLink";
 import VoxCard from "@/components/VoxCard/VoxCard";
 import { useGetExecutiveScopes } from "@/services/profile/hook";
 import { useGetAvailableSenders } from "@/services/messages/hook";
 import MessageScopeSelector from "@/features/message/components/MessageScopeSelector";
+import { ImageSourcePropType, Platform } from "react-native";
+
+const postSimpleImage = require('@/assets/images/post-simple.png');
+const postWithCtaImage = require('@/assets/images/post-with-cta.png');
+const postIllustratedImage = require('@/assets/images/post-illustrated.png');
 
 const HelpCard = () => {
   const [isOpen, setIsOpen] = useState(true)
@@ -34,6 +39,7 @@ const HelpCard = () => {
             </Text.SM>
           </YStack>
           <VoxButton
+            display="none"
             theme="gray"
             backgroundColor="white"
             variant="soft"
@@ -48,6 +54,34 @@ const HelpCard = () => {
   )
 }
 
+const PostCard = ({ title, description, image, href, icon }: { title: string, description: string, image?: ImageSourcePropType, href: string, icon?: React.ReactNode }) => {
+  return (
+    <Link href={href as any} asChild>
+      <VoxCard
+        borderRadius="$medium"
+        shadowColor="rgb(145, 158, 171)"
+        shadowOpacity={0.16}
+        shadowOffset={{ width: 0, height: 2 }}
+        shadowRadius={6}
+        elevation={Platform.OS === 'android' ? 4 : undefined}
+      >
+        <VoxCard.Content>
+          <XStack gap="$medium" alignItems="center">
+            {image ? <Image source={image} width={48} height={64} /> : <YStack width={48} height={48}  borderRadius="$small" backgroundColor="$gray1" justifyContent="center" alignItems="center">{icon}</YStack>}
+            <YStack gap="$xsmall" flexShrink={1}>
+              <Text.MD semibold>{title}</Text.MD>
+              <Text.SM secondary>{description}</Text.SM>
+            </YStack>
+            <YStack justifyContent="center" marginLeft="auto">
+              <ChevronRight size={16} color="$primary" />
+            </YStack>
+          </XStack>
+        </VoxCard.Content>
+      </VoxCard>
+    </Link>
+  )
+}
+
 const MessagePageIndex = () => {
   const { data: scopes } = useGetExecutiveScopes();
   const [selectedScope, setSelectedScope] = useState<string | undefined>(() => {
@@ -59,8 +93,8 @@ const MessagePageIndex = () => {
   });
 
   // Preload senders for the selected scope
-  useGetAvailableSenders({ 
-    scope: selectedScope || '', 
+  useGetAvailableSenders({
+    scope: selectedScope || '',
   });
 
   const scopeOptions = (scopes?.list || [])
@@ -71,47 +105,45 @@ const MessagePageIndex = () => {
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn>
         <ScrollView backgroundColor="$surface" flex={1}>
-          <YStack gap="$medium" maxWidth={550} width="100%" marginHorizontal="auto" padding="$medium" $sm={{ maxWidth: '100%' }}>
+          <YStack gap="$xlarge" maxWidth={550} width="100%" marginHorizontal="auto" padding="$medium" paddingBottom={100} $sm={{ maxWidth: '100%' }}>
             <HelpCard />
             {scopeOptions.length > 0 && (
-              <MessageScopeSelector value={selectedScope} onChange={setSelectedScope} />
+              <MessageScopeSelector label="Pour" value={selectedScope} onChange={setSelectedScope} />
             )}
-            <Link 
+            <PostCard
+              title="Mes brouillons"
+              description="Reprenez là où vous vous étiez arrêté"
               href="/messages/draft"
-              asChild>
-              <VoxButton theme="blue" variant="soft" size="lg">
-                Mes brouillons
-              </VoxButton>
-            </Link>
-            <Text.MD semibold secondary>Démarrer à partir d’un template</Text.MD>
-            <Link 
-              href={selectedScope ? `/messages/creer?scope=${selectedScope}&template=${encodeURIComponent(JSON.stringify([{type:'richtext'}]))}` : "/messages/creer"} 
-              asChild>
-              <VoxButton theme="blue" variant="soft" size="lg" disabled={!selectedScope}>
-                Post Simple
-              </VoxButton>
-            </Link>
-            <Link 
+              icon={<FileEdit size={20} color="$gray6" />}
+            />
+            <YStack gap="$medium">
+            <Text.MD semibold secondary>Démarrer à partir d'un template</Text.MD>
+            <PostCard
+              title="Post d'information"
+              description="Simple texte."
+              image={postSimpleImage}
+              href={selectedScope ? `/messages/creer?scope=${selectedScope}&template=${encodeURIComponent(JSON.stringify([{ type: 'richtext' }]))}` : "/messages/creer"}
+            />
+            <PostCard
+              title="Appel à l'action"
+              description="Zone de texte et bouton."
+              image={postWithCtaImage}
               href={selectedScope ? `/messages/creer?scope=${selectedScope}&template=${encodeURIComponent(JSON.stringify([
-                {type:'richtext'},
-                {type:'button'}
-              ]))}` : "/messages/creer"} 
-              asChild>
-              <VoxButton theme="blue" variant="soft" size="lg" disabled={!selectedScope}>
-                Post simple avec appel à l’action
-              </VoxButton>
-            </Link>
-            <Link 
+                { type: 'richtext' },
+                { type: 'button' }
+              ]))}` : "/messages/creer"}
+            />
+            <PostCard
+              title="Post illustré avec appel à l'action"
+              description="Image d’entête, texte et bouton."
+              image={postIllustratedImage}
               href={selectedScope ? `/messages/creer?scope=${selectedScope}&template=${encodeURIComponent(JSON.stringify([
-                {type:'image'},
-                {type:'richtext'},
-                {type:'button'}
-              ]))}` : "/messages/creer"} 
-              asChild>
-              <VoxButton theme="blue" variant="soft" size="lg" disabled={!selectedScope}>
-                Post illustré avec appel à l’action
-              </VoxButton>
-            </Link>
+                { type: 'image' },
+                { type: 'richtext' },
+                { type: 'button' }
+              ]))}` : "/messages/creer"}
+            />
+            </YStack>
           </YStack>
         </ScrollView>
       </PageLayout.MainSingleColumn>
