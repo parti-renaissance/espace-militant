@@ -2,7 +2,6 @@ import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/messages/api'
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { RestPostMessageResponse } from '../files/schema'
 import { RestGetMessageResponse, RestPostMessageRequest } from './schema'
 
 export const useCreateMessage = (props: { uuid?: string }) => {
