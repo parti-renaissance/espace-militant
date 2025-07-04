@@ -27,8 +27,6 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
   const scrollRef = useRef<FlatList>(null)
   const insets = useSafeAreaInsets()
   const fieldLength = useRef(fields.length)
-
-  console.log('RenderFields render - message:', props.message)
   const memoizedAvailableSenders = useMemo(() => props.availableSenders, [props.availableSenders])
   const memoizedMessage = useMemo(() => props.message, [props.message])
 

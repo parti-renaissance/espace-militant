@@ -8,7 +8,7 @@ import { RichTextRenderer } from '@/features/message/components/Editor/NodeRende
 import { NodeSelectorWrapper } from '@/features/message/components/Editor/NodeSelectorWrapper'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { EditorMethods } from '@/features/message/components/Editor/types'
-import { Image as ImageIcon, Text as TextIcon } from '@tamagui/lucide-icons'
+import { Image as ImageIcon } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
 import { ButtonNodeEditor } from '../NodeEditor/ButtonNodeEditor'

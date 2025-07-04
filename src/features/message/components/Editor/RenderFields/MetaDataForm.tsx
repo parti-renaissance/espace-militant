@@ -1,12 +1,12 @@
-import React, { memo, useMemo, useState } from 'react'
-import Input from '@/components/base/Input/Input'
-import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
+import React, { memo, useMemo } from 'react'
 import { Control, Controller } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
-import Sender from '../../Sender'
-import Text from '@/components/base/Text'
-import { RestAvailableSendersResponse, RestGetMessageResponse, RestAvailableSender } from '@/services/messages/schema'
 import { Clock } from '@tamagui/lucide-icons'
+import Input from '@/components/base/Input/Input'
+import Text from '@/components/base/Text'
+import Sender from '../../Sender'
+import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
+import { RestAvailableSendersResponse, RestGetMessageResponse } from '@/services/messages/schema'
 
 export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, availableSenders?: RestAvailableSendersResponse, message?: RestGetMessageResponse, displayToolbar?: boolean }) => {
   const senderToDisplay = useMemo(() => {
@@ -14,7 +14,6 @@ export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, avail
   }, [props.message?.sender, props.availableSenders])
 
   const senderProps = useMemo(() => {
-    console.log('senderProps useMemo recalculating')
     if (!senderToDisplay) {
       return {
         name: null,

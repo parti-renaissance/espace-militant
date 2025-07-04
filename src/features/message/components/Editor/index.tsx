@@ -1,18 +1,17 @@
 import { forwardRef, useImperativeHandle, useRef, useMemo } from 'react'
-import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uniqueId } from 'lodash'
 import { useForm } from 'react-hook-form'
 import { getTokenValue, isWeb, YStack } from 'tamagui'
+import { useLocalSearchParams } from 'expo-router'
 import { StyleRendererContextProvider } from './context/styleRenderContext'
 import { getHTML } from './HtmlOneRenderer'
 import { RenderFields } from './RenderFields'
 import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
-import { useLocalSearchParams } from 'expo-router'
 import { useGetAvailableSenders, useGetMessage } from '@/services/messages/hook'
-import { RestAvailableSendersResponse } from '@/services/messages/schema'
+import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 
 export { getHTML, defaultTheme }
 
@@ -47,8 +46,6 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   }), [message?.author.scope, scopeFromQuery])
   
   const { data: availableSenders } = useGetAvailableSenders(availableSendersQueryParams)
-
-  console.log('mode edit:', props.displayToolbar)
 
   const defaultData = useMemo(() => {
     if (props.defaultValue) {

@@ -1,4 +1,4 @@
-import React, { useMemo, memo } from "react"
+import React, { useMemo } from "react"
 import { XStack } from "tamagui"
 import Text from "@/components/base/Text"
 import ProfilePicture from "@/components/ProfilePicture"
@@ -13,8 +13,6 @@ export type SenderProps = {
 }
 
 const Sender = ({ sender }: SenderProps) => {
-  console.log('Sender component render - sender:', sender)
-  
   const profilePictureProps = useMemo(() => ({
     size: "$4" as const,
     rounded: true,
