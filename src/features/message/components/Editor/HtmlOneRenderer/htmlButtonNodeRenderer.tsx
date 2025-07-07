@@ -12,7 +12,7 @@ import { stringifyCSSProperties } from 'react-style-stringify'
 //   </Column>
 // </Row>
 export const buttonRenderer = (props: { theme: S.MessageStyle; data: S.ButtonNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
-  const { containerStyle, baseStyle, wrapperStyle } = getThemeStyle(props.theme, props.data, props.edgePosition)
+  const { containerStyle, baseStyle, wrapperStyle: { paddingTop, paddingBottom, paddingLeft, paddingRight, ...wrapperStyle } } = getThemeStyle(props.theme, props.data, props.edgePosition)
   if (!props.data.content) return ''
 
   return `<table
@@ -26,7 +26,7 @@ export const buttonRenderer = (props: { theme: S.MessageStyle; data: S.ButtonNod
   >
       <tbody style="width: 100%">
           <tr style="width: 100%">
-              <td data-id="__react-email-column" style="padding: 16px;">
+              <td data-id="__react-email-column" style="${stringifyCSSProperties({ paddingTop, paddingBottom, paddingLeft, paddingRight } as CSSProperties)}">
                   <a
                       href="${props.data.content.link ?? 'parti.re'}"
                       style="

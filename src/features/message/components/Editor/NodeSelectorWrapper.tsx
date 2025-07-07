@@ -218,6 +218,9 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToo
               e.stopPropagation()
               field.onChange({ edit: false, field: props.field })
               addBarField.onChange(null)
+              if (!props.displayToolbar) {
+                // set display toolbar to true
+              }
             }
             const handleShowAddBar = (key: string) => {
               addBarField.onChange(key)

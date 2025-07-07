@@ -5,11 +5,11 @@ import { Href, Link } from 'expo-router'
 import { View, YStack } from 'tamagui'
 
 export const ButtonRenderer = (props: { data: S.ButtonNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
-  const { containerStyle, baseStyle, wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
+  const { containerStyle, baseStyle, wrapperStyle: { paddingTop, paddingBottom, paddingLeft, paddingRight, ...wrapperStyle } } = useThemeStyle(props.data, props.edgePosition)
   if (!props.data.content) return null
 
   return (
-    <YStack style={wrapperStyle} padding={16}>
+    <YStack style={wrapperStyle} paddingTop={paddingTop} paddingBottom={paddingBottom} paddingLeft={paddingLeft} paddingRight={paddingRight}>
       <Link asChild href={props.data.content.link as Href} target="_blank">
         <View tag="button" style={containerStyle}>
           <Text style={baseStyle as TextStyle}>{props.data.content.text}</Text>

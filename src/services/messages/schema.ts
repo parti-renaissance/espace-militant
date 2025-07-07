@@ -14,10 +14,11 @@ export type RestPostMessageRequest = z.infer<typeof RestPostMessageRequestSchema
 export const RestPostMessageResponseSchema = z.object({
   uuid: z.string(),
   author: z.object({
-    email_address: z.string().email(),
     uuid: z.string(),
     first_name: z.string(),
     last_name: z.string(),
+    image_url: z.string().url().optional(),
+    scope: z.string().optional(),
   }),
   label: z.string(),
   subject: z.string(),
@@ -64,7 +65,7 @@ export const RestMessageListItemSchema = z.object({
     unsubscribe: z.number(),
     unsubscribe_rate: z.number(),
   }),
-  preview_link: z.string(),
+  preview_link: z.string().nullable(),
 })
 
 export const RestMessageListResponseSchema = createRestPaginationSchema(RestMessageListItemSchema)
@@ -125,7 +126,7 @@ export const RestGetMessageResponseSchema = z.object({
   uuid: z.string(),
   updated_at: z.string(),
   synchronized: z.boolean(),
-  preview_link: z.string(),
+  preview_link: z.string().nullable(),
 })
 
 export type RestGetMessageResponse = z.infer<typeof RestGetMessageResponseSchema>

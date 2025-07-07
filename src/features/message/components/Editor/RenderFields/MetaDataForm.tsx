@@ -23,10 +23,10 @@ export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, avail
     }
     
     return {
-      name: `${senderToDisplay.first_name} ${senderToDisplay.last_name}`,
-      role: senderToDisplay.role || undefined,
-      pictureLink: senderToDisplay.image_url || undefined,
-      textColor: senderToDisplay.theme.primary ?? '$gray5'
+      name: `${senderToDisplay?.first_name} ${senderToDisplay?.last_name}`,
+      role: senderToDisplay?.role || undefined,
+      pictureLink: senderToDisplay?.image_url || undefined,
+      textColor: senderToDisplay?.theme?.primary ?? '$gray5'
     }
   }, [senderToDisplay])
 
@@ -38,14 +38,14 @@ export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, avail
     <YStack gap="$medium" backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" padding="$medium" paddingBottom={props.displayToolbar ?  '$medium': 0}>
       <XStack justifyContent="space-between" gap="$small">
         <XStack
-          backgroundColor={senderToDisplay?.theme.soft ?? '$gray1'}
+          backgroundColor={senderToDisplay?.theme?.soft ?? '$gray1'}
           borderRadius={999}
           paddingVertical={4}
           paddingHorizontal={8}
           alignItems="center"
           flexShrink={1}
         >
-          <Text.SM semibold color={senderToDisplay?.theme.primary ?? '$gray5'}  ellipsizeMode="tail" numberOfLines={1}>
+          <Text.SM semibold color={senderToDisplay?.theme?.primary ?? '$gray5'}  ellipsizeMode="tail" numberOfLines={1}>
             {senderToDisplay?.instance ?? 'Instance inconnue'} {senderToDisplay?.zone ? `• ${senderToDisplay?.zone}` : ''}
           </Text.SM>
         </XStack>
@@ -60,7 +60,7 @@ export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, avail
         name="metaData.subject"
         render={({ field, fieldState }) => {
           if (field.value && !props.displayToolbar) {
-            return <Text.LG semibold>{field.value}</Text.LG>
+            return <Text.LG semibold mb="$medium">{field.value}</Text.LG>
           }
           return <Input placeholder="Titre de la publication" label="" color="gray" defaultValue={field.value} onBlur={field.onBlur} onChange={field.onChange} error={fieldState.error?.message} />
         }}
