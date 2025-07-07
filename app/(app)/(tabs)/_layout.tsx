@@ -7,7 +7,7 @@ import { useSession } from '@/ctx/SessionProvider'
 import PageHeader from '@/features/profil/components/PageHeader'
 import { HeartHandshake, Link2, Send } from '@tamagui/lucide-icons'
 import { Link, Slot, Tabs } from 'expo-router'
-import { useMedia, View, XStack } from 'tamagui'
+import { isWeb, useMedia, View, XStack } from 'tamagui'
 import { useGetProfil } from '@/services/profile/hook'
 
 const HomeHeader = () => {
@@ -62,7 +62,7 @@ export default function AppLayout() {
   const { data: profile } = useGetProfil({ enabled: !!session })
 
   return (
-    <View style={{ height: '100%' }} position="relative">
+    <View style={{ height: isWeb ? '100dvh' : '100%' }} position="relative">
       {!isAuth ? (
         <Slot />
       ) : (
