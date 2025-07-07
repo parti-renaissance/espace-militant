@@ -8,39 +8,42 @@ import VoxCard from '@/components/VoxCard/VoxCard';
 import { Spinner, View, XStack, YStack } from 'tamagui';
 import Text from '@/components/base/Text';
 import SkeCard from '@/components/Skeleton/CardSkeleton';
-import { Clock, PenLine, Speech } from '@tamagui/lucide-icons';
+import { Clock, PenLine } from '@tamagui/lucide-icons';
 import { relativeDateFormatter } from '@/utils/DateFormatter';
 import { VoxButton } from '@/components/Button';
 import { RestMessageListItem } from '@/services/messages/schema';
+import SenderView from '../../components/SenderView';
 
-const MessageItem = ({ item }: { item: RestMessageListItem}) => {
+const MessageItem = ({ item }: { item: RestMessageListItem }) => {
   const router = useRouter();
+
+  const handlePress = useCallback(() => {
+    router.push({
+      pathname: '/messages/[id]/editer',
+      params: { id: item.uuid },
+    })
+  }, [item.uuid])
+
   return (
     <VoxCard
-      onPress={() =>
-        router.push({
-          pathname: '/messages/[id]/editer',
-          params: { id: item.uuid },
-        })
-      }
+      onPress={handlePress}
       marginBottom="$small"
       cursor="pointer"
     >
       <VoxCard.Content>
-        <VoxCard.Chip icon={Speech} theme="orange">Assemblée • Tech</VoxCard.Chip>
-        <Text.SM>{item.author.first_name} {item.author.last_name}</Text.SM>
+        <SenderView sender={item.sender} />
         <Text.MD semibold>
-          {item.subject} 
-          { item.status === "draft" ? (<Text.MD semibold color="#D02828"> (Brouillon)</Text.MD>) : null }
-          </Text.MD>
+          {item.subject}
+          {item.status === "draft" ? (<Text.MD semibold color="#D02828"> (Brouillon)</Text.MD>) : null}
+        </Text.MD>
         <XStack justifyContent="space-between">
-          <VoxButton variant="outlined" iconLeft={PenLine} size="sm">Éditer / publier</VoxButton>
-        <XStack gap="$xsmall" alignItems="center">
-          <Clock size={16} color="$textSecondary"/>
-          <Text.SM secondary>
-            Créé {relativeDateFormatter(item.created_at)}
-          </Text.SM>
-        </XStack>
+          <XStack gap="$xsmall" alignItems="center">
+            <Clock size={16} color="$textSecondary" />
+            <Text.SM secondary>
+              Créé {relativeDateFormatter(item.created_at)}
+            </Text.SM>
+          </XStack>
+          <VoxButton variant="outlined" iconLeft={PenLine} size="sm" onPress={handlePress}>Éditer / publier</VoxButton>
         </XStack>
       </VoxCard.Content>
     </VoxCard>

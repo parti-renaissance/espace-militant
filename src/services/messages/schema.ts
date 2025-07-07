@@ -40,12 +40,32 @@ export type RestGetMessageContentResponse = z.infer<typeof RestGetMessageContent
 
 export type RestPostMessageResponse = z.infer<typeof RestPostMessageResponseSchema>
 
+export const RestAvailableSenderThemeSchema = z.object({
+  primary: z.string(),
+  soft: z.string(),
+  hover: z.string(),
+  active: z.string(),
+})
+
+export const RestSenderSchema = z.object({
+  uuid: z.string(),
+  first_name: z.string(),
+  last_name: z.string(),
+  image_url: z.string().nullish(),
+  scope: z.string().nullish(),
+  instance: z.string().nullish(),
+  zone: z.string().nullish(),
+  role: z.string().nullish(),
+  theme: RestAvailableSenderThemeSchema,
+})
+
 export const RestMessageListItemSchema = z.object({
   author: z.object({
     uuid: z.string(),
     first_name: z.string(),
     last_name: z.string(),
   }),
+  sender: RestSenderSchema.nullable(),
   label: z.string(),
   subject: z.string(),
   status: z.string(),
@@ -84,25 +104,6 @@ export const RestMessageCountRecipientsResponseSchema = z.object({
 })
 
 export type RestMessageCountRecipientsResponse = z.infer<typeof RestMessageCountRecipientsResponseSchema>
-
-export const RestAvailableSenderThemeSchema = z.object({
-  primary: z.string(),
-  soft: z.string(),
-  hover: z.string(),
-  active: z.string(),
-})
-
-export const RestSenderSchema = z.object({
-  uuid: z.string(),
-  first_name: z.string(),
-  last_name: z.string(),
-  image_url: z.string().nullish(),
-  scope: z.string().nullish(),
-  instance: z.string().nullish(),
-  zone: z.string().nullish(),
-  role: z.string().nullish(),
-  theme: RestAvailableSenderThemeSchema,
-})
 
 export const RestAvailableSendersResponseSchema = z.array(RestSenderSchema)
 
