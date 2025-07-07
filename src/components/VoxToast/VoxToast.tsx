@@ -69,6 +69,8 @@ const VoxToast = () => {
       theme={theme}
       maxWidth={320}
       viewportName={currentToast.viewportName}
+      zIndex={999999}
+      style={{ zIndex: 999999, elevation: 999999 }}
     >
       <VoxCard.Content paddingVertical={10}>
         <XStack gap={10} justifyContent="space-between" alignContent="center" alignItems="center" position="relative">

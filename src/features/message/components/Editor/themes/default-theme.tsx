@@ -54,10 +54,10 @@ export default {
   image: {
     global: {
       container: {
-        paddingBottom: 24,
-        paddingTop: 24,
-        paddingLeft: 24,
-        paddingRight: 24,
+        paddingBottom: 16,
+        paddingTop: 16,
+        paddingLeft: 16,
+        paddingRight: 16,
       },
       base: {
         borderRadius: 8,
@@ -67,7 +67,7 @@ export default {
     leading: {
       wrapper: { padding: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
       container: {
-        paddingBottom: 24,
+        paddingBottom: 8,
         paddingTop: 0,
         paddingLeft: 0,
         paddingRight: 0,
@@ -91,16 +91,16 @@ export default {
       container: { minHeight: 20 },
     },
     leading: {
-      container: { paddingTop: 16, paddingBottom: 0, paddingLeft: 16, paddingRight: 16 },
+      container: { paddingTop: 0, paddingBottom: 0, paddingLeft: 16, paddingRight: 16 },
     },
     trailing: {
-      container: { paddingTop: 0, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
+      container: { paddingTop: 8, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
     },
     middle: {
-      container: { paddingLeft: 16, paddingRight: 16 },
+      container: {  paddingTop: 8, paddingBottom: 8,  paddingLeft: 16, paddingRight: 16 },
     },
     alone: {
-      container: { paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
+      container: { paddingTop: 0, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
     }
   },
   button: {

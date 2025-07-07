@@ -10,40 +10,7 @@ import ViewportModalSheet, { ViewportModalRef } from './ViewportModalSheet'
 import Text from '@/components/base/Text'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 
-const SenderView = (props: { payload: RestPostMessageResponse; scope: string }) => {
-  const { mutate, isPending } = useSendMessage({
-    uuid: props.payload.uuid,
-  })
-
-  const handleSendMessage = () => {
-    mutate({ scope: props.scope })
-  }
-
-  const handleSendTestMessage = () => {
-    mutate({ scope: props.scope, test: true })
-  }
-
-  return (
-    <YStack flex={1} minHeight={300}>
-      {props.payload.preview_link ? (
-        <Link href={props.payload.preview_link! as Href} asChild={!isWeb} target="_blank">
-          <VoxButton variant="outlined" iconLeft={Eye}>
-            Prévisualiser
-          </VoxButton>
-        </Link>
-      ) : null
-      }
-      <VoxButton variant="outlined" iconLeft={Send} loading={isPending} disabled={isPending} onPress={handleSendTestMessage}>
-        Envoyer test
-      </VoxButton>
-      <VoxButton theme="purple" variant="outlined" iconLeft={Send} loading={isPending} disabled={isPending} onPress={handleSendMessage}>
-        Envoyer
-      </VoxButton>
-    </YStack>
-  )
-}
-
-const ModalSender = forwardRef<ViewportModalRef, { payload?: { messageId: string; scope: string } }>((props, ref) => {
+const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: string; scope: string } }>((props, ref) => {
   const modalSheetRef = useRef<ViewportModalRef>(null)
   const { data: isMessageTilSync, isLoading: isSyncLoading, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ payload: props.payload?.messageId && props.payload?.scope ? { messageId: props.payload.messageId, scope: props.payload.scope } : undefined })
 
@@ -62,10 +29,10 @@ const ModalSender = forwardRef<ViewportModalRef, { payload?: { messageId: string
     mutate({ scope: props.payload?.scope || '' })
   }
 
-  const handleSendTestMessage = () => {
-    if (isSyncLoading) return
-    mutate({ scope: props.payload?.scope || '', test: true })
-  }
+  // const handleSendTestMessage = () => {
+  //   if (isSyncLoading) return
+  //   mutate({ scope: props.payload?.scope || '', test: true })
+  // }
 
   const handleCopyUrl = useHandleCopyUrl()
 
@@ -121,7 +88,7 @@ const ModalSender = forwardRef<ViewportModalRef, { payload?: { messageId: string
                   ) : (
                     <Text.LG color="$purple5" semibold>{recipients?.push ?? 0}</Text.LG>
                   )}
-                  <Text.MD medium>recevront une notification push</Text.MD>
+                  <Text.MD medium>notifications push seront envoyées</Text.MD>
                 </XStack>
               </VoxCard.Content>
             </VoxCard>
@@ -133,7 +100,7 @@ const ModalSender = forwardRef<ViewportModalRef, { payload?: { messageId: string
                   ) : (
                     <Text.LG color="$purple5" semibold>{recipients?.email ?? 0}</Text.LG>
                   )}
-                  <Text.MD medium>recevront la version email</Text.MD>
+                  <Text.MD medium>emails seront envoyés</Text.MD>
                 </XStack>
               </VoxCard.Content>
             </VoxCard>
@@ -145,13 +112,13 @@ const ModalSender = forwardRef<ViewportModalRef, { payload?: { messageId: string
                   ) : (
                     <Text.LG color="$purple5" semibold>{recipients?.push_email ?? 0}</Text.LG>
                   )}
-                  <Text.MD medium>recevront un push + un email</Text.MD>
+                  <Text.MD medium>contacts recevront les deux</Text.MD>
                 </XStack>
               </VoxCard.Content>
             </VoxCard>
           </YStack>
           <Text.MD secondary px="$medium" mb="$medium">
-            Au total, <Text.MD primary semibold>{recipients?.total ?? 0}</Text.MD> pourront la voir sur leur espace militant.
+            Au total, <Text.MD primary semibold>{recipients?.total ?? 0}</Text.MD> pourront voir cette publication sur leur accueil de l'espace militant.
           </Text.MD>
         </YStack>
 
@@ -231,4 +198,4 @@ const ModalSender = forwardRef<ViewportModalRef, { payload?: { messageId: string
   )
 })
 
-export default ModalSender
+export default ConfirmationModal

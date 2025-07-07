@@ -26,7 +26,7 @@ export const buttonRenderer = (props: { theme: S.MessageStyle; data: S.ButtonNod
   >
       <tbody style="width: 100%">
           <tr style="width: 100%">
-              <td data-id="__react-email-column" style="padding: 16px;">
+              <td data-id="__react-email-column" style="padding-top: 8px; padding-bottom: 8px; padding-left: 16px; padding-right: 16px;">
                   <a
                       href="${props.data.content.link ?? 'parti.re'}"
                       style="

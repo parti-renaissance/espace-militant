@@ -47,7 +47,7 @@ const RenderText: RenderFn<S.TipText> = ({ data }) => {
 
 const RenderParagraph: RenderFn<S.TipParagraph> = ({ data }) => {
   return data.content ? (
-    <Text.MD tag="p" marginVertical={4} color="$gray8">
+    <Text.MD tag="p" marginVertical={0} color="$gray8">
       {data.content.map((x, i) => {
         if (U.isTipNonSupported(x)) return <RenderNonSupported key={x.type + i} data={x} />
         if (U.isTipText(x)) return <RenderText key={x.type + i} data={x} />

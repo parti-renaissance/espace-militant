@@ -7,9 +7,9 @@ export const PortalLayout = ({ children }: { children: React.ReactNode }) => {
   const insets = useSafeAreaInsets()
   return (
     <PortalProvider>
+      {children}
       <VoxToast />
       <ToastViewport flexDirection="column-reverse" top={16 + insets.top} right={16} />
-      {children}
     </PortalProvider>
   )
 }

@@ -13,8 +13,8 @@ import { PenLine, Speech } from '@tamagui/lucide-icons'
 import { Link, router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
-import ModalSender from '../../components/ModalSender'
-import { ViewportModalRef } from '../../components/ModalSender/ViewportModalSheet'
+import ModalSender from '../../components/ConfirmationModal'
+import { ViewportModalRef } from '../../components/ConfirmationModal/ViewportModalSheet'
 import BigSwitch from '@/components/base/BigSwitch'
 
 const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse; scope?: string }) => {
