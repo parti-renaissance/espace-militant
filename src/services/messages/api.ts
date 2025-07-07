@@ -56,12 +56,11 @@ export const sendTestMessage = (props: { messageId: string; scope: string }) =>
     type: 'private',
   })()
 
-export const getMessages = (props: { scope: string; page?: number; perPage?: number; status?: 'draft' | 'sent'; orderCreatedAt?: 'asc' | 'desc' }) =>
+export const getMessages = (props: { scope: string; page?: number; status?: 'draft' | 'sent'; orderCreatedAt?: 'asc' | 'desc' }) =>
   api({
     method: 'get',
     path: `/api/v3/adherent_messages?scope=${props.scope}` +
       (props.page ? `&page=${props.page}` : '') +
-      (props.perPage ? `&per_page=${props.perPage}` : '') +
       (props.status ? `&status=${props.status}` : '') +
       (props.orderCreatedAt ? `&order[createdAt]=${props.orderCreatedAt}` : ''),
     requestSchema: z.void(),
