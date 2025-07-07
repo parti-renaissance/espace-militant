@@ -105,6 +105,7 @@ export default {
   },
   button: {
     global: {
+      wrapper: { paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
       container: {
         width: '100%',
         borderRadius: 28,
@@ -121,6 +122,9 @@ export default {
         fontWeight: 'bold',
         color: 'hsl(211,24%, 17%)',
       },
+    },
+    trailing: {
+      wrapper: { paddingBottom: 16 },
     },
     primary: {
       container: {

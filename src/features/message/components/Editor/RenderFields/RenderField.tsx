@@ -80,7 +80,7 @@ export const RenderField = memo((props: {
                   editorMethods={props.editorMethods}
                   displayToolbar={props.displayToolbar ?? true}
                 >
-                  {field.value.content ? <ImageRenderer data={field.value} edgePosition={props.edgePosition} /> : <EmptyImageRenderer data={field.value} />}
+                  {field?.value?.content ? <ImageRenderer data={field.value} edgePosition={props.edgePosition} /> : <EmptyImageRenderer data={field.value} />}
                 </NodeSelectorWrapper>
                 <Controller 
                   control={props.control}
