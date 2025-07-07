@@ -8,6 +8,7 @@ import { isWeb, Spinner, View, XStack, YStack } from 'tamagui'
 import ViewportModalSheet, { ViewportModalRef } from './ViewportModalSheet'
 import Text from '@/components/base/Text'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
+import SenderView from '../SenderView'
 
 const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: string; scope: string } }>((props, ref) => {
   const modalSheetRef = useRef<ViewportModalRef>(null)
@@ -52,6 +53,11 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
     <ViewportModalSheet ref={modalSheetRef} onClose={handleCancel}>
       <VoxCard.Content marginBottom="$large" gap="$large">
         <Text.LG>Prêt à publier ?</Text.LG>
+        {/* TODO: add sender preview */}
+        <YStack gap="$medium">
+          <SenderView sender={isMessageTilSync?.sender || null} />
+          <Text.LG semibold>{isMessageTilSync?.subject}</Text.LG>
+        </YStack>
         <YStack gap="$medium" position="relative">
           {syncError ? (
             <YStack position="absolute" inset={0} bottom={0} zIndex={1}>
@@ -66,9 +72,9 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
               </VoxCard>
             </YStack>
           ) : null}
-          <YStack gap="$small">
-            <VoxCard inside backgroundColor="$gray1">
-              <VoxCard.Content justifyContent="center" alignItems="center" gap="$small">
+          <View gap="$small" $gtSm={{ flexDirection: 'row' }}>
+            <VoxCard inside backgroundColor="$gray1" justifyContent="center" alignItems="center">
+            <VoxCard.Content justifyContent="center" alignItems="center" gap="$small">
                 {isLoadingRecipients ? (
                   <View alignItems="center" justifyContent="center" height={52}>
                     <Spinner color="$purple5" />
@@ -79,43 +85,45 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
                 <Text.LG semibold>Contacts notifiés</Text.LG>
               </VoxCard.Content>
             </VoxCard>
-            <VoxCard inside backgroundColor="$gray1">
-              <VoxCard.Content>
-                <XStack gap="$xsmall" alignItems="center" height={20}>
-                  {isLoadingRecipients ? (
-                    <Spinner color="$purple5" />
-                  ) : (
-                    <Text.LG color="$purple5" semibold>{recipients?.push ?? 0}</Text.LG>
-                  )}
-                  <Text.MD medium>notifications push seront envoyées</Text.MD>
-                </XStack>
-              </VoxCard.Content>
-            </VoxCard>
-            <VoxCard inside backgroundColor="$gray1">
-              <VoxCard.Content>
-                <XStack gap="$xsmall" alignItems="center" height={20}>
-                  {isLoadingRecipients ? (
-                    <Spinner color="$purple5" />
-                  ) : (
-                    <Text.LG color="$purple5" semibold>{recipients?.email ?? 0}</Text.LG>
-                  )}
-                  <Text.MD medium>emails seront envoyés</Text.MD>
-                </XStack>
-              </VoxCard.Content>
-            </VoxCard>
-            <VoxCard inside backgroundColor="$gray1">
-              <VoxCard.Content>
-                <XStack gap="$xsmall" alignItems="center" height={20}>
-                  {isLoadingRecipients ? (
-                    <Spinner color="$purple5" />
-                  ) : (
-                    <Text.LG color="$purple5" semibold>{recipients?.push_email ?? 0}</Text.LG>
-                  )}
-                  <Text.MD medium>contacts recevront les deux</Text.MD>
-                </XStack>
-              </VoxCard.Content>
-            </VoxCard>
-          </YStack>
+            <YStack gap="$small" flexGrow={1} flexShrink={1}>
+              <VoxCard inside backgroundColor="$gray1">
+                <VoxCard.Content>
+                  <XStack gap="$xsmall" alignItems="center" height={20}>
+                    {isLoadingRecipients ? (
+                      <Spinner color="$purple5" />
+                    ) : (
+                      <Text.LG color="$purple5" semibold>{recipients?.push ?? 0}</Text.LG>
+                    )}
+                    <Text.MD medium numberOfLines={1}>{(recipients?.push ?? 0) > 500 ? 'notifs' : 'notifications'} mobile seront envoyées</Text.MD>
+                  </XStack>
+                </VoxCard.Content>
+              </VoxCard>
+              <VoxCard inside backgroundColor="$gray1">
+                <VoxCard.Content>
+                  <XStack gap="$xsmall" alignItems="center" height={20}>
+                    {isLoadingRecipients ? (
+                      <Spinner color="$purple5" />
+                    ) : (
+                      <Text.LG color="$purple5" semibold>{recipients?.email ?? 0}</Text.LG>
+                    )}
+                    <Text.MD medium numberOfLines={1}>emails seront envoyés</Text.MD>
+                  </XStack>
+                </VoxCard.Content>
+              </VoxCard>
+              <VoxCard inside backgroundColor="$gray1">
+                <VoxCard.Content>
+                  <XStack gap="$xsmall" alignItems="center" height={20}>
+                    {isLoadingRecipients ? (
+                      <Spinner color="$purple5" />
+                    ) : (
+                      <Text.LG color="$purple5" semibold>{recipients?.push_email ?? 0}</Text.LG>
+                    )}
+                    <Text.MD medium numberOfLines={1}>contacts recevront les deux</Text.MD>
+                  </XStack>
+                </VoxCard.Content>
+              </VoxCard>
+            </YStack>
+          </View>
           <Text.MD secondary px="$medium" mb="$medium">
             Au total, <Text.MD primary semibold>{recipients?.total ?? 0}</Text.MD> pourront voir cette publication sur leur accueil de l'espace militant.
           </Text.MD>
