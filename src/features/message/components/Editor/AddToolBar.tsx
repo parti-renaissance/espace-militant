@@ -57,17 +57,17 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
   return (
     <ToolBarPositioner onPress={(e) => e.stopPropagation()}>
       <ToolBarFrame>
-        <VoxButton size="sm" variant="soft" iconLeft={TextSelect} onPress={() => handleAddField('richtext')}>
+        <VoxButton size="sm" variant="soft" backgroundColor="$white0" iconLeft={TextSelect} onPress={() => handleAddField('richtext')}>
           Text
         </VoxButton>
-        <VoxButton size="sm" variant="soft" iconLeft={PlusSquare} onPress={() => handleAddField('button')}>
+        <VoxButton size="sm" variant="soft" backgroundColor="$white0" iconLeft={PlusSquare} onPress={() => handleAddField('button')}>
           Bouton
         </VoxButton>
-        <VoxButton size="sm" variant="soft" iconLeft={ImagePlus} onPress={() => handleAddField('image')}>
+        <VoxButton size="sm" variant="soft" backgroundColor="$white0" iconLeft={ImagePlus} onPress={() => handleAddField('image')}>
           Image
         </VoxButton>
         {props.onClose ? (
-          <VoxButton size="sm" variant="soft" shrink iconLeft={X} onPress={props.onClose}></VoxButton>
+          <VoxButton size="sm" variant="soft" backgroundColor="$white2" shrink iconLeft={X} onPress={props.onClose}></VoxButton>
         ) : null}
       </ToolBarFrame>
     </ToolBarPositioner >

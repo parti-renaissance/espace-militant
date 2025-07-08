@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { useThemeStyle } from '@/features/message/components/Editor/hooks/useThemeStyle'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { Image, ImageStyle } from 'expo-image'
-import { YStack } from 'tamagui'
+import { YStack, View } from 'tamagui'
 
-export const ImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
-  const { containerStyle, baseStyle, wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
+export const ImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leading' | 'trailing' | 'alone'; displayToolbar?: boolean }) => {
+  const { containerStyle: {paddingBottom, ...containerStyle}, baseStyle, wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
   if (!props.data.content) return null
   const { width, height, url } = props.data.content
   const dynStyle = useMemo(
@@ -18,7 +18,7 @@ export const ImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leadin
 
   return (
     <YStack style={wrapperStyle}>
-      <View style={[containerStyle]}>
+      <View style={containerStyle} paddingBottom={props.displayToolbar && props.edgePosition === 'leading' ? 0 : paddingBottom}>
         <Image contentFit={'cover'} source={url} style={[styles.image, dynStyle, baseStyle as ImageStyle]} />
       </View>
     </YStack>

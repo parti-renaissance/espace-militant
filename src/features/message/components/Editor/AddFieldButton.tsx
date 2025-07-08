@@ -1,10 +1,10 @@
 import { styled, ThemeableStack } from "tamagui"
 import { EditorMethods } from "./types"
-import { memo, RefObject } from "react"
+import { memo, RefObject, useState } from "react"
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
 import { Control } from "react-hook-form"
 import MessageEditorAddToolbar from "./AddToolBar"
-import { TouchableOpacity, Platform } from "react-native"
+import { Platform, Pressable } from "react-native"
 import { Plus } from "@tamagui/lucide-icons"
 
 const AddFieldButtonContainer = styled(ThemeableStack, {
@@ -73,6 +73,12 @@ const AddFieldButtonContainer = styled(ThemeableStack, {
     borderRadius: 36,
     justifyContent: 'center',
     alignItems: 'center',
+    pressStyle: {
+      backgroundColor: '$gray3',
+    },
+    hoverStyle: {
+      backgroundColor: '$gray2',
+    }
   })
   
   type AddFieldButtonProps = {
@@ -104,11 +110,13 @@ const AddFieldButtonContainer = styled(ThemeableStack, {
           />
         ) : (
           <AddFieldButtonCircle>
-            <TouchableOpacity onPress={props.onShowAddBar}>
+            <Pressable 
+              onPress={props.onShowAddBar}
+            >
               <AddFieldButtonInner>
                 <Plus color="black" size={16} />
               </AddFieldButtonInner>
-            </TouchableOpacity>
+            </Pressable>
           </AddFieldButtonCircle>
         )}
       </AddFieldButtonContainer>

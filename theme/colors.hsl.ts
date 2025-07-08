@@ -79,14 +79,14 @@ export const blue = {
 export const white = {
   white0: 'hsl(0, 0%, 100%)',
   white1: 'hsl(0, 0%, 100%)',
-  white2: 'hsl(0, 0%, 97%)',
-  white3: 'hsl(0, 0%, 96.3%)',
-  white4: 'hsl(0, 0%, 94.1%)',
-  white5: 'hsl(0, 0%, 92.0%)',
-  white6: 'hsl(0, 0%, 90.0%)',
-  white7: 'hsl(0, 0%, 88.5%)',
-  white8: 'hsl(0, 0%, 81.0%)',
-  white9: 'hsl(0, 0%, 56.1%)',
+  white2: 'hsl(0, 0%, 95%)',
+  white3: 'hsl(0, 0%, 90%)',
+  white4: 'hsl(0, 0%, 85%)',
+  white5: 'hsl(0, 0%, 75%)',
+  white6: 'hsl(0, 0%, 65%)',
+  white7: 'hsl(0, 0%, 55%)',
+  white8: 'hsl(0, 0%, 45%)',
+  white9: 'hsl(211, 24%, 17%)',
 }
 
 export const black = {

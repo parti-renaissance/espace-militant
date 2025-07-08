@@ -13,38 +13,24 @@ export default {
       paddingBottom: 16,
       maxWidth: 550,
     },
-
     item: {
       wrapper: {
         overflow: 'hidden',
         backgroundColor: 'white',
-        // borderColor: '#EEF0F2',
-        // borderStyle: 'solid',
-        // paddingTop: 16,
-        // paddingBottom: 16,
-        // paddingLeft: 40,
-        // paddingRight: 40,
       },
       trailing: {
-        // borderWidth: 1,
         borderTopWidth: 0,
         borderBottomRightRadius: 16,
         borderBottomLeftRadius: 16,
       },
       leading: {
-        // borderWidth: 1,
         borderBottomWidth: 0,
-        // borderTopRightRadius: 16,
-        //borderTopLeftRadius: 16,
       },
       middle: {
-        // borderWidth: 1,
         borderTopWidth: 0,
         borderBottomWidth: 0,
       },
-
       alone: {
-        // borderWidth: 1,
         borderRadius: 0,
         borderBottomRightRadius: 16,
         borderBottomLeftRadius: 16,
@@ -65,7 +51,7 @@ export default {
       },
     },
     leading: {
-      wrapper: { padding: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+      wrapper: {},
       container: {
         paddingBottom: 8,
         paddingTop: 0,
@@ -78,7 +64,7 @@ export default {
       },
     },
     alone: {
-      wrapper: { padding: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+      wrapper: {},
       container: {},
       base: {
         width: '100%',
@@ -94,10 +80,10 @@ export default {
       container: { paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
     },
     trailing: {
-      container: { paddingTop: 8, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
+      container: { paddingTop: 8, paddingBottom: 24, paddingLeft: 16, paddingRight: 16 },
     },
     middle: {
-      container: {  paddingTop: 8, paddingBottom: 8,  paddingLeft: 16, paddingRight: 16 },
+      container: { paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
     },
     alone: {
       container: { paddingTop: 8, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
@@ -110,7 +96,6 @@ export default {
         width: '100%',
         borderRadius: 28,
         cursor: 'pointer',
-
         paddingTop: 12,
         paddingBottom: 12,
         paddingRight: 12,
@@ -124,7 +109,7 @@ export default {
       },
     },
     trailing: {
-      wrapper: { paddingBottom: 16 },
+      wrapper: { paddingBottom: 24 },
     },
     primary: {
       container: {
