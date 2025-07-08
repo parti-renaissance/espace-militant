@@ -29,7 +29,7 @@ const EmptyImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leading'
   )
 }
 
-const EmptyButtonRenderer = (props: { edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
+const EmptyButtonRenderer = (props: { edgePosition?: 'leading' | 'trailing' | 'alone', color?: string }) => {
   return (
     <ButtonRenderer
       edgePosition={props.edgePosition}
@@ -39,6 +39,7 @@ const EmptyButtonRenderer = (props: { edgePosition?: 'leading' | 'trailing' | 'a
         content: {
           link: 'http://parti-renaissance.fr',
           text: 'Bouton (vide)',
+          color: props.color || '#4291E1',
         },
       }}
     />
@@ -62,6 +63,7 @@ export const RenderField = memo((props: {
   edgePosition?: 'leading' | 'trailing' | 'alone';
   editorMethods: RefObject<EditorMethods>;
   displayToolbar?: boolean;
+  senderThemeColor?: string; // Ajout de cette prop
 }) => {
   switch (props.field.type) {
     case 'image':
@@ -119,7 +121,7 @@ export const RenderField = memo((props: {
                 {field.value.content ? (
                   <ButtonRenderer data={field.value} edgePosition={props.edgePosition} />
                 ) : (
-                  <EmptyButtonRenderer edgePosition={props.edgePosition} />
+                  <EmptyButtonRenderer edgePosition={props.edgePosition} color={props.senderThemeColor} />
                 )}
               </NodeSelectorWrapper>
               <Controller
@@ -131,6 +133,7 @@ export const RenderField = memo((props: {
                       present={value?.field.id === props.field.id && value.edit}
                       onChange={field.onChange}
                       value={field.value}
+                      senderThemeColor={props.senderThemeColor} // Passage de la couleur
                     />
                   )
                 }}

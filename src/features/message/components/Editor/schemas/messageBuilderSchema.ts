@@ -37,6 +37,7 @@ export const ButtonNodeSchema = z.object({
     .object({
       text: z.string(),
       link: z.string(),
+      color: z.string().optional(),
     })
     .nullish(),
 })
@@ -71,6 +72,7 @@ export const ButtonNodeValidationSchema = z.object({
           message: 'Veuillez saisir un lien valide',
         },
       ),
+    color: z.string().optional(),
   }),
 })
 

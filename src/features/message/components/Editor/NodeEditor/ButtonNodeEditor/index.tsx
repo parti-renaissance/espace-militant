@@ -14,7 +14,13 @@ import { useDebouncedCallback } from 'use-debounce'
 import ViewportModal from './ViewportModal'
 import { useRef } from 'react'
 
-type NodeEditorProps = { value: S.ButtonNode; onChange: (node: S.ButtonNode) => void; onBlur: () => void; present: boolean }
+type NodeEditorProps = { 
+  value: S.ButtonNode; 
+  onChange: (node: S.ButtonNode) => void; 
+  onBlur: () => void; 
+  present: boolean;
+  senderThemeColor?: string; // Ajout de cette prop
+}
 
 export const ButtonNodeEditor = (props: NodeEditorProps) => {
   const insets = useSafeAreaInsets()
@@ -27,6 +33,7 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
       content: props.value.content ?? {
         link: '',
         text: '',
+        color: props.senderThemeColor || '#4291E1',
       },
     },
     resolver: zodResolver(S.ButtonNodeValidationSchema),
@@ -115,8 +122,8 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
                 <Select
                   label="Style"
                   options={[
-                    { value: 'primary', label: 'Primaire (bleu)' },
-                    { value: 'secondary', label: 'Secondaire (blanc)' },
+                    { value: 'primary', label: 'Bouton principal' },
+                    { value: 'secondary', label: 'Bouton secondaire' },
                   ]}
                   value={field.value?.filter((x) => x !== 'unsupported')[0]}
                   onChange={(x) => field.onChange([x])}
@@ -126,6 +133,28 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
             }}
           />
         </YStack>
+        <YStack display="none">
+          <Controller
+            control={control}
+            name="content.color"
+            render={({ field, fieldState }) => {
+              return (
+                <Input
+                  bottomSheetInput={isIosMobile}
+                  label="Couleur personnalisée (optionnel)"
+                  color="gray"
+                  placeholder="#4291E1"
+                  defaultValue={field.value}
+                  onBlur={field.onBlur}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  autoCapitalize="none"
+                />
+              )
+            }}
+          />
+        </YStack>
+
       </VoxCard.Content>
     </ViewportModal>
   )

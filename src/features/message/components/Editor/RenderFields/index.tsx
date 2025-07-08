@@ -107,17 +107,23 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
     }
   }, [fields])
 
+  const senderThemeColor = useMemo(() => {
+    const sender = props.message?.sender || (props.availableSenders && props.availableSenders.length > 0 ? props.availableSenders[0] : null)
+    return sender?.theme?.primary || '#4291E1'
+  }, [props.message?.sender, props.availableSenders])
+
   const RenderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<S.FieldsArray[number]>) => (
       <RenderField
-        control={props.control}
         field={item}
+        control={props.control}
         edgePosition={getFieldEdge(index)}
         editorMethods={props.editorMethods}
-        displayToolbar={props.displayToolbar ?? true}
+        displayToolbar={props.displayToolbar}
+        senderThemeColor={senderThemeColor}
       />
     ),
-    [props.control, props.editorMethods, props.displayToolbar],
+    [props.control, props.editorMethods, props.displayToolbar, senderThemeColor],
   )
 
   const keyExtractor = useCallback((props: S.FieldsArray[number]) => props.id, [])

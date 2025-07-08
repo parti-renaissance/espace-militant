@@ -56,7 +56,7 @@ export const RestSenderSchema = z.object({
   instance: z.string().nullish(),
   zone: z.string().nullish(),
   role: z.string().nullish(),
-  theme: RestAvailableSenderThemeSchema,
+  theme: RestAvailableSenderThemeSchema.nullable(),
 })
 
 export const RestMessageListItemSchema = z.object({

@@ -45,7 +45,7 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
           style={styles.centeredView}
           onPress={(e) => {
             e.stopPropagation()
-            e.target == e.currentTarget && onClose?.()
+            // e.target == e.currentTarget && onClose?.()
           }}
         >
           <View style={styles.modalView}>
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
-    cursor: 'pointer',
+    // cursor: 'pointer',
   },
   modalView: {
     backgroundColor: 'white',
