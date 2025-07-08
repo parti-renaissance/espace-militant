@@ -29,7 +29,12 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
   if (viewport.gtSm && isWeb) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
-        <View style={styles.centeredView}>
+        <View 
+        style={styles.centeredView}
+        onPress={(e) => {
+          e.stopPropagation()
+        }}
+        >
           <View style={styles.modalView}>
             <CardFrame width={width} height={height}>
               {header ? header : null}
@@ -71,7 +76,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
-    cursor: 'pointer',
+    // cursor: 'pointer',
   },
   modalView: {
     backgroundColor: 'white',

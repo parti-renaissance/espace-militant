@@ -43,6 +43,22 @@ export function getThemeStyle(theme: S.MessageStyle, _node?: S.Node, edgePositio
   const containerStyle = nodeHasMarks(node) ? flatNodeStyle('container', node, nodeTheme) : (nodeTheme.global?.container ?? {})
   const baseStyle = nodeHasMarks(node) ? flatNodeStyle('base', node, nodeTheme) : (nodeTheme.global?.base ?? {})
   const nodeWrapperStyle = { ...wrapperStyle, ...(nodeHasMarks(node) ? flatNodeStyle('wrapper', node, nodeTheme) : (nodeTheme.global?.wrapper ?? {})) }
+  if (node.type === 'button' && node.content?.color) {
+    console.log('button content', node.content)
+    const customColor = node.content.color
+    const defaultColor = '#4291E1'
+    
+    if ((containerStyle as ViewStyle)?.backgroundColor === defaultColor) {
+      (containerStyle as ViewStyle).backgroundColor = customColor
+    }
+    if ((containerStyle as ViewStyle)?.borderColor === defaultColor) {
+      (containerStyle as ViewStyle).borderColor = customColor
+    }
+    if ((baseStyle as TextStyle)?.color === defaultColor) {
+      (baseStyle as TextStyle).color = customColor
+    }
+  }
+  
   return { containerStyle, baseStyle, wrapperStyle: nodeWrapperStyle }
 }
 
