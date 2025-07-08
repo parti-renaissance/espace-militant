@@ -1,7 +1,7 @@
 import { forwardRef, RefObject, useCallback } from 'react'
 import { VoxButton } from '@/components/Button'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
-import { ChevronDown, ChevronUp, Pencil, Trash2, X } from '@tamagui/lucide-icons'
+import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2, X } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { styled, ThemeableStack, XStack } from 'tamagui'
 import { EditorMethods } from './types'
@@ -75,19 +75,19 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
               field.value ? (
                 <ToolBarFrame>
                   <XStack>
-                    <VoxButton size="lg" variant="soft" shrink iconLeft={Pencil} onPress={handleEditField(field.value.field)} />
+                    <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={Pencil} onPress={handleEditField(field.value.field)} />
                   </XStack>
                   <XStack>
-                    <VoxButton size="lg" variant="soft" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value.field)} />
+                    <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value.field)} />
                   </XStack>
                   <XStack>
-                    <VoxButton size="lg" variant="soft" shrink iconLeft={ChevronUp} onPress={handleMoveUp(field.value.field)} />
+                    <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={ArrowUpToLine} onPress={handleMoveUp(field.value.field)} />
                   </XStack>
                   <XStack>
-                    <VoxButton size="lg" variant="soft" shrink iconLeft={ChevronDown} onPress={handleMoveDown(field.value.field)} />
+                    <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={ArrowDownToLine} onPress={handleMoveDown(field.value.field)} />
                   </XStack>
                   <XStack>
-                    <VoxButton size="lg" variant="soft" shrink iconLeft={X} onPress={handleUnSelect} />
+                    <VoxButton size="lg" variant="soft" backgroundColor="$white4" shrink iconLeft={X} onPress={handleUnSelect} />
                   </XStack>
                 </ToolBarFrame>
               ) : (

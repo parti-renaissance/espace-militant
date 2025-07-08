@@ -82,7 +82,7 @@ export const RenderField = memo((props: {
                   editorMethods={props.editorMethods}
                   displayToolbar={props.displayToolbar ?? true}
                 >
-                  {field?.value?.content ? <ImageRenderer data={field.value} edgePosition={props.edgePosition} /> : <EmptyImageRenderer data={field.value} />}
+                  {field?.value?.content ? <ImageRenderer data={field.value} edgePosition={props.edgePosition} displayToolbar={props.displayToolbar} /> : <EmptyImageRenderer data={field.value} />}
                 </NodeSelectorWrapper>
                 <Controller 
                   control={props.control}
@@ -119,7 +119,7 @@ export const RenderField = memo((props: {
                 displayToolbar={props.displayToolbar ?? true}
               >
                 {field.value.content ? (
-                  <ButtonRenderer data={field.value} edgePosition={props.edgePosition} />
+                  <ButtonRenderer data={field.value} edgePosition={props.edgePosition} displayToolbar={props.displayToolbar} />
                 ) : (
                   <EmptyButtonRenderer edgePosition={props.edgePosition} color={props.senderThemeColor} />
                 )}
@@ -159,7 +159,7 @@ export const RenderField = memo((props: {
                 displayToolbar={props.displayToolbar ?? true}
               >
                 {field.value.content && field.value.content.pure.length > 0 ? (
-                  <RichTextRenderer id={props.field.id} data={field.value} edgePosition={props.edgePosition} />
+                  <RichTextRenderer id={props.field.id} data={field.value} edgePosition={props.edgePosition} displayToolbar={props.displayToolbar} />
                 ) : (
                   <EmptyRichTextRender data={field.value} edgePosition={props.edgePosition} />
                 )}
