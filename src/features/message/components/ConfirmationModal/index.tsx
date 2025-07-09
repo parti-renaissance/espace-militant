@@ -9,9 +9,11 @@ import ViewportModalSheet, { ViewportModalRef } from './ViewportModalSheet'
 import Text from '@/components/base/Text'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 import SenderView from '../SenderView'
+import { useToastController } from '@tamagui/toast'
 
 const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: string; scope: string } }>((props, ref) => {
   const modalSheetRef = useRef<ViewportModalRef>(null)
+  const toast = useToastController()
   const { data: isMessageTilSync, isLoading: isSyncLoading, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ payload: props.payload?.messageId && props.payload?.scope ? { messageId: props.payload.messageId, scope: props.payload.scope } : undefined })
 
   const { data: recipients, isLoading: isLoadingRecipients } = useGetMessageCountRecipients({
@@ -29,10 +31,11 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
     mutate({ scope: props.payload?.scope || '' })
   }
 
-  // const handleSendTestMessage = () => {
-  //   if (isSyncLoading) return
-  //   mutate({ scope: props.payload?.scope || '', test: true })
-  // }
+  const handleSendTestMessage = () => {
+    if (isSyncLoading) return
+    toast.show('Test envoyé', { message: 'Le test a été envoyé avec succès', type: 'success' })
+    mutate({ scope: props.payload?.scope || '', test: true })
+  }
 
   const handleCopyUrl = useHandleCopyUrl()
 
@@ -150,6 +153,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
                       iconLeft={ExternalLink}
                       flexGrow={1}
                       disabled={allDisabled}
+                      onLongPress={handleSendTestMessage}
                     >
                       Aperçu version email
                     </VoxButton>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useMemo } from 'react'
 import { Keyboard } from 'react-native'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
@@ -7,10 +7,10 @@ import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import StickyBox from '@/components/StickyBox/StickyBox'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
-import { useCreateMessage } from '@/services/messages/hook'
+import { useCreateMessage, useGetAvailableSenders, useGetMessage } from '@/services/messages/hook'
 import * as types from '@/services/messages/schema'
 import { PenLine, Speech } from '@tamagui/lucide-icons'
-import { Link, router } from 'expo-router'
+import { Link, router, useLocalSearchParams } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
 import ModalSender from '../../components/ConfirmationModal'
@@ -21,6 +21,9 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
   const editorRef = useRef<MessageEditorRef>(null)
   const modalSendRef = useRef<ViewportModalRef>(null)
   const media = useMedia()
+  const searchParams = useLocalSearchParams<{ scope?: string }>()
+  const scopeFromQuery = searchParams?.scope
+  
   const [message, setMessage] = useState<
     | {
       messageId: string
@@ -31,6 +34,34 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
 
   const messageQuery = useCreateMessage({ uuid: props?.edit?.uuid })
+  
+  // Récupérer les données du message et des senders pour le HTML
+  const messageQueryParams = useMemo(() => ({
+    messageId: props?.edit?.uuid ?? '', 
+    scope: scopeFromQuery ?? props?.scope ?? '', 
+    enabled: !!props?.edit?.uuid
+  }), [props?.edit?.uuid, scopeFromQuery, props?.scope])
+  
+  const { data: messageData } = useGetMessage(messageQueryParams)
+  
+  const availableSendersQueryParams = useMemo(() => ({
+    scope: messageData?.author.scope ?? scopeFromQuery ?? props?.scope ?? ''
+  }), [messageData?.author.scope, scopeFromQuery, props?.scope])
+  
+  const { data: availableSenders } = useGetAvailableSenders(availableSendersQueryParams)
+  
+  // Déterminer le sender à utiliser pour le HTML
+  const senderForHtml = useMemo(() => {
+    // Pour les messages existants, utiliser le sender du message
+    if (messageData?.sender) {
+      return messageData.sender
+    }
+    // Pour les nouveaux messages, utiliser le premier sender disponible
+    if (availableSenders && availableSenders.length > 0) {
+      return availableSenders[0]
+    }
+    return null
+  }, [messageData?.sender, availableSenders])
 
   const handleSubmit = (x: S.Message) => {
     return messageQuery
@@ -41,7 +72,7 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
           subject: x.metaData.subject,
           label: x.metaData.subject,
           json_content: JSON.stringify(x),
-          content: getHTML(defaultTheme, x),
+          content: getHTML(defaultTheme, x, senderForHtml),
         },
       })
       .then((result) => {

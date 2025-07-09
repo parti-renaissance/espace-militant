@@ -2,6 +2,7 @@ import { buttonRenderer } from '@/features/message/components/Editor/HtmlOneRend
 import { imageRenderer } from '@/features/message/components/Editor/HtmlOneRenderer/htmlImageNodeRenderer'
 import { richTextRenderer } from '@/features/message/components/Editor/HtmlOneRenderer/htmlRichTextNodeRender'
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
+import { RestAvailableSendersResponse } from '@/services/messages/schema'
 import { containerRenderer } from './htmlContainerRenderer'
 
 const renderNode = (props: { theme: S.MessageStyle; data: S.Node; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
@@ -18,7 +19,11 @@ const renderNode = (props: { theme: S.MessageStyle; data: S.Node; edgePosition?:
   }
 }
 
-const htmlNodeRenderer = (props: { data: S.Message; theme: S.MessageStyle }) => {
+const htmlNodeRenderer = (props: { 
+  data: S.Message; 
+  theme: S.MessageStyle;
+  sender?: RestAvailableSendersResponse[number] | null;
+}) => {
   const getFieldEdge = (index: number) => {
     if (index === 0 && props.data?.content.length === 1) {
       return 'alone'
@@ -32,11 +37,13 @@ const htmlNodeRenderer = (props: { data: S.Message; theme: S.MessageStyle }) => 
 
   return containerRenderer({
     theme: props.theme,
-    data:
+    content:
       props.data?.content
         .map((item, index) => renderNode({ data: item, edgePosition: getFieldEdge(index), theme: props.theme }))
         .filter(Boolean)
         .join('') ?? '',
+    sender: props.sender,
+    subject: props.data?.metaData?.subject,
   })
 }
 
