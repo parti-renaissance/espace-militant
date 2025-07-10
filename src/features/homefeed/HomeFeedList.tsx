@@ -6,10 +6,14 @@ import { transformFeedItemToProps } from '@/helpers/homeFeed'
 import { useAlerts } from '@/services/alerts/hook'
 import { useGetPaginatedFeed } from '@/services/timeline-feed/hook'
 import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
+import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { useScrollToTop } from '@react-navigation/native'
 import { useFocusEffect } from 'expo-router'
-import { getToken, Spinner, useMedia, YStack } from 'tamagui'
+import { getToken, Spinner, useMedia, YStack, XStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
+import { Sparkle } from '@tamagui/lucide-icons'
+import { VoxButton } from '@/components/Button'
+import { Link } from 'expo-router'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
@@ -27,6 +31,7 @@ const HomeFeedList = () => {
   const shouldShowNotificationCard = useShouldShowNotificationCard()
   const { data: paginatedFeed, fetchNextPage, hasNextPage, ...feedQuery } = useGetPaginatedFeed()
   const { data: alerts, ...alertQuery } = useAlerts()
+  const { hasFeature } = useGetExecutiveScopes()
   const feedData = paginatedFeed?.pages.map((page) => page?.hits ?? []).flat()
 
   const refetch = () => {
@@ -71,15 +76,24 @@ const HomeFeedList = () => {
           <YStack gap={8} $gtSm={{ gap: 16, }}>
             {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
             {alerts.length > 0 ? <AlertStack alerts={alerts} /> : null}
-            {alerts.length > 0 ? (
-              <Text.MD color="$gray4" semibold px="$medium" $gtSm={{ px: 0 }}>
-              Dernières actualités
-            </Text.MD>
+            {alerts.length > 0 && hasFeature('publications') ? (
+              <XStack justifyContent="space-between" alignItems="center" px="$medium" $gtSm={{ px: 0 }}>
+                <Text.MD color="$gray4" semibold>
+                  Dernières actualités
+                </Text.MD>
+                {hasFeature('publications') && (
+                  <Link href="/messages" asChild>
+                    <VoxButton variant="soft" size="sm" theme="purple" iconLeft={Sparkle}>
+                      Nouvelle publication
+                    </VoxButton>
+                  </Link>
+                )}
+              </XStack>
             ) : null}
           </YStack>
         )
       : null
-  ), [alerts, shouldShowNotificationCard])
+  ), [alerts, shouldShowNotificationCard, hasFeature])
 
   return (
     <FlatList
