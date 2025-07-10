@@ -52,6 +52,17 @@ const HomeFeedList = () => {
     }, []),
   )
 
+  console.log(
+    feedData
+      ?.filter((item) => item.type === 'publication')
+      .map((item) => {
+        // Remove all keys that are null
+        return Object.fromEntries(
+          Object.entries(item).filter(([_, v]) => v !== null)
+        )
+      })
+  );
+
   const loadMore = useDebouncedCallback(loadMoreGeneric, 1000, { leading: true, trailing: false })
 
   const { isWebPageLayoutScrollActive } = usePageLayoutScroll({

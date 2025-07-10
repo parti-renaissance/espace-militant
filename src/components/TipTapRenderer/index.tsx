@@ -8,6 +8,17 @@ import * as U from './utils'
 
 type RenderFn<A, P extends object = Record<string, unknown>> = (props: { data: A } & P) => React.ReactNode
 
+// Composant wrapper pour limiter le nombre de lignes
+const LimitedContent = ({ children, numberOfLines }: { children: React.ReactNode; numberOfLines?: number }) => {
+  if (!numberOfLines) return <>{children}</>
+
+  return (
+    <Text.SM numberOfLines={numberOfLines} multiline>
+      {children}
+    </Text.SM>
+  )
+}
+
 const RenderNonSupported: RenderFn<S.TipNonSupported> = () => null
 
 const RenderHardBreak: RenderFn<S.TipHardBreak> = () =>
@@ -62,9 +73,9 @@ const RenderParagraph: RenderFn<S.TipParagraph> = ({ data }) => {
 
 const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
   const { level } = data.attrs
-  
+
   if (!data.content) return null
-  
+
   return data.content.map((x, i) => {
     if (U.isTipNonSupported(x)) return <RenderNonSupported key={x.type + i} data={x} />
     if (U.isTipText(x)) {
@@ -80,7 +91,7 @@ const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
         6: 14,
       }
       const fontSize = fontSizeMap[level as keyof typeof fontSizeMap] || 16
-      
+
       if (link) {
         return (
           <Link href={link.attrs.href as Href} target="_blank">
@@ -96,7 +107,7 @@ const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
           </Link>
         )
       }
-      
+
       return (
         <Text
           fontSize={fontSize}
@@ -114,13 +125,13 @@ const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
 
 type ListItemOptions = {
   options?:
-    | {
-        type: 'bullet'
-      }
-    | {
-        type: 'number'
-        number: number
-      }
+  | {
+    type: 'bullet'
+  }
+  | {
+    type: 'number'
+    number: number
+  }
 }
 
 const RenderListItem: RenderFn<S.TipListItem, ListItemOptions> = ({ data: { content }, options }) => {
@@ -159,9 +170,10 @@ const RenderOrderedList: RenderFn<S.TipOrderedList> = ({ data: { content } }) =>
   )
 }
 
-export const RenderContent: RenderFn<S.TipContent[], { id?: string }> = ({ data, ...props }) => {
+export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLines?: number }> = ({ data, numberOfLines, ...props }) => {
   const id = props.id ?? 'no-id'
-  return data.map((x, i) => {
+
+  const content = data.map((x, i) => {
     if (U.isTipNonSupported(x)) {
       return <RenderNonSupported key={id + i + x.type} data={x} />
     }
@@ -184,16 +196,22 @@ export const RenderContent: RenderFn<S.TipContent[], { id?: string }> = ({ data,
 
     return null
   })
+
+  return <LimitedContent numberOfLines={numberOfLines}>{content}</LimitedContent>
 }
 
-export const TipTapRenderer = (props: { content: string; id?: string }) => {
+export const TipTapRenderer = (props: { content: string; id?: string; numberOfLines?: number }) => {
   const { content, type } = U.parseJsonEditorContent(props.content)
   if (type === 'string') {
-    return <VoxCard.Description markdown>{content}</VoxCard.Description>
+    return (
+      <LimitedContent numberOfLines={props.numberOfLines}>
+        <VoxCard.Description markdown>{content}</VoxCard.Description>
+      </LimitedContent>
+    )
   } else {
     return (
       <YStack>
-        <RenderContent id={props.id} data={content.content} />
+        <RenderContent id={props.id} data={content.content} numberOfLines={props.numberOfLines} />
       </YStack>
     )
   }

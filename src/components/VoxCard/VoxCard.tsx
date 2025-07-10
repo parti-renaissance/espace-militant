@@ -223,9 +223,10 @@ export type VoxCardDescriptionProps = {
   children: string | string[]
   full?: boolean
   markdown?: boolean
+  numberOfLines?: number
 }
 
-const VoxCardDescription = ({ children, full, markdown }: VoxCardDescriptionProps) => {
+const VoxCardDescription = ({ children, full, markdown, numberOfLines }: VoxCardDescriptionProps) => {
   const theme = useTheme()
   return markdown ? (
     <Markdown
@@ -241,7 +242,7 @@ const VoxCardDescription = ({ children, full, markdown }: VoxCardDescriptionProp
       {children}
     </Markdown>
   ) : (
-    <Text.SM numberOfLines={full ? undefined : 3} multiline>
+    <Text.SM numberOfLines={numberOfLines ?? (full ? undefined : 3)} multiline>
       {children}
     </Text.SM>
   )

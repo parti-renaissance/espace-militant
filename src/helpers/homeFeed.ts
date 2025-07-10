@@ -17,6 +17,8 @@ const transformFeedItemType = (type: RestTimelineFeedItem['type']): FeedCardProp
     case 'pap-campaign':
     case 'survey':
       return 'action'
+    case 'publication':
+      return 'publication'
   }
 }
 
@@ -34,6 +36,8 @@ const transformFeedItemTypeToTag = (type: RestTimelineFeedItem['type']) => {
       return 'Campagne PAP'
     case 'survey':
       return 'Enquête'
+    case 'publication':
+      return 'Publication'
   }
 }
 
@@ -106,6 +110,15 @@ export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardPr
           //   count: 40,
           // },
         },
+      }
+    case 'publication':
+      return {
+        type,
+        title: feed.title,
+        description: feed.description,
+        author: feed.author || undefined,
+        date: feed.date,
+        uuid: feed.objectID,
       }
   }
 }
