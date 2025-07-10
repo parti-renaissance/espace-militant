@@ -260,7 +260,8 @@ const VoxHeaderFrameModal = (props: React.ComponentProps<typeof VoxHeaderFrameSt
 const VoxHeaderLeftButtonFrame = styled(ThemeableStack, {
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 4,
+  cursor: 'pointer',
+  gap: 8,
   $md: {
     minWidth: 36,
     // height: 36,
