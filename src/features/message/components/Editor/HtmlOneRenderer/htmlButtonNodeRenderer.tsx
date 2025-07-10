@@ -26,7 +26,7 @@ export const buttonRenderer = (props: { theme: S.MessageStyle; data: S.ButtonNod
   >
       <tbody style="width: 100%">
           <tr style="width: 100%">
-              <td data-id="__react-email-column" style="${stringifyCSSProperties({ paddingTop, paddingBottom, paddingLeft, paddingRight } as CSSProperties)}">
+              <td data-id="__react-email-column" class="padding-responsive" style="${stringifyCSSProperties({ paddingTop, paddingBottom, paddingLeft, paddingRight } as CSSProperties)}">
                   <a
                       href="${props.data.content.link ?? 'parti.re'}"
                       style="

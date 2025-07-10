@@ -44,6 +44,17 @@ export const paragraphSchema = z.object({
 
 export type TipParagraph = z.infer<typeof paragraphSchema>
 
+// Titres H1 à H6
+export const headingSchema = z.object({
+  type: z.literal('heading'),
+  attrs: z.object({
+    level: z.number().min(1).max(6),
+  }),
+  content: z.array(textSchema.or(hardBreakSchema).or(nonSupportedSchema)).optional(),
+})
+
+export type TipHeading = z.infer<typeof headingSchema>
+
 export const listItemSchema = z.object({
   type: z.literal('listItem'),
   content: z.array(paragraphSchema),
@@ -68,7 +79,7 @@ export const bulletListSchema = z.object({
 
 export type TipBulletList = z.infer<typeof bulletListSchema>
 
-const contentSchema = z.union([paragraphSchema, orderedListSchema, bulletListSchema, nonSupportedSchema])
+const contentSchema = z.union([paragraphSchema, headingSchema, orderedListSchema, bulletListSchema, nonSupportedSchema])
 
 export type TipContent = z.infer<typeof contentSchema>
 

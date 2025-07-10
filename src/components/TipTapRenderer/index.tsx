@@ -60,6 +60,58 @@ const RenderParagraph: RenderFn<S.TipParagraph> = ({ data }) => {
   )
 }
 
+const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
+  const { level } = data.attrs
+  
+  if (!data.content) return null
+  
+  return data.content.map((x, i) => {
+    if (U.isTipNonSupported(x)) return <RenderNonSupported key={x.type + i} data={x} />
+    if (U.isTipText(x)) {
+      const marks = x.marks?.map(({ type }) => type)
+      const link = x.marks?.find(U.isTipLinkMark)
+
+      const fontSizeMap = {
+        1: 20,
+        2: 18,
+        3: 17,
+        4: 16,
+        5: 15,
+        6: 14,
+      }
+      const fontSize = fontSizeMap[level as keyof typeof fontSizeMap] || 16
+      
+      if (link) {
+        return (
+          <Link href={link.attrs.href as Href} target="_blank">
+            <Text
+              fontSize={fontSize}
+              color="$blue5"
+              textDecorationLine="underline"
+              fontWeight={marks?.includes('bold') ? '700' : '600'}
+              fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}
+            >
+              {x.text}
+            </Text>
+          </Link>
+        )
+      }
+      
+      return (
+        <Text
+          fontSize={fontSize}
+          fontWeight={marks?.includes('bold') ? '700' : '600'}
+          fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}
+        >
+          {x.text}
+        </Text>
+      )
+    }
+    if (U.isTipHardBreak(x)) return <RenderHardBreak key={x.type + i} data={x} />
+    return null
+  })
+}
+
 type ListItemOptions = {
   options?:
     | {
@@ -116,6 +168,10 @@ export const RenderContent: RenderFn<S.TipContent[], { id?: string }> = ({ data,
 
     if (U.isTipParagraph(x)) {
       return <RenderParagraph key={id + i + x.type} data={x} />
+    }
+
+    if (U.isTipHeading(x)) {
+      return <RenderHeading key={id + i + x.type} data={x} />
     }
 
     if (U.isTipBulletList(x)) {

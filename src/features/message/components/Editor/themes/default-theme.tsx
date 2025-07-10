@@ -63,6 +63,9 @@ export default {
         borderRadius: 0,
       },
     },
+    trailing: {
+      container: { paddingBottom: 24 },
+    },
     alone: {
       wrapper: {},
       container: {},

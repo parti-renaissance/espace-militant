@@ -2,23 +2,37 @@ import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useGetIsMessageTilSync, useSendMessage, useGetMessageCountRecipients } from '@/services/messages/hook'
+import { RestAvailableSender } from '@/services/messages/schema'
 import { AlertTriangle, ArrowLeft, ExternalLink, Link as LinkIcon, RefreshCcw, SendHorizontal } from '@tamagui/lucide-icons'
 import { ExternalPathString, Link, router } from 'expo-router'
-import { isWeb, Spinner, View, XStack, YStack } from 'tamagui'
+import { isWeb, Spinner, useMedia, View, XStack, YStack } from 'tamagui'
 import ViewportModalSheet, { ViewportModalRef } from './ViewportModalSheet'
 import Text from '@/components/base/Text'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 import SenderView from '../SenderView'
+import { useToastController } from '@tamagui/toast'
 
-const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: string; scope: string } }>((props, ref) => {
+type ConfirmationModalProps = {
+  payload?: { 
+    messageId: string; 
+    scope: string 
+  }
+  defaultSender?: RestAvailableSender
+}
+
+const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>(({ payload, defaultSender }, ref) => {
   const modalSheetRef = useRef<ViewportModalRef>(null)
-  const { data: isMessageTilSync, isLoading: isSyncLoading, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ payload: props.payload?.messageId && props.payload?.scope ? { messageId: props.payload.messageId, scope: props.payload.scope } : undefined })
+  const toast = useToastController()
+  const media = useMedia()
+  const { data: isMessageTilSync, isLoading: isSyncLoading, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ payload: payload?.messageId && payload?.scope ? { messageId: payload.messageId, scope: payload.scope } : undefined })
 
   const { data: recipients, isLoading: isLoadingRecipients } = useGetMessageCountRecipients({
-    messageId: props.payload?.messageId || '',
-    scope: props.payload?.scope || '',
-    enabled: Boolean(props.payload?.messageId && props.payload?.scope),
+    messageId: payload?.messageId || '',
+    scope: payload?.scope || '',
+    enabled: Boolean(payload?.messageId && payload?.scope),
   })
+
+  const isLoadingNumbers = isSyncLoading || isLoadingRecipients
 
   const { mutate, isPending } = useSendMessage({
     uuid: isMessageTilSync?.uuid || ''
@@ -26,25 +40,30 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
 
   const handleSendMessage = () => {
     if (isSyncLoading) return
-    mutate({ scope: props.payload?.scope || '' })
+    mutate({ scope: payload?.scope || '' })
   }
 
-  // const handleSendTestMessage = () => {
-  //   if (isSyncLoading) return
-  //   mutate({ scope: props.payload?.scope || '', test: true })
-  // }
+  const handleSendTestMessage = () => {
+    if (isSyncLoading) return
+    toast.show('Test envoyé', { message: 'Le test a été envoyé avec succès', type: 'success' })
+    mutate({ scope: payload?.scope || '', test: true })
+  }
 
   const handleCopyUrl = useHandleCopyUrl()
 
   useImperativeHandle(ref, () => modalSheetRef.current!)
 
   const handleCancel = () => {
-    router.replace({
-      pathname: '/messages/[id]/editer',
-      params: {
-        id: props.payload?.messageId ? props.payload.messageId : '',
-      },
-    })
+    if (payload?.messageId) {
+      return
+    } else {
+      router.replace({
+        pathname: '/messages/[id]/editer',
+        params: {
+          id: payload?.messageId ? payload.messageId : '',
+        },
+      })
+    }
   }
 
   const allDisabled = !!syncError || isSyncLoading || isLoadingRecipients || isPending
@@ -55,7 +74,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
         <Text.LG>Prêt à publier ?</Text.LG>
         {/* TODO: add sender preview */}
         <YStack gap="$medium">
-          <SenderView sender={isMessageTilSync?.sender || null} />
+          <SenderView sender={isMessageTilSync?.sender || defaultSender || null} />
           <Text.LG semibold>{isMessageTilSync?.subject}</Text.LG>
         </YStack>
         <YStack gap="$medium" position="relative">
@@ -66,7 +85,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
                   <AlertTriangle color="#D02828" size="$medium" />
                   <Text.LG color="#D02828" textAlign="center"> Nous n'avons pas pu synchroniser{'\n'}les données de votre publication</Text.LG>
                   <YStack>
-                    <VoxButton variant="outlined" iconLeft={RefreshCcw} onPress={() => { refetchSync() }}>Réessayer</VoxButton>
+                    <VoxButton variant="outlined" iconLeft={RefreshCcw} disabled={isSyncLoading} loading={isSyncLoading} onPress={() => { refetchSync() }}>Réessayer</VoxButton>
                   </YStack>
                 </VoxCard.Content>
               </VoxCard>
@@ -75,21 +94,21 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
           <View gap="$small" $gtSm={{ flexDirection: 'row' }}>
             <VoxCard inside backgroundColor="$gray1" justifyContent="center" alignItems="center">
             <VoxCard.Content justifyContent="center" alignItems="center" gap="$small">
-                {isLoadingRecipients ? (
+                {isLoadingNumbers ? (
                   <View alignItems="center" justifyContent="center" height={52}>
                     <Spinner color="$purple5" />
                   </View>
                 ) : (
                   <Text color="$purple5" fontSize={40} lineHeight={52} semibold>{recipients?.contacts ?? 0}</Text>
                 )}
-                <Text.LG semibold>Contacts notifiés</Text.LG>
+                <Text.LG textAlign='center' semibold>Contacts{ media.gtSm ? <Text.BR/> : ' '}notifiés</Text.LG>
               </VoxCard.Content>
             </VoxCard>
             <YStack gap="$small" flexGrow={1} flexShrink={1}>
               <VoxCard inside backgroundColor="$gray1">
                 <VoxCard.Content>
                   <XStack gap="$xsmall" alignItems="center" height={20}>
-                    {isLoadingRecipients ? (
+                    {isLoadingNumbers ? (
                       <Spinner color="$purple5" />
                     ) : (
                       <Text.LG color="$purple5" semibold>{recipients?.push ?? 0}</Text.LG>
@@ -101,7 +120,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
               <VoxCard inside backgroundColor="$gray1">
                 <VoxCard.Content>
                   <XStack gap="$xsmall" alignItems="center" height={20}>
-                    {isLoadingRecipients ? (
+                    {isLoadingNumbers ? (
                       <Spinner color="$purple5" />
                     ) : (
                       <Text.LG color="$purple5" semibold>{recipients?.email ?? 0}</Text.LG>
@@ -113,7 +132,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
               <VoxCard inside backgroundColor="$gray1">
                 <VoxCard.Content>
                   <XStack gap="$xsmall" alignItems="center" height={20}>
-                    {isLoadingRecipients ? (
+                    {isLoadingNumbers ? (
                       <Spinner color="$purple5" />
                     ) : (
                       <Text.LG color="$purple5" semibold>{recipients?.push_email ?? 0}</Text.LG>
@@ -150,6 +169,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, { payload?: { messageId: 
                       iconLeft={ExternalLink}
                       flexGrow={1}
                       disabled={allDisabled}
+                      // onLongPress={handleSendTestMessage}
                     >
                       Aperçu version email
                     </VoxButton>

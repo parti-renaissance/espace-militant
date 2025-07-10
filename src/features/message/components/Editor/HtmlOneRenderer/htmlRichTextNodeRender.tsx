@@ -23,7 +23,7 @@ export const richTextRenderer = (props: { theme: S.MessageStyle; data: S.RichTex
   >
     <tbody>
       <tr style="width:100%;" >
-        <td style="${stringifyCSSProperties(containerStyle as CSSProperties)}">
+        <td class="padding-responsive" style="${stringifyCSSProperties(containerStyle as CSSProperties)}">
         ${htmlWithMinHeight}
         </td>
       </tr>

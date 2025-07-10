@@ -22,17 +22,62 @@ const customFont = (primary?: boolean) => `
 ${PublicSans}
 * {
     font-family: 'Public Sans', sans-serif;
-    font-size: 12px;
     color: ${primary ? 'hsl(211,24%, 17%)' : 'hsl(208, 13%, 45%)'};
 }
 
 p, li {
+  font-size: 12px;
   line-height: 20px;
   margin: 0;
 }
 
 ol, ul {
   padding-left: 24px;
+}
+
+a {
+  color: #4b85be !important;
+  text-decoration: underline;
+}
+
+h1, h1 * {
+  font-size: 20px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h1 strong, h1 b, h2 strong, h2 b, h3 strong, h3 b, h4 strong, h4 b, h5 strong, h5 b, h6 strong, h6 b {
+  font-weight: bolder !important;
+}
+
+h2, h2 * {
+  font-size: 18px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h3, h3 * {
+  font-size: 17px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h4, h4 * {
+  font-size: 16px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h5, h5 * {
+  font-size: 15px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h6, h6 * {
+  font-size: 14px !important;
+  font-weight: 600;
+  margin: 0;
 }
 `
 
@@ -50,6 +95,51 @@ p, li {
 
 ol, ul {
   padding-left: 28px;
+}
+
+a {
+  color: #4b85be !important;
+  text-decoration: underline;
+}
+
+h1 strong, h1 b, h2 strong, h2 b, h3 strong, h3 b, h4 strong, h4 b, h5 strong, h5 b, h6 strong, h6 b {
+  font-weight: bolder !important;
+}
+
+h1, h1 * {
+  font-size: 20px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h2, h2 * {
+  font-size: 18px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h3, h3 * {
+  font-size: 17px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h4, h4 * {
+  font-size: 16px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h5, h5 * {
+  font-size: 15px !important;
+  font-weight: 600;
+  margin: 0;
+}
+
+h6, h6 * {
+  font-size: 14px !important;
+  font-weight: 600;
+  margin: 0;
 }
 `
 

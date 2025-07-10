@@ -28,7 +28,7 @@ export const imageRenderer = (props: { theme: S.MessageStyle; data: S.ImageNode;
   >
       <tbody style="width: 100%">
           <tr style="width: 100%">
-              <td data-id="__react-email-column" style="${stringifyCSSProperties(containerStyle as CSSProperties)}">
+              <td data-id="__react-email-column" ${props.edgePosition === 'leading' ? '' : 'class="padding-responsive"'} style="${stringifyCSSProperties(containerStyle as CSSProperties)}">
                   <img
                       src="${url}"
                       style="${stringifyCSSProperties({ ...dynStyle, ...baseStyle } as CSSProperties)}; margin: 0 !important;"

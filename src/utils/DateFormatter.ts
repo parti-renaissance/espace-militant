@@ -1,4 +1,4 @@
-import { differenceInDays, format, formatDistanceToNow } from 'date-fns'
+import { differenceInDays, format, formatDistanceToNowStrict } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
 export const DateFormatter = {
@@ -13,7 +13,7 @@ export function relativeDateFormatter(dateString: string) {
   const daysDiff = differenceInDays(now, date);
 
   if (daysDiff < 7) {
-    return `il y a ${formatDistanceToNow(date, { addSuffix: false, locale: fr })}`;
+    return `il y a ${formatDistanceToNowStrict(date, { addSuffix: false, locale: fr })}`;
   } else {
     return `le ${format(date, 'dd/MM/yyyy', { locale: fr })}`;
   }
