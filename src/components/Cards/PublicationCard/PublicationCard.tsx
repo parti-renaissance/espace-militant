@@ -1,7 +1,7 @@
 import React from 'react'
 import { RestTimelineFeedAuthor } from '@/services/timeline-feed/schema'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import SenderView from '@/features/message/components/SenderView'
+import SenderView, { SenderViewProps } from '@/features/message/components/SenderView'
 import { relativeDateFormatter } from '@/utils/DateFormatter'
 import { VoxButton } from '@/components/Button'
 import { Eye } from '@tamagui/lucide-icons'
@@ -122,7 +122,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
     <VoxCard>
       <VoxCard.Content padding={0} gap={0}>
         <YStack px="$medium" pt="$medium" pb="$small" gap="$medium">
-          {author && author.first_name && author.last_name && author.uuid && <SenderView sender={author as any} datetime={date ? relativeDateFormatter(date) : undefined} />}
+          {author && author.first_name && author.last_name && author.uuid && <SenderView sender={author as SenderViewProps} datetime={date ? relativeDateFormatter(date) : undefined} />}
           <Text.LG semibold>{title}</Text.LG>
         </YStack>
         {renderContent()}

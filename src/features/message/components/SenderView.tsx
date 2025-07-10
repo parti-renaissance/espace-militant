@@ -3,7 +3,6 @@ import { XStack, YStack } from "tamagui"
 import Text from "@/components/base/Text"
 import ProfilePicture from "@/components/ProfilePicture"
 import { Clock } from "@tamagui/lucide-icons"
-import { RestAvailableSendersResponse } from "@/services/messages/schema"
 
 export type SenderProfileProps = {
   sender: {
@@ -40,7 +39,24 @@ const SenderProfile = ({ sender }: SenderProfileProps) => {
 
 SenderProfile.displayName = 'SenderProfile'
 
-export const SenderView = ({sender, datetime}: {sender: RestAvailableSendersResponse[number] | null, datetime?: string}) => {
+export type SenderViewProps = {
+  uuid: string
+  first_name: string
+  last_name: string
+  role?: string | null
+  image_url?: string | null
+  theme: {
+    soft: string
+    hover: string
+    active: string
+    primary: string
+  } | null
+  instance?: string | null
+  zone?: string | null
+  scope?: string | null
+}
+
+export const SenderView = ({sender, datetime}: {sender: SenderViewProps | null, datetime?: string}) => {
 
   const senderProps = useMemo(() => {
     if (!sender) {
