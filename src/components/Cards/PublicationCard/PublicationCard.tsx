@@ -1,0 +1,137 @@
+import React from 'react'
+import { RestTimelineFeedAuthor } from '@/services/timeline-feed/schema'
+import VoxCard from '@/components/VoxCard/VoxCard'
+import SenderView, { SenderViewProps } from '@/features/message/components/SenderView'
+import { relativeDateFormatter } from '@/utils/DateFormatter'
+import { VoxButton } from '@/components/Button'
+import { Eye } from '@tamagui/lucide-icons'
+import { router } from 'expo-router'
+import Text from '@/components/base/Text'
+import { RichTextRenderer } from '@/features/message/components/Editor/NodeRenderer/RichTextRenderer'
+import { ImageRenderer } from '@/features/message/components/Editor/NodeRenderer/ImageRenderer'
+import { ButtonRenderer } from '@/features/message/components/Editor/NodeRenderer/ButtonRenderer'
+import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
+import { XStack, YStack } from 'tamagui'
+
+export type PublicationCardProps = {
+  title?: string | null
+  description?: string | null
+  author?: RestTimelineFeedAuthor
+  date?: string | null
+  uuid?: string | null
+  showFullContent?: boolean
+}
+
+const PublicationCard = ({ title, description, author, date, uuid, showFullContent = false }: PublicationCardProps) => {
+  const renderContent = () => {
+    if (!description) return null
+
+    try {
+      const parsed = JSON.parse(description)
+      if (parsed.content && Array.isArray(parsed.content)) {
+        if (showFullContent) {
+          return (
+            <YStack pt="$small" gap="$small">
+              {parsed.content.map((item: S.Node, index: number) => {
+                if (item.type === 'image') {
+                  return (
+                    <ImageRenderer
+                      key={`content-image-${index}`}
+                      data={item as S.ImageNode}
+                      edgePosition={index === 0 ? "leading" : undefined}
+                      displayToolbar={false}
+                    />
+                  )
+                }
+                if (item.type === 'richtext') {
+                  return (
+                    <RichTextRenderer
+                      key={`content-text-${index}`}
+                      id={`content-text-${index}`}
+                      data={item as S.RichTextNode}
+                      displayToolbar={false}
+                    />
+                  )
+                }
+                if (item.type === 'button') {
+                  return (
+                    <ButtonRenderer
+                      key={`content-button-${index}`}
+                      data={item as S.ButtonNode}
+                      displayToolbar={false}
+                    />
+                  )
+                }
+                return null
+              })}
+            </YStack>
+          )
+        } else {
+          const nonButtonContent = parsed.content.filter((item: S.Node) => item.type !== 'button')
+          
+          if (nonButtonContent.length === 0) return null
+
+          const firstItem = nonButtonContent[0]
+          const firstTextItem = nonButtonContent.find((item: S.Node) => item.type === 'richtext')
+
+          if (firstItem.type === 'image') {
+            return (
+              <YStack pt="$small">
+                <ImageRenderer
+                  key="preview-image"
+                  data={firstItem as S.ImageNode}
+                  edgePosition="leading"
+                  displayToolbar={false}
+                />
+                {firstTextItem && (
+                  <RichTextRenderer
+                    key="preview-text"
+                    id="preview-text"
+                    data={firstTextItem as S.RichTextNode}
+                    displayToolbar={false}
+                    numberOfLines={3}
+                  />
+                )}
+              </YStack>
+            )
+          }
+
+          if (firstItem.type === 'richtext') {
+            return (
+              <RichTextRenderer
+                key="preview-text"
+                id="preview-text"
+                data={firstItem as S.RichTextNode}
+                displayToolbar={false}
+                numberOfLines={4}
+              />
+            )
+          }
+        }
+        
+        return null
+      }
+    } catch (e) {
+      return <Text.MD numberOfLines={showFullContent ? undefined : 3}>{description}</Text.MD>
+    }
+
+    return null
+  }
+
+  return (
+    <VoxCard>
+      <VoxCard.Content padding={0} gap={0}>
+        <YStack px="$medium" pt="$medium" pb="$small" gap="$medium">
+          {author && author.first_name && author.last_name && author.uuid && <SenderView sender={author as SenderViewProps} datetime={date ? relativeDateFormatter(date) : undefined} />}
+          <Text.LG semibold>{title}</Text.LG>
+        </YStack>
+        {renderContent()}
+        <XStack px="$medium" pb="$medium" pt="$small" gap="$medium" justifyContent="flex-end">
+          <VoxButton variant="outlined" theme="blue" iconLeft={Eye} size="sm" disabled={!uuid} onPress={() => { router.push({ pathname: '/messages/[id]/editer', params: { id: uuid ?? '' } }) }}>Lire la suite</VoxButton>
+        </XStack>
+      </VoxCard.Content>
+    </VoxCard>
+  )
+}
+
+export default PublicationCard 
