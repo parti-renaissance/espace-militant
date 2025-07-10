@@ -25,7 +25,7 @@ const FeedCard = (props: FeedCardProps) => {
     case 'news':
       return <NewsCard {...props} />
     default:
-      throw new Error('Invalid card type')
+      return null
   }
 }
 

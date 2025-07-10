@@ -44,7 +44,6 @@ export function getThemeStyle(theme: S.MessageStyle, _node?: S.Node, edgePositio
   const baseStyle = nodeHasMarks(node) ? flatNodeStyle('base', node, nodeTheme) : (nodeTheme.global?.base ?? {})
   const nodeWrapperStyle = { ...wrapperStyle, ...(nodeHasMarks(node) ? flatNodeStyle('wrapper', node, nodeTheme) : (nodeTheme.global?.wrapper ?? {})) }
   if (node.type === 'button' && node.content?.color) {
-    console.log('button content', node.content)
     const customColor = node.content.color
     const defaultColor = '#4291E1'
     

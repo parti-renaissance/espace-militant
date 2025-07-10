@@ -13,14 +13,14 @@ export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, avail
   }, [props.message?.sender, props.availableSenders])
 
   return (
-    <YStack gap="$medium" backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" padding="$medium" paddingBottom={props.displayToolbar ?  '$medium': 0}>
+    <YStack gap="$medium" backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ?  '$medium': 0}>
       <SenderView sender={senderToDisplay} datetime="1 min."/>
       <Controller
         control={props.control}
         name="metaData.subject"
         render={({ field, fieldState }) => {
           if (field.value && !props.displayToolbar) {
-            return <Text.LG semibold mb="$medium">{field.value}</Text.LG>
+            return <Text.LG semibold mb="$large">{field.value}</Text.LG>
           }
           return <Input placeholder="Titre de la publication" label="" color="gray" defaultValue={field.value} onBlur={field.onBlur} onChange={field.onChange} error={fieldState.error?.message} />
         }}

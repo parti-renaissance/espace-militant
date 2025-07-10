@@ -1,5 +1,5 @@
 import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
-import { RestAvailableSendersResponse, RestGetMessageResponse } from '@/services/messages/schema'
+import { RestAvailableSendersResponse } from '@/services/messages/schema'
 import htmlNodeRenderer from './htmlNodeRenderer'
 
 export const getHTML = (

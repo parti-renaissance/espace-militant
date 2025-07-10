@@ -11,7 +11,10 @@ const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | 
   const containerStyle: CSSProperties = {
     display: 'block',
     // width: '100%',
-    padding: '16px', // $medium
+    paddingLeft: '16px',
+    paddingRight: '16px',
+    paddingTop: '24px',
+    paddingBottom: '16px',
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: '16px',
     borderTopRightRadius: '16px',

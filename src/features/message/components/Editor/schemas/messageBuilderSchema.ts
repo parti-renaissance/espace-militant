@@ -65,7 +65,7 @@ export const ButtonNodeValidationSchema = z.object({
       .refine(
         (value) => {
           if (!value.trim()) return false
-          const regex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w.-]*)*\/?$/
+          const regex = /^(http:\/\/|https:\/\/)?(www\.)?[a-zA-Z0-9-_\.]+\.[a-zA-Z]+(:\d+)?(\/[a-zA-Z\d\.\-_]*)*[a-zA-Z.!@#$%&=-_'":,.?\d*)(]*$/
           return regex.test(value)
         },
         {

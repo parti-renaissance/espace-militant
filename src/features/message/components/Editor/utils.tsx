@@ -51,6 +51,12 @@ export const zipMessage = (states: S.MessageFormValues, struct: S.FieldsArray, m
     (acc, { id, type }) => {
       const node = states[type]?.[id]
       if (node) {
+        if (node.type === 'button' && node.content?.link) {
+          const link = node.content.link
+          if (!link.startsWith('http://') && !link.startsWith('https://')) {
+            node.content.link = `https://${link}`
+          }
+        }
         acc.content.push(node)
       }
       return acc

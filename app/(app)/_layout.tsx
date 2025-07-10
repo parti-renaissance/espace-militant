@@ -3,7 +3,7 @@ import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustratio
 import { VoxButton } from '@/components/Button'
 import { NavBar, ProfileNav, VoxHeader } from '@/components/Header/Header'
 import { PortalLayout } from '@/components/layouts/PortalLayout'
-import { ArrowLeft } from '@tamagui/lucide-icons'
+import { ArrowLeft, FileEdit } from '@tamagui/lucide-icons'
 import { Link, Stack, usePathname, useSegments } from 'expo-router'
 import { isWeb, useMedia, View, XStack } from 'tamagui'
 import ProfilHeader from '@/features/profil/components/PageHeader'
@@ -126,7 +126,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="messages/draft"
             options={{
-              header: () => { return <ProfilHeader title="Brouillons" hideOnMdUp={false} />}
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false} />}
             }}
           />
 
