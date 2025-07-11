@@ -42,7 +42,7 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
   const hasTicket = !!payload?.data?.ticket_url
 
   return (
-    <VoxCard {...props} borderRadius="$medium" overflow="hidden" key={`meeting-alert-${payload.title}`}>
+    <VoxCard key={`meeting-alert-${payload.title}`} borderRadius="$medium" overflow="hidden" {...props}>
       <VoxCard.Content gap="0">
         <XStack gap="$medium">
           {payload.image_url && <Image src={payload.image_url} width={91} height={91} borderRadius="$4" objectFit="cover" />}

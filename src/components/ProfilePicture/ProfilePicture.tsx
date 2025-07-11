@@ -70,4 +70,6 @@ const ProfilePicture = (props: ProfilePictureProps) => {
   )
 }
 
-export default (props: ComponentPropsWithRef<typeof ProfilePicture>) => <ProfilePicture {...props} key={props.src} />
+export default (props: ComponentPropsWithRef<typeof ProfilePicture>) => {
+  return <ProfilePicture key={props.src} {...props} />
+}

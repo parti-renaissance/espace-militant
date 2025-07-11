@@ -155,6 +155,8 @@ const MemoWrapper = memo(
     const displayBottomAddBar = props.edgePosition === 'alone' || props.edgePosition === 'trailing'
     const showAddBarTop = props.addBarOpenForFieldId === topKey
     const showAddBarBottom = props.addBarOpenForFieldId === bottomKey
+
+    console.log('addBarOpenForFieldId', props.addBarOpenForFieldId, showAddBarTop, topKey)
     return (
       <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition} error={Boolean(props.error)}>
         {props.displayToolbar && (
@@ -223,6 +225,7 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToo
               }
             }
             const handleShowAddBar = (key: string) => {
+              console.log('handleShowAddBar', key)
               addBarField.onChange(key)
               field.onChange(null)
             }

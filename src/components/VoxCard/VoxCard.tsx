@@ -212,9 +212,10 @@ export type VoxCardImageProps = {
 }
 
 const VoxCardImage = ({ image, large, imageData }: VoxCardImageProps) => {
+  const imageKey = imageData?.url ?? image
   return (
     <XStack borderRadius={large ? 0 : 8} overflow="hidden">
-      <AutoSizeImage key={imageData?.url ?? image} source={image} width={imageData?.width ?? undefined} height={imageData?.height ?? undefined} />
+      <AutoSizeImage key={imageKey} source={image} width={imageData?.width ?? undefined} height={imageData?.height ?? undefined} />
     </XStack>
   )
 }

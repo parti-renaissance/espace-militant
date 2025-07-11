@@ -1,14 +1,15 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { YStack, ScrollView, XStack } from 'tamagui'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import Text from '@/components/base/Text'
 import { RestGetMessageContentResponse, RestGetMessageResponse } from '@/services/publications/schema'
 import PublicationCard from '@/components/Cards/PublicationCard/PublicationCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { VoxHeader } from '@/components/Header/Header'
 import { useMedia } from 'tamagui'
+import CongratulationsModal from '../../components/CongratulationsModal'
 
 interface MessageDetailsScreenProps {
   data?: RestGetMessageResponse
@@ -95,6 +96,19 @@ export const MessageDetailsScreenDeny: React.FC<MessageDetailsScreenDenyProps> =
 }
 
 const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoading, error }) => {
+  const params = useLocalSearchParams()
+  const [showCongratulations, setShowCongratulations] = useState(false)
+
+  useEffect(() => {
+    if (params.congratulations) {
+      setShowCongratulations(true)
+    }
+  }, [params.congratulations])
+
+  const handleCloseCongratulations = () => {
+    setShowCongratulations(false)
+  }
+
   if (isLoading) {
     return <MessageDetailsScreenSkeleton />
   }
@@ -115,6 +129,7 @@ const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoa
           uuid={data.uuid}
         />
       </YStack>
+      <CongratulationsModal isOpen={showCongratulations} onClose={handleCloseCongratulations} />
     </ScrollView>
   )
 }
