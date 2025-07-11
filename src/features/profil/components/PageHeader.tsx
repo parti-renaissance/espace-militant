@@ -10,9 +10,11 @@ type ProfilHeaderProps = {
   title: string
   backArrow?: boolean
   hideOnMdUp?: boolean
+  forcedBackTitle?: string
+  backgroundColor?: string
 }
 
-const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true }: ProfilHeaderProps) => {
+const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forcedBackTitle, backgroundColor = 'white' }: ProfilHeaderProps) => {
   const router = useRouter()
   const navigation = useNavigation()
   const { gtSm } = useMedia()
@@ -27,7 +29,7 @@ const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true }: Prof
 
   return (
     <VoxHeader
-      backgroundColor="white"
+      backgroundColor={backgroundColor}
       {...(hideOnMdUp ? { $gtMd: { display: 'none' } } : {})}
     >
       <YStack flex={1} position="relative" minHeight={48}>
@@ -36,7 +38,7 @@ const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true }: Prof
             <VoxHeader.LeftButton 
               icon={ArrowLeft} 
               onPress={handleBack}
-              backTitle={gtSm ? 'Retour' : undefined}
+              backTitle={forcedBackTitle ? forcedBackTitle : (gtSm ? 'Retour' : undefined)}
             />
           ) : null }
         </XStack>
