@@ -18,7 +18,7 @@ export default function AppLayout() {
     '/messages',
   ]
   const isEditRoute = segments[1] === 'messages' && segments[3] === 'editer'
-  
+
   const shouldShowHeader = media.gtSm && !hideHeaderRoutes.includes(pathname) && !isEditRoute
   return (
     <PortalLayout>
@@ -103,7 +103,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="messages/index"
             options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false} />}
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false} /> }
             }}
           />
 
@@ -113,6 +113,10 @@ export default function AppLayout() {
               headerShown: false,
               gestureEnabled: false,
             }}
+          />
+
+          <Stack.Screen
+            name="messages/[id]"
           />
 
           <Stack.Screen
@@ -126,7 +130,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="messages/draft"
             options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false} />}
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false} /> }
             }}
           />
 

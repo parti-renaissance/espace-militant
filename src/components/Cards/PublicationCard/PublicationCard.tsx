@@ -126,9 +126,11 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
           <Text.LG semibold>{title}</Text.LG>
         </YStack>
         {renderContent()}
-        <XStack px="$medium" pb="$medium" pt="$small" gap="$medium" justifyContent="flex-end">
-          <VoxButton variant="outlined" theme="blue" iconLeft={Eye} size="sm" disabled={!uuid} onPress={() => { router.push({ pathname: '/messages/[id]/editer', params: { id: uuid ?? '' } }) }}>Lire la suite</VoxButton>
-        </XStack>
+        { !showFullContent ? (
+          <XStack px="$medium" pb="$medium" pt="$small" gap="$medium" justifyContent="flex-end">
+            <VoxButton variant="outlined" theme="blue" iconLeft={Eye} size="sm" disabled={!uuid} onPress={() => { router.push({ pathname: '/messages/[id]', params: { id: uuid ?? '' } }) }}>Lire la suite</VoxButton>
+          </XStack>
+        ) : <YStack pb="$medium"></YStack>}
       </VoxCard.Content>
     </VoxCard>
   )
