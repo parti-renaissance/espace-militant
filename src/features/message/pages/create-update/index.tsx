@@ -13,16 +13,19 @@ import { PenLine, Speech } from '@tamagui/lucide-icons'
 import { Link, router, useLocalSearchParams } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
-import ModalSender from '../../components/ConfirmationModal'
+import ConfirmationModal from '../../components/ConfirmationModal'
 import { ViewportModalRef } from '../../components/ConfirmationModal/ViewportModalSheet'
 import BigSwitch from '@/components/base/BigSwitch'
-
+import { RestAvailableSender } from '@/services/messages/schema'
+import { useToastController } from '@tamagui/toast'
+  
 const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse; scope?: string }) => {
   const editorRef = useRef<MessageEditorRef>(null)
   const modalSendRef = useRef<ViewportModalRef>(null)
   const media = useMedia()
   const searchParams = useLocalSearchParams<{ scope?: string }>()
   const scopeFromQuery = searchParams?.scope
+  const toast = useToastController()
   
   const [message, setMessage] = useState<
     | {
@@ -64,6 +67,10 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
   }, [messageData?.sender, availableSenders])
 
   const handleSubmit = (x: S.Message) => {
+    if (x?.content.length === 0) {
+      toast.show('Erreur', { message: 'Veuillez ajouter au moins un champ', type: 'error' })
+      return
+    }
     return messageQuery
       .mutateAsync({
         scope: x.metaData.scope ?? '',
@@ -115,7 +122,6 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
               <XStack>
                 <VoxButton
                   size="lg"
-                  variant="text"
                   loading={messageQuery.isPending}
                   disabled={messageQuery.isPending}
                   theme="purple"
@@ -146,7 +152,7 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
           editorRef.current?.unSelect()
         }}
       >
-        <ModalSender ref={modalSendRef} payload={message} />
+        <ConfirmationModal ref={modalSendRef} payload={message} defaultSender={senderForHtml as RestAvailableSender | null} isEdit={!!props?.edit} />
         <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton />}>
           <PageLayout.MainSingleColumn
             opacity={messageQuery.isPending ? 0.5 : 1}

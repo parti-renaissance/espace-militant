@@ -13,14 +13,15 @@ import SenderView from '../SenderView'
 import { useToastController } from '@tamagui/toast'
 
 type ConfirmationModalProps = {
-  payload?: { 
-    messageId: string; 
-    scope: string 
+  payload?: {
+    messageId: string;
+    scope: string
   }
-  defaultSender?: RestAvailableSender
+  defaultSender?: RestAvailableSender | null
+  isEdit?: boolean
 }
 
-const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>(({ payload, defaultSender }, ref) => {
+const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>(({ payload, defaultSender, isEdit }, ref) => {
   const modalSheetRef = useRef<ViewportModalRef>(null)
   const toast = useToastController()
   const media = useMedia()
@@ -53,8 +54,9 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
 
   useImperativeHandle(ref, () => modalSheetRef.current!)
 
+  console.log(payload)
   const handleCancel = () => {
-    if (payload?.messageId) {
+    if (isEdit) {
       return
     } else {
       router.replace({
@@ -72,7 +74,6 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
     <ViewportModalSheet ref={modalSheetRef} onClose={handleCancel}>
       <VoxCard.Content marginBottom="$large" gap="$large">
         <Text.LG>Prêt à publier ?</Text.LG>
-        {/* TODO: add sender preview */}
         <YStack gap="$medium">
           <SenderView sender={isMessageTilSync?.sender || defaultSender || null} />
           <Text.LG semibold>{isMessageTilSync?.subject}</Text.LG>
@@ -92,8 +93,8 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
             </YStack>
           ) : null}
           <View gap="$small" $gtSm={{ flexDirection: 'row' }}>
-            <VoxCard inside backgroundColor="$gray1" justifyContent="center" alignItems="center">
-            <VoxCard.Content justifyContent="center" alignItems="center" gap="$small">
+            <VoxCard inside backgroundColor="$gray1" justifyContent="center" alignItems="center" minWidth={140}>
+              <VoxCard.Content justifyContent="center" alignItems="center" gap="$small">
                 {isLoadingNumbers ? (
                   <View alignItems="center" justifyContent="center" height={52}>
                     <Spinner color="$purple5" />
@@ -101,7 +102,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
                 ) : (
                   <Text color="$purple5" fontSize={40} lineHeight={52} semibold>{recipients?.contacts ?? 0}</Text>
                 )}
-                <Text.LG textAlign='center' semibold>Contacts{ media.gtSm ? <Text.BR/> : ' '}notifiés</Text.LG>
+                <Text.LG textAlign='center' semibold>Contacts{media.gtSm ? <Text.BR /> : ' '}notifiés</Text.LG>
               </VoxCard.Content>
             </VoxCard>
             <YStack gap="$small" flexGrow={1} flexShrink={1}>
@@ -169,7 +170,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
                       iconLeft={ExternalLink}
                       flexGrow={1}
                       disabled={allDisabled}
-                      // onLongPress={handleSendTestMessage}
+                    // onLongPress={handleSendTestMessage}
                     >
                       Aperçu version email
                     </VoxButton>
@@ -205,7 +206,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
         </VoxCard>
 
         <XStack gap="$medium" justifyContent="space-between">
-          <VoxButton theme="gray" variant="outlined" iconLeft={ArrowLeft} onPress={() => modalSheetRef.current?.dismiss()} disabled={allDisabled}>
+          <VoxButton theme="gray" variant="outlined" iconLeft={ArrowLeft} onPress={() => modalSheetRef.current?.dismiss()} disabled={isSyncLoading}>
             Retour à l'édition
           </VoxButton>
           <VoxButton

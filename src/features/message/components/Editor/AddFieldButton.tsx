@@ -110,13 +110,9 @@ const AddFieldButtonContainer = styled(ThemeableStack, {
           />
         ) : (
           <AddFieldButtonCircle>
-            <Pressable 
-              onPress={props.onShowAddBar}
-            >
-              <AddFieldButtonInner>
+              <AddFieldButtonInner onPress={props.onShowAddBar}>
                 <Plus color="black" size={16} />
               </AddFieldButtonInner>
-            </Pressable>
           </AddFieldButtonCircle>
         )}
       </AddFieldButtonContainer>
