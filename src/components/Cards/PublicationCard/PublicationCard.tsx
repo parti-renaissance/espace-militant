@@ -1,16 +1,16 @@
 import React from 'react'
 import { RestTimelineFeedAuthor } from '@/services/timeline-feed/schema'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import SenderView, { SenderViewProps } from '@/features/message/components/SenderView'
+import SenderView, { SenderViewProps } from '@/features/publications/components/SenderView'
 import { relativeDateFormatter } from '@/utils/DateFormatter'
 import { VoxButton } from '@/components/Button'
 import { Eye } from '@tamagui/lucide-icons'
 import { router } from 'expo-router'
 import Text from '@/components/base/Text'
-import { RichTextRenderer } from '@/features/message/components/Editor/NodeRenderer/RichTextRenderer'
-import { ImageRenderer } from '@/features/message/components/Editor/NodeRenderer/ImageRenderer'
-import { ButtonRenderer } from '@/features/message/components/Editor/NodeRenderer/ButtonRenderer'
-import * as S from '@/features/message/components/Editor/schemas/messageBuilderSchema'
+import { RichTextRenderer } from '@/features/publications/components/Editor/NodeRenderer/RichTextRenderer'
+import { ImageRenderer } from '@/features/publications/components/Editor/NodeRenderer/ImageRenderer'
+import { ButtonRenderer } from '@/features/publications/components/Editor/NodeRenderer/ButtonRenderer'
+import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { XStack, YStack } from 'tamagui'
 
 export type PublicationCardProps = {
@@ -128,7 +128,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
         {renderContent()}
         { !showFullContent ? (
           <XStack px="$medium" pb="$medium" pt="$small" gap="$medium" justifyContent="flex-end">
-            <VoxButton variant="outlined" theme="blue" iconLeft={Eye} size="sm" disabled={!uuid} onPress={() => { router.push({ pathname: '/messages/[id]', params: { id: uuid ?? '' } }) }}>Lire la suite</VoxButton>
+            <VoxButton variant="outlined" theme="blue" iconLeft={Eye} size="sm" disabled={!uuid} onPress={() => { router.push({ pathname: '/publications/[id]', params: { id: uuid ?? '' } }) }}>Lire la suite</VoxButton>
           </XStack>
         ) : <YStack pb="$medium"></YStack>}
       </VoxCard.Content>

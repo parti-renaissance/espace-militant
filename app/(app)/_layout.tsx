@@ -13,11 +13,11 @@ export default function AppLayout() {
   const pathname = usePathname()
   const segments = useSegments()
   const hideHeaderRoutes = [
-    '/messages/creer',
-    '/messages/draft',
-    '/messages',
+    '/publications/creer',
+    '/publications/draft',
+    '/publications',
   ]
-  const isEditRoute = segments[1] === 'messages' && segments[3] === 'editer'
+  const isEditRoute = segments[1] === 'publications' && segments[3] === 'editer'
 
   const shouldShowHeader = media.gtSm && !hideHeaderRoutes.includes(pathname) && !isEditRoute
   return (
@@ -101,14 +101,14 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="messages/index"
+            name="publications/index"
             options={{
               header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false} /> }
             }}
           />
 
           <Stack.Screen
-            name="messages/creer"
+            name="publications/creer"
             options={{
               headerShown: false,
               gestureEnabled: false,
@@ -116,11 +116,11 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="messages/[id]"
+            name="publications/[id]"
           />
 
           <Stack.Screen
-            name="messages/[id]/editer"
+            name="publications/[id]/editer"
             options={{
               headerShown: false,
               gestureEnabled: false,
@@ -128,7 +128,7 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="messages/draft"
+            name="publications/draft"
             options={{
               header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false} /> }
             }}

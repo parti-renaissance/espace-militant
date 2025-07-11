@@ -82,7 +82,7 @@ const HomeFeedList = () => {
                   Dernières actualités
                 </Text.MD>
                 {hasFeature('publications') && (
-                  <Link href="/messages" asChild>
+                  <Link href="/publications" asChild>
                     <VoxButton variant="soft" size="sm" theme="purple" iconLeft={Sparkle}>
                       Nouvelle publication
                     </VoxButton>
