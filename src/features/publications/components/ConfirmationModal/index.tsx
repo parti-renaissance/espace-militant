@@ -41,7 +41,20 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
 
   const handleSendMessage = () => {
     if (isSyncLoading) return
-    mutate({ scope: payload?.scope || '' })
+    mutate({ 
+      scope: payload?.scope || '',
+    }, {
+      onSuccess: () => {
+        modalSheetRef.current?.dismiss()
+        router.push({
+          pathname: '/publications/[id]',
+          params: {
+            id: isMessageTilSync?.uuid || '',
+            congratulations: 'true',
+          },
+        })
+      }
+    })
   }
 
   const handleSendTestMessage = () => {
@@ -54,7 +67,6 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
 
   useImperativeHandle(ref, () => modalSheetRef.current!)
 
-  console.log(payload)
   const handleCancel = () => {
     if (isEdit) {
       return
@@ -63,6 +75,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
         pathname: '/publications/[id]/editer',
         params: {
           id: payload?.messageId ? payload.messageId : '',
+          scope: payload?.scope ? payload.scope : '',
         },
       })
     }

@@ -94,7 +94,7 @@ const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
 
       if (link) {
         return (
-          <Link href={link.attrs.href as Href} target="_blank">
+          <Link key={x.type + i} href={link.attrs.href as Href} target="_blank">
             <Text
               fontSize={fontSize}
               color="$blue5"
@@ -110,6 +110,7 @@ const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
 
       return (
         <Text
+          key={x.type + i}
           fontSize={fontSize}
           fontWeight={marks?.includes('bold') ? '700' : '600'}
           fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}
