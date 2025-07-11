@@ -147,7 +147,7 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
   const { isWebPageLayoutScrollActive } = usePageLayoutScroll()
 
   return (
-    <YStack flex={1} overflow="hidden" backgroundColor="red">
+    <YStack flex={1} overflow="hidden">
       <Animated.FlatList
           style={renderFieldsStyle.flatlist}
           scrollEnabled={!isWebPageLayoutScrollActive}
