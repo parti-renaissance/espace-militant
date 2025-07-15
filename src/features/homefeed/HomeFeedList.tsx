@@ -76,7 +76,7 @@ const HomeFeedList = () => {
           <YStack gap={8} $gtSm={{ gap: 16, }}>
             {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
             {alerts.length > 0 ? <AlertStack alerts={alerts} /> : null}
-            {alerts.length > 0 && hasFeature('publications') ? (
+            {alerts.length > 0 || hasFeature('publications') ? (
               <XStack justifyContent="space-between" alignItems="center" px="$medium" $gtSm={{ px: 0 }}>
                 <Text.MD color="$gray4" semibold>
                   Dernières actualités
