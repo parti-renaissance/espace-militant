@@ -104,7 +104,7 @@ export default function EventFormMobileScreen() {
       {ConfirmAlert}
       <LayoutPage.MainSingleColumn
         opacity={globalPending ? 0.5 : 1}
-        pointerEvents={globalPending ? 'none' : 'auto'}
+        style={{ pointerEvents: globalPending ? 'none' : 'auto' }}
         cursor={globalPending ? 'progress' : 'auto'}
       >
         <VoxHeader>

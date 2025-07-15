@@ -156,7 +156,7 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
         <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton />}>
           <PageLayout.MainSingleColumn
             opacity={messageQuery.isPending ? 0.5 : 1}
-            pointerEvents={messageQuery.isPending ? 'none' : 'auto'}
+            style={{ pointerEvents: messageQuery.isPending ? 'none' : 'auto' }}
             cursor={messageQuery.isPending ? 'progress' : 'auto'}
           >
             <MessageEditor
@@ -166,6 +166,9 @@ const MessageEditorPage = (props?: { edit?: types.RestGetMessageContentResponse;
               onSubmit={handleSubmit}
               displayToolbar={mode === 'edit'}
               messageId={props?.edit?.uuid}
+              onDisplayToolbarChange={(displayToolbar) => {
+                setMode(displayToolbar ? 'edit' : 'preview')
+              }}
             />
           </PageLayout.MainSingleColumn>
         </BoundarySuspenseWrapper>

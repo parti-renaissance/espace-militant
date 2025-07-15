@@ -55,7 +55,7 @@ export const ButtonFrameStyled = styled(View, {
     },
     loading: {
       true: {
-        pointerEvents: 'none',
+        style: { pointerEvents: 'none' },
         cursor: 'wait',
       },
     },

@@ -13,4 +13,5 @@ export type EditorMethods = Omit<RenderFieldRef, 'addField' | 'removeField'> & {
   removeField: (field: S.FieldsArray[number]) => void
   editField: (field: S.FieldsArray[number]) => void
   unSelect: () => void
+  setEditorMode: (mode: 'edit' | 'preview') => void
 }

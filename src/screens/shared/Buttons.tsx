@@ -93,9 +93,7 @@ const BaseButton: FunctionComponent<
             {props.leadingIcon ? (
               <View style={{ paddingRight: props.iconPadding }}>
                 <Image
-                  style={{
-                    tintColor: props.iconTint,
-                  }}
+                  tintColor={props.iconTint}
                   source={props.leadingIcon}
                 />
               </View>
@@ -104,9 +102,7 @@ const BaseButton: FunctionComponent<
             {props.trailingIcon ? (
               <View style={{ paddingLeft: props.iconPadding }}>
                 <Image
-                  style={{
-                    tintColor: props.iconTint,
-                  }}
+                  tintColor={props.iconTint}
                   source={props.trailingIcon}
                 />
               </View>

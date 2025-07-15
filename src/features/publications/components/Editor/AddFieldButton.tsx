@@ -42,7 +42,7 @@ const AddFieldButtonSeparator = () => {
       flexDirection="row"
       alignItems="center"
       justifyContent="space-between"
-      pointerEvents="none"
+      style={{ pointerEvents: 'none' }}
     >
       {Array.from({ length: 60 }).map((_, i) => (
         <ThemeableStack

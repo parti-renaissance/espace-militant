@@ -37,7 +37,8 @@ export function AnimatedStack({ children, isOpen }: { children: React.ReactNode[
         return (
           <View
             key={i}
-            style={{ position: 'absolute', left: 0, opacity: 0, zIndex: -1, userSelect: 'none', pointerEvents: 'none' }}
+            style={{ position: 'absolute', left: 0, opacity: 0, zIndex: -1, userSelect: 'none' }}
+            pointerEvents="none"
             onLayout={event => {
               const { height } = event.nativeEvent.layout
               setChildHeights(prev => {

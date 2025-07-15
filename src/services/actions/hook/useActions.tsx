@@ -6,10 +6,7 @@ import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
 import { useToastController } from '@tamagui/toast'
 import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { optimisticToggleSubscribe } from './helpers'
-
-export const QUERY_KEY_PAGINATED_ACTIONS = 'QUERY_KEY_PAGINATED_ACTIONS'
-export const QUERY_KEY_ACTIONS = 'QUERY_KEY_ACTIONS'
+import { optimisticToggleSubscribe, QUERY_KEY_ACTIONS, QUERY_KEY_PAGINATED_ACTIONS } from './helpers'
 
 type ParamsEnabled = Omit<RestActionRequestParams, 'page'> & {
   filters: {
