@@ -120,7 +120,7 @@ const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
       )
     }
     if (U.isTipHardBreak(x)) return <RenderHardBreak key={x.type + i} data={x} />
-    return null
+    return <React.Fragment key={`unsupported-${i}`} />
   })
 }
 
