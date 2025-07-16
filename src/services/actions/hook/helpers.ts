@@ -3,7 +3,9 @@ import * as helpers from '@/services/common/helpers'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { optimisticToggleSubscribe as toggleSubscribeOnfeed } from '@/services/timeline-feed/hook/helpers'
 import { QueryClient } from '@tanstack/react-query'
-import { QUERY_KEY_ACTIONS, QUERY_KEY_PAGINATED_ACTIONS } from './useActions'
+
+export const QUERY_KEY_PAGINATED_ACTIONS = 'QUERY_KEY_PAGINATED_ACTIONS'
+export const QUERY_KEY_ACTIONS = 'QUERY_KEY_ACTIONS'
 
 const createParticipant = (me: RestProfilResponse): RestActionParticipant => ({
   uuid: me.uuid,

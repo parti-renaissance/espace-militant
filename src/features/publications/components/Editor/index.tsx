@@ -21,6 +21,7 @@ export type MessageEditorProps = {
   onSubmit: (x: S.Message) => void
   displayToolbar?: boolean
   messageId?: string
+  onDisplayToolbarChange?: (display: boolean) => void
 }
 
 export type MessageEditorRef = {
@@ -110,6 +111,9 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
     getFields: () => renderFieldsRef.current?.getFields() ?? [],
     unSelect: () => setValue('selectedField', null),
     editField: (field: S.FieldsArray[number]) => setValue('selectedField', { edit: true, field }),
+    setEditorMode: (mode: 'edit' | 'preview') => {
+      props.onDisplayToolbarChange?.(mode === 'edit')
+    }
   } satisfies EditorMethods)
 
   useImperativeHandle(ref, () => ({
@@ -142,7 +146,8 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
             <RenderFields
               ref={renderFieldsRef}
               control={control}
-              defaultStruct={defaultData.struct} editorMethods={editorMethods}
+              defaultStruct={defaultData.struct}
+              editorMethods={editorMethods}
               displayToolbar={props.displayToolbar}
               availableSenders={availableSenders}
               message={message}

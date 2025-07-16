@@ -116,7 +116,19 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="publications/[id]"
+            name="publications/[id]/index"
+            options={{
+              headerTransparent: true,
+              header: ({ navigation }) => {
+                return media.sm ? (
+                  <VoxHeader backgroundColor="transparent" borderWidth={0}>
+                    <Link href={navigation.canGoBack() ? '../' : '/publications'} replace asChild={!isWeb}>
+                      <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
+                    </Link>
+                  </VoxHeader>
+                ) : null
+              },
+            }}
           />
 
           <Stack.Screen

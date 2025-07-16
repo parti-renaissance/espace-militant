@@ -31,7 +31,7 @@ export const NavigationHeaderButton: FunctionComponent<
           onPress={onPress}
           android_ripple={{ color: Colors.touchHighlight }}
         >
-          <Image source={source} style={{ tintColor: tintColor }} />
+          <Image source={source} tintColor={tintColor} />
         </Pressable>
       </View>
     )
@@ -39,7 +39,7 @@ export const NavigationHeaderButton: FunctionComponent<
     return (
       <View style={[styles.container, style]}>
         <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
-          <Image source={source} style={{ tintColor: tintColor }} />
+          <Image source={source} tintColor={tintColor} />
         </TouchableOpacity>
       </View>
     )

@@ -1,31 +1,13 @@
 import React from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import MeetingAlert from '@/components/Cards/AlertCard/components/MeetingAlert'
+import { MeetingAlertCollapsed } from '@/components/Cards/AlertCard/components'
 import VoxCard, { VoxCardFrameProps } from '@/components/VoxCard/VoxCard'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
-import { genericErrorThrower } from '@/services/common/errors/generic-errors'
+import { createOnShow } from '@/components/Cards/AlertCard/utils'
 import { BellElectric, ExternalLink, Radio } from '@tamagui/lucide-icons'
-import { Href, router } from 'expo-router'
-import * as WebBrowser from 'expo-web-browser'
-import { isWeb, XStack } from 'tamagui'
-
-export const createOnShow = (url: string | null) => () => {
-  if (url) {
-    try {
-      if (url.startsWith('/')) {
-        router.push(url as Href)
-      } else if (isWeb) {
-        window.open(url, '_blank')
-      } else {
-        WebBrowser.openBrowserAsync(url)
-      }
-    } catch (error) {
-      genericErrorThrower(error)
-    }
-  }
-}
+import { XStack } from 'tamagui'
 
 export type AlertVoxCardProps = {
   payload: RestAlertsResponse[0]
@@ -40,7 +22,7 @@ const AlertMeetingCard = (props: AlertVoxCardProps) => {
   }
 
   return (
-    <MeetingAlert
+    <MeetingAlertCollapsed
       onShow={createOnShow(props.payload.cta_url)}
       onPressShare={onPressShare}
       payload={props.payload}

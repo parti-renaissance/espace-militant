@@ -3,20 +3,11 @@ import RadioGroup from '@/components/base/RadioGroup/RadioGroup'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { useDeleteProfil } from '@/services/profile/hook'
+import { UnregistrationReason } from '@/services/profile/schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { styled, View, XStack, YStack } from 'tamagui'
 import { z } from 'zod'
-
-export enum UnregistrationReason {
-  Emails = 'unregistration_reasons.emails',
-  Tools = 'unregistration_reasons.tools',
-  Support = 'unregistration_reasons.support',
-  Government = 'unregistration_reasons.government',
-  Elected = 'unregistration_reasons.elected',
-  Movement = 'unregistration_reasons.movement',
-  Other = 'unregistration_reasons.other',
-}
 interface Props {
   onClose: () => void
   onConfirm: () => void
