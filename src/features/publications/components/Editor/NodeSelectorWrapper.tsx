@@ -165,7 +165,7 @@ const MemoWrapper = memo(
     const showAddBarBottom = props.addBarOpenForFieldId === bottomKey
 
     const [isHovered, setIsHovered] = React.useState(false)
-    const animatedHeight = useSharedValue((props.selected) ? 120 : 0)
+    const animatedHeight = useSharedValue((props.selected) ? 120 : 0.1)
     
     const animatedStyle = useAnimatedStyle(() => {
       return {
@@ -178,7 +178,7 @@ const MemoWrapper = memo(
 
     React.useEffect(() => {
       const shouldAnimate = (props.selected) && props.displayToolbar
-      animatedHeight.value = shouldAnimate ? 120 : 0
+      animatedHeight.value = shouldAnimate ? 120 : 0.1
     }, [props.selected, isHovered, props.displayToolbar])
 
     const handleMouseEnter = () => {

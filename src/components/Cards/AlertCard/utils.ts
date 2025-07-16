@@ -1,5 +1,4 @@
 import { genericErrorThrower } from '@/services/common/errors/generic-errors'
-import { BellElectric, ExternalLink, Radio } from '@tamagui/lucide-icons'
 import { Href, router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'

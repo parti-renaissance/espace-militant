@@ -3,7 +3,7 @@ import { VoxButton } from '@/components/Button'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2, X } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
-import { styled, ThemeableStack, XStack } from 'tamagui'
+import { styled, ThemeableStack } from 'tamagui'
 import { EditorMethods } from './types'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, withDelay, Easing } from 'react-native-reanimated'
 import React from 'react'
@@ -143,23 +143,25 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
             onPress={(e) => e.stopPropagation()}
             style={[animatedStyle, { pointerEvents: props.selected ? 'auto' : 'none' }]}
           >
-            <AnimatedToolBarFrame style={animatedToolBarStyle}>
-              <Animated.View style={animatedButtonStyle}>
-                <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={Pencil} onPress={handleEditField(field.value?.field!)} />
-              </Animated.View>
-              <Animated.View style={animatedButtonStyle}>
-                <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value?.field!)} />
-              </Animated.View>
-              <Animated.View style={animatedButtonStyle}>
-                <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={ArrowUpToLine} onPress={handleMoveUp(field.value?.field!)} />
-              </Animated.View>
-              <Animated.View style={animatedButtonStyle}>
-                <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={ArrowDownToLine} onPress={handleMoveDown(field.value?.field!)} />
-              </Animated.View>
-              <Animated.View style={animatedButtonStyle}>
-                <VoxButton size="lg" variant="soft" backgroundColor="$white4" shrink iconLeft={X} onPress={handleUnSelect} />
-              </Animated.View>
-            </AnimatedToolBarFrame>
+            {field.value?.field && (
+              <AnimatedToolBarFrame style={animatedToolBarStyle}>
+                <Animated.View style={animatedButtonStyle}>
+                  <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={Pencil} onPress={handleEditField(field.value.field)} />
+                </Animated.View>
+                <Animated.View style={animatedButtonStyle}>
+                  <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value.field)} />
+                </Animated.View>
+                <Animated.View style={animatedButtonStyle}>
+                  <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={ArrowUpToLine} onPress={handleMoveUp(field.value.field)} />
+                </Animated.View>
+                <Animated.View style={animatedButtonStyle}>
+                  <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={ArrowDownToLine} onPress={handleMoveDown(field.value.field)} />
+                </Animated.View>
+                <Animated.View style={animatedButtonStyle}>
+                  <VoxButton size="lg" variant="soft" backgroundColor="$white4" shrink iconLeft={X} onPress={handleUnSelect} />
+                </Animated.View>
+              </AnimatedToolBarFrame>
+            )}
           </AnimatedToolBarPositioner >
         )
       }}
