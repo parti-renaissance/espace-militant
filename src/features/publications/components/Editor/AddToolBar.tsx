@@ -1,11 +1,11 @@
-import { forwardRef, RefObject, useCallback, useEffect, useState } from 'react'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
-import { Image, Text as TextIcon, MousePointerSquare, X, Plus } from '@tamagui/lucide-icons'
+import { forwardRef, RefObject, useCallback, useEffect } from 'react'
 import { Control } from 'react-hook-form'
-import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
-import { EditorMethods } from './types'
-import Text from '@/components/base/Text'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, withDelay, Easing } from 'react-native-reanimated'
+import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
+import { Image, Text as TextIcon, MousePointerSquare, X, Plus } from '@tamagui/lucide-icons'
+import Text from '@/components/base/Text'
+import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import { EditorMethods } from './types'
 
 export const TOOLBAR_ITEM_HEIGHT = 56
 

@@ -275,7 +275,7 @@ const VoxHeaderLeftButton = (
   return (
     <VoxHeaderLeftButtonFrame {...restProps} height="100%">
       {IconComponent ? <IconComponent size={24} color="$textPrimary" /> : null}
-      {!!backTitle ? <Text.LG semibold>{backTitle}</Text.LG> : null}
+      {backTitle ? <Text.LG semibold>{backTitle}</Text.LG> : null}
     </VoxHeaderLeftButtonFrame>
   )
 }

@@ -10,7 +10,7 @@ import { Control } from 'react-hook-form'
 import { isWeb, YStack } from 'tamagui'
 import { MetaDataForm } from './MetaDataForm'
 import { RenderField } from './RenderField'
-import { AddFieldButton } from '../AddFieldButton'
+import { EditorInsertionToolbar } from '../EditorInsertionToolbar'
 import { RestAvailableSendersResponse, RestGetMessageResponse } from '@/services/publications/schema'
 
 type RenderFieldsProps = {
@@ -160,7 +160,7 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
           keyExtractor={keyExtractor}
           ListHeaderComponent={memoizedHeaderComponent}
           ListEmptyComponent={
-            <AddFieldButton
+            <EditorInsertionToolbar
               control={props.control}
               editorMethods={props.editorMethods}
               field={undefined}

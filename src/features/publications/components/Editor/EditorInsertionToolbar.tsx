@@ -6,14 +6,13 @@ import * as S from '@/features/publications/components/Editor/schemas/messageBui
 import { Control } from "react-hook-form"
 import MessageEditorAddToolbar from "./AddToolBar"
 import { Platform } from "react-native"
-import Animated, { useAnimatedStyle, useSharedValue, withTiming, Easing } from 'react-native-reanimated'
 
-const AddFieldButtonContainer = styled(ThemeableStack, {
+const EditorInsertionToolbarContainer = styled(ThemeableStack, {
   position: 'relative',
   zIndex: 1000,
 })
 
-const AddFieldButtonSeparator = ({ bottom }: { bottom?: boolean }) => {
+const EditorInsertionToolbarSeparator = ({ bottom }: { bottom?: boolean }) => {
   return (
     <ThemeableStack
       position="absolute"
@@ -40,7 +39,7 @@ const AddFieldButtonSeparator = ({ bottom }: { bottom?: boolean }) => {
   )
 }
 
-type AddFieldButtonProps = {
+type EditorInsertionToolbarProps = {
   display: boolean
   control: Control<S.GlobalForm>
   editorMethods: RefObject<EditorMethods>
@@ -51,15 +50,15 @@ type AddFieldButtonProps = {
   onCloseAddBar?: () => void
 }
 
-export const AddFieldButton = memo((props: AddFieldButtonProps) => {
+export const EditorInsertionToolbar = memo((props: EditorInsertionToolbarProps) => {
 
   if (!props.display) {
     return null
   }
 
   return (
-    <AddFieldButtonContainer>
-      <AddFieldButtonSeparator />
+    <EditorInsertionToolbarContainer>
+      <EditorInsertionToolbarSeparator />
       <YStack paddingHorizontal="$medium" width="100%" justifyContent="center" alignItems="center" zIndex={10}>
         <MessageEditorAddToolbar
           control={props.control}
@@ -71,9 +70,9 @@ export const AddFieldButton = memo((props: AddFieldButtonProps) => {
           showAddBar={props.showAddBar}
         />
       </YStack>
-      <AddFieldButtonSeparator bottom={true} />
-    </AddFieldButtonContainer>
+      <EditorInsertionToolbarSeparator bottom={true} />
+    </EditorInsertionToolbarContainer>
   )
 })
 
-AddFieldButton.displayName = 'AddFieldButton'
+EditorInsertionToolbar.displayName = 'EditorInsertionToolbar' 

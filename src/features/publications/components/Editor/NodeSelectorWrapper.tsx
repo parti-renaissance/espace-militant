@@ -6,7 +6,7 @@ import { Control, Controller } from 'react-hook-form'
 import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
 import { EditorMethods } from './types'
 import MessageEditorEditToolbar from './EditToolBar'
-import { AddFieldButton } from './AddFieldButton'
+import { EditorInsertionToolbar } from './EditorInsertionToolbar'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, Easing } from 'react-native-reanimated'
 
 const wrapperContext = createStyledContext<{ selected: boolean; edgePosition?: 'trailing' | 'leading' | 'alone'; error?: boolean }>({
@@ -199,7 +199,7 @@ const MemoWrapper = memo(
     return (
       <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition} error={Boolean(props.error)}>
         {props.displayToolbar && (
-          <AddFieldButton
+          <EditorInsertionToolbar
             control={props.control}
             editorMethods={props.editorMethods}
             field={props.field}
@@ -228,7 +228,7 @@ const MemoWrapper = memo(
           {props.children}
         </AnimatedWrapperFrame>
         {displayBottomAddBar && props.displayToolbar && (
-          <AddFieldButton
+          <EditorInsertionToolbar
             control={props.control}
             editorMethods={props.editorMethods}
             field={props.field}
