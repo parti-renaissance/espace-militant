@@ -6,6 +6,7 @@ import Text from '@/components/base/Text'
 import SenderView from '../../SenderView'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { RestAvailableSendersResponse, RestGetMessageResponse } from '@/services/publications/schema'
+import Animated from 'react-native-reanimated'
 
 export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, availableSenders?: RestAvailableSendersResponse, message?: RestGetMessageResponse, displayToolbar?: boolean }) => {
   const senderToDisplay = useMemo(() => {
@@ -19,10 +20,15 @@ export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, avail
         control={props.control}
         name="metaData.subject"
         render={({ field, fieldState }) => {
-          if (field.value && !props.displayToolbar) {
-            return <Text.LG semibold mb="$large">{field.value}</Text.LG>
-          }
-          return <Input placeholder="Titre de la publication" label="" color="gray" defaultValue={field.value} onBlur={field.onBlur} onChange={field.onChange} error={fieldState.error?.message} />
+          return (
+            <Animated.View style={{ height: 'auto' }}>
+              {field.value && !props.displayToolbar ? (
+                <Text.LG semibold mb="$large">{field.value}</Text.LG>
+              ) : (
+                <Input placeholder="Titre de la publication" label="" color="gray" defaultValue={field.value} onBlur={field.onBlur} onChange={field.onChange} error={fieldState.error?.message} />
+              )}
+            </Animated.View>
+          )
         }}
       />
 

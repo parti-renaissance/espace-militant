@@ -129,7 +129,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   return (
     <YStack alignItems="center" flex={1}>
       <YStack
-        maxWidth={550}
+        maxWidth={520}
         width="100%"
         flexGrow={1}
         $gtSm={

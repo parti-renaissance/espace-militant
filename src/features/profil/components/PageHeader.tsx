@@ -2,7 +2,7 @@ import { NamedExoticComponent } from 'react'
 import { VoxHeader } from '@/components/Header/Header'
 import type { IconProps } from '@tamagui/helpers-icon'
 import { ArrowLeft } from '@tamagui/lucide-icons'
-import { useNavigation, useRouter } from 'expo-router'
+import { Href, useNavigation, useRouter } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
 
 type ProfilHeaderProps = {
@@ -12,9 +12,10 @@ type ProfilHeaderProps = {
   hideOnMdUp?: boolean
   forcedBackTitle?: string
   backgroundColor?: string
+  backPath?: Href
 }
 
-const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forcedBackTitle, backgroundColor = 'white' }: ProfilHeaderProps) => {
+const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forcedBackTitle, backgroundColor = 'white', backPath = '/' }: ProfilHeaderProps) => {
   const router = useRouter()
   const navigation = useNavigation()
   const { gtSm } = useMedia()
@@ -23,7 +24,7 @@ const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forced
     if (navigation.canGoBack?.()) {
       router.back()
     } else {
-      router.push('/')
+      router.push(backPath)
     }
   }
 

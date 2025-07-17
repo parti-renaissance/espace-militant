@@ -122,7 +122,7 @@ export default function AppLayout() {
               header: ({ navigation }) => {
                 return media.sm ? (
                   <VoxHeader backgroundColor="transparent" borderWidth={0}>
-                    <Link href={navigation.canGoBack() ? '../' : '/publications'} replace asChild={!isWeb}>
+                    <Link href={navigation.canGoBack() ? '../' : '/'} replace asChild={!isWeb}>
                       <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
                     </Link>
                   </VoxHeader>
@@ -142,7 +142,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="publications/draft"
             options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false} /> }
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false}  backPath="/publications"/> }
             }}
           />
 

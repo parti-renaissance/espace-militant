@@ -4,7 +4,7 @@ import { Image, ScrollView, XStack, YStack } from "tamagui";
 import { VoxButton } from "@/components/Button";
 import { Link } from "expo-router";
 import Text from "@/components/base/Text";
-import { ChevronRight, FileEdit, FileText, X } from "@tamagui/lucide-icons";
+import { ChevronRight, FileEdit, X } from "@tamagui/lucide-icons";
 import { ExternalLink } from "@/screens/shared/ExternalLink";
 import VoxCard from "@/components/VoxCard/VoxCard";
 import { useGetExecutiveScopes } from "@/services/profile/hook";
@@ -122,7 +122,7 @@ const MessagePageIndex = () => {
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn>
         <ScrollView backgroundColor="$surface" flex={1}>
-          <YStack gap="$xlarge" maxWidth={550} width="100%" marginHorizontal="auto" padding="$medium" paddingBottom={100} $sm={{ maxWidth: '100%' }}>
+          <YStack gap="$xlarge" maxWidth={520} width="100%" marginHorizontal="auto" paddingTop="$medium" paddingBottom={100} $sm={{ maxWidth: '100%', paddingHorizontal: '$medium' }}>
             <HelpCard />
             {scopeOptions.length > 0 && (
               <MessageScopeSelector label="Pour" value={selectedScope} onChange={setSelectedScope} />
