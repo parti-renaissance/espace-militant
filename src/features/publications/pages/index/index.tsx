@@ -5,7 +5,6 @@ import { VoxButton } from "@/components/Button";
 import { Link } from "expo-router";
 import Text from "@/components/base/Text";
 import { ChevronRight, FileEdit, X } from "@tamagui/lucide-icons";
-import { ExternalLink } from "@/screens/shared/ExternalLink";
 import VoxCard from "@/components/VoxCard/VoxCard";
 import { useGetExecutiveScopes } from "@/services/profile/hook";
 import { useGetAvailableSenders } from "@/services/publications/hook";
@@ -28,16 +27,6 @@ const HelpCard = () => {
           <YStack flexShrink={1}>
             <Text.SM lineHeight={20}>
               <Text.SM semibold>Votre publication sera diffusée sur l'accueil de l'espace Militants de vos destinataires. Elle leur sera également envoyée par email.</Text.SM>
-              <Text.SM display="none">Besoin d'en savoir plus ?
-                <Text.SM
-                  textDecorationLine="underline"
-                  textDecorationDistance={2}
-                  color="$blue5"
-                  onPress={() => ExternalLink.openUrl("https://parti.re")}
-                >
-                  Consultez l'aide.
-                </Text.SM>
-              </Text.SM>
             </Text.SM>
           </YStack>
           <VoxButton

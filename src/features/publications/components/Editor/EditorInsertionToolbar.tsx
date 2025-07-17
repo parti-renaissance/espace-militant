@@ -5,8 +5,8 @@ import { memo, RefObject } from "react"
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { Control } from "react-hook-form"
 import MessageEditorAddToolbar from "./AddToolBar"
-import { Easing, Platform } from "react-native"
-import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
+import { Platform } from "react-native"
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming, Easing } from 'react-native-reanimated'
 
 const EditorInsertionToolbarContainer = styled(ThemeableStack, {
   position: 'relative',

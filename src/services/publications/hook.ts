@@ -3,6 +3,7 @@ import * as api from '@/services/publications/api'
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { RestGetMessageResponse, RestPostMessageRequest } from './schema'
+import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 
 export const useCreateMessage = (props: { uuid?: string }) => {
   const toast = useToastController()
@@ -21,6 +22,9 @@ export const useCreateMessage = (props: { uuid?: string }) => {
         queryClient.invalidateQueries({ queryKey: ['message', data.uuid] })
         queryClient.invalidateQueries({ queryKey: ['message-content', data.uuid] })
       }
+      queryClient.invalidateQueries({
+        queryKey: [PAGINATED_QUERY_FEED],
+      })
     },
     onError: (error) => {
       if (error instanceof GenericResponseError) {
@@ -36,6 +40,7 @@ export const useCreateMessage = (props: { uuid?: string }) => {
 export const useSendMessage = (props: { uuid: string }) => {
   const toast = useToastController()
   const errorMessage = "L'envoi de l'email n'a pas abouti"
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ test, scope }: Omit<Parameters<typeof api.sendMessage>[0], 'messageId'> & { test?: boolean }) =>
       test
@@ -44,7 +49,12 @@ export const useSendMessage = (props: { uuid: string }) => {
             scope,
             messageId: props.uuid,
           }),
-    onSuccess: () => {},
+    onSuccess: () => {
+      // Invalider le feed pour rafraîchir les publications après envoi
+      queryClient.invalidateQueries({
+        queryKey: [PAGINATED_QUERY_FEED],
+      })
+    },
     onError: (error) => {
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })

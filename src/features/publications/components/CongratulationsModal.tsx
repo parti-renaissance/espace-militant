@@ -2,7 +2,7 @@ import React from 'react'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import { VoxButton } from '@/components/Button'
 import { Check, Eye, Home } from '@tamagui/lucide-icons'
-import { View, XStack, YStack } from 'tamagui'
+import { View, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import { router } from 'expo-router'
 
@@ -49,25 +49,24 @@ export default function CongratulationsModal({ isOpen, onClose }: Congratulation
             Elle est déjà disponible sur l'accueil de l'espace militant de vos destinataires.
           </Text.SM>
         </YStack>
-
-        <YStack gap="$medium" marginTop="$large">
+        <YStack gap="$medium" marginTop="$large" marginBottom="$large" alignItems="center" justifyContent="center" >
           <VoxButton
             theme="gray"
             variant='outlined'
-            full
             iconLeft={Home}
             onPress={() => {
               onClose()
               router.push('/')
             }}
+            alignSelf="center"
           >
             Retour à l'accueil
           </VoxButton>
           <VoxButton
             theme="blue"
             onPress={onClose}
-            full
             iconLeft={Eye}
+            alignSelf="center"
           >
             Voir la publication
           </VoxButton>

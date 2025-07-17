@@ -209,7 +209,7 @@ export const VoxHeaderFrameStyled = styled(ThemeableStack, {
 })
 
 const VoxHeaderContainerStyled = styled(Container, {
-  borderBottomWidth: 1,
+  // borderBottomWidth: 1,
   borderBottomColor: '$textOutline',
 
   $md: {
