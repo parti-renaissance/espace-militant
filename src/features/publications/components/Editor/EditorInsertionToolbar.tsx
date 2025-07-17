@@ -1,16 +1,19 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { styled, ThemeableStack, View, YStack } from "tamagui"
 import { EditorMethods } from "./types"
 import { memo, RefObject } from "react"
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { Control } from "react-hook-form"
 import MessageEditorAddToolbar from "./AddToolBar"
-import { Platform } from "react-native"
+import { Easing, Platform } from "react-native"
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
 
 const EditorInsertionToolbarContainer = styled(ThemeableStack, {
   position: 'relative',
   zIndex: 1000,
 })
+
+const AnimatedEditorInsertionToolbarContainer = Animated.createAnimatedComponent(EditorInsertionToolbarContainer)
 
 const EditorInsertionToolbarSeparator = ({ bottom }: { bottom?: boolean }) => {
   return (
@@ -52,12 +55,42 @@ type EditorInsertionToolbarProps = {
 
 export const EditorInsertionToolbar = memo((props: EditorInsertionToolbarProps) => {
 
-  if (!props.display) {
-    return null
-  }
+  const wrapperHeight = useSharedValue(28)
+  const wrapperIsAuto = useSharedValue(0)
+  const wrapperOpacity = useSharedValue(0)
+
+  useEffect(() => {
+    if (props.display) {
+      wrapperHeight.value = withTiming(28, { duration: 300, easing: Easing.inOut(Easing.ease) })
+      wrapperIsAuto.value = withDelay(300, withTiming(1, { duration: 0 }))
+      wrapperOpacity.value = withTiming(1, { duration: 400, easing: Easing.inOut(Easing.ease) })
+    } else {
+      props.onCloseAddBar?.()
+      wrapperIsAuto.value = withDelay(0, withTiming(0, { duration: 0 }))
+      wrapperHeight.value = withDelay(0, withTiming(0, { duration: 300, easing: Easing.inOut(Easing.ease) }))
+      wrapperOpacity.value = withDelay(0, withTiming(0, { duration: 300, easing: Easing.inOut(Easing.ease) }))
+    }
+  }, [props.display, props.onCloseAddBar])
+
+  const wrapperAnimatedStyle = useAnimatedStyle(() => {
+    const pointerEvents = wrapperOpacity.value === 0 ? 'none' : 'auto'
+
+    if (wrapperIsAuto.value > 0) {
+      return {
+        height: 'auto',
+        opacity: wrapperOpacity.value,
+        pointerEvents,
+      }
+    }
+    return {
+      height: wrapperHeight.value,
+      opacity: wrapperOpacity.value,
+      pointerEvents,
+    }
+  })
 
   return (
-    <EditorInsertionToolbarContainer>
+    <AnimatedEditorInsertionToolbarContainer style={wrapperAnimatedStyle}>
       <EditorInsertionToolbarSeparator />
       <YStack paddingHorizontal="$medium" width="100%" justifyContent="center" alignItems="center" zIndex={10}>
         <MessageEditorAddToolbar
@@ -71,7 +104,7 @@ export const EditorInsertionToolbar = memo((props: EditorInsertionToolbarProps) 
         />
       </YStack>
       <EditorInsertionToolbarSeparator bottom={true} />
-    </EditorInsertionToolbarContainer>
+    </AnimatedEditorInsertionToolbarContainer>
   )
 })
 

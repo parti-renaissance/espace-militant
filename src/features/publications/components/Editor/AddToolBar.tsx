@@ -288,9 +288,10 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
           const previousField = currentIndex > 0 ? fields[currentIndex - 1] : undefined
           props.editorMethods.current.addField(node, previousField, currentIndex === 0)
         }
+        props.onClose?.()
       }
     },
-    [props.editorMethods, props.field],
+    [props.editorMethods, props.field, props.onClose],
   )
 
  
@@ -299,7 +300,7 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
     <AnimatedToolBarWrapper style={wrapperAnimatedStyle}>
         <AnimatedToolBarContainer style={containerAnimatedStyle} onPress={(e) => e.stopPropagation()}>
         <Animated.View style={[plusAnimatedStyle, { justifyContent: 'center', alignItems: 'center', alignSelf: 'center', position: 'absolute', zIndex: 100 }]}>
-          <YStack justifyContent="center" alignItems="center" width="100%" height="100%" borderRadius={36} backgroundColor="white" onPress={props.onShowAddBar}>
+          <YStack justifyContent="center" alignItems="center" width="100%" height="100%" borderRadius={36} backgroundColor="white" cursor='pointer' pressStyle={{ backgroundColor: '$gray2' }} hoverStyle={{ backgroundColor: '$gray1' }} onPress={props.onShowAddBar}>
             <Plus color="black" size={16} />
           </YStack>
         </Animated.View>

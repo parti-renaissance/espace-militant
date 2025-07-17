@@ -5,7 +5,7 @@ import { isWeb, Media, useMedia, View, ViewProps, withStaticProperties, XStack, 
 import { ScrollContext } from './scrollContext'
 
 export const padding = '$medium'
-export const columnWidth = 333
+export const columnWidth = 340
 
 const LayoutFrame = ({ children, webScrollable, ...props }: ComponentProps<typeof Container> & { webScrollable?: boolean; full?: boolean }) => {
   const insets = useSafeAreaInsets()

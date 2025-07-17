@@ -23,7 +23,7 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
   const viewport = useMedia()
   const size = useWindowDimensions()
 
-  const width = Math.min((size.width * 80) / 100, 500)
+  const width = Math.min((size.width * 80) / 100, 480)
   const height = 500
 
   if (viewport.gtSm && isWeb) {

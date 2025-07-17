@@ -5,7 +5,7 @@ import { useGetExecutiveScopes } from '@/services/profile/hook';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import PageLayout from '@/components/layouts/PageLayout/PageLayout';
 import VoxCard from '@/components/VoxCard/VoxCard';
-import { Spinner, View, XStack, YStack } from 'tamagui';
+import { Spinner, View, XStack, YStack, useMedia } from 'tamagui';
 import Text from '@/components/base/Text';
 import SkeCard from '@/components/Skeleton/CardSkeleton';
 import { Clock, PenLine } from '@tamagui/lucide-icons';
@@ -56,6 +56,7 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
 };
 
 const DraftPage = () => {
+  const media = useMedia();
   const { data: scopes } = useGetExecutiveScopes();
   const params = useLocalSearchParams<{ scope?: string }>();
   const scopeFromParams = params?.scope;
@@ -73,7 +74,7 @@ const DraftPage = () => {
   if (isLoading) return (
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn>
-        <YStack alignItems="center" marginTop={16} maxWidth={550} alignSelf="center" width="100%" gap="$small">
+        <YStack alignItems="center" marginTop={16} maxWidth={520} $sm={{ maxWidth: '100%' }} alignSelf="center" width="100%" gap="$small">
           {Array.from({ length: 5 }).map((_, i) => (
             <SkeCard key={i} width="100%">
               <SkeCard.Content>
@@ -95,7 +96,7 @@ const DraftPage = () => {
       <PageLayout.MainSingleColumn>
         <FlatList
           data={publications}
-          contentContainerStyle={{ maxWidth: 550, alignSelf: 'center', width: '100%', paddingBottom: 100, paddingTop: 16 }}
+          contentContainerStyle={{ maxWidth: media.sm ? '100%' : 520, alignSelf: 'center', width: '100%', paddingBottom: 100, paddingTop: 16 }}
           renderItem={({ item }) => <PublicationItem item={item} scope={scopeFromParams} />}
           keyExtractor={(item) => item.uuid}
           onEndReached={handleEndReached}

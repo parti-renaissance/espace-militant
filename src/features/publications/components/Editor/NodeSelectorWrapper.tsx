@@ -147,6 +147,7 @@ const MemoWrapper = memo(
     htmlId: string
     onWrapperPress: (e: GestureResponderEvent) => void
     onHoverEnter: () => void
+    onHoverLeave: () => void
     children: ReactNode
     edgePosition?: 'trailing' | 'leading' | 'alone'
     error?: string
@@ -166,7 +167,7 @@ const MemoWrapper = memo(
 
     const [isHovered, setIsHovered] = React.useState(false)
     const animatedHeight = useSharedValue((props.selected) ? 120 : 0.1)
-    
+
     const animatedStyle = useAnimatedStyle(() => {
       return {
         minHeight: withTiming(animatedHeight.value, {
@@ -188,6 +189,7 @@ const MemoWrapper = memo(
 
     const handleMouseLeave = () => {
       setIsHovered(false)
+      props.onHoverLeave()
     }
 
     const handlePress = (e: GestureResponderEvent) => {
@@ -198,26 +200,24 @@ const MemoWrapper = memo(
 
     return (
       <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition} error={Boolean(props.error)}>
-        {props.displayToolbar && (
-          <EditorInsertionToolbar
-            control={props.control}
-            editorMethods={props.editorMethods}
-            field={props.field}
-            display={true}
-            showAddBar={showAddBarTop}
-            onShowAddBar={() => props.onChangeAddBarOpenFieldId(topKey)}
-            onCloseAddBar={props.onCloseAddBar}
-          />
-        )}
-        <AnimatedWrapperFrame 
-          id={props.htmlId} 
+        <EditorInsertionToolbar
+          control={props.control}
+          editorMethods={props.editorMethods}
+          field={props.field}
+          display={props.displayToolbar}
+          showAddBar={showAddBarTop}
+          onShowAddBar={() => props.onChangeAddBarOpenFieldId(topKey)}
+          onCloseAddBar={props.onCloseAddBar}
+        />
+        <AnimatedWrapperFrame
+          id={props.htmlId}
           onPress={handlePress}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           style={animatedStyle}
         >
-          { props.displayToolbar && (
-            <MessageEditorEditToolbar selected={props.selected} control={props.control} editorMethods={props.editorMethods}/>
+          {props.displayToolbar && (
+            <MessageEditorEditToolbar selected={props.selected} control={props.control} editorMethods={props.editorMethods} />
           )}
 
           <Wrapper.Overlay>
@@ -227,18 +227,18 @@ const MemoWrapper = memo(
           </Wrapper.Overlay>
           {props.children}
         </AnimatedWrapperFrame>
-        {displayBottomAddBar && props.displayToolbar && (
+        {displayBottomAddBar ? (
           <EditorInsertionToolbar
             control={props.control}
             editorMethods={props.editorMethods}
             field={props.field}
             asLast={true}
-            display={true}
+            display={props.displayToolbar}
             showAddBar={showAddBarBottom}
             onShowAddBar={() => props.onChangeAddBarOpenFieldId(bottomKey)}
             onCloseAddBar={props.onCloseAddBar}
           />
-        )}
+        ) : null}
       </Wrapper.Props>
     )
   },
@@ -246,7 +246,7 @@ const MemoWrapper = memo(
 
 MemoWrapper.displayName = 'MemoWrapper'
 
-export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToolbar?: boolean}) => {
+export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToolbar?: boolean }) => {
   const content = useMemo(() => props.children, [props.children])
 
   return (
@@ -259,7 +259,7 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToo
             const handlePress = (e: GestureResponderEvent) => {
               e.stopPropagation()
               field.onChange({ edit: false, field: props.field })
-              addBarField.onChange(null)  
+              addBarField.onChange(null)
               if (!props.displayToolbar) {
                 props.editorMethods.current?.setEditorMode('edit')
               }
@@ -271,17 +271,21 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToo
             const handleCloseAddBar = () => {
               addBarField.onChange(null)
             }
-            
+
             const handleHoverSelect = () => {
               field.onChange({ edit: false, field: props.field })
-              addBarField.onChange(null)
             }
-            
+
+            const handleHoverLeave = () => {
+              field.onChange({ edit: false, field: undefined })
+            }
+
             return (
               <MemoWrapper
-                selected={field.value?.field.id === props.field.id}
+                selected={field?.value?.field?.id === props.field.id}
                 onWrapperPress={handlePress}
                 onHoverEnter={handleHoverSelect}
+                onHoverLeave={handleHoverLeave}
                 htmlId={`field-${props.field.type}-${props.field.id}`}
                 children={content}
                 error={props.error}

@@ -91,7 +91,7 @@ export const RenderField = memo((props: {
                       <ImageNodeEditor
                         onBlur={() => onChange(null)}
                         onChange={field.onChange}
-                        present={Boolean(value?.field.id === props.field.id) && value?.edit === true}
+                        present={value?.field?.id === props.field.id && value?.edit === true}
                         value={field.value}
                       />
                     )
@@ -130,7 +130,7 @@ export const RenderField = memo((props: {
                   return (
                     <ButtonNodeEditor
                       onBlur={() => onChange(null)}
-                      present={value?.field.id === props.field.id && value.edit}
+                      present={value?.field?.id === props.field.id && value.edit}
                       onChange={field.onChange}
                       value={field.value}
                       senderThemeColor={props.senderThemeColor} // Passage de la couleur
@@ -170,7 +170,7 @@ export const RenderField = memo((props: {
                   return (
                     <RichTextNodeEditor
                       onBlur={() => onChange(null)}
-                      present={value?.field.id === props.field.id && value.edit}
+                      present={value?.field?.id === props.field.id && value.edit}
                       onChange={field.onChange}
                       value={field.value}
                     />
