@@ -117,18 +117,14 @@ export default function AppLayout() {
 
           <Stack.Screen
             name="publications/[id]/index"
-            options={{
-              headerTransparent: true,
-              header: ({ navigation }) => {
+            options={({ route }) => ({
+              header: () => {
                 return media.sm ? (
-                  <VoxHeader backgroundColor="transparent" borderWidth={0}>
-                    <Link href={navigation.canGoBack() ? '../' : '/'} replace asChild={!isWeb}>
-                      <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
-                    </Link>
-                  </VoxHeader>
+                  <ProfilHeader title="" backgroundColor="$textSurface" forcedBackTitle="Retour" />
                 ) : null
               },
-            }}
+              animation: route.params && 'withoutAnimation' in route.params ? 'none' : 'slide_from_right',
+            })}
           />
 
           <Stack.Screen

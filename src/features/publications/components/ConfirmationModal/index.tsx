@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useGetIsMessageTilSync, useSendMessage, useGetMessageCountRecipients } from '@/services/publications/hook'
@@ -25,6 +25,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
   const modalSheetRef = useRef<ViewportModalRef>(null)
   const toast = useToastController()
   const media = useMedia()
+  const [isSending, setIsSending] = useState(false)
   const { data: isMessageTilSync, isLoading: isSyncLoading, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ payload: payload?.messageId && payload?.scope ? { messageId: payload.messageId, scope: payload.scope } : undefined })
 
   const { data: recipients, isLoading: isLoadingRecipients } = useGetMessageCountRecipients({
@@ -41,16 +42,18 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
 
   const handleSendMessage = () => {
     if (isSyncLoading) return
+    setIsSending(true)
     mutate({ 
       scope: payload?.scope || '',
     }, {
       onSuccess: () => {
         modalSheetRef.current?.dismiss()
-        router.push({
+        router.replace({
           pathname: '/publications/[id]',
           params: {
             id: isMessageTilSync?.uuid || '',
             congratulations: 'true',
+            withoutAnimation: 'true',
           },
         })
       }
@@ -68,7 +71,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
   useImperativeHandle(ref, () => modalSheetRef.current!)
 
   const handleCancel = () => {
-    if (isEdit) {
+    if (isEdit || isSending) {
       return
     } else {
       router.replace({
@@ -218,7 +221,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
           </VoxCard.Content>
         </VoxCard>
 
-        <XStack gap="$medium" justifyContent="space-between">
+        <XStack gap="$small" justifyContent="space-between">
           <VoxButton theme="gray" variant="outlined" iconLeft={ArrowLeft} onPress={() => modalSheetRef.current?.dismiss()} disabled={isSyncLoading}>
             Retour à l'édition
           </VoxButton>
