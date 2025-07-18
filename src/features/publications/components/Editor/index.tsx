@@ -89,7 +89,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   const renderFieldsRef = useRef<RenderFieldRef>(null)
   const editorMethods = useRef({
     addField: (node: S.NodeType | S.Node, afterField?: S.FieldsArray[number], atStart?: boolean) => {
-      const field = { id: uniqueId(), type: typeof node === 'string' ? node : node.type }
+      const field = { id: `field_${uniqueId()}`, type: typeof node === 'string' ? node : node.type }
       setValue(`formValues.${field.type}.${field.id}`, typeof node === 'string' ? createNodeByType(node) : node)
       setValue(`selectedField`, { edit: true, field })
       renderFieldsRef.current?.addField(field, afterField, atStart)
@@ -117,9 +117,15 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   } satisfies EditorMethods)
 
   useImperativeHandle(ref, () => ({
-    submit: handleSubmit((x) => {
-      props.onSubmit(zipMessage(x.formValues, renderFieldsRef.current!.getFields(), x.metaData))
-    }),
+    submit: handleSubmit(
+      (x) => {
+        props.onSubmit(zipMessage(x.formValues, renderFieldsRef.current!.getFields(), x.metaData))
+      },
+      (errors) => {
+        console.error('Validation errors:', errors);
+        console.error('Form errors details:', JSON.stringify(errors, null, 2));
+      }
+    ),
     unSelect: () => {
       setValue('selectedField', null)
       setValue('addBarOpenForFieldId', null)
