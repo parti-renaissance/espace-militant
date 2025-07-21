@@ -92,7 +92,6 @@ export const RenderField = memo((props: {
                       <ImageNodeEditor
                         onBlur={() => onChange(null)}
                         onChange={(newValue) => {
-                           // TODO: sauvegarder le contenu avec editorRef.current?.debouncedSave()
                           field.onChange(newValue)
                           props.onNodeChange?.(props.field.id, props.field.type, newValue)
                         }}
