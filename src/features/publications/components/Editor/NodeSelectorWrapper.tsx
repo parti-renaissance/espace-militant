@@ -9,10 +9,11 @@ import MessageEditorEditToolbar from './EditToolBar'
 import { EditorInsertionToolbar } from './EditorInsertionToolbar'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, Easing } from 'react-native-reanimated'
 
-const wrapperContext = createStyledContext<{ selected: boolean; edgePosition?: 'trailing' | 'leading' | 'alone'; error?: boolean }>({
+const wrapperContext = createStyledContext<{ selected: boolean; edgePosition?: 'trailing' | 'leading' | 'alone'; error?: boolean; editMode?: boolean }>({
   selected: false,
   edgePosition: undefined,
   error: false,
+  editMode: false,
 })
 
 const WrapperFrame = styled(ThemeableStack, {
@@ -73,8 +74,8 @@ const SelectOverlay = styled(ThemeableStack, {
       },
     },
     editMode: {
-      true: {
-        borderWidth: 1,
+      false: {
+        display: 'none',
       },
     },
     edgePosition: {
@@ -176,13 +177,13 @@ const MemoWrapper = memo(
     }, [props.selected, props.displayToolbar])
 
     const handlePress = (e: GestureResponderEvent) => {
-      if (!props.selected || !props.displayToolbar) {
+      if (!props.selected && props.displayToolbar) {
         props.onWrapperPress(e)
       }
     }
 
     return (
-      <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition} error={Boolean(props.error)}>
+      <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition} error={Boolean(props.error)} editMode={props.displayToolbar}>
         <EditorInsertionToolbar
           control={props.control}
           editorMethods={props.editorMethods}
