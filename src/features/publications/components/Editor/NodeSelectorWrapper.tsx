@@ -27,14 +27,6 @@ const WrapperFrame = styled(ThemeableStack, {
         minHeight: 'auto',
       },
     },
-    hovered: {
-      true: {
-        minHeight: 120,
-      },
-      false: {
-        minHeight: 'auto',
-      },
-    },
     edgePosition: {
       trailing: {
         overflow: 'hidden',
@@ -66,6 +58,10 @@ const SelectOverlay = styled(ThemeableStack, {
   bottom: 0,
   zIndex: 1,
   cursor: 'pointer',
+  hoverStyle: {
+    backgroundColor: '$gray8',
+    opacity: 0.08,
+  },
   variants: {
     selected: {
       true: {},
@@ -146,8 +142,6 @@ const MemoWrapper = memo(
     selected: boolean
     htmlId: string
     onWrapperPress: (e: GestureResponderEvent) => void
-    onHoverEnter: () => void
-    onHoverLeave: () => void
     children: ReactNode
     edgePosition?: 'trailing' | 'leading' | 'alone'
     error?: string
@@ -165,7 +159,6 @@ const MemoWrapper = memo(
     const showAddBarTop = props.addBarOpenForFieldId === topKey
     const showAddBarBottom = props.addBarOpenForFieldId === bottomKey
 
-    const [isHovered, setIsHovered] = React.useState(false)
     const animatedHeight = useSharedValue((props.selected) ? 120 : 0.1)
 
     const animatedStyle = useAnimatedStyle(() => {
@@ -180,17 +173,7 @@ const MemoWrapper = memo(
     React.useEffect(() => {
       const shouldAnimate = (props.selected) && props.displayToolbar
       animatedHeight.value = shouldAnimate ? 120 : 0.1
-    }, [props.selected, isHovered, props.displayToolbar])
-
-    const handleMouseEnter = () => {
-      setIsHovered(true)
-      props.onHoverEnter()
-    }
-
-    const handleMouseLeave = () => {
-      setIsHovered(false)
-      props.onHoverLeave()
-    }
+    }, [props.selected, props.displayToolbar])
 
     const handlePress = (e: GestureResponderEvent) => {
       if (!props.selected || !props.displayToolbar) {
@@ -212,8 +195,6 @@ const MemoWrapper = memo(
         <AnimatedWrapperFrame
           id={props.htmlId}
           onPress={handlePress}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
           style={animatedStyle}
         >
           {props.displayToolbar && (
@@ -272,20 +253,10 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToo
               addBarField.onChange(null)
             }
 
-            const handleHoverSelect = () => {
-              field.onChange({ edit: false, field: props.field })
-            }
-
-            const handleHoverLeave = () => {
-              field.onChange({ edit: false, field: undefined })
-            }
-
             return (
               <MemoWrapper
                 selected={field?.value?.field?.id === props.field.id}
                 onWrapperPress={handlePress}
-                onHoverEnter={handleHoverSelect}
-                onHoverLeave={handleHoverLeave}
                 htmlId={`field-${props.field.type}-${props.field.id}`}
                 children={content}
                 error={props.error}

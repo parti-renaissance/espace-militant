@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useGetIsMessageTilSync, useSendMessage, useGetMessageCountRecipients } from '@/services/publications/hook'
@@ -18,14 +18,13 @@ type ConfirmationModalProps = {
     scope: string
   }
   defaultSender?: RestAvailableSender | null
-  isEdit?: boolean
+  defaultTitle?: string | null
 }
 
-const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>(({ payload, defaultSender, isEdit }, ref) => {
+const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>(({ payload, defaultSender, defaultTitle }, ref) => {
   const modalSheetRef = useRef<ViewportModalRef>(null)
   const toast = useToastController()
   const media = useMedia()
-  const [isSending, setIsSending] = useState(false)
   const { data: isMessageTilSync, isLoading: isSyncLoading, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ payload: payload?.messageId && payload?.scope ? { messageId: payload.messageId, scope: payload.scope } : undefined })
 
   const { data: recipients, isLoading: isLoadingRecipients } = useGetMessageCountRecipients({
@@ -42,7 +41,6 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
 
   const handleSendMessage = () => {
     if (isSyncLoading) return
-    setIsSending(true)
     mutate({ 
       scope: payload?.scope || '',
     }, {
@@ -70,19 +68,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
 
   useImperativeHandle(ref, () => modalSheetRef.current!)
 
-  const handleCancel = () => {
-    if (isEdit || isSending) {
-      return
-    } else {
-      router.replace({
-        pathname: '/publications/[id]/editer',
-        params: {
-          id: payload?.messageId ? payload.messageId : '',
-          scope: payload?.scope ? payload.scope : '',
-        },
-      })
-    }
-  }
+  const handleCancel = () => {}
 
   const allDisabled = !!syncError || isSyncLoading || isLoadingRecipients || isPending
 
@@ -92,7 +78,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
         <Text.LG>Prêt à publier ?</Text.LG>
         <YStack gap="$medium">
           <SenderView sender={isMessageTilSync?.sender || defaultSender || null} />
-          <Text.LG semibold>{isMessageTilSync?.subject}</Text.LG>
+          <Text.LG semibold>{isMessageTilSync?.subject || defaultTitle}</Text.LG>
         </YStack>
         <YStack gap="$medium" position="relative">
           {syncError ? (

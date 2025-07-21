@@ -8,7 +8,13 @@ import * as S from '@/features/publications/components/Editor/schemas/messageBui
 import { RestAvailableSendersResponse, RestGetMessageResponse } from '@/services/publications/schema'
 import Animated from 'react-native-reanimated'
 
-export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, availableSenders?: RestAvailableSendersResponse, message?: RestGetMessageResponse, displayToolbar?: boolean }) => {
+export const MetaDataForm = memo((props: { 
+  control: Control<S.GlobalForm>, 
+  availableSenders?: RestAvailableSendersResponse, 
+  message?: RestGetMessageResponse, 
+  displayToolbar?: boolean,
+  onMetaDataChange?: () => void
+}) => {
   const senderToDisplay = useMemo(() => {
     return props.message?.sender || (props.availableSenders && props.availableSenders.length > 0 ? props.availableSenders[0] : null)
   }, [props.message?.sender, props.availableSenders])
@@ -25,7 +31,18 @@ export const MetaDataForm = memo((props: { control: Control<S.GlobalForm>, avail
               {field.value && !props.displayToolbar ? (
                 <Text.LG semibold mb="$large">{field.value}</Text.LG>
               ) : (
-                <Input placeholder="Titre de la publication" label="" color="gray" defaultValue={field.value} onBlur={field.onBlur} onChange={field.onChange} error={fieldState.error?.message} />
+                <Input 
+                  placeholder="Titre de la publication" 
+                  label="" 
+                  color="gray" 
+                  defaultValue={field.value} 
+                  onBlur={() => {
+                    field.onBlur()
+                    props.onMetaDataChange?.()
+                  }} 
+                  onChange={field.onChange} 
+                  error={fieldState.error?.message} 
+                />
               )}
             </Animated.View>
           )
