@@ -63,7 +63,8 @@ export const RenderField = memo((props: {
   edgePosition?: 'leading' | 'trailing' | 'alone';
   editorMethods: RefObject<EditorMethods>;
   displayToolbar?: boolean;
-  senderThemeColor?: string; // Ajout de cette prop
+  senderThemeColor?: string;
+  onNodeChange?: (fieldId: string, nodeType: string, newValue: S.Node) => void;
 }) => {
   switch (props.field.type) {
     case 'image':
@@ -90,7 +91,11 @@ export const RenderField = memo((props: {
                     return (
                       <ImageNodeEditor
                         onBlur={() => onChange(null)}
-                        onChange={field.onChange}
+                        onChange={(newValue) => {
+                           // TODO: sauvegarder le contenu avec editorRef.current?.debouncedSave()
+                          field.onChange(newValue)
+                          props.onNodeChange?.(props.field.id, props.field.type, newValue)
+                        }}
                         present={value?.field?.id === props.field.id && value?.edit === true}
                         value={field.value}
                       />
@@ -131,9 +136,13 @@ export const RenderField = memo((props: {
                     <ButtonNodeEditor
                       onBlur={() => onChange(null)}
                       present={value?.field?.id === props.field.id && value.edit}
-                      onChange={field.onChange}
+                      onChange={(newValue) => {
+                         // TODO: sauvegarder le contenu avec editorRef.current?.debouncedSave()
+                        field.onChange(newValue)
+                        props.onNodeChange?.(props.field.id, props.field.type, newValue)
+                      }}
                       value={field.value}
-                      senderThemeColor={props.senderThemeColor} // Passage de la couleur
+                      senderThemeColor={props.senderThemeColor}
                     />
                   )
                 }}
@@ -171,7 +180,11 @@ export const RenderField = memo((props: {
                     <RichTextNodeEditor
                       onBlur={() => onChange(null)}
                       present={value?.field?.id === props.field.id && value.edit}
-                      onChange={field.onChange}
+                      onChange={(newValue) => {
+                         // TODO: sauvegarder le contenu avec editorRef.current?.debouncedSave()
+                        field.onChange(newValue)
+                        props.onNodeChange?.(props.field.id, props.field.type, newValue)
+                      }}
                       value={field.value}
                     />
                   )

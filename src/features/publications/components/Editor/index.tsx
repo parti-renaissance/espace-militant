@@ -1,17 +1,19 @@
-import { forwardRef, useImperativeHandle, useRef, useMemo } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useMemo, useEffect, useCallback } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uniqueId } from 'lodash'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { getTokenValue, isWeb, YStack } from 'tamagui'
-import { useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams, router } from 'expo-router'
 import { StyleRendererContextProvider } from './context/styleRenderContext'
 import { getHTML } from './HtmlOneRenderer'
 import { RenderFields } from './RenderFields'
 import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
-import { useGetAvailableSenders, useGetMessage } from '@/services/publications/hook'
+import { useGetAvailableSenders, useGetMessage, useAutoSave } from '@/services/publications/hook'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import { AutoSaveIndicator } from './AutoSaveIndicator'
+import { RestAvailableSender } from '@/services/publications/schema'
 
 export { getHTML, defaultTheme }
 
@@ -22,6 +24,8 @@ export type MessageEditorProps = {
   displayToolbar?: boolean
   messageId?: string
   onDisplayToolbarChange?: (display: boolean) => void
+  sender: RestAvailableSender
+  onMessageIdCreated?: (messageId: string) => void
 }
 
 export type MessageEditorRef = {
@@ -81,10 +85,32 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
     }
   }, [props.defaultValue, templateFromQuery, scopeFromQuery])
 
-  const { control, handleSubmit, setValue, unregister } = useForm<S.GlobalForm>({
+  const { control, handleSubmit, setValue, unregister, getValues } = useForm<S.GlobalForm>({
     defaultValues: { formValues: defaultData.states, metaData: defaultData.metaData, selectedField: null, addBarOpenForFieldId: null },
     resolver: zodResolver(S.MessageFormValuesValidatorSchema),
   })
+
+  const { 
+    debouncedSave, 
+    immediateSave,
+    isPending: isAutoSaving,
+    lastSaved,
+    hasError,
+    createdMessageId,
+  } = useAutoSave({
+    messageId: props.messageId,
+    scope: scopeFromQuery ?? '',
+  })
+
+  useEffect(() => {
+    if (createdMessageId) {
+      props.onMessageIdCreated?.(createdMessageId)
+      router.setParams({ 
+        id: createdMessageId,
+        scope: scopeFromQuery 
+      })
+    }
+  }, [createdMessageId, scopeFromQuery, props.onMessageIdCreated])
 
   const renderFieldsRef = useRef<RenderFieldRef>(null)
   const editorMethods = useRef({
@@ -101,9 +127,15 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       renderFieldsRef.current?.removeField(field)
       unregister(`formValues.${field.type}.${field.id}`)
       setValue('selectedField', null)
+      setTimeout(() => {
+        const currentValues = getValues()
+        const fields = renderFieldsRef.current?.getFields() ?? []
+        immediateSave(currentValues.formValues, fields, currentValues.metaData, props.sender)
+      }, 100)
     },
     moveField: (...xs) => {
       renderFieldsRef.current?.moveField(...xs)
+      debouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender)
     },
     scrollToField: (...xs) => {
       renderFieldsRef.current?.scrollToField(...xs)
@@ -116,10 +148,19 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
     }
   } satisfies EditorMethods)
 
+  const handleNodeChange = useCallback(() => {
+    debouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender)
+  }, [debouncedSave, getValues, props.sender])
+
   useImperativeHandle(ref, () => ({
     submit: handleSubmit(
       (x) => {
-        props.onSubmit(zipMessage(x.formValues, renderFieldsRef.current!.getFields(), x.metaData))
+        const fields = renderFieldsRef.current!.getFields()
+        immediateSave(x.formValues, fields, x.metaData, props.sender).then(() => {
+          props.onSubmit(zipMessage(x.formValues, fields, x.metaData))
+        }).catch((error) => {
+          console.error('Submit error:', error)
+        })
       },
       (errors) => {
         console.error('Validation errors:', errors);
@@ -157,10 +198,17 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
               displayToolbar={props.displayToolbar}
               availableSenders={availableSenders}
               message={message}
+              onNodeChange={handleNodeChange}
             />
           </StyleRendererContextProvider>
         </YStack>
       </YStack>
+
+      <AutoSaveIndicator
+        isSaving={isAutoSaving}
+        lastSaved={lastSaved}
+        hasError={hasError}
+      />
     </YStack>
   )
 })

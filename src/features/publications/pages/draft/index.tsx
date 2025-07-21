@@ -24,7 +24,7 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
     }
     
     router.push({
-      pathname: '/publications/[id]/editer',
+      pathname: '/publications/creer',
       params: navigationParams,
     })
   }, [item.uuid, scope])

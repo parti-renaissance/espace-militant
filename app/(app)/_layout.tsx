@@ -17,9 +17,9 @@ export default function AppLayout() {
     '/publications/draft',
     '/publications',
   ]
-  const isEditRoute = segments[1] === 'publications' && segments[3] === 'editer'
 
-  const shouldShowHeader = media.gtSm && !hideHeaderRoutes.includes(pathname) && !isEditRoute
+  const shouldShowHeader = media.gtSm && !hideHeaderRoutes.includes(pathname)
+  
   return (
     <PortalLayout>
       {shouldShowHeader ? (
@@ -125,14 +125,6 @@ export default function AppLayout() {
               },
               animation: route.params && 'withoutAnimation' in route.params ? 'none' : 'slide_from_right',
             })}
-          />
-
-          <Stack.Screen
-            name="publications/[id]/editer"
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
           />
 
           <Stack.Screen

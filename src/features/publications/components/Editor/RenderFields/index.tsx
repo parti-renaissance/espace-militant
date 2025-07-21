@@ -20,6 +20,7 @@ type RenderFieldsProps = {
   displayToolbar?: boolean
   availableSenders?: RestAvailableSendersResponse
   message?: RestGetMessageResponse
+  onNodeChange?: () => void
 }
 
 export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function RenderFields(props, ref) {
@@ -121,9 +122,10 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
         editorMethods={props.editorMethods}
         displayToolbar={props.displayToolbar}
         senderThemeColor={senderThemeColor}
+        onNodeChange={props.onNodeChange}
       />
     ),
-    [props.control, props.editorMethods, props.displayToolbar, senderThemeColor],
+    [props.control, props.editorMethods, props.displayToolbar, senderThemeColor, props.onNodeChange],
   )
 
   const keyExtractor = useCallback((props: S.FieldsArray[number]) => props.id, [])
@@ -139,9 +141,10 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
       control={props.control} 
       availableSenders={memoizedAvailableSenders} 
       message={memoizedMessage} 
-      displayToolbar={props.displayToolbar} 
+      displayToolbar={props.displayToolbar}
+      onMetaDataChange={props.onNodeChange}
     />
-  ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar])
+  ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar, props.onNodeChange])
 
   const { scrollHandler } = useFlatListHeader()
   const { isWebPageLayoutScrollActive } = usePageLayoutScroll()
