@@ -8,7 +8,6 @@ import StickyBox from '@/components/StickyBox/StickyBox'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { useCreateMessage, useGetAvailableSenders, useGetMessage, useGetMessageContent } from '@/services/publications/hook'
-import * as types from '@/services/publications/schema'
 import { PenLine, Speech } from '@tamagui/lucide-icons'
 import { Link, router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
@@ -18,7 +17,6 @@ import { ViewportModalRef } from '../../components/ConfirmationModal/ViewportMod
 import BigSwitch from '@/components/base/BigSwitch'
 import { RestAvailableSender } from '@/services/publications/schema'
 import { useToastController } from '@tamagui/toast'
-import { Spinner } from 'tamagui'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
