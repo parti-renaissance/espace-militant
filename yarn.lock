@@ -2954,7 +2954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/webpack-config@npm:~19.0.1":
+"@expo/webpack-config@npm:^19.0.1":
   version: 19.0.1
   resolution: "@expo/webpack-config@npm:19.0.1"
   dependencies:
@@ -30338,7 +30338,7 @@ __metadata:
     "@10play/tentap-editor": "npm:^0.6.1"
     "@babel/core": "npm:^7.25.2"
     "@eslint/js": "npm:^9.3.0"
-    "@expo/webpack-config": "npm:~19.0.1"
+    "@expo/webpack-config": "npm:^19.0.1"
     "@gorhom/bottom-sheet": "npm:^5"
     "@hookform/resolvers": "npm:^3.9.0"
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.1.1"
