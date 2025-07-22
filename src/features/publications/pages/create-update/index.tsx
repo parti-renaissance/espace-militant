@@ -9,7 +9,7 @@ import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/ind
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { useCreateMessage, useGetAvailableSenders, useGetMessage, useGetMessageContent } from '@/services/publications/hook'
 import { PenLine, Speech } from '@tamagui/lucide-icons'
-import { Link, router } from 'expo-router'
+import { router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
 import ConfirmationModal from '../../components/ConfirmationModal'
@@ -18,6 +18,7 @@ import BigSwitch from '@/components/base/BigSwitch'
 import { RestAvailableSender } from '@/services/publications/schema'
 import { useToastController } from '@tamagui/toast'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
+import QuitConfirmModal from '../../components/QuitConfirmModal'
 
 const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const editorRef = useRef<MessageEditorRef>(null)
@@ -27,6 +28,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [currentMessageId, setCurrentMessageId] = useState<string | undefined>(props?.messageId)
   const [wasInitiallyInCreation] = useState(!props?.messageId)
+  const [displayQuitModal, setDisplayQuitModal] = useState(false)
 
   useEffect(() => {
     if (props?.messageId) {
@@ -83,35 +85,32 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
       })
   }
 
+  const handleQuit = () => {
+    setDisplayQuitModal(false)
+    if (router.canGoBack()) {
+      router.back()
+    } else {
+      router.push('/publications')
+    }
+  }
+
   return (
     <>
+      <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} />
       <StickyBox webOnly style={{ zIndex: 10 }}>
         <YStack $gtSm={{ overflow: 'hidden', zIndex: 10 }}>
           <VoxHeader>
             <XStack alignItems="center" flex={1} width="100%">
               <XStack alignContent="flex-start">
-                {router.canGoBack() ? (
-                  <VoxButton
-                    size="lg"
-                    variant="text"
-                    theme={!messageContent ? 'orange' : undefined}
-                    onPress={() => router.back()}
-                    disabled={isInitialLoading}
-                  >
-                    {messageContent ? 'Quitter' : 'Annuler'}
-                  </VoxButton>
-                ) : (
-                  <Link href="/publications" replace asChild={!isWeb}>
-                    <VoxButton
-                      size="lg"
-                      variant="text"
-                      theme={!messageContent ? 'orange' : undefined}
-                      disabled={isInitialLoading}
-                    >
-                      {messageContent ? 'Quitter' : 'Annuler'}
-                    </VoxButton>
-                  </Link>
-                )}
+                <VoxButton
+                  size="lg"
+                  variant="text"
+                  theme={!messageContent ? 'orange' : undefined}
+                  onPress={messageContent && !displayQuitModal ? () => setDisplayQuitModal(true) : handleQuit}
+                  disabled={isInitialLoading}
+                >
+                  {messageContent ? 'Quitter' : 'Annuler'}
+                </VoxButton>
               </XStack>
               <XStack flexGrow={1} justifyContent="center">
                 <VoxHeader.Title icon={messageContent ? PenLine : media.gtSm ? Speech : undefined}>{messageContent ? 'Editer publication' : media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
@@ -150,7 +149,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
             marginHorizontal='auto'
             width="100%"
             flexGrow={1}
-            $gtSm={ isWeb ? { paddingTop: '$large' } : undefined }
+            $gtSm={isWeb ? { paddingTop: '$large' } : undefined}
           >
             <SkeCard>
               <SkeCard.Content>
