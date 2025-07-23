@@ -85,3 +85,21 @@ export const getAvailableSenders = (props: { scope: string }) =>
     responseSchema: schemas.RestAvailableSendersResponseSchema,
     type: 'private',
   })()
+
+export const getMessageFilters = (props: { messageId: string; scope: string }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherent_messages/${props.messageId}/filter?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestGetMessageFiltersResponseSchema,
+    type: 'private',
+  })()
+
+export const putMessageFilters = (props: { messageId: string; payload: schemas.RestPutMessageFiltersRequest; scope: string }) =>
+  api({
+    method: 'put',
+    path: `/api/v3/adherent_messages/${props.messageId}/filter?scope=${props.scope}`,
+    requestSchema: schemas.RestPutMessageFiltersRequestSchema,
+    responseSchema: z.literal('OK'),
+    type: 'private',
+  })(props.payload)
