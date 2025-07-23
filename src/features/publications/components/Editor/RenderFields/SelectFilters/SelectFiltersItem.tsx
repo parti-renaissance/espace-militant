@@ -159,13 +159,12 @@ const SelectItemComponent = ({
   disabled = false,
   type = 'radio'
 }: SelectItemProps) => {
-  const ctx = SelectItemContext.useStyledContext()
   const currentState = disabled ? 'default' : state
 
   const renderButton = () => {
     if (type === 'radio') {
-      return currentState === 'selected' || currentState === 'parentSelected' ? (
-       <YStack h="$medium" w="$medium" borderWidth={3} borderColor="$blue9" bg="white" borderRadius="$medium" />
+      return currentState === 'selected' || currentState === 'parentSelected' ? (
+        <YStack h="$medium" w="$medium" borderWidth={3} borderColor="$blue9" bg="white" borderRadius="$medium" />
       ) : (
         <YStack h="$medium" w="$medium" borderWidth={2} borderColor="$gray6" borderRadius="$medium" />
       )
