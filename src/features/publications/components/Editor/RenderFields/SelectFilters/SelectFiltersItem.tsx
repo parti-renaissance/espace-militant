@@ -1,7 +1,7 @@
 import React from 'react'
 import { createStyledContext, styled, withStaticProperties, XStack, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
-import { Check, Circle } from '@tamagui/lucide-icons'
+import { Check } from '@tamagui/lucide-icons'
 
 // Types pour les états
 type SelectItemState = 'default' | 'selected' | 'parentSelected'
