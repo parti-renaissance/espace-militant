@@ -2,7 +2,7 @@ import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/publications/api'
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { RestAvailableSender, RestGetMessageResponse, RestPostMessageRequest } from './schema'
+import { RestAvailableSender, RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 import { useCallback, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
@@ -52,9 +52,9 @@ export const useSendMessage = (props: { uuid: string }) => {
       test
         ? api.sendTestMessage({ scope, messageId: props.uuid })
         : api.sendMessage({
-            scope,
-            messageId: props.uuid,
-          }),
+          scope,
+          messageId: props.uuid,
+        }),
     onSuccess: () => {
       // Invalider le feed pour rafraîchir les publications après envoi
       queryClient.invalidateQueries({
@@ -103,11 +103,11 @@ export const useGetIsMessageTilSync = (props: { payload?: { messageId: string; s
     queryFn: () =>
       props.payload?.messageId && props.payload?.scope
         ? api.getMessage({ messageId: props.payload.messageId, scope: props.payload.scope }).then((x) => {
-            if (x.synchronized) {
-              return x as Omit<RestGetMessageResponse, 'synchronized'> & { synchronized: true }
-            }
-            throw new MessageNotSynchronizedError(props.payload?.messageId)
-          })
+          if (x.synchronized) {
+            return x as Omit<RestGetMessageResponse, 'synchronized'> & { synchronized: true }
+          }
+          throw new MessageNotSynchronizedError(props.payload?.messageId)
+        })
         : Promise.resolve(undefined),
     enabled: Boolean(props.payload?.messageId && props.payload?.scope),
     refetchOnMount: true,
@@ -177,7 +177,6 @@ export const useGetMessageCountRecipients = (props: { messageId?: string; scope?
     queryKey: ['message-count-recipients', props.messageId],
     queryFn: () => (props.messageId && props.scope ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined)),
     enabled: Boolean(props.messageId && props.scope) && props.enabled,
-    refetchOnMount: true,
   })
 }
 
@@ -185,8 +184,37 @@ export const useGetAvailableSenders = (props: { scope: string; }) => {
   return useQuery({
     queryKey: ['available-senders', props.scope],
     queryFn: () => api.getAvailableSenders({ scope: props.scope }),
-    refetchOnMount: true,
     staleTime: 60 * 1000,
+  })
+}
+
+export const useGetMessageFilters = (props: { messageId?: string; scope?: string; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['message-filters', props.messageId],
+    queryFn: () => (props.messageId && props.scope ? api.getMessageFilters({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined)),
+    enabled: props.enabled,
+  })
+}
+
+export const usePutMessageFilters = (props: { messageId?: string; scope?: string }) => {
+  const toast = useToastController()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: RestPutMessageFiltersRequest) =>
+      api.putMessageFilters({
+        messageId: props.messageId!,
+        payload,
+        scope: props.scope!
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['message-count-recipients', props.messageId],
+      })
+    },
+    onError: (error) => {
+      toast.show('Erreur', { message: 'Une erreur est survenue lors de la mise à jour des filtres', type: 'error' })
+      return error
+    }
   })
 }
 
@@ -199,19 +227,19 @@ export const useAutoSave = (props: {
   const createdMessageId = useRef<string | null>(null)
   const [lastSaved, setLastSaved] = useState<Date | undefined>(undefined)
   const [hasError, setHasError] = useState<boolean>(false)
-  
+
   const { mutateAsync: saveMessage, isPending } = useCreateMessage({ uuid: props.messageId })
 
   // Fonction utilitaire pour vérifier si un node a du contenu
   const hasContent = useCallback((node: S.Node): boolean => {
     if (!node.content) return false
-    
+
     switch (node.type) {
       case 'richtext':
         return Boolean(node.content.pure && node.content.pure.length > 0)
       case 'button':
-        return Boolean(node.content.text && node.content.text.length > 0 && 
-               node.content.link && node.content.link.length > 0)
+        return Boolean(node.content.text && node.content.text.length > 0 &&
+          node.content.link && node.content.link.length > 0)
       case 'image':
         return Boolean(node.content.url && node.content.url.length > 0)
       default:
@@ -229,20 +257,20 @@ export const useAutoSave = (props: {
 
   // Fonction de sauvegarde avec vérification de changement et de contenu
   const performSave = useCallback(async (
-    formValues: S.MessageFormValues, 
-    fields: S.FieldsArray, 
+    formValues: S.MessageFormValues,
+    fields: S.FieldsArray,
     metaData: S.MessageMetaData,
     sender: RestAvailableSender | null,
     forceSave = false
   ) => {
     const currentContent = JSON.stringify({ formValues, fields, metaData })
     const contentHash = `${currentContent}_${Date.now()}`
-    
+
     // Éviter les sauvegardes en double
     if (pendingSaves.current.has(contentHash)) {
       return
     }
-    
+
     // Éviter les sauvegardes inutiles sauf si forcée
     if (!forceSave && currentContent === lastSavedContent.current) {
       return
@@ -259,7 +287,7 @@ export const useAutoSave = (props: {
     try {
       pendingSaves.current.add(contentHash)
       setHasError(false)
-      
+
       const message = zipMessage(formValues, fields, metaData)
       const result = await saveMessage({
         scope: props.scope,
@@ -271,12 +299,12 @@ export const useAutoSave = (props: {
           content: htmlContent,
         },
       })
-      
+
       // Si c'est la première sauvegarde et qu'on n'avait pas d'ID, stocker le nouvel ID
       if (!props.messageId && result?.uuid && !createdMessageId.current) {
         createdMessageId.current = result.uuid
       }
-      
+
       lastSavedContent.current = currentContent
       setLastSaved(new Date())
     } catch (error) {
@@ -291,7 +319,7 @@ export const useAutoSave = (props: {
   const debouncedSave = useDebouncedCallback(
     (formValues: S.MessageFormValues, fields: S.FieldsArray, metaData: S.MessageMetaData, sender: RestAvailableSender | null) => {
       performSave(formValues, fields, metaData, sender, false)
-    }, 
+    },
     3000, // 3 secondes de délai
     {
       leading: false,
@@ -302,8 +330,8 @@ export const useAutoSave = (props: {
 
   // Sauvegarde immédiate pour les actions critiques
   const immediateSave = useCallback((
-    formValues: S.MessageFormValues, 
-    fields: S.FieldsArray, 
+    formValues: S.MessageFormValues,
+    fields: S.FieldsArray,
     metaData: S.MessageMetaData,
     sender: RestAvailableSender | null
   ) => {

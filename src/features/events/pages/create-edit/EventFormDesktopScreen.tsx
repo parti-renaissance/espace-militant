@@ -115,6 +115,7 @@ const EventDesktopAside = () => {
             render={({ field, fieldState }) => {
               return (
                 <AddressAutocomplete
+                  enableFallback
                   size="sm"
                   color="gray"
                   label="Localisation"

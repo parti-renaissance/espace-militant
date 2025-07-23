@@ -13,7 +13,7 @@ import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from
 import { useGetAvailableSenders, useGetMessage, useAutoSave } from '@/services/publications/hook'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { AutoSaveIndicator } from './AutoSaveIndicator'
-import { RestAvailableSender } from '@/services/publications/schema'
+import { RestAvailableSender, RestGetMessageFiltersResponse } from '@/services/publications/schema'
 
 export { getHTML, defaultTheme }
 
@@ -26,6 +26,7 @@ export type MessageEditorProps = {
   onDisplayToolbarChange?: (display: boolean) => void
   sender: RestAvailableSender
   onMessageIdCreated?: (messageId: string) => void
+  messageFilters?: RestGetMessageFiltersResponse
 }
 
 export type MessageEditorRef = {
@@ -199,6 +200,9 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
               availableSenders={availableSenders}
               message={message}
               onNodeChange={handleNodeChange}
+              messageFilters={props.messageFilters}
+              messageId={props.messageId}
+              scope={scopeFromQuery ?? ''}
             />
           </StyleRendererContextProvider>
         </YStack>

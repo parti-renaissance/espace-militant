@@ -11,7 +11,7 @@ import { isWeb, YStack } from 'tamagui'
 import { MetaDataForm } from './MetaDataForm'
 import { RenderField } from './RenderField'
 import { EditorInsertionToolbar } from '../EditorInsertionToolbar'
-import { RestAvailableSendersResponse, RestGetMessageResponse } from '@/services/publications/schema'
+import { RestAvailableSendersResponse, RestGetMessageResponse, RestGetMessageFiltersResponse } from '@/services/publications/schema'
 
 type RenderFieldsProps = {
   defaultStruct: S.FieldsArray
@@ -21,6 +21,9 @@ type RenderFieldsProps = {
   availableSenders?: RestAvailableSendersResponse
   message?: RestGetMessageResponse
   onNodeChange?: () => void
+  messageFilters?: RestGetMessageFiltersResponse
+  messageId?: string
+  scope: string
 }
 
 export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function RenderFields(props, ref) {
@@ -143,6 +146,9 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
       message={memoizedMessage} 
       displayToolbar={props.displayToolbar}
       onMetaDataChange={props.onNodeChange}
+      messageFilters={props.messageFilters}
+      messageId={props.messageId}
+      scope={props.scope}
     />
   ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar, props.onNodeChange])
 

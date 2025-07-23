@@ -7,7 +7,7 @@ import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import StickyBox from '@/components/StickyBox/StickyBox'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
-import { useCreateMessage, useGetAvailableSenders, useGetMessage, useGetMessageContent } from '@/services/publications/hook'
+import { useCreateMessage, useGetAvailableSenders, useGetMessage, useGetMessageContent, useGetMessageFilters } from '@/services/publications/hook'
 import { PenLine, Speech } from '@tamagui/lucide-icons'
 import { router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
@@ -46,6 +46,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
     }
   }, [props?.messageId, props?.scope])
 
+  const { data: messageFiltersData, isLoading: isMessageFiltersLoading } = useGetMessageFilters(messageQueryParams)
   const { data: messageData, isLoading: isMessageLoading } = useGetMessage(messageQueryParams)
   const { data: messageContent, isLoading: isMessageContentLoading, isError: isMessageContentError } = useGetMessageContent(messageQueryParams)
 
@@ -61,7 +62,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
     return null
   }, [messageData?.sender, availableSenders])
 
-  const isInitialLoading = !wasInitiallyInCreation && (isMessageLoading || isSendersLoading || isMessageContentLoading)
+  const isInitialLoading = !wasInitiallyInCreation && (isMessageLoading || isSendersLoading || isMessageContentLoading || isMessageFiltersLoading)
 
   const handleSubmit = (x: S.Message) => {
     if (x?.content.length === 0) {
@@ -90,7 +91,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
     if (router.canGoBack()) {
       router.back()
     } else {
-      router.push('/publications')
+      router.replace('/publications')
     }
   }
 
@@ -191,6 +192,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
                   setMode(displayToolbar ? 'edit' : 'preview')
                 }}
                 sender={selectedSender as RestAvailableSender}
+                messageFilters={messageFiltersData}
               />
             </PageLayout.MainSingleColumn>
           </BoundarySuspenseWrapper>

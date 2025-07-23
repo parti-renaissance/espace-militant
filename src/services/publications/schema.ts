@@ -132,3 +132,79 @@ export const RestGetMessageResponseSchema = z.object({
 })
 
 export type RestGetMessageResponse = z.infer<typeof RestGetMessageResponseSchema>
+
+export const RestGetMessageFiltersResponseSchema = z.object({
+  is_certified: z.boolean().nullable(),
+  zone: z.object({
+    uuid: z.string(),
+    type: z.string(),
+    code: z.string(),
+    name: z.string(),
+  }).nullable(),
+  committee: z.string().nullable(),
+  is_committee_member: z.boolean().nullable(),
+  mandate_type: z.string().nullable(),
+  declared_mandate: z.string().nullable(),
+  is_campus_registered: z.boolean().nullable(),
+  donator_status: z.string().nullable(),
+  adherent_tags: z.string().nullable(),
+  elect_tags: z.string().nullable(),
+  static_tags: z.string().nullable(),
+  zones: z.array(z.object({
+    uuid: z.string(),
+    type: z.string(),
+    code: z.string(),
+    name: z.string(),
+  })).nullable(),
+  gender: z.string().nullable(),
+  age_min: z.number().nullable(),
+  age_max: z.number().nullable(),
+  first_name: z.string().nullable(),
+  last_name: z.string().nullable(),
+  registered_since: z.string().nullable(),
+  registered_until: z.string().nullable(),
+  first_membership_since: z.string().nullable(),
+  first_membership_before: z.string().nullable(),
+  last_membership_since: z.string().nullable(),
+  last_membership_before: z.string().nullable(),
+}).passthrough() // Permet d'ajouter des champs supplémentaires
+
+export type RestGetMessageFiltersResponse = z.infer<typeof RestGetMessageFiltersResponseSchema>
+
+export const RestPutMessageFiltersRequestSchema = z.object({
+  is_certified: z.boolean().nullable().optional(),
+  zone: z.string().nullable().optional(),
+  committee: z.string().nullable().optional(),
+  is_committee_member: z.boolean().nullable().optional(),
+  mandate_type: z.string().nullable().optional(),
+  declared_mandate: z.string().nullable().optional(),
+  is_campus_registered: z.boolean().nullable().optional(),
+  donator_status: z.string().nullable().optional(),
+  adherent_tags: z.string().nullable().optional(),
+  elect_tags: z.string().nullable().optional(),
+  static_tags: z.string().nullable().optional(),
+  zones: z
+    .array(
+      z.object({
+        uuid: z.string(),
+        type: z.string(),
+        code: z.string(),
+        name: z.string(),
+      })
+    )
+    .nullable()
+    .optional(),
+  gender: z.string().nullable().optional(),
+  age_min: z.number().nullable().optional(),
+  age_max: z.number().nullable().optional(),
+  first_name: z.string().nullable().optional(),
+  last_name: z.string().nullable().optional(),
+  registered_since: z.string().nullable().optional(),
+  registered_until: z.string().nullable().optional(),
+  first_membership_since: z.string().nullable().optional(),
+  first_membership_before: z.string().nullable().optional(),
+  last_membership_since: z.string().nullable().optional(),
+  last_membership_before: z.string().nullable().optional(),
+}).passthrough()
+
+export type RestPutMessageFiltersRequest = z.infer<typeof RestPutMessageFiltersRequestSchema>
