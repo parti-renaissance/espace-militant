@@ -150,7 +150,7 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
       messageId={props.messageId}
       scope={props.scope}
     />
-  ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar, props.onNodeChange])
+  ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar, props.onNodeChange, props.messageFilters, props.messageId, props.scope])
 
   const { scrollHandler } = useFlatListHeader()
   const { isWebPageLayoutScrollActive } = usePageLayoutScroll()
