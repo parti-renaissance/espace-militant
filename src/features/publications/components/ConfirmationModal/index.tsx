@@ -72,8 +72,6 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
 
   const allDisabled = !!syncError || isSyncFetching || isLoadingRecipients || isPending
 
-  console.log('synchronized :', isMessageTilSync?.synchronized)
-
   return (
     <ViewportModalSheet ref={modalSheetRef} onClose={handleCancel}>
       <VoxCard.Content marginBottom="$large" gap="$large">

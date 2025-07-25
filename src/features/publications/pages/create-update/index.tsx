@@ -9,7 +9,7 @@ import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/ind
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { useCreateMessage, useGetAvailableSenders, useGetMessage, useGetMessageContent, useGetMessageFilters } from '@/services/publications/hook'
 import { useQueryClient } from '@tanstack/react-query'
-import { PenLine, Speech } from '@tamagui/lucide-icons'
+import { Speech } from '@tamagui/lucide-icons'
 import { router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
@@ -85,10 +85,8 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
       .then((result) => {
         // Invalider la query message-til-sync seulement lors du submit définitif
         if (result?.uuid) {
-          console.log('invalidate message-til-sync result.uuid', result.uuid)
           queryClient.invalidateQueries({ queryKey: ['message-til-sync', result.uuid] })
         } else if (currentMessageId) {
-          console.log('invalidate message-til-sync currentMessageId', currentMessageId)
           queryClient.invalidateQueries({ queryKey: ['message-til-sync', currentMessageId] })
         }
         
