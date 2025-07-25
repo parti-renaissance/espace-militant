@@ -3,15 +3,25 @@ import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustratio
 import { VoxButton } from '@/components/Button'
 import { NavBar, ProfileNav, VoxHeader } from '@/components/Header/Header'
 import { PortalLayout } from '@/components/layouts/PortalLayout'
-import { ArrowLeft } from '@tamagui/lucide-icons'
-import { Link, Stack } from 'expo-router'
+import { ArrowLeft, FileEdit, Speech } from '@tamagui/lucide-icons'
+import { Link, Stack, usePathname } from 'expo-router'
 import { isWeb, useMedia, View, XStack } from 'tamagui'
+import ProfilHeader from '@/features/profil/components/PageHeader'
 
 export default function AppLayout() {
   const media = useMedia()
+  const pathname = usePathname()
+  const hideHeaderRoutes = [
+    '/publications/creer',
+    '/publications/draft',
+    '/publications',
+  ]
+
+  const shouldShowHeader = media.gtSm && !hideHeaderRoutes.includes(pathname)
+
   return (
     <PortalLayout>
-      {media.gtSm ? (
+      {shouldShowHeader ? (
         <VoxHeader justifyContent="space-between" display="none" $gtSm={{ display: 'flex' }} safeAreaView={true}>
           <XStack flex={1} flexBasis={0}>
             <Link href="/" replace>
@@ -90,7 +100,14 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="messages/creer"
+            name="publications/index"
+            options={{
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false} /> }
+            }}
+          />
+
+          <Stack.Screen
+            name="publications/creer"
             options={{
               headerShown: false,
               gestureEnabled: false,
@@ -98,12 +115,24 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="messages/[id]/editer"
+            name="publications/[id]/index"
+            options={({ route }) => ({
+              header: () => {
+                return media.sm ? (
+                  <ProfilHeader title="" backgroundColor="$textSurface" forcedBackTitle="Retour" />
+                ) : null
+              },
+              animation: route.params && 'withoutAnimation' in route.params ? 'none' : 'slide_from_right',
+            })}
+          />
+
+          <Stack.Screen
+            name="publications/draft"
             options={{
-              headerShown: false,
-              gestureEnabled: false,
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false}  backPath="/publications"/> }
             }}
           />
+
           <Stack.Screen name="porte-a-porte/building-detail" options={{ title: '' }} />
           <Stack.Screen name="porte-a-porte/tunnel" options={{ presentation: 'fullScreenModal', headerShown: false }} />
           <Stack.Screen name="questionnaires/index" options={{ headerShown: false }} />

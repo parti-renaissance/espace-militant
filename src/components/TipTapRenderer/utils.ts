@@ -28,6 +28,10 @@ export function isTipParagraph(obj: unknown): obj is schemas.TipParagraph {
   return schemas.paragraphSchema.safeParse(obj).success
 }
 
+export function isTipHeading(obj: unknown): obj is schemas.TipHeading {
+  return schemas.headingSchema.safeParse(obj).success
+}
+
 export function isTipListItem(obj: unknown): obj is schemas.TipListItem {
   return schemas.listItemSchema.safeParse(obj).success
 }

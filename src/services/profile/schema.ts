@@ -1,7 +1,18 @@
-import { UnregistrationReason } from '@/components/DeleteAccountModal/Components/DeleteAccountModalStep2'
 import { activistTagSchema, ActivistTagTypes } from '@/data/Activist/schema'
 import { RestEventAgoraSchema, RestEventCommitteeSchema } from '@/services/events/schema'
 import { z } from 'zod'
+
+// -----------------  UnregistrationReason  -----------------
+
+export enum UnregistrationReason {
+  Emails = 'unregistration_reasons.emails',
+  Tools = 'unregistration_reasons.tools',
+  Support = 'unregistration_reasons.support',
+  Government = 'unregistration_reasons.government',
+  Elected = 'unregistration_reasons.elected',
+  Movement = 'unregistration_reasons.movement',
+  Other = 'unregistration_reasons.other',
+}
 
 // -----------------  RestProfil  -----------------
 

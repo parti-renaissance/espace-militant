@@ -55,7 +55,7 @@ export const ButtonFrameStyled = styled(View, {
     },
     loading: {
       true: {
-        pointerEvents: 'none',
+        style: { pointerEvents: 'none' },
         cursor: 'wait',
       },
     },
@@ -71,6 +71,11 @@ export const ButtonFrameStyled = styled(View, {
       },
     },
     size: {
+      xs: {
+        height: 24,
+        minWidth: 24,
+        gap: 2,
+      },
       sm: {
         height: 32,
         minWidth: 32,

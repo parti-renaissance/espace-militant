@@ -100,8 +100,6 @@ const EventDesktopAside = () => {
                   { value: 'online', label: 'En ligne' },
                 ]}
                 onChange={(x) => {
-                  console.log({ mode: x });
-
                   field.onChange(x)
                   setMode(x as EventFormData['mode'])
                 }}
@@ -117,6 +115,7 @@ const EventDesktopAside = () => {
             render={({ field, fieldState }) => {
               return (
                 <AddressAutocomplete
+                  enableFallback
                   size="sm"
                   color="gray"
                   label="Localisation"
@@ -358,7 +357,7 @@ const EventFormDesktopScreen = () => {
           <BackButton />
         </XStack>
         <YStack gap="$medium">
-          <VoxCard opacity={globalPending ? 0.5 : 1} pointerEvents={globalPending ? 'none' : 'auto'} cursor={globalPending ? 'progress' : 'auto'}>
+          <VoxCard opacity={globalPending ? 0.5 : 1} style={{ pointerEvents: globalPending ? 'none' : 'auto' }} cursor={globalPending ? 'progress' : 'auto'}>
             <VoxCard.Content pb={0} justifyContent="center" alignItems="center">
               <VoxHeader.Title icon={Calendar}>{`${editMode ? 'Modifier' : 'Créer'} l'événement`}</VoxHeader.Title>
             </VoxCard.Content>

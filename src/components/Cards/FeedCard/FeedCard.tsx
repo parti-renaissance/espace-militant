@@ -2,6 +2,7 @@ import { ComponentProps } from 'react'
 import { ActionCard, ActionVoxCardProps } from '@/components/Cards/ActionCard'
 import { NewsCard, NewsVoxCardProps } from '@/components/Cards/NewsCard'
 import EventListItem from '@/features/events/components/EventListItem'
+import PublicationCard, { PublicationCardProps } from '@/components/Cards/PublicationCard/PublicationCard'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
 
 export type FeedCardProps =
@@ -14,6 +15,9 @@ export type FeedCardProps =
   | ({
       type: 'news'
     } & NewsVoxCardProps)
+  | ({
+      type: 'publication'
+    } & PublicationCardProps)
 
 const FeedCard = (props: FeedCardProps) => {
   const { data } = useGetSuspenseProfil()
@@ -24,8 +28,10 @@ const FeedCard = (props: FeedCardProps) => {
       return <ActionCard {...props} />
     case 'news':
       return <NewsCard {...props} />
+    case 'publication':
+      return <PublicationCard {...props} />
     default:
-      throw new Error('Invalid card type')
+      return null
   }
 }
 

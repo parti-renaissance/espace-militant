@@ -11,6 +11,7 @@ export const RestTimelineFeedAddressSchema = z.object({
   country: z.string().nullable(),
 })
 
+export type RestTimelineFeedAuthor = z.infer<typeof RestTimelineFeedAuthorSchema>
 export const RestTimelineFeedAuthorSchema = z.object({
   first_name: z.string().nullable(),
   last_name: z.string().nullable(),
@@ -19,13 +20,20 @@ export const RestTimelineFeedAuthorSchema = z.object({
   zone: z.string().nullish(),
   image_url: z.string().url().nullish(),
   uuid: z.string().nullish(),
+  scope: z.string().nullish(),
+  theme: z.object({
+    soft: z.string().nullish(),
+    hover: z.string().nullish(),
+    active: z.string().nullish(),
+    primary: z.string().nullish(),
+  }).nullish(),
 })
 
 export type RestTimelineFeedItem = z.infer<typeof RestTimelineFeedItemSchema>
 export const RestTimelineFeedItemSchema = z.object({
   objectID: z.string(),
   identifier: z.string().nullable(),
-  type: z.enum(['news', 'event', 'phoning-campaign', 'pap-campaign', 'survey', 'riposte', 'action']),
+  type: z.enum(['news', 'event', 'phoning-campaign', 'pap-campaign', 'survey', 'riposte', 'action', 'publication']),
   title: z.string().nullable(),
   description: z.string().nullable(),
   author: RestTimelineFeedAuthorSchema.nullable().optional(),
@@ -57,6 +65,9 @@ export const RestTimelineFeedItemSchema = z.object({
   visibility: z.string().nullish(),
   live_url: z.string().nullish(),
   participants_count: z.number().nullish(),
+  zone_codes: z.union([z.array(z.string()), z.array(z.array(z.string()))]).nullish(),
+  committee_uuid: z.string().nullish(),
+  agora_uuid: z.string().nullish(),
 })
 
 export type RestTimelineFeedResponse = z.infer<typeof RestTimelineFeedResponseSchema>

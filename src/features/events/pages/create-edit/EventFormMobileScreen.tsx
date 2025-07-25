@@ -104,7 +104,7 @@ export default function EventFormMobileScreen() {
       {ConfirmAlert}
       <LayoutPage.MainSingleColumn
         opacity={globalPending ? 0.5 : 1}
-        pointerEvents={globalPending ? 'none' : 'auto'}
+        style={{ pointerEvents: globalPending ? 'none' : 'auto' }}
         cursor={globalPending ? 'progress' : 'auto'}
       >
         <VoxHeader>
@@ -244,6 +244,7 @@ export default function EventFormMobileScreen() {
                     render={({ field, fieldState }) => {
                       return (
                         <AddressAutocomplete
+                          enableFallback
                           size="sm"
                           color="gray"
                           label="Localisation"

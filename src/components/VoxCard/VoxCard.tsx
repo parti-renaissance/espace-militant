@@ -212,9 +212,10 @@ export type VoxCardImageProps = {
 }
 
 const VoxCardImage = ({ image, large, imageData }: VoxCardImageProps) => {
+  const imageKey = imageData?.url ?? image
   return (
     <XStack borderRadius={large ? 0 : 8} overflow="hidden">
-      <AutoSizeImage key={imageData?.url ?? image} source={image} width={imageData?.width ?? undefined} height={imageData?.height ?? undefined} />
+      <AutoSizeImage key={imageKey} source={image} width={imageData?.width ?? undefined} height={imageData?.height ?? undefined} />
     </XStack>
   )
 }
@@ -223,9 +224,10 @@ export type VoxCardDescriptionProps = {
   children: string | string[]
   full?: boolean
   markdown?: boolean
+  numberOfLines?: number
 }
 
-const VoxCardDescription = ({ children, full, markdown }: VoxCardDescriptionProps) => {
+const VoxCardDescription = ({ children, full, markdown, numberOfLines }: VoxCardDescriptionProps) => {
   const theme = useTheme()
   return markdown ? (
     <Markdown
@@ -241,7 +243,7 @@ const VoxCardDescription = ({ children, full, markdown }: VoxCardDescriptionProp
       {children}
     </Markdown>
   ) : (
-    <Text.SM numberOfLines={full ? undefined : 3} multiline>
+    <Text.SM numberOfLines={numberOfLines ?? (full ? undefined : 3)} multiline>
       {children}
     </Text.SM>
   )

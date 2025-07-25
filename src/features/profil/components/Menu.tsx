@@ -2,10 +2,10 @@ import { useMemo } from 'react'
 import Menu from '@/components/menu/Menu'
 import clientEnv from '@/config/clientEnv'
 import { useSession } from '@/ctx/SessionProvider'
-import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
+import { useGetProfil } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
-import { LogOut, PenLine, Send } from '@tamagui/lucide-icons'
+import { LogOut, PenLine } from '@tamagui/lucide-icons'
 import { Href, Link, usePathname } from 'expo-router'
 import omit from 'lodash/omit'
 import { isWeb, useMedia, YStack } from 'tamagui'
@@ -27,7 +27,6 @@ const ProfilMenu = () => {
   const media = useMedia()
   const pathname = usePathname()
   const { signOut } = useSession()
-  const { hasFeature } = useGetExecutiveScopes()
   const { data: profile } = useGetProfil({ enabled: true })
   const itemsData = useMemo(
     () => (media.gtSm ? mapPageConfigs(pageConfigs, profile) : mapPageConfigs(omit(pageConfigs, ['index']), profile)),
@@ -64,15 +63,6 @@ const ProfilMenu = () => {
           {credentials?.isAdmin ? 'Quitter l’impersonnification' : 'Me déconnecter'}
         </Menu.Item>
       </Menu>
-      {hasFeature('messages_vox') ? (
-        <Menu>
-          <Link href="/messages/creer" asChild={!isWeb}>
-            <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} icon={Send} last={true}>
-              Beta: créer un message
-            </Menu.Item>
-          </Link>
-        </Menu>
-      ) : null}
     </YStack>
   )
 }

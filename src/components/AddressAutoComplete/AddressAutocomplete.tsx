@@ -26,6 +26,7 @@ export interface AddressAutocompleteProps {
   forceSelect?: boolean
   placeholder?: string
   onReset?: () => void
+  enableFallback?: boolean
 }
 
 function AddressAutocomplete({
@@ -36,6 +37,7 @@ function AddressAutocomplete({
   minWidth,
   onBlur,
   onReset,
+  enableFallback = false,
   ...rest
 }: Readonly<AddressAutocompleteProps> & Omit<ComponentProps<typeof Select>, 'handleQuery' | 'options' | 'value' | 'onChange'>): JSX.Element {
   const [value, setValue] = useState<string>('default')
@@ -66,7 +68,7 @@ function AddressAutocomplete({
     mutateAsync(id)
       .then((placeDetails) => {
         if (placeDetails?.formatted && placeDetails.details && placeDetails.geometry) {
-          const fallback = selectedPrediction ? !isProbablyAddress(selectedPrediction) : false
+          const fallback = enableFallback && selectedPrediction ? !isProbablyAddress(selectedPrediction) : false
           setAddressComponents?.(
             googleAddressMapper({ placeDetails, addressFallback: fallback })
           )
@@ -110,7 +112,7 @@ function AddressAutocomplete({
         options={[
           ...(autocompleteResults?.map((x) => ({
             value: x.place_id,
-            label: !isProbablyAddress(x) ? `🔜 Lieu communiqué bientôt, ${x.description}` : x.description,
+            label: enableFallback && !isProbablyAddress(x) ? `🔜 Lieu communiqué bientôt, ${x.description}` : x.description,
           })) ?? []),
           ...(defaultValue ? [{ value: 'default', label: defaultValue }] : []),
         ]}
