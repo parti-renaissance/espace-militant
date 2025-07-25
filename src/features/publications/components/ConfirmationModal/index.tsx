@@ -25,7 +25,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
   const modalSheetRef = useRef<ViewportModalRef>(null)
   const toast = useToastController()
   const media = useMedia()
-  const { data: isMessageTilSync, isLoading: isSyncLoading, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ payload: payload?.messageId && payload?.scope ? { messageId: payload.messageId, scope: payload.scope } : undefined })
+  const { data: isMessageTilSync, isLoading: isSyncLoading, isFetching: isSyncFetching, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ payload: payload?.messageId && payload?.scope ? { messageId: payload.messageId, scope: payload.scope } : undefined })
 
   const { data: recipients, isLoading: isLoadingRecipients } = useGetMessageCountRecipients({
     messageId: payload?.messageId || '',
@@ -40,7 +40,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
   })
 
   const handleSendMessage = () => {
-    if (isSyncLoading) return
+    if (isSyncFetching) return
     mutate({ 
       scope: payload?.scope || '',
     }, {
@@ -59,7 +59,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
   }
 
   const handleSendTestMessage = () => {
-    if (isSyncLoading) return
+    if (isSyncFetching) return
     toast.show('Test envoyé', { message: 'Le test a été envoyé avec succès', type: 'success' })
     mutate({ scope: payload?.scope || '', test: true })
   }
@@ -70,7 +70,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
 
   const handleCancel = () => {}
 
-  const allDisabled = !!syncError || isSyncLoading || isLoadingRecipients || isPending
+  const allDisabled = !!syncError || isSyncFetching || isLoadingRecipients || isPending
 
   return (
     <ViewportModalSheet ref={modalSheetRef} onClose={handleCancel}>
@@ -88,7 +88,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
                   <AlertTriangle color="#D02828" size="$medium" />
                   <Text.LG color="#D02828" textAlign="center"> Nous n'avons pas pu synchroniser{'\n'}les données de votre publication</Text.LG>
                   <YStack>
-                    <VoxButton variant="outlined" iconLeft={RefreshCcw} disabled={isSyncLoading} loading={isSyncLoading} onPress={() => { refetchSync() }}>Réessayer</VoxButton>
+                    <VoxButton variant="outlined" iconLeft={RefreshCcw} disabled={isSyncFetching} loading={isSyncFetching} onPress={() => { refetchSync() }}>Réessayer</VoxButton>
                   </YStack>
                 </VoxCard.Content>
               </VoxCard>
@@ -174,7 +174,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
                       disabled={allDisabled}
                     // onLongPress={handleSendTestMessage}
                     >
-                      Aperçu version email
+                      {media.gtSm ? 'Aperçu version email' : 'Aperçu'}
                     </VoxButton>
                   </Link>
                 </YStack>
@@ -187,7 +187,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
                   flexGrow={1}
                   disabled={allDisabled}
                 >
-                  Aperçu version email
+                  {media.gtSm ? 'Aperçu version email' : 'Aperçu'}
                 </VoxButton>
               )}
               <VoxButton
@@ -216,8 +216,8 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
             variant="contained"
             iconRight={SendHorizontal}
             onPress={handleSendMessage}
-            loading={isPending}
-            disabled={allDisabled || !isMessageTilSync?.uuid}
+            loading={isPending || isSyncFetching}
+            disabled={allDisabled || !isMessageTilSync?.synchronized}
           >
             Publier & envoyer
           </VoxButton>

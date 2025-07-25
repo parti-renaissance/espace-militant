@@ -110,7 +110,6 @@ export const useGetIsMessageTilSync = (props: { payload?: { messageId: string; s
         })
         : Promise.resolve(undefined),
     enabled: Boolean(props.payload?.messageId && props.payload?.scope),
-    refetchOnMount: true,
     retry: (attempts, error) => {
       if (attempts > 20) return false
       if (error instanceof MessageNotSynchronizedError) {
@@ -169,7 +168,6 @@ export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') =
     getPreviousPageParam: (firstPage) =>
       firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined,
     placeholderData: (prev) => prev,
-    refetchOnMount: true,
   })
 }
 
