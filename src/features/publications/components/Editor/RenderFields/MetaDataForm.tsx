@@ -46,33 +46,28 @@ export const MetaDataForm = memo((props: {
   const { mutate: putMessageFilters, isPending: isPuttingMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
 
   // Animation values
-  const animatedHeight = useSharedValue(props.displayToolbar ? 56 : 0)
-  const animatedOpacity = useSharedValue(props.displayToolbar ? 1 : 0)
+  const animatedProgress = useSharedValue(props.displayToolbar ? 1 : 0)
 
   // Animated style
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      height: animatedHeight.value,
-      opacity: animatedOpacity.value,
+      height: animatedProgress.value * 56,
+      opacity: animatedProgress.value,
       overflow: 'hidden',
+      marginTop: 16,
+      marginBottom: animatedProgress.value * 16,
     }
   })
 
   // Update animation when displayToolbar changes
   useEffect(() => {
-    const targetHeight = props.displayToolbar ? 56 : 0
-    const targetOpacity = props.displayToolbar ? 1 : 0
+    const targetProgress = props.displayToolbar ? 1 : 0
     
-    animatedHeight.value = withTiming(targetHeight, {
+    animatedProgress.value = withTiming(targetProgress, {
       duration: 300,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+      easing: Easing.ease,
     })
-    
-    animatedOpacity.value = withTiming(targetOpacity, {
-      duration: 300,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-    })
-  }, [props.displayToolbar, animatedHeight, animatedOpacity])
+  }, [props.displayToolbar, animatedProgress])
 
   useEffect(() => {
     const newFilters = props.messageFilters as SelectedFiltersType ?? { 'adherent_tags': 'adherent' }
@@ -108,7 +103,7 @@ export const MetaDataForm = memo((props: {
   }
 
   return (
-    <YStack gap="$medium" backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ? '$medium' : 0}>
+    <YStack backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ? '$medium' : 0}>
       <SenderView sender={senderToDisplay} datetime="1 min." />
       <Animated.View style={[animatedStyle, { justifyContent: 'center' }]}>
         <SelectFilters

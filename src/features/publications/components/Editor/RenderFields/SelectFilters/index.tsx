@@ -164,7 +164,7 @@ export default function SelectFilters({
                   <Text.MD secondary>contacts.</Text.MD>
                 </XStack>
                 <XStack alignItems="center" flexWrap="wrap">
-                  <Text.MD secondary>Il sera visible à</Text.MD>
+                  <Text.MD secondary>Elle sera visible à</Text.MD>
                   <XStack alignItems="center" justifyContent="center" position="relative" minWidth={18}>
                     {isFetchingMessageCountRecipients || isLoading ? (
                       <YStack position="absolute" left={0} top={0} right={0} bottom={0} justifyContent="center" alignItems="center" backgroundColor="white" zIndex={10}>

@@ -8,6 +8,7 @@ import StickyBox from '@/components/StickyBox/StickyBox'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { useCreateMessage, useGetAvailableSenders, useGetMessage, useGetMessageContent, useGetMessageFilters } from '@/services/publications/hook'
+import { useQueryClient } from '@tanstack/react-query'
 import { PenLine, Speech } from '@tamagui/lucide-icons'
 import { router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
@@ -25,6 +26,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const modalSendRef = useRef<ViewportModalRef>(null)
   const media = useMedia()
   const toast = useToastController()
+  const queryClient = useQueryClient()
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [currentMessageId, setCurrentMessageId] = useState<string | undefined>(props?.messageId)
   const [wasInitiallyInCreation] = useState(!props?.messageId)
@@ -80,7 +82,16 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
           content: getHTML(defaultTheme, x, selectedSender),
         },
       })
-      .then(() => {
+      .then((result) => {
+        // Invalider la query message-til-sync seulement lors du submit définitif
+        if (result?.uuid) {
+          console.log('invalidate message-til-sync result.uuid', result.uuid)
+          queryClient.invalidateQueries({ queryKey: ['message-til-sync', result.uuid] })
+        } else if (currentMessageId) {
+          console.log('invalidate message-til-sync currentMessageId', currentMessageId)
+          queryClient.invalidateQueries({ queryKey: ['message-til-sync', currentMessageId] })
+        }
+        
         modalSendRef.current?.present()
         Keyboard.dismiss()
       })
@@ -114,7 +125,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
                 </VoxButton>
               </XStack>
               <XStack flexGrow={1} justifyContent="center">
-                <VoxHeader.Title icon={props?.messageId ? PenLine : media.gtSm ? Speech : undefined}>{props?.messageId ? 'Editer publication' : media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
+                <VoxHeader.Title icon={media.gtSm ? Speech : undefined}>Nouvelle publication</VoxHeader.Title>
               </XStack>
               <XStack>
                 <VoxButton

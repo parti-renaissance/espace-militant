@@ -76,10 +76,12 @@ const DraftPage = () => {
       <PageLayout.MainSingleColumn>
         <YStack alignItems="center" marginTop={16} maxWidth={520} $sm={{ maxWidth: '100%' }} alignSelf="center" width="100%" gap="$small">
           {Array.from({ length: 5 }).map((_, i) => (
-            <SkeCard key={i} width="100%">
+            <SkeCard key={i} width="100%" height={195}>
               <SkeCard.Content>
+                <SkeCard.Chip />
+                <SkeCard.Author />
                 <SkeCard.Title />
-                <SkeCard.Description />
+                <SkeCard.Line width="30%" />
               </SkeCard.Content>
             </SkeCard>
           ))}
