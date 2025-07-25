@@ -6,7 +6,7 @@ import Text from '@/components/base/Text'
 import SenderView from '../../SenderView'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { RestAvailableSendersResponse, RestGetMessageFiltersResponse, RestGetMessageResponse } from '@/services/publications/schema'
-import Animated from 'react-native-reanimated'
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated'
 import SelectFilters, { SelectedFiltersType } from './SelectFilters'
 import { usePutMessageFilters } from '@/services/publications/hook'
 import { identifyQuickFilter } from './SelectFilters/helpers'
@@ -43,7 +43,36 @@ export const MetaDataForm = memo((props: {
   const [filters, setFilters] = useState<SelectedFiltersType>(props.messageFilters as SelectedFiltersType ?? { 'adherent_tags': 'adherent' })
   const [quickFilterId, setQuickFilterId] = useState<string | null>('adherents')
 
-  const { mutate: putMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
+  const { mutate: putMessageFilters, isPending: isPuttingMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
+
+  // Animation values
+  const animatedHeight = useSharedValue(props.displayToolbar ? 56 : 0)
+  const animatedOpacity = useSharedValue(props.displayToolbar ? 1 : 0)
+
+  // Animated style
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      height: animatedHeight.value,
+      opacity: animatedOpacity.value,
+      overflow: 'hidden',
+    }
+  })
+
+  // Update animation when displayToolbar changes
+  useEffect(() => {
+    const targetHeight = props.displayToolbar ? 56 : 0
+    const targetOpacity = props.displayToolbar ? 1 : 0
+    
+    animatedHeight.value = withTiming(targetHeight, {
+      duration: 300,
+      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+    })
+    
+    animatedOpacity.value = withTiming(targetOpacity, {
+      duration: 300,
+      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+    })
+  }, [props.displayToolbar, animatedHeight, animatedOpacity])
 
   useEffect(() => {
     const newFilters = props.messageFilters as SelectedFiltersType ?? { 'adherent_tags': 'adherent' }
@@ -55,15 +84,12 @@ export const MetaDataForm = memo((props: {
 
   const handleFiltersChange = ({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => {
     const mergedFilters = { ...filters, ...newFilters }
-
     const mappedFilters = temporaryMapFiltersForApi(mergedFilters)
 
     let hasAnyChange = false
-    const initialFilters = props.messageFilters as SelectedFiltersType ?? { 'adherent_tags': 'adherent' }
-
     Object.keys(mergedFilters).forEach(key => {
       const newValue = mergedFilters[key]
-      const initialValue = initialFilters[key]
+      const initialValue = filters[key]
       if (newValue !== initialValue) {
         hasAnyChange = true
       }
@@ -84,13 +110,17 @@ export const MetaDataForm = memo((props: {
   return (
     <YStack gap="$medium" backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ? '$medium' : 0}>
       <SenderView sender={senderToDisplay} datetime="1 min." />
-      <SelectFilters
-        selectedFilters={filters}
-        onFiltersChange={handleFiltersChange}
-        selectedQuickFilterId={quickFilterId}
-        messageId={props.messageId}
-        scope={props.scope}
-      />
+      <Animated.View style={[animatedStyle, { justifyContent: 'center' }]}>
+        <SelectFilters
+          selectedFilters={filters}
+          onFiltersChange={handleFiltersChange}
+          selectedQuickFilterId={quickFilterId}
+          messageId={props.messageId}
+          scope={props.scope}
+          isLoading={isPuttingMessageFilters}
+        />
+      </Animated.View>
+      
       <Controller
         control={props.control}
         name="metaData.subject"

@@ -128,15 +128,15 @@ const MessagePageIndex = () => {
                 title="Post d'information"
                 description="Simple texte."
                 image={postSimpleImage}
-                href={selectedScope ? `/publications/creer?scope=${selectedScope}&template=${encodeURIComponent(JSON.stringify([{ type: 'richtext' }]))}` : "/publications/creer"}
+                href={selectedScope ? `/publications/creer?scope=${selectedScope}&template=${encodeURIComponent(JSON.stringify([{ type: 'richtext', id: 'text' }]))}` : "/publications/creer"}
               />
               <PostCard
                 title="Appel à l'action"
                 description="Zone de texte et bouton."
                 image={postWithCtaImage}
                 href={selectedScope ? `/publications/creer?scope=${selectedScope}&template=${encodeURIComponent(JSON.stringify([
-                  { type: 'richtext' },
-                  { type: 'button' }
+                  { type: 'richtext', id: 'text' },
+                  { type: 'button', id: 'cta' }
                 ]))}` : "/publications/creer"}
               />
               <PostCard
@@ -144,9 +144,9 @@ const MessagePageIndex = () => {
                 description="Image d’entête, texte et bouton."
                 image={postIllustratedImage}
                 href={selectedScope ? `/publications/creer?scope=${selectedScope}&template=${encodeURIComponent(JSON.stringify([
-                  { type: 'image' },
-                  { type: 'richtext' },
-                  { type: 'button' }
+                  { type: 'image', id: 'image' },
+                  { type: 'richtext', id: 'text' },
+                  { type: 'button', id: 'cta' }
                 ]))}` : "/publications/creer"}
               />
             </YStack>

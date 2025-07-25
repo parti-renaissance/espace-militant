@@ -8,6 +8,7 @@ type FilterValue =
   | Record<string, string>
   | Record<string, string>[]
   | undefined
+  | null
 
 export type SelectedFiltersType = Record<string, FilterValue>;
 

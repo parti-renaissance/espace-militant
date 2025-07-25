@@ -38,7 +38,7 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
       <VoxCard.Content>
         <SenderView sender={item.sender} />
         <Text.MD semibold>
-          {item.subject}
+          {item.subject || 'Sans titre'}
           {item.status === "draft" ? (<Text.MD semibold color="#D02828"> (Brouillon)</Text.MD>) : null}
         </Text.MD>
         <XStack justifyContent="space-between">

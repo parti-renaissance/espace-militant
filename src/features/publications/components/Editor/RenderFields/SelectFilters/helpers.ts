@@ -14,7 +14,8 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       level: 0,
       parentId: null,
       filters: {
-        'adherent_tags': undefined
+        'adherent_tags': null,
+        'first_membership_since': null,
       }
     },
     {
@@ -24,7 +25,8 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       level: 1,
       parentId: 'tous-contacts',
       filters: {
-        'adherent_tags': 'adherent'
+        'adherent_tags': 'adherent',
+        'first_membership_since': null,
       }
     },
     {
@@ -34,7 +36,8 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       level: 2,
       parentId: 'adherents',
       filters: {
-        'adherent_tags': 'adherent:a_jour_2025'
+        'adherent_tags': 'adherent:a_jour_2025',
+        'first_membership_since': null,
       }
     },
     {
@@ -44,7 +47,8 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       level: 3,
       parentId: 'a-jour',
       filters: {
-        'adherent_tags': 'adherent:a_jour_2025:primo'
+        'adherent_tags': 'adherent:a_jour_2025:primo',
+        'first_membership_since': null,
       }
     },
     {
@@ -55,7 +59,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       parentId: 'primos',
       filters: {
         'adherent_tags': 'adherent:a_jour_2025:primo',
-        'firstMembership': { start: formatDate(oneMonthAgo), end: formatDate(today) }
+        'first_membership_since': formatDate(oneMonthAgo),
       }
     },
     {
@@ -65,7 +69,8 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       level: 2,
       parentId: 'adherents',
       filters: {
-        'adherent_tags': 'adherent:plus_a_jour'
+        'adherent_tags': 'adherent:plus_a_jour',
+        'first_membership_since': null,
       }
     },
     {
@@ -75,7 +80,8 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       level: 1,
       parentId: 'tous-contacts',
       filters: {
-        'adherent_tags': 'sympathisant'
+        'adherent_tags': 'sympathisant',
+        'first_membership_since': null,
       }
     }
   ];
@@ -99,7 +105,7 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
       value: 'primos-recents',
       filters: {
         'adherent_tags': 'adherent:a_jour_2025:primo',
-        'first_membership_since': { start: '', end: '' }
+        'first_membership_since': 'today - 30 days'
       }
     },
     {
@@ -134,7 +140,7 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
     }
 
     const allFields = [
-      'is_certified', 'committee', 'is_committee_member', 'mandate_type',
+      'is_certified', 'is_committee_member', 'mandate_type',
       'declared_mandate', 'is_campus_registered', 'donator_status', 'adherent_tags',
       'elect_tags', 'static_tags', 'gender', 'age_min', 'age_max', 'first_name',
       'last_name', 'registered_since', 'registered_until', 'first_membership_since',

@@ -40,9 +40,9 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
 
   const messageQueryParams = useMemo(() => {
     return {
-      messageId: currentMessageId ?? '',
+      messageId: props?.messageId ?? '',
       scope: props?.scope ?? '',
-      enabled: !!currentMessageId
+      enabled: !!props?.messageId
     }
   }, [props?.messageId, props?.scope])
 
@@ -106,15 +106,15 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
                 <VoxButton
                   size="lg"
                   variant="text"
-                  theme={!messageContent ? 'orange' : undefined}
-                  onPress={messageContent && !displayQuitModal ? () => setDisplayQuitModal(true) : handleQuit}
+                  theme={!props?.messageId ? 'orange' : undefined}
+                  onPress={props?.messageId && !displayQuitModal ? () => setDisplayQuitModal(true) : handleQuit}
                   disabled={isInitialLoading}
                 >
-                  {messageContent ? 'Quitter' : 'Annuler'}
+                  {props?.messageId ? 'Quitter' : 'Annuler'}
                 </VoxButton>
               </XStack>
               <XStack flexGrow={1} justifyContent="center">
-                <VoxHeader.Title icon={messageContent ? PenLine : media.gtSm ? Speech : undefined}>{messageContent ? 'Editer publication' : media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
+                <VoxHeader.Title icon={props?.messageId ? PenLine : media.gtSm ? Speech : undefined}>{props?.messageId ? 'Editer publication' : media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
               </XStack>
               <XStack>
                 <VoxButton
