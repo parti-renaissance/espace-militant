@@ -13,15 +13,19 @@ type ProfilHeaderProps = {
   forcedBackTitle?: string
   backgroundColor?: string
   backPath?: Href
+  forcedBackPath?: Href
 }
 
-const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forcedBackTitle, backgroundColor = 'white', backPath = '/' }: ProfilHeaderProps) => {
+const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forcedBackTitle, backgroundColor = 'white', backPath = '/', forcedBackPath }: ProfilHeaderProps) => {
   const router = useRouter()
   const navigation = useNavigation()
   const { gtSm } = useMedia()
 
   const handleBack = () => {
-    if (navigation.canGoBack?.()) {
+    if (forcedBackPath) {
+      router.push(forcedBackPath)
+      return
+    } else if (navigation.canGoBack?.()) {
       router.back()
     } else {
       router.push(backPath)

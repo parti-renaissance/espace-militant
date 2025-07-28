@@ -26,11 +26,7 @@ export const HeaderMesssageDetails: React.FC = () => {
 
   const media = useMedia()
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back()
-    } else {
-      router.push({ pathname: '/' })
-    }
+    router.replace({ pathname: '/' })
   }
 
   if (media.sm) {
