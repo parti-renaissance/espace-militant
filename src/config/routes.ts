@@ -5,7 +5,7 @@ import { ThemeName } from 'tamagui'
 import clientEnv from './clientEnv'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'etats-generaux' | 'parrainages' | 'questionnaires'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'parrainages' | 'questionnaires'
   screenName: string
   highlighted?: boolean
   icon: typeof HomeIcon
@@ -42,14 +42,6 @@ export const ROUTES: TabRoute[] = [
     screenName: 'Actions',
     icon: Zap,
     theme: 'green',
-  },
-  {
-    name: 'etats-generaux',
-    screenName: 'États généraux',
-    icon: ClipboardCheck,
-    theme: 'orange',
-    hidden: true,
-    hiddenMobile: true,
   },
   {
     name: 'formations',
