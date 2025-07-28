@@ -119,7 +119,7 @@ const MessagePageIndex = () => {
             <PostCard
               title="Mes brouillons"
               description="Reprenez là où vous vous étiez arrêté"
-              href={selectedScope ? `/publications/draft?scope=${selectedScope}` : "/publications/draft"}
+              href={selectedScope ? `/publications/brouillons?scope=${selectedScope}` : "/publications/brouillons"}
               icon={<FileEdit size={20} color="$gray6" />}
             />
             <YStack gap="$medium">
