@@ -27,6 +27,7 @@ const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | 
     padding: '0px 8px',
     maxWidth: 'fit-content',
     marginBottom: '12px',
+    height: '22px',
   }
 
   const instanceTextStyle: CSSProperties = {
@@ -37,6 +38,7 @@ const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | 
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     lineHeight: '1.2',
+    verticalAlign: 'text-bottom',
   }
 
   const profileSectionStyle: CSSProperties = {
@@ -83,7 +85,7 @@ const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | 
     <div class="padding-responsive" style="${stringifyCSSProperties(containerStyle)}">
       <div style="${stringifyCSSProperties(instanceBadgeStyle)}">
         <span style="${stringifyCSSProperties(instanceTextStyle)}">
-          ${instanceText}${zoneText}
+          ${' '}${instanceText}${zoneText}${' '}
         </span>
       </div>
       <div style="${stringifyCSSProperties(profileSectionStyle)}">
