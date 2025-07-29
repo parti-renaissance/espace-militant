@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useRef, useMemo, useEffect, useCallback } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uniqueId } from 'lodash'
-import { useForm } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 import { getTokenValue, isWeb, YStack } from 'tamagui'
 import { useLocalSearchParams, router } from 'expo-router'
 import { StyleRendererContextProvider } from './context/styleRenderContext'
@@ -86,10 +86,20 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
     }
   }, [props.defaultValue, templateFromQuery, scopeFromQuery])
 
-  const { control, handleSubmit, setValue, unregister, getValues } = useForm<S.GlobalForm>({
-    defaultValues: { formValues: defaultData.states, metaData: defaultData.metaData, selectedField: null, addBarOpenForFieldId: null },
+  const formMethods = useForm<S.GlobalForm>({
+    defaultValues: { 
+      formValues: defaultData.states, 
+      metaData: defaultData.metaData, 
+      selectedField: null, 
+      addBarOpenForFieldId: null,
+      filters: {
+        hasRecipients: true
+      }
+    },
     resolver: zodResolver(S.MessageFormValuesValidatorSchema),
   })
+
+  const { control, handleSubmit, setValue, unregister, getValues } = formMethods
 
   const { 
     debouncedSave, 
@@ -191,19 +201,21 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       >
         <YStack flex={1} gap="$medium" position="relative">
           <StyleRendererContextProvider value={props.theme}>
-            <RenderFields
-              ref={renderFieldsRef}
-              control={control}
-              defaultStruct={defaultData.struct}
-              editorMethods={editorMethods}
-              displayToolbar={props.displayToolbar}
-              availableSenders={availableSenders}
-              message={message}
-              onNodeChange={handleNodeChange}
-              messageFilters={props.messageFilters}
-              messageId={props.messageId}
-              scope={scopeFromQuery ?? ''}
-            />
+            <FormProvider {...formMethods}>
+              <RenderFields
+                ref={renderFieldsRef}
+                control={control}
+                defaultStruct={defaultData.struct}
+                editorMethods={editorMethods}
+                displayToolbar={props.displayToolbar}
+                availableSenders={availableSenders}
+                message={message}
+                onNodeChange={handleNodeChange}
+                messageFilters={props.messageFilters}
+                messageId={props.messageId}
+                scope={scopeFromQuery ?? ''}
+              />
+            </FormProvider>
           </StyleRendererContextProvider>
         </YStack>
       </YStack>

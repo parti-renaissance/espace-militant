@@ -65,9 +65,6 @@ const DraftPage = () => {
 
   const publications = data?.pages.flatMap((page) => page.items) || [];
 
-  console.log({defaultScope, error});
-  
-
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();

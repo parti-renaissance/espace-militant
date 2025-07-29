@@ -19,6 +19,7 @@ interface SelectFiltersProps {
   messageId?: string
   scope?: string
   isLoading?: boolean
+  hasError?: boolean
 }
 
 export default function SelectFilters({
@@ -27,7 +28,8 @@ export default function SelectFilters({
   selectedQuickFilterId = null,
   messageId,
   scope,
-  isLoading = false
+  isLoading = false,
+  hasError = false
 }: SelectFiltersProps) {
   const media = useMedia()
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -102,7 +104,7 @@ export default function SelectFilters({
           theme="gray"
           size="lg"
           onPress={handleOpenModal}
-          error={false}
+          error={hasError}
           disabled={!messageId || !scope}
         >
           <SF.Container>

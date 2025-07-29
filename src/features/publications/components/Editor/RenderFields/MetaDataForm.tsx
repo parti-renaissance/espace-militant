@@ -1,6 +1,6 @@
 import React, { memo, useMemo, useState, useEffect } from 'react'
-import { Control, Controller } from 'react-hook-form'
-import { YStack } from 'tamagui'
+import { Control, Controller, useFormContext } from 'react-hook-form'
+import { XStack, YStack } from 'tamagui'
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import SenderView from '../../SenderView'
@@ -10,6 +10,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from '
 import SelectFilters, { SelectedFiltersType } from './SelectFilters'
 import { usePutMessageFilters } from '@/services/publications/hook'
 import { identifyQuickFilter } from './SelectFilters/helpers'
+import { useGetMessageCountRecipients } from '@/services/publications/hook'
 
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
   const { committee, ...filtersWithoutCommittee } = filters
@@ -36,6 +37,7 @@ export const MetaDataForm = memo((props: {
   messageId?: string,
   scope: string
 }) => {
+  const { setValue } = useFormContext<S.GlobalForm>()
   const senderToDisplay = useMemo(() => {
     return props.message?.sender || (props.availableSenders && props.availableSenders.length > 0 ? props.availableSenders[0] : null)
   }, [props.message?.sender, props.availableSenders])
@@ -44,6 +46,19 @@ export const MetaDataForm = memo((props: {
   const [quickFilterId, setQuickFilterId] = useState<string | null>('adherents')
 
   const { mutate: putMessageFilters, isPending: isPuttingMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
+  const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipients({ 
+    messageId: props.messageId, 
+    scope: props.scope,
+    enabled: !!props.messageId && !!props.scope
+  })
+
+  // Mettre à jour la validation des filtres quand le nombre de contacts change
+  useEffect(() => {
+    if (!isFetchingMessageCountRecipients && messageCountRecipients) {
+      const hasRecipients = messageCountRecipients.contacts > 0
+      setValue('filters.hasRecipients', hasRecipients)
+    }
+  }, [messageCountRecipients, isFetchingMessageCountRecipients, setValue])
 
   // Animation values
   const animatedProgress = useSharedValue(props.displayToolbar ? 1 : 0)
@@ -51,7 +66,7 @@ export const MetaDataForm = memo((props: {
   // Animated style
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      height: animatedProgress.value * 56,
+      height: animatedProgress.value === 1 ? 'auto' : animatedProgress.value * 56,
       opacity: animatedProgress.value,
       overflow: 'hidden',
       marginTop: 16,
@@ -62,7 +77,7 @@ export const MetaDataForm = memo((props: {
   // Update animation when displayToolbar changes
   useEffect(() => {
     const targetProgress = props.displayToolbar ? 1 : 0
-    
+
     animatedProgress.value = withTiming(targetProgress, {
       duration: 300,
       easing: Easing.ease,
@@ -106,16 +121,33 @@ export const MetaDataForm = memo((props: {
     <YStack backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ? '$medium' : 0}>
       <SenderView sender={senderToDisplay} datetime="1 min." />
       <Animated.View style={[animatedStyle, { justifyContent: 'center' }]}>
-        <SelectFilters
-          selectedFilters={filters}
-          onFiltersChange={handleFiltersChange}
-          selectedQuickFilterId={quickFilterId}
-          messageId={props.messageId}
-          scope={props.scope}
-          isLoading={isPuttingMessageFilters}
+        <Controller
+          control={props.control}
+          name="filters.hasRecipients"
+          render={({ field, fieldState }) => {
+            
+            return (
+              <>
+                <SelectFilters
+                  hasError={fieldState.error ? true : false}
+                  selectedFilters={filters}
+                  onFiltersChange={handleFiltersChange}
+                  selectedQuickFilterId={quickFilterId}
+                  messageId={props.messageId}
+                  scope={props.scope}
+                  isLoading={isPuttingMessageFilters}
+                />
+                {fieldState.error ? (
+                  <XStack gap="$small" alignItems="center" pl="$medium" mt="$small">
+                    <Text.XSM color="$orange5">{fieldState.error.message}</Text.XSM>
+                  </XStack>
+                ) : <></>}
+              </>
+            )
+          }}
         />
       </Animated.View>
-      
+
       <Controller
         control={props.control}
         name="metaData.subject"
