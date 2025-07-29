@@ -89,7 +89,7 @@ export default {
       container: { paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
     },
     alone: {
-      container: { paddingTop: 8, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
+      container: { paddingTop: 8, paddingBottom: 40, paddingLeft: 16, paddingRight: 16 },
     }
   },
   button: {

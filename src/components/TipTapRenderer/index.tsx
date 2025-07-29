@@ -13,9 +13,9 @@ const LimitedContent = ({ children, numberOfLines }: { children: React.ReactNode
   if (!numberOfLines) return <>{children}</>
 
   return (
-    <Text.SM numberOfLines={numberOfLines} multiline>
-      {children}
-    </Text.SM>
+    <YStack maxHeight={numberOfLines * 20 + 18} position="relative">
+      {Array.isArray(children) ? children.slice(0, numberOfLines) : children}
+    </YStack>
   )
 }
 
