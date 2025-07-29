@@ -86,7 +86,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="publications/index"
             options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false}  forcedBackPath="/" /> }
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false}  forcedBackPath={isWeb ? '/' : undefined} /> }
             }}
           />
 
@@ -103,7 +103,7 @@ export default function AppLayout() {
             options={({ route }) => ({
               header: () => {
                 return media.sm ? (
-                  <ProfilHeader title="" backgroundColor="$textSurface" forcedBackTitle="Retour" forcedBackPath="/" />
+                  <ProfilHeader title="" backgroundColor="$textSurface" forcedBackTitle="Retour" forcedBackPath={isWeb ? '/' : undefined} />
                 ) : null
               },
               animation: route.params && 'withoutAnimation' in route.params ? 'none' : 'slide_from_right',
@@ -113,7 +113,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="publications/brouillons"
             options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false}  forcedBackPath="/publications"/> }
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false}  forcedBackPath={isWeb ? '/publications' : undefined}/> }
             }}
           />
 
