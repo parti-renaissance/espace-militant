@@ -27,7 +27,6 @@ const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | 
     padding: '0px 8px',
     maxWidth: 'fit-content',
     marginBottom: '12px',
-    height: '22px',
   }
 
   const instanceTextStyle: CSSProperties = {
@@ -38,7 +37,7 @@ const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | 
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     lineHeight: '1.2',
-    verticalAlign: 'text-bottom',
+    verticalAlign: 'middle',
   }
 
   const profileSectionStyle: CSSProperties = {
