@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { View } from 'react-native'
 import Text from '@/components/base/Text'
 import { Href, Link } from 'expo-router'
@@ -14,19 +14,22 @@ type RenderFn<A, P extends object = Record<string, unknown>> = (props: { data: A
 const LimitedContent = ({ children, numberOfLines }: { children: React.ReactNode; numberOfLines?: number }) => {
   if (!numberOfLines) return <>{children}</>
 
+  const gradientId = useMemo(() => `fadeGradient-${Math.random().toString(36).substring(2, 11)}`, [])
+  
+  console.log(numberOfLines, Array.isArray(children) && children?.length > 1 )
   return (
     <YStack maxHeight={numberOfLines * 20 + 20} position="relative" overflow="hidden">
       {Array.isArray(children) ? children.slice(0, numberOfLines) : children}
       {Array.isArray(children) && children?.length > 1 ? (
-        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, maxHeight: 100, height: '100%', userSelect: 'none', pointerEvents: 'none' }}>
+        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, maxHeight: 40, height: '100%', userSelect: 'none', }}>
           <Svg width="100%" height="100%">
             <Defs>
-              <LinearGradient id="fadeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <Stop offset="40%" stopColor="white" stopOpacity="0" />
-                <Stop offset="98%" stopColor="white" stopOpacity="1" />
+              <LinearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+                <Stop offset="0%" stopColor="white" stopOpacity="0" />
+                <Stop offset="100%" stopColor="white" stopOpacity="1" />
               </LinearGradient>
             </Defs>
-            <Rect width="100%" height="100%" fill="url(#fadeGradient)" />
+            <Rect width="100%" height="100%" fill={`url(#${gradientId})`} />
           </Svg>
         </View>
       ) : null
