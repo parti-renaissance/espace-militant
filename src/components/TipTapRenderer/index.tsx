@@ -15,7 +15,7 @@ const LimitedContent = ({ children, numberOfLines }: { children: React.ReactNode
   if (!numberOfLines) return <>{children}</>
 
   return (
-    <YStack maxHeight={numberOfLines * 20 + 20} position="relative">
+    <YStack maxHeight={numberOfLines * 20 + 20} position="relative" overflow="hidden">
       {Array.isArray(children) ? children.slice(0, numberOfLines) : children}
       {Array.isArray(children) && children?.length > 1 ? (
         <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, maxHeight: 100, height: '100%', userSelect: 'none', pointerEvents: 'none' }}>
