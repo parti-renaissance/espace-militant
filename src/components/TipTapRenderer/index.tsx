@@ -1,10 +1,12 @@
 import React from 'react'
+import { View } from 'react-native'
 import Text from '@/components/base/Text'
 import { Href, Link } from 'expo-router'
 import { isWeb, XStack, YStack } from 'tamagui'
 import VoxCard from '../VoxCard/VoxCard'
 import * as S from './schema'
 import * as U from './utils'
+import { Svg, LinearGradient, Rect, Defs, Stop } from 'react-native-svg'
 
 type RenderFn<A, P extends object = Record<string, unknown>> = (props: { data: A } & P) => React.ReactNode
 
@@ -13,8 +15,23 @@ const LimitedContent = ({ children, numberOfLines }: { children: React.ReactNode
   if (!numberOfLines) return <>{children}</>
 
   return (
-    <YStack maxHeight={numberOfLines * 20 + 18} position="relative">
+    <YStack maxHeight={numberOfLines * 20 + 20} position="relative">
       {Array.isArray(children) ? children.slice(0, numberOfLines) : children}
+      {Array.isArray(children) && children?.length > 1 ? (
+        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, maxHeight: 100, height: '100%', userSelect: 'none', pointerEvents: 'none' }}>
+          <Svg width="100%" height="100%">
+            <Defs>
+              <LinearGradient id="fadeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <Stop offset="40%" stopColor="white" stopOpacity="0" />
+                <Stop offset="98%" stopColor="white" stopOpacity="1" />
+              </LinearGradient>
+            </Defs>
+            <Rect width="100%" height="100%" fill="url(#fadeGradient)" />
+          </Svg>
+        </View>
+      ) : null
+      }
+
     </YStack>
   )
 }
