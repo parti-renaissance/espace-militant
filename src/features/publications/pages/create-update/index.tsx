@@ -66,33 +66,9 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
 
   const isInitialLoading = !wasInitiallyInCreation && (isMessageLoading || isSendersLoading || isMessageContentLoading || isMessageFiltersLoading)
 
-  const handleSubmit = (x: S.Message) => {
-    if (x?.content.length === 0) {
-      toast.show('Erreur', { message: 'Veuillez ajouter au moins un champ', type: 'error' })
-      return
-    }
-    return messageQuery
-      .mutateAsync({
-        scope: x.metaData.scope ?? '',
-        payload: {
-          type: x.metaData.scope,
-          subject: x.metaData.subject,
-          label: x.metaData.subject,
-          json_content: JSON.stringify(x),
-          content: getHTML(defaultTheme, x, selectedSender),
-        },
-      })
-      .then((result) => {
-        // Invalider la query message-til-sync seulement lors du submit définitif
-        if (result?.uuid) {
-          queryClient.invalidateQueries({ queryKey: ['message-til-sync', result.uuid] })
-        } else if (currentMessageId) {
-          queryClient.invalidateQueries({ queryKey: ['message-til-sync', currentMessageId] })
-        }
-        
-        modalSendRef.current?.present()
-        Keyboard.dismiss()
-      })
+  const handleSubmit = () => {
+    modalSendRef.current?.present()
+    Keyboard.dismiss()
   }
 
   const handleQuit = () => {

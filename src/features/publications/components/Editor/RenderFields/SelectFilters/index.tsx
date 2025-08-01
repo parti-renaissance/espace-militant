@@ -8,9 +8,10 @@ import Text from '@/components/base/Text'
 import { SelectFrames as SF } from '@/components/base/Select/Frames'
 import SelectFiltersItem from './SelectFiltersItem'
 import { AlertUtils } from '@/screens/shared/AlertUtils'
-import { useGetMessageCountRecipients } from '@/services/publications/hook';
+import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook';
 import { getHierarchicalQuickFilters, getItemState } from './helpers';
 import { SelectedFiltersType, HierarchicalQuickFilterType } from './type';
+import { useQueryClient } from '@tanstack/react-query'
 
 interface SelectFiltersProps {
   onFiltersChange?: ({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => void
@@ -36,8 +37,9 @@ export default function SelectFilters({
   const [tempSelectedQuickFilter, setTempSelectedQuickFilter] = useState<string | null>(selectedQuickFilterId || null)
   const [tempSelectedFilters, setTempSelectedFilters] = useState<SelectedFiltersType>(selectedFilters)
   const quickFilters: HierarchicalQuickFilterType[] = useMemo(() => getHierarchicalQuickFilters(), [])
+  const queryClient = useQueryClient();
 
-  const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipients({ messageId: messageId, scope: scope })
+  const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({ messageId: messageId, scope: scope })
 
   const handleOpenModal = () => {
     const quickFilterToUse = selectedQuickFilterId || (() => {
@@ -65,6 +67,9 @@ export default function SelectFilters({
     } else {
       onFiltersChange?.({ newFilters: tempSelectedFilters, newQuickFilterId: null })
     }
+    queryClient.invalidateQueries({
+      queryKey: ['message-count-recipients', messageId],
+    })
     handleCloseModal()
   }
 

@@ -14,13 +14,14 @@ import { useGetAvailableSenders, useGetMessage, useAutoSave } from '@/services/p
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { AutoSaveIndicator } from './AutoSaveIndicator'
 import { RestAvailableSender, RestGetMessageFiltersResponse } from '@/services/publications/schema'
+import { Keyboard } from 'react-native'
 
 export { getHTML, defaultTheme }
 
 export type MessageEditorProps = {
   theme: S.MessageStyle
   defaultValue?: S.Message
-  onSubmit: (x: S.Message) => void
+  onSubmit: () => void
   displayToolbar?: boolean
   messageId?: string
   onDisplayToolbarChange?: (display: boolean) => void
@@ -168,7 +169,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       (x) => {
         const fields = renderFieldsRef.current!.getFields()
         immediateSave(x.formValues, fields, x.metaData, props.sender).then(() => {
-          props.onSubmit(zipMessage(x.formValues, fields, x.metaData))
+          props.onSubmit()
         }).catch((error) => {
           console.error('Submit error:', error)
         })

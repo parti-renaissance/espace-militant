@@ -68,10 +68,11 @@ export const getMessages = (props: { scope: string; page?: number; status?: 'dra
     type: 'private',
   })()
 
-export const getMessageCountRecipients = (props: { messageId: string; scope: string }) =>
+export const getMessageCountRecipients = (props: { messageId: string; scope: string; partial?: boolean }) =>
   api({
     method: 'get',
-    path: `/api/v3/adherent_messages/${props.messageId}/count-recipients?scope=${props.scope}`,
+    path: `/api/v3/adherent_messages/${props.messageId}/count-recipients?scope=${props.scope}` +
+      (props.partial ? '&partial=true' : ''),
     requestSchema: z.void(),
     responseSchema: schemas.RestMessageCountRecipientsResponseSchema,
     type: 'private',
