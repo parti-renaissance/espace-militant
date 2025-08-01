@@ -18,6 +18,7 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   allowDrag?: boolean
   mobileBackdrop?: boolean
   snapPoints?: number[]
+  withKeyboard?: boolean
 }
 
 /**
@@ -36,6 +37,7 @@ export default function ModalOrPageBase({
   snapPoints,
   allowDrag,
   mobileBackdrop,
+  withKeyboard = true,
 }: ModalOrPageBaseProps) {
   const viewport = useMedia()
   const insets = useSafeAreaInsets()
@@ -66,7 +68,7 @@ export default function ModalOrPageBase({
       snapPoints={snapPoints ?? [100]}
       snapPointsMode={'percent'}
       disableDrag={!allowDrag}
-      moveOnKeyboardChange
+      moveOnKeyboardChange={withKeyboard}
       onOpenChange={(x) => {
         if (!x) {
           onClose?.()
@@ -92,7 +94,7 @@ export default function ModalOrPageBase({
               ref={scrollRef}
               scrollEnabled={scrollable}
               keyboardShouldPersistTaps={'handled'}
-              automaticallyAdjustKeyboardInsets
+              automaticallyAdjustKeyboardInsets={withKeyboard}
               backgroundColor={'white'}
               contentContainerStyle={{
                 flexGrow: 1,

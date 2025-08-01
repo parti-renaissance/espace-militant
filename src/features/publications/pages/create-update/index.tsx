@@ -139,7 +139,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
             </XStack>
           </VoxHeader>
         </YStack>
-        <YStack backgroundColor="$textSurface">
+        <YStack backgroundColor="$textSurface" $gtSm={{ paddingTop: '$large' }}>
           <YStack maxWidth={520} marginHorizontal='auto' width="100%" height={76} $sm={{ px: '$medium', py: '$small', height: 60 }} justifyContent='center' py="$medium">
             <BigSwitch
               options={[

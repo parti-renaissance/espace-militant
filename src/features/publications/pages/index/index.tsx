@@ -111,7 +111,7 @@ const MessagePageIndex = () => {
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn>
         <ScrollView backgroundColor="$surface" flex={1}>
-          <YStack gap="$xlarge" maxWidth={520} width="100%" marginHorizontal="auto" paddingTop="$medium" paddingBottom={100} $sm={{ maxWidth: '100%', paddingHorizontal: '$medium' }}>
+          <YStack gap="$xlarge" maxWidth={520} width="100%" marginHorizontal="auto" paddingTop='$medium' $gtSm={{ paddingTop: '$xxlarge' }} paddingBottom={100} $sm={{ maxWidth: '100%', paddingHorizontal: '$medium' }}>
             <HelpCard />
             {scopeOptions.length > 0 && (
               <MessageScopeSelector label="Pour" value={selectedScope} onChange={setSelectedScope} />
