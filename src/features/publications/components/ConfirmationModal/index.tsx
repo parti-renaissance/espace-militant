@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useGetIsMessageTilSync, useSendMessage, useGetMessageCountRecipients } from '@/services/publications/hook'
@@ -25,15 +25,19 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
   const modalSheetRef = useRef<ViewportModalRef>(null)
   const toast = useToastController()
   const media = useMedia()
-  const { data: isMessageTilSync, isLoading: isSyncLoading, isFetching: isSyncFetching, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ payload: payload?.messageId && payload?.scope ? { messageId: payload.messageId, scope: payload.scope } : undefined })
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const { data: recipients, isLoading: isLoadingRecipients } = useGetMessageCountRecipients({
+  const { data: isMessageTilSync, isLoading: isSyncLoading, isFetching: isSyncFetching, error: syncError, refetch: refetchSync } = useGetIsMessageTilSync({ 
+    payload: isModalOpen && payload?.messageId && payload?.scope ? { messageId: payload.messageId, scope: payload.scope } : undefined
+  })
+
+  const { data: recipients, isFetching: isFetchingRecipients } = useGetMessageCountRecipients({
     messageId: payload?.messageId || '',
     scope: payload?.scope || '',
     enabled: Boolean(payload?.messageId && payload?.scope),
   })
 
-  const isLoadingNumbers = isSyncLoading || isLoadingRecipients
+  const isLoadingNumbers = isSyncLoading || isFetchingRecipients
 
   const { mutate, isPending } = useSendMessage({
     uuid: isMessageTilSync?.uuid || ''
@@ -67,11 +71,20 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
 
   const handleCopyUrl = useHandleCopyUrl()
 
-  useImperativeHandle(ref, () => modalSheetRef.current!)
+  useImperativeHandle(ref, () => ({
+    present: () => {
+      setIsModalOpen(true)
+      modalSheetRef.current?.present()
+    },
+    dismiss: () => {
+      setIsModalOpen(false)
+      modalSheetRef.current?.dismiss()
+    }
+  }))
 
   const handleCancel = () => {}
 
-  const allDisabled = !!syncError || isSyncFetching || isLoadingRecipients || isPending
+  const allDisabled = !!syncError || isSyncFetching || isFetchingRecipients || isPending
 
   return (
     <ViewportModalSheet ref={modalSheetRef} onClose={handleCancel}>

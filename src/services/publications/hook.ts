@@ -165,6 +165,7 @@ export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') =
     getPreviousPageParam: (firstPage) =>
       firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined,
     placeholderData: (prev) => prev,
+    refetchOnMount: true,
   })
 }
 
@@ -172,6 +173,14 @@ export const useGetMessageCountRecipients = (props: { messageId?: string; scope?
   return useQuery({
     queryKey: ['message-count-recipients', props.messageId],
     queryFn: () => (props.messageId && props.scope ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined)),
+    enabled: Boolean(props.messageId && props.scope) && props.enabled,
+  })
+}
+
+export const useGetMessageCountRecipientsPartial = (props: { messageId?: string; scope?: string; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['message-count-recipients-partial', props.messageId],
+    queryFn: () => (props.messageId && props.scope ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope, partial: true }) : Promise.resolve(undefined)),
     enabled: Boolean(props.messageId && props.scope) && props.enabled,
   })
 }
@@ -204,7 +213,7 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['message-count-recipients', props.messageId],
+        queryKey: ['message-count-recipients-partial', props.messageId],
       })
     },
     onError: (error) => {
