@@ -10,7 +10,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from '
 import SelectFilters, { SelectedFiltersType } from './SelectFilters'
 import { usePutMessageFilters } from '@/services/publications/hook'
 import { identifyQuickFilter } from './SelectFilters/helpers'
-import { useGetMessageCountRecipients } from '@/services/publications/hook'
+import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook'
 
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
   const { committee, ...filtersWithoutCommittee } = filters
@@ -46,7 +46,7 @@ export const MetaDataForm = memo((props: {
   const [quickFilterId, setQuickFilterId] = useState<string | null>('adherents')
 
   const { mutate: putMessageFilters, isPending: isPuttingMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
-  const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipients({ 
+  const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({ 
     messageId: props.messageId, 
     scope: props.scope,
     enabled: !!props.messageId && !!props.scope
