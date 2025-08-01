@@ -15,8 +15,7 @@ const LimitedContent = ({ children, numberOfLines }: { children: React.ReactNode
   if (!numberOfLines) return <>{children}</>
 
   const gradientId = useMemo(() => `fadeGradient-${Math.random().toString(36).substring(2, 11)}`, [])
-  
-  console.log(numberOfLines, Array.isArray(children) && children?.length > 1 )
+
   return (
     <YStack maxHeight={numberOfLines * 20 + 20} position="relative" overflow="hidden">
       {Array.isArray(children) ? children.slice(0, numberOfLines) : children}
