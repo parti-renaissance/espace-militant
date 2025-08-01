@@ -97,6 +97,14 @@ export const MessageFormValuesValidatorSchema = z.object({
         message: "L'objet doit faire maximum 255 charatères",
       }),
   }),
+  filters: z.object({
+    hasRecipients: z.boolean().refine(
+      (value) => value === true,
+      {
+        message: "Ce filtre ne correspond à aucun contact",
+      }
+    ),
+  }),
   formValues: z.record(
     z.enum(nodeTypesArray),
     z.record(
@@ -135,6 +143,9 @@ export type GlobalForm = {
   formValues: MessageFormValues
   metaData: MessageMetaData
   addBarOpenForFieldId?: string | null
+  filters: {
+    hasRecipients: boolean
+  }
 }
 
 export type FieldsArray = { type: NodeType; id: string }[]

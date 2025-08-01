@@ -46,7 +46,8 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
     }, {
       onSuccess: () => {
         modalSheetRef.current?.dismiss()
-        router.replace({
+        router.dismissAll()
+        router.push({
           pathname: '/publications/[id]',
           params: {
             id: isMessageTilSync?.uuid || '',

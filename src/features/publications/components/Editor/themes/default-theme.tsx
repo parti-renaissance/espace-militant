@@ -64,7 +64,7 @@ export default {
       },
     },
     trailing: {
-      container: { paddingBottom: 24 },
+      container: { paddingBottom: 40 },
     },
     alone: {
       wrapper: {},
@@ -83,13 +83,13 @@ export default {
       container: { paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
     },
     trailing: {
-      container: { paddingTop: 8, paddingBottom: 24, paddingLeft: 16, paddingRight: 16 },
+      container: { paddingTop: 8, paddingBottom: 40, paddingLeft: 16, paddingRight: 16 },
     },
     middle: {
       container: { paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
     },
     alone: {
-      container: { paddingTop: 8, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
+      container: { paddingTop: 8, paddingBottom: 40, paddingLeft: 16, paddingRight: 16 },
     }
   },
   button: {
@@ -112,7 +112,7 @@ export default {
       },
     },
     trailing: {
-      wrapper: { paddingBottom: 24 },
+      wrapper: { paddingBottom: 40 },
     },
     primary: {
       container: {

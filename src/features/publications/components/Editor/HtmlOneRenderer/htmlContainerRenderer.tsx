@@ -37,6 +37,7 @@ const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | 
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     lineHeight: '1.2',
+    verticalAlign: 'middle',
   }
 
   const profileSectionStyle: CSSProperties = {
@@ -80,10 +81,10 @@ const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | 
   const zoneText = sender?.zone ? ` • ${sender.zone}` : ''
 
   return `
-    <div class="padding-responsive" style="${stringifyCSSProperties(containerStyle)}">
+    <div class="padding-responsive padding-responsive-top" style="${stringifyCSSProperties(containerStyle)}">
       <div style="${stringifyCSSProperties(instanceBadgeStyle)}">
         <span style="${stringifyCSSProperties(instanceTextStyle)}">
-          ${instanceText}${zoneText}
+          ${' '}${instanceText}${zoneText}${' '}
         </span>
       </div>
       <div style="${stringifyCSSProperties(profileSectionStyle)}">
@@ -119,7 +120,7 @@ export const containerRenderer = (props: {
   return (
     `<div>
       ${senderViewHtml}
-      ${props.subject ? `<h1 class="padding-responsive" style="font-size: 16px; font-style: normal !important; font-weight: 600 !important; margin-top: 0px; padding-bottom: 24px !important; background-color: #FFFFFF; padding-left: 16px; padding-right: 16px;">${props.subject}</h1>` : ''}
+      ${props.subject ? `<h1 class="padding-responsive" style="font-size: 18px; font-style: normal !important; font-weight: 600 !important; margin-top: 0px; padding-bottom: 24px !important; background-color: #FFFFFF; padding-left: 16px; padding-right: 16px; line-height: 1.6;">${props.subject}</h1>` : ''}
       ${props.content}
     </div>`
   )

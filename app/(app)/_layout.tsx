@@ -13,7 +13,7 @@ export default function AppLayout() {
   const pathname = usePathname()
   const hideHeaderRoutes = [
     '/publications/creer',
-    '/publications/draft',
+    '/publications/brouillons',
     '/publications',
   ]
 
@@ -52,22 +52,6 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="etats-generaux/[id]/index"
-            options={{
-              headerTransparent: true,
-              header: ({ navigation }) => {
-                return media.sm ? (
-                  <VoxHeader backgroundColor="transparent" borderWidth={0}>
-                    <Link href={navigation.canGoBack() ? '../' : '/etats-generaux'} replace asChild={!isWeb}>
-                      <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
-                    </Link>
-                  </VoxHeader>
-                ) : null
-              },
-            }}
-          />
-
-          <Stack.Screen
             name="evenements/[id]/index"
             options={{
               headerTransparent: true,
@@ -102,7 +86,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="publications/index"
             options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false} /> }
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false}  forcedBackPath={isWeb ? '/' : undefined} /> }
             }}
           />
 
@@ -119,7 +103,7 @@ export default function AppLayout() {
             options={({ route }) => ({
               header: () => {
                 return media.sm ? (
-                  <ProfilHeader title="" backgroundColor="$textSurface" forcedBackTitle="Retour" />
+                  <ProfilHeader title="" backgroundColor="$textSurface" forcedBackTitle="Retour" forcedBackPath={isWeb ? '/' : undefined} />
                 ) : null
               },
               animation: route.params && 'withoutAnimation' in route.params ? 'none' : 'slide_from_right',
@@ -127,9 +111,9 @@ export default function AppLayout() {
           />
 
           <Stack.Screen
-            name="publications/draft"
+            name="publications/brouillons"
             options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false}  backPath="/publications"/> }
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false}  forcedBackPath={isWeb ? '/publications' : undefined}/> }
             }}
           />
 

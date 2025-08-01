@@ -28,9 +28,6 @@ export const useCreateMessage = (props: { uuid?: string }) => {
         queryClient.invalidateQueries({ queryKey: ['message', data.uuid] })
         queryClient.invalidateQueries({ queryKey: ['message-content', data.uuid] })
       }
-      queryClient.invalidateQueries({
-        queryKey: [PAGINATED_QUERY_FEED],
-      })
     },
     onError: (error) => {
       if (error instanceof GenericResponseError) {

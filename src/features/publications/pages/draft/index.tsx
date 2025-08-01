@@ -22,7 +22,7 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
     if (scope) {
       navigationParams.scope = scope;
     }
-    
+
     router.push({
       pathname: '/publications/creer',
       params: navigationParams,
@@ -39,7 +39,7 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
         <SenderView sender={item.sender} />
         <Text.MD semibold>
           {item.subject || 'Sans titre'}
-          {item.status === "draft" ? (<Text.MD semibold color="#D02828"> (Brouillon)</Text.MD>) : null}
+          {item.status === "draft" ? (<Text.MD regular color="#D02828"> (Brouillon)</Text.MD>) : null}
         </Text.MD>
         <XStack justifyContent="space-between">
           <XStack gap="$xsmall" alignItems="center">
@@ -96,16 +96,18 @@ const DraftPage = () => {
   return (
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn>
-        <FlatList
-          data={publications}
-          contentContainerStyle={{ maxWidth: media.sm ? '100%' : 520, alignSelf: 'center', width: '100%', paddingBottom: 100, paddingTop: 16 }}
-          renderItem={({ item }) => <PublicationItem item={item} scope={scopeFromParams} />}
-          keyExtractor={(item) => item.uuid}
-          onEndReached={handleEndReached}
-          onEndReachedThreshold={0.2}
-          ListFooterComponent={isFetchingNextPage ? <View alignItems="center" margin={16}><Spinner color="$blue9" /></View> : null}
-          ListEmptyComponent={<View alignItems="center" margin={16}><Text.MD color="$gray6">Aucune publication trouvée</Text.MD></View>}
-        />
+        <YStack paddingTop='$medium' $gtSm={{ paddingTop: '$xxlarge' }}>
+          <FlatList
+            data={publications}
+            contentContainerStyle={{ maxWidth: media.sm ? '100%' : 520, alignSelf: 'center', width: '100%', paddingBottom: 100 }}
+            renderItem={({ item }) => <PublicationItem item={item} scope={scopeFromParams} />}
+            keyExtractor={(item) => item.uuid}
+            onEndReached={handleEndReached}
+            onEndReachedThreshold={0.2}
+            ListFooterComponent={isFetchingNextPage ? <View alignItems="center" margin={16}><Spinner color="$blue9" /></View> : null}
+            ListEmptyComponent={<View alignItems="center" margin={16}><Text.MD color="$gray6">Aucune publication trouvée</Text.MD></View>}
+          />
+        </YStack>
       </PageLayout.MainSingleColumn>
     </PageLayout>
   );

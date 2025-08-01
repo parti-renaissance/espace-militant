@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import { XStack, YStack, useMedia } from 'tamagui'
-import { ActivityIndicator, SafeAreaView } from 'react-native'
+import { ActivityIndicator, Platform, SafeAreaView } from 'react-native'
 import { Save } from '@tamagui/lucide-icons'
 import { VoxButton } from '@/components/Button'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
@@ -19,6 +19,7 @@ interface SelectFiltersProps {
   messageId?: string
   scope?: string
   isLoading?: boolean
+  hasError?: boolean
 }
 
 export default function SelectFilters({
@@ -27,7 +28,8 @@ export default function SelectFilters({
   selectedQuickFilterId = null,
   messageId,
   scope,
-  isLoading = false
+  isLoading = false,
+  hasError = false
 }: SelectFiltersProps) {
   const media = useMedia()
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -102,7 +104,7 @@ export default function SelectFilters({
           theme="gray"
           size="lg"
           onPress={handleOpenModal}
-          error={false}
+          error={hasError}
           disabled={!messageId || !scope}
         >
           <SF.Container>
@@ -139,10 +141,11 @@ export default function SelectFilters({
         onClose={handleCloseModal}
         header={
           <>
-            <SafeAreaView />
+            <SafeAreaView style={{ height: Platform.OS === 'android' ? 20 : undefined }} />
             <Header />
           </>
         }
+        withKeyboard={false}
       >
         <YStack w="100%" $gtMd={{ maxWidth: 480 }}>
           {media.gtMd ? (
