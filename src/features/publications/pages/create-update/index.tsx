@@ -6,18 +6,15 @@ import { VoxHeader } from '@/components/Header/Header'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import StickyBox from '@/components/StickyBox/StickyBox'
 import { EventFormScreenSkeleton } from '@/features/events/pages/create-edit/index'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { useCreateMessage, useGetAvailableSenders, useGetMessage, useGetMessageContent, useGetMessageFilters } from '@/services/publications/hook'
-import { useQueryClient } from '@tanstack/react-query'
 import { Speech } from '@tamagui/lucide-icons'
 import { router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
-import MessageEditor, { defaultTheme, getHTML, MessageEditorRef } from '../../components/Editor'
+import MessageEditor, { defaultTheme, MessageEditorRef } from '../../components/Editor'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import { ViewportModalRef } from '../../components/ConfirmationModal/ViewportModalSheet'
 import BigSwitch from '@/components/base/BigSwitch'
 import { RestAvailableSender } from '@/services/publications/schema'
-import { useToastController } from '@tamagui/toast'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import QuitConfirmModal from '../../components/QuitConfirmModal'
 
@@ -25,8 +22,6 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const editorRef = useRef<MessageEditorRef>(null)
   const modalSendRef = useRef<ViewportModalRef>(null)
   const media = useMedia()
-  const toast = useToastController()
-  const queryClient = useQueryClient()
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [currentMessageId, setCurrentMessageId] = useState<string | undefined>(props?.messageId)
   const [wasInitiallyInCreation] = useState(!props?.messageId)

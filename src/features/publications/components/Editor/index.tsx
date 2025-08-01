@@ -9,12 +9,11 @@ import { getHTML } from './HtmlOneRenderer'
 import { RenderFields } from './RenderFields'
 import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
-import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
+import { createNodeByType, getDefaultFormValues, unZipMessage } from './utils'
 import { useGetAvailableSenders, useGetMessage, useAutoSave } from '@/services/publications/hook'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { AutoSaveIndicator } from './AutoSaveIndicator'
 import { RestAvailableSender, RestGetMessageFiltersResponse } from '@/services/publications/schema'
-import { Keyboard } from 'react-native'
 
 export { getHTML, defaultTheme }
 
