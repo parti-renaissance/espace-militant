@@ -23,18 +23,13 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
   const viewport = useMedia()
   const size = useWindowDimensions()
 
-  const width = Math.min((size.width * 80) / 100, 480)
+  const width = Math.min((size.width * 80) / 100, 520)
   const height = 500
 
   if (viewport.gtSm && isWeb) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
-        <View 
-        style={styles.centeredView}
-        onPress={(e) => {
-          e.stopPropagation()
-        }}
-        >
+        <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <CardFrame width={width} height={height}>
               {header ? header : null}
@@ -62,7 +57,7 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
       }}
     >
       <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-      <Sheet.Frame onPress={(e) => e.stopPropagation()}>
+      <Sheet.Frame>
         {header ? header : null}
         {children}
       </Sheet.Frame>
