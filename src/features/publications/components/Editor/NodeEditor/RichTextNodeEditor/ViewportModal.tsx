@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react'
-import { Modal, ScrollView, StyleSheet } from 'react-native'
+import { Modal, Platform, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { isWeb, Sheet, useMedia, useWindowDimensions, View } from 'tamagui'
@@ -57,7 +57,7 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
       }}
     >
       <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-      <Sheet.Frame>
+      <Sheet.Frame onPress={(e) => Platform.OS === 'ios' ? e.stopPropagation() : null}>
         {header ? header : null}
         {children}
       </Sheet.Frame>
