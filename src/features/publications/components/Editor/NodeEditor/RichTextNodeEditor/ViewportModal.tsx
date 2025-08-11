@@ -57,7 +57,7 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
       }}
     >
       <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-      <Sheet.Frame onPress={(e) => Platform.OS === 'ios' ? e.stopPropagation() : null}>
+      <Sheet.Frame onPress={Platform.OS === 'ios' ? (e) => e.stopPropagation() : undefined}>
         {header ? header : null}
         {children}
       </Sheet.Frame>
