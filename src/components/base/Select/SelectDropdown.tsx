@@ -2,11 +2,12 @@ import React, { ComponentRef, forwardRef, ReactNode, RefObject, useCallback, use
 import { FlatList, GestureResponderEvent, Modal, TouchableOpacity } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { YStack } from 'tamagui'
-import { DropdownFrame, DropdownItem } from '../Dropdown'
+import { DropdownFrame, DropdownItem, DropdownItemFrame } from '../Dropdown'
 import Input from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
 import { reactTextNodeChildrenToString } from './utils'
+import Text from '../Text'
 
 type ModalDropDownProps = {
   children: ReactNode
@@ -65,7 +66,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
   const dropdownTop = useSharedValue(0)
   const dropdownX = useSharedValue(0)
   const dropdownWidth = useSharedValue(0)
-  const { setQuery, filteredItems, queryInputRef, searchableIcon } = useSelectSearch({ options, searchableOptions })
+  const { setQuery, filteredItems, queryInputRef, searchableIcon, query } = useSelectSearch({ options, searchableOptions })
 
   const setModalPosition = useCallback(() => {
     frameRef.current?.measure((_fx, _fy, _w, h, _px, py) => {
@@ -148,6 +149,13 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
               }
               data={filteredItems}
               keyExtractor={(item) => item.id}
+              ListEmptyComponent={
+                props.searchable && searchableOptions?.isFetching === false && filteredItems.length === 0 && query.trim() !== '' ? (
+                  <DropdownItemFrame>
+                    <Text.SM color="$textSecondary">{searchableOptions?.noResults ?? 'Aucun résultat trouvé'}</Text.SM>
+                  </DropdownItemFrame>
+                ) : null
+              }
               renderItem={({ item, index }) => (
                 <MemoItem
                   {...item}

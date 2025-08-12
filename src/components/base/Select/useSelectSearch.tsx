@@ -24,6 +24,7 @@ const useSelectSearch = ({ options, searchableOptions }: Pick<SelectProps<string
     queryInputRef,
     filteredItems,
     searchableIcon,
+    query,
   }
 }
 
