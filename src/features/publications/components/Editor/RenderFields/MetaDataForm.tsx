@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState, useEffect } from 'react'
+import React, { memo, useMemo, useState, useEffect, useCallback } from 'react'
 import { Control, Controller, useFormContext } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
 import Input from '@/components/base/Input/Input'
@@ -60,6 +60,8 @@ export const MetaDataForm = memo((props: {
     }
   }, [messageCountRecipients, isFetchingMessageCountRecipients, setValue])
 
+  console.log('MetaDataForm render', new Date().toISOString());
+
   // Animation values
   const animatedProgress = useSharedValue(props.displayToolbar ? 1 : 0)
 
@@ -92,7 +94,7 @@ export const MetaDataForm = memo((props: {
   }, [props.messageFilters])
 
 
-  const handleFiltersChange = ({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => {
+  const handleFiltersChange = useCallback(({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => {
     const mergedFilters = { ...filters, ...newFilters }
     const mappedFilters = temporaryMapFiltersForApi(mergedFilters)
 
@@ -115,7 +117,7 @@ export const MetaDataForm = memo((props: {
         },
       })
     }
-  }
+  }, [filters, props.messageId, props.scope, putMessageFilters, setFilters, setQuickFilterId])
 
   return (
     <YStack backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ? '$medium' : 0}>
