@@ -140,10 +140,10 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
   }, [])
 
   const memoizedHeaderComponent = useMemo(() => (
-    <MetaDataForm 
-      control={props.control} 
-      availableSenders={memoizedAvailableSenders} 
-      message={memoizedMessage} 
+    <MetaDataForm
+      control={props.control}
+      availableSenders={memoizedAvailableSenders}
+      message={memoizedMessage}
       displayToolbar={props.displayToolbar}
       onMetaDataChange={props.onNodeChange}
       messageFilters={props.messageFilters}
@@ -157,29 +157,29 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
 
   return (
     <YStack flex={1} overflow="hidden">
+      {memoizedHeaderComponent}
       <Animated.FlatList
-          style={renderFieldsStyle.flatlist}
-          scrollEnabled={!isWebPageLayoutScrollActive}
-          onScroll={scrollHandler}
-          ref={scrollRef}
-          contentContainerStyle={[!isWebPageLayoutScrollActive ? { paddingBottom: insets.bottom + 96 } : undefined]}
-          data={fields}
-          onScrollToIndexFailed={reTryScrollOnFail}
-          renderItem={RenderItem}
-          keyExtractor={keyExtractor}
-          ListHeaderComponent={memoizedHeaderComponent}
-          ListEmptyComponent={
-            <EditorInsertionToolbar
-              control={props.control}
-              editorMethods={props.editorMethods}
-              field={undefined}
-              display={true}
-              showAddBar={true}
-              onShowAddBar={() => { }}
-              onCloseAddBar={undefined}
-            />
-          }
-        />
+        style={renderFieldsStyle.flatlist}
+        scrollEnabled={!isWebPageLayoutScrollActive}
+        onScroll={scrollHandler}
+        ref={scrollRef}
+        contentContainerStyle={[!isWebPageLayoutScrollActive ? { paddingBottom: insets.bottom + 96 } : undefined]}
+        data={fields}
+        onScrollToIndexFailed={reTryScrollOnFail}
+        renderItem={RenderItem}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={
+          <EditorInsertionToolbar
+            control={props.control}
+            editorMethods={props.editorMethods}
+            field={undefined}
+            display={true}
+            showAddBar={true}
+            onShowAddBar={() => { }}
+            onCloseAddBar={undefined}
+          />
+        }
+      />
     </YStack>
   )
 })
@@ -188,7 +188,7 @@ const renderFieldsStyle = StyleSheet.create({
   flatlist: {
     flex: 1,
     backgroundColor: 'hsl(240, 9%, 98%)',
-    paddingTop: 12,
     paddingBottom: 12,
+    overflow: 'visible',
   },
 })

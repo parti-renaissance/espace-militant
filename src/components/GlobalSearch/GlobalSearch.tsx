@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
+import React, { memo, useCallback, useState, useMemo, useEffect, useRef } from 'react'
 import { useDebounceValue, YStack } from 'tamagui'
 import Select from '@/components/base/Select/SelectV3'
 import { GlobalSearchProps, SearchResult, SearchProvider } from './types'
@@ -16,6 +16,7 @@ function GlobalSearch({
   onReset,
   disabled,
   size = 'md',
+  scope,
   ...rest
 }: Readonly<GlobalSearchProps>): JSX.Element {
   const [value, setValue] = useState<string>('default')
@@ -25,23 +26,16 @@ function GlobalSearch({
 
   const debouncedQuery = useDebounceValue(query, 500)
 
-  // Recherche avec le provider unique
   const performSearch = useCallback(async (searchQuery: string) => {
-    if (searchQuery.length < 2) {
-      setResults([])
-      return
-    }
 
-    if (!provider.isSearchable(searchQuery)) {
-      setResults([])
+    if (searchQuery.length < 2 || !provider.isSearchable(searchQuery)) {
       return
     }
 
     setIsFetching(true)
     try {
-      const searchResults = await provider.search(searchQuery)
+      const searchResults = await provider.search(searchQuery, scope)
       
-      // Trier et limiter les résultats
       const sortedResults = searchResults
         .sort((a, b) => a.label.localeCompare(b.label))
         .slice(0, 20)
@@ -53,9 +47,8 @@ function GlobalSearch({
     } finally {
       setIsFetching(false)
     }
-  }, [provider])
+  }, [provider, scope])
 
-  // Effectuer la recherche quand la query change
   useEffect(() => {
     performSearch(debouncedQuery)
   }, [debouncedQuery, performSearch])
@@ -75,14 +68,11 @@ function GlobalSearch({
     const selectedResult = results.find(r => r.id === id)
     
     if (selectedResult) {
-      // Récupérer les détails complets si nécessaire
       const details = await provider.getDetails(id)
       
       if (details) {
-        // Il y avait des détails supplémentaires
         onSelect(details)
       } else {
-        // Pas de détails, on utilise le résultat de search()
         onSelect(selectedResult)
       }
     }
@@ -90,10 +80,7 @@ function GlobalSearch({
     onBlur?.()
   }, [results, provider, onSelect, onReset, onBlur])
 
-  // Icône du provider
-  const getProviderIcon = useCallback(() => {
-    return provider.getIcon()
-  }, [provider])
+  const providerIcon = useMemo(() => provider.getIcon(), [provider])
 
   const options = useMemo(() => [
     ...results.map((result) => ({
@@ -104,13 +91,18 @@ function GlobalSearch({
     ...(defaultValue ? [{ value: 'default', label: defaultValue }] : []),
   ], [results, defaultValue])
 
+  const searchPlaceholder = useMemo(() => 
+    placeholder || provider.getPlaceholder(), 
+    [placeholder, provider]
+  )
+
   return (
     <YStack minWidth={minWidth} maxWidth={maxWidth}>
       <Select
-        placeholder={placeholder || provider.getPlaceholder()}
+        placeholder={searchPlaceholder}
         value={value}
         onChange={onResultSelect}
-        icon={getProviderIcon()}
+        icon={providerIcon}
         searchable
         searchableOptions={{
           autocompleteCallback: onInput,

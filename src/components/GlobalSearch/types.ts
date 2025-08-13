@@ -30,4 +30,5 @@ export interface GlobalSearchProps {
   onReset?: () => void
   disabled?: boolean
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  scope?: string
 } 

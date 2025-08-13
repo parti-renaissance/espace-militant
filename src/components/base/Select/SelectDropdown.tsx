@@ -44,7 +44,7 @@ const ModalDropDown = forwardRef<ModalDropDownRef, ModalDropDownProps>((props, r
 
   return (
     <Modal visible={isOpen} transparent animationType="fade" onRequestClose={handleClose}>
-      <TouchableOpacity style={{ flex: 1 }} onPress={handleBackDropClose}>
+      <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={handleBackDropClose}>
         {props.children}
       </TouchableOpacity>
     </Modal>

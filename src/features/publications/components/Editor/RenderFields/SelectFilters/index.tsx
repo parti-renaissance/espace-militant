@@ -7,11 +7,19 @@ import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import Text from '@/components/base/Text'
 import { SelectFrames as SF } from '@/components/base/Select/Frames'
 import SelectFiltersItem from './SelectFiltersItem'
-import { AlertUtils } from '@/screens/shared/AlertUtils'
 import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook';
 import { getHierarchicalQuickFilters, getItemState } from './helpers';
 import { SelectedFiltersType, HierarchicalQuickFilterType } from './type';
 import { useQueryClient } from '@tanstack/react-query'
+import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
+
+// Type pour les zones
+type Zone = {
+  uuid: string
+  name: string
+  code: string
+  type: string
+}
 
 interface SelectFiltersProps {
   onFiltersChange?: ({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => void
@@ -39,9 +47,48 @@ export default function SelectFilters({
   const quickFilters: HierarchicalQuickFilterType[] = useMemo(() => getHierarchicalQuickFilters(), [])
   const queryClient = useQueryClient();
 
+  const zoneProvider = useMemo(() => new ZoneProvider(), [])
+
+  // Optimisation : Calcul du defaultValue de la zone avec useMemo
+  const zoneDefaultValue = useMemo(() => {
+    // Vérifier d'abord si une zone est sélectionnée
+    if (selectedFilters.zone && typeof selectedFilters.zone === 'object' && 'name' in selectedFilters.zone && 'code' in selectedFilters.zone) {
+      return `${selectedFilters.zone.name} (${selectedFilters.zone.code})`
+    }
+    
+    // Vérifier s'il y a des zones de fallback
+    if (selectedFilters.zones && Array.isArray(selectedFilters.zones) && selectedFilters.zones.length > 0) {
+      const firstZone = selectedFilters.zones[0]
+      if (firstZone && typeof firstZone === 'object' && 'name' in firstZone && 'code' in firstZone) {
+        return `${firstZone.name} (${firstZone.code})`
+      }
+    }
+    
+    // Vérifier s'il y a un committee (priorité sur les zones)
+    if (selectedFilters.committee && typeof selectedFilters.committee === 'object' && 'name' in selectedFilters.committee) {
+      return selectedFilters.committee.name
+    }
+    
+    // Aucune zone ni committee trouvé
+    return undefined
+  }, [selectedFilters.zone, selectedFilters.zones, selectedFilters.committee])
+
+  // Optimisation : Calcul du texte d'affichage avec useMemo
+  const displayText = useMemo(() => {
+    if (selectedQuickFilterId) {
+      const item = quickFilters.find(d => d.value === selectedQuickFilterId)
+      return item ? item.label : 'Sélectionné'
+    }
+    
+    const nonNullFilters = Object.entries(selectedFilters).filter(([_, value]) => value !== null && value !== undefined)
+    return nonNullFilters.length > 0
+      ? `${nonNullFilters.length} filtre${nonNullFilters.length > 1 ? 's' : ''} avancé${nonNullFilters.length > 1 ? 's' : ''}`
+      : 'Sélectionner'
+  }, [selectedQuickFilterId, quickFilters, selectedFilters])
+
   const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({ messageId: messageId, scope: scope })
 
-  const handleOpenModal = () => {
+  const handleOpenModal = useCallback(() => {
     const quickFilterToUse = selectedQuickFilterId || (() => {
       const matchingQuickFilter = quickFilters.find(qf =>
         JSON.stringify(qf.filters) === JSON.stringify(selectedFilters)
@@ -52,13 +99,13 @@ export default function SelectFilters({
     setTempSelectedQuickFilter(quickFilterToUse)
     setTempSelectedFilters(selectedFilters)
     setIsModalOpen(true)
-  }
+  }, [selectedQuickFilterId, quickFilters, selectedFilters])
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false)
-  }
+  }, [])
 
-  const handleConfirmSelection = () => {
+  const handleConfirmSelection = useCallback(() => {
     if (tempSelectedQuickFilter) {
       const selectedQuickFilter = quickFilters.find(qf => qf.value === tempSelectedQuickFilter)
       if (selectedQuickFilter) {
@@ -71,9 +118,9 @@ export default function SelectFilters({
       queryKey: ['message-count-recipients', messageId],
     })
     handleCloseModal()
-  }
+  }, [tempSelectedQuickFilter, quickFilters, tempSelectedFilters, onFiltersChange, queryClient, messageId, handleCloseModal])
 
-  const handleItemSelection = (itemId: string, immediateChange: boolean = false) => {
+  const handleItemSelection = useCallback((itemId: string, immediateChange: boolean = false) => {
     const item = quickFilters.find(d => d.value === itemId)
     if (!item) return
     if (tempSelectedQuickFilter === itemId) return
@@ -83,11 +130,48 @@ export default function SelectFilters({
     if (immediateChange) {
       onFiltersChange?.({ newFilters: item.filters, newQuickFilterId: itemId })
     }
-  }
+  }, [quickFilters, tempSelectedQuickFilter, onFiltersChange])
 
   const handleFilterChange = (newFilters: SelectedFiltersType) => {
     setTempSelectedFilters(newFilters)
   }
+
+  const handleZoneSelect = useCallback((result: any) => {
+    const newFilters = {
+      ...tempSelectedFilters,
+      zone: {
+        uuid: result.id,
+        name: result.metadata?.zone?.name || '',
+        code: result.metadata?.zoneCode || '',
+        type: result.metadata?.zoneType || 'custom'
+      },
+    }
+    
+    setTempSelectedFilters(newFilters)
+    
+    onFiltersChange?.({ newFilters: newFilters, newQuickFilterId: tempSelectedQuickFilter })
+  }, [tempSelectedFilters, onFiltersChange, tempSelectedQuickFilter])
+
+  const handleZoneReset = useCallback(() => {
+    const newFilters = { ...tempSelectedFilters }
+    delete newFilters.zone
+    setTempSelectedFilters(newFilters)
+    const apiFilters = { ...newFilters }
+    delete apiFilters.zone
+    onFiltersChange?.({ newFilters: apiFilters, newQuickFilterId: tempSelectedQuickFilter })
+  }, [tempSelectedFilters, onFiltersChange, tempSelectedQuickFilter])
+
+  // Handler pour réinitialiser les zones ET les committees
+  const handleZoneAndCommitteeReset = useCallback(() => {
+    const newFilters = { ...tempSelectedFilters }
+    delete newFilters.zone
+    delete newFilters.committee
+    setTempSelectedFilters(newFilters)
+    const apiFilters = { ...newFilters }
+    delete apiFilters.zone
+    delete apiFilters.committee
+    onFiltersChange?.({ newFilters: apiFilters, newQuickFilterId: tempSelectedQuickFilter })
+  }, [tempSelectedFilters, onFiltersChange, tempSelectedQuickFilter])
 
   const Header = useCallback(() => {
     return (
@@ -116,18 +200,7 @@ export default function SelectFilters({
             <SF.Label>Destinataires</SF.Label>
             <SF.ValueContainer alignItems="flex-end">
               <SF.Text>
-                {selectedQuickFilterId
-                  ? (() => {
-                    const item = quickFilters.find(d => d.value === selectedQuickFilterId)
-                    return item ? item.label : 'Sélectionné'
-                  })()
-                  : (() => {
-                    const nonNullFilters = Object.entries(selectedFilters).filter(([_, value]) => value !== null && value !== undefined)
-                    return nonNullFilters.length > 0
-                      ? `${nonNullFilters.length} filtre${nonNullFilters.length > 1 ? 's' : ''} avancé${nonNullFilters.length > 1 ? 's' : ''}`
-                      : 'Sélectionner'
-                  })()
-                }
+                {displayText}
               </SF.Text>
               {isFetchingMessageCountRecipients ? (
                 <YStack marginBottom={2} marginHorizontal={2}>
@@ -187,26 +260,14 @@ export default function SelectFilters({
             </YStack>
 
             <YStack gap="$small" w="100%">
-              <SF.Props themedText={false}>
-                <SF
-                  theme="gray"
-                  size="lg"
-                  onPress={() => {
-                    AlertUtils.showSimpleAlert('En cours de développement', 'Prochainement, vous pourrez sélectionner des zones comme des circonscriptions, des communes, etc...', 'Retour', 'OK', () => { })
-                  }}
-                  error={false}
-                  disabled={false}
-                >
-                  <SF.Container>
-                    <SF.Label>Zone géographique</SF.Label>
-                    <SF.ValueContainer>
-                      <SF.Text>
-                        {selectedFilters.zones?.[0]?.name ? selectedFilters.zones[0].name : 'Votre zone géographique'}
-                      </SF.Text>
-                    </SF.ValueContainer>
-                  </SF.Container>
-                </SF>
-              </SF.Props>
+              <GlobalSearch
+                provider={zoneProvider}
+                onSelect={handleZoneSelect}
+                onReset={handleZoneAndCommitteeReset}
+                placeholder="Zone géographique"
+                scope={scope}
+                defaultValue={zoneDefaultValue}
+              />
               <Text.SM secondary>Ciblez votre publication géographiquement (Circonscriptions, communes, etc.)</Text.SM>
             </YStack>
             <YStack gap="$small">

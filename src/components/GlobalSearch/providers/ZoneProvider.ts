@@ -25,7 +25,7 @@ export class ZoneProvider implements SearchProvider {
       const response = await getZoneAutocomplete({
         q: query,
         scope,
-        // 'types[]': ['city', 'department', 'region']
+        'types[]': ['borough', 'city', 'canton', 'department', 'region', 'country', 'district', 'foreign_district'] // Contrainte Mailchimp
       })
 
       return response.map(zone => ({
