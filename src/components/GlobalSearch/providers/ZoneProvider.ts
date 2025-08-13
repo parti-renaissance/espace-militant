@@ -1,5 +1,5 @@
 import { SearchProvider, SearchResult } from '../types'
-import { MapPin, Building2 } from '@tamagui/lucide-icons'
+import { Building2 } from '@tamagui/lucide-icons'
 import { NamedExoticComponent } from 'react'
 import { IconProps } from '@tamagui/helpers-icon'
 import { getZoneAutocomplete } from '@/services/search/api'
