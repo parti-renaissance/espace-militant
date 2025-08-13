@@ -1,7 +1,7 @@
-import React, { memo, useCallback, useState, useMemo, useEffect, useRef } from 'react'
+import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
 import { useDebounceValue, YStack } from 'tamagui'
 import Select from '@/components/base/Select/SelectV3'
-import { GlobalSearchProps, SearchResult, SearchProvider } from './types'
+import { GlobalSearchProps, SearchResult } from './types'
 import { Search } from '@tamagui/lucide-icons'
 
 function GlobalSearch({

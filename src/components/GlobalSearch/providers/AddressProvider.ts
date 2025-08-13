@@ -4,6 +4,7 @@ import { getPlaceAutocomplete, getPlaceDetails } from '@/services/search/api'
 import googleAddressMapper from '@/data/mapper/googleAddressMapper'
 import { NamedExoticComponent } from 'react'
 import { IconProps } from '@tamagui/helpers-icon'
+import { GoogleAddressPlaceResult } from '@/data/network/ApiService'
 
 export class AddressProvider implements SearchProvider {
   async search(query: string): Promise<SearchResult[]> {
@@ -34,7 +35,7 @@ export class AddressProvider implements SearchProvider {
           placeDetails: {
             formatted: placeDetails.result.formatted_address,
             details: placeDetails.result.address_components,
-            geometry: placeDetails.result.geometry as any // Type casting pour compatibilité
+            geometry: placeDetails.result.geometry as unknown as google.maps.GeocoderGeometry
           }
         })
         
