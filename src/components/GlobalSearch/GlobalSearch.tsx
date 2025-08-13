@@ -17,6 +17,7 @@ function GlobalSearch({
   disabled,
   size = 'md',
   scope,
+  nullable = false,
   ...rest
 }: Readonly<GlobalSearchProps>): JSX.Element {
   const [value, setValue] = useState<string>('default')
@@ -64,6 +65,12 @@ function GlobalSearch({
       return
     }
 
+    if (id === '__null__') {
+      onSelect(null)
+      onBlur?.()
+      return
+    }
+
     setValue(id)
     const selectedResult = results.find(r => r.id === id)
     
@@ -89,7 +96,8 @@ function GlobalSearch({
       subLabel: result.subLabel,
     })),
     ...(defaultValue ? [{ value: 'default', label: defaultValue }] : []),
-  ], [results, defaultValue])
+    ...(nullable ? [{ value: '__null__', label: 'Remettre à zéro' }] : []),
+  ], [results, defaultValue, nullable])
 
   const searchPlaceholder = useMemo(() => 
     placeholder || provider.getPlaceholder(), 

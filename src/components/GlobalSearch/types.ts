@@ -19,7 +19,7 @@ export interface SearchProvider {
 
 export interface GlobalSearchProps {
   defaultValue?: string
-  onSelect: (result: SearchResult) => void
+  onSelect: (result: SearchResult | null) => void
   provider: SearchProvider
   placeholder?: string
   error?: string
@@ -31,4 +31,5 @@ export interface GlobalSearchProps {
   disabled?: boolean
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   scope?: string
+  nullable?: boolean
 } 

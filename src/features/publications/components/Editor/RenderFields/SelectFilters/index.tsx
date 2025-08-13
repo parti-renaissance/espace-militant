@@ -136,7 +136,21 @@ export default function SelectFilters({
     setTempSelectedFilters(newFilters)
   }
 
-  const handleZoneSelect = useCallback((result: any) => {
+    const handleZoneSelect = useCallback((result: any) => {
+    if (!result) {
+      const newFilters = {
+        ...tempSelectedFilters,
+        zone: null,
+      }
+      setTempSelectedFilters(newFilters)
+      onFiltersChange?.({ newFilters: newFilters, newQuickFilterId: tempSelectedQuickFilter })
+      return
+    }
+
+    if (!result.id) {
+      return
+    }
+
     const newFilters = {
       ...tempSelectedFilters,
       zone: {
@@ -267,6 +281,7 @@ export default function SelectFilters({
                 placeholder="Zone géographique"
                 scope={scope}
                 defaultValue={zoneDefaultValue}
+                nullable={!!selectedFilters.committee && !!selectedFilters.zone}
               />
               <Text.SM secondary>Ciblez votre publication géographiquement (Circonscriptions, communes, etc.)</Text.SM>
             </YStack>
