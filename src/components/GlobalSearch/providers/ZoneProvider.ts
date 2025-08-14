@@ -1,5 +1,5 @@
 import { SearchProvider, SearchResult } from '../types'
-import { Building2 } from '@tamagui/lucide-icons'
+import { ChevronsUpDown } from '@tamagui/lucide-icons'
 import { NamedExoticComponent } from 'react'
 import { IconProps } from '@tamagui/helpers-icon'
 import { getZoneAutocomplete } from '@/services/search/api'
@@ -9,12 +9,12 @@ const ZONE_TYPE_LABELS: Record<string, string> = {
   country: 'Pays',
   region: 'Région',
   department: 'Département',
-  district: 'Arrondissement',
+  district: 'Circonscription',
   city: 'Ville',
-  borough: 'Quartier',
+  borough: 'Arrondissement',
   city_community: 'Communauté de communes',
   canton: 'Canton',
-  foreign_district: 'Circonscription consulaire',
+  foreign_district: 'Circonscription',
   consular_district: 'District consulaire',
   vote_place: 'Bureau de vote'
 }
@@ -58,7 +58,7 @@ export class ZoneProvider implements SearchProvider {
   }
 
   getIcon(): NamedExoticComponent<IconProps> {
-    return Building2 as NamedExoticComponent<IconProps>
+    return ChevronsUpDown as NamedExoticComponent<IconProps>
   }
 
   getPlaceholder(): string {
