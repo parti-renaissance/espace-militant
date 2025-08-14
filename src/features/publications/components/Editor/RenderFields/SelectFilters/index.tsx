@@ -49,31 +49,34 @@ export default function SelectFilters({
 
   const zoneProvider = useMemo(() => new ZoneProvider(), [])
 
-  // Optimisation : Calcul du defaultValue de la zone avec useMemo
   const zoneDefaultValue = useMemo(() => {
-    // Vérifier d'abord si une zone est sélectionnée
     if (selectedFilters.zone && typeof selectedFilters.zone === 'object' && 'name' in selectedFilters.zone && 'code' in selectedFilters.zone) {
-      return `${selectedFilters.zone.name} (${selectedFilters.zone.code})`
+      return {
+        label: `${selectedFilters.zone.name} (${selectedFilters.zone.code})`,
+        value: selectedFilters.zone.uuid
+      }
     }
-    
-    // Vérifier s'il y a des zones de fallback
+
     if (selectedFilters.zones && Array.isArray(selectedFilters.zones) && selectedFilters.zones.length > 0) {
       const firstZone = selectedFilters.zones[0]
       if (firstZone && typeof firstZone === 'object' && 'name' in firstZone && 'code' in firstZone) {
-        return `${firstZone.name} (${firstZone.code})`
+        return {
+          label: `${firstZone.name} (${firstZone.code})`,
+          value: firstZone.uuid
+        }
       }
     }
-    
-    // Vérifier s'il y a un committee (priorité sur les zones)
-    if (selectedFilters.committee && typeof selectedFilters.committee === 'object' && 'name' in selectedFilters.committee) {
-      return selectedFilters.committee.name
-    }
-    
-    // Aucune zone ni committee trouvé
-    return undefined
-  }, [selectedFilters.zone, selectedFilters.zones, selectedFilters.committee])
 
-  // Optimisation : Calcul du texte d'affichage avec useMemo
+    if (selectedFilters.committee && typeof selectedFilters.committee === 'object' && 'name' in selectedFilters.committee) {
+      return {
+        label: selectedFilters.committee.name,
+        value: null
+      }
+    }
+
+    return undefined
+  }, [isModalOpen]) // update defaultValue only when modal state changes
+
   const displayText = useMemo(() => {
     if (selectedQuickFilterId) {
       const item = quickFilters.find(d => d.value === selectedQuickFilterId)
@@ -175,7 +178,6 @@ export default function SelectFilters({
     onFiltersChange?.({ newFilters: apiFilters, newQuickFilterId: tempSelectedQuickFilter })
   }, [tempSelectedFilters, onFiltersChange, tempSelectedQuickFilter])
 
-  // Handler pour réinitialiser les zones ET les committees
   const handleZoneAndCommitteeReset = useCallback(() => {
     const newFilters = { ...tempSelectedFilters }
     delete newFilters.zone

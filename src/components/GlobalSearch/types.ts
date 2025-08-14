@@ -18,7 +18,7 @@ export interface SearchProvider {
 }
 
 export interface GlobalSearchProps {
-  defaultValue?: string
+  defaultValue?: string | { value: string | null; label: string }
   onSelect: (result: SearchResult | null) => void
   provider: SearchProvider
   placeholder?: string

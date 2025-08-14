@@ -20,10 +20,35 @@ function GlobalSearch({
   nullable = false,
   ...rest
 }: Readonly<GlobalSearchProps>): JSX.Element {
-  const [value, setValue] = useState<string>('default')
+  const [value, setValue] = useState<string>(() => {
+    if (typeof defaultValue === 'string') return defaultValue
+    if (defaultValue && typeof defaultValue === 'object') return defaultValue.value || ''
+    return ''
+  })
+  const [selectedLabel, setSelectedLabel] = useState<string>(() => {
+    if (typeof defaultValue === 'string') return defaultValue
+    if (defaultValue && typeof defaultValue === 'object') return defaultValue.label || ''
+    return ''
+  })
   const [query, setQuery] = useState<string>('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [isFetching, setIsFetching] = useState(false)
+  
+  // Handle defaultValue which can be {value, label}, label string, or undefined
+  const defaultOption = useMemo(() => {
+    if (!defaultValue) return null
+    
+    if (typeof defaultValue === 'string') {
+      return { value: '', label: defaultValue }
+    }
+    
+    // defaultValue is an object with {value, label}
+    const defaultObj = defaultValue as { value?: string; label: string }
+    return {
+      value: defaultObj.value || '',
+      label: defaultObj.label
+    }
+  }, [defaultValue])
 
   const debouncedQuery = useDebounceValue(query, 500)
 
@@ -59,13 +84,17 @@ function GlobalSearch({
   }, [])
 
   const onResultSelect = useCallback(async (id: string) => {
-    if (id === 'default') {
+    if (id === '') {
+      setValue('')
+      setSelectedLabel('')
       onReset?.()
       onBlur?.()
       return
     }
 
     if (id === '__null__') {
+      setValue('__null__')
+      setSelectedLabel('Remettre à zéro')
       onSelect(null)
       onBlur?.()
       return
@@ -75,6 +104,7 @@ function GlobalSearch({
     const selectedResult = results.find(r => r.id === id)
     
     if (selectedResult) {
+      setSelectedLabel(selectedResult.label)
       const details = await provider.getDetails(id)
       
       if (details) {
@@ -89,15 +119,37 @@ function GlobalSearch({
 
   const providerIcon = useMemo(() => provider.getIcon(), [provider])
 
-  const options = useMemo(() => [
-    ...results.map((result) => ({
-      value: result.id,
-      label: result.label,
-      subLabel: result.subLabel,
-    })),
-    ...(defaultValue ? [{ value: 'default', label: defaultValue }] : []),
-    ...(nullable ? [{ value: '__null__', label: 'Remettre à zéro' }] : []),
-  ], [results, defaultValue, nullable])
+  const options = useMemo(() => {
+    const allOptions = [
+      ...results.map((result) => ({
+        value: result.id,
+        label: result.label,
+        subLabel: result.subLabel,
+      })),
+      ...(defaultOption ? [defaultOption] : []),
+      // Always include the currently selected value if it's not already in results
+      ...(value && value !== '' && value !== '__null__' && !results.find(r => r.id === value) && selectedLabel ? [{
+        value: value,
+        label: selectedLabel,
+      }] : []),
+      ...(nullable ? [{ value: '__null__', label: 'Remettre à zéro' }] : []),
+    ]
+
+    // Remove duplicates by keeping only the first occurrence of each value
+    const uniqueOptions = allOptions.reduce((acc, option) => {
+      const existingIndex = acc.findIndex(existing => existing.value === option.value)
+      if (existingIndex !== -1) {
+        // Skip duplicate - keep the first occurrence (search results have priority)
+        return acc
+      } else {
+        // Add new option
+        acc.push(option)
+      }
+      return acc
+    }, [] as typeof allOptions)
+
+    return uniqueOptions
+  }, [results, defaultOption, nullable, value, selectedLabel])
 
   const searchPlaceholder = useMemo(() => 
     placeholder || provider.getPlaceholder(), 
