@@ -206,11 +206,11 @@ const SelectItemComponent = ({
 }
 
 // Export avec les propriétés statiques
-export const SelectFiltersItem = withStaticProperties(SelectItemComponent, {
+export const SelectQuickFiltersItem = withStaticProperties(SelectItemComponent, {
   Container: SelectItemContainer,
   Label: SelectItemLabel,
   Count: SelectItemCount,
   Button: SelectItemButton,
 })
 
-export default SelectFiltersItem 
+export default SelectQuickFiltersItem 
