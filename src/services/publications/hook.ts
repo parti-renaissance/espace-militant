@@ -353,3 +353,12 @@ export const useAutoSave = (props: {
     createdMessageId: createdMessageId.current,
   }
 }
+
+export const useGetFilterCollection = (props: { scope: string; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['filter-collection', props.scope],
+    queryFn: () => api.getFilterCollection({ scope: props.scope }),
+    enabled: props.enabled !== false,
+    staleTime: 60 * 1000, // 1 minute
+  })
+}

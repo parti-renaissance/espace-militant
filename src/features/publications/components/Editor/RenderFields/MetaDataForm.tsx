@@ -43,7 +43,7 @@ export const MetaDataForm = memo((props: {
   }, [props.message?.sender, props.availableSenders])
 
   const [filters, setFilters] = useState<SelectedFiltersType>(props.messageFilters as SelectedFiltersType ?? { 'adherent_tags': 'adherent' })
-  const [quickFilterId, setQuickFilterId] = useState<string | null>('adherents')
+  const [quickFilterId, setQuickFilterId] = useState<string | null>(null)
 
   const { mutate: putMessageFilters, isPending: isPuttingMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
   const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({ 
@@ -52,7 +52,6 @@ export const MetaDataForm = memo((props: {
     enabled: !!props.messageId && !!props.scope
   })
 
-  // Mettre à jour la validation des filtres quand le nombre de contacts change
   useEffect(() => {
     if (!isFetchingMessageCountRecipients && messageCountRecipients) {
       const hasRecipients = messageCountRecipients.contacts > 0
@@ -60,12 +59,7 @@ export const MetaDataForm = memo((props: {
     }
   }, [messageCountRecipients, isFetchingMessageCountRecipients, setValue])
 
-  console.log('MetaDataForm render', new Date().toISOString());
-
-  // Animation values
   const animatedProgress = useSharedValue(props.displayToolbar ? 1 : 0)
-
-  // Animated style
   const animatedStyle = useAnimatedStyle(() => {
     return {
       height: animatedProgress.value === 1 ? 'auto' : animatedProgress.value * 56,
@@ -76,7 +70,6 @@ export const MetaDataForm = memo((props: {
     }
   })
 
-  // Update animation when displayToolbar changes
   useEffect(() => {
     const targetProgress = props.displayToolbar ? 1 : 0
 
@@ -97,6 +90,8 @@ export const MetaDataForm = memo((props: {
   const handleFiltersChange = useCallback(({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => {
     const mergedFilters = { ...filters, ...newFilters }
     const mappedFilters = temporaryMapFiltersForApi(mergedFilters)
+
+    console.log('mergedFilters', mergedFilters)
 
     let hasAnyChange = false
     Object.keys(mergedFilters).forEach(key => {

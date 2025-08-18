@@ -104,3 +104,12 @@ export const putMessageFilters = (props: { messageId: string; payload: schemas.R
     responseSchema: z.literal('OK'),
     type: 'private',
   })(props.payload)
+
+export const getFilterCollection = (props: { scope: string }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/filters?scope=${props.scope}&feature=publications`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestFilterCollectionResponseSchema,
+    type: 'private',
+  })()
