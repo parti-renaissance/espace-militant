@@ -18,6 +18,7 @@ function GlobalSearch({
   size = 'md',
   scope,
   nullable = false,
+  helpText,
   ...rest
 }: Readonly<GlobalSearchProps>): JSX.Element {
   const [value, setValue] = useState<string>(() => {
@@ -51,6 +52,9 @@ function GlobalSearch({
   }, [defaultValue])
 
   const debouncedQuery = useDebounceValue(query, 500)
+
+  const shouldShowNoResults = results?.length === 0 && debouncedQuery.length > 2 && !isFetching && debouncedQuery === query
+  const debouncedShowNoResults = useDebounceValue(shouldShowNoResults, 100)
 
   const performSearch = useCallback(async (searchQuery: string) => {
 
@@ -168,8 +172,9 @@ function GlobalSearch({
           autocompleteCallback: onInput,
           isFetching,
           icon: Search,
-          noResults: 'Aucun résultat trouvé',
+          noResults: debouncedShowNoResults ? 'Aucun résultat trouvé' : undefined,
         }}
+        helpText={helpText}
         disabled={disabled}
         size={size}
         {...rest}

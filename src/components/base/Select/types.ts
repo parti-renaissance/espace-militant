@@ -45,6 +45,7 @@ export type SelectProps<A extends string> = {
     autocompleteCallback?: (value: string) => void
     isFetching?: boolean
   }
+  helpText?: string | React.ReactNode
   resetable?: boolean
   openAbove?: boolean
 }

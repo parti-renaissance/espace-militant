@@ -335,6 +335,7 @@ export default function SelectFilters({
                 scope={scope}
                 defaultValue={zoneDefaultValue}
                 nullable={!!selectedFilters.committee && !!selectedFilters.zone}
+                helpText={<Text.SM><Text.SM semibold>Toutes les zones inclues dans votre zone de gestion sont filtrables. </Text.SM> Exemple :  Circonscriptions, Cantons, Communauté de communes, Communes et Bureaux de vote.</Text.SM>}
               />
               <Text.SM secondary>Ciblez votre publication géographiquement (Circonscriptions, communes, etc.)</Text.SM>
             </YStack>

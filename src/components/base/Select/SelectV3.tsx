@@ -6,7 +6,6 @@ import { SelectFrames as SF } from './Frames'
 import SelectBottomSheet from './SelectBottomSheet'
 import SelectDropdown, { SelectDropdownRef } from './SelectDropdown'
 import { ModalDropDownRef, SelectOption, SelectProps } from './types'
-import { useState } from 'react'
 
 export { SelectOption, SF }
 
