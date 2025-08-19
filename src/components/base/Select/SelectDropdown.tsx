@@ -1,5 +1,5 @@
 import React, { ComponentRef, forwardRef, ReactNode, RefObject, useCallback, useImperativeHandle, useRef, useState } from 'react'
-import { FlatList, GestureResponderEvent, Modal, TouchableOpacity } from 'react-native'
+import { FlatList, GestureResponderEvent, Modal, Platform, TouchableOpacity } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { YStack } from 'tamagui'
 import { DropdownFrame, DropdownItem, DropdownItemFrame } from '../Dropdown'
@@ -136,7 +136,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
       top: dropdownTop.value,
       left: dropdownX.value,
       width: dropdownWidth.value,
-      position: 'absolute',
+      position: Platform.OS === 'web' && openAbove ? 'fixed' : 'absolute',
       maxHeight: 325,
     }
   })
