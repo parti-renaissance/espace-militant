@@ -46,4 +46,5 @@ export type SelectProps<A extends string> = {
     isFetching?: boolean
   }
   resetable?: boolean
+  openAbove?: boolean
 }

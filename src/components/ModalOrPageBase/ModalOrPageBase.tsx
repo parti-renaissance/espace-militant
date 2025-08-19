@@ -1,5 +1,5 @@
 import { MutableRefObject, PropsWithChildren, ReactNode } from 'react'
-import { Modal, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
+import { Modal, Pressable, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Spacing } from '@/styles'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
@@ -14,11 +14,12 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   shouldDisplayCloseButton?: boolean
   header?: ReactNode
   scrollable?: boolean
-  scrollRef?: MutableRefObject<ScrollView | null>
+  scrollRef?: MutableRefObject<React.ElementRef<typeof Sheet.ScrollView> | null>
   allowDrag?: boolean
   mobileBackdrop?: boolean
   snapPoints?: number[]
   withKeyboard?: boolean
+  modalViewStyle?: ViewStyle
 }
 
 /**
@@ -38,6 +39,7 @@ export default function ModalOrPageBase({
   allowDrag,
   mobileBackdrop,
   withKeyboard = true,
+  modalViewStyle,
 }: ModalOrPageBaseProps) {
   const viewport = useMedia()
   const insets = useSafeAreaInsets()
@@ -51,7 +53,7 @@ export default function ModalOrPageBase({
             bounces={false}
             showsVerticalScrollIndicator={false}
           >
-          <View style={styles.modalView}>
+          <View style={[styles.modalView, modalViewStyle]}>
             {children}
             {shouldDisplayCloseButton
               ? (
