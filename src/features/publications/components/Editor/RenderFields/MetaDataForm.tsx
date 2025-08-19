@@ -11,6 +11,7 @@ import SelectFilters, { SelectedFiltersType } from './SelectFilters'
 import { usePutMessageFilters } from '@/services/publications/hook'
 import { identifyQuickFilter } from './SelectFilters/helpers'
 import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook'
+import { useQueryClient } from '@tanstack/react-query'
 
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
   const { committee, ...filtersWithoutCommittee } = filters
@@ -37,6 +38,7 @@ export const MetaDataForm = memo((props: {
   messageId?: string,
   scope: string
 }) => {
+  const queryClient = useQueryClient()
   const { setValue } = useFormContext<S.GlobalForm>()
   const senderToDisplay = useMemo(() => {
     return props.message?.sender || (props.availableSenders && props.availableSenders.length > 0 ? props.availableSenders[0] : null)
@@ -90,8 +92,6 @@ export const MetaDataForm = memo((props: {
   const handleFiltersChange = useCallback(({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => {
     const mergedFilters = { ...filters, ...newFilters }
     const mappedFilters = temporaryMapFiltersForApi(mergedFilters)
-
-    console.log('mergedFilters', mergedFilters)
 
     let hasAnyChange = false
     Object.keys(mergedFilters).forEach(key => {

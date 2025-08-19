@@ -14,11 +14,12 @@ const Select = <A extends string>(props: SelectProps<A>) => {
   const frameRef = useRef<ComponentRef<typeof TouchableOpacity>>(null)
   const modalRef = useRef<SelectDropdownRef>(null)
   const bottomSheetRef = useRef<ModalDropDownRef>(null)
+  
   const handlePress = useCallback(() => {
     if (props.disabled) return
     modalRef.current?.open()
     bottomSheetRef.current?.open()
-  }, [props.disabled])
+  }, [props.disabled, props.searchable, props.options.length])
 
   const Selector = useMemo(() => {
     return media.gtSm && isWeb ? SelectDropdown : SelectBottomSheet
@@ -51,7 +52,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
 
   return (
     <YStack>
-      <Selector ref={selectorRef} frameRef={frameRef} {...props} />
+      <Selector ref={selectorRef} frameRef={frameRef} {...props} openAbove={props.openAbove} />
 
       <SF.Props themedText={props.matchTextWithTheme ?? false}>
         <SF

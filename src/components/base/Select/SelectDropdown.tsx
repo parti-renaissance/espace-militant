@@ -61,7 +61,7 @@ export type SelectDropdownRef = ModalDropDownRef & {
   setModalPosition: () => void
 }
 
-const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ frameRef, options, searchableOptions, resetable, ...props }, ref) => {
+const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ frameRef, options, searchableOptions, resetable, openAbove, searchable, ...props }, ref) => {
   const modalRef = useRef<ModalDropDownRef>(null)
   const dropdownTop = useSharedValue(0)
   const dropdownX = useSharedValue(0)
@@ -73,11 +73,27 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
       const isMinWidth = _w < MIN_WIDTH
       const x = isMinWidth ? _px - (MIN_WIDTH - _w) / 2 : _px
       const w = isMinWidth ? MIN_WIDTH : _w
-      dropdownTop.value = py + h
+
+      // Calculer la hauteur du dropdown en fonction du nombre d'options
+      const itemHeight = 48 // Hauteur approximative de chaque option
+      const headerHeight = searchable ? 56 : 0 // Hauteur de la barre de recherche si activée
+      const maxVisibleItems = 7 // Nombre maximum d'items visibles
+      const dropdownHeight = Math.min(
+        headerHeight + (Math.min(options.length, maxVisibleItems) * itemHeight),
+        325 // Hauteur maximale du dropdown
+      )
+
+      // Si openAbove est true, positionner le dropdown au-dessus du select
+      if (openAbove) {
+        dropdownTop.value = py - dropdownHeight
+      } else {
+        dropdownTop.value = py + h
+      }
+
       dropdownX.value = x
       dropdownWidth.value = w
     })
-  }, [])
+  }, [openAbove, searchable, options.length])
 
   useImperativeHandle(
     ref,
@@ -121,19 +137,24 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
       left: dropdownX.value,
       width: dropdownWidth.value,
       position: 'absolute',
-      maxHeight: 200,
+      maxHeight: 325,
     }
   })
+
   return (
     <>
       <ModalDropDown onClose={handleClose} ref={modalRef}>
         <Animated.View style={[dropDownAnimatedStyle]}>
           <DropdownFrame width="100%">
             <FlatList
-              stickyHeaderHiddenOnScroll={props.searchable}
-              stickyHeaderIndices={props.searchable ? [0] : undefined}
+              stickyHeaderHiddenOnScroll={searchable}
+              stickyHeaderIndices={searchable ? [0] : undefined}
+              contentContainerStyle={{
+                maxHeight: 325,
+              }}
               ListHeaderComponent={
-                props.searchable ? (
+                <YStack>
+                {searchable ? (
                   <YStack padding={8} bg="white" borderBottomColor="$textOutline" borderBottomWidth={1}>
                     <Input
                       ref={queryInputRef}
@@ -145,17 +166,27 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
                       loading={searchableOptions?.isFetching}
                     />
                   </YStack>
-                ) : null
+                ) : null}
+                {props.helpText ? (
+                  <YStack p="$medium" bg="$textSurface" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                    {typeof props.helpText === 'string' ? (
+                      <Text.SM color="$textSecondary">{props.helpText}</Text.SM>
+                    ) : (
+                      props.helpText
+                    )}
+                  </YStack>
+                ) : null}
+                {
+                  searchableOptions?.noResults && searchableOptions?.isFetching === false ? (
+                    <DropdownItemFrame>
+                      <Text.SM color="$textSecondary">{searchableOptions?.noResults}</Text.SM>
+                    </DropdownItemFrame>
+                  ) : null
+                }
+                </YStack>
               }
               data={filteredItems}
               keyExtractor={(item) => item.id}
-              ListEmptyComponent={
-                props.searchable && searchableOptions?.isFetching === false && filteredItems.length === 0 && query.trim() !== '' ? (
-                  <DropdownItemFrame>
-                    <Text.SM color="$textSecondary">{searchableOptions?.noResults ?? 'Aucun résultat trouvé'}</Text.SM>
-                  </DropdownItemFrame>
-                ) : null
-              }
               renderItem={({ item, index }) => (
                 <MemoItem
                   {...item}

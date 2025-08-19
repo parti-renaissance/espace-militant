@@ -233,6 +233,8 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                 const choices = filter.options.choices
                 if (typeof choices === 'object' && choices !== null) {
                   const options = getSelectOptions(choices as Record<string, string>)
+                  const isLastCategory = categoryIndex === displayFilters.length - 1
+                  const isLastTwoInLastCategory = isLastCategory && filterIndex >= category.filters.length - 2
                   return (
                     <SelectV3
                       key={filterIndex}
@@ -243,6 +245,7 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                       placeholder={filter.options.placeholder || `Sélectionner ${filter.label.toLowerCase()}`}
                       size="sm"
                       color="gray"
+                      openAbove={isLastTwoInLastCategory}
                       // searchable={true}
                     />
                   )

@@ -3,11 +3,12 @@ import { Platform, TouchableOpacity } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet'
 import { YStack } from 'tamagui'
-import { DropdownItem } from '../Dropdown'
+import { DropdownItem, DropdownItemFrame } from '../Dropdown'
 import Input from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
 import { reactTextNodeChildrenToString } from './utils'
+import Text from '../Text'
 
 const MemoItem = React.memo(DropdownItem)
 
@@ -71,19 +72,37 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
           keyboardShouldPersistTaps="always"
           contentContainerStyle={{ paddingBottom: insets.bottom }}
           ListHeaderComponent={
-            props.searchable ? (
-              <YStack padding={16} bg="white">
-                <Input
-                  bottomSheetInput={Platform.OS === 'ios'}
-                  color="gray"
-                  ref={queryInputRef}
-                  onChangeText={setQuery}
-                  placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
-                  iconRight={searchableIcon}
-                  loading={searchableOptions?.isFetching}
-                />
-              </YStack>
-            ) : null
+            <YStack>
+              {props.searchable ? (
+                <YStack padding={16} bg="white">
+                  <Input
+                    bottomSheetInput={Platform.OS === 'ios'}
+                    color="gray"
+                    ref={queryInputRef}
+                    onChangeText={setQuery}
+                    placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
+                    iconRight={searchableIcon}
+                    loading={searchableOptions?.isFetching}
+                  />
+                </YStack>
+              ) : null}
+               {props.helpText ? (
+                <YStack p="$medium" bg="$textSurface" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                  {typeof props.helpText === 'string' ? (
+                    <Text.SM color="$textSecondary">{props.helpText}</Text.SM>
+                  ) : (
+                    props.helpText
+                  )}
+                </YStack>
+              ) : null}
+              {
+                searchableOptions?.noResults && searchableOptions?.isFetching === false ? (
+                  <DropdownItemFrame>
+                    <Text.SM color="$textSecondary">{searchableOptions?.noResults}</Text.SM>
+                  </DropdownItemFrame>
+                ) : null
+              }
+            </YStack>
           }
           data={filteredItems}
           keyExtractor={(item) => item.id}

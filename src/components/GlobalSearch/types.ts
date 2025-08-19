@@ -32,4 +32,5 @@ export interface GlobalSearchProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   scope?: string
   nullable?: boolean
+  helpText?: string | React.ReactNode
 } 
