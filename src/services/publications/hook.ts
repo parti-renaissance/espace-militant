@@ -2,14 +2,8 @@ import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/publications/api'
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { RestAvailableSender, RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
+import { RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
-import { useCallback, useRef, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
-import { zipMessage } from '@/features/publications/components/Editor/utils'
-import { getHTML } from '@/features/publications/components/Editor/HtmlOneRenderer'
-import { defaultTheme } from '@/features/publications/components/Editor'
 
 export const useCreateMessage = (props: { uuid?: string }) => {
   const toast = useToastController()
@@ -223,136 +217,7 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
   })
 }
 
-export const useAutoSave = (props: {
-  messageId?: string
-  scope: string
-}) => {
-  const lastSavedContent = useRef<string>('')
-  const pendingSaves = useRef<Set<string>>(new Set())
-  const createdMessageId = useRef<string | null>(null)
-  const [lastSaved, setLastSaved] = useState<Date | undefined>(undefined)
-  const [hasError, setHasError] = useState<boolean>(false)
-
-  const { mutateAsync: saveMessage, isPending } = useCreateMessage({ uuid: props.messageId })
-
-  // Fonction utilitaire pour vérifier si un node a du contenu
-  const hasContent = useCallback((node: S.Node): boolean => {
-    if (!node.content) return false
-
-    switch (node.type) {
-      case 'richtext':
-        return Boolean(node.content.pure && node.content.pure.length > 0)
-      case 'button':
-        return Boolean(node.content.text && node.content.text.length > 0 &&
-          node.content.link && node.content.link.length > 0)
-      case 'image':
-        return Boolean(node.content.url && node.content.url.length > 0)
-      default:
-        return false
-    }
-  }, [])
-
-  // Fonction pour vérifier si un message a du contenu valide
-  const hasValidContent = useCallback((formValues: S.MessageFormValues, fields: S.FieldsArray): boolean => {
-    return fields.some(field => {
-      const node = formValues[field.type]?.[field.id]
-      return node && hasContent(node)
-    })
-  }, [hasContent])
-
-  // Fonction de sauvegarde avec vérification de changement et de contenu
-  const performSave = useCallback(async (
-    formValues: S.MessageFormValues,
-    fields: S.FieldsArray,
-    metaData: S.MessageMetaData,
-    sender: RestAvailableSender | null,
-    forceSave = false
-  ) => {
-    const currentContent = JSON.stringify({ formValues, fields, metaData })
-    const contentHash = `${currentContent}_${Date.now()}`
-
-    // Éviter les sauvegardes en double
-    if (pendingSaves.current.has(contentHash)) {
-      return
-    }
-
-    // Éviter les sauvegardes inutiles sauf si forcée
-    if (!forceSave && currentContent === lastSavedContent.current) {
-      return
-    }
-
-    // Vérifier qu'il y a du contenu valide avant de sauvegarder
-    if (!forceSave && !hasValidContent(formValues, fields)) {
-      return
-    }
-
-    const message = zipMessage(formValues, fields, metaData)
-    const htmlContent = getHTML(defaultTheme, message, sender)
-
-    try {
-      pendingSaves.current.add(contentHash)
-      setHasError(false)
-
-      const message = zipMessage(formValues, fields, metaData)
-      const result = await saveMessage({
-        scope: props.scope,
-        payload: {
-          type: metaData.scope,
-          subject: metaData.subject,
-          label: metaData.subject,
-          json_content: JSON.stringify(message),
-          content: htmlContent,
-        },
-      })
-
-      // Si c'est la première sauvegarde et qu'on n'avait pas d'ID, stocker le nouvel ID
-      if (!props.messageId && result?.uuid && !createdMessageId.current) {
-        createdMessageId.current = result.uuid
-      }
-
-      lastSavedContent.current = currentContent
-      setLastSaved(new Date())
-    } catch (error) {
-      console.error('Error saving message:', error)
-      setHasError(true)
-    } finally {
-      pendingSaves.current.delete(contentHash)
-    }
-  }, [saveMessage, props.scope, hasValidContent, props.messageId])
-
-  // Sauvegarde debounced pour les modifications continues (seulement si contenu valide)
-  const debouncedSave = useDebouncedCallback(
-    (formValues: S.MessageFormValues, fields: S.FieldsArray, metaData: S.MessageMetaData, sender: RestAvailableSender | null) => {
-      performSave(formValues, fields, metaData, sender, false)
-    },
-    3000, // 3 secondes de délai
-    {
-      leading: false,
-      trailing: true,
-      maxWait: 15000, // Maximum 15 secondes d'attente
-    }
-  )
-
-  // Sauvegarde immédiate pour les actions critiques
-  const immediateSave = useCallback((
-    formValues: S.MessageFormValues,
-    fields: S.FieldsArray,
-    metaData: S.MessageMetaData,
-    sender: RestAvailableSender | null
-  ) => {
-    debouncedSave.cancel() // Annuler les sauvegardes en attente
-    return performSave(formValues, fields, metaData, sender, true) // Force save
-  }, [performSave, debouncedSave])
-
-  return {
-    debouncedSave,
-    immediateSave,
-    isPending,
-    lastSaved,
-    hasError,
-    createdMessageId: createdMessageId.current,
-  }
-}
+export { useAutoSave } from '@/features/publications/components/Editor/hooks/useAutoSave'
 
 export const useGetFilterCollection = (props: { scope: string; enabled?: boolean }) => {
   return useQuery({

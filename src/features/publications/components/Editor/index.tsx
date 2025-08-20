@@ -9,9 +9,9 @@ import { getHTML } from './HtmlOneRenderer'
 import { RenderFields } from './RenderFields'
 import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
-import { createNodeByType, getDefaultFormValues, unZipMessage } from './utils'
+import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
 import { useGetAvailableSenders, useGetMessage, useAutoSave } from '@/services/publications/hook'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import * as S from './schemas/messageBuilderSchema'
 import { AutoSaveIndicator } from './AutoSaveIndicator'
 import { RestAvailableSender, RestGetMessageFiltersResponse } from '@/services/publications/schema'
 
@@ -113,6 +113,8 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
     scope: scopeFromQuery ?? '',
   })
 
+
+
   useEffect(() => {
     if (createdMessageId) {
       props.onMessageIdCreated?.(createdMessageId)
@@ -141,12 +143,12 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       setTimeout(() => {
         const currentValues = getValues()
         const fields = renderFieldsRef.current?.getFields() ?? []
-        immediateSave(currentValues.formValues, fields, currentValues.metaData, props.sender)
+        immediateSave(currentValues.formValues, fields, currentValues.metaData, props.sender, zipMessage, getHTML, defaultTheme)
       }, 100)
     },
     moveField: (...xs) => {
       renderFieldsRef.current?.moveField(...xs)
-      debouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender)
+      debouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender, zipMessage, getHTML, defaultTheme)
     },
     scrollToField: (...xs) => {
       renderFieldsRef.current?.scrollToField(...xs)
@@ -160,14 +162,14 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   } satisfies EditorMethods)
 
   const handleNodeChange = useCallback(() => {
-    debouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender)
+    debouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender, zipMessage, getHTML, defaultTheme)
   }, [debouncedSave, getValues, props.sender])
 
   useImperativeHandle(ref, () => ({
     submit: handleSubmit(
       (x) => {
         const fields = renderFieldsRef.current!.getFields()
-        immediateSave(x.formValues, fields, x.metaData, props.sender).then(() => {
+        immediateSave(x.formValues, fields, x.metaData, props.sender, zipMessage, getHTML, defaultTheme).then(() => {
           props.onSubmit()
         }).catch((error) => {
           console.error('Submit error:', error)
