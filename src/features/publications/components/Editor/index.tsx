@@ -10,10 +10,10 @@ import { RenderFields } from './RenderFields'
 import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
-import { useGetAvailableSenders, useGetMessage, useAutoSave } from '@/services/publications/hook'
+import { useGetAvailableSenders, useGetMessage } from '@/services/publications/hook'
 import * as S from './schemas/messageBuilderSchema'
-import { AutoSaveIndicator } from './AutoSaveIndicator'
 import { RestAvailableSender, RestGetMessageFiltersResponse } from '@/services/publications/schema'
+import { DebouncedSaveFunction, ImmediateSaveFunction } from './hooks/useAutoSave'
 
 export { getHTML, defaultTheme }
 
@@ -27,6 +27,9 @@ export type MessageEditorProps = {
   sender: RestAvailableSender
   onMessageIdCreated?: (messageId: string) => void
   messageFilters?: RestGetMessageFiltersResponse
+  onDebouncedSave: DebouncedSaveFunction
+  onImmediateSave: ImmediateSaveFunction
+  createdMessageId?: string | null
 }
 
 export type MessageEditorRef = {
@@ -101,19 +104,11 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
 
   const { control, handleSubmit, setValue, unregister, getValues } = formMethods
 
-  const { 
-    debouncedSave, 
-    immediateSave,
-    isPending: isAutoSaving,
-    lastSaved,
-    hasError,
+  const {
+    onDebouncedSave,
+    onImmediateSave,
     createdMessageId,
-  } = useAutoSave({
-    messageId: props.messageId,
-    scope: scopeFromQuery ?? '',
-  })
-
-
+  } = props
 
   useEffect(() => {
     if (createdMessageId) {
@@ -143,12 +138,12 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       setTimeout(() => {
         const currentValues = getValues()
         const fields = renderFieldsRef.current?.getFields() ?? []
-        immediateSave(currentValues.formValues, fields, currentValues.metaData, props.sender, zipMessage, getHTML, defaultTheme)
+        onImmediateSave(currentValues.formValues, fields, currentValues.metaData, props.sender, zipMessage, getHTML, defaultTheme)
       }, 100)
     },
     moveField: (...xs) => {
       renderFieldsRef.current?.moveField(...xs)
-      debouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender, zipMessage, getHTML, defaultTheme)
+      onDebouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender, zipMessage, getHTML, defaultTheme)
     },
     scrollToField: (...xs) => {
       renderFieldsRef.current?.scrollToField(...xs)
@@ -162,14 +157,14 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   } satisfies EditorMethods)
 
   const handleNodeChange = useCallback(() => {
-    debouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender, zipMessage, getHTML, defaultTheme)
-  }, [debouncedSave, getValues, props.sender])
+    onDebouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender, zipMessage, getHTML, defaultTheme)
+  }, [onDebouncedSave, getValues, props.sender])
 
   useImperativeHandle(ref, () => ({
     submit: handleSubmit(
       (x) => {
         const fields = renderFieldsRef.current!.getFields()
-        immediateSave(x.formValues, fields, x.metaData, props.sender, zipMessage, getHTML, defaultTheme).then(() => {
+        onImmediateSave(x.formValues, fields, x.metaData, props.sender, zipMessage, getHTML, defaultTheme).then(() => {
           props.onSubmit()
         }).catch((error) => {
           console.error('Submit error:', error)
@@ -222,11 +217,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
         </YStack>
       </YStack>
 
-      <AutoSaveIndicator
-        isSaving={isAutoSaving}
-        lastSaved={lastSaved}
-        hasError={hasError}
-      />
+      {/* AutoSaveIndicator removed */}
     </YStack>
   )
 })

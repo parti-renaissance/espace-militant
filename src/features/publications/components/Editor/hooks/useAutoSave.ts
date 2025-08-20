@@ -7,6 +7,38 @@ import * as api from '@/services/publications/api'
 import { RestAvailableSender, RestPostMessageRequest } from '@/services/publications/schema'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 
+export type ZipMessageFunction = (
+    formValues: S.MessageFormValues, 
+    fields: S.FieldsArray, 
+    metaData: S.MessageMetaData
+  ) => S.Message
+  
+  export type GetHTMLFunction = (
+    theme: S.MessageStyle, 
+    message: S.Message, 
+    sender: RestAvailableSender | null
+  ) => string
+  
+  export type DebouncedSaveFunction = (
+    formValues: S.MessageFormValues,
+    fields: S.FieldsArray,
+    metaData: S.MessageMetaData,
+    sender: RestAvailableSender | null,
+    zipMessageFn: ZipMessageFunction,
+    getHTMLFn: GetHTMLFunction,
+    theme: S.MessageStyle
+  ) => void
+  
+  export type ImmediateSaveFunction = (
+    formValues: S.MessageFormValues,
+    fields: S.FieldsArray,
+    metaData: S.MessageMetaData,
+    sender: RestAvailableSender | null,
+    zipMessageFn: ZipMessageFunction,
+    getHTMLFn: GetHTMLFunction,
+    theme: S.MessageStyle
+  ) => Promise<void> 
+
 export const useAutoSave = (props: {
   messageId?: string
   scope: string
@@ -75,9 +107,9 @@ export const useAutoSave = (props: {
     fields: S.FieldsArray,
     metaData: S.MessageMetaData,
     sender: RestAvailableSender | null,
-    zipMessageFn: (formValues: S.MessageFormValues, fields: S.FieldsArray, metaData: S.MessageMetaData) => S.Message,
-    getHTMLFn: (theme: any, message: S.Message, sender: RestAvailableSender | null) => string,
-    theme: any,
+    zipMessageFn: ZipMessageFunction,
+    getHTMLFn: GetHTMLFunction,
+    theme: S.MessageStyle,
     forceSave = false
   ) => {
     const currentContent = JSON.stringify({ formValues, fields, metaData })
@@ -133,7 +165,7 @@ export const useAutoSave = (props: {
 
   // Sauvegarde debounced pour les modifications continues (seulement si contenu valide)
   const debouncedSave = useDebouncedCallback(
-    (formValues: S.MessageFormValues, fields: S.FieldsArray, metaData: S.MessageMetaData, sender: RestAvailableSender | null, zipMessageFn: any, getHTMLFn: any, theme: any) => {
+    (formValues: S.MessageFormValues, fields: S.FieldsArray, metaData: S.MessageMetaData, sender: RestAvailableSender | null, zipMessageFn: ZipMessageFunction, getHTMLFn: GetHTMLFunction, theme: S.MessageStyle) => {
       performSave(formValues, fields, metaData, sender, zipMessageFn, getHTMLFn, theme, false)
     },
     3000, // 3 secondes de délai
@@ -150,9 +182,9 @@ export const useAutoSave = (props: {
     fields: S.FieldsArray,
     metaData: S.MessageMetaData,
     sender: RestAvailableSender | null,
-    zipMessageFn: any,
-    getHTMLFn: any,
-    theme: any
+    zipMessageFn: ZipMessageFunction,
+    getHTMLFn: GetHTMLFunction,
+    theme: S.MessageStyle
   ) => {
     debouncedSave.cancel() // Annuler les sauvegardes en attente
     return performSave(formValues, fields, metaData, sender, zipMessageFn, getHTMLFn, theme, true) // Force save
