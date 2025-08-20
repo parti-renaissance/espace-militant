@@ -19,7 +19,6 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   mobileBackdrop?: boolean
   snapPoints?: number[]
   withKeyboard?: boolean
-  modalViewStyle?: ViewStyle
 }
 
 /**
@@ -39,7 +38,6 @@ export default function ModalOrPageBase({
   allowDrag,
   mobileBackdrop,
   withKeyboard = true,
-  modalViewStyle,
 }: ModalOrPageBaseProps) {
   const viewport = useMedia()
   const insets = useSafeAreaInsets()
@@ -53,7 +51,7 @@ export default function ModalOrPageBase({
             bounces={false}
             showsVerticalScrollIndicator={false}
           >
-          <View style={[styles.modalView, modalViewStyle]}>
+          <View style={styles.modalView}>
             {children}
             {shouldDisplayCloseButton
               ? (
