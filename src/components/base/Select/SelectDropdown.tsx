@@ -85,9 +85,14 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
 
       // Si openAbove est true, positionner le dropdown au-dessus du select
       if (openAbove) {
-        dropdownTop.value = py - dropdownHeight
+        if (Platform.OS === 'web') {
+          console.log('web', Math.max(1, py - dropdownHeight), py - dropdownHeight, 'bas:', py + h)
+          dropdownTop.value = Math.max(1, py - dropdownHeight)
+        } else {
+          dropdownTop.value = py - dropdownHeight
+        }
       } else {
-        dropdownTop.value = py + h
+        dropdownTop.value = Math.max(1, py + h)
       }
 
       dropdownX.value = x
