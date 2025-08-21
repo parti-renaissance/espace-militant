@@ -250,7 +250,7 @@ export const RestFilterSchema = z.object({
     RestFilterOptionZoneAutocompleteSchema,
     z.null(),
   ]),
-  type: z.enum(['select', 'text', 'integer_interval', 'date_interval', 'zone_autocomplete']),
+  type: z.enum(['select', 'text', 'integer_interval', 'date_interval', 'date', 'zone_autocomplete']),
 })
 
 export const RestFilterCategorySchema = z.object({

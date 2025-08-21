@@ -9,7 +9,7 @@ import { SelectFrames as SF } from '@/components/base/Select/Frames'
 import QuickFilter from './QuickFilter'
 import AdvancedFilters from './AdvancedFilters'
 import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook';
-import { getHierarchicalQuickFilters, getItemState } from './helpers';
+import { getHierarchicalQuickFilters, getItemState, identifyQuickFilter } from './helpers';
 import { SelectedFiltersType, HierarchicalQuickFilterType } from './type';
 import { useQueryClient } from '@tanstack/react-query'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
@@ -162,7 +162,10 @@ export default function SelectFilters({
   }, [])
 
   const handleConfirmSelection = useCallback(() => {
-    if (tempSelectedQuickFilter) {
+    console.log('tempSelectedFilters', tempSelectedFilters)
+    console.log('tempSelectedQuickFilter', tempSelectedQuickFilter)
+    console.log('isAdvancedFilters', isAdvancedFilters)
+    if (tempSelectedQuickFilter && !isAdvancedFilters) {
       const selectedQuickFilter = quickFilters.find(qf => qf.value === tempSelectedQuickFilter)
 
       if (selectedQuickFilter) {
@@ -345,7 +348,15 @@ export default function SelectFilters({
                 <XStack alignItems="center" gap="$small">
                   <SwitchV2
                     checked={isAdvancedFilters}
-                    onPress={() => setIsAdvancedFilters(!isAdvancedFilters)}
+                    onPress={() => {
+                      if (isAdvancedFilters) {
+                        const correspondingQuickFilter = identifyQuickFilter(tempSelectedFilters) 
+                        setTempSelectedQuickFilter(correspondingQuickFilter)
+                      } else {
+                        setTempSelectedQuickFilter(null)
+                      }
+                      setIsAdvancedFilters(!isAdvancedFilters)
+                    }}
                   />
                 </XStack>
               </XStack>
@@ -355,12 +366,11 @@ export default function SelectFilters({
                 scope={scope}
                 selectedFilters={tempSelectedFilters}
                 onFilterChange={(filterCode, value) => {
+                  console.log('filter', filterCode, value)
                   const newFilters = { ...tempSelectedFilters }
-                  if (value === null) {
-                    delete newFilters[filterCode]
-                  } else {
-                    newFilters[filterCode] = value
-                  }
+                  
+                  newFilters[filterCode] = value
+                  
                   setTempSelectedFilters(newFilters)
                 }}
               />

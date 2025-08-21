@@ -2,6 +2,7 @@ import React from 'react'
 import { XStack, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import SelectV3 from '@/components/base/Select/SelectV3'
+import DateInput from '@/components/base/DateInput'
 import { useGetFilterCollection } from '@/services/publications/hook'
 import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/publications/schema'
 import { SelectedFiltersType } from './type'
@@ -86,21 +87,39 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
     color: "#10B981",
     filters: [
       {
-        code: "firstMembership",
-        label: "Date de première cotisation",
-        type: "date_interval",
+        code: "first_membership_since",
+        label: "Première cotisation - Depuis",
+        type: "date",
         options: null
       },
       {
-        code: "lastMembership",
-        label: "Date de dernière cotisation",
-        type: "date_interval",
+        code: "first_membership_before",
+        label: "Première cotisation - Jusqu'au",
+        type: "date",
         options: null
       },
       {
-        code: "registered",
-        label: "Date de création de compte",
-        type: "date_interval",
+        code: "last_membership_since",
+        label: "Dernière cotisation - Depuis",
+        type: "date",
+        options: null
+      },
+      {
+        code: "last_membership_before",
+        label: "Dernière cotisation - Jusqu'au",
+        type: "date",
+        options: null
+      },
+      {
+        code: "registered_since",
+        label: "Création de compte - Depuis",
+        type: "date",
+        options: null
+      },
+      {
+        code: "registered_until",
+        label: "Création de compte - Jusqu'au",
+        type: "date",
         options: null
       }
     ]
@@ -205,8 +224,8 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
     }))
   }
 
-  const handleFilterChange = (filterCode: string, value: string) => {
-    onFilterChange?.(filterCode, value || null)
+  const handleFilterChange = (filterCode: string, value: string | null) => {
+    onFilterChange?.(filterCode, value)
   }
 
   const getFilterValue = (filterCode: string): string => {
@@ -243,13 +262,29 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                       options={options}
                       onChange={(value) => handleFilterChange(filter.code, value)}
                       placeholder={filter.options.placeholder || `Sélectionner ${filter.label.toLowerCase()}`}
-                      size="sm"
+                      size="md"
                       color="gray"
                       openAbove={isLastTwoInLastCategory}
                       // searchable={true}
                     />
                   )
                 }
+              }
+              
+              if (filter.type === 'date') {
+                return (
+                  <DateInput
+                    key={filterIndex}
+                    label={filter.label}
+                    value={selectedFilters[filter.code] as string || null}
+                    onChange={(value: string | null) => {
+                      handleFilterChange(filter.code, value)
+                    }}
+                    placeholder={`Sélectionner ${filter.label.toLowerCase()}`}
+                    size="md"
+                    color="gray"
+                  />
+                )
               }
               
               // Pour les autres types de filtres, afficher juste le label et le type
