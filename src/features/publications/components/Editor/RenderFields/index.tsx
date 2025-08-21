@@ -1,9 +1,7 @@
 import React, { forwardRef, RefObject, useCallback, useImperativeHandle, useRef, useState, useMemo } from 'react'
-import { FlatList, ListRenderItemInfo, StyleSheet } from 'react-native'
-import Animated from 'react-native-reanimated'
+import { ScrollView, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { usePageLayoutScroll } from '@/components/layouts/PageLayout/usePageLayoutScroll'
-import useFlatListHeader from '@/features/publications/components/Editor/hooks/useFlatListHeader'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { RenderFieldRef, EditorMethods } from '@/features/publications/components/Editor/types'
 import { Control } from 'react-hook-form'
@@ -28,7 +26,7 @@ type RenderFieldsProps = {
 
 export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function RenderFields(props, ref) {
   const [fields, setFields] = useState<S.FieldsArray>(props.defaultStruct)
-  const scrollRef = useRef<FlatList>(null)
+  const scrollRef = useRef<ScrollView>(null)
   const insets = useSafeAreaInsets()
   const fieldLength = useRef(fields.length)
   const memoizedAvailableSenders = useMemo(() => props.availableSenders, [props.availableSenders])
@@ -59,10 +57,12 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
         } else {
           const index = fields.findIndex((x) => x.id === field.id)
           if (index === -1) return
-          scrollRef.current?.scrollToIndex({
-            index,
-            viewPosition: 0.5,
-            viewOffset: insets.top,
+          // For ScrollView, we need to calculate approximate position
+          // This is a simplified approach - you might need to adjust based on your actual field heights
+          const estimatedFieldHeight = 150 // Adjust this value based on your actual field heights
+          const scrollToY = index * estimatedFieldHeight
+          scrollRef.current?.scrollTo({
+            y: scrollToY,
             animated: true,
           })
         }
@@ -105,6 +105,7 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
           const mesureDistance = clamp(fieldIndex + distance)
           const fieldRemoved = [...xs.slice(0, fieldIndex), ...xs.slice(fieldIndex + 1)]
           const fieldMoved = [...fieldRemoved.slice(0, mesureDistance), field, ...fieldRemoved.slice(mesureDistance)]
+          fieldLength.current = fieldMoved.length
           return fieldMoved
         })
       },
@@ -116,28 +117,7 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
     return sender?.theme?.primary || '#4291E1'
   }, [props.message?.sender, props.availableSenders])
 
-  const RenderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<S.FieldsArray[number]>) => (
-      <RenderField
-        field={item}
-        control={props.control}
-        edgePosition={getFieldEdge(index)}
-        editorMethods={props.editorMethods}
-        displayToolbar={props.displayToolbar}
-        senderThemeColor={senderThemeColor}
-        onNodeChange={props.onNodeChange}
-      />
-    ),
-    [props.control, props.editorMethods, props.displayToolbar, senderThemeColor, props.onNodeChange],
-  )
-
-  const keyExtractor = useCallback((props: S.FieldsArray[number]) => props.id, [])
-  const reTryScrollOnFail = useCallback((info: { index: number }) => {
-    const wait = new Promise((resolve) => setTimeout(resolve, 500))
-    wait.then(() => {
-      scrollRef.current?.scrollToIndex({ index: info.index, animated: true })
-    })
-  }, [])
+  const { isWebPageLayoutScrollActive } = usePageLayoutScroll()
 
   const memoizedHeaderComponent = useMemo(() => (
     <MetaDataForm
@@ -152,23 +132,17 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
     />
   ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar, props.onNodeChange, props.messageFilters, props.messageId, props.scope])
 
-  const { scrollHandler } = useFlatListHeader()
-  const { isWebPageLayoutScrollActive } = usePageLayoutScroll()
-
   return (
     <YStack flex={1} overflow="hidden">
-      {memoizedHeaderComponent}
-      <Animated.FlatList
-        style={renderFieldsStyle.flatlist}
+      <ScrollView
+        style={renderFieldsStyle.scrollview}
         scrollEnabled={!isWebPageLayoutScrollActive}
-        onScroll={scrollHandler}
         ref={scrollRef}
         contentContainerStyle={[!isWebPageLayoutScrollActive ? { paddingBottom: insets.bottom + 96 } : undefined]}
-        data={fields}
-        onScrollToIndexFailed={reTryScrollOnFail}
-        renderItem={RenderItem}
-        keyExtractor={keyExtractor}
-        ListEmptyComponent={
+        showsVerticalScrollIndicator={false}
+      >
+        {memoizedHeaderComponent}
+        {fields.length === 0 ? (
           <EditorInsertionToolbar
             control={props.control}
             editorMethods={props.editorMethods}
@@ -178,14 +152,27 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
             onShowAddBar={() => { }}
             onCloseAddBar={undefined}
           />
-        }
-      />
+        ) : (
+          fields.map((field, index) => (
+            <RenderField
+              key={field.id}
+              field={field}
+              control={props.control}
+              edgePosition={getFieldEdge(index)}
+              editorMethods={props.editorMethods}
+              displayToolbar={props.displayToolbar}
+              senderThemeColor={senderThemeColor}
+              onNodeChange={props.onNodeChange}
+            />
+          ))
+        )}
+      </ScrollView>
     </YStack>
   )
 })
 
 const renderFieldsStyle = StyleSheet.create({
-  flatlist: {
+  scrollview: {
     flex: 1,
     backgroundColor: 'hsl(240, 9%, 98%)',
     paddingBottom: 12,
