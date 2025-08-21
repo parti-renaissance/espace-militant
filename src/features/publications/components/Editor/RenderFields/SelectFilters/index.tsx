@@ -9,7 +9,7 @@ import { SelectFrames as SF } from '@/components/base/Select/Frames'
 import QuickFilter from './QuickFilter'
 import AdvancedFilters from './AdvancedFilters'
 import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook';
-import { getHierarchicalQuickFilters, getItemState } from './helpers';
+import { getHierarchicalQuickFilters, getItemState, identifyQuickFilter } from './helpers';
 import { SelectedFiltersType, HierarchicalQuickFilterType } from './type';
 import { useQueryClient } from '@tanstack/react-query'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
@@ -44,8 +44,6 @@ export default function SelectFilters({
 }: SelectFiltersProps) {
   const media = useMedia()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [tempSelectedQuickFilter, setTempSelectedQuickFilter] = useState<string | null>(selectedQuickFilterId || null)
-  const [tempSelectedFilters, setTempSelectedFilters] = useState<SelectedFiltersType>(selectedFilters)
   const [isAdvancedFilters, setIsAdvancedFilters] = useState(false)
   const quickFilters: HierarchicalQuickFilterType[] = useMemo(() => getHierarchicalQuickFilters(), [])
   const queryClient = useQueryClient();
@@ -54,8 +52,15 @@ export default function SelectFilters({
     setIsAdvancedFilters(selectedQuickFilterId ? false : true)
   }, [selectedQuickFilterId])
 
-
   const zoneProvider = useMemo(() => new ZoneProvider(), [])
+
+  // Fonction pour sauvegarder les filtres immédiatement
+  const saveFilters = useCallback((
+    newFilters: SelectedFiltersType, 
+    newQuickFilterId: string | null
+  ) => {
+    onFiltersChange?.({ newFilters, newQuickFilterId: !isAdvancedFilters ? newQuickFilterId : null })
+  }, [onFiltersChange, queryClient, messageId, isAdvancedFilters])
 
   // Fonction pour fusionner les filtres du filtre rapide avec les filtres avancés
   const mergeQuickFilterWithAdvancedFilters = useCallback((quickFilter: HierarchicalQuickFilterType, currentFilters: SelectedFiltersType, isAdvancedMode: boolean = false) => {
@@ -71,7 +76,13 @@ export default function SelectFilters({
     } else {
       // En mode filtres rapides : on réinitialise les filtres avancés non protégés
       const protectedFilters = ['zone', 'zones', 'committee']
+      protectedFilters.forEach(filterKey => {
+        if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
+          mergedFilters[filterKey] = currentFilters[filterKey]
+        }
+      })
 
+      // On réinitialise les autres filtres avancés
       Object.keys(currentFilters).forEach(filterKey => {
         if (!(filterKey in quickFilter.filters) &&
           !protectedFilters.includes(filterKey) &&
@@ -129,129 +140,79 @@ export default function SelectFilters({
 
   const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({ messageId: messageId, scope: scope })
 
-  // Synchroniser tempSelectedFilters quand selectedFilters change
-  useEffect(() => {
-    setTempSelectedFilters(selectedFilters)
-  }, [selectedFilters])
-
-  // Synchroniser tempSelectedFilters quand selectedQuickFilterId change
-  useEffect(() => {
-    if (selectedQuickFilterId) {
-      const selectedQuickFilter = quickFilters.find(qf => qf.value === selectedQuickFilterId)
-      if (selectedQuickFilter) {
-        setTempSelectedFilters(selectedQuickFilter.filters)
-      }
-    }
-  }, [selectedQuickFilterId, quickFilters])
-
   const handleOpenModal = useCallback(() => {
-    const quickFilterToUse = selectedQuickFilterId || (() => {
-      const matchingQuickFilter = quickFilters.find(qf =>
-        JSON.stringify(qf.filters) === JSON.stringify(selectedFilters)
-      )
-      return matchingQuickFilter?.value || 'adherents'
-    })()
-
-    setTempSelectedQuickFilter(quickFilterToUse)
-    setTempSelectedFilters(selectedFilters)
     setIsModalOpen(true)
-  }, [selectedQuickFilterId, quickFilters, selectedFilters])
+  }, [])
 
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false)
-  }, [])
-
-  const handleConfirmSelection = useCallback(() => {
-    if (tempSelectedQuickFilter) {
-      const selectedQuickFilter = quickFilters.find(qf => qf.value === tempSelectedQuickFilter)
-
-      if (selectedQuickFilter) {
-        const mergedFilters = mergeQuickFilterWithAdvancedFilters(selectedQuickFilter, tempSelectedFilters, isAdvancedFilters)
-        onFiltersChange?.({ newFilters: mergedFilters, newQuickFilterId: tempSelectedQuickFilter })
-      }
-    } else {
-      onFiltersChange?.({ newFilters: tempSelectedFilters, newQuickFilterId: null })
-    }
     queryClient.refetchQueries({
       queryKey: ['message-count-recipients', messageId],
     })
-    handleCloseModal()
-  }, [tempSelectedQuickFilter, quickFilters, tempSelectedFilters, mergeQuickFilterWithAdvancedFilters, onFiltersChange, queryClient, messageId, handleCloseModal, isAdvancedFilters])
+  }, [])
 
-  const handleItemSelection = useCallback((itemId: string, immediateChange: boolean = false) => {
+  const handleQuickFilterSelection = useCallback((itemId: string) => {
     const item = quickFilters.find(d => d.value === itemId)
     if (!item) return
-    if (tempSelectedQuickFilter === itemId) return
 
-    setTempSelectedQuickFilter(itemId)
+    const mergedFilters = mergeQuickFilterWithAdvancedFilters(item, selectedFilters, isAdvancedFilters)
+    saveFilters(mergedFilters, itemId)
+  }, [quickFilters, selectedFilters, mergeQuickFilterWithAdvancedFilters, saveFilters, isAdvancedFilters])
 
-    if (immediateChange) {
-      // Utiliser la fonction de fusion pour la sauvegarde immédiate
-      const mergedFilters = mergeQuickFilterWithAdvancedFilters(item, tempSelectedFilters, isAdvancedFilters)
-      onFiltersChange?.({ newFilters: mergedFilters, newQuickFilterId: itemId })
-    } else {
-      // Mettre à jour tempSelectedFilters avec les filtres du filtre rapide sélectionné
-      setTempSelectedFilters(item.filters)
-    }
-  }, [quickFilters, tempSelectedQuickFilter, tempSelectedFilters, mergeQuickFilterWithAdvancedFilters, onFiltersChange, isAdvancedFilters])
-
-  const handleFilterChange = (newFilters: SelectedFiltersType) => {
-    setTempSelectedFilters(newFilters)
-  }
+  const handleAdvancedFilterChange = useCallback((filterCode: string, value: any) => {
+    const newFilters = { ...selectedFilters, [filterCode]: value }
+    saveFilters(newFilters, selectedQuickFilterId)
+  }, [selectedFilters, selectedQuickFilterId, saveFilters])
 
   const handleZoneSelect = useCallback((result: any) => {
+    let newFilters: SelectedFiltersType
+
     if (!result) {
-      const newFilters = {
-        ...tempSelectedFilters,
+      newFilters = {
+        ...selectedFilters,
         zone: null,
       }
-      setTempSelectedFilters(newFilters)
-      onFiltersChange?.({ newFilters: newFilters, newQuickFilterId: tempSelectedQuickFilter })
+    } else if (result.id) {
+      newFilters = {
+        ...selectedFilters,
+        zone: {
+          uuid: result.id,
+          name: result.metadata?.zone?.name || '',
+          code: result.metadata?.zoneCode || '',
+          type: result.metadata?.zoneType || 'custom'
+        },
+      }
+    } else {
       return
     }
 
-    if (!result.id) {
-      return
-    }
-
-    const newFilters = {
-      ...tempSelectedFilters,
-      zone: {
-        uuid: result.id,
-        name: result.metadata?.zone?.name || '',
-        code: result.metadata?.zoneCode || '',
-        type: result.metadata?.zoneType || 'custom'
-      },
-    }
-
-    setTempSelectedFilters(newFilters)
-
-    onFiltersChange?.({ newFilters: newFilters, newQuickFilterId: tempSelectedQuickFilter })
-  }, [tempSelectedFilters, onFiltersChange, tempSelectedQuickFilter])
+    saveFilters(newFilters, selectedQuickFilterId)
+  }, [selectedFilters, selectedQuickFilterId, saveFilters])
 
   const handleZoneAndCommitteeReset = useCallback(() => {
-    const newFilters = { ...tempSelectedFilters }
+    const newFilters = { ...selectedFilters }
     delete newFilters.zone
     delete newFilters.committee
-    setTempSelectedFilters(newFilters)
-    const apiFilters = { ...newFilters }
-    delete apiFilters.zone
-    delete apiFilters.committee
-    onFiltersChange?.({ newFilters: apiFilters, newQuickFilterId: tempSelectedQuickFilter })
-  }, [tempSelectedFilters, onFiltersChange, tempSelectedQuickFilter])
+    
+    saveFilters(newFilters, selectedQuickFilterId)
+  }, [selectedFilters, selectedQuickFilterId, saveFilters])
+
+  const handleAdvancedFiltersToggle = useCallback(() => {
+    setIsAdvancedFilters(!isAdvancedFilters)
+  }, [isAdvancedFilters])
 
   const Header = useCallback(() => {
     return (
       <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderColor="$gray1" padding="$medium">
         <Text.LG semibold>Destinataires</Text.LG>
         <XStack gap="$small">
-          <VoxButton onPress={handleConfirmSelection} theme="blue" variant="soft" iconLeft={Save} size="sm">
+          <VoxButton onPress={handleCloseModal} theme="blue" variant="soft" iconLeft={Save} size="sm">
             Terminé
           </VoxButton>
         </XStack>
       </XStack>
     )
-  }, [handleConfirmSelection])
+  }, [handleCloseModal])
 
   return (
     <>
@@ -341,11 +302,11 @@ export default function SelectFilters({
             </YStack>
             <YStack gap="$small" marginVertical="$small">
               <XStack alignItems="center" gap="$xsmall" justifyContent="flex-end">
-                <Text.MD color="$blue6" semibold onPress={() => setIsAdvancedFilters(!isAdvancedFilters)}>Filtres avancés</Text.MD>
+                <Text.MD color="$blue6" semibold onPress={handleAdvancedFiltersToggle}>Filtres avancés</Text.MD>
                 <XStack alignItems="center" gap="$small">
                   <SwitchV2
                     checked={isAdvancedFilters}
-                    onPress={() => setIsAdvancedFilters(!isAdvancedFilters)}
+                    onPress={handleAdvancedFiltersToggle}
                   />
                 </XStack>
               </XStack>
@@ -353,23 +314,14 @@ export default function SelectFilters({
             {isAdvancedFilters ? (
               <AdvancedFilters
                 scope={scope}
-                selectedFilters={tempSelectedFilters}
-                onFilterChange={(filterCode, value) => {
-                  const newFilters = { ...tempSelectedFilters }
-                  if (value === null) {
-                    delete newFilters[filterCode]
-                  } else {
-                    newFilters[filterCode] = value
-                  }
-                  setTempSelectedFilters(newFilters)
-                }}
+                selectedFilters={selectedFilters}
+                onFilterChange={handleAdvancedFilterChange}
               />
             ) : (
               <QuickFilter
                 quickFilters={quickFilters}
-                tempSelectedQuickFilter={tempSelectedQuickFilter}
                 selectedQuickFilterId={selectedQuickFilterId}
-                onItemSelection={handleItemSelection}
+                onItemSelection={handleQuickFilterSelection}
               />
             )}
           </YStack>
