@@ -1,7 +1,7 @@
 import { NamedExoticComponent } from 'react'
 import Text from '@/components/base/Text'
 import { IconProps } from '@tamagui/helpers-icon'
-import { ChevronsUpDown, XCircle } from '@tamagui/lucide-icons'
+import { ChevronsUpDown, X } from '@tamagui/lucide-icons'
 import { GestureReponderEvent } from '@tamagui/web'
 import { createStyledContext, styled, useGetThemedIcon, View, withStaticProperties, XStack, XStackProps } from 'tamagui'
 
@@ -103,18 +103,16 @@ const SelectFrame = styled(XStack, {
   },
 })
 
-const SelectResetIcon = styled(XCircle, {
+const SelectResetIcon = styled(X, {
   context: SelectContext,
   size: 20,
   variants: {
     themedText: {
       true: {
-        //@ts-expect-error miss type for tamagui lucide icons, but it's valid
         color: '$color9',
       },
       false: {
-        //@ts-expect-error miss type for tamagui lucide icons, but it's valid
-        color: '$blue9',
+        color: '$primary',
       },
     },
   } as const,
@@ -137,7 +135,7 @@ const SelectFrameContainer = XStack.styleable<
   const defIcon = <SelectIconContainer icon={icon ?? ChevronsUpDown} />
   return (
     <XStack gap="$small" alignItems="center" flex={1} ref={ref}>
-      <XStack flexShrink={1} flex={1} {...props} alignItems="center" gap="$small">
+      <XStack flexShrink={1} flex={1} {...props} alignItems="center" gap="$small" margin="auto">
         {props.children}
       </XStack>
       <XStack onPress={resetable ? onResetPress : undefined}>{resetable ? <SelectResetIcon /> : defIcon}</XStack>
@@ -186,7 +184,7 @@ const SelectIconValue = ({ icon, themedText }: { icon: NamedExoticComponent<Icon
   )
 }
 
-const SelectValueContainer = styled(XStack, { gap: '$xsmall', flexShrink: 1, alignItems: 'center', alignSelf: 'flex-end' })
+const SelectValueContainer = styled(XStack, { gap: '$xsmall', alignItems: 'center', justifyContent: 'flex-end', alignSelf: 'flex-end', marginVertical: 'auto', flex: 1, minWidth: 50 })
 
 export const SelectFrames = withStaticProperties(SelectFrame, {
   Props: SelectContext.Provider,

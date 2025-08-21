@@ -158,8 +158,8 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
   return matchingQuickFilter?.value || null
 }
 
-export const getItemState = (itemId: string, tempSelectedQuickFilter: string | null, quickFilters: HierarchicalQuickFilterType[]) => {
-  const isSelected = tempSelectedQuickFilter === itemId
+export const getItemState = (itemId: string, selectedQuickFilterId: string | null, quickFilters: HierarchicalQuickFilterType[]) => {
+  const isSelected = selectedQuickFilterId === itemId
 
   if (isSelected) {
     return 'selected'
@@ -169,7 +169,7 @@ export const getItemState = (itemId: string, tempSelectedQuickFilter: string | n
 
   if (item && item.parentId) {
     const checkParentSelection = (currentParentId: string): boolean => {
-      const parentSelected = tempSelectedQuickFilter === currentParentId
+      const parentSelected = selectedQuickFilterId === currentParentId
       if (parentSelected) {
         return true
       }

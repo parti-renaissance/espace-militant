@@ -68,8 +68,10 @@ const Select = <A extends string>(props: SelectProps<A>) => {
           disabled={props.disabled}
           {...props.frameProps}
         >
-          <SF.Container resetable={props.resetable} icon={props.icon} onResetPress={handleResetPress}>
-            {props.label || props.placeholder ? <SF.Label>{props.label || props.placeholder}</SF.Label> : null}
+          <SF.Container resetable={props.resetable && !!props.value} icon={props.icon} onResetPress={handleResetPress}>
+            <XStack width="fit-content" maxWidth="50%">
+              {props.label || props.placeholder ? <SF.Label>{props.label || props.placeholder}</SF.Label> : null}
+            </XStack>
             <SF.ValueContainer theme={fullValue?.theme}>
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}
               <SF.Text themedText={Boolean(fullValue?.theme)}>{parseFullValueLabel(fullValue)}</SF.Text>

@@ -5,7 +5,7 @@ import SelectV3 from '@/components/base/Select/SelectV3'
 import DateInput from '@/components/base/DateInput'
 import { useGetFilterCollection } from '@/services/publications/hook'
 import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/publications/schema'
-import { SelectedFiltersType } from './type'
+import { SelectedFiltersType } from '../type'
 
 // Filtres temporaires en attendant la mise à jour de l'API
 const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
@@ -265,6 +265,7 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                       size="md"
                       color="gray"
                       openAbove={isLastTwoInLastCategory}
+                      resetable={true}
                       // searchable={true}
                     />
                   )

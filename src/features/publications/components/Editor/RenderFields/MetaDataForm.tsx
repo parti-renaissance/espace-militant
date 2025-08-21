@@ -12,6 +12,7 @@ import { usePutMessageFilters } from '@/services/publications/hook'
 import { identifyQuickFilter } from './SelectFilters/helpers'
 import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook'
 import { useQueryClient } from '@tanstack/react-query'
+import { useDebouncedCallback } from 'use-debounce'
 
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
   const { committee, ...filtersWithoutCommittee } = filters
@@ -54,6 +55,8 @@ export const MetaDataForm = memo((props: {
     enabled: !!props.messageId && !!props.scope
   })
 
+  console.log('filters', filters)
+
   useEffect(() => {
     if (!isFetchingMessageCountRecipients && messageCountRecipients) {
       const hasRecipients = messageCountRecipients.contacts > 0
@@ -89,30 +92,52 @@ export const MetaDataForm = memo((props: {
   }, [props.messageFilters])
 
 
-  const handleFiltersChange = useCallback(({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => {
-    const mergedFilters = { ...filters, ...newFilters }
-    const mappedFilters = temporaryMapFiltersForApi(mergedFilters)
-
-    let hasAnyChange = false
-    Object.keys(mergedFilters).forEach(key => {
-      const newValue = mergedFilters[key]
-      const initialValue = filters[key]
-      if (newValue !== initialValue) {
-        hasAnyChange = true
-      }
-    })
-
-    if (hasAnyChange && props.messageId && props.scope) {
-      setFilters(mergedFilters)
-      if (newQuickFilterId) { setQuickFilterId(newQuickFilterId) }
+  // Fonction debouncée pour l'envoi des filtres
+  const debouncedPutMessageFilters = useDebouncedCallback(
+    (mappedFilters: SelectedFiltersType) => {
       putMessageFilters(mappedFilters, {
         onError: (error) => {
+          // En cas d'erreur, on revient aux filtres précédents
           setFilters(filters)
           setQuickFilterId(quickFilterId)
         },
       })
+    },
+    500, // 500ms de délai
+    {
+      leading: false,
+      trailing: true,
     }
-  }, [filters, props.messageId, props.scope, putMessageFilters, setFilters, setQuickFilterId])
+  )
+
+  const handleFiltersChange = useCallback(({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => {
+    const mappedFilters = temporaryMapFiltersForApi(newFilters)
+
+    if (props.messageId && props.scope) {
+      setFilters(newFilters)
+      if (newQuickFilterId) { 
+        setQuickFilterId(newQuickFilterId) 
+      } else {
+        setQuickFilterId(null)
+      }
+      
+      // Si il y a un quickfilter sélectionné, on envoie immédiatement
+      if (newQuickFilterId) {
+        console.log('putMessageFilters', newQuickFilterId)
+        putMessageFilters(mappedFilters, {
+          onError: (error) => {
+            // En cas d'erreur, on revient aux filtres précédents
+            setFilters(filters)
+            setQuickFilterId(quickFilterId)
+          },
+        })
+      } else {
+        // Sinon on utilise la fonction debouncée
+        console.log('debouncedPutMessageFilters', mappedFilters)
+        debouncedPutMessageFilters(mappedFilters)
+      }
+    }
+  }, [filters, quickFilterId, props.messageId, props.scope, putMessageFilters, debouncedPutMessageFilters])
 
   return (
     <YStack backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ? '$medium' : 0}>
