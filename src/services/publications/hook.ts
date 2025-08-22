@@ -217,6 +217,41 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
   })
 }
 
+export const useDeleteMessage = (props: { messageId?: string; scope?: string }) => {
+  const toast = useToastController()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => api.deleteMessage({
+      messageId: props.messageId!,
+      scope: props.scope!
+    }),
+    onSuccess: () => {
+      // Invalider les requêtes liées au message supprimé
+      if (props.messageId) {
+        queryClient.removeQueries({ queryKey: ['message', props.messageId] })
+        queryClient.removeQueries({ queryKey: ['message-content', props.messageId] })
+        queryClient.removeQueries({ queryKey: ['message-filters', props.messageId] })
+        queryClient.removeQueries({ queryKey: ['message-count-recipients', props.messageId] })
+        queryClient.removeQueries({ queryKey: ['message-count-recipients-partial', props.messageId] })
+      }
+      
+      // Invalider la liste des messages pour rafraîchir l'affichage
+      queryClient.invalidateQueries({ queryKey: ['messages', props.scope] })
+      
+      // Invalider le feed pour rafraîchir les publications
+      queryClient.invalidateQueries({
+        queryKey: [PAGINATED_QUERY_FEED],
+      })
+      
+      toast.show('Succès', { message: 'Publication supprimée avec succès', type: 'success' })
+    },
+    onError: (error) => {
+      toast.show('Erreur', { message: 'Une erreur est survenue lors de la suppression de la publication', type: 'error' })
+      return error
+    }
+  })
+}
+
 export { useAutoSave } from '@/features/publications/components/Editor/hooks/useAutoSave'
 
 export const useGetFilterCollection = (props: { scope: string; enabled?: boolean }) => {

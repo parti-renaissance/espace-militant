@@ -19,6 +19,7 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 import QuitConfirmModal from '../../components/QuitConfirmModal'
 import { useAutoSave } from '../../components/Editor/hooks/useAutoSave'
 import { AutoSaveErrorIndicator } from '../../components/Editor/AutoSaveErrorIndicator'
+import Error404 from '@/components/404/Error404'
 
 const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const editorRef = useRef<MessageEditorRef>(null)
@@ -46,8 +47,8 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   }, [props?.messageId, props?.scope])
 
   const { data: messageFiltersData, isLoading: isMessageFiltersLoading } = useGetMessageFilters(messageQueryParams)
-  const { data: messageData, isLoading: isMessageLoading } = useGetMessage(messageQueryParams)
-  const { data: messageContent, isLoading: isMessageContentLoading, isError: isMessageContentError } = useGetMessageContent(messageQueryParams)
+  const { data: messageData, isLoading: isMessageLoading, error: messageError } = useGetMessage(messageQueryParams)
+  const { data: messageContent, isLoading: isMessageContentLoading, error: messageContentError } = useGetMessageContent(messageQueryParams)
 
   const availableSendersQueryParams = useMemo(() => ({
     scope: messageData?.author.scope ?? props?.scope ?? ''
@@ -76,6 +77,10 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
     scope: props?.scope ?? '',
   })
 
+  if (messageError || messageContentError) {
+    return <Error404 />
+  }
+
   const handleSubmit = () => {
     modalSendRef.current?.present()
     Keyboard.dismiss()
@@ -92,7 +97,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
 
   return (
     <>
-      <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} />
+      <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} messageId={currentMessageId} scope={props?.scope} />
       <StickyBox webOnly style={{ zIndex: 10 }}>
         <YStack $gtSm={{ overflow: 'hidden', zIndex: 10 }}>
           <VoxHeader>
