@@ -216,8 +216,6 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
           </StyleRendererContextProvider>
         </YStack>
       </YStack>
-
-      {/* AutoSaveIndicator removed */}
     </YStack>
   )
 })

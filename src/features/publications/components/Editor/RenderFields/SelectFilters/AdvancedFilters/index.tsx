@@ -261,7 +261,7 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                       value={getFilterValue(filter.code)}
                       options={options}
                       onChange={(value) => handleFilterChange(filter.code, value)}
-                      placeholder={filter.options.placeholder || `Sélectionner ${filter.label.toLowerCase()}`}
+                      noValuePlaceholder={filter.options.placeholder || 'Choisir'}
                       size="md"
                       color="gray"
                       openAbove={isLastTwoInLastCategory}
