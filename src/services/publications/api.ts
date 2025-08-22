@@ -113,3 +113,12 @@ export const getFilterCollection = (props: { scope: string }) =>
     responseSchema: schemas.RestFilterCollectionResponseSchema,
     type: 'private',
   })()
+
+export const deleteMessage = (props: { messageId: string; scope: string }) =>
+  api({
+    method: 'delete',
+    path: `/api/v3/adherent_messages/${props.messageId}?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: z.void(),
+    type: 'private',
+  })()
