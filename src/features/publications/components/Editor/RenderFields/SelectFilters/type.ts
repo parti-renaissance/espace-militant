@@ -1,4 +1,4 @@
-type FilterValue =
+export type FilterValue =
   | string
   | number
   | boolean
