@@ -33,6 +33,7 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           advanced: true,
           placeholder: "Tous les militants",
           choices: {
+            "": "Tous les militants",
             "adherent": "Adhérent",
             "adherent:a_jour_2025": "Adhérent - À jour 2025",
             "adherent:a_jour_2025:primo": "Adhérent - À jour 2025 - Primo-adhérent",
@@ -60,6 +61,7 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           favorite: true,
           advanced: true,
           choices: {
+            "": "Aucun label divers",
             "national_event:levenement-6-avril": "Levenement 6 Avril",
             "national_event:rentree-2025": "Rentree 2025",
             "conseil-national:membre-du-burex": "Conseil national - Membre du Burex",
@@ -74,9 +76,10 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
         type: "select",
         options: {
           choices: {
-            female: "Femme",
-            male: "Homme",
-            other: "Autre"
+            "": "Toutes civilités",
+            "female": "Femme",
+            "male": "Homme",
+            "other": "Autre"
           }
         }
       }
@@ -136,6 +139,7 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           favorite: true,
           advanced: true,
           choices: {
+            "": "Aucun label élu",
             "elu": "Élu",
             "elu:attente_declaration": "Élu - En attente de déclaration",
             "elu:cotisation_ok": "Élu - À jour de cotisation",
@@ -155,6 +159,7 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           multiple: false,
           advanced: true,
           choices: {
+            "": "Tous mandats",
             "depute_europeen": "Député européen",
             "senateur": "Sénateur",
             "depute": "Député",
