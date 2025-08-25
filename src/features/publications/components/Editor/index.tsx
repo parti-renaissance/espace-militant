@@ -172,7 +172,6 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       },
       (errors) => {
         console.error('Validation errors:', errors);
-        console.error('Form errors details:', JSON.stringify(errors, null, 2));
       }
     ),
     unSelect: () => {

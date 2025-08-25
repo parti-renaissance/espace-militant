@@ -94,13 +94,13 @@ export type RestMessageListItem = z.infer<typeof RestMessageListItemSchema>
 export type RestMessageListResponse = z.infer<typeof RestMessageListResponseSchema>
 
 export const RestMessageCountRecipientsResponseSchema = z.object({
-  push: z.number(),
-  email: z.number(),
-  push_email: z.number(),
-  only_push: z.number(),
-  only_email: z.number(),
-  contacts: z.number(),
-  total: z.number(),
+  push: z.number().optional(),
+  email: z.number().optional(),
+  push_email: z.number().optional(),
+  only_push: z.number().optional(),
+  only_email: z.number().optional(),
+  contacts: z.number().optional(),
+  total: z.number().optional(),
 })
 
 export type RestMessageCountRecipientsResponse = z.infer<typeof RestMessageCountRecipientsResponseSchema>
