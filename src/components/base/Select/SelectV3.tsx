@@ -14,7 +14,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
   const frameRef = useRef<ComponentRef<typeof TouchableOpacity>>(null)
   const modalRef = useRef<SelectDropdownRef>(null)
   const bottomSheetRef = useRef<ModalDropDownRef>(null)
-  
+
   const handlePress = useCallback(() => {
     if (props.disabled) return
     modalRef.current?.open()
@@ -69,9 +69,9 @@ const Select = <A extends string>(props: SelectProps<A>) => {
           {...props.frameProps}
         >
           <SF.Container resetable={props.resetable && !!props.value} icon={props.icon} onResetPress={handleResetPress}>
-            <XStack width="fit-content" maxWidth="50%">
+            <Text width="fit-content" maxWidth="50%" mr="$medium">
               {props.label || props.placeholder ? <SF.Label>{props.label || props.placeholder}</SF.Label> : null}
-            </XStack>
+            </Text>
             <SF.ValueContainer theme={fullValue?.theme}>
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}
               <SF.Text themedText={Boolean(fullValue?.theme)}>{parseFullValueLabel(fullValue)}</SF.Text>
