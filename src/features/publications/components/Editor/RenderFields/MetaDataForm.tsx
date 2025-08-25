@@ -44,8 +44,18 @@ export const MetaDataForm = memo((props: {
     return props.message?.sender || (props.availableSenders && props.availableSenders.length > 0 ? props.availableSenders[0] : null)
   }, [props.message?.sender, props.availableSenders])
 
-  const [filters, setFilters] = useState<SelectedFiltersType>(props.messageFilters as SelectedFiltersType ?? { 'adherent_tags': 'adherent' })
-  const [quickFilterId, setQuickFilterId] = useState<string | null>(null)
+  const [filters, setFilters] = useState<SelectedFiltersType>(() => {
+    if (props.messageFilters) {
+      return props.messageFilters as SelectedFiltersType
+    }
+    return { 'adherent_tags': 'adherent' }
+  })
+  const [quickFilterId, setQuickFilterId] = useState<string | null>(() => {
+    if (props.messageFilters) {
+      return identifyQuickFilter(props.messageFilters as SelectedFiltersType)
+    }
+    return 'adherent'
+  })
 
   const { mutate: putMessageFilters, isPending: isPuttingMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
   const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({ 
@@ -56,7 +66,7 @@ export const MetaDataForm = memo((props: {
 
   useEffect(() => {
     if (!isFetchingMessageCountRecipients && messageCountRecipients) {
-      const hasRecipients = messageCountRecipients.contacts > 0
+      const hasRecipients = (messageCountRecipients?.contacts ?? 0) > 0
       setValue('filters.hasRecipients', hasRecipients)
     }
   }, [messageCountRecipients, isFetchingMessageCountRecipients, setValue])
