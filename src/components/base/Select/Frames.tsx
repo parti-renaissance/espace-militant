@@ -4,6 +4,7 @@ import { IconProps } from '@tamagui/helpers-icon'
 import { ChevronsUpDown, X } from '@tamagui/lucide-icons'
 import { GestureReponderEvent } from '@tamagui/web'
 import { createStyledContext, styled, useGetThemedIcon, View, withStaticProperties, XStack, XStackProps } from 'tamagui'
+import { VoxButton } from '@/components/Button/Button'
 
 export const SelectContext = createStyledContext<{
   themedText: boolean
@@ -103,21 +104,6 @@ const SelectFrame = styled(XStack, {
   },
 })
 
-const SelectResetIcon = styled(X, {
-  context: SelectContext,
-  size: 20,
-  variants: {
-    themedText: {
-      true: {
-        color: '$color9',
-      },
-      false: {
-        color: '$primary',
-      },
-    },
-  } as const,
-})
-
 const SelectIconContainer = ({ icon, themedText }: { icon: NamedExoticComponent<IconProps>; themedText?: boolean }) => {
   const ctx = SelectContext.useStyledContext()
   const isThemed = ctx.themedText || themedText
@@ -138,7 +124,22 @@ const SelectFrameContainer = XStack.styleable<
       <XStack flexShrink={1} flex={1} {...props} alignItems="center" gap="$small" margin="auto">
         {props.children}
       </XStack>
-      <XStack onPress={resetable ? onResetPress : undefined}>{resetable ? <SelectResetIcon /> : defIcon}</XStack>
+      <XStack onPress={resetable ? onResetPress : undefined}>
+        {resetable ? (
+          <VoxButton
+            size="md"
+            variant="text"
+            onPress={onResetPress}
+            iconSize={20}
+            shrink
+            iconLeft={X}
+            textColor="$gray5"
+            theme="gray"
+          />
+        ) : (
+          defIcon
+        )}
+      </XStack>
     </XStack>
   )
 })

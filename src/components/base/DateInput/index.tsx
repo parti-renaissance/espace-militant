@@ -3,6 +3,8 @@ import { XStack, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import DatePickerField from '@/components/DatePickerV2'
 import { FormFrame } from '@/components/base/FormFrames'
+import { X } from '@tamagui/lucide-icons'
+import { VoxButton } from '@/components/Button'
 
 interface DateInputProps {
   label: string
@@ -13,6 +15,7 @@ interface DateInputProps {
   color?: 'gray' | 'blue' | 'green' | 'red'
   disabled?: boolean
   error?: string
+  resetable?: boolean
 }
 
 export default function DateInput({
@@ -23,7 +26,8 @@ export default function DateInput({
   size = 'sm',
   color = 'gray',
   disabled = false,
-  error
+  error,
+  resetable = false
 }: DateInputProps) {
   
   // Convertir la value en Date pour le DatePickerField
@@ -45,12 +49,16 @@ export default function DateInput({
     }
   }
 
+  const handleReset = () => {
+    onChange(null)
+  }
+
   return (
     <FormFrame 
       height="auto" 
       flexDirection="row"
       pl="$medium" 
-      pr="$medium"
+      pr="$xsmall"
       pt="$xsmall" 
       pb="$xsmall"
       overflow="hidden" 
@@ -60,13 +68,32 @@ export default function DateInput({
     >
       <FormFrame.Label>{label}</FormFrame.Label>
       
-      <DatePickerField
-        disabled={disabled}
-        type="date"
-        value={getDateValue()}
-        onChange={handleDateChange}
-        placeholder={placeholder}
-      />
+      <XStack alignItems="center" >
+        <XStack mr="$xsmall">
+        <DatePickerField
+          disabled={disabled}
+          type="date"
+          value={getDateValue()}
+          onChange={handleDateChange}
+          placeholder={placeholder}
+        />
+        </XStack>
+        
+        
+        {resetable && value && (
+          <VoxButton
+            size="md"
+            variant="text"
+            onPress={handleReset}
+            disabled={disabled}
+            iconSize={20}
+            shrink
+            iconLeft={X}
+            textColor="$gray5"
+            theme={color}
+          />
+        )}
+      </XStack>
       
       {error && (
         <Text.XSM color="$orange5" textAlign="left">
