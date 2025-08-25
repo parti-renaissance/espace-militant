@@ -61,7 +61,7 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           favorite: true,
           advanced: true,
           choices: {
-            "": "Aucun label divers",
+            "": "Aucune sélection",
             "national_event:levenement-6-avril": "Levenement 6 Avril",
             "national_event:rentree-2025": "Rentree 2025",
             "conseil-national:membre-du-burex": "Conseil national - Membre du Burex",
@@ -76,7 +76,7 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
         type: "select",
         options: {
           choices: {
-            "": "Toutes civilités",
+            "": "Aucune sélection",
             "female": "Femme",
             "male": "Homme",
             "other": "Autre"
@@ -139,7 +139,7 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           favorite: true,
           advanced: true,
           choices: {
-            "": "Aucun label élu",
+            "": "Aucune sélection",
             "elu": "Élu",
             "elu:attente_declaration": "Élu - En attente de déclaration",
             "elu:cotisation_ok": "Élu - À jour de cotisation",
@@ -159,7 +159,7 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           multiple: false,
           advanced: true,
           choices: {
-            "": "Tous mandats",
+            "": "Aucune sélection",
             "depute_europeen": "Député européen",
             "senateur": "Sénateur",
             "depute": "Député",
