@@ -174,7 +174,7 @@ export default function EventFormMobileScreen() {
                         error={fieldState.error?.message}
                         size="sm"
                         color="gray"
-                        label="Accèes"
+                        label="Accès"
                         value={field.value}
                         options={visibilityOptions}
                         onChange={field.onChange}

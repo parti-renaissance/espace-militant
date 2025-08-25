@@ -270,7 +270,6 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                       size="md"
                       color="gray"
                       openAbove={isLastTwoInLastCategory}
-                      resetable={true}
                       // searchable={true}
                     />
                   )
@@ -289,6 +288,7 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                     placeholder={`Sélectionner ${filter.label.toLowerCase()}`}
                     size="md"
                     color="gray"
+                    resetable
                   />
                 )
               }

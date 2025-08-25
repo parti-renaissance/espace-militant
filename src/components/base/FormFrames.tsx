@@ -100,12 +100,12 @@ export const FormFrameInput = styled(Input, {
       },
       false: {
         color: '$textPrimary',
-        backgroundColor: '$textOutline',
+        backgroundColor: '$textOutline20',
         hoverStyle: {
-          backgroundColor: '$textOutline20',
+          backgroundColor: '$gray2',
         },
         pressStyle: {
-          backgroundColor: '$textOutline32',
+          backgroundColor: '$gray3',
         },
       },
     },
@@ -139,19 +139,19 @@ export const FormFrameButton = styled(ThemeableStack, {
       true: {
         backgroundColor: '$color2',
         hoverStyle: {
-          backgroundColor: '$color3',
+          backgroundColor: '$color',
         },
         pressStyle: {
           backgroundColor: '$color4',
         },
       },
       false: {
-        backgroundColor: '$textOutline',
+        backgroundColor: '$textOutline20',
         hoverStyle: {
-          backgroundColor: '$textOutline20',
+          backgroundColor: '$gray2',
         },
         pressStyle: {
-          backgroundColor: '$textOutline32',
+          backgroundColor: '$gray3',
         },
       },
     },
