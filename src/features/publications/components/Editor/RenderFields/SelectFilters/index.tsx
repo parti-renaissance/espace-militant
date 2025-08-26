@@ -14,6 +14,7 @@ import { SelectedFiltersType, HierarchicalQuickFilterType, FilterValue } from '.
 import { useQueryClient } from '@tanstack/react-query'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
 import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
+import SelectQuickFiltersItem from './QuickFilter/SelectQuickFiltersItem'
 
 interface SelectFiltersProps {
   updateFilter: (updatedFilter: { [code: string]: FilterValue }) => void
@@ -110,7 +111,19 @@ export default function SelectFilters({
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
       const item = quickFilters.find(d => d.value === selectedQuickFilterId)
-      return item ? item.label : 'Sélectionné'
+      let baseLabel = item ? item.label : 'Sélectionné'
+      
+      // Check if static_tags contains rentree-2025 to add rentrée information
+      if (selectedFilters.static_tags) {
+        const staticTagsValue = selectedFilters.static_tags
+        if (staticTagsValue === 'national_event:rentree-2025') {
+          baseLabel += ' - Inscrits à la rentrée'
+        } else if (staticTagsValue === '!national_event:rentree-2025') {
+          baseLabel += ' - Non-inscrits à la rentrée'
+        }
+      }
+      
+      return baseLabel
     }
 
     const excludedFilters = ['zone', 'zones', 'committee']
@@ -141,7 +154,7 @@ export default function SelectFilters({
     if (!item) return
 
     const mergedFilters = mergeQuickFilterWithAdvancedFilters(item, selectedFilters, isAdvancedFilters)
-    
+
     // Appliquer tous les filtres fusionnés en une seule fois
     updateFilter(mergedFilters)
   }, [quickFilters, selectedFilters, mergeQuickFilterWithAdvancedFilters, updateFilter, isAdvancedFilters])
@@ -290,11 +303,44 @@ export default function SelectFilters({
                 onFilterChange={handleAdvancedFilterChange}
               />
             ) : (
-              <QuickFilter
-                quickFilters={quickFilters}
-                selectedQuickFilterId={selectedQuickFilterId}
-                onItemSelection={handleQuickFilterSelection}
-              />
+              <>
+                <QuickFilter
+                  quickFilters={quickFilters}
+                  selectedQuickFilterId={selectedQuickFilterId}
+                  onItemSelection={handleQuickFilterSelection}
+                />
+                <XStack alignItems="center" gap="$small">
+                  <Text.MD secondary>Filtres circonstanciels</Text.MD>
+                  <YStack h={1} flexGrow={1} mt={2} bg="$textOutline" />
+                </XStack>
+                <YStack gap="$small">
+                  <SelectQuickFiltersItem
+                    label="Inscrits à la rentrée"
+                    state={selectedFilters.static_tags === "national_event:rentree-2025" ? "selected" : "default"}
+                    onPress={() => {
+                      if (selectedFilters.static_tags === "national_event:rentree-2025") {
+                        handleAdvancedFilterChange("static_tags", null)
+                      } else {
+                        handleAdvancedFilterChange("static_tags", "national_event:rentree-2025")
+                      }
+                    }}
+                    type="radio"
+                  />
+                  <SelectQuickFiltersItem
+                    label="Non-inscrits à la rentrée"
+                    state={selectedFilters.static_tags === "!national_event:rentree-2025" ? "selected" : "default"}
+                    onPress={() => {
+                      if (selectedFilters.static_tags === "!national_event:rentree-2025") {
+                        handleAdvancedFilterChange("static_tags", null)
+                      } else {
+                        handleAdvancedFilterChange("static_tags", "!national_event:rentree-2025")
+                      }
+                    }}
+                    type="radio"
+                  />
+                </YStack>
+              </>
+
             )}
           </YStack>
         </YStack>

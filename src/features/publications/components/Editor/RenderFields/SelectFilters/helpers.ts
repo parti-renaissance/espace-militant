@@ -149,6 +149,13 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
 
     const nonQuickFilterFields = allFields.filter(field => !quickFilterFields.includes(field))
     const hasNullNonQuickFilterFields = nonQuickFilterFields.every(field => {
+      if (field === 'static_tags') {
+        const staticTagsValue = filters[field]
+        if (staticTagsValue === 'national_event:rentree-2025' || staticTagsValue === '!national_event:rentree-2025') {
+          return true
+        }
+      }
+      
       return filters[field] === null || filters[field] === undefined
     })
 
