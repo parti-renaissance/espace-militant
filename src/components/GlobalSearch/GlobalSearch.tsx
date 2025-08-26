@@ -160,11 +160,24 @@ function GlobalSearch({
     [placeholder, provider]
   )
 
+  const valueMemo = useMemo(() => {
+    if (value) {
+      return value
+    }
+    if (nullable) {
+      return value === '__null__' ? undefined : value
+    }
+    if (defaultValue && typeof defaultValue === 'object' && 'value' in defaultValue) {
+      return defaultValue.value || undefined
+    }
+    return undefined
+  }, [value, nullable, defaultValue])
+
   return (
     <YStack minWidth={minWidth} maxWidth={maxWidth}>
       <Select
         placeholder={searchPlaceholder}
-        value={value}
+        value={valueMemo}
         onChange={onResultSelect}
         icon={providerIcon}
         searchable
