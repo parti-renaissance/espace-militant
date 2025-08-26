@@ -62,8 +62,8 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           advanced: true,
           choices: {
             "": "Aucune sélection",
-            "national_event:levenement-6-avril": "Levenement 6 Avril",
-            "national_event:rentree-2025": "Rentree 2025",
+            "national_event:rentree-2025": "Inscrits à la rentrée 2025",
+            "!national_event:rentree-2025": "Non-inscrits à la rentrée 2025",
             "conseil-national:membre-du-burex": "Conseil national - Membre du Burex",
             "conseil-national:ancien-membre-du-burex": "Conseil national - Ancien membre du Burex",
             "conseil-national:membre-du-cese": "Conseil national - Membre du CESE"
