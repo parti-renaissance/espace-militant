@@ -61,7 +61,6 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           favorite: true,
           advanced: true,
           choices: {
-            "": "Aucune sélection",
             "national_event:rentree-2025": "Inscrits à la rentrée 2025",
             "!national_event:rentree-2025": "Non-inscrits à la rentrée 2025",
             "conseil-national:membre-du-burex": "Conseil national - Membre du Burex",
@@ -76,7 +75,6 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
         type: "select",
         options: {
           choices: {
-            "": "Aucune sélection",
             "female": "Femme",
             "male": "Homme",
             "other": "Autre"
@@ -139,7 +137,6 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           favorite: true,
           advanced: true,
           choices: {
-            "": "Aucune sélection",
             "elu": "Élu",
             "elu:attente_declaration": "Élu - En attente de déclaration",
             "elu:cotisation_ok": "Élu - À jour de cotisation",
@@ -159,7 +156,6 @@ const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
           multiple: false,
           advanced: true,
           choices: {
-            "": "Aucune sélection",
             "depute_europeen": "Député européen",
             "senateur": "Sénateur",
             "depute": "Député",
@@ -259,6 +255,8 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                   const options = getSelectOptions(choices as Record<string, string>)
                   const isLastCategory = categoryIndex === displayFilters.length - 1
                   const isLastTwoInLastCategory = isLastCategory && filterIndex >= category.filters.length - 2
+                  const hasEmptyOption = options.some(option => option.value === '' || option.value === null)
+                  
                   return (
                     <SelectV3
                       key={filterIndex}
@@ -267,6 +265,7 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                       options={options}
                       onChange={(value) => handleFilterChange(filter.code, value)}
                       noValuePlaceholder={filter.options.placeholder || 'Choisir'}
+                      nullableOption={!hasEmptyOption ? "Aucune sélection" : undefined}
                       size="md"
                       color="gray"
                       openAbove={isLastTwoInLastCategory}

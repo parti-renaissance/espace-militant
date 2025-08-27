@@ -21,7 +21,7 @@ export type SelectOption<A extends string> = {
 export type SelectProps<A extends string> = {
   value?: A
   options: Readonly<Array<SelectOption<A>>>
-  onChange?: (value: A) => void
+  onChange?: (value: A | null) => void
   onDetailChange?: (value: { value: A; label: string | React.ReactNode[]; subLabel?: string }) => void
   onBlur?: () => void
   disabled?: boolean
@@ -48,4 +48,5 @@ export type SelectProps<A extends string> = {
   helpText?: string | React.ReactNode
   resetable?: boolean
   openAbove?: boolean
+  nullableOption?: string
 }
