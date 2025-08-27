@@ -168,13 +168,14 @@ export const SelectTextValue = ({ children, themedText, placeholder, ...props }:
   if (isThemed) {
     color = placeholder ? '$color4' : '$color6'
   } else {
-    color = placeholder ? '$textSecondary' : '$textPrimary'
+    color = placeholder ? '$gray4' : '$textPrimary'
   }
   
   return (
     <Text.MD 
       numberOfLines={1} 
       color={color}
+      fontWeight={placeholder ? '400' : '500'}
       {...props}
     >
       {children}
