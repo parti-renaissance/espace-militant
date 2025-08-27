@@ -74,7 +74,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
             </Text>
             <SF.ValueContainer theme={fullValue?.theme}>
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}
-              <SF.Text themedText={Boolean(fullValue?.theme)}>{parseFullValueLabel(fullValue)}</SF.Text>
+              <SF.Text themedText={Boolean(fullValue?.theme)} placeholder={!fullValue}>{parseFullValueLabel(fullValue)}</SF.Text>
             </SF.ValueContainer>
           </SF.Container>
         </SF>
