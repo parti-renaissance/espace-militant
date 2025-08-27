@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState, useEffect } from 'react'
+import React, { memo, useMemo, useState, useEffect, useCallback } from 'react'
 import { Control, Controller, useFormContext } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
 import Input from '@/components/base/Input/Input'
@@ -8,9 +8,11 @@ import * as S from '@/features/publications/components/Editor/schemas/messageBui
 import { RestAvailableSendersResponse, RestGetMessageFiltersResponse, RestGetMessageResponse } from '@/services/publications/schema'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated'
 import SelectFilters, { SelectedFiltersType } from './SelectFilters'
+import { FilterValue } from './SelectFilters/type'
 import { usePutMessageFilters } from '@/services/publications/hook'
 import { identifyQuickFilter } from './SelectFilters/helpers'
 import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook'
+import { useDebouncedCallback } from 'use-debounce'
 
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
   const { committee, ...filtersWithoutCommittee } = filters
@@ -42,8 +44,18 @@ export const MetaDataForm = memo((props: {
     return props.message?.sender || (props.availableSenders && props.availableSenders.length > 0 ? props.availableSenders[0] : null)
   }, [props.message?.sender, props.availableSenders])
 
-  const [filters, setFilters] = useState<SelectedFiltersType>(props.messageFilters as SelectedFiltersType ?? { 'adherent_tags': 'adherent' })
-  const [quickFilterId, setQuickFilterId] = useState<string | null>('adherents')
+  const [filters, setFilters] = useState<SelectedFiltersType>(() => {
+    if (props.messageFilters) {
+      return props.messageFilters as SelectedFiltersType
+    }
+    return { 'adherent_tags': 'adherent' }
+  })
+  const [quickFilterId, setQuickFilterId] = useState<string | null>(() => {
+    if (props.messageFilters) {
+      return identifyQuickFilter(props.messageFilters as SelectedFiltersType)
+    }
+    return 'adherent'
+  })
 
   const { mutate: putMessageFilters, isPending: isPuttingMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
   const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({ 
@@ -52,18 +64,14 @@ export const MetaDataForm = memo((props: {
     enabled: !!props.messageId && !!props.scope
   })
 
-  // Mettre à jour la validation des filtres quand le nombre de contacts change
   useEffect(() => {
     if (!isFetchingMessageCountRecipients && messageCountRecipients) {
-      const hasRecipients = messageCountRecipients.contacts > 0
+      const hasRecipients = (messageCountRecipients?.contacts ?? 0) > 0
       setValue('filters.hasRecipients', hasRecipients)
     }
   }, [messageCountRecipients, isFetchingMessageCountRecipients, setValue])
 
-  // Animation values
   const animatedProgress = useSharedValue(props.displayToolbar ? 1 : 0)
-
-  // Animated style
   const animatedStyle = useAnimatedStyle(() => {
     return {
       height: animatedProgress.value === 1 ? 'auto' : animatedProgress.value * 56,
@@ -74,7 +82,6 @@ export const MetaDataForm = memo((props: {
     }
   })
 
-  // Update animation when displayToolbar changes
   useEffect(() => {
     const targetProgress = props.displayToolbar ? 1 : 0
 
@@ -92,30 +99,49 @@ export const MetaDataForm = memo((props: {
   }, [props.messageFilters])
 
 
-  const handleFiltersChange = ({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => {
-    const mergedFilters = { ...filters, ...newFilters }
-    const mappedFilters = temporaryMapFiltersForApi(mergedFilters)
-
-    let hasAnyChange = false
-    Object.keys(mergedFilters).forEach(key => {
-      const newValue = mergedFilters[key]
-      const initialValue = filters[key]
-      if (newValue !== initialValue) {
-        hasAnyChange = true
-      }
-    })
-
-    if (hasAnyChange && props.messageId && props.scope) {
-      setFilters(mergedFilters)
-      if (newQuickFilterId) { setQuickFilterId(newQuickFilterId) }
+  // Fonction debouncée pour l'envoi des filtres
+  const debouncedPutMessageFilters = useDebouncedCallback(
+    (mappedFilters: SelectedFiltersType) => {
       putMessageFilters(mappedFilters, {
         onError: (error) => {
+          // En cas d'erreur, on revient aux filtres précédents
           setFilters(filters)
           setQuickFilterId(quickFilterId)
         },
       })
+    },
+    500, // 500ms de délai
+    {
+      leading: false,
+      trailing: true,
     }
-  }
+  )
+
+  const handleUpdateFilter = useCallback((updatedFilter: { [code: string]: FilterValue }) => {
+    setFilters((oldFilters) => {
+      const newFilters = { ...oldFilters, ...updatedFilter }
+
+      const correspondingQuickFilter = identifyQuickFilter(newFilters)
+      setQuickFilterId(correspondingQuickFilter)
+
+      if (props.messageId && props.scope) {
+        const mappedFilters = temporaryMapFiltersForApi(newFilters)
+
+        if (correspondingQuickFilter) {
+          putMessageFilters(mappedFilters, {
+            onError: () => {
+              setFilters(oldFilters)
+              setQuickFilterId(quickFilterId)
+            },
+          })
+        } else {
+          debouncedPutMessageFilters(mappedFilters)
+        }
+      }
+      
+      return newFilters
+    })
+  }, [props.messageId, props.scope, putMessageFilters, debouncedPutMessageFilters, quickFilterId])
 
   return (
     <YStack backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ? '$medium' : 0}>
@@ -131,7 +157,7 @@ export const MetaDataForm = memo((props: {
                 <SelectFilters
                   hasError={fieldState.error ? true : false}
                   selectedFilters={filters}
-                  onFiltersChange={handleFiltersChange}
+                  updateFilter={handleUpdateFilter}
                   selectedQuickFilterId={quickFilterId}
                   messageId={props.messageId}
                   scope={props.scope}

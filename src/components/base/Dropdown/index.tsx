@@ -24,6 +24,17 @@ export const DropdownItemFrame = styled(ThemeableStack, {
     backgroundColor: '$gray1',
   },
   variants: {
+    selected: {
+      true: {
+        backgroundColor: '$gray1',
+        hoverStyle: {
+          backgroundColor: '$gray1',
+        },
+        pressStyle: {
+          backgroundColor: '$gray3',
+        },
+      },
+    },
     last: {
       true: {
         borderBottomWidth: 0,

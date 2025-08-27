@@ -14,11 +14,12 @@ const Select = <A extends string>(props: SelectProps<A>) => {
   const frameRef = useRef<ComponentRef<typeof TouchableOpacity>>(null)
   const modalRef = useRef<SelectDropdownRef>(null)
   const bottomSheetRef = useRef<ModalDropDownRef>(null)
+
   const handlePress = useCallback(() => {
     if (props.disabled) return
     modalRef.current?.open()
     bottomSheetRef.current?.open()
-  }, [props.disabled])
+  }, [props.disabled, props.searchable, props.options.length])
 
   const Selector = useMemo(() => {
     return media.gtSm && isWeb ? SelectDropdown : SelectBottomSheet
@@ -51,7 +52,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
 
   return (
     <YStack>
-      <Selector ref={selectorRef} frameRef={frameRef} {...props} />
+      <Selector ref={selectorRef} frameRef={frameRef} {...props} openAbove={props.openAbove} />
 
       <SF.Props themedText={props.matchTextWithTheme ?? false}>
         <SF
@@ -67,11 +68,13 @@ const Select = <A extends string>(props: SelectProps<A>) => {
           disabled={props.disabled}
           {...props.frameProps}
         >
-          <SF.Container resetable={props.resetable} icon={props.icon} onResetPress={handleResetPress}>
-            {props.label || props.placeholder ? <SF.Label>{props.label || props.placeholder}</SF.Label> : null}
+          <SF.Container resetable={props.resetable && !!props.value} icon={props.icon} onResetPress={handleResetPress}>
+            <Text width="fit-content" maxWidth="50%" mr="$medium">
+              {props.label || props.placeholder ? <SF.Label>{props.label || props.placeholder}</SF.Label> : null}
+            </Text>
             <SF.ValueContainer theme={fullValue?.theme}>
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}
-              <SF.Text themedText={Boolean(fullValue?.theme)}>{parseFullValueLabel(fullValue)}</SF.Text>
+              <SF.Text themedText={Boolean(fullValue?.theme)} placeholder={!fullValue}>{parseFullValueLabel(fullValue)}</SF.Text>
             </SF.ValueContainer>
           </SF.Container>
         </SF>

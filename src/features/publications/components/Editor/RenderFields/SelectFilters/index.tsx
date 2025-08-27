@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { XStack, YStack, useMedia } from 'tamagui'
 import { ActivityIndicator, Platform, SafeAreaView } from 'react-native'
 import { Save } from '@tamagui/lucide-icons'
@@ -6,15 +6,18 @@ import { VoxButton } from '@/components/Button'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import Text from '@/components/base/Text'
 import { SelectFrames as SF } from '@/components/base/Select/Frames'
-import SelectFiltersItem from './SelectFiltersItem'
-import { AlertUtils } from '@/screens/shared/AlertUtils'
+import QuickFilter from './QuickFilter'
+import AdvancedFilters from './AdvancedFilters'
 import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook';
 import { getHierarchicalQuickFilters, getItemState } from './helpers';
-import { SelectedFiltersType, HierarchicalQuickFilterType } from './type';
+import { SelectedFiltersType, HierarchicalQuickFilterType, FilterValue } from './type';
 import { useQueryClient } from '@tanstack/react-query'
+import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
+import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
+import SelectQuickFiltersItem from './QuickFilter/SelectQuickFiltersItem'
 
 interface SelectFiltersProps {
-  onFiltersChange?: ({ newFilters, newQuickFilterId }: { newFilters: SelectedFiltersType, newQuickFilterId: string | null }) => void
+  updateFilter: (updatedFilter: { [code: string]: FilterValue }) => void
   selectedFilters?: SelectedFiltersType
   selectedQuickFilterId?: string | null
   messageId?: string
@@ -24,7 +27,7 @@ interface SelectFiltersProps {
 }
 
 export default function SelectFilters({
-  onFiltersChange,
+  updateFilter,
   selectedFilters = {},
   selectedQuickFilterId = null,
   messageId,
@@ -34,73 +37,179 @@ export default function SelectFilters({
 }: SelectFiltersProps) {
   const media = useMedia()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [tempSelectedQuickFilter, setTempSelectedQuickFilter] = useState<string | null>(selectedQuickFilterId || null)
-  const [tempSelectedFilters, setTempSelectedFilters] = useState<SelectedFiltersType>(selectedFilters)
+  const [isAdvancedFilters, setIsAdvancedFilters] = useState(false)
   const quickFilters: HierarchicalQuickFilterType[] = useMemo(() => getHierarchicalQuickFilters(), [])
   const queryClient = useQueryClient();
 
+  useEffect(() => {
+    setIsAdvancedFilters(selectedQuickFilterId ? false : true)
+  }, [])
+
+  const zoneProvider = useMemo(() => new ZoneProvider(), [])
+
+  // Fonction pour fusionner les filtres du filtre rapide avec les filtres avancés
+  const mergeQuickFilterWithAdvancedFilters = useCallback((quickFilter: HierarchicalQuickFilterType, currentFilters: SelectedFiltersType, isAdvancedMode: boolean = false) => {
+    const mergedFilters = { ...quickFilter.filters }
+    if (isAdvancedMode) {
+      // En mode avancé avec filtre rapide : on fusionne les deux, on ne réinitialise rien
+      // Les filtres avancés ont la priorité sur les filtres du filtre rapide
+      Object.keys(currentFilters).forEach(filterKey => {
+        if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
+          mergedFilters[filterKey] = currentFilters[filterKey]
+        }
+      })
+    } else {
+      // En mode filtres rapides : on réinitialise les filtres avancés non protégés
+      const protectedFilters = ['zone', 'zones', 'committee']
+      
+      // Protéger static_tags si sa valeur est liée à la rentrée
+      if (currentFilters.static_tags === 'national_event:rentree-2025' || currentFilters.static_tags === '!national_event:rentree-2025') {
+        protectedFilters.push('static_tags')
+      }
+      
+      protectedFilters.forEach(filterKey => {
+        if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
+          mergedFilters[filterKey] = currentFilters[filterKey]
+        }
+      })
+
+      // On réinitialise les autres filtres avancés
+      Object.keys(currentFilters).forEach(filterKey => {
+        if (!(filterKey in quickFilter.filters) &&
+          !protectedFilters.includes(filterKey) &&
+          currentFilters[filterKey] !== null) {
+          mergedFilters[filterKey] = null
+        }
+      })
+    }
+
+    return mergedFilters
+  }, [])
+
+  const zoneDefaultValue = useMemo(() => {
+    if (selectedFilters.zone && typeof selectedFilters.zone === 'object' && 'name' in selectedFilters.zone && 'code' in selectedFilters.zone) {
+      return {
+        label: `${selectedFilters.zone.name} (${selectedFilters.zone.code})`,
+        value: selectedFilters.zone.uuid
+      }
+    }
+
+    if (selectedFilters.zones && Array.isArray(selectedFilters.zones) && selectedFilters.zones.length > 0) {
+      const firstZone = selectedFilters.zones[0]
+      if (firstZone && typeof firstZone === 'object' && 'name' in firstZone && 'code' in firstZone) {
+        return {
+          label: `${firstZone.name} (${firstZone.code})`,
+          value: firstZone.uuid
+        }
+      }
+    }
+
+    if (selectedFilters.committee && typeof selectedFilters.committee === 'object' && 'name' in selectedFilters.committee) {
+      return {
+        label: selectedFilters.committee.name,
+        value: null
+      }
+    }
+
+    return undefined
+  }, [isModalOpen]) // update defaultValue only when modal state changes
+
+  const displayText = useMemo(() => {
+    if (selectedQuickFilterId && !isAdvancedFilters) {
+      const item = quickFilters.find(d => d.value === selectedQuickFilterId)
+      let baseLabel = item ? item.label : 'Sélectionné'
+      
+      // Check if static_tags contains rentree-2025 to add rentrée information
+      if (selectedFilters.static_tags) {
+        const staticTagsValue = selectedFilters.static_tags
+        if (staticTagsValue === 'national_event:rentree-2025') {
+          baseLabel += ' - Inscrits à la rentrée'
+        } else if (staticTagsValue === '!national_event:rentree-2025') {
+          baseLabel += ' - Non-inscrits à la rentrée'
+        }
+      }
+      
+      return baseLabel
+    }
+
+    const excludedFilters = ['zone', 'zones', 'committee']
+    
+    // Exclure static_tags s'il est protégé (lié à la rentrée)
+    if (selectedFilters.static_tags === 'national_event:rentree-2025' || selectedFilters.static_tags === '!national_event:rentree-2025') {
+      excludedFilters.push('static_tags')
+    }
+    
+    const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) =>
+      value !== null && value !== undefined && !excludedFilters.includes(key)
+    )
+    return nonNullFilters.length > 0
+      ? `${nonNullFilters.length} filtre${nonNullFilters.length > 1 ? 's' : ''} avancé${nonNullFilters.length > 1 ? 's' : ''}`
+      : 'Sélectionner'
+  }, [selectedQuickFilterId, quickFilters, selectedFilters, isAdvancedFilters])
+
   const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({ messageId: messageId, scope: scope })
 
-  const handleOpenModal = () => {
-    const quickFilterToUse = selectedQuickFilterId || (() => {
-      const matchingQuickFilter = quickFilters.find(qf =>
-        JSON.stringify(qf.filters) === JSON.stringify(selectedFilters)
-      )
-      return matchingQuickFilter?.value || 'adherents'
-    })()
-
-    setTempSelectedQuickFilter(quickFilterToUse)
-    setTempSelectedFilters(selectedFilters)
+  const handleOpenModal = useCallback(() => {
     setIsModalOpen(true)
-  }
+    setIsAdvancedFilters(selectedQuickFilterId ? false : true)
+  }, [selectedQuickFilterId])
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false)
-  }
-
-  const handleConfirmSelection = () => {
-    if (tempSelectedQuickFilter) {
-      const selectedQuickFilter = quickFilters.find(qf => qf.value === tempSelectedQuickFilter)
-      if (selectedQuickFilter) {
-        onFiltersChange?.({ newFilters: selectedQuickFilter.filters, newQuickFilterId: tempSelectedQuickFilter })
-      }
-    } else {
-      onFiltersChange?.({ newFilters: tempSelectedFilters, newQuickFilterId: null })
-    }
-    queryClient.invalidateQueries({
+    queryClient.refetchQueries({
       queryKey: ['message-count-recipients', messageId],
     })
-    handleCloseModal()
-  }
+  }, [])
 
-  const handleItemSelection = (itemId: string, immediateChange: boolean = false) => {
+  const handleQuickFilterSelection = useCallback((itemId: string) => {
     const item = quickFilters.find(d => d.value === itemId)
     if (!item) return
-    if (tempSelectedQuickFilter === itemId) return
 
-    setTempSelectedQuickFilter(itemId)
+    const mergedFilters = mergeQuickFilterWithAdvancedFilters(item, selectedFilters, isAdvancedFilters)
 
-    if (immediateChange) {
-      onFiltersChange?.({ newFilters: item.filters, newQuickFilterId: itemId })
+    // Appliquer tous les filtres fusionnés en une seule fois
+    updateFilter(mergedFilters)
+  }, [quickFilters, selectedFilters, mergeQuickFilterWithAdvancedFilters, updateFilter, isAdvancedFilters])
+
+  const handleAdvancedFilterChange = useCallback((filterCode: string, value: any) => {
+    updateFilter({ [filterCode]: value })
+  }, [updateFilter])
+
+  const handleZoneSelect = useCallback((result: any) => {
+    if (!result) {
+      updateFilter({ zone: null })
+    } else if (result.id) {
+      updateFilter({
+        zone: {
+          uuid: result.id,
+          name: result.metadata?.zone?.name || '',
+          code: result.metadata?.zoneCode || '',
+          type: result.metadata?.zoneType || 'custom'
+        }
+      })
     }
-  }
+  }, [updateFilter])
 
-  const handleFilterChange = (newFilters: SelectedFiltersType) => {
-    setTempSelectedFilters(newFilters)
-  }
+  const handleZoneAndCommitteeReset = useCallback(() => {
+    updateFilter({ zone: null, committee: null })
+  }, [updateFilter])
+
+  const handleAdvancedFiltersToggle = useCallback(() => {
+    setIsAdvancedFilters(!isAdvancedFilters)
+  }, [isAdvancedFilters])
 
   const Header = useCallback(() => {
     return (
       <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderColor="$gray1" padding="$medium">
         <Text.LG semibold>Destinataires</Text.LG>
         <XStack gap="$small">
-          <VoxButton onPress={handleConfirmSelection} theme="blue" variant="soft" iconLeft={Save} size="sm">
+          <VoxButton onPress={handleCloseModal} theme="blue" variant="soft" iconLeft={Save} size="sm">
             Terminé
           </VoxButton>
         </XStack>
       </XStack>
     )
-  }, [handleConfirmSelection])
+  }, [handleCloseModal])
 
   return (
     <>
@@ -116,18 +225,7 @@ export default function SelectFilters({
             <SF.Label>Destinataires</SF.Label>
             <SF.ValueContainer alignItems="flex-end">
               <SF.Text>
-                {selectedQuickFilterId
-                  ? (() => {
-                    const item = quickFilters.find(d => d.value === selectedQuickFilterId)
-                    return item ? item.label : 'Sélectionné'
-                  })()
-                  : (() => {
-                    const nonNullFilters = Object.entries(selectedFilters).filter(([_, value]) => value !== null && value !== undefined)
-                    return nonNullFilters.length > 0
-                      ? `${nonNullFilters.length} filtre${nonNullFilters.length > 1 ? 's' : ''} avancé${nonNullFilters.length > 1 ? 's' : ''}`
-                      : 'Sélectionner'
-                  })()
-                }
+                {displayText}
               </SF.Text>
               {isFetchingMessageCountRecipients ? (
                 <YStack marginBottom={2} marginHorizontal={2}>
@@ -187,50 +285,75 @@ export default function SelectFilters({
             </YStack>
 
             <YStack gap="$small" w="100%">
-              <SF.Props themedText={false}>
-                <SF
-                  theme="gray"
-                  size="lg"
-                  onPress={() => {
-                    AlertUtils.showSimpleAlert('En cours de développement', 'Prochainement, vous pourrez sélectionner des zones comme des circonscriptions, des communes, etc...', 'Retour', 'OK', () => { })
-                  }}
-                  error={false}
-                  disabled={false}
-                >
-                  <SF.Container>
-                    <SF.Label>Zone géographique</SF.Label>
-                    <SF.ValueContainer>
-                      <SF.Text>
-                        {selectedFilters.zones?.[0]?.name ? selectedFilters.zones[0].name : 'Votre zone géographique'}
-                      </SF.Text>
-                    </SF.ValueContainer>
-                  </SF.Container>
-                </SF>
-              </SF.Props>
+              <GlobalSearch
+                provider={zoneProvider}
+                onSelect={handleZoneSelect}
+                onReset={handleZoneAndCommitteeReset}
+                placeholder="Zone géographique"
+                scope={scope}
+                defaultValue={zoneDefaultValue}
+                nullable={!!selectedFilters.committee && !!selectedFilters.zone}
+                helpText={<Text.SM><Text.SM semibold>Toutes les zones inclues dans votre zone de gestion sont filtrables. </Text.SM> Exemple :  Circonscriptions, Cantons, Communauté de communes, Communes et Bureaux de vote.</Text.SM>}
+              />
               <Text.SM secondary>Ciblez votre publication géographiquement (Circonscriptions, communes, etc.)</Text.SM>
             </YStack>
-            <YStack gap="$small">
-
-            </YStack>
-            <XStack alignItems="center" gap="$small">
-              <Text.MD secondary>Filtres militants</Text.MD>
-              <YStack h={1} flexGrow={1} mt={2} bg="$textOutline" />
-            </XStack>
-            <YStack gap="$small">
-              {quickFilters.map((item) => {
-                const state = getItemState(item.value, tempSelectedQuickFilter, quickFilters)
-                return (
-                  <SelectFiltersItem
-                    key={item.value}
-                    label={item.label}
-                    count={item.count}
-                    state={state}
-                    onPress={() => handleItemSelection(item.value, !!selectedQuickFilterId)}
-                    type={item.type}
+            <YStack gap="$small" marginVertical="$small">
+              <XStack alignItems="center" gap="$xsmall" justifyContent="flex-end">
+                <Text.MD color="$blue6" semibold onPress={handleAdvancedFiltersToggle}>Filtres avancés</Text.MD>
+                <XStack alignItems="center" gap="$small">
+                  <SwitchV2
+                    checked={isAdvancedFilters}
+                    onPress={handleAdvancedFiltersToggle}
                   />
-                )
-              })}
+                </XStack>
+              </XStack>
             </YStack>
+            {isAdvancedFilters ? (
+              <AdvancedFilters
+                scope={scope}
+                selectedFilters={selectedFilters}
+                onFilterChange={handleAdvancedFilterChange}
+              />
+            ) : (
+              <>
+                <QuickFilter
+                  quickFilters={quickFilters}
+                  selectedQuickFilterId={selectedQuickFilterId}
+                  onItemSelection={handleQuickFilterSelection}
+                />
+                <XStack alignItems="center" gap="$small">
+                  <Text.MD secondary>Filtres circonstanciels</Text.MD>
+                  <YStack h={1} flexGrow={1} mt={2} bg="$textOutline" />
+                </XStack>
+                <YStack gap="$small">
+                  <SelectQuickFiltersItem
+                    label="Inscrits à la rentrée"
+                    state={selectedFilters.static_tags === "national_event:rentree-2025" ? "selected" : "default"}
+                    onPress={() => {
+                      if (selectedFilters.static_tags === "national_event:rentree-2025") {
+                        handleAdvancedFilterChange("static_tags", null)
+                      } else {
+                        handleAdvancedFilterChange("static_tags", "national_event:rentree-2025")
+                      }
+                    }}
+                    type="radio"
+                  />
+                  <SelectQuickFiltersItem
+                    label="Non-inscrits à la rentrée"
+                    state={selectedFilters.static_tags === "!national_event:rentree-2025" ? "selected" : "default"}
+                    onPress={() => {
+                      if (selectedFilters.static_tags === "!national_event:rentree-2025") {
+                        handleAdvancedFilterChange("static_tags", null)
+                      } else {
+                        handleAdvancedFilterChange("static_tags", "!national_event:rentree-2025")
+                      }
+                    }}
+                    type="radio"
+                  />
+                </YStack>
+              </>
+
+            )}
           </YStack>
         </YStack>
 

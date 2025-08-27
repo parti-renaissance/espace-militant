@@ -17,6 +17,9 @@ import BigSwitch from '@/components/base/BigSwitch'
 import { RestAvailableSender } from '@/services/publications/schema'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import QuitConfirmModal from '../../components/QuitConfirmModal'
+import { useAutoSave } from '../../components/Editor/hooks/useAutoSave'
+import { AutoSaveErrorIndicator } from '../../components/Editor/AutoSaveErrorIndicator'
+import Error404 from '@/components/404/Error404'
 
 const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const editorRef = useRef<MessageEditorRef>(null)
@@ -44,8 +47,8 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   }, [props?.messageId, props?.scope])
 
   const { data: messageFiltersData, isLoading: isMessageFiltersLoading } = useGetMessageFilters(messageQueryParams)
-  const { data: messageData, isLoading: isMessageLoading } = useGetMessage(messageQueryParams)
-  const { data: messageContent, isLoading: isMessageContentLoading, isError: isMessageContentError } = useGetMessageContent(messageQueryParams)
+  const { data: messageData, isLoading: isMessageLoading, error: messageError } = useGetMessage(messageQueryParams)
+  const { data: messageContent, isLoading: isMessageContentLoading, error: messageContentError } = useGetMessageContent(messageQueryParams)
 
   const availableSendersQueryParams = useMemo(() => ({
     scope: messageData?.author.scope ?? props?.scope ?? ''
@@ -60,6 +63,23 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   }, [messageData?.sender, availableSenders])
 
   const isInitialLoading = !wasInitiallyInCreation && (isMessageLoading || isSendersLoading || isMessageContentLoading || isMessageFiltersLoading)
+
+  // Hook de sauvegarde automatique
+  const { 
+    debouncedSave, 
+    immediateSave,
+    isPending: isAutoSaving,
+    lastSaved,
+    hasError,
+    createdMessageId,
+  } = useAutoSave({
+    messageId: currentMessageId,
+    scope: props?.scope ?? '',
+  })
+
+  if (messageError || messageContentError) {
+    return <Error404 />
+  }
 
   const handleSubmit = () => {
     modalSendRef.current?.present()
@@ -77,26 +97,31 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
 
   return (
     <>
-      <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} />
+      <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} messageId={currentMessageId} scope={props?.scope} />
       <StickyBox webOnly style={{ zIndex: 10 }}>
         <YStack $gtSm={{ overflow: 'hidden', zIndex: 10 }}>
           <VoxHeader>
-            <XStack alignItems="center" flex={1} width="100%">
-              <XStack alignContent="flex-start">
+            <XStack flex={1} alignItems="center" justifyContent="center" width="100%">
+              <XStack flex={1} alignContent="flex-start" w={100}>
                 <VoxButton
                   size="lg"
                   variant="text"
-                  theme={!props?.messageId ? 'orange' : undefined}
+                  theme={isAutoSaving ? 'blue' : (!props?.messageId ? 'orange' : undefined)}
                   onPress={props?.messageId && !displayQuitModal ? () => setDisplayQuitModal(true) : handleQuit}
-                  disabled={isInitialLoading}
+                  disabled={isInitialLoading || isAutoSaving}
+                  loading={isAutoSaving}
                 >
-                  {props?.messageId ? 'Quitter' : 'Annuler'}
+                  {isAutoSaving ? 'Sauvegarde' : (props?.messageId ? 'Quitter' : 'Annuler')}
                 </VoxButton>
+                <AutoSaveErrorIndicator
+                  hasError={hasError}
+                />
+                
               </XStack>
-              <XStack flexGrow={1} justifyContent="center">
-                <VoxHeader.Title icon={media.gtSm ? Speech : undefined}>Nouvelle publication</VoxHeader.Title>
+              <XStack maxWidth={520} justifyContent="center">
+                <VoxHeader.Title icon={media.gtSm ? Speech : undefined}>{media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
               </XStack>
-              <XStack>
+              <XStack flex={1} justifyContent="flex-end" w={100}>
                 <VoxButton
                   size="lg"
                   loading={messageQuery.isPending}
@@ -173,6 +198,9 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
                 }}
                 sender={selectedSender as RestAvailableSender}
                 messageFilters={messageFiltersData}
+                onDebouncedSave={debouncedSave}
+                onImmediateSave={immediateSave}
+                createdMessageId={createdMessageId}
               />
             </PageLayout.MainSingleColumn>
           </BoundarySuspenseWrapper>

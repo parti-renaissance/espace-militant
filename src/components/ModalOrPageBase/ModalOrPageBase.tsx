@@ -1,5 +1,5 @@
 import { MutableRefObject, PropsWithChildren, ReactNode } from 'react'
-import { Modal, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
+import { Modal, Pressable, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Spacing } from '@/styles'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
@@ -14,7 +14,7 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   shouldDisplayCloseButton?: boolean
   header?: ReactNode
   scrollable?: boolean
-  scrollRef?: MutableRefObject<ScrollView | null>
+  scrollRef?: MutableRefObject<React.ElementRef<typeof Sheet.ScrollView> | null>
   allowDrag?: boolean
   mobileBackdrop?: boolean
   snapPoints?: number[]
@@ -46,6 +46,11 @@ export default function ModalOrPageBase({
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
+        <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+          >
           <View style={styles.modalView}>
             {children}
             {shouldDisplayCloseButton
@@ -56,6 +61,7 @@ export default function ModalOrPageBase({
               ) : null
             }
           </View>
+          </ScrollView>
         </Pressable>
       </Modal>
     )
@@ -144,4 +150,9 @@ const styles = StyleSheet.create({
     elevation: 1,
     borderBottomColor: gray.gray2,
   },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 })

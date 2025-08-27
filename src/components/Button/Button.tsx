@@ -209,13 +209,14 @@ export default Button
 export type VoxButtonProps = {
   iconLeft?: NamedExoticComponent<IconProps>
   iconRight?: NamedExoticComponent<IconProps>
+  iconSize?: number
   textColor?: string
   loading?: boolean
   children?: string[] | string
 } & React.ComponentProps<typeof Button>
 
 export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
-  ({ children: child, shrink, iconLeft: IconLeft, iconRight: IconRight, onPress, textColor, ...props }, ref) => {
+  ({ children: child, shrink, iconLeft: IconLeft, iconRight: IconRight, onPress, textColor, iconSize, ...props }, ref) => {
     const children = shrink ? undefined : child
     const fnOnPress = props.asChip ? undefined : onPress
 
@@ -225,7 +226,7 @@ export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
       <Button {...props} onPress={fnOnPress} shrink={shrink} ref={ref} theme={props.theme ?? 'gray'} group>
         {IconLeft ? (
           <IconLeft
-            size={16}
+            size={iconSize ?? 16}
             color={textColor ?? (props.pop ? '$colorPop' : '$color')}
             $group-hover={{
               color: '$colorHover',
@@ -242,7 +243,7 @@ export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
         ) : null}
         {IconRight ? (
           <IconRight
-            size={16}
+            size={iconSize ?? 16}
             color={textColor ?? (props.pop ? '$colorPop' : '$color')}
             $group-hover={{
               color: '$colorHover',

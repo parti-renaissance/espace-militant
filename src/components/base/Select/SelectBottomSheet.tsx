@@ -3,11 +3,12 @@ import { Platform, TouchableOpacity } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet'
 import { YStack } from 'tamagui'
-import { DropdownItem } from '../Dropdown'
+import { DropdownItem, DropdownItemFrame } from '../Dropdown'
 import Input from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
 import { reactTextNodeChildrenToString } from './utils'
+import Text from '../Text'
 
 const MemoItem = React.memo(DropdownItem)
 
@@ -15,7 +16,7 @@ type BottomsheetLogicProps = {
   frameRef?: RefObject<ComponentRef<typeof TouchableOpacity>>
 } & SelectProps<string>
 
-const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({ options, searchableOptions, frameRef, resetable, ...props }, ref) => {
+const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({ options, searchableOptions, frameRef, resetable, nullableOption, ...props }, ref) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
   const { setQuery, filteredItems, queryInputRef, searchableIcon } = useSelectSearch({ options, searchableOptions })
   const insets = useSafeAreaInsets()
@@ -71,19 +72,53 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
           keyboardShouldPersistTaps="always"
           contentContainerStyle={{ paddingBottom: insets.bottom }}
           ListHeaderComponent={
-            props.searchable ? (
-              <YStack padding={16} bg="white">
-                <Input
-                  bottomSheetInput={Platform.OS === 'ios'}
-                  color="gray"
-                  ref={queryInputRef}
-                  onChangeText={setQuery}
-                  placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
-                  iconRight={searchableIcon}
-                  loading={searchableOptions?.isFetching}
-                />
-              </YStack>
-            ) : null
+            <YStack>
+              {props.searchable ? (
+                <YStack padding={16} bg="white">
+                  <Input
+                    bottomSheetInput={Platform.OS === 'ios'}
+                    color="gray"
+                    ref={queryInputRef}
+                    onChangeText={setQuery}
+                    placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
+                    iconRight={searchableIcon}
+                    loading={searchableOptions?.isFetching}
+                  />
+                </YStack>
+              ) : null}
+               {props.helpText ? (
+                <YStack p="$medium" bg="$textSurface" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                  {typeof props.helpText === 'string' ? (
+                    <Text.SM color="$textSecondary">{props.helpText}</Text.SM>
+                  ) : (
+                    props.helpText
+                  )}
+                </YStack>
+              ) : null}
+              {
+                searchableOptions?.noResults && searchableOptions?.isFetching === false ? (
+                  <DropdownItemFrame>
+                    <Text.MD secondary>{searchableOptions?.noResults}</Text.MD>
+                  </DropdownItemFrame>
+                ) : null
+              }
+              {
+                nullableOption && (
+                  <DropdownItemFrame onPress={() => {
+                    props.onChange?.(null)
+                    props.onDetailChange?.({
+                      value: '',
+                      label: '',
+                      subLabel: '',
+                    })
+                    handleClose()
+                    bottomSheetRef.current?.close()
+                  }}>
+                    <Text.MD secondary>{nullableOption}</Text.MD>
+                  </DropdownItemFrame>
+                )
+              }
+            </YStack>
           }
           data={filteredItems}
           keyExtractor={(item) => item.id}

@@ -94,13 +94,13 @@ export type RestMessageListItem = z.infer<typeof RestMessageListItemSchema>
 export type RestMessageListResponse = z.infer<typeof RestMessageListResponseSchema>
 
 export const RestMessageCountRecipientsResponseSchema = z.object({
-  push: z.number(),
-  email: z.number(),
-  push_email: z.number(),
-  only_push: z.number(),
-  only_email: z.number(),
-  contacts: z.number(),
-  total: z.number(),
+  push: z.number().optional(),
+  email: z.number().optional(),
+  push_email: z.number().optional(),
+  only_push: z.number().optional(),
+  only_email: z.number().optional(),
+  contacts: z.number().optional(),
+  total: z.number().optional(),
 })
 
 export type RestMessageCountRecipientsResponse = z.infer<typeof RestMessageCountRecipientsResponseSchema>
@@ -208,3 +208,63 @@ export const RestPutMessageFiltersRequestSchema = z.object({
 }).passthrough()
 
 export type RestPutMessageFiltersRequest = z.infer<typeof RestPutMessageFiltersRequestSchema>
+
+// Filter collection schemas
+export const RestFilterOptionChoicesSchema = z.record(z.string(), z.string())
+
+export const RestFilterOptionIntegerIntervalSchema = z.object({
+  first: z.object({
+    min: z.number(),
+    max: z.number(),
+  }),
+  second: z.object({
+    min: z.number(),
+    max: z.number(),
+  }),
+})
+
+export const RestFilterOptionZoneAutocompleteSchema = z.object({
+  url: z.string(),
+  query_param: z.string(),
+  value_param: z.string(),
+  label_param: z.string(),
+  multiple: z.boolean(),
+  required: z.boolean(),
+})
+
+export const RestFilterOptionSelectSchema = z.object({
+  choices: z.union([RestFilterOptionChoicesSchema, z.array(z.string())]),
+  multiple: z.boolean().optional(),
+  required: z.boolean().optional(),
+  favorite: z.boolean().optional(),
+  advanced: z.boolean().optional(),
+  placeholder: z.string().optional(),
+})
+
+export const RestFilterSchema = z.object({
+  code: z.string(),
+  label: z.string(),
+  options: z.union([
+    RestFilterOptionSelectSchema,
+    RestFilterOptionIntegerIntervalSchema,
+    RestFilterOptionZoneAutocompleteSchema,
+    z.null(),
+  ]),
+  type: z.enum(['select', 'text', 'integer_interval', 'date_interval', 'date', 'zone_autocomplete']),
+})
+
+export const RestFilterCategorySchema = z.object({
+  label: z.string(),
+  color: z.string(),
+  filters: z.array(RestFilterSchema),
+})
+
+export const RestFilterCollectionResponseSchema = z.array(RestFilterCategorySchema)
+
+export type RestFilterOptionChoices = z.infer<typeof RestFilterOptionChoicesSchema>
+export type RestFilterOptionIntegerInterval = z.infer<typeof RestFilterOptionIntegerIntervalSchema>
+export type RestFilterOptionZoneAutocomplete = z.infer<typeof RestFilterOptionZoneAutocompleteSchema>
+export type RestFilterOptionSelect = z.infer<typeof RestFilterOptionSelectSchema>
+export type RestFilter = z.infer<typeof RestFilterSchema>
+export type RestFilterCategory = z.infer<typeof RestFilterCategorySchema>
+export type RestFilterCollectionResponse = z.infer<typeof RestFilterCollectionResponseSchema>

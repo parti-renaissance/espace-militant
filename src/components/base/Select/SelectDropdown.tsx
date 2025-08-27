@@ -1,12 +1,13 @@
 import React, { ComponentRef, forwardRef, ReactNode, RefObject, useCallback, useImperativeHandle, useRef, useState } from 'react'
-import { FlatList, GestureResponderEvent, Modal, TouchableOpacity } from 'react-native'
+import { FlatList, GestureResponderEvent, Modal, Platform, TouchableOpacity } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { YStack } from 'tamagui'
-import { DropdownFrame, DropdownItem } from '../Dropdown'
+import { DropdownFrame, DropdownItem, DropdownItemFrame } from '../Dropdown'
 import Input from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
 import { reactTextNodeChildrenToString } from './utils'
+import Text from '../Text'
 
 type ModalDropDownProps = {
   children: ReactNode
@@ -43,7 +44,7 @@ const ModalDropDown = forwardRef<ModalDropDownRef, ModalDropDownProps>((props, r
 
   return (
     <Modal visible={isOpen} transparent animationType="fade" onRequestClose={handleClose}>
-      <TouchableOpacity style={{ flex: 1 }} onPress={handleBackDropClose}>
+      <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={handleBackDropClose}>
         {props.children}
       </TouchableOpacity>
     </Modal>
@@ -60,23 +61,43 @@ export type SelectDropdownRef = ModalDropDownRef & {
   setModalPosition: () => void
 }
 
-const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ frameRef, options, searchableOptions, resetable, ...props }, ref) => {
+const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ frameRef, options, searchableOptions, resetable, openAbove, searchable, nullableOption, ...props }, ref) => {
   const modalRef = useRef<ModalDropDownRef>(null)
   const dropdownTop = useSharedValue(0)
   const dropdownX = useSharedValue(0)
   const dropdownWidth = useSharedValue(0)
-  const { setQuery, filteredItems, queryInputRef, searchableIcon } = useSelectSearch({ options, searchableOptions })
+  const { setQuery, filteredItems, queryInputRef, searchableIcon, query } = useSelectSearch({ options, searchableOptions })
 
   const setModalPosition = useCallback(() => {
     frameRef.current?.measure((_fx, _fy, _w, h, _px, py) => {
       const isMinWidth = _w < MIN_WIDTH
       const x = isMinWidth ? _px - (MIN_WIDTH - _w) / 2 : _px
       const w = isMinWidth ? MIN_WIDTH : _w
-      dropdownTop.value = py + h
+
+      // Calculer la hauteur du dropdown en fonction du nombre d'options
+      const itemHeight = 48 // Hauteur approximative de chaque option
+      const headerHeight = searchable ? 56 : 0 // Hauteur de la barre de recherche si activée
+      const maxVisibleItems = 7 // Nombre maximum d'items visibles
+      const dropdownHeight = Math.min(
+        headerHeight + (Math.min(options.length, maxVisibleItems) * itemHeight),
+        325 // Hauteur maximale du dropdown
+      )
+
+      // Si openAbove est true, positionner le dropdown au-dessus du select
+      if (openAbove) {
+        if (Platform.OS === 'web') {
+          dropdownTop.value = Math.max(1, py - dropdownHeight)
+        } else {
+          dropdownTop.value = py - dropdownHeight
+        }
+      } else {
+        dropdownTop.value = Math.max(1, py + h)
+      }
+
       dropdownX.value = x
       dropdownWidth.value = w
     })
-  }, [])
+  }, [openAbove, searchable, options.length])
 
   useImperativeHandle(
     ref,
@@ -119,32 +140,70 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
       top: dropdownTop.value,
       left: dropdownX.value,
       width: dropdownWidth.value,
-      position: 'absolute',
-      maxHeight: 200,
+      position: Platform.OS === 'web' && openAbove ? 'fixed' : 'absolute',
+      maxHeight: 325,
     }
   })
+
   return (
     <>
       <ModalDropDown onClose={handleClose} ref={modalRef}>
         <Animated.View style={[dropDownAnimatedStyle]}>
           <DropdownFrame width="100%">
             <FlatList
-              stickyHeaderHiddenOnScroll={props.searchable}
-              stickyHeaderIndices={props.searchable ? [0] : undefined}
+              stickyHeaderHiddenOnScroll={searchable}
+              stickyHeaderIndices={searchable ? [0] : undefined}
+              contentContainerStyle={{
+                maxHeight: 325,
+              }}
               ListHeaderComponent={
-                props.searchable ? (
-                  <YStack padding={8} bg="white" borderBottomColor="$textOutline" borderBottomWidth={1}>
-                    <Input
-                      ref={queryInputRef}
-                      size="sm"
-                      color="gray"
-                      onChangeText={setQuery}
-                      placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
-                      iconRight={searchableIcon}
-                      loading={searchableOptions?.isFetching}
-                    />
-                  </YStack>
-                ) : null
+                <YStack>
+                  {searchable ? (
+                    <YStack padding={8} bg="white" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                      <Input
+                        ref={queryInputRef}
+                        size="sm"
+                        color="gray"
+                        onChangeText={setQuery}
+                        placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
+                        iconRight={searchableIcon}
+                        loading={searchableOptions?.isFetching}
+                      />
+                    </YStack>
+                  ) : null}
+                  {props.helpText ? (
+                    <YStack p="$medium" bg="$textSurface" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                      {typeof props.helpText === 'string' ? (
+                        <Text.SM secondary>{props.helpText}</Text.SM>
+                      ) : (
+                        props.helpText
+                      )}
+                    </YStack>
+                  ) : null}
+                  {
+                    searchableOptions?.noResults && searchableOptions?.isFetching === false ? (
+                      <DropdownItemFrame>
+                        <Text.MD secondary>{searchableOptions?.noResults}</Text.MD>
+                      </DropdownItemFrame>
+                    ) : null
+                  }
+                  {
+                    nullableOption && (
+                      <DropdownItemFrame onPress={() => {
+                        props.onChange?.(null)
+                        props.onDetailChange?.({
+                          value: '',
+                          label: '',
+                          subLabel: '',
+                        })
+                        handleClose()
+                        modalRef.current?.close()
+                      }}>
+                        <Text.MD secondary>{nullableOption}</Text.MD>
+                      </DropdownItemFrame>
+                    )
+                  }
+                </YStack>
               }
               data={filteredItems}
               keyExtractor={(item) => item.id}

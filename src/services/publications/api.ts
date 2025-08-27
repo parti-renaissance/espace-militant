@@ -104,3 +104,21 @@ export const putMessageFilters = (props: { messageId: string; payload: schemas.R
     responseSchema: z.literal('OK'),
     type: 'private',
   })(props.payload)
+
+export const getFilterCollection = (props: { scope: string }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/filters?scope=${props.scope}&feature=publications`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestFilterCollectionResponseSchema,
+    type: 'private',
+  })()
+
+export const deleteMessage = (props: { messageId: string; scope: string }) =>
+  api({
+    method: 'delete',
+    path: `/api/v3/adherent_messages/${props.messageId}?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: z.void(),
+    type: 'private',
+  })()

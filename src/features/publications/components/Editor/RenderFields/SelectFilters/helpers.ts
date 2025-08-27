@@ -149,6 +149,13 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
 
     const nonQuickFilterFields = allFields.filter(field => !quickFilterFields.includes(field))
     const hasNullNonQuickFilterFields = nonQuickFilterFields.every(field => {
+      if (field === 'static_tags') {
+        const staticTagsValue = filters[field]
+        if (staticTagsValue === 'national_event:rentree-2025' || staticTagsValue === '!national_event:rentree-2025') {
+          return true
+        }
+      }
+      
       return filters[field] === null || filters[field] === undefined
     })
 
@@ -158,8 +165,8 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
   return matchingQuickFilter?.value || null
 }
 
-export const getItemState = (itemId: string, tempSelectedQuickFilter: string | null, quickFilters: HierarchicalQuickFilterType[]) => {
-  const isSelected = tempSelectedQuickFilter === itemId
+export const getItemState = (itemId: string, selectedQuickFilterId: string | null, quickFilters: HierarchicalQuickFilterType[]) => {
+  const isSelected = selectedQuickFilterId === itemId
 
   if (isSelected) {
     return 'selected'
@@ -169,7 +176,7 @@ export const getItemState = (itemId: string, tempSelectedQuickFilter: string | n
 
   if (item && item.parentId) {
     const checkParentSelection = (currentParentId: string): boolean => {
-      const parentSelected = tempSelectedQuickFilter === currentParentId
+      const parentSelected = selectedQuickFilterId === currentParentId
       if (parentSelected) {
         return true
       }

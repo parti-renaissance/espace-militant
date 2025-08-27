@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { MatomoDefaultRequestSchema, MatomoDefaultResponseSchema, MatomoEventRequestSchema } from './schema'
 
 const instance = axios.create({
-  baseURL: 'https://matomo.parti-renaissance.fr/matomo.php',
+  baseURL: 'https://edge.parti-renaissance.fr/m.php',
 })
 
 export const matomoApi =
@@ -13,7 +13,6 @@ export const matomoApi =
   (payload: z.infer<z.ZodObject<Request>> & { userId?: string }) =>
     createApi({ authInstance: instance, publicInstance: instance })({
       path: '',
-      useParams: true,
       requestSchema: MatomoDefaultRequestSchema(requestSchema),
       responseSchema: MatomoDefaultResponseSchema,
       method: 'POST',
