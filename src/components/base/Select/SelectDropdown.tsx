@@ -197,6 +197,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
                           subLabel: '',
                         })
                         handleClose()
+                        modalRef.current?.close()
                       }}>
                         <Text.MD secondary>{nullableOption}</Text.MD>
                       </DropdownItemFrame>
