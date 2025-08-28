@@ -1,4 +1,4 @@
-import { NamedExoticComponent } from 'react'
+import { NamedExoticComponent, ComponentProps } from 'react'
 import Text from '@/components/base/Text'
 import { IconProps } from '@tamagui/helpers-icon'
 import { ChevronsUpDown, X } from '@tamagui/lucide-icons'
@@ -159,20 +159,29 @@ const SelectLabel = styled(Text.MD, {
   } as const,
 })
 
-export const SelectTextValue = styled(Text.MD, {
-  context: SelectContext,
-  numberOfLines: 1,
-  variants: {
-    themedText: {
-      true: {
-        color: '$color6',
-      },
-      false: {
-        color: '$textPrimary',
-      },
-    },
-  } as const,
-})
+export const SelectTextValue = ({ children, themedText, placeholder, ...props }: ComponentProps<typeof Text.MD> & { themedText?: boolean, placeholder?: boolean }) => {
+  const ctx = SelectContext.useStyledContext()
+  const isThemed = themedText ?? ctx.themedText
+  
+  let color: string
+  
+  if (isThemed) {
+    color = placeholder ? '$color4' : '$color6'
+  } else {
+    color = placeholder ? '$gray4' : '$textPrimary'
+  }
+  
+  return (
+    <Text.MD 
+      numberOfLines={1} 
+      color={color}
+      fontWeight={placeholder ? '400' : '500'}
+      {...props}
+    >
+      {children}
+    </Text.MD>
+  )
+}
 
 const SelectIconValue = ({ icon, themedText }: { icon: NamedExoticComponent<IconProps>; themedText?: boolean }) => {
   const ctx = SelectContext.useStyledContext()

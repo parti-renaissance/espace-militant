@@ -61,6 +61,12 @@ export default function SelectFilters({
     } else {
       // En mode filtres rapides : on réinitialise les filtres avancés non protégés
       const protectedFilters = ['zone', 'zones', 'committee']
+      
+      // Protéger static_tags si sa valeur est liée à la rentrée
+      if (currentFilters.static_tags === 'national_event:rentree-2025' || currentFilters.static_tags === '!national_event:rentree-2025') {
+        protectedFilters.push('static_tags')
+      }
+      
       protectedFilters.forEach(filterKey => {
         if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
           mergedFilters[filterKey] = currentFilters[filterKey]
@@ -127,6 +133,12 @@ export default function SelectFilters({
     }
 
     const excludedFilters = ['zone', 'zones', 'committee']
+    
+    // Exclure static_tags s'il est protégé (lié à la rentrée)
+    if (selectedFilters.static_tags === 'national_event:rentree-2025' || selectedFilters.static_tags === '!national_event:rentree-2025') {
+      excludedFilters.push('static_tags')
+    }
+    
     const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) =>
       value !== null && value !== undefined && !excludedFilters.includes(key)
     )

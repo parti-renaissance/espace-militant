@@ -61,7 +61,7 @@ export type SelectDropdownRef = ModalDropDownRef & {
   setModalPosition: () => void
 }
 
-const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ frameRef, options, searchableOptions, resetable, openAbove, searchable, ...props }, ref) => {
+const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ frameRef, options, searchableOptions, resetable, openAbove, searchable, nullableOption, ...props }, ref) => {
   const modalRef = useRef<ModalDropDownRef>(null)
   const dropdownTop = useSharedValue(0)
   const dropdownX = useSharedValue(0)
@@ -158,35 +158,51 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
               }}
               ListHeaderComponent={
                 <YStack>
-                {searchable ? (
-                  <YStack padding={8} bg="white" borderBottomColor="$textOutline" borderBottomWidth={1}>
-                    <Input
-                      ref={queryInputRef}
-                      size="sm"
-                      color="gray"
-                      onChangeText={setQuery}
-                      placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
-                      iconRight={searchableIcon}
-                      loading={searchableOptions?.isFetching}
-                    />
-                  </YStack>
-                ) : null}
-                {props.helpText ? (
-                  <YStack p="$medium" bg="$textSurface" borderBottomColor="$textOutline" borderBottomWidth={1}>
-                    {typeof props.helpText === 'string' ? (
-                      <Text.SM color="$textSecondary">{props.helpText}</Text.SM>
-                    ) : (
-                      props.helpText
-                    )}
-                  </YStack>
-                ) : null}
-                {
-                  searchableOptions?.noResults && searchableOptions?.isFetching === false ? (
-                    <DropdownItemFrame>
-                      <Text.SM color="$textSecondary">{searchableOptions?.noResults}</Text.SM>
-                    </DropdownItemFrame>
-                  ) : null
-                }
+                  {searchable ? (
+                    <YStack padding={8} bg="white" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                      <Input
+                        ref={queryInputRef}
+                        size="sm"
+                        color="gray"
+                        onChangeText={setQuery}
+                        placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
+                        iconRight={searchableIcon}
+                        loading={searchableOptions?.isFetching}
+                      />
+                    </YStack>
+                  ) : null}
+                  {props.helpText ? (
+                    <YStack p="$medium" bg="$textSurface" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                      {typeof props.helpText === 'string' ? (
+                        <Text.SM secondary>{props.helpText}</Text.SM>
+                      ) : (
+                        props.helpText
+                      )}
+                    </YStack>
+                  ) : null}
+                  {
+                    searchableOptions?.noResults && searchableOptions?.isFetching === false ? (
+                      <DropdownItemFrame>
+                        <Text.MD secondary>{searchableOptions?.noResults}</Text.MD>
+                      </DropdownItemFrame>
+                    ) : null
+                  }
+                  {
+                    nullableOption && (
+                      <DropdownItemFrame onPress={() => {
+                        props.onChange?.(null)
+                        props.onDetailChange?.({
+                          value: '',
+                          label: '',
+                          subLabel: '',
+                        })
+                        handleClose()
+                        modalRef.current?.close()
+                      }}>
+                        <Text.MD secondary>{nullableOption}</Text.MD>
+                      </DropdownItemFrame>
+                    )
+                  }
                 </YStack>
               }
               data={filteredItems}

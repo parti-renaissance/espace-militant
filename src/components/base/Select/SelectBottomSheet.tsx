@@ -16,7 +16,7 @@ type BottomsheetLogicProps = {
   frameRef?: RefObject<ComponentRef<typeof TouchableOpacity>>
 } & SelectProps<string>
 
-const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({ options, searchableOptions, frameRef, resetable, ...props }, ref) => {
+const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({ options, searchableOptions, frameRef, resetable, nullableOption, ...props }, ref) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
   const { setQuery, filteredItems, queryInputRef, searchableIcon } = useSelectSearch({ options, searchableOptions })
   const insets = useSafeAreaInsets()
@@ -98,9 +98,25 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
               {
                 searchableOptions?.noResults && searchableOptions?.isFetching === false ? (
                   <DropdownItemFrame>
-                    <Text.SM color="$textSecondary">{searchableOptions?.noResults}</Text.SM>
+                    <Text.MD secondary>{searchableOptions?.noResults}</Text.MD>
                   </DropdownItemFrame>
                 ) : null
+              }
+              {
+                nullableOption && (
+                  <DropdownItemFrame onPress={() => {
+                    props.onChange?.(null)
+                    props.onDetailChange?.({
+                      value: '',
+                      label: '',
+                      subLabel: '',
+                    })
+                    handleClose()
+                    bottomSheetRef.current?.close()
+                  }}>
+                    <Text.MD secondary>{nullableOption}</Text.MD>
+                  </DropdownItemFrame>
+                )
               }
             </YStack>
           }
