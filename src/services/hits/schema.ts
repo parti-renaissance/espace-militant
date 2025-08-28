@@ -1,0 +1,35 @@
+import { z } from 'zod'
+
+export const EVENT_TYPES = ['activity_session', 'impression', 'open', 'click'] as const
+export type EventType = (typeof EVENT_TYPES)[number]
+
+export const OBJECT_TYPES = ['publication', 'evenement', 'action', 'alerte', 'ressource', 'questionnaire'] as const
+export type ObjectType = (typeof OBJECT_TYPES)[number]
+
+export type AppSystem = 'ios' | 'android' | 'web'
+
+const BaseHitSchema = z.object({
+  event_type: z.enum(EVENT_TYPES),
+  activity_session_uuid: z.string(),
+  app_date: z.string(),
+  app_version: z.string(),
+  app_system: z.enum(['ios', 'android', 'web']),
+  user_agent: z.string().optional(),
+})
+
+export const ActivitySessionHitSchema = BaseHitSchema.extend({
+  event_type: z.literal('activity_session'),
+}).strip()
+
+export const ObjectHitSchema = BaseHitSchema.extend({
+  event_type: z.union([z.literal('impression'), z.literal('open'), z.literal('click')]),
+  object_type: z.enum(OBJECT_TYPES),
+  object_id: z.string().optional(),
+  source: z.string().optional(),
+}).strip()
+
+export const HitPayloadSchema = z.union([ActivitySessionHitSchema, ObjectHitSchema])
+
+export type HitPayload = z.infer<typeof HitPayloadSchema>
+
+
