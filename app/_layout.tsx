@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import WaitingScreen from '@/components/WaitingScreen'
 import { SessionProvider, useSession } from '@/ctx/SessionProvider'
@@ -20,6 +20,7 @@ import { BlurView } from 'expo-blur'
 import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { isWeb, ViewProps } from 'tamagui'
+import { useHits } from '@/services/hits/hook'
 
 if (isWeb) {
   require('@tamagui/core/reset.css')
@@ -45,7 +46,9 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
   useInitMatomo()
   useDeepLinkHandler()
 
-  const { isLoading } = useSession()
+  const { isLoading, isAuth } = useSession()
+  const { trackActivitySession } = useHits()
+  const didStartRef = useRef(false)
   const { isAvailable: isUpdateAvailable, isError: isUpdateError } = useCheckStoreUpdate()
   const { isAvailable: isExpoUpdateAvailable, isError: isExpoUpdateError, isProcessing: isExpoUpdateProcessing } = useCheckExpoUpdate()
 
@@ -54,6 +57,13 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
   if (!props.isLoading) {
     SplashScreen.hideAsync()
   }
+
+  useEffect(() => {
+    if (isAuth && !didStartRef.current) {
+      didStartRef.current = true
+      trackActivitySession()
+    }
+  }, [isAuth, trackActivitySession])
 
   if (isLoading) {
     return <WaitingScreen />
