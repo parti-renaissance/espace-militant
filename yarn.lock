@@ -7115,7 +7115,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tamagui/babel-plugin@npm:^1.98.0":
+"@tamagui/babel-plugin@npm:^1.132.23":
   version: 1.132.23
   resolution: "@tamagui/babel-plugin@npm:1.132.23"
   dependencies:
@@ -7279,7 +7279,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tamagui/config@npm:^1.98.0":
+"@tamagui/config@npm:^1.132.23":
   version: 1.132.23
   resolution: "@tamagui/config@npm:1.132.23"
   dependencies:
@@ -7684,7 +7684,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tamagui/lucide-icons@npm:^1.98.0":
+"@tamagui/lucide-icons@npm:^1.132.23":
   version: 1.132.23
   resolution: "@tamagui/lucide-icons@npm:1.132.23"
   dependencies:
@@ -7697,7 +7697,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tamagui/metro-plugin@npm:^1.98.0":
+"@tamagui/metro-plugin@npm:^1.132.23":
   version: 1.132.23
   resolution: "@tamagui/metro-plugin@npm:1.132.23"
   dependencies:
@@ -8277,7 +8277,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tamagui/toast@npm:^1.98.0":
+"@tamagui/toast@npm:^1.132.23":
   version: 1.132.23
   resolution: "@tamagui/toast@npm:1.132.23"
   dependencies:
@@ -27500,7 +27500,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tamagui@npm:^1.98.0":
+"tamagui@npm:^1.132.23":
   version: 1.132.23
   resolution: "tamagui@npm:1.132.23"
   dependencies:
@@ -28931,11 +28931,11 @@ __metadata:
     "@storybook/addon-ondevice-actions": "npm:^7.6.16"
     "@storybook/addon-ondevice-controls": "npm:^7.6.16"
     "@storybook/react-native": "npm:^7.6.16"
-    "@tamagui/babel-plugin": "npm:^1.98.0"
-    "@tamagui/config": "npm:^1.98.0"
-    "@tamagui/lucide-icons": "npm:^1.98.0"
-    "@tamagui/metro-plugin": "npm:^1.98.0"
-    "@tamagui/toast": "npm:^1.98.0"
+    "@tamagui/babel-plugin": "npm:^1.132.23"
+    "@tamagui/config": "npm:^1.132.23"
+    "@tamagui/lucide-icons": "npm:^1.132.23"
+    "@tamagui/metro-plugin": "npm:^1.132.23"
+    "@tamagui/toast": "npm:^1.132.23"
     "@tanstack/react-query": "npm:^5.74.4"
     "@testing-library/jest-native": "npm:^5.4.3"
     "@testing-library/react-native": "npm:^12.4.3"
@@ -29041,7 +29041,7 @@ __metadata:
     react-stickynode: "npm:^4.1.1"
     react-style-stringify: "npm:^1.1.0"
     react-test-renderer: "npm:18.1.0"
-    tamagui: "npm:^1.98.0"
+    tamagui: "npm:^1.132.23"
     timezones-list: "npm:^3.1.0"
     tinycolor2: "npm:^1.6.0"
     tsx: "npm:^4.20.5"
