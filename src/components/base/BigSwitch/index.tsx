@@ -23,7 +23,7 @@ export const SwitchGroupZone = styled(ThemeableStack, {
 
   cursor: 'pointer',
 
-  '$group-hover': { backgroundColor: '$blue1' },
+  // '$group-hover': { backgroundColor: '$blue1' }, // Disabled for Expo 53 compatibility
   backgroundColor: '$white1',
 
   disabledStyle: {
@@ -86,7 +86,7 @@ export const SwitchGroupIndicator = styled(ThemeableStack, {
 
 export type OptionsTuple = [{ label: string; value: string }, { label: string; value: string }]
 
-export default forwardRef<ComponentRef<typeof SwitchGroupZone>, { options: OptionsTuple; onChange: (x: string) => void; value: string }>(function BigSwitch(
+const BigSwitchOld = forwardRef<ComponentRef<typeof SwitchGroupZone>, { options: OptionsTuple; onChange: (x: string) => void; value: string }>(function BigSwitch(
   { options, onChange, value },
   ref,
 ) {
@@ -113,3 +113,31 @@ export default forwardRef<ComponentRef<typeof SwitchGroupZone>, { options: Optio
     </SwitchGroupZone>
   )
 })
+
+
+const BigSwitch = ({ options, value, onChange }: { options: OptionsTuple; value: string; onChange: (x: string) => void }) => {
+  return (
+    <XStack
+      flex={1}
+      height={44}
+      borderRadius={999}
+      borderWidth={1}
+      borderColor="$textOutline"
+      backgroundColor="$white1"
+      onPress={() => onChange(value === options[0].value ? options[1].value : options[0].value)}
+    >
+      <XStack flex={1} alignItems="center" justifyContent="center">
+        <Text color={value === options[0].value ? '$blue5' : '$textDisabled'} fontWeight="600">
+          {options[0].label}
+        </Text>
+      </XStack>
+      <XStack flex={1} alignItems="center" justifyContent="center">
+        <Text color={value === options[1].value ? '$blue5' : '$textDisabled'} fontWeight="600">
+          {options[1].label}
+        </Text>
+      </XStack>
+    </XStack>
+  )
+}
+
+export default BigSwitch

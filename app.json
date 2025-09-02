@@ -88,8 +88,6 @@
         }
       ],
       "expo-localization",
-      "@react-native-firebase/app",
-      "@react-native-firebase/messaging",
       "expo-secure-store",
       [
         "expo-build-properties",
@@ -116,7 +114,9 @@
         {
           "calendarPermission": "Autorisez $(PRODUCT_NAME) à ajouter des événements à votre calendrier"
         }
-      ]
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging"
     ],
     "extra": {
       "eas_update_version": "6",
