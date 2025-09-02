@@ -2,8 +2,7 @@ import { SearchProvider, SearchResult } from '../types'
 import { MapPin } from '@tamagui/lucide-icons'
 import { getPlaceAutocomplete, getPlaceDetails } from '@/services/search/api'
 import googleAddressMapper from '@/data/mapper/googleAddressMapper'
-import { NamedExoticComponent } from 'react'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { GoogleAddressPlaceResult } from '@/data/network/ApiService'
 
 export class AddressProvider implements SearchProvider {
@@ -60,8 +59,8 @@ export class AddressProvider implements SearchProvider {
     return query.length >= 3 && /[a-zA-Z]/.test(query)
   }
 
-  getIcon(): NamedExoticComponent<IconProps> {
-    return MapPin as NamedExoticComponent<IconProps>
+  getIcon(): IconComponent {
+    return MapPin as IconComponent
   }
 
   getPlaceholder(): string {

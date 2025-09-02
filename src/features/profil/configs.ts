@@ -1,11 +1,10 @@
-import { NamedExoticComponent } from 'react'
 import { RestProfilResponse } from '@/services/profile/schema'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { CircleUser, HeartHandshake, HelpingHand, KeyRound, LandPlot, MessageCircle, Settings2, Sparkle, TreeDeciduous } from '@tamagui/lucide-icons'
 
 export type PageConfig = {
   title: string
-  icon: NamedExoticComponent<IconProps>
+  icon: IconComponent
   hiddenInMenu?: boolean | ((profile?: RestProfilResponse) => boolean)
 }
 

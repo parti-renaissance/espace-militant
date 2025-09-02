@@ -1,6 +1,6 @@
-import { NamedExoticComponent, ComponentProps } from 'react'
+import { ComponentProps } from 'react'
 import Text from '@/components/base/Text'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { ChevronsUpDown, X } from '@tamagui/lucide-icons'
 import { GestureReponderEvent } from '@tamagui/web'
 import { createStyledContext, styled, useGetThemedIcon, View, withStaticProperties, XStack, XStackProps } from 'tamagui'
@@ -104,7 +104,7 @@ const SelectFrame = styled(XStack, {
   },
 })
 
-const SelectIconContainer = ({ icon, themedText }: { icon: NamedExoticComponent<IconProps>; themedText?: boolean }) => {
+const SelectIconContainer = ({ icon, themedText }: { icon: IconComponent; themedText?: boolean }) => {
   const ctx = SelectContext.useStyledContext()
   const isThemed = ctx.themedText || themedText
   const getIcon = useGetThemedIcon({ color: isThemed ? '$color4' : '$gray4', size: 20, })
@@ -114,7 +114,7 @@ const SelectIconContainer = ({ icon, themedText }: { icon: NamedExoticComponent<
 const SelectFrameContainer = XStack.styleable<
   XStackProps & {
     resetable?: boolean
-    icon?: NamedExoticComponent<IconProps>
+    icon?: IconComponent
     onResetPress?: (e: GestureReponderEvent) => void
   }
 >(({ resetable, onResetPress, icon, ...props }, ref) => {
@@ -183,7 +183,7 @@ export const SelectTextValue = ({ children, themedText, placeholder, ...props }:
   )
 }
 
-const SelectIconValue = ({ icon, themedText }: { icon: NamedExoticComponent<IconProps>; themedText?: boolean }) => {
+const SelectIconValue = ({ icon, themedText }: { icon: IconComponent; themedText?: boolean }) => {
   const ctx = SelectContext.useStyledContext()
   const isThemed = ctx.themedText || themedText
   const getIcon = useGetThemedIcon({ color: isThemed ? '$color6' : '$textPrimary', size: 14 })

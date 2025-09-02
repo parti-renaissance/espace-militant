@@ -1,12 +1,11 @@
-import { NamedExoticComponent } from 'react'
 import { VoxHeader } from '@/components/Header/Header'
-import type { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Href, useNavigation, useRouter } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
 
 type ProfilHeaderProps = {
-  icon?: NamedExoticComponent<IconProps>
+  icon?: IconComponent
   title: string
   backArrow?: boolean
   hideOnMdUp?: boolean

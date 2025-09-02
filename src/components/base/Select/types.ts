@@ -1,6 +1,6 @@
-import { ComponentProps, NamedExoticComponent } from 'react'
+import { ComponentProps } from 'react'
 import type Text from '@/components/base/Text'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { ThemeName } from 'tamagui'
 import { InputProps } from '../Input/Input'
 import { SelectFrames } from './Frames'
@@ -15,7 +15,7 @@ export type SelectOption<A extends string> = {
   label: string | React.ReactNode[] | Element
   subLabel?: string
   theme?: ThemeName
-  icon?: NamedExoticComponent<IconProps>
+  icon?: IconComponent
 }
 
 export type SelectProps<A extends string> = {
@@ -35,13 +35,13 @@ export type SelectProps<A extends string> = {
   multiline?: boolean
   color?: InputProps['color']
   theme?: ThemeName
-  icon?: NamedExoticComponent<IconProps>
+  icon?: IconComponent
   frameProps?: ComponentProps<typeof SelectFrames>
   customTextComponent?: (x: ComponentProps<typeof Text>) => React.ReactNode
   searchableOptions?: {
     placeholder?: string
     noResults?: string
-    icon?: NamedExoticComponent<IconProps>
+    icon?: IconComponent
     autocompleteCallback?: (value: string) => void
     isFetching?: boolean
   }

@@ -1,6 +1,6 @@
-import { forwardRef, NamedExoticComponent } from 'react'
+import { forwardRef } from 'react'
 import Text from '@/components/base/Text'
-import type { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { createStyledContext, Spinner, styled, TamaguiElement, View, withStaticProperties } from 'tamagui'
 
 export const ButtonContext = createStyledContext({
@@ -207,8 +207,8 @@ const Button = withStaticProperties(ButtonFrame, {
 export default Button
 
 export type VoxButtonProps = {
-  iconLeft?: NamedExoticComponent<IconProps>
-  iconRight?: NamedExoticComponent<IconProps>
+  iconLeft?: IconComponent
+  iconRight?: IconComponent
   iconSize?: number
   textColor?: string
   loading?: boolean

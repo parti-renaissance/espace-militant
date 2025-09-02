@@ -1,8 +1,8 @@
-import React, { ComponentRef, NamedExoticComponent, useCallback, useEffect } from 'react'
+import React, { ComponentRef, useCallback, useEffect } from 'react'
 import { FlatList, Modal, TouchableOpacity } from 'react-native'
 import Text from '@/components/base/Text'
 import { useLazyRef } from '@/hooks/useLazyRef'
-import type { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { Check } from '@tamagui/lucide-icons'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 
@@ -69,7 +69,7 @@ type ItemProps = {
   onPress?: () => void
   selected?: boolean
   color?: string
-  icon?: NamedExoticComponent<IconProps>
+  icon?: IconComponent
 } & React.ComponentPropsWithoutRef<typeof DropdownItemFrame>
 
 export const DropdownItem = ({ title, subtitle, color = '$textPrimary', theme, ...props }: ItemProps) => {
