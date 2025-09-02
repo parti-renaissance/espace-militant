@@ -72,10 +72,10 @@ const CircleIcon = styled(Circle, {
     interactive: {
       true: {
         cursor: 'pointer',
-        '$group-hover': {
-          borderColor: '$purple9',
-          backgroundColor: '$gray1',
-        },
+        // '$group-hover': { // Disabled for Expo 53 compatibility
+        //   borderColor: '$purple9',
+        //   backgroundColor: '$gray1',
+        // },
       },
     },
   } as const,

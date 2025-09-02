@@ -6,14 +6,13 @@ export interface SearchResult {
   metadata?: Record<string, unknown>
 }
 
-import { NamedExoticComponent } from 'react'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 
 export interface SearchProvider {
   search(query: string, scope?: string): Promise<SearchResult[]>
   getDetails(id: string): Promise<SearchResult | null>
   isSearchable(query: string): boolean
-  getIcon(): NamedExoticComponent<IconProps>
+  getIcon(): IconComponent
   getPlaceholder(): string
 }
 

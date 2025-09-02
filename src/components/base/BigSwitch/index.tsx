@@ -1,115 +1,96 @@
-import { ComponentRef, forwardRef, useState } from 'react'
-import { createStyledContext, styled } from '@tamagui/core'
-import { ThemeableStack } from '@tamagui/stacks'
-import { XStack } from 'tamagui'
-import Text from '../Text'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { LayoutChangeEvent } from 'react-native'
+import { XStack, Text, Stack } from 'tamagui'
 
-export const SwitchContext = createStyledContext({
-  checked: false,
-  disabled: false,
-})
+type Option = { label: string; value: string }
+export type OptionsTuple = [Option, Option]
 
-export const SwitchGroupZone = styled(ThemeableStack, {
-  tag: 'button',
-  context: SwitchContext,
-  focusable: true,
-  height: 44,
-  flexDirection: 'row',
-  borderWidth: 1,
-  flex: 1,
-  borderColor: '$textOutline',
-  borderRadius: 999,
-  group: true,
+type Props = {
+  options: OptionsTuple
+  value: string
+  onChange: (x: string) => void
+}
 
-  cursor: 'pointer',
+const HEIGHT = 44
+const PADDING = 4
 
-  '$group-hover': { backgroundColor: '$blue1' },
-  backgroundColor: '$white1',
+const BigSwitch = ({ options, value, onChange }: Props) => {
+  const [containerW, setContainerW] = useState<number>(0)
+  const prevW = useRef<number>(0)
 
-  disabledStyle: {
-    cursor: 'not-allowed',
-    opacity: 0.4,
-    backgroundColor: 'transparent',
-  },
-  variants: {
-    checked: {
-      true: {},
-    },
-  } as const,
-})
+  const isFirst = value === options[0].value
+  const innerW = Math.max(0, containerW - PADDING * 2)
+  const halfW = innerW / 2
 
-export const SwitchGroupItemFrame = styled(ThemeableStack, {
-  context: SwitchContext,
-  height: 44,
-  flex: 1,
-  flexBasis: 0,
-  alignItems: 'center',
-  justifyContent: 'center',
-})
+  const translateX = useMemo(() => (isFirst ? 0 : halfW), [isFirst, halfW])
 
-export const SwitchGroupItemFrameText = styled(Text.MD, {
-  context: SwitchContext,
-  textAlign: 'center',
-  color: '$textDisabled',
+  const onLayout = useCallback((e: LayoutChangeEvent) => {
+    const w = e.nativeEvent.layout.width
+    if (Math.abs(w - prevW.current) > 1) {
+      prevW.current = w
+      setContainerW(w)
+    }
+  }, [])
 
-  semibold: true,
-  variants: {
-    checked: {
-      true: {
-        color: '$blue5',
-      },
-    },
-  } as const,
-})
-
-export const SwitchGroupIndicatorFrame = styled(ThemeableStack, {
-  context: SwitchContext,
-  height: 45,
-  position: 'absolute',
-  top: -1,
-  left: -1,
-  right: -1,
-  flexDirection: 'row',
-  animation: 'medium',
-  transform: [{ translateX: 0 }],
-})
-
-export const SwitchGroupIndicator = styled(ThemeableStack, {
-  context: SwitchContext,
-  flex: 1,
-  height: 45,
-  borderRadius: 999,
-  borderWidth: 1,
-  borderColor: '$blue1',
-  backgroundColor: '$blue1',
-})
-
-export type OptionsTuple = [{ label: string; value: string }, { label: string; value: string }]
-
-export default forwardRef<ComponentRef<typeof SwitchGroupZone>, { options: OptionsTuple; onChange: (x: string) => void; value: string }>(function BigSwitch(
-  { options, onChange, value },
-  ref,
-) {
-  const checked = value === options[1].value
-  const [width, setWidth] = useState<`${number}%` | number>('100%')
+  const handleLeft = useCallback(() => onChange(options[0].value), [onChange, options])
+  const handleRight = useCallback(() => onChange(options[1].value), [onChange, options])
 
   return (
-    <SwitchGroupZone checked={checked} ref={ref} onPress={() => onChange(checked ? options[0].value : options[1].value)}>
-      <SwitchGroupIndicatorFrame
-        transform={[{ translateX: !checked ? 0 : width }]}
-        onLayout={(x) => {
-          setWidth(x.nativeEvent.layout.width / 2)
-        }}
+    <XStack
+      flex={1}
+      height={HEIGHT}
+      borderRadius={999}
+      backgroundColor="$textOutline20"
+      position="relative"
+      overflow="hidden"
+      padding={PADDING}
+      onLayout={onLayout}
+      role="tablist"
+      aria-label="Big switch"
+    >
+      <Stack
+        position="absolute"
+        top={PADDING}
+        bottom={PADDING}
+        left={PADDING}
+        width={halfW}
+        borderRadius={999}
+        backgroundColor="$white1"
+        animation="medium"
+        transform={[{ translateX }]}
+      />
+
+      <XStack
+        width="50%"
+        alignItems="center"
+        justifyContent="center"
+        zIndex={1}
+        cursor="pointer"
+        onPress={handleLeft}
+        accessibilityRole="tab"
+        aria-selected={isFirst}
       >
-        <SwitchGroupIndicator />
-        <XStack flex={1} />
-      </SwitchGroupIndicatorFrame>
-      <SwitchGroupItemFrame flex={1} width="100%">
-        <SwitchGroupItemFrameText checked={!checked}>{options[0].label}</SwitchGroupItemFrameText>
-      </SwitchGroupItemFrame>
-      <SwitchGroupItemFrame flex={1} width="100%">
-        <SwitchGroupItemFrameText checked={checked}>{options[1].label}</SwitchGroupItemFrameText>
-      </SwitchGroupItemFrame>
-    </SwitchGroupZone>
+        <Text fontWeight="600" fontSize={14} color="$textPrimary">
+          {options[0].label}
+        </Text>
+      </XStack>
+
+      <XStack
+        width="50%"
+        alignItems="center"
+        justifyContent="center"
+        zIndex={1}
+        cursor="pointer"
+        onPress={handleRight}
+        accessibilityRole="tab"
+        aria-selected={!isFirst}
+      >
+        <Text fontWeight="600" fontSize={14} color="$textPrimary">
+          {options[1].label}
+        </Text>
+      </XStack>
+    </XStack>
   )
-})
+}
+
+export default React.memo(BigSwitch)

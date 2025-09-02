@@ -1,15 +1,15 @@
-import { NamedExoticComponent, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import EmptyStateInstanceIllustration from '@/assets/illustrations/EmptyStateInstanceIllustration'
 import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { Separator, withStaticProperties, XStack, YStack } from 'tamagui'
 import { VoxButton } from '../Button'
 
 type InstanceCardHeaderProps = {
   title: string
-  icon: NamedExoticComponent<IconProps>
+  icon: IconComponent
   middleIconOffset?: number
   headerLeft?: ReactNode
 }

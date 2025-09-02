@@ -2,7 +2,7 @@
   "expo": {
     "slug": "vox",
     "scheme": "vox",
-    "version": "5.17.0",
+    "version": "5.18.0",
     "owner": "parti-renaissance",
     "runtimeVersion": {
       "policy": "appVersion"
@@ -88,8 +88,6 @@
         }
       ],
       "expo-localization",
-      "@react-native-firebase/app",
-      "@react-native-firebase/messaging",
       "expo-secure-store",
       [
         "expo-build-properties",
@@ -116,10 +114,12 @@
         {
           "calendarPermission": "Autorisez $(PRODUCT_NAME) à ajouter des événements à votre calendrier"
         }
-      ]
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging"
     ],
     "extra": {
-      "eas_update_version": "5",
+      "eas_update_version": "0",
       "router": {
         "origin": false
       },

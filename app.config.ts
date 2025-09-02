@@ -74,6 +74,7 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
       },
     ])
     plugins.push(['expo-router', { origin: `https://${process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN}` }])
+    plugins.push('expo-web-browser')
   }
   config.plugins = plugins
 

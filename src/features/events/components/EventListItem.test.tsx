@@ -1,8 +1,8 @@
-import React, { NamedExoticComponent } from 'react'
+import React from 'react'
 import { payload } from '@/services/events/mock/feed-item'
 import * as mockedEvnt from '@/services/events/mock/feed-item'
 import TamaguiProvider from '@/tamagui/provider'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { Calendar } from '@tamagui/lucide-icons'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render } from '@testing-library/react-native'
@@ -33,7 +33,7 @@ const expectChip = (
   instance: ReactTestInstance,
   payload: {
     name: string
-    icon: NamedExoticComponent<IconProps>
+    icon: IconComponent
   },
 ) => {
   expect(instance).toBeTruthy()
@@ -48,6 +48,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
           category: payload.category,
         }}
       />,
@@ -64,6 +65,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
         }}
       />,
     )
@@ -80,6 +82,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
           name: payload.name,
         }}
       />,
@@ -95,6 +98,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
           begin_at: '2030-08-09T10:59:52+02:00',
           finish_at: '2030-08-09T11:59:52+02:00',
           time_zone: 'Europe/Paris',
@@ -112,6 +116,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
           begin_at: '2030-08-09T10:59:52+02:00',
           time_zone: 'Europe/Paris',
         }}
@@ -128,6 +133,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
           begin_at: '2030-08-09T10:59:52+02:00',
         }}
       />,
@@ -143,6 +149,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
           organizer: payload.organizer,
         }}
       />,
@@ -157,6 +164,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
           status: 'CANCELLED',
         }}
       />,
@@ -170,6 +178,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
         }}
       />,
     )
@@ -183,6 +192,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
         }}
       />,
     )
@@ -196,6 +206,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
           ...mockedEvnt.editableEvent,
         }}
       />,
@@ -210,6 +221,7 @@ describe('EventListItem', () => {
         userUuid="user-uuid"
         event={{
           uuid: '1',
+          slug: 'test-event',
           visibility: 'adherent',
         }}
       />,

@@ -1,12 +1,11 @@
-import { NamedExoticComponent } from 'react'
 import { TouchableOpacity } from 'react-native'
 import Text from '@/components/base/Text'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { View } from 'tamagui'
 
 type ActionTypeEntryProps = {
   label: string
-  Icon?: NamedExoticComponent<IconProps>
+  Icon?: IconComponent
   description: string
   selected: boolean
   onPress: () => void

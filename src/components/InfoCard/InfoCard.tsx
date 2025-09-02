@@ -1,13 +1,12 @@
-import { NamedExoticComponent } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import type { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { Href, Link } from 'expo-router'
 import { isWeb, ThemeName, YStack } from 'tamagui'
 
 type InfoCardPropsBase = {
-  icon: NamedExoticComponent<IconProps>
+  icon: IconComponent
   children: string | string[]
   theme?: ThemeName | null
 }

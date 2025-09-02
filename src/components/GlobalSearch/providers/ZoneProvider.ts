@@ -1,7 +1,6 @@
 import { SearchProvider, SearchResult } from '../types'
 import { ChevronsUpDown } from '@tamagui/lucide-icons'
-import { NamedExoticComponent } from 'react'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { getZoneAutocomplete } from '@/services/search/api'
 
 const ZONE_TYPE_LABELS: Record<string, string> = {
@@ -57,8 +56,8 @@ export class ZoneProvider implements SearchProvider {
     return query.length >= 2 && /[a-zA-Z]/.test(query)
   }
 
-  getIcon(): NamedExoticComponent<IconProps> {
-    return ChevronsUpDown as NamedExoticComponent<IconProps>
+  getIcon(): IconComponent {
+    return ChevronsUpDown as IconComponent
   }
 
   getPlaceholder(): string {

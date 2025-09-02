@@ -16,6 +16,7 @@ export const matomoApi =
       requestSchema: MatomoDefaultRequestSchema(requestSchema),
       responseSchema: MatomoDefaultResponseSchema,
       method: 'POST',
+      axiosConfig: { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
     })({ ...payload, idsite: '6', rec: 1, apiv: 1, send_image: 0 })
 
 export const trackEvent = (data: { category: string; action: string; name?: string; value?: string; campaign?: string; userData?: Record<string, string> }) =>
