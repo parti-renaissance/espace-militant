@@ -42,7 +42,7 @@
     "@react-native-community/netinfo": "11.4.1",
     "@react-native-firebase/app": "^23.2.1",
     "@react-native-firebase/messaging": "^23.2.1",
-    "@rnmapbox/maps": "^10.1.33",
+    "@rnmapbox/maps": "10.1.42",
     "@ronradtke/react-native-markdown-display": "^8.0.0",
     "@sentry/react-native": "~6.14.0",
     "@shopify/react-native-skia": "v2.0.0-next.4",

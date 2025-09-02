@@ -6090,9 +6090,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rnmapbox/maps@npm:^10.1.33":
-  version: 10.1.33
-  resolution: "@rnmapbox/maps@npm:10.1.33"
+"@rnmapbox/maps@npm:10.1.42":
+  version: 10.1.42
+  resolution: "@rnmapbox/maps@npm:10.1.42"
   dependencies:
     "@turf/along": "npm:6.5.0"
     "@turf/distance": "npm:6.5.0"
@@ -6114,7 +6114,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/fbad1cd2b7ca0c3ce6045beaf06061ded71037b0b52a65db723fb107e083a940545be471c56ed997c21044a998dd5022d29fd7de01dddeaf0c2ec0952e0b4c59
+  checksum: 10c0/367d66fc99b2745bc606813eedd98632dff5571376dec018c485b5e365df63fd8c1fae07a25e287f2fe99d2d6f9dceb95a0928af97dbf95d88143abff5623a01
   languageName: node
   linkType: hard
 
@@ -28924,7 +28924,7 @@ __metadata:
     "@react-native-community/slider": "npm:4.5.6"
     "@react-native-firebase/app": "npm:^23.2.1"
     "@react-native-firebase/messaging": "npm:^23.2.1"
-    "@rnmapbox/maps": "npm:^10.1.33"
+    "@rnmapbox/maps": "npm:10.1.42"
     "@ronradtke/react-native-markdown-display": "npm:^8.0.0"
     "@sentry/react-native": "npm:~6.14.0"
     "@shopify/react-native-skia": "npm:v2.0.0-next.4"
