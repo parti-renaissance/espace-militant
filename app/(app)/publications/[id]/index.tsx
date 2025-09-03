@@ -48,7 +48,7 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
   const { data: messageData, isLoading: isMessageLoading, error: messageError } = useGetMessage({
     messageId: props.id,
     scope: defaultScope!,
-    enabled: Boolean(defaultScope)
+    enabled: true,
   })
 
   return (
