@@ -6,8 +6,11 @@ import * as metatags from '@/config/metatags'
 import { ForbiddenError, UnauthorizedError } from '@/core/errors'
 import EventDetailsScreen, { EventDetailsScreenDeny, EventDetailsScreenSkeleton } from '@/features/events/pages/detail/EventDetailsScreen'
 import { useGetEvent } from '@/services/events/hook'
-import { Stack as RouterStack, useLocalSearchParams } from 'expo-router'
+import { Stack as RouterStack, useLocalSearchParams, useGlobalSearchParams } from 'expo-router'
 import Head from 'expo-router/head'
+import { useHits } from '@/services/hits/hook'
+import { cleanupUrlParams } from '@/utils/urlCleanup'
+import { resolveSource } from '@/utils/sourceResolver'
 
 const HomeScreen: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
@@ -37,16 +40,44 @@ const HomeScreen: React.FC = () => {
 }
 
 function EventDetailScreen(props: Readonly<{ id: string }>) {
-  const { data } = useGetEvent({ id: props.id })
+  const { data, isLoading: isEventLoading, error: eventError } = useGetEvent({ id: props.id })
+  const { trackOpen } = useHits()
+  const searchParams = useGlobalSearchParams<{
+    utm_source?: string
+    utm_campaign?: string
+    referrer_code?: string
+    source?: string
+  }>()
+  const sentRef = React.useRef<string | null>(null)
+
+  React.useEffect(() => {
+    if (!isEventLoading && !eventError && data) {
+      if (sentRef.current !== props.id) {
+        sentRef.current = props.id
+        
+        trackOpen({ 
+          object_type: 'evenement', 
+          object_id: props.id, 
+          source: resolveSource(searchParams.source),
+          utm_source: searchParams.utm_source,
+          utm_campaign: searchParams.utm_campaign,
+          referrer_code: searchParams.referrer_code
+        })
+        
+        cleanupUrlParams(['source'])
+      }
+    }
+  }, [props.id, isEventLoading, eventError, data, trackOpen, searchParams])
+
   return (
     <>
       <RouterStack.Screen
         options={{
-          title: data.name,
+          title: data?.name || 'Détails de l\'événement',
         }}
       />
       <Head>
-        <title>{metatags.createTitle(data.name)}</title>
+        <title>{metatags.createTitle(data?.name || 'Détails de l\'événement')}</title>
       </Head>
       <EventDetailsScreen data={data} />
     </>

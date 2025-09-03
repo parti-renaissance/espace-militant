@@ -57,6 +57,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
             id: isMessageTilSync?.uuid || '',
             congratulations: 'true',
             withoutAnimation: 'true',
+            source: 'page_publication_edition',
           },
         })
       }
