@@ -26,6 +26,9 @@ export const ObjectHitSchema = BaseHitSchema.extend({
   object_type: z.enum(OBJECT_TYPES),
   object_id: z.string().optional(),
   source: z.string().optional(),
+  utm_source: z.string().optional(),
+  utm_campaign: z.string().optional(),
+  referrer_code: z.string().optional(),
 }).strip()
 
 export const HitPayloadSchema = z.union([ActivitySessionHitSchema, ObjectHitSchema])

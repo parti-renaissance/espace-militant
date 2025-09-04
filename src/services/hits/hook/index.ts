@@ -14,7 +14,14 @@ const THROTTLE_CLICK_MS = 30 * 1000
 
 const mutex = new Mutex()
 
-type TrackParams = { object_type: ObjectType; object_id?: string; source?: string }
+type TrackParams = { 
+  object_type: ObjectType; 
+  object_id?: string; 
+  source?: string;
+  utm_source?: string;
+  utm_campaign?: string;
+  referrer_code?: string;
+}
 type SessionBlob = { uuid: string; lastActiveAt: number }
 
 const SESSION_KEY = 'hits.session'
@@ -147,7 +154,6 @@ export function useHits() {
 
   const track = React.useCallback(
     async (event_type: 'impression' | 'open' | 'click', params: TrackParams) => {
-      console.log('track', event_type, params)
       const now = Date.now()
       const { session, rotated } = await mutex.runExclusive(() => rotateIfNeededAndGetSessionLocked(now))
 

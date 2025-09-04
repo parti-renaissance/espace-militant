@@ -69,7 +69,7 @@ export const useGetMessage = (props: { messageId: string; scope: string; enabled
     queryFn: () => api.getMessage({ messageId: props.messageId, scope: props.scope }),
     enabled: props.enabled,
     refetchOnMount: true,
-    staleTime: 60 * 5000,
+    staleTime: (query) => query.state.error ? 0 : 60 * 5000,
   })
 }
 
@@ -183,7 +183,7 @@ export const useGetAvailableSenders = (props: { scope: string; }) => {
   return useQuery({
     queryKey: ['available-senders', props.scope],
     queryFn: () => api.getAvailableSenders({ scope: props.scope }),
-    staleTime: 60 * 1000,
+    staleTime: (query) => query.state.error ? 0 : 60 * 1000,
   })
 }
 
@@ -259,6 +259,6 @@ export const useGetFilterCollection = (props: { scope: string; enabled?: boolean
     queryKey: ['filter-collection', props.scope],
     queryFn: () => api.getFilterCollection({ scope: props.scope }),
     enabled: props.enabled !== false,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: (query) => query.state.error ? 0 : 60 * 1000,
   })
 }
