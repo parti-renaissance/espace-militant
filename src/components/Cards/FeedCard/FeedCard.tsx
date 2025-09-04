@@ -23,7 +23,7 @@ const FeedCard = (props: FeedCardProps) => {
   const { data } = useGetSuspenseProfil()
   switch (props.type) {
     case 'event':
-      return <EventListItem {...props} userUuid={data!.uuid} />
+      return <EventListItem {...props} userUuid={data!.uuid} source="page_timeline" />
     case 'action':
       return <ActionCard {...props} />
     case 'news':

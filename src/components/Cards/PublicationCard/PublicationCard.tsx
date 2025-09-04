@@ -56,9 +56,11 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                 if (item.type === 'button') {
                   return (
                     <ButtonRenderer
+                      publicationUuid={uuid || undefined}
                       key={`content-button-${index}`}
                       data={item as S.ButtonNode}
                       displayToolbar={false}
+                      allowHits={true}
                     />
                   )
                 }

@@ -8,12 +8,7 @@ import { getNavigationType } from './navigationType'
  */
 export function resolveSource(urlSource?: string, defaultSource = 'direct_link'): string {
   const navigationType = getNavigationType()
-  
-  // If it's a reload, always use 'reload' as source
-  if (navigationType === 'reload') {
-    return 'reload'
-  }
-  
-  // Otherwise, use URL source or default
-  return urlSource || defaultSource
+  if (urlSource) return urlSource
+  if (navigationType === 'reload') return 'reload'
+  return defaultSource
 }

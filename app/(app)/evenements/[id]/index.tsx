@@ -56,7 +56,7 @@ function EventDetailScreen(props: Readonly<{ id: string }>) {
         sentRef.current = props.id
         
         trackOpen({ 
-          object_type: 'evenement', 
+          object_type: 'event', 
           object_id: props.id, 
           source: resolveSource(searchParams.source),
           utm_source: searchParams.utm_source,

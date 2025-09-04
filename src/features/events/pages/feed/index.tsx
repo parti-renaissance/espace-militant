@@ -138,7 +138,7 @@ const EventList = () => {
                 paddingBottom: getToken('$11', 'space'),
               }}
               sections={feedData}
-              renderItem={({ item }) => <EventListItem event={item} userUuid={user.data?.uuid} />}
+              renderItem={({ item }) => <EventListItem event={item} userUuid={user.data?.uuid} source={"page_events"} />}
               renderSectionHeader={({ section }) => {
                 return (
                   <YStack>

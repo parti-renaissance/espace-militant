@@ -15,12 +15,14 @@ const THROTTLE_CLICK_MS = 30 * 1000
 const mutex = new Mutex()
 
 type TrackParams = { 
-  object_type: ObjectType; 
+  object_type?: ObjectType; 
   object_id?: string; 
   source?: string;
   utm_source?: string;
   utm_campaign?: string;
   referrer_code?: string;
+  target_url?: string;
+  button_name?: string;
 }
 type SessionBlob = { uuid: string; lastActiveAt: number }
 
@@ -173,9 +175,11 @@ export function useHits() {
         if (shouldSkip) return
       }
 
-      // Throttle click per (object_type, object_id)
-      if (event_type === 'click' && params.object_type && params.object_id) {
-        const key = `click:${params.object_type}:${params.object_id}`
+      // Throttle click per (object_type, identifier)
+      if (event_type === 'click' && params.object_type) {
+        const identifier = params.object_id || params.target_url || params.button_name || 'unknown'
+        const key = `click:${params.object_type}:${identifier}`
+        
         const shouldSkip = await mutex.runExclusive(async () => {
           const map = await readLastSent()
           const last = map[key] || 0

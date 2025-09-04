@@ -23,7 +23,7 @@ const AlertMeetingCard = (props: AlertVoxCardProps) => {
 
   return (
     <MeetingAlertCollapsed
-      onShow={createOnShow(props.payload.cta_url)}
+      onShow={createOnShow(props.payload.cta_url, props.payload.cta_label)}
       onPressShare={onPressShare}
       payload={props.payload}
     />
@@ -31,7 +31,7 @@ const AlertMeetingCard = (props: AlertVoxCardProps) => {
 }
 
 const AlertOnLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
-  const onShow = createOnShow(payload.cta_url)
+  const onShow = createOnShow(payload.cta_url, payload.cta_label)
   return (
     <VoxCard
       {...props}
@@ -63,7 +63,7 @@ const AlertOnLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
 }
 
 const AlertAnnonceLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
-  const onShow = createOnShow(payload.cta_url)
+  const onShow = createOnShow(payload.cta_url, payload.cta_label)
   return (
     <VoxCard
     {...props}
@@ -94,7 +94,7 @@ const AlertAnnonceLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
 }
 
 const AlertBasicCard = ({ payload, ...props }: AlertVoxCardProps) => {
-  const onShow = createOnShow(payload.cta_url)
+  const onShow = createOnShow(payload.cta_url, payload.cta_label)
   return (
     <VoxCard
       {...props}
