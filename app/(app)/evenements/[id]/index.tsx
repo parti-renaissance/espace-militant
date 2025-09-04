@@ -45,7 +45,7 @@ function EventDetailScreen(props: Readonly<{ id: string }>) {
   const searchParams = useGlobalSearchParams<{
     utm_source?: string
     utm_campaign?: string
-    referrer_code?: string
+    ref?: string
     source?: string
   }>()
   const sentRef = React.useRef<string | null>(null)
@@ -56,12 +56,12 @@ function EventDetailScreen(props: Readonly<{ id: string }>) {
         sentRef.current = props.id
         
         trackOpen({ 
-          object_type: 'evenement', 
+          object_type: 'event', 
           object_id: props.id, 
           source: resolveSource(searchParams.source),
           utm_source: searchParams.utm_source,
           utm_campaign: searchParams.utm_campaign,
-          referrer_code: searchParams.referrer_code
+          referrer_code: searchParams.ref
         })
         
         cleanupUrlParams(['source'])

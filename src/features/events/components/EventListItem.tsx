@@ -30,9 +30,9 @@ const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 
   )
 }
 
-const GoToButton = ({ eventUuid }: { eventUuid: string }) => {
+const GoToButton = ({ eventUuid, source }: { eventUuid: string, source?: string }) => {
   return (
-    <Link href={`/evenements/${eventUuid}`} asChild={!isWeb}>
+    <Link href={`/evenements/${eventUuid}?source=${source || ''}`} asChild={!isWeb}>
       <VoxButton variant="outlined" theme="gray" iconLeft={Eye} testID="event-show-button">
         Voir
       </VoxButton>
@@ -40,7 +40,7 @@ const GoToButton = ({ eventUuid }: { eventUuid: string }) => {
   )
 }
 
-export const BaseEventListItem = ({ event, userUuid }: EventItemProps) => {
+export const BaseEventListItem = ({ event, userUuid, source }: EventItemProps) => {
   const fallbackImage = getEventItemImageFallback(event)
   const isFull = isEventFull(event)
   const participantsCount = event?.participants_count
@@ -72,7 +72,7 @@ export const BaseEventListItem = ({ event, userUuid }: EventItemProps) => {
           }}
         />
         <EventItemActions>
-          <GoToButton eventUuid={event.slug} />
+          <GoToButton eventUuid={event.slug} source={source} />
           <EventToggleSubscribeButton event={event} userUuid={userUuid} />
           <EventItemHandleButton event={event} userUuid={userUuid} />
         </EventItemActions>
@@ -81,15 +81,15 @@ export const BaseEventListItem = ({ event, userUuid }: EventItemProps) => {
   )
 }
 
-const EventListItem = ({ event, userUuid }: EventItemProps) => {
+const EventListItem = ({ event, userUuid, source }: EventItemProps) => {
   if (!userUuid && isEventPrivate(event)) {
     return (
       <EventAuthDialog>
-        <BaseEventListItem event={event} />
+        <BaseEventListItem event={event} source={source} />
       </EventAuthDialog>
     )
   }
-  return <BaseEventListItem event={event} userUuid={userUuid} />
+  return <BaseEventListItem event={event} userUuid={userUuid} source={source} />
 }
 
 export default EventListItem
