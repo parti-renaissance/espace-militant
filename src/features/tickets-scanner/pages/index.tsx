@@ -3,14 +3,13 @@ import { StyleSheet, View, Dimensions, ScrollView } from 'react-native'
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera'
 import { useScanTicket } from '@/services/tickets/hook'
 import { ScanTicketResponse } from '@/services/tickets/schema'
-import { User, Ticket, Clock } from '@tamagui/lucide-icons'
+import { User, Ticket, Clock, ScanQrCode, QrCode } from '@tamagui/lucide-icons'
 import { Button, Card, YStack, XStack } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import StatusIndicator from '../components/StatusIndicator'
-import { mockTickets } from '@/services/tickets/api'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import Text from '@/components/base/Text'
-import { config } from '@tamagui/config/v3'
+import { VoxButton } from '@/components/Button'
 
 const { width, height } = Dimensions.get('window')
 
@@ -82,11 +81,16 @@ export default function TicketScannerPage() {
 
   if (!permission.granted) {
     return (
-      <YStack flex={1} backgroundColor="$textSurface">
-        <Text style={styles.message}>Nous avons besoin de votre permission pour utiliser la caméra</Text>
-        <Button onPress={requestPermission}>
-          Accorder la permission
-        </Button>
+      <YStack flex={1} gap="$medium" justifyContent="center" alignItems="center">
+        <YStack backgroundColor="$gray5" w={64} h={64} borderRadius={32} justifyContent="center" alignItems="center">
+          <QrCode size={32} color="white" />
+        </YStack>
+        <Text.LG maxWidth={320} textWrap="balance" primary semibold textAlign="center">Nous avons besoin de votre permission pour utiliser la caméra</Text.LG>
+        <YStack>
+          <VoxButton onPress={requestPermission}>
+            Accorder la permission
+          </VoxButton>
+        </YStack>
       </YStack>
     )
   }
