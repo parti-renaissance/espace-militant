@@ -72,6 +72,8 @@ export default function AppLayout() {
         >
           {ROUTES.map((route) => {
             const isHiddenMobile = typeof route.hiddenMobile === 'function' ? route.hiddenMobile(profile) : route.hiddenMobile
+
+            console.log('route', route.name, isHiddenMobile)
             return (
               <Tabs.Screen
                 key={route.name}
