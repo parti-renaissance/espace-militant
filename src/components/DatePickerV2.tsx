@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useState } from 'react'
 import { Keyboard, Platform } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { FormFrame } from '@/components/base/FormFrames'
@@ -20,15 +20,7 @@ interface DatePickerFieldProps {
 
 const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabled, onChange, error, type = 'date', onBlur }, ref) => {
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false)
-
-  const inputRef = useRef(null)
-
-  useEffect(() => {
-    if (inputRef.current && type && isWeb) {
-      // @ts-expect-error wrong type on input
-      inputRef.current.type = type
-    }
-  }, [type])
+  
 
   // In case of mobile component
   const handleConfirm = (input: Date) => {
@@ -80,7 +72,30 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabl
 
   const formatedValue = (type: 'date' | 'time', value: Date) => (type === 'date' ? getFormattedDate(value) : getFormattedTime(value))
   return Platform.OS === 'web' ? (
-    <FormFrame.Input disabled={disabled} error={Boolean(error)} ref={inputRef} value={webInputValue} onChangeText={handleChange} onBlur={() => onBlur?.()} />
+    <input
+      type={type}
+      value={webInputValue}
+      onChange={(e) => handleChange(e.target.value)}
+      onBlur={() => onBlur?.()}
+      disabled={disabled}
+      placeholder={placeholder}
+      name={`datepicker-${type}`}
+      id={`datepicker-${type}-${Math.random().toString(36).substr(2, 9)}`}
+      style={{
+        fontFamily: 'Public Sans, sans-serif',
+        fontSize: 14,
+        fontWeight: 400,
+        height: 36,
+        padding: '4px 8px',
+        borderRadius: 8,
+        backgroundColor: error ? '#fff3f0' : '#e8ebed',
+        outline: 'none',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        color: error ? '#d26b4b' : '#212b36',
+        boxSizing: 'border-box',
+      }}
+    />
   ) : (
     <>
       <FormFrame.Button onPress={onShow} error={Boolean(error)}>
