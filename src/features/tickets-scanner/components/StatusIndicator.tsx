@@ -1,6 +1,5 @@
 import React from 'react'
-import { StyleSheet } from 'react-native'
-import { QrCode, X, Check } from '@tamagui/lucide-icons'
+import { QrCode, TicketCheck, TicketX } from '@tamagui/lucide-icons'
 import { YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import { ScanTicketResponse } from '@/services/tickets/schema'
@@ -16,14 +15,14 @@ export default function StatusIndicator({ ticket }: StatusIndicatorProps) {
       case 'already_scanned':
         return {
           color: '$green4',
-          icon: Check,
+          icon: TicketCheck,
           title: 'VALIDE',
           subtitle: 'Personne autorisée à entrer'
         }
       case 'invalid':
         return {
           color: '$orange6',
-          icon: X,
+          icon: TicketX,
           title: 'INVALIDE',
           subtitle: 'Personne non-autorisée à entrer'
         }
