@@ -43,7 +43,7 @@ const HeaderCTA = (props: EventItemProps) => {
   const needAuth = isEventPartial(props.event) && !props.userUuid
   const elements = Children.map(
     [
-      <EventToggleSubscribeButton {...props} buttonProps={buttonProps} />,
+      <EventToggleSubscribeButton {...props} buttonProps={buttonProps} />, // TODO add subscribe payload referrer_code and utm_... 
       <EventItemHandleButton {...props} buttonProps={{ ...buttonProps, variant: 'soft' }} />,
     ],
     //@ts-expect-error child type on string
