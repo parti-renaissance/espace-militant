@@ -1,7 +1,7 @@
 import { forwardRef } from 'react'
 import Text from '@/components/base/Text'
-import type { IconComponent } from '@/models/common.model'
 import { createStyledContext, Spinner, styled, TamaguiElement, View, withStaticProperties } from 'tamagui'
+import { IconComponent } from '@/models/common.model'
 
 export const ButtonContext = createStyledContext({
   pop: false,

@@ -146,16 +146,16 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
             {field.value?.field && (
               <AnimatedToolBarFrame style={animatedToolBarStyle}>
                 <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={Pencil} onPress={handleEditField(field.value.field)} />
+                  <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={Pencil} onPress={handleEditField(field.value.field)} />
                 </Animated.View>
                 <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value.field)} />
+                  <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value.field)} />
                 </Animated.View>
                 <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={ArrowUpToLine} onPress={handleMoveUp(field.value.field)} />
+                  <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={ArrowUpToLine} onPress={handleMoveUp(field.value.field)} />
                 </Animated.View>
                 <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$white0" shrink iconLeft={ArrowDownToLine} onPress={handleMoveDown(field.value.field)} />
+                  <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={ArrowDownToLine} onPress={handleMoveDown(field.value.field)} />
                 </Animated.View>
                 <Animated.View style={animatedButtonStyle}>
                   <VoxButton size="lg" variant="soft" backgroundColor="$white4" shrink iconLeft={X} onPress={handleUnSelect} />

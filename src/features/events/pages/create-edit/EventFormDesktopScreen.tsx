@@ -258,7 +258,6 @@ const EventDesktopFooter = () => {
                 size="md"
                 variant="contained"
                 theme="purple"
-                pop
                 loading={isPending || isUploadImagePending || isUploadDeletePending}
                 iconLeft={Sparkle}
               >
