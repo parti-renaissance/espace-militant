@@ -10,6 +10,7 @@ import useShareApi from '@/hooks/useShareApi'
 import useCreateEvent from '@/modules/Calendar/Calendar'
 import * as eventTypes from '@/services/events/schema'
 import { RestEvent } from '@/services/events/schema'
+import { useGetProfil } from '@/services/profile/hook'
 import { CalendarPlus, Share2 } from '@tamagui/lucide-icons'
 import { isEventFull } from '../utils'
 
@@ -19,8 +20,9 @@ type Props = {
 
 export const useEventSharing = ({ event }: Props) => {
   const handleCopyUrl = useHandleCopyUrl()
+  const { data: profile } = useGetProfil()
 
-  const shareUrl = `https://${clientEnv.ASSOCIATED_DOMAIN}/evenements/${event.slug}`
+  const shareUrl = `https://${clientEnv.ASSOCIATED_DOMAIN}/evenements/${event.slug}${profile?.id ? `?ref=${profile.id}` : ''}`
   const { shareAsync, isShareAvailable } = useShareApi()
 
   const handleShareUrl = () => {

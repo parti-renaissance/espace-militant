@@ -63,12 +63,26 @@ const initialValues = {
   join_newsletter: false,
 } satisfies PublicSubscribtionFormData
 
-const EventRegisterForm = (props: { onScrollTo?: (x: { x: number; y: number }) => void; eventId: string; eventSlug?: string }) => {
+const EventRegisterForm = (props: { 
+  onScrollTo?: (x: { x: number; y: number }) => void; 
+  eventId: string; 
+  eventSlug?: string;
+  urlParams: { ref?: string; utm_source?: string; utm_campaign?: string };
+}) => {
   const { signIn } = useSession()
   const { mutateAsync } = useSubscribePublicEvent({ id: props.eventId, slug: props.eventSlug })
+
   const onSubmit = (values: PublicSubscribtionFormData, action: FormikHelpers<PublicSubscribtionFormData>) => {
     action.setSubmitting(true)
-    mutateAsync(values)
+    
+    const payloadWithTracking: RestPostPublicEventSubsciptionRequest = {
+      ...values,
+      referrer_code: props.urlParams.ref,
+      utm_source: props.urlParams.utm_source,
+      utm_campaign: props.urlParams.utm_campaign,
+    }
+    
+    mutateAsync(payloadWithTracking)
       .then(() => {
         action.resetForm()
         router.replace('/(tabs)/evenements')

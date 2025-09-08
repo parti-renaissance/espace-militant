@@ -161,6 +161,15 @@ export const RestGetPublicEventDetailsResponseSchema = RestPublicEventSchema
 export type RestGetEventDetailsRequest = z.infer<typeof RestGetEventsResponseSchema>
 export const RestGetEventDetailsRequestSchema = z.void()
 
+// ------------ Rest Subscription --------------
+
+export type RestPostEventSubsciptionRequest = z.infer<typeof RestPostEventSubsciptionRequest>
+export const RestPostEventSubsciptionRequest = z.object({
+  utm_source: z.string().optional(),
+  utm_campaign: z.string().optional(),
+  referrer_code: z.string().optional(),
+})
+
 // ------------ Rest Public Subscription --------------
 
 export type RestPostPublicEventSubsciptionRequest = z.infer<typeof RestPostPublicEventSubsciptionRequest>
@@ -171,6 +180,9 @@ export const RestPostPublicEventSubsciptionRequest = z.object({
   postal_code: z.string().min(4).max(6),
   cgu_accepted: z.boolean(),
   join_newsletter: z.boolean(),
+  utm_source: z.string().optional(),
+  utm_campaign: z.string().optional(),
+  referrer_code: z.string().optional(),
 })
 
 // ------------ Rest Event Participants --------------

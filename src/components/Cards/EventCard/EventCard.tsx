@@ -61,7 +61,7 @@ export const SubscribeEventButton = ({ isSubscribed, eventId: id, outside = fals
   const { session } = useSession()
   const { mutate: subscribe, isPending: isSubPending } = useSubscribeEvent({ id })
   const { mutate: unsubscribe, isPending: isUnSubPending } = useUnsubscribeEvent({ id })
-  const handleSubscribe = useDebouncedCallback(() => (isSubscribed ? unsubscribe() : subscribe()), 200)
+  const handleSubscribe = useDebouncedCallback(() => (isSubscribed ? unsubscribe() : subscribe({})), 200)
   const outsideStyle = outside ? ({ size: 'lg', width: '100%' } as const) : {}
   const subscribeButton = isSubscribed ? (
     <VoxAlertDialog theme="blue" title="Se désinscrire" description={`Voulez-vous vraiment vous désinscrire de l'événement ?`} onAccept={handleSubscribe}>

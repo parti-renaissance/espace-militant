@@ -10,6 +10,7 @@ import { RestItemEvent } from '@/services/events/schema'
 import { Calendar, X } from '@tamagui/lucide-icons'
 import { ScrollView, ScrollViewProps, useMedia, XStack } from 'tamagui'
 import EventRegisterForm from './EventRegisterForm/EventRegisterForm'
+import { useLocalSearchParams } from 'expo-router'
 
 type ButtonProps = ComponentPropsWithoutRef<typeof VoxButton> &
   Pick<RestItemEvent, 'uuid' | 'slug'> & {
@@ -29,11 +30,27 @@ export const EventSubscribeButton = ({ uuid, slug, isPremium, userUuid, ...butto
   const modalScreenRef = useRef<ScrollView | null>(null)
   const sheetScrollRef = useRef<ScrollView | null>(null)
 
+  // Récupérer les paramètres URL
+  const urlParams = useLocalSearchParams<{ 
+    ref?: string; 
+    utm_source?: string; 
+    utm_campaign?: string;
+  }>()
+
   const height = Dimensions.get('window').height * 0.8
 
   const handlePress = () => {
-    if (userUuid) mutate()
-    else setOpen(true)
+    if (userUuid) {
+      // Construire le payload avec les paramètres de tracking pour les utilisateurs connectés
+      const payloadWithTracking = {
+        referrer_code: urlParams.ref,
+        utm_source: urlParams.utm_source,
+        utm_campaign: urlParams.utm_campaign,
+      }
+      mutate(payloadWithTracking)
+    } else {
+      setOpen(true)
+    }
   }
   return (
     <Fragment>
@@ -64,6 +81,7 @@ export const EventSubscribeButton = ({ uuid, slug, isPremium, userUuid, ...butto
               <EventRegisterForm
                 eventId={uuid}
                 eventSlug={slug}
+                urlParams={urlParams}
                 onScrollTo={(x) => {
                   modalScreenRef.current?.scrollTo(x)
                   sheetScrollRef.current?.scrollTo(x)
