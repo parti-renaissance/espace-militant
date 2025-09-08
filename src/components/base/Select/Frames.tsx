@@ -36,7 +36,7 @@ const SelectFrame = styled(XStack, {
     },
     white: {
       true: {
-        backgroundColor: '$white0',
+        backgroundColor: '$white1',
         hoverStyle: {
           backgroundColor: '$color1',
         },
@@ -47,7 +47,7 @@ const SelectFrame = styled(XStack, {
           borderColor: '$color9',
         },
         disabledStyle: {
-          backgroundColor: '$white1',
+          backgroundColor: '$white2',
           opacity: 0.5,
           cursor: 'not-allowed',
         },
