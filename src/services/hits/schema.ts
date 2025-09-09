@@ -4,7 +4,7 @@ export const EVENT_TYPES = ['activity_session', 'impression', 'open', 'click'] a
 export type EventType = (typeof EVENT_TYPES)[number]
 
 export const OBJECT_TYPES = ['publication', 'event', 'action', 'alert', 'resource', 'questionnaire', 'news'] as const
-export type ObjectType = (typeof OBJECT_TYPES)[number]
+export type ObjectType = (typeof OBJECT_TYPES)[number] | string
 
 export type AppSystem = 'ios' | 'android' | 'web'
 
@@ -23,7 +23,7 @@ export const ActivitySessionHitSchema = BaseHitSchema.extend({
 
 export const ObjectHitSchema = BaseHitSchema.extend({
   event_type: z.union([z.literal('impression'), z.literal('open'), z.literal('click')]),
-  object_type: z.enum(OBJECT_TYPES).optional(),
+  object_type: z.string().nullable().optional(),
   object_id: z.string().optional(),
   target_url: z.string().optional(),
   button_name: z.string().optional(),

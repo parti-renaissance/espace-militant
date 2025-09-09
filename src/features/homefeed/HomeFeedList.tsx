@@ -1,5 +1,5 @@
 import { memo, useCallback, useRef, useMemo } from 'react'
-import { FlatList } from 'react-native'
+import { FlatList, ViewToken } from 'react-native'
 import { FeedCard } from '@/components/Cards'
 import { usePageLayoutScroll } from '@/components/layouts/PageLayout/usePageLayoutScroll'
 import { transformFeedItemToProps } from '@/helpers/homeFeed'
@@ -18,11 +18,27 @@ import NotificationSubscribeCard from './components/NotificationSubscribeCard'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
 import Text from '@/components/base/Text'
+import { useHits } from '@/services/hits/hook'
+import TrackImpressionWeb from '@/components/TrackImpressionWeb'
+import { Platform } from 'react-native'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 
 const TimelineFeedCard = memo((item: RestTimelineFeedItem) => {
   const props = transformFeedItemToProps(item)
+
+  if (Platform.OS === 'web' && props) {
+    return (
+      <TrackImpressionWeb
+        objectType={item.type}
+        objectId={item.objectID}
+        source="page_timeline"
+      >
+        <FeedCardMemoized {...props} />
+      </TrackImpressionWeb>
+    )
+  }
+
   return <FeedCardMemoized {...props} />
 })
 
@@ -32,6 +48,7 @@ const HomeFeedList = () => {
   const { data: paginatedFeed, fetchNextPage, hasNextPage, ...feedQuery } = useGetPaginatedFeed()
   const { data: alerts, ...alertQuery } = useAlerts()
   const { hasFeature } = useGetExecutiveScopes()
+  const { trackImpression } = useHits()
   const feedData = paginatedFeed?.pages.map((page) => page?.hits ?? []).flat()
 
   const refetch = () => {
@@ -95,6 +112,25 @@ const HomeFeedList = () => {
       : null
   ), [alerts, shouldShowNotificationCard, hasFeature])
 
+  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    if (Platform.OS !== 'web') {
+      viewableItems.forEach((viewToken) => {
+        if (viewToken.isViewable && viewToken.item) {
+          trackImpression({
+            object_type: viewToken.item.type,
+            object_id: viewToken.item.objectID,
+            source: 'page_timeline',
+          })
+        }
+      })
+    }
+  }, [trackImpression])
+
+  const viewabilityConfig = {
+    itemVisiblePercentThreshold: 50,
+    minimumViewTime: 400,
+  }
+
   return (
     <FlatList
       ref={flatListRef}
@@ -112,6 +148,8 @@ const HomeFeedList = () => {
       data={feedData}
       renderItem={renderFeedItem}
       keyExtractor={(item) => item.objectID}
+      onViewableItemsChanged={onViewableItemsChanged}
+      viewabilityConfig={viewabilityConfig}
       refreshing={isRefetching}
       onRefresh={() => refetch()}
       onEndReached={loadMoreNative}
