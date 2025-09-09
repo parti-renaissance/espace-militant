@@ -15,7 +15,7 @@ const THROTTLE_CLICK_MS = 30 * 1000
 const mutex = new Mutex()
 
 type TrackParams = { 
-  object_type?: ObjectType; 
+  object_type?: ObjectType | null; 
   object_id?: string; 
   source?: string;
   utm_source?: string;
@@ -94,10 +94,6 @@ export function useHits() {
     if (current && now - current.lastActiveAt < INACTIVITY_MS) {
       const updated = { ...current, lastActiveAt: now }
       await writeSession(updated)
-      if (__DEV__) {
-        // eslint-disable-next-line no-console
-        console.log('[hits] session restored', { uuid: updated.uuid })
-      }
       return { session: updated, rotated: false }
     }
     const next = { uuid: generateUuid(), lastActiveAt: now }
@@ -184,6 +180,21 @@ export function useHits() {
           const map = await readLastSent()
           const last = map[key] || 0
           if (now - last < THROTTLE_CLICK_MS) {
+            return true
+          }
+          map[key] = now
+          await writeLastSent(map)
+          return false
+        })
+        if (shouldSkip) return
+      }
+      // Throttle impression per (object_type, object_id)
+      if (event_type === 'impression' && params.object_type && params.object_id) {
+        const key = `impression:${params.object_type}:${params.object_id}`
+        
+        const shouldSkip = await mutex.runExclusive(async () => {
+          const map = await readLastSent()
+          if (map[key]) {
             return true
           }
           map[key] = now
