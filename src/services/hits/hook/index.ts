@@ -119,6 +119,11 @@ export function useHits() {
     try {
       const state = await NetInfo.fetch()
       if (!state.isConnected) return
+      
+      // Vérifier si l'utilisateur est connecté (auth token disponible)
+      const session = await readSession()
+      if (!session) return
+      
       await mutex.runExclusive(async () => {
         let pending = await readPending()
         while (pending.length > 0) {
@@ -154,6 +159,9 @@ export function useHits() {
     async (event_type: 'impression' | 'open' | 'click', params: TrackParams) => {
       const now = Date.now()
       const { session, rotated } = await mutex.runExclusive(() => rotateIfNeededAndGetSessionLocked(now))
+      
+      // Ne pas tracker si pas de session (utilisateur non connecté)
+      if (!session) return
 
       // Throttle open per (object_type, object_id)
       if (event_type === 'open' && params.object_type && params.object_id) {
