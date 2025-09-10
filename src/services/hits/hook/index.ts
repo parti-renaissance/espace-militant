@@ -6,6 +6,7 @@ import { postHit } from '@/services/hits/api'
 import { HitPayload, HitPayloadSchema, ObjectType } from '@/services/hits/schema'
 import { formatLocalISO, getAppSystem, getAppVersionTag, getUserAgentSafe, generateUuid } from './helpers'
 import { Mutex } from 'async-mutex'
+import { useUserStore } from '@/store/user-store'
 
 const INACTIVITY_MS = 30 * 60 * 1000
 const MAX_BUFFER = 50
@@ -78,6 +79,7 @@ async function writeLastSent(map: LastSentMap) {
 export function useHits() {
   const isFlushingRef = React.useRef(false)
   const didInitRef = React.useRef(false)
+  const { user } = useUserStore()
 
   const buildBase = React.useCallback((sessionUuid: string) => {
     return {
@@ -120,9 +122,8 @@ export function useHits() {
       const state = await NetInfo.fetch()
       if (!state.isConnected) return
       
-      // Vérifier si l'utilisateur est connecté (auth token disponible)
-      const session = await readSession()
-      if (!session) return
+      // Vérifier si l'utilisateur est connecté
+      if (!user?.accessToken) return
       
       await mutex.runExclusive(async () => {
         let pending = await readPending()
@@ -140,9 +141,12 @@ export function useHits() {
     } finally {
       isFlushingRef.current = false
     }
-  }, [])
+  }, [user?.accessToken])
 
   const trackActivitySession = React.useCallback(async () => {
+    // Vérifier si l'utilisateur est connecté
+    if (!user?.accessToken) return
+    
     console.log('trackActivitySession')
     const now = Date.now()
     const { session, rotated } = await mutex.runExclusive(() => rotateIfNeededAndGetSessionLocked(now))
@@ -153,15 +157,15 @@ export function useHits() {
       })
     }
     await trySend()
-  }, [buildBase, trySend])
+  }, [user?.accessToken, buildBase, trySend])
 
   const track = React.useCallback(
     async (event_type: 'impression' | 'open' | 'click', params: TrackParams) => {
+      // Vérifier si l'utilisateur est connecté
+      if (!user?.accessToken) return
+      
       const now = Date.now()
       const { session, rotated } = await mutex.runExclusive(() => rotateIfNeededAndGetSessionLocked(now))
-      
-      // Ne pas tracker si pas de session (utilisateur non connecté)
-      if (!session) return
 
       // Throttle open per (object_type, object_id)
       if (event_type === 'open' && params.object_type && params.object_id) {
@@ -231,7 +235,7 @@ export function useHits() {
       }
       await trySend()
     },
-    [buildBase, trySend],
+    [user?.accessToken, buildBase, trySend],
   )
 
   const trackImpression = React.useCallback((p: TrackParams) => track('impression', p), [track])
