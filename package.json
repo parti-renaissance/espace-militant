@@ -33,7 +33,7 @@
     "@10play/tentap-editor": "^0.6.1",
     "@eslint/js": "^9.3.0",
     "@expo/webpack-config": "~19.0.1",
-    "@gorhom/bottom-sheet": "^5",
+    "@gorhom/bottom-sheet": "^5.2.6",
     "@hookform/resolvers": "^3.9.0",
     "@react-email/components": "0.0.33",
     "@react-email/render": "1.0.5",
