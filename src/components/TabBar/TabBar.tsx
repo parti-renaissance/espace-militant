@@ -4,10 +4,12 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } f
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Text from '@/components/base/Text'
 import BottomSheet from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet'
-import { MoreHorizontal } from '@tamagui/lucide-icons'
-import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties } from 'tamagui'
+import { MoreHorizontal, ScanQrCode } from '@tamagui/lucide-icons'
+import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, YStack } from 'tamagui'
 import MoreSheet from './MoreSheet'
 import { TabBarNavProps, TabNavOptions } from './types'
+import { VoxButton } from '../Button'
+import clientEnv from '@/config/clientEnv'
 
 const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
 const SAVProps: any = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
@@ -200,6 +202,20 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
   return (
     <>
       <SAV {...SAVProps} style={{ backgroundColor: 'white' }}>
+        {clientEnv.ENVIRONMENT === 'staging' ? (
+          <YStack zIndex={1000} height={44} position="absolute" top={-44 - 8} right={16} bottom={0} justifyContent="center" alignItems="center">
+            <VoxButton
+              onPress={() => navigation.navigate('scanner')}
+              variant="contained"
+              theme="purple"
+              size="xl"
+              shrink
+              iconLeft={ScanQrCode}
+            >
+              Scanner de billets
+            </VoxButton>
+          </YStack>
+        ) : null}
         <TabBar>
           <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
           {filteredRoutes.map((route, index) => {

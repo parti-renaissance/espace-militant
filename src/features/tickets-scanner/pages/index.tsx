@@ -102,20 +102,13 @@ export default function TicketScannerPage() {
     return (
       <YStack flex={1} backgroundColor="$textSurface">
         <YStack style={styles.cameraSection}>
-          <CameraView
-            style={styles.camera}
-            facing="back"
-            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-            barcodeScannerSettings={{
-              barcodeTypes: ['qr'],
-            }}
-          >
+          <YStack flex={1} backgroundColor="black">
             <View style={styles.overlay}>
               <View style={styles.scanArea}>
                 <View style={styles.scanFrame} />
               </View>
             </View>
-          </CameraView>
+          </YStack>
         </YStack>
         <YStack paddingVertical="$medium" gap="$medium" alignItems="center" justifyContent="center" height={height * 0.4}>
           <CameraOff size={96} color="$orange9" />

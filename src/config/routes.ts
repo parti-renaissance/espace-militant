@@ -78,15 +78,6 @@ export const ROUTES: TabRoute[] = [
     disabled: !(clientEnv.ENVIRONMENT === 'staging')
   },
   {
-    name: 'scanner',
-    screenName: 'Scanner de billets',
-    icon: ScanQrCode,
-    theme: 'gray',
-    hidden: true,
-    hiddenMobile: true,
-    disabled: !(clientEnv.ENVIRONMENT === 'staging')
-  },
-  {
     name: 'profil',
     screenName: 'Mon profil',
     icon: CircleUser,
