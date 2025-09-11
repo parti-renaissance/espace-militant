@@ -1,10 +1,10 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import { StyleSheet, View, Dimensions } from 'react-native'
+import { ActivityIndicator, Dimensions } from 'react-native'
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera'
 import { useScanTicket } from '@/services/tickets/hook'
 import { ScanTicketResponse } from '@/services/tickets/schema'
 import { User, Ticket, Clock, Tickets, CameraOff } from '@tamagui/lucide-icons'
-import { YStack, XStack, ScrollView } from 'tamagui'
+import { YStack, XStack, ScrollView, View } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import StatusIndicator from '../components/StatusIndicator'
 import VoxCard from '@/components/VoxCard/VoxCard'
@@ -45,7 +45,7 @@ export default function TicketScannerPage() {
           resetTimeoutRef.current = setTimeout(() => {
             setScanned(false)
             resetTimeoutRef.current = null
-          }, 5000)
+          }, 1000)
         },
         onSuccess: (response) => {
           setTicketData(response)
@@ -78,21 +78,21 @@ export default function TicketScannerPage() {
   const handleRequestPermission = useCallback(async () => {
     try {
       const result = await requestPermission()
-      
+
       if (!result.granted) {
-        toast.show('Permission refusée', { 
-          message: 'Veuillez autoriser l\'accès à la caméra dans les paramètres de l\'appareil', 
-          type: 'error' 
+        toast.show('Permission refusée', {
+          message: 'Veuillez autoriser l\'accès à la caméra dans les paramètres de l\'appareil',
+          type: 'error'
         })
       }
     } catch (error) {
-      toast.show('Erreur', { 
-        message: 'Impossible de demander la permission. Veuillez réessayer.', 
-        type: 'error' 
+      toast.show('Erreur', {
+        message: 'Impossible de demander la permission. Veuillez réessayer.',
+        type: 'error'
       })
     }
   }, [requestPermission])
-  
+
 
   if (!permission) {
     return <YStack />
@@ -101,11 +101,11 @@ export default function TicketScannerPage() {
   if (!permission.granted) {
     return (
       <YStack flex={1} backgroundColor="$textSurface">
-        <YStack style={styles.cameraSection}>
+        <YStack height={height * 0.4} backgroundColor="black">
           <YStack flex={1} backgroundColor="black">
-            <View style={styles.overlay}>
-              <View style={styles.scanArea}>
-                <View style={styles.scanFrame} />
+            <View flex={1} backgroundColor="transparent" justifyContent="center" alignItems="center">
+              <View width={150} height={150} marginTop={32} justifyContent="center" alignItems="center">
+                <View width="100%" height="100%" borderWidth={8} borderColor="#F5D900" borderRadius={10} backgroundColor="transparent" />
               </View>
             </View>
           </YStack>
@@ -114,15 +114,15 @@ export default function TicketScannerPage() {
           <CameraOff size={96} color="$orange9" />
           <YStack maxWidth={360} mx="auto" gap="$medium">
             <Text.LG textAlign="center" primary semibold>
-              Autoriser l’accès à l’appareil photo
+              Autoriser l'accès à l'appareil photo
             </Text.LG>
             <Text.MD primary textAlign="center">
-              L’usage de l’appareil photo est nécessaire au scan des billets.
+              L'usage de l'appareil photo est nécessaire au scan des billets.
             </Text.MD>
           </YStack>
           <YStack>
-            <VoxButton 
-              onPress={handleRequestPermission} 
+            <VoxButton
+              onPress={handleRequestPermission}
               variant="outlined"
             >
               J'autorise
@@ -135,20 +135,22 @@ export default function TicketScannerPage() {
 
   return (
     <YStack flex={1} backgroundColor="$textSurface">
-      <YStack style={styles.cameraSection}>
+      <YStack height={height * 0.4} backgroundColor="black">
         <CameraView
-          style={styles.camera}
+          style={{ flex: 1 }}
           facing="back"
           onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
           barcodeScannerSettings={{
             barcodeTypes: ['qr'],
           }}
         >
-          <View style={styles.overlay}>
-            <View style={styles.scanArea}>
-              <View style={styles.scanFrame} />
+          <View flex={1} backgroundColor="transparent" justifyContent="center" alignItems="center">
+            <View width={150} height={150} marginTop={32} justifyContent="center" alignItems="center">
+              <View width="100%" height="100%" borderWidth={8} borderColor={scanned ? '#E0C600' : '#F5D900'} borderRadius={10} backgroundColor="transparent" justifyContent="center" alignItems="center">
+                {scanTicketMutation.isPending && <ActivityIndicator size="large" color="#F5D900" />}
+              </View>
             </View>
-            <Text style={styles.instructionText}>
+            <Text color="white" fontSize={14} textAlign="center" marginTop={15} paddingHorizontal={20}>
               Pointez la caméra vers le QR code du ticket
             </Text>
           </View>
@@ -178,23 +180,23 @@ export default function TicketScannerPage() {
                     <YStack gap="$small">
                       <XStack alignItems="center">
                         <Ticket size={16} color="$gray10" />
-                        <Text style={styles.label}>ID:</Text>
-                        <Text style={styles.value}>{ticketData.id}</Text>
+                        <Text fontSize={12} fontWeight="600" color="#666">ID:</Text>
+                        <Text fontSize={12} color="#333" flex={1}>{ticketData.id}</Text>
                       </XStack>
 
                       {ticketData.userName && (
                         <XStack alignItems="center">
                           <User size={16} color="$gray10" />
-                          <Text style={styles.label}>Nom:</Text>
-                          <Text style={styles.value}>{ticketData.userName}</Text>
+                          <Text fontSize={12} fontWeight="600" color="#666">Nom:</Text>
+                          <Text fontSize={12} color="#333" flex={1}>{ticketData.userName}</Text>
                         </XStack>
                       )}
 
                       {ticketData.type && (
                         <XStack alignItems="center">
                           <Ticket size={16} color="$gray10" />
-                          <Text style={styles.label}>Type:</Text>
-                          <Text style={styles.value}>{ticketData.type}</Text>
+                          <Text fontSize={12} fontWeight="600" color="#666">Type:</Text>
+                          <Text fontSize={12} color="#333" flex={1}>{ticketData.type}</Text>
                         </XStack>
                       )}
 
@@ -204,8 +206,8 @@ export default function TicketScannerPage() {
                 {ticketData.scannedAt && (
                   <XStack alignItems="center">
                     <Clock size={16} color="$gray10" />
-                    <Text style={styles.label}>Scanné le:</Text>
-                    <Text style={styles.value}>
+                    <Text fontSize={12} fontWeight="600" color="#666">Scanné le:</Text>
+                    <Text fontSize={12} color="#333" flex={1}>
                       {new Date(ticketData.scannedAt).toLocaleString('fr-FR')}
                     </Text>
                   </XStack>
@@ -219,80 +221,3 @@ export default function TicketScannerPage() {
   )
 }
 
-const styles = StyleSheet.create({
-  cameraSection: {
-    height: height * 0.4, // 40% de la hauteur pour la caméra
-    backgroundColor: 'black',
-  },
-  camera: {
-    flex: 1,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scanArea: {
-    width: 150,
-    height: 150,
-    marginTop: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scanFrame: {
-    width: '100%',
-    height: '100%',
-    borderWidth: 8,
-    borderColor: '#F5D900',
-    borderRadius: 10,
-    backgroundColor: 'transparent',
-  },
-  instructionText: {
-    color: 'white',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 15,
-    paddingHorizontal: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  message: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: 'white',
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#666',
-  },
-  value: {
-    fontSize: 12,
-    color: '#333',
-    flex: 1,
-  },
-  timestamp: {
-    fontSize: 10,
-    color: '#999',
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-  },
-})
