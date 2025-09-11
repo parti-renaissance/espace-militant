@@ -156,8 +156,14 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
 
   React.useEffect(() => {
     const key = state.index > filteredRoutes.length - 1 ? 'more' : state.routes[state.index].key
+    if (otherIsFocus) {
+      return
+    }
     position.value = withSpring(getPositionFromKey(key), springConfig)
-  }, [state.index])
+    setTimeout(() => {
+      activeColor.value = activeColorValue
+    }, 100)
+  }, [state.index, otherIsFocus])
 
   const indicatorAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -179,11 +185,6 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
 
   const handleMoreClose = () => {
     setOtherFocus(false)
-    const key = state.index > filteredRoutes.length - 1 ? 'more' : state.routes[state.index].key
-    position.value = withSpring(getPositionFromKey(key), springConfig)
-    setTimeout(() => {
-      activeColor.value = activeColorValue
-    }, 100)
   }
 
   const handleOtherPress = () => {
