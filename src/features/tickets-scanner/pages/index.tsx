@@ -3,7 +3,7 @@ import { ActivityIndicator, Dimensions } from 'react-native'
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera'
 import { useScanTicket } from '@/services/tickets/hook'
 import { ScanTicketResponse } from '@/services/tickets/schema'
-import { User, Tickets, CameraOff, MapPin, Car, Home } from '@tamagui/lucide-icons'
+import { Tickets, CameraOff } from '@tamagui/lucide-icons'
 import { YStack, XStack, ScrollView, View } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import StatusIndicator, { StatusIndicatorSkeleton } from '../components/StatusIndicator'
@@ -25,11 +25,8 @@ export default function TicketScannerPage() {
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleScanTicket = useCallback((ticketUuid: string) => {
-    console.log('QR Code scanné:', ticketUuid)
-
     // Vérifier si c'est le même ticket que le dernier scanné
     if (lastScannedId === ticketUuid) {
-      console.log('Même ticket que le dernier scanné, ignoré')
       return
     }
     setScanned(true)
