@@ -3,7 +3,6 @@ import { QrCode, TicketCheck, TicketX } from '@tamagui/lucide-icons'
 import { YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import { ScanTicketResponse } from '@/services/tickets/schema'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 interface StatusIndicatorProps {
   ticket: ScanTicketResponse
@@ -18,28 +17,28 @@ export default function StatusIndicator({ ticket }: StatusIndicatorProps) {
           color: '$green4',
           icon: TicketCheck,
           title: 'VALIDE',
-          subtitle: ticket.status.subtitle
+          subtitle: ticket.status.message
         }
       case 'invalid':
         return {
           color: '$red4',
           icon: TicketX,
           title: 'INVALIDE',
-          subtitle: ticket.status.subtitle
+          subtitle: ticket.status.message
         }
       case 'unknown':
         return {
           color: '$gray4',
           icon: QrCode,
           title: 'INCONNU',
-          subtitle: ticket.status.subtitle
+          subtitle: ticket.status.message
         }
       default:
         return {
           color: '$gray4',
           icon: QrCode,
           title: 'INCONNU',
-          subtitle: ticket.status.subtitle
+          subtitle: ticket.status.message
         }
     }
   }
