@@ -6,11 +6,12 @@ import { ScanTicketResponse } from '@/services/tickets/schema'
 import { User, Tickets, CameraOff, MapPin, Car, Home } from '@tamagui/lucide-icons'
 import { YStack, XStack, ScrollView, View } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
-import StatusIndicator from '../components/StatusIndicator'
+import StatusIndicator, { StatusIndicatorSkeleton } from '../components/StatusIndicator'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ActivistTags from '@/components/ActivistTags'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 const { width, height } = Dimensions.get('window')
 
@@ -160,127 +161,100 @@ export default function TicketScannerPage() {
 
       <YStack flex={1}>
         <ScrollView flex={1} showsVerticalScrollIndicator={false}>
-          <YStack $gtSm={{ maxWidth: 520 }} width="100%" marginHorizontal="auto">
-            {!ticketData ? (
-              <YStack paddingVertical="$medium" gap="$medium" alignItems="center" justifyContent="center" height={height * 0.4}>
-                <Tickets size={96} color="$blue9" />
-                <YStack maxWidth={360} mx="auto" gap="$medium">
-                  <Text.LG textAlign="center" primary semibold>
-                    Lancez un premier scan de billet pour commencer
-                  </Text.LG>
-                  <Text.MD primary textAlign="center">
-                    Pour lancer un premier scan, pointez votre appareil photo vers le QR code d’un billet.
-                  </Text.MD>
-                </YStack>
+          <YStack $gtSm={{ maxWidth: 520 }} paddingBottom={100} width="100%" marginHorizontal="auto">
+            {scanTicketMutation.isPending ? (
+              <SkeCard>
+                <SkeCard.Content>
+                  <StatusIndicatorSkeleton />
+                  <YStack backgroundColor="#F7F7F7" height={50} borderRadius="$medium" />
+                  <YStack backgroundColor="#F7F7F7" height={200} borderRadius="$medium" />
+                </SkeCard.Content>
+              </SkeCard>
+            ) : !ticketData ? (
+            <YStack paddingVertical="$medium" gap="$medium" alignItems="center" justifyContent="center" height={height * 0.4}>
+              <Tickets size={96} color="$blue9" />
+              <YStack maxWidth={360} mx="auto" gap="$medium">
+                <Text.LG textAlign="center" primary semibold>
+                  Lancez un premier scan de billet pour commencer
+                </Text.LG>
+                <Text.MD primary textAlign="center">
+                  Pour lancer un premier scan, pointez votre appareil photo vers le QR code d’un billet.
+                </Text.MD>
               </YStack>
+            </YStack>
             ) : (
-              <YStack gap="$medium" paddingVertical="$medium">
-                <StatusIndicator ticket={ticketData} />
+            <YStack gap="$medium" paddingVertical="$medium">
+              <StatusIndicator ticket={ticketData} />
 
-                <YStack gap="$medium" mt="$small">
-                  {ticketData.type && (
-                    <YStack backgroundColor={ticketData.type.color} borderRadius="$medium" padding="$medium" mx="$medium">
-                      <Text.LG textAlign="center" color="white">
-                        {ticketData.type.label}
-                      </Text.LG>
-                    </YStack>
-                  )}
-
-                  {ticketData.alert && (
-                    <YStack backgroundColor="$blue1" borderRadius="$medium" padding="$medium" borderColor="$blue3" borderWidth={2} mx="$medium">
-                      <Text.LG textAlign="center" color="$blue6">
-                        {ticketData.alert}
-                      </Text.LG>
-                    </YStack>
-                  )}
-                </YStack>
-
-                {/* Informations utilisateur */}
-                {ticketData.user && (
-                  <VoxCard>
-                    <VoxCard.Content>
-                      <YStack gap="$small">
-                        <Text.SM fontWeight="600" color="#333" marginBottom="$xs">Informations utilisateur</Text.SM>
-                        <XStack alignItems="center">
-                          <User size={16} color="$gray10" />
-                          <Text fontSize={12} fontWeight="600" color="#666">Nom:</Text>
-                          <Text fontSize={12} color="#333" flex={1}>
-                            {ticketData.user.civility && `${ticketData.user.civility} `}
-                            {ticketData.user.first_name} {ticketData.user.last_name}
-                          </Text>
-                        </XStack>
-
-                        {ticketData.user.age && (
-                          <XStack alignItems="center">
-                            <User size={16} color="$gray10" />
-                            <Text fontSize={12} fontWeight="600" color="#666">Âge:</Text>
-                            <Text fontSize={12} color="#333" flex={1}>{ticketData.user.age} ans</Text>
-                          </XStack>
-                        )}
-
-                        {ticketData.user.tags && ticketData.user.tags.length > 0 && (
-                          <YStack gap="$xs">
-                            <Text fontSize={12} fontWeight="600" color="#666">Tags:</Text>
-                            <ActivistTags tags={ticketData.user.tags} />
-                          </YStack>
-                        )}
-                      </YStack>
-                    </VoxCard.Content>
-                  </VoxCard>
+              <YStack gap="$medium" mt="$small">
+                {ticketData.type && (
+                  <YStack backgroundColor={ticketData.type.color} borderRadius="$medium" padding="$medium" mx="$medium">
+                    <Text.LG textAlign="center" color="white">
+                      {ticketData.type.label}
+                    </Text.LG>
+                  </YStack>
                 )}
 
-                {/* Informations de l'événement */}
-                {(ticketData.visit_day || ticketData.transport || ticketData.accommodation) && (
-                  <VoxCard>
-                    <VoxCard.Content>
-                      <YStack gap="$small">
-                        <Text.SM fontWeight="600" color="#333" marginBottom="$xs">Détails de l'événement</Text.SM>
-                        {ticketData.visit_day && (
-                          <XStack alignItems="center">
-                            <MapPin size={16} color="$gray10" />
-                            <Text fontSize={12} fontWeight="600" color="#666">Jour:</Text>
-                            <Text fontSize={12} color="#333" flex={1}>{ticketData.visit_day}</Text>
-                          </XStack>
-                        )}
-
-                        {ticketData.transport && (
-                          <XStack alignItems="center">
-                            <Car size={16} color="$gray10" />
-                            <Text fontSize={12} fontWeight="600" color="#666">Transport:</Text>
-                            <Text fontSize={12} color="#333" flex={1}>{ticketData.transport}</Text>
-                          </XStack>
-                        )}
-
-                        {ticketData.accommodation && (
-                          <XStack alignItems="center">
-                            <Home size={16} color="$gray10" />
-                            <Text fontSize={12} fontWeight="600" color="#666">Hébergement:</Text>
-                            <Text fontSize={12} color="#333" flex={1}>{ticketData.accommodation}</Text>
-                          </XStack>
-                        )}
-                      </YStack>
-                    </VoxCard.Content>
-                  </VoxCard>
-                )}
-
-                {/* Historique des scans */}
-                {ticketData.scanHistory && ticketData.scanHistory.length > 0 && (
-                  <YStack gap="$small" mx="$medium">
-                    <Text.LG secondary>Historique des scans</Text.LG>
-                    {ticketData.scanHistory.map((scan, index) => (
-                      <XStack key={index} alignItems="center" justifyContent="space-between">
-                        <Text.SM primary medium>
-                          {new Date(scan.date).toLocaleString('fr-FR')}
-                        </Text.SM>
-                        <Text.SM secondary>
-                              {scan.name} ({scan.public_id})
-                        </Text.SM>
-                        
-                      </XStack>
-                    ))}
+                {ticketData.alert && (
+                  <YStack backgroundColor="$blue1" borderRadius="$medium" padding="$medium" borderColor="$blue3" borderWidth={2} mx="$medium">
+                    <Text.LG textAlign="center" color="$blue6">
+                      {ticketData.alert}
+                    </Text.LG>
                   </YStack>
                 )}
               </YStack>
+
+              {/* Informations utilisateur */}
+              {ticketData.user && (
+                <VoxCard>
+                  <VoxCard.Content>
+                    <YStack gap="$small">
+                      <YStack gap="$xsmall">
+                        <Text.MD secondary regular>{ticketData.user.public_id}</Text.MD>
+                        <Text.LG primary semibold>{ticketData.user.civility && `${ticketData.user.civility} `}{ticketData.user.first_name} {ticketData.user.last_name}</Text.LG>
+                      </YStack>
+                      {ticketData.user.tags && ticketData.user.tags.length > 0 && (
+                        <ActivistTags tags={ticketData.user.tags} />
+                      )}
+                      {ticketData.user.age && (
+                        <Text.MD secondary regular>{ticketData.user.age} ans</Text.MD>
+                      )}
+
+                      <YStack>
+                        {ticketData.visit_day && (
+                          <Text.MD regular>{ticketData.visit_day}</Text.MD>
+                        )}
+                        {ticketData.transport && (
+                          <Text.MD regular>{ticketData.transport}</Text.MD>
+                        )}
+                        {ticketData.accommodation && (
+                          <Text.MD regular>{ticketData.accommodation}</Text.MD>
+                        )}
+                      </YStack>
+                    </YStack>
+                  </VoxCard.Content>
+                </VoxCard>
+              )}
+              <YStack gap="$small" mx="$medium">
+                <Text.LG secondary>Historique des scans</Text.LG>
+                {ticketData.scanHistory && ticketData.scanHistory.length > 0 ? (
+                  ticketData.scanHistory.map((scan, index) => (
+                    <XStack key={index} alignItems="center" justifyContent="space-between">
+                      <Text.SM primary medium>
+                        {new Date(scan.date).toLocaleString('fr-FR')}
+                      </Text.SM>
+                      <Text.SM secondary>
+                        {scan.name} ({scan.public_id})
+                      </Text.SM>
+
+                    </XStack>
+                  ))
+                ) : (
+                  <Text.SM secondary regular>Aucun historique de scan</Text.SM>
+                )}
+              </YStack>
+
+            </YStack>
             )}
           </YStack>
         </ScrollView>
