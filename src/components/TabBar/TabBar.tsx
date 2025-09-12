@@ -203,13 +203,17 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
   return (
     <>
       <SAV {...SAVProps} style={{ backgroundColor: 'white' }}>
-        
+
         {clientEnv.ENVIRONMENT === 'staging' ? (
-          <XStack zIndex={1000} height={44} position="absolute" top={-44 - 8} right={16} bottom={0} justifyContent="center" alignItems="center">
-            <FutureButton onPress={() => navigation.navigate('scanner')}>
-              <QrCode size={20} color="white" />
-              Scanner
-            </FutureButton>
+          <XStack zIndex={1000} height={58 + 16 + 16} position="absolute" top={-58 - 8 - 16 - 16} right={0} left={0} bottom={0} justifyContent="center" alignItems="center">
+            <XStack padding={16} backgroundColor="#290A4299" borderRadius={999}>
+              <FutureButton onPress={() => navigation.navigate('scanner')}>
+                <XStack alignItems="center" gap={8}>
+                  <QrCode size={20} color="white" />
+                  <Text.LG regular color="white">Scanner un billet</Text.LG>
+                </XStack>
+              </FutureButton>
+            </XStack>
           </XStack>
         ) : null}
         <TabBar>

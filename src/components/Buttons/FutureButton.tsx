@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-import { Button, View } from 'tamagui';
+import { View, } from 'tamagui';
 import { LinearGradient  } from 'expo-linear-gradient';
+import { TouchableHighlight } from 'react-native';
+import Text from '../base/Text';
 
 type FutureButtonProps = {
   label?: string;
@@ -19,8 +21,7 @@ export default function FutureButton({
   children,
   onPress,
   disabled = false,
-  size = 40,
-  durationMs = 6000,
+  durationMs = 3000,
 }: Readonly<FutureButtonProps>) {
   const rotation = useSharedValue(0);
 
@@ -65,32 +66,21 @@ export default function FutureButton({
           colors={['#290A42', '#8EC5FC', '#E0C3FC', '#A1FFCE', '#290A42']}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
-          style={{position: 'absolute', top: '35%', left: 0, right: 0, bottom: 0}}
+          style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}
         />
       </Animated.View>
 
       {/* Bouton au-dessus (statique) */}
-      <Button
+      <TouchableHighlight
         onPress={onPress}
         disabled={disabled}
-        fontWeight="600"
-        borderRadius={999}
-        height={size}
-        paddingHorizontal={20}
-        bg="#290A42"
-        hoverStyle={{
-          backgroundColor: '#3A185C',
-          borderColor: '#3A185C',
-        }}
-        pressStyle={{
-          backgroundColor: '#290A42',
-          borderColor: '#290A42',
-        }}
-        color="white"
+        style={{ borderRadius: 999, paddingHorizontal: 24, paddingVertical: 16, backgroundColor: '#290A42', alignItems: 'center', justifyContent: 'center' }}
+        underlayColor="#3A185C"
+        activeOpacity={0.7}
         aria-label={label}
       >
-        {children || label}
-      </Button>
+        {children || <Text.LG regular>{label}</Text.LG>}
+      </TouchableHighlight>
     </View>
   );
 }
