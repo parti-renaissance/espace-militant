@@ -1,15 +1,17 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import { StyleSheet, View, Dimensions } from 'react-native'
+import { ActivityIndicator, Dimensions } from 'react-native'
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera'
 import { useScanTicket } from '@/services/tickets/hook'
 import { ScanTicketResponse } from '@/services/tickets/schema'
-import { User, Ticket, Clock, Tickets, CameraOff } from '@tamagui/lucide-icons'
-import { YStack, XStack, ScrollView } from 'tamagui'
+import { Tickets, CameraOff } from '@tamagui/lucide-icons'
+import { YStack, XStack, ScrollView, View } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
-import StatusIndicator from '../components/StatusIndicator'
+import StatusIndicator, { StatusIndicatorSkeleton } from '../components/StatusIndicator'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import ActivistTags from '@/components/ActivistTags'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 const { width, height } = Dimensions.get('window')
 
@@ -22,18 +24,15 @@ export default function TicketScannerPage() {
   const toast = useToastController()
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const handleScanTicket = useCallback((data: string) => {
-    console.log('QR Code scanné:', data)
-
+  const handleScanTicket = useCallback((ticketUuid: string) => {
     // Vérifier si c'est le même ticket que le dernier scanné
-    if (lastScannedId === data) {
-      console.log('Même ticket que le dernier scanné, ignoré')
+    if (lastScannedId === ticketUuid) {
       return
     }
     setScanned(true)
     // Appeler l'API pour vérifier le ticket
     scanTicketMutation.mutate(
-      { qrCodeId: data },
+      ticketUuid,
       {
         onSettled: () => {
           // Annuler le timeout précédent s'il existe
@@ -45,11 +44,11 @@ export default function TicketScannerPage() {
           resetTimeoutRef.current = setTimeout(() => {
             setScanned(false)
             resetTimeoutRef.current = null
-          }, 5000)
+          }, 1000)
         },
         onSuccess: (response) => {
           setTicketData(response)
-          setLastScannedId(data)
+          setLastScannedId(ticketUuid)
         },
         onError: (error) => {
           console.error('Erreur lors du scan:', error)
@@ -78,21 +77,21 @@ export default function TicketScannerPage() {
   const handleRequestPermission = useCallback(async () => {
     try {
       const result = await requestPermission()
-      
+
       if (!result.granted) {
-        toast.show('Permission refusée', { 
-          message: 'Veuillez autoriser l\'accès à la caméra dans les paramètres de l\'appareil', 
-          type: 'error' 
+        toast.show('Permission refusée', {
+          message: 'Veuillez autoriser l\'accès à la caméra dans les paramètres de l\'appareil',
+          type: 'error'
         })
       }
     } catch (error) {
-      toast.show('Erreur', { 
-        message: 'Impossible de demander la permission. Veuillez réessayer.', 
-        type: 'error' 
+      toast.show('Erreur', {
+        message: 'Impossible de demander la permission. Veuillez réessayer.',
+        type: 'error'
       })
     }
   }, [requestPermission])
-  
+
 
   if (!permission) {
     return <YStack />
@@ -101,35 +100,28 @@ export default function TicketScannerPage() {
   if (!permission.granted) {
     return (
       <YStack flex={1} backgroundColor="$textSurface">
-        <YStack style={styles.cameraSection}>
-          <CameraView
-            style={styles.camera}
-            facing="back"
-            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-            barcodeScannerSettings={{
-              barcodeTypes: ['qr'],
-            }}
-          >
-            <View style={styles.overlay}>
-              <View style={styles.scanArea}>
-                <View style={styles.scanFrame} />
+        <YStack height={height * 0.4} backgroundColor="black">
+          <YStack flex={1} backgroundColor="black">
+            <View flex={1} backgroundColor="transparent" justifyContent="center" alignItems="center">
+              <View width={150} height={150} marginTop={32} justifyContent="center" alignItems="center">
+                <View width="100%" height="100%" borderWidth={8} borderColor="#F5D900" borderRadius={10} backgroundColor="transparent" />
               </View>
             </View>
-          </CameraView>
+          </YStack>
         </YStack>
         <YStack paddingVertical="$medium" gap="$medium" alignItems="center" justifyContent="center" height={height * 0.4}>
           <CameraOff size={96} color="$orange9" />
           <YStack maxWidth={360} mx="auto" gap="$medium">
             <Text.LG textAlign="center" primary semibold>
-              Autoriser l’accès à l’appareil photo
+              Autoriser l'accès à l'appareil photo
             </Text.LG>
             <Text.MD primary textAlign="center">
-              L’usage de l’appareil photo est nécessaire au scan des billets.
+              L'usage de l'appareil photo est nécessaire au scan des billets.
             </Text.MD>
           </YStack>
           <YStack>
-            <VoxButton 
-              onPress={handleRequestPermission} 
+            <VoxButton
+              onPress={handleRequestPermission}
               variant="outlined"
             >
               J'autorise
@@ -142,20 +134,22 @@ export default function TicketScannerPage() {
 
   return (
     <YStack flex={1} backgroundColor="$textSurface">
-      <YStack style={styles.cameraSection}>
+      <YStack height={height * 0.4} backgroundColor="black">
         <CameraView
-          style={styles.camera}
+          style={{ flex: 1 }}
           facing="back"
           onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
           barcodeScannerSettings={{
             barcodeTypes: ['qr'],
           }}
         >
-          <View style={styles.overlay}>
-            <View style={styles.scanArea}>
-              <View style={styles.scanFrame} />
+          <View flex={1} backgroundColor="transparent" justifyContent="center" alignItems="center">
+            <View width={150} height={150} marginTop={32} justifyContent="center" alignItems="center">
+              <View width="100%" height="100%" borderWidth={8} borderColor={scanned ? '#E0C600' : '#F5D900'} borderRadius={10} backgroundColor="transparent" justifyContent="center" alignItems="center">
+                {scanTicketMutation.isPending && <ActivityIndicator size="large" color="#F5D900" />}
+              </View>
             </View>
-            <Text style={styles.instructionText}>
+            <Text color="white" fontSize={14} textAlign="center" marginTop={15} paddingHorizontal={20}>
               Pointez la caméra vers le QR code du ticket
             </Text>
           </View>
@@ -164,8 +158,16 @@ export default function TicketScannerPage() {
 
       <YStack flex={1}>
         <ScrollView flex={1} showsVerticalScrollIndicator={false}>
-          <YStack $gtSm={{ maxWidth: 520 }} width="100%" marginHorizontal="auto">
-            {!ticketData ? (
+          <YStack $gtSm={{ maxWidth: 520 }} paddingBottom={100} width="100%" marginHorizontal="auto">
+            {scanTicketMutation.isPending ? (
+              <SkeCard>
+                <SkeCard.Content>
+                  <StatusIndicatorSkeleton />
+                  <YStack backgroundColor="#F7F7F7" height={50} borderRadius="$medium" />
+                  <YStack backgroundColor="#F7F7F7" height={200} borderRadius="$medium" />
+                </SkeCard.Content>
+              </SkeCard>
+            ) : !ticketData ? (
               <YStack paddingVertical="$medium" gap="$medium" alignItems="center" justifyContent="center" height={height * 0.4}>
                 <Tickets size={96} color="$blue9" />
                 <YStack maxWidth={360} mx="auto" gap="$medium">
@@ -180,43 +182,77 @@ export default function TicketScannerPage() {
             ) : (
               <YStack gap="$medium" paddingVertical="$medium">
                 <StatusIndicator ticket={ticketData} />
-                <VoxCard>
-                  <VoxCard.Content>
-                    <YStack gap="$small">
-                      <XStack alignItems="center">
-                        <Ticket size={16} color="$gray10" />
-                        <Text style={styles.label}>ID:</Text>
-                        <Text style={styles.value}>{ticketData.id}</Text>
-                      </XStack>
 
-                      {ticketData.userName && (
-                        <XStack alignItems="center">
-                          <User size={16} color="$gray10" />
-                          <Text style={styles.label}>Nom:</Text>
-                          <Text style={styles.value}>{ticketData.userName}</Text>
-                        </XStack>
-                      )}
+                {(ticketData.type || ticketData.alert) && (
+                  <YStack gap="$medium" mt="$small">
+                    {ticketData.type?.label && (
+                      <YStack backgroundColor={ticketData.type.color} borderRadius="$medium" padding="$medium" mx="$medium">
+                        <Text.LG textAlign="center" color="white">
+                          {ticketData.type.label}
+                        </Text.LG>
+                      </YStack>
+                    )}
 
-                      {ticketData.type && (
-                        <XStack alignItems="center">
-                          <Ticket size={16} color="$gray10" />
-                          <Text style={styles.label}>Type:</Text>
-                          <Text style={styles.value}>{ticketData.type}</Text>
-                        </XStack>
-                      )}
-
-                    </YStack>
-                  </VoxCard.Content>
-                </VoxCard>
-                {ticketData.scannedAt && (
-                  <XStack alignItems="center">
-                    <Clock size={16} color="$gray10" />
-                    <Text style={styles.label}>Scanné le:</Text>
-                    <Text style={styles.value}>
-                      {new Date(ticketData.scannedAt).toLocaleString('fr-FR')}
-                    </Text>
-                  </XStack>
+                    {ticketData.alert && (
+                      <YStack backgroundColor="$blue1" borderRadius="$medium" padding="$medium" borderColor="$blue3" borderWidth={2} mx="$medium">
+                        <Text.LG textAlign="center" color="$blue6">
+                          {ticketData.alert}
+                        </Text.LG>
+                      </YStack>
+                    )}
+                  </YStack>
                 )}
+
+                {/* Informations utilisateur */}
+                {ticketData.user && (
+                  <VoxCard>
+                    <VoxCard.Content>
+                      <YStack gap="$small">
+                        <YStack gap="$xsmall">
+                          <Text.MD secondary regular>{ticketData.user.public_id}</Text.MD>
+                          <Text.LG primary semibold>{ticketData.user.civility && `${ticketData.user.civility} `}{ticketData.user.first_name} {ticketData.user.last_name}</Text.LG>
+                        </YStack>
+                        {ticketData.user.tags && ticketData.user.tags.length > 0 && (
+                          <ActivistTags tags={ticketData.user.tags} />
+                        )}
+                        {ticketData.user.age && (
+                          <Text.MD secondary regular>{ticketData.user.age} ans</Text.MD>
+                        )}
+
+                        <YStack>
+                          {ticketData.visit_day && (
+                            <Text.MD regular>{ticketData.visit_day}</Text.MD>
+                          )}
+                          {ticketData.transport && (
+                            <Text.MD regular>{ticketData.transport}</Text.MD>
+                          )}
+                          {ticketData.accommodation && (
+                            <Text.MD regular>{ticketData.accommodation}</Text.MD>
+                          )}
+                        </YStack>
+                      </YStack>
+                    </VoxCard.Content>
+                  </VoxCard>
+                )}
+                <YStack gap="$small" mx="$medium">
+                  <Text.LG secondary>Historique des scans</Text.LG>
+                  {ticketData.scan_history && ticketData.scan_history.length > 0 ? (
+                    ticketData.scan_history.map((scan, index) => (
+                      <XStack key={index} alignItems="center" justifyContent="space-between">
+                        <Text.SM primary medium>
+                          {new Date(scan.date).toLocaleString('fr-FR')}
+                        </Text.SM>
+                        <Text.SM secondary>
+                          {scan.name} ({scan.public_id})
+                        </Text.SM>
+
+                      </XStack>
+                    ))
+                  ) : (
+                    <Text.SM secondary regular>Aucun historique de scan</Text.SM>
+                  )}
+                </YStack>
+
               </YStack>
             )}
           </YStack>
@@ -226,80 +262,3 @@ export default function TicketScannerPage() {
   )
 }
 
-const styles = StyleSheet.create({
-  cameraSection: {
-    height: height * 0.4, // 40% de la hauteur pour la caméra
-    backgroundColor: 'black',
-  },
-  camera: {
-    flex: 1,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scanArea: {
-    width: 150,
-    height: 150,
-    marginTop: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scanFrame: {
-    width: '100%',
-    height: '100%',
-    borderWidth: 8,
-    borderColor: '#F5D900',
-    borderRadius: 10,
-    backgroundColor: 'transparent',
-  },
-  instructionText: {
-    color: 'white',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 15,
-    paddingHorizontal: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  message: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: 'white',
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#666',
-  },
-  value: {
-    fontSize: 12,
-    color: '#333',
-    flex: 1,
-  },
-  timestamp: {
-    fontSize: 10,
-    color: '#999',
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-  },
-})

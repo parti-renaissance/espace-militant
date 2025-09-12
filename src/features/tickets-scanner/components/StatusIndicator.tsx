@@ -9,41 +9,41 @@ interface StatusIndicatorProps {
 }
 
 export default function StatusIndicator({ ticket }: StatusIndicatorProps) {
-  const getStatusConfig = (status: ScanTicketResponse['status']) => {
-    switch (status) {
+  const getStatusConfig = (statusCode: string) => {
+    switch (statusCode) {
       case 'valid':
       case 'already_scanned':
         return {
           color: '$green4',
           icon: TicketCheck,
           title: 'VALIDE',
-          subtitle: 'Personne autorisée à entrer'
+          subtitle: ticket.status.message
         }
       case 'invalid':
         return {
-          color: '$orange6',
+          color: '$red4',
           icon: TicketX,
           title: 'INVALIDE',
-          subtitle: 'Personne non-autorisée à entrer'
+          subtitle: ticket.status.message
         }
       case 'unknown':
         return {
           color: '$gray4',
           icon: QrCode,
           title: 'INCONNU',
-          subtitle: 'Envoyer au point information'
+          subtitle: ticket.status.message
         }
       default:
         return {
           color: '$gray4',
           icon: QrCode,
           title: 'INCONNU',
-          subtitle: 'Envoyer au point information'
+          subtitle: ticket.status.message
         }
     }
   }
 
-  const config = getStatusConfig(ticket.status)
+  const config = getStatusConfig(ticket.status.code)
   const IconComponent = config.icon
 
   return (
@@ -63,3 +63,15 @@ export default function StatusIndicator({ ticket }: StatusIndicatorProps) {
   )
 }
 
+export const StatusIndicatorSkeleton = () => {
+  return (
+    <YStack gap="$small" alignItems="center" justifyContent="center">
+      <YStack backgroundColor="#F7F7F7" w={64} h={64} borderRadius={32}>
+      </YStack>
+      <YStack gap="$xsmall" alignItems="center">
+        <YStack h={25} w={100} bg="#F7F7F7" />
+        <YStack h={16} w={200} bg="#F7F7F7" />
+      </YStack>
+    </YStack>
+  )
+}

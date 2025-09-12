@@ -4,10 +4,12 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } f
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Text from '@/components/base/Text'
 import BottomSheet from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheet/BottomSheet'
-import { MoreHorizontal } from '@tamagui/lucide-icons'
-import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties } from 'tamagui'
+import { MoreHorizontal, QrCode } from '@tamagui/lucide-icons'
+import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, XStack } from 'tamagui'
 import MoreSheet from './MoreSheet'
 import { TabBarNavProps, TabNavOptions } from './types'
+import clientEnv from '@/config/clientEnv'
+import FutureButton from '../Buttons/FutureButton'
 
 const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
 const SAVProps: any = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
@@ -154,8 +156,14 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
 
   React.useEffect(() => {
     const key = state.index > filteredRoutes.length - 1 ? 'more' : state.routes[state.index].key
+    if (otherIsFocus) {
+      return
+    }
     position.value = withSpring(getPositionFromKey(key), springConfig)
-  }, [state.index])
+    setTimeout(() => {
+      activeColor.value = activeColorValue
+    }, 100)
+  }, [state.index, otherIsFocus])
 
   const indicatorAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -177,11 +185,6 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
 
   const handleMoreClose = () => {
     setOtherFocus(false)
-    const key = state.index > filteredRoutes.length - 1 ? 'more' : state.routes[state.index].key
-    position.value = withSpring(getPositionFromKey(key), springConfig)
-    setTimeout(() => {
-      activeColor.value = activeColorValue
-    }, 100)
   }
 
   const handleOtherPress = () => {
@@ -200,6 +203,19 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
   return (
     <>
       <SAV {...SAVProps} style={{ backgroundColor: 'white' }}>
+
+        {clientEnv.ENVIRONMENT === 'staging' ? (
+          <XStack zIndex={1000} height={58 + 16 + 16} position="absolute" top={-58 - 8 - 16 - 16} right={0} left={0} bottom={0} justifyContent="center" alignItems="center">
+            <XStack padding={16} backgroundColor="#290A4299" borderRadius={999}>
+              <FutureButton onPress={() => navigation.navigate('scanner')}>
+                <XStack alignItems="center" gap={8}>
+                  <QrCode size={20} color="white" />
+                  <Text.LG regular color="white">Scanner un billet</Text.LG>
+                </XStack>
+              </FutureButton>
+            </XStack>
+          </XStack>
+        ) : null}
         <TabBar>
           <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
           {filteredRoutes.map((route, index) => {

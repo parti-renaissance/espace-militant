@@ -1,6 +1,5 @@
-import { HomeIcon } from '@/assets/icons/nav'
 import { RestProfilResponse } from '@/services/profile/schema'
-import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap, HeartHandshake, ScanQrCode } from '@tamagui/lucide-icons'
+import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap, HeartHandshake } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
 import clientEnv from './clientEnv'
 import { IconComponent } from '@/models/common.model'
@@ -72,15 +71,6 @@ export const ROUTES: TabRoute[] = [
     name: 'questionnaires',
     screenName: 'Questionnaires',
     icon: ClipboardCheck,
-    theme: 'gray',
-    hidden: true,
-    hiddenMobile: true,
-    disabled: !(clientEnv.ENVIRONMENT === 'staging')
-  },
-  {
-    name: 'scanner',
-    screenName: 'Scanner de billets',
-    icon: ScanQrCode,
     theme: 'gray',
     hidden: true,
     hiddenMobile: true,
