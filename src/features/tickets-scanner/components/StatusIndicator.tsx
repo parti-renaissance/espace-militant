@@ -9,41 +9,41 @@ interface StatusIndicatorProps {
 }
 
 export default function StatusIndicator({ ticket }: StatusIndicatorProps) {
-  const getStatusConfig = (status: ScanTicketResponse['status']) => {
-    switch (status) {
+  const getStatusConfig = (statusCode: string) => {
+    switch (statusCode) {
       case 'valid':
       case 'already_scanned':
         return {
           color: '$green4',
           icon: TicketCheck,
           title: 'VALIDE',
-          subtitle: 'Personne autorisée à entrer'
+          subtitle: ticket.status.subtitle
         }
       case 'invalid':
         return {
-          color: '$orange6',
+          color: '$red4',
           icon: TicketX,
           title: 'INVALIDE',
-          subtitle: 'Personne non-autorisée à entrer'
+          subtitle: ticket.status.subtitle
         }
       case 'unknown':
         return {
           color: '$gray4',
           icon: QrCode,
           title: 'INCONNU',
-          subtitle: 'Envoyer au point information'
+          subtitle: ticket.status.subtitle
         }
       default:
         return {
           color: '$gray4',
           icon: QrCode,
           title: 'INCONNU',
-          subtitle: 'Envoyer au point information'
+          subtitle: ticket.status.subtitle
         }
     }
   }
 
-  const config = getStatusConfig(ticket.status)
+  const config = getStatusConfig(ticket.status.code)
   const IconComponent = config.icon
 
   return (

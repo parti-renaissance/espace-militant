@@ -3,13 +3,14 @@ import { ActivityIndicator, Dimensions } from 'react-native'
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera'
 import { useScanTicket } from '@/services/tickets/hook'
 import { ScanTicketResponse } from '@/services/tickets/schema'
-import { User, Ticket, Clock, Tickets, CameraOff } from '@tamagui/lucide-icons'
+import { User, Tickets, CameraOff, MapPin, Car, Home } from '@tamagui/lucide-icons'
 import { YStack, XStack, ScrollView, View } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import StatusIndicator from '../components/StatusIndicator'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import ActivistTags from '@/components/ActivistTags'
 
 const { width, height } = Dimensions.get('window')
 
@@ -175,42 +176,109 @@ export default function TicketScannerPage() {
             ) : (
               <YStack gap="$medium" paddingVertical="$medium">
                 <StatusIndicator ticket={ticketData} />
-                <VoxCard>
-                  <VoxCard.Content>
-                    <YStack gap="$small">
-                      <XStack alignItems="center">
-                        <Ticket size={16} color="$gray10" />
-                        <Text fontSize={12} fontWeight="600" color="#666">ID:</Text>
-                        <Text fontSize={12} color="#333" flex={1}>{ticketData.id}</Text>
-                      </XStack>
 
-                      {ticketData.userName && (
+                <YStack gap="$medium" mt="$small">
+                  {ticketData.type && (
+                    <YStack backgroundColor={ticketData.type.color} borderRadius="$medium" padding="$medium" mx="$medium">
+                      <Text.LG textAlign="center" color="white">
+                        {ticketData.type.label}
+                      </Text.LG>
+                    </YStack>
+                  )}
+
+                  {ticketData.alert && (
+                    <YStack backgroundColor="$blue1" borderRadius="$medium" padding="$medium" borderColor="$blue3" borderWidth={2} mx="$medium">
+                      <Text.LG textAlign="center" color="$blue6">
+                        {ticketData.alert}
+                      </Text.LG>
+                    </YStack>
+                  )}
+                </YStack>
+
+                {/* Informations utilisateur */}
+                {ticketData.user && (
+                  <VoxCard>
+                    <VoxCard.Content>
+                      <YStack gap="$small">
+                        <Text.SM fontWeight="600" color="#333" marginBottom="$xs">Informations utilisateur</Text.SM>
                         <XStack alignItems="center">
                           <User size={16} color="$gray10" />
                           <Text fontSize={12} fontWeight="600" color="#666">Nom:</Text>
-                          <Text fontSize={12} color="#333" flex={1}>{ticketData.userName}</Text>
+                          <Text fontSize={12} color="#333" flex={1}>
+                            {ticketData.user.civility && `${ticketData.user.civility} `}
+                            {ticketData.user.first_name} {ticketData.user.last_name}
+                          </Text>
                         </XStack>
-                      )}
 
-                      {ticketData.type && (
-                        <XStack alignItems="center">
-                          <Ticket size={16} color="$gray10" />
-                          <Text fontSize={12} fontWeight="600" color="#666">Type:</Text>
-                          <Text fontSize={12} color="#333" flex={1}>{ticketData.type}</Text>
-                        </XStack>
-                      )}
+                        {ticketData.user.age && (
+                          <XStack alignItems="center">
+                            <User size={16} color="$gray10" />
+                            <Text fontSize={12} fontWeight="600" color="#666">Âge:</Text>
+                            <Text fontSize={12} color="#333" flex={1}>{ticketData.user.age} ans</Text>
+                          </XStack>
+                        )}
 
-                    </YStack>
-                  </VoxCard.Content>
-                </VoxCard>
-                {ticketData.scannedAt && (
-                  <XStack alignItems="center">
-                    <Clock size={16} color="$gray10" />
-                    <Text fontSize={12} fontWeight="600" color="#666">Scanné le:</Text>
-                    <Text fontSize={12} color="#333" flex={1}>
-                      {new Date(ticketData.scannedAt).toLocaleString('fr-FR')}
-                    </Text>
-                  </XStack>
+                        {ticketData.user.tags && ticketData.user.tags.length > 0 && (
+                          <YStack gap="$xs">
+                            <Text fontSize={12} fontWeight="600" color="#666">Tags:</Text>
+                            <ActivistTags tags={ticketData.user.tags} />
+                          </YStack>
+                        )}
+                      </YStack>
+                    </VoxCard.Content>
+                  </VoxCard>
+                )}
+
+                {/* Informations de l'événement */}
+                {(ticketData.visit_day || ticketData.transport || ticketData.accommodation) && (
+                  <VoxCard>
+                    <VoxCard.Content>
+                      <YStack gap="$small">
+                        <Text.SM fontWeight="600" color="#333" marginBottom="$xs">Détails de l'événement</Text.SM>
+                        {ticketData.visit_day && (
+                          <XStack alignItems="center">
+                            <MapPin size={16} color="$gray10" />
+                            <Text fontSize={12} fontWeight="600" color="#666">Jour:</Text>
+                            <Text fontSize={12} color="#333" flex={1}>{ticketData.visit_day}</Text>
+                          </XStack>
+                        )}
+
+                        {ticketData.transport && (
+                          <XStack alignItems="center">
+                            <Car size={16} color="$gray10" />
+                            <Text fontSize={12} fontWeight="600" color="#666">Transport:</Text>
+                            <Text fontSize={12} color="#333" flex={1}>{ticketData.transport}</Text>
+                          </XStack>
+                        )}
+
+                        {ticketData.accommodation && (
+                          <XStack alignItems="center">
+                            <Home size={16} color="$gray10" />
+                            <Text fontSize={12} fontWeight="600" color="#666">Hébergement:</Text>
+                            <Text fontSize={12} color="#333" flex={1}>{ticketData.accommodation}</Text>
+                          </XStack>
+                        )}
+                      </YStack>
+                    </VoxCard.Content>
+                  </VoxCard>
+                )}
+
+                {/* Historique des scans */}
+                {ticketData.scanHistory && ticketData.scanHistory.length > 0 && (
+                  <YStack gap="$small" mx="$medium">
+                    <Text.LG secondary>Historique des scans</Text.LG>
+                    {ticketData.scanHistory.map((scan, index) => (
+                      <XStack key={index} alignItems="center" justifyContent="space-between">
+                        <Text.SM primary medium>
+                          {new Date(scan.date).toLocaleString('fr-FR')}
+                        </Text.SM>
+                        <Text.SM secondary>
+                              {scan.name} ({scan.public_id})
+                        </Text.SM>
+                        
+                      </XStack>
+                    ))}
+                  </YStack>
                 )}
               </YStack>
             )}
