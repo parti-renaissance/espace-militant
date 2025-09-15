@@ -117,7 +117,7 @@ export default function ReferralForm({ close }: Props) {
   }
 
   return (
-    <YStack padding={'$medium'} gap={'$medium'} $gtSm={{ width: 500 }} alignSelf={'center'}>
+    <YStack padding={'$medium'} gap={'$medium'} $gtSm={{ width: 500 }} flex={1} width="100%">
       <XStack alignItems={'center'} justifyContent={isMobileWebSpecific ? 'flex-end' : 'space-between'}>
         {!isMobileWebSpecific && <Text.LG bold>Invitation</Text.LG>}
         {isFullForm && (

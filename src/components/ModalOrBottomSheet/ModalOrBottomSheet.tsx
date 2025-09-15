@@ -71,8 +71,9 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
         backgroundColor: '#D2DCE5',
         width: 48,
       }}
+      style={{ width: '100%' }}
     >
-      <BottomSheetScrollView>
+      <BottomSheetScrollView contentContainerStyle={{ width: '100%' }}>
         {children}
 
         {/* In iOS we need to pass a view of specific height as paddingBottom won't work as expected. */}

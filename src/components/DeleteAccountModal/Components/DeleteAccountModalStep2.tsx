@@ -119,5 +119,5 @@ const UnregistrationReasonLabels: Record<UnregistrationReason, string> = {
 
 const JustificationText = styled(Text, {
   color: '$textSecondary',
-  lineHeight: '20px',
+  lineHeight: 20,
 })

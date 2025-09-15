@@ -91,7 +91,7 @@ export default forwardRef<ComponentRef<typeof CheckboxGroupZone>, ComponentProps
     <CheckboxGroupZone {...props} ref={ref}>
       <CheckboxGroupItemFrame borderColor={props.checked ? hintColor : '$textSecondary'}>
         <CheckboxGroupIndicatorFrame backgroundColor={props.checked ? hintColor : undefined}>
-          <Check size={14} color="white1" />
+          <Check size={14} color="$white2" />
         </CheckboxGroupIndicatorFrame>
       </CheckboxGroupItemFrame>
     </CheckboxGroupZone>
