@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { LayoutChangeEvent, LayoutRectangle, Platform, SafeAreaView as RNSafeAreaView, StyleSheet } from 'react-native'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -10,6 +10,7 @@ import MoreSheet from './MoreSheet'
 import { TabBarNavProps, TabNavOptions } from './types'
 import clientEnv from '@/config/clientEnv'
 import FutureButton from '../Buttons/FutureButton'
+import { useGetUserScopes } from '@/services/profile/hook'
 
 const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
 const SAVProps: any = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
@@ -112,6 +113,14 @@ const MemoTab = React.memo(Tab)
 
 const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => {
   const [otherFocus, setOtherFocus] = React.useState(false)
+  const { data: scopes } = useGetUserScopes()
+
+  const hasScannerScope = useMemo(() => scopes?.some((scope) => scope.code === 'meeting_scanner'), [scopes])
+  
+  const isOnHomeRoute = useMemo(() => {
+    const currentRoute = state.routes[state.index]
+    return currentRoute?.name === '(home)'
+  }, [state.routes, state.index])
 
   const filteredRoutes = React.useMemo(
     () =>
@@ -203,10 +212,9 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
   return (
     <>
       <SAV {...SAVProps} style={{ backgroundColor: 'white' }}>
-
-        {clientEnv.ENVIRONMENT === 'staging' ? (
-          <XStack zIndex={1000} height={58 + 16 + 16} position="absolute" top={-58 - 8 - 16 - 16} right={0} left={0} bottom={0} justifyContent="center" alignItems="center">
-            <XStack padding={16} backgroundColor="#290A4299" borderRadius={999}>
+        {hasScannerScope && isOnHomeRoute ? (
+          <XStack zIndex={1000} height={58 + 16 + 16} position="absolute" top={-58 - 8 - 16 - 16} right={0} left={0} bottom={0} pointerEvents="box-none" justifyContent="center" alignItems="center">
+            <XStack padding={16} backgroundColor="#290A4299" borderRadius={999} pointerEvents="auto">
               <FutureButton onPress={() => navigation.navigate('scanner')}>
                 <XStack alignItems="center" gap={8}>
                   <QrCode size={20} color="white" />
