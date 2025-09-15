@@ -209,8 +209,8 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
       <SAV {...SAVProps} style={{ backgroundColor: 'white' }}>
 
         {hasScannerScope ? (
-          <XStack zIndex={1000} height={58 + 16 + 16} position="absolute" top={-58 - 8 - 16 - 16} right={0} left={0} bottom={0} justifyContent="center" alignItems="center">
-            <XStack padding={16} backgroundColor="#290A4299" borderRadius={999}>
+          <XStack zIndex={1000} height={58 + 16 + 16} position="absolute" top={-58 - 8 - 16 - 16} right={0} left={0} bottom={0} pointerEvents="box-none" justifyContent="center" alignItems="center">
+            <XStack padding={16} backgroundColor="#290A4299" borderRadius={999} pointerEvents="auto">
               <FutureButton onPress={() => navigation.navigate('scanner')}>
                 <XStack alignItems="center" gap={8}>
                   <QrCode size={20} color="white" />
