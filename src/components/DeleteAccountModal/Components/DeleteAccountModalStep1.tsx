@@ -64,5 +64,5 @@ export default function DeleteAccountModalStep1({ onClose, onConfirm, isAdherent
 
 const JustificationText = styled(Text, {
   color: '$textSecondary',
-  lineHeight: '20px',
+  lineHeight: 20,
 })
