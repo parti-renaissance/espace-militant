@@ -116,6 +116,11 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
   const { data: scopes } = useGetUserScopes()
 
   const hasScannerScope = useMemo(() => scopes?.some((scope) => scope.code === 'meeting_scanner'), [scopes])
+  
+  const isOnHomeRoute = useMemo(() => {
+    const currentRoute = state.routes[state.index]
+    return currentRoute?.name === '(home)'
+  }, [state.routes, state.index])
 
   const filteredRoutes = React.useMemo(
     () =>
@@ -208,7 +213,7 @@ const TabBarNav = ({ state, descriptors, navigation, hide }: TabBarNavProps) => 
     <>
       <SAV {...SAVProps} style={{ backgroundColor: 'white' }}>
 
-        {hasScannerScope ? (
+        {hasScannerScope && isOnHomeRoute ? (
           <XStack zIndex={1000} height={58 + 16 + 16} position="absolute" top={-58 - 8 - 16 - 16} right={0} left={0} bottom={0} pointerEvents="box-none" justifyContent="center" alignItems="center">
             <XStack padding={16} backgroundColor="#290A4299" borderRadius={999} pointerEvents="auto">
               <FutureButton onPress={() => navigation.navigate('scanner')}>
