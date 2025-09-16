@@ -1,12 +1,11 @@
-import { NamedExoticComponent } from 'react'
 import { VoxHeader } from '@/components/Header/Header'
-import type { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Href, useNavigation, useRouter } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
 
 type ProfilHeaderProps = {
-  icon?: NamedExoticComponent<IconProps>
+  icon?: IconComponent
   title: string
   backArrow?: boolean
   hideOnMdUp?: boolean
@@ -35,7 +34,7 @@ const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forced
   return (
     <VoxHeader
       backgroundColor={backgroundColor}
-      {...(hideOnMdUp ? { $gtMd: { display: 'none' } } : {})}
+      display={hideOnMdUp ? (gtSm ? 'none' : undefined) : undefined}
     >
       <YStack flex={1} position="relative" minHeight={48}>
         <XStack position="absolute" left={0} top={0} bottom={0} zIndex={1}>

@@ -28,6 +28,7 @@ type VoxCardBasePayload = {
   date: VoxCardDateProps
   editable: boolean
   edit_link?: string
+  source?: string
 } & ({ author: Partial<VoxCardAuthorProps>['author'] & { uuid?: string } } | { author: undefined })
 
 export type EventVoxCardProps = {
@@ -48,6 +49,7 @@ type SubscribeEventButtonProps = {
   eventId: string
   outside?: boolean
 } & ComponentProps<typeof Button> & {
+  source?: string
     editData: {
       editable: boolean
       edit_link?: string
@@ -55,11 +57,11 @@ type SubscribeEventButtonProps = {
     }
   }
 
-export const SubscribeEventButton = ({ isSubscribed, eventId: id, outside = false, editData, ...btnProps }: SubscribeEventButtonProps) => {
+export const SubscribeEventButton = ({ isSubscribed, eventId: id, outside = false, editData, source, ...btnProps }: SubscribeEventButtonProps) => {
   const { session } = useSession()
   const { mutate: subscribe, isPending: isSubPending } = useSubscribeEvent({ id })
   const { mutate: unsubscribe, isPending: isUnSubPending } = useUnsubscribeEvent({ id })
-  const handleSubscribe = useDebouncedCallback(() => (isSubscribed ? unsubscribe() : subscribe()), 200)
+  const handleSubscribe = useDebouncedCallback(() => (isSubscribed ? unsubscribe() : subscribe({})), 200)
   const outsideStyle = outside ? ({ size: 'lg', width: '100%' } as const) : {}
   const subscribeButton = isSubscribed ? (
     <VoxAlertDialog theme="blue" title="Se désinscrire" description={`Voulez-vous vraiment vous désinscrire de l'événement ?`} onAccept={handleSubscribe}>
@@ -77,7 +79,7 @@ export const SubscribeEventButton = ({ isSubscribed, eventId: id, outside = fals
           : () =>
               router.navigate({
                 pathname: '/evenements/[id]',
-                params: { id },
+                params: { id, source: source || undefined },
               })
       }
       iconLeft={CalendarCheck2}
@@ -90,7 +92,7 @@ export const SubscribeEventButton = ({ isSubscribed, eventId: id, outside = fals
   )
 
   const editButton = (
-    <Link href={editData.edit_link as Href<string>} asChild={!isWeb}>
+    <Link href={editData.edit_link as Href} asChild={!isWeb}>
       <VoxButton variant="outlined" theme="purple" iconLeft={Sparkle} {...outsideStyle}>
         Gérer
       </VoxButton>
@@ -112,7 +114,7 @@ const EventCard = ({ payload, onShow, ...props }: EventVoxCardProps) => {
   const isPassed = isPast(payload.date.end ?? payload.date.start)
   const isAuthor = Boolean(user?.uuid === payload.author?.uuid && payload.author?.uuid)
   const canSubscribe = [
-    !isPast(payload.date.end),
+    !isPast(payload.date.end ?? payload.date.start),
     payload.isSubscribed !== undefined,
     !isCancelled,
     !payload.isCompleted || (payload.isCompleted && payload.isSubscribed),
@@ -148,7 +150,7 @@ const EventCard = ({ payload, onShow, ...props }: EventVoxCardProps) => {
         {payload.isOnline ? <VoxCard.Visio /> : payload.location && <VoxCard.Location location={payload.location} />}
         {payload.author && <VoxCard.Author author={payload.author} />}
         <XStack justifyContent={'space-between'}>
-          <Link href={`/evenements/${payload.id}`} asChild={!isWeb}>
+          <Link href={`/evenements/${payload.id}&source=${payload.source}`} asChild={!isWeb}>
             <VoxButton variant="outlined" theme="gray" iconLeft={Eye}>
               Voir
             </VoxButton>
@@ -163,6 +165,7 @@ const EventCard = ({ payload, onShow, ...props }: EventVoxCardProps) => {
             disabled={!canSubscribe}
             isSubscribed={!!payload.isSubscribed}
             eventId={payload.id}
+            source={payload.source}
           />
         </XStack>
       </VoxCard.Content>

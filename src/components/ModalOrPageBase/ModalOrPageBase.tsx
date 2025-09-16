@@ -46,21 +46,21 @@ export default function ModalOrPageBase({
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
-        <ScrollView
+          <ScrollView
             contentContainerStyle={styles.scrollContainer}
             bounces={false}
             showsVerticalScrollIndicator={false}
           >
-          <View style={styles.modalView}>
-            {children}
-            {shouldDisplayCloseButton
-              ? (
-                <TouchableOpacity style={{ position: 'absolute', top: 0, right: 0, padding: 14 }} onPress={onClose}>
-                  <X />
-                </TouchableOpacity>
-              ) : null
-            }
-          </View>
+            <View style={styles.modalView}>
+              {children}
+              {shouldDisplayCloseButton
+                ? (
+                  <TouchableOpacity style={{ position: 'absolute', top: 0, right: 0, padding: 14 }} onPress={onClose}>
+                    <X />
+                  </TouchableOpacity>
+                ) : null
+              }
+            </View>
           </ScrollView>
         </Pressable>
       </Modal>
@@ -82,7 +82,6 @@ export default function ModalOrPageBase({
       }}
     >
       {mobileBackdrop && <Sheet.Overlay animation="lazy" backgroundColor="$shadow6" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />}
-
       <Sheet.Frame>
         <BottomSheetModalProvider>
           {shouldDisplayCloseHeader && (
@@ -96,7 +95,7 @@ export default function ModalOrPageBase({
           {scrollable === false ? (
             children
           ) : (
-            <Sheet.ScrollView
+            <ScrollView
               ref={scrollRef}
               scrollEnabled={scrollable}
               keyboardShouldPersistTaps={'handled'}
@@ -107,7 +106,7 @@ export default function ModalOrPageBase({
               }}
             >
               {children}
-            </Sheet.ScrollView>
+            </ScrollView>
           )}
         </BottomSheetModalProvider>
       </Sheet.Frame>

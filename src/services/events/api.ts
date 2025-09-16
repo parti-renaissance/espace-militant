@@ -40,14 +40,14 @@ export const getPublicEventDetails = (eventId: string) =>
     type: 'public',
   })()
 
-export const subscribeToEvent = (eventId: string) =>
-  api<void, void>({
+export const subscribeToEvent = (eventId: string, payload: schemas.RestPostEventSubsciptionRequest) =>
+  api({
     method: 'post',
     path: `/api/v3/events/${eventId}/subscribe`,
-    requestSchema: z.void(),
+    requestSchema: schemas.RestPostEventSubsciptionRequest,
     responseSchema: z.any(),
     type: 'private',
-  })()
+  })(payload)
 
 export const unsubscribeFromEvent = (eventId: string) =>
   api<void, void>({

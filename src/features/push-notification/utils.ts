@@ -1,15 +1,28 @@
 import { Href } from 'expo-router'
 
-export const parseHref = (x: unknown): Href | null => {
+export const parseHref = (x: unknown, source?: string): Href | null => {
   if (typeof x !== 'string') return null
-  if (x.startsWith('/')) return x as Href
-  if (x.startsWith('https')) {
+  
+  let href: string
+  
+  if (x.startsWith('/')) {
+    href = x
+  } else if (x.startsWith('https')) {
     try {
       const url = new URL(x)
-      return (url.pathname + url.search) as Href
+      href = url.pathname + url.search
     } catch (e) {
       return null
     }
+  } else {
+    return null
   }
-  return null
+  
+  // Ajouter le paramètre source si fourni
+  if (source) {
+    const separator = href.includes('?') ? '&' : '?'
+    href = `${href}${separator}source=${encodeURIComponent(source)}`
+  }
+  
+  return href as Href
 }

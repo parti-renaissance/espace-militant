@@ -20,7 +20,7 @@ export const CheckboxGroupZone = styled(ThemeableStack, {
   justifyContent: 'center',
   cursor: 'pointer',
   animation: 'bouncy',
-  '$group-hover': { backgroundColor: '$blue2' },
+  // '$group-hover': { backgroundColor: '$blue2' }, // Disabled for Expo 53 compatibility
   focusStyle: {
     backgroundColor: '$blue2',
   },
@@ -91,7 +91,7 @@ export default forwardRef<ComponentRef<typeof CheckboxGroupZone>, ComponentProps
     <CheckboxGroupZone {...props} ref={ref}>
       <CheckboxGroupItemFrame borderColor={props.checked ? hintColor : '$textSecondary'}>
         <CheckboxGroupIndicatorFrame backgroundColor={props.checked ? hintColor : undefined}>
-          <Check size={14} color="white1" />
+          <Check size={14} color="$white2" />
         </CheckboxGroupIndicatorFrame>
       </CheckboxGroupItemFrame>
     </CheckboxGroupZone>

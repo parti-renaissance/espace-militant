@@ -8,11 +8,13 @@ import NationalitySelect from '@/components/NationalitySelect/NationalitySelect'
 import { RestDetailedProfileResponse } from '@/services/profile/schema'
 import { Info } from '@tamagui/lucide-icons'
 import { Controller } from 'react-hook-form'
-import { View } from 'tamagui'
+import { View, useMedia } from 'tamagui'
 import AbstractProfilForm from './AbstractProfilForm'
 import { validateInformationsFormSchema } from './schema'
 
 const InformationsForm = ({ profile }: { profile: RestDetailedProfileResponse }) => {
+  const media = useMedia()
+  
   return (
     <AbstractProfilForm
       uuid={profile.uuid}
@@ -55,8 +57,8 @@ const InformationsForm = ({ profile }: { profile: RestDetailedProfileResponse })
                 />
               )}
             />
-            <View $gtMd={{ flexDirection: 'row', gap: '$medium' }} gap="$large">
-              <View $gtMd={{ flex: 1, flexBasis: 0 }}>
+            <View flexDirection={media.gtMd ? 'row' : undefined} gap={media.gtMd ? '$medium' : '$large'}>
+              <View flex={media.gtMd ? 1 : undefined} flexBasis={media.gtMd ? 0 : undefined}>
                 <Controller
                   name="first_name"
                   control={control}
@@ -74,7 +76,7 @@ const InformationsForm = ({ profile }: { profile: RestDetailedProfileResponse })
                 />
               </View>
 
-              <View $gtMd={{ flex: 1, flexBasis: 0 }}>
+              <View flex={media.gtMd ? 1 : undefined} flexBasis={media.gtMd ? 0 : undefined}>
                 <Controller
                   name="last_name"
                   control={control}
@@ -92,8 +94,8 @@ const InformationsForm = ({ profile }: { profile: RestDetailedProfileResponse })
                 />
               </View>
             </View>
-            <View $gtMd={{ flexDirection: 'row', gap: '$medium' }} gap="$large">
-              <View $gtMd={{ flex: 1, flexBasis: 0 }}>
+            <View flexDirection={media.gtMd ? 'row' : undefined} gap={media.gtMd ? '$medium' : '$large'}>
+              <View flex={media.gtMd ? 1 : undefined} flexBasis={media.gtMd ? 0 : undefined}>
                 <Controller
                   name="birthdate"
                   control={control}
@@ -112,7 +114,7 @@ const InformationsForm = ({ profile }: { profile: RestDetailedProfileResponse })
                 />
               </View>
 
-              <View $gtMd={{ flex: 1, flexBasis: 0 }}>
+              <View flex={media.gtMd ? 1 : undefined} flexBasis={media.gtMd ? 0 : undefined}>
                 <Controller
                   name="nationality"
                   control={control}

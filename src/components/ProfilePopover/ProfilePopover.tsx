@@ -4,12 +4,13 @@ import clientEnv from '@/config/clientEnv'
 import { useSession } from '@/ctx/SessionProvider'
 import { useUserStore } from '@/store/user-store'
 import { Link, router } from 'expo-router'
-import { Adapt, isWeb, ListItem, Popover, Separator, YGroup } from 'tamagui'
+import { Adapt, isWeb, ListItem, Popover, Separator, useMedia, YGroup } from 'tamagui'
 
 export default function ProfilePopover({ children }: PropsWithChildren) {
   const { signOut } = useSession()
   const { user } = useUserStore()
   const { bottom } = useSafeAreaInsets()
+  const media = useMedia()
 
   const ref = useRef<Popover>(null)
 
@@ -38,7 +39,7 @@ export default function ProfilePopover({ children }: PropsWithChildren) {
       </Adapt>
 
       <Popover.Content borderWidth={1} padding={0} borderColor="$gray1" overflow="hidden">
-        <YGroup $gtLg={{ width: 300 }} paddingBottom={16}>
+        <YGroup width={media.gtLg ? 300 : undefined} paddingBottom={16}>
           <YGroup.Item>
             <Link href="/profil/" asChild>
               <MenuEntry title="Mon profil" onPress={() => ref.current?.close()} />

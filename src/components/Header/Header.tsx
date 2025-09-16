@@ -7,7 +7,7 @@ import { ROUTES } from '@/config/routes'
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
 import { NativeStackHeaderProps } from '@react-navigation/native-stack'
-import type { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { ArrowLeft, HeartHandshake } from '@tamagui/lucide-icons'
 import { Link, router, usePathname, useSegments } from 'expo-router'
 import { capitalize } from 'lodash'
@@ -269,7 +269,7 @@ const VoxHeaderLeftButtonFrame = styled(ThemeableStack, {
 })
 
 const VoxHeaderLeftButton = (
-  props: React.ComponentProps<typeof VoxHeaderLeftButtonFrame> & { icon?: React.NamedExoticComponent<IconProps>; backTitle?: string },
+  props: React.ComponentProps<typeof VoxHeaderLeftButtonFrame> & { icon?: IconComponent; backTitle?: string },
 ) => {
   const { backTitle, icon: IconComponent, ...restProps } = props
   return (
@@ -280,7 +280,7 @@ const VoxHeaderLeftButton = (
   )
 }
 
-const VoxHeaderTitle = (props: { children: string; icon?: React.NamedExoticComponent<IconProps> }) => {
+const VoxHeaderTitle = (props: { children: string; icon?: IconComponent }) => {
   return (
     <XStack alignItems="center" gap={10}>
       {props.icon ? <props.icon size={20} color="$textPrimary" /> : null}

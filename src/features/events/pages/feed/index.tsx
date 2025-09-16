@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState, useCallback } from 'react'
 import { SectionList, StyleSheet } from 'react-native'
 import Animated from 'react-native-reanimated'
 import Text from '@/components/base/Text'
@@ -23,6 +23,8 @@ import { EmptyStateSection } from './components/EmptyStateSection'
 import EventsHeader from './components/Header'
 import EventsListSkeleton from './components/Skeleton'
 import { useSyncScrollHeader } from './hooks/useSyncScrollHeader'
+import { useListImpressionTracking } from '@/hooks/useListImpressionTracking'
+import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 
 const splitEvents = (events: RestItemEvent[] | RestPublicItemEvent[]) => {
   const incomming: typeof events = []
@@ -57,6 +59,7 @@ const EventList = () => {
   const [filters] = useDebounce(_filters, 300)
 
   const syncHeader = useSyncScrollHeader()
+  const { createOnViewableItemsChanged, viewabilityConfig } = useListImpressionTracking()
 
   const {
     data: paginatedFeed,
@@ -97,12 +100,27 @@ const EventList = () => {
     return splitEvents(paginatedFeed.pages.flatMap((page) => page.items))
   }, [paginatedFeed])
 
+  // Créer la liste des items trackables pour le mobile
+  const trackableItems = useMemo(() => {
+    if (!paginatedFeed) return []
+    return paginatedFeed.pages.flatMap((page) => 
+      page.items.map((event) => ({
+        objectType: 'event' as const,
+        objectId: event.uuid,
+        source: 'page_events',
+      }))
+    )
+  }, [paginatedFeed])
+
+  const onViewableItemsChanged = useCallback(
+    createOnViewableItemsChanged(trackableItems),
+    [createOnViewableItemsChanged, trackableItems]
+  )
+
   return (
     <>
       <PageLayout.SideBarLeft
-        $gtSm={{
-          paddingTop: '$xxlarge',
-        }}
+        paddingTop={media.gtSm ? '$xxlarge' : undefined}
       >
         <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
           <YStack gap="$medium">
@@ -130,6 +148,8 @@ const EventList = () => {
               initialNumToRender={10}
               maxToRenderPerBatch={10}
               removeClippedSubviews={true}
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
               contentContainerStyle={{
                 gap: getToken('$medium', 'space'),
                 paddingTop: media.gtLg ? getToken('$xlarge', 'space') : 155,
@@ -138,7 +158,15 @@ const EventList = () => {
                 paddingBottom: getToken('$11', 'space'),
               }}
               sections={feedData}
-              renderItem={({ item }) => <EventListItem event={item} userUuid={user.data?.uuid} />}
+              renderItem={({ item }) => (
+                <TrackImpressionWeb
+                  objectType="event"
+                  objectId={item.uuid}
+                  source="page_events"
+                >
+                  <EventListItem event={item} userUuid={user.data?.uuid} source={"page_events"} />
+                </TrackImpressionWeb>
+              )}
               renderSectionHeader={({ section }) => {
                 return (
                   <YStack>
@@ -146,7 +174,7 @@ const EventList = () => {
                       <EmptyStateSection isAuth={isAuth} />
                     ) : (
                       <XStack justifyContent="center">
-                        <XStack gap="$small" $md={{ paddingLeft: '$medium' }} $gtLg={{ paddingVertical: section.index === 0 ? '$large' : 0 }}>
+                        <XStack gap="$small" paddingLeft={media.md ? '$medium' : undefined} paddingVertical={media.gtLg ? (section.index === 0 ? '$large' : 0) : undefined}>
                           <Text.MD color={section.data.length === 0 ? '$textDisabled' : '$gray4'} semibold>
                             {activeTab === 'myEvents' ? 'MES ' : ''}
                             {`événements ${section.title}`.toUpperCase()}
@@ -177,9 +205,7 @@ const EventList = () => {
         </YStack>
       </PageLayout.MainSingleColumn>
       <PageLayout.SideBarRight
-        $gtSm={{
-          paddingTop: '$xxlarge',
-        }}
+        paddingTop={media.gtSm ? '$xxlarge' : undefined}
       >
         <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
           <EventsHeader mode="aside" value={activeTab} onChange={setActiveTab} />

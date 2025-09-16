@@ -15,7 +15,7 @@ import { EventFormData } from '@/features/events/pages/create-edit/schema'
 import { ArrowLeft, Calendar, Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
 import { Controller } from 'react-hook-form'
-import { isWeb, Spinner, XStack, YStack } from 'tamagui'
+import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import EventHandleActions from '../../components/EventHandleActions'
 import { ScrollStack } from '../../pages/detail/EventComponents'
 import { useEventFormContext } from './context'
@@ -23,6 +23,7 @@ import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
 
 const EventDesktopAside = () => {
+  const media = useMedia()
   const {
     isPastEvent,
     scopeOptions,
@@ -39,7 +40,7 @@ const EventDesktopAside = () => {
   } = useEventFormContext()
 
   return (
-    <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
+    <PageLayout.SideBarRight width={media.gtSm ? 390 : undefined} alwaysShow paddingTop={0}>
       <VoxCard.Content>
         <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} />
         <Controller
@@ -230,11 +231,12 @@ const EventDesktopAside = () => {
 }
 
 const EventDesktopFooter = () => {
+  const media = useMedia()
   const { isPending, isUploadImagePending, isUploadDeletePending, onSubmit, editMode, event, editEventScope } = useEventFormContext()
   return (
     <XStack flex={1}>
       <VoxCard.Content pt={0} flex={1}>
-        <XStack alignItems="center" gap="$small">
+        <XStack alignItems="center" gap={media.sm ? '$small' : '$medium'}>
           {editMode && event ? (
             <EventHandleActions
               event={event}
@@ -249,16 +251,15 @@ const EventDesktopFooter = () => {
         </XStack>
       </VoxCard.Content>
 
-      <PageLayout.SideBarRight width={390} alwaysShow paddingTop={0}>
+      <PageLayout.SideBarRight width={media.gtSm ? 390 : undefined} alwaysShow paddingTop={0}>
         <VoxCard.Content pt={0}>
-          <XStack alignItems="center" justifyContent="flex-end" gap="$small" flex={1} width="100%">
+          <XStack alignItems="center" justifyContent="flex-end" gap={media.sm ? '$small' : '$medium'} flex={1} width="100%">
             <XStack>
               <VoxButton
                 onPress={() => onSubmit()}
                 size="md"
                 variant="contained"
                 theme="purple"
-                pop
                 loading={isPending || isUploadImagePending || isUploadDeletePending}
                 iconLeft={Sparkle}
               >

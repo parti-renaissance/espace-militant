@@ -99,7 +99,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
     <>
       <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} messageId={currentMessageId} scope={props?.scope} />
       <StickyBox webOnly style={{ zIndex: 10 }}>
-        <YStack $gtSm={{ overflow: 'hidden', zIndex: 10 }}>
+        <YStack overflow={media.gtSm ? 'hidden' : undefined} zIndex={media.gtSm ? 10 : undefined}>
           <VoxHeader>
             <XStack flex={1} alignItems="center" justifyContent="center" width="100%">
               <XStack flex={1} alignContent="flex-start" w={100}>
@@ -135,8 +135,8 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
             </XStack>
           </VoxHeader>
         </YStack>
-        <YStack backgroundColor="$textSurface" $gtSm={{ paddingTop: '$large' }}>
-          <YStack maxWidth={520} marginHorizontal='auto' width="100%" height={76} $sm={{ px: '$medium', py: '$small', height: 60 }} justifyContent='center' py="$medium">
+        <YStack backgroundColor="$textSurface" paddingTop={media.gtSm ? '$large' : undefined}>
+          <YStack maxWidth={520} marginHorizontal='auto' width="100%" height={media.sm ? 60 : 76} px={media.sm ? '$medium' : undefined} py={media.sm ? '$small' : '$medium'} justifyContent='center'>
             <BigSwitch
               options={[
                 { label: 'Édition', value: 'edit' },
@@ -155,7 +155,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
             marginHorizontal='auto'
             width="100%"
             flexGrow={1}
-            $gtSm={isWeb ? { paddingTop: '$large' } : undefined}
+            paddingTop={isWeb && media.gtSm ? '$large' : undefined}
           >
             <SkeCard>
               <SkeCard.Content>

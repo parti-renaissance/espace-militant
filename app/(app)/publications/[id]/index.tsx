@@ -8,8 +8,11 @@ import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSke
 import { useGetMessage } from '@/services/publications/hook'
 import { useUserStore } from '@/store/user-store'
 import { useSession } from '@/ctx/SessionProvider'
-import { Redirect, Stack as RouterStack, useLocalSearchParams } from 'expo-router'
+import { Redirect, Stack as RouterStack, useLocalSearchParams, useGlobalSearchParams } from 'expo-router'
 import Head from 'expo-router/head'
+import { useHits } from '@/services/hits/hook'
+import { cleanupUrlParams } from '@/utils/urlCleanup'
+import { resolveSource } from '@/utils/sourceResolver'
 
 const MessageDetailsPage: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
@@ -50,6 +53,33 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
     scope: defaultScope!,
     enabled: true,
   })
+  const { trackOpen } = useHits()
+  const searchParams = useGlobalSearchParams<{
+    utm_source?: string
+    utm_campaign?: string
+    ref?: string
+    source?: string
+  }>()
+  const sentRef = React.useRef<string | null>(null)
+
+  React.useEffect(() => {
+    if (!isMessageLoading && !messageError && messageData) {
+      if (sentRef.current !== props.id) {
+        sentRef.current = props.id
+        
+        trackOpen({ 
+          object_type: 'publication', 
+          object_id: props.id, 
+          source : resolveSource(searchParams.source),
+          utm_source: searchParams.utm_source,
+          utm_campaign: searchParams.utm_campaign,
+          referrer_code: searchParams.ref
+        })
+        
+        cleanupUrlParams(['source'])
+      }
+    }
+  }, [props.id, isMessageLoading, messageError, messageData, trackOpen, searchParams])
 
   return (
     <>

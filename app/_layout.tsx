@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import WaitingScreen from '@/components/WaitingScreen'
 import { SessionProvider, useSession } from '@/ctx/SessionProvider'
@@ -9,7 +9,7 @@ import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks
 import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen'
 import useDeepLinkHandler from '@/hooks/useDeepLinkHandler'
 import useImportFont from '@/hooks/useImportFont'
-import TamaguiProvider from '@/tamagui/provider'
+import { TamaguiProvider } from 'tamagui'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { isSupported } from '@firebase/messaging'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
@@ -20,6 +20,8 @@ import { BlurView } from 'expo-blur'
 import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { isWeb, ViewProps } from 'tamagui'
+import { useHits } from '@/services/hits/hook'
+import config from 'tamagui.config'
 
 if (isWeb) {
   require('@tamagui/core/reset.css')
@@ -45,7 +47,9 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
   useInitMatomo()
   useDeepLinkHandler()
 
-  const { isLoading } = useSession()
+  const { isLoading, isAuth } = useSession()
+  const { trackActivitySession } = useHits()
+  const didStartRef = useRef(false)
   const { isAvailable: isUpdateAvailable, isError: isUpdateError } = useCheckStoreUpdate()
   const { isAvailable: isExpoUpdateAvailable, isError: isExpoUpdateError, isProcessing: isExpoUpdateProcessing } = useCheckExpoUpdate()
 
@@ -54,6 +58,13 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
   if (!props.isLoading) {
     SplashScreen.hideAsync()
   }
+
+  useEffect(() => {
+    if (isAuth && !didStartRef.current) {
+      didStartRef.current = true
+      trackActivitySession()
+    }
+  }, [isAuth, trackActivitySession])
 
   if (isLoading) {
     return <WaitingScreen />
@@ -112,7 +123,7 @@ function Root() {
       <StatusBar animated style="dark" />
       <ToastProvider swipeDirection="up">
         <QueryClientProvider client={queryClient}>
-          <TamaguiProvider>
+          <TamaguiProvider config={config} defaultTheme="light">
             <ThemeProvider value={DefaultTheme}>
               <BottomSheetModalProvider>
                 <SessionProvider>

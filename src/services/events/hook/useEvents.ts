@@ -7,7 +7,7 @@ import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 import { useToastController } from '@tamagui/toast'
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { RestPostCountInvitationsEventRequest, RestPostEventRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
+import { RestPostCountInvitationsEventRequest, RestPostEventRequest, RestPostEventSubsciptionRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
 import { optimisticToggleSubscribe, optimisticUpdate } from './helpers'
 import { QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
 
@@ -43,11 +43,11 @@ export const useSuspensePaginatedEvents = (opts: { filters?: EventFilters; posta
   })
 }
 
-export const useSubscribeEvent = ({ id: eventId, slug }: { id: string; slug?: string }) => {
+export const useSubscribeEvent = ({ id: eventId, slug }: { id: string; slug?: string; }) => {
   const toast = useToastController()
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: () => api.subscribeToEvent(eventId),
+    mutationFn: (payload: RestPostEventSubsciptionRequest) => api.subscribeToEvent(eventId, payload),
     onSuccess: () => {
       toast.show('Succès', { message: "Inscription à l'événement réussie", type: 'success' })
       optimisticToggleSubscribe(true, { eventId, slug }, queryClient)

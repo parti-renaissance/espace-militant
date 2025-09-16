@@ -2,7 +2,7 @@ import { useReferralStatistics, useReferrals } from '@/services/referral/hook'
 import StatsCard from '@/components/StatsCard/StatsCard'
 import Text from '@/components/base/Text'
 import { VoxCard } from '@/components/VoxCard/VoxCard'
-import { View, XStack, YStack } from 'tamagui'
+import { useMedia, View, XStack, YStack } from 'tamagui'
 import i18n from '@/utils/i18n'
 import ReferralListEmptyState from '@/features/referrals/components/ReferralListEmptyState'
 import ReferralListItem from '@/features/referrals/components/ReferralListItem'
@@ -10,6 +10,7 @@ import ReferralListItem from '@/features/referrals/components/ReferralListItem'
 const ReferralsTrackingCard = () => {
   const { data: referrals } = useReferrals()
   const { data: statistics, isLoading } = useReferralStatistics()
+  const media = useMedia()
 
   return (
     <VoxCard>
@@ -18,9 +19,7 @@ const ReferralsTrackingCard = () => {
           <ReferralListEmptyState />
         ) : (
           <>
-            <Text.MD semibold $sm={{
-              display: 'none'
-            }}>Suivi des parrainages</Text.MD>
+            <Text.MD semibold display={media.sm ? 'none' : undefined}>Suivi des parrainages</Text.MD>
             <XStack alignItems="center" gap="$medium">
               <XStack flex={1}>
                 <StatsCard

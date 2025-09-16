@@ -22,7 +22,7 @@ export default function AppLayout() {
   return (
     <PortalLayout>
       {shouldShowHeader ? (
-        <VoxHeader justifyContent="space-between" display="none" $gtSm={{ display: 'flex' }} safeAreaView={true}>
+        <VoxHeader justifyContent="space-between" display={media.sm ? 'none' : 'flex'} safeAreaView={true}>
           <XStack flex={1} flexBasis={0}>
             <Link href="/" replace>
               <EuCampaignIllustration cursor="pointer" showText={media.gtLg} />
@@ -86,7 +86,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="publications/index"
             options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false}  forcedBackPath={isWeb ? '/' : undefined} /> }
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false} forcedBackPath={isWeb ? '/' : undefined} /> }
             }}
           />
 
@@ -113,7 +113,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="publications/brouillons"
             options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false}  forcedBackPath={isWeb ? '/publications' : undefined}/> }
+              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false} forcedBackPath={isWeb ? '/publications' : undefined} /> }
             }}
           />
 
@@ -121,6 +121,21 @@ export default function AppLayout() {
           <Stack.Screen name="porte-a-porte/tunnel" options={{ presentation: 'fullScreenModal', headerShown: false }} />
           <Stack.Screen name="questionnaires/index" options={{ headerShown: false }} />
           <Stack.Screen name="questionnaires/[id]" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="scanner"
+            options={{
+              headerTransparent: true,
+              header: ({ navigation }) => {
+                return (
+                  <VoxHeader backgroundColor="transparent" borderWidth={0}>
+                    <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
+                      <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
+                    </Link>
+                  </VoxHeader>
+                )
+              },
+            }}
+          />
         </Stack>
       </View>
     </PortalLayout>

@@ -1,5 +1,4 @@
-import { NamedExoticComponent } from 'react'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { DoorOpen, Layers3, Mailbox, Paintbrush } from '@tamagui/lucide-icons'
 import * as z from 'zod'
 import { createRestPaginationSchema } from '../common/schema'
@@ -28,7 +27,7 @@ export const ReadableActionType: Record<ActionType, string> = {
   [ActionType.COLLAGE]: 'Collage',
 }
 
-export const ActionTypeIcon: Record<ActionType, NamedExoticComponent<IconProps>> = {
+export const ActionTypeIcon: Record<ActionType, IconComponent> = {
   [ActionType.PAP]: DoorOpen,
   [ActionType.BOITAGE]: Mailbox,
   [ActionType.TRACTAGE]: Layers3,

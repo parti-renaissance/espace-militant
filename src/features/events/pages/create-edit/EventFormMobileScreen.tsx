@@ -17,7 +17,7 @@ import ScrollView from '@/features/profil/components/ScrollView'
 import { Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
 import { Controller } from 'react-hook-form'
-import { isWeb, Spinner, XStack, YStack } from 'tamagui'
+import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import EventHandleActions from '../../components/EventHandleActions'
 import { useEventFormContext } from './context'
 import EventDatesField from './EventDatesField'
@@ -74,6 +74,7 @@ export const EventFormMobileScreenSkeleton = (props?: { editMode?: boolean }) =>
 }
 
 export default function EventFormMobileScreen() {
+  const media = useMedia()
   const {
     navigation,
     onSubmit,
@@ -308,7 +309,7 @@ export default function EventFormMobileScreen() {
                     name="description"
                   />
                 </YStack>
-                <XStack gap="$medium" alignContent="center" alignItems="center">
+                <XStack gap={media.sm ? '$medium' : '$large'} alignContent="center" alignItems="center">
                   <Text.MD secondary>Optionnel</Text.MD>
                   <VoxCard.Separator />
                 </XStack>

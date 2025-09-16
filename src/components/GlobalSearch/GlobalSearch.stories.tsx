@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { YStack, Card, ScrollView } from 'tamagui'
+import { YStack, Card, ScrollView, useMedia } from 'tamagui'
 import { MapPin } from '@tamagui/lucide-icons'
 import { AddressProvider, GlobalSearch, ZoneProvider } from './index'
 import { SearchResult } from './types'
@@ -94,6 +94,7 @@ const fakeAddressProvider = {
 // Story principale avec toutes les variantes
 export const AllVariants: Story = {
   render: () => {
+    const media = useMedia()
     const handleSelect = (result: SearchResult) => {
       console.log('Résultat sélectionné:', result)
       if (result.type === 'address' && result.metadata?.addressComponents) {
@@ -103,7 +104,7 @@ export const AllVariants: Story = {
 
     return (
       <ScrollView flex={1} width="100%" backgroundColor="$surface" padding="$medium" showsVerticalScrollIndicator={false}>
-        <YStack gap="$xlarge" maxWidth={480} width="100%" marginHorizontal="auto" paddingBottom={100} >
+        <YStack gap="$xlarge" maxWidth={media.gtSm ? 480 : undefined} width="100%" marginHorizontal="auto" paddingBottom={100} >
 
           <Text.LG semibold>GlobalSearch</Text.LG>
 

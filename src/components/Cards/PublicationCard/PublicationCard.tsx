@@ -56,9 +56,11 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                 if (item.type === 'button') {
                   return (
                     <ButtonRenderer
+                      publicationUuid={uuid || undefined}
                       key={`content-button-${index}`}
                       data={item as S.ButtonNode}
                       displayToolbar={false}
+                      allowHits={true}
                     />
                   )
                 }
@@ -128,7 +130,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
         {renderContent()}
         { !showFullContent ? (
           <XStack px="$medium" pb="$medium" pt="$small" gap="$medium" justifyContent="flex-end">
-            <VoxButton variant="outlined" theme="blue" iconLeft={Eye} size="sm" disabled={!uuid} onPress={() => { router.push({ pathname: '/publications/[id]', params: { id: uuid ?? '' } }) }}>Lire</VoxButton>
+            <VoxButton variant="outlined" theme="blue" iconLeft={Eye} size="sm" disabled={!uuid} onPress={() => { router.push({ pathname: '/publications/[id]', params: { id: uuid ?? '', source: 'page_timeline' } }) }}>Lire</VoxButton>
           </XStack>
         ) : <YStack pb="$medium"></YStack>}
       </VoxCard.Content>

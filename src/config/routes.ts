@@ -1,14 +1,14 @@
-import { HomeIcon } from '@/assets/icons/nav'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap, HeartHandshake } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
 import clientEnv from './clientEnv'
+import { IconComponent } from '@/models/common.model'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'parrainages' | 'questionnaires'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'parrainages' | 'questionnaires' | 'scanner'
   screenName: string
   highlighted?: boolean
-  icon: typeof HomeIcon
+  icon: IconComponent
   hidden?: boolean | ((profile?: RestProfilResponse) => boolean)
   hiddenMobile?: boolean | ((profile?: RestProfilResponse) => boolean)
   disabled?: boolean

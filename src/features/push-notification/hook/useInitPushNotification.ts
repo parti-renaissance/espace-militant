@@ -22,7 +22,7 @@ export const useInitPushNotification = () => {
             const possibleLinkData1 = e.notification?.request?.content?.data?.link
             //@ts-expect-error type do not contain payload key inside trigger
             const possibleLinkData2 = e.notification?.request?.trigger?.payload?.link
-            const link = parseHref(possibleLinkData1 ?? possibleLinkData2)
+            const link = parseHref(possibleLinkData1 ?? possibleLinkData2, 'push_notification')
             if (link) setTimeout(() => router.replace(link), 1)
           }
         } catch (e) {
@@ -54,7 +54,7 @@ export const useInitPushNotification = () => {
             })
           } else {
             if (message?.notification?.title) {
-              const link = parseHref(message?.data?.link)
+              const link = parseHref(message?.data?.link, 'push_notification')
               toast.show(message.notification?.title, {
                 message: message.notification?.body,
                 type: 'info',

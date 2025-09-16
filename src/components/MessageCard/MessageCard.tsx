@@ -1,12 +1,12 @@
-import React, { ComponentProps, NamedExoticComponent, ReactNode } from 'react'
+import React, { ComponentProps, ReactNode } from 'react'
 import Text from '@/components/base/Text'
-import type { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
 import { View, XStack } from 'tamagui'
 import VoxCard from '../VoxCard/VoxCard'
 
 type Props = {
   children: string | string[] | ReactNode
-  iconLeft: NamedExoticComponent<IconProps>
+  iconLeft: IconComponent
   rightComponent?: React.ReactNode
 } & ComponentProps<typeof VoxCard>
 

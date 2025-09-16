@@ -57,6 +57,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
             id: isMessageTilSync?.uuid || '',
             congratulations: 'true',
             withoutAnimation: 'true',
+            source: 'page_publication_edition',
           },
         })
       }
@@ -97,7 +98,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
         <YStack gap="$medium" position="relative">
           {syncError ? (
             <YStack position="absolute" inset={0} bottom={0} zIndex={1}>
-              <VoxCard flex={1} justifyContent="center" alignItems="center" borderRadius="$small" $gtSm={{ borderRadius: "$small" }}>
+              <VoxCard flex={1} justifyContent="center" alignItems="center" borderRadius="$small">
                 <VoxCard.Content justifyContent="center" alignItems="center">
                   <AlertTriangle color="#D02828" size="$medium" />
                   <Text.LG color="#D02828" textAlign="center"> Nous n'avons pas pu synchroniser{'\n'}les données de votre publication</Text.LG>
@@ -108,7 +109,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
               </VoxCard>
             </YStack>
           ) : null}
-          <View gap="$small" $gtSm={{ flexDirection: 'row' }}>
+          <View gap="$small" flexDirection={media.gtSm ? 'row' : undefined}>
             <VoxCard inside backgroundColor="$gray1" justifyContent="center" alignItems="center" minWidth={140}>
               <VoxCard.Content justifyContent="center" alignItems="center" gap="$small">
                 {isLoadingNumbers ? (

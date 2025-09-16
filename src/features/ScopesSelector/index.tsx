@@ -52,9 +52,7 @@ export default function ScopesSelector() {
   const MultiScopeStep = useCallback(() => {
     return (
       <YStack
-        $gtSm={{
-          width: 390,
-        }}
+        width={media.gtSm ? 390 : undefined}
         gap="$medium"
       >
         <YStack flex={1}>
@@ -71,7 +69,7 @@ export default function ScopesSelector() {
         <YStack p="$medium" pt={0} alignItems="center" gap="$medium">
           <Text.SM>Vos fonctonnalités de cadre sont indiquées en violet dans votre espace Militant.</Text.SM>
           <XStack>
-            <VoxButton theme="purple" pop iconRight={ArrowRight} onPress={handleSubmit()}>
+            <VoxButton theme="purple" iconRight={ArrowRight} onPress={handleSubmit()}>
               Continuer
             </VoxButton>
           </XStack>
@@ -86,7 +84,7 @@ export default function ScopesSelector() {
     const { name, description } = getFormatedScope(scopes.list.find((x) => x.code === selectedScope)!)
     return (
       <YStack backgroundColor="$purple1" paddingVertical="$xxlarge" paddingHorizontal="$large">
-        <ScopeItem title={name} pop description={description} showButton={false} selected />
+        <ScopeItem title={name} pop description={description ?? ''} showButton={false} selected />
       </YStack>
     )
   }
@@ -94,9 +92,7 @@ export default function ScopesSelector() {
   const OneScopeStep = () => {
     return (
       <YStack
-        $gtSm={{
-          width: 390,
-        }}
+        width={media.gtSm ? 390 : undefined}
         gap="$medium"
       >
         <HeaderOneScope />
@@ -107,7 +103,7 @@ export default function ScopesSelector() {
           <YStack p="$medium" pt={0} alignItems="center" gap="$medium">
             <Image source={media.gtSm ? tutoNavDesktopImg : tutoNavMobileImg} />
             <XStack paddingVertical="$medium">
-              <VoxButton theme="purple" pop iconRight={ArrowRight} onPress={handleSubmit(true)}>
+              <VoxButton theme="purple" iconRight={ArrowRight} onPress={handleSubmit(true)}>
                 C'est noté !
               </VoxButton>
             </XStack>
@@ -122,9 +118,7 @@ export default function ScopesSelector() {
   const SecondStep = () => {
     return (
       <YStack
-        $gtSm={{
-          width: 390,
-        }}
+        width={media.gtSm ? 390 : undefined}
         gap="$medium"
       >
         <HeaderOneScope />
@@ -149,10 +143,8 @@ export default function ScopesSelector() {
   return (
     <ModalOrPageV2 open={shouldOpen}>
       <YStack
-        $sm={{ flex: 1 }}
-        $gtSm={{
-          maxHeight: height * 0.8 - viewport.top - viewport.bottom,
-        }}
+        flex={media.sm ? 1 : undefined}
+        maxHeight={media.gtSm ? height * 0.8 - viewport.top - viewport.bottom : undefined}
       >
         <ScrollView style={{ flex: 1, paddingBottom: viewport.bottom }}>{!hasSelectedScope ? <FirstStep /> : <SecondStep />}</ScrollView>
       </YStack>

@@ -3,7 +3,6 @@ import * as Colors from './colors'
 
 export const headerBlank: NativeStackNavigationOptions = {
   title: '',
-  headerBackTitleVisible: false,
   headerTintColor: Colors.titleText,
   headerShadowVisible: false,
   headerStyle: {

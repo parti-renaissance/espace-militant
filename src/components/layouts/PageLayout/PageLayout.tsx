@@ -16,14 +16,12 @@ const LayoutFrame = ({ children, webScrollable, ...props }: ComponentProps<typeo
       ref={layoutRef}
       flex={1}
       bg="$textSurface"
-      pl={insets.left}
+      pl={media.gtLg ? insets.left : (media.gtMd ? (insets.left ?? padding) : insets.left)}
       pr={insets.right}
-      $gtMd={{ pl: insets.left ?? padding }}
-      $gtLg={{ pl: insets.left }}
       overflowY={isWeb && webScrollable ? 'auto' : undefined}
       {...props}
     >
-      <ScrollContext.Provider value={{ layoutRef, scrollActive: Boolean(isWeb && webScrollable && media.gtSm) }}>
+      <ScrollContext.Provider value={{ layoutRef: layoutRef as React.RefObject<HTMLDivElement>, scrollActive: Boolean(isWeb && webScrollable && media.gtSm) }}>
         <XStack flex={1}>{children}</XStack>
       </ScrollContext.Provider>
     </Container>
@@ -34,7 +32,7 @@ const LayoutSideBarLeft = ({ children, showOn = 'gtSm', ...props }: ViewProps & 
   const media = useMedia()
   return (
     media[showOn] && (
-      <View $gtMd={{ width: columnWidth }} $md={{ width: 250 }} height="100%" pt={padding} $lg={{ pl: padding }} {...props}>
+      <View width={media.gtMd ? columnWidth : (media.md ? 250 : undefined)} height="100%" pt={padding} pl={media.lg ? padding : undefined} {...props}>
         {children}
       </View>
     )
@@ -42,8 +40,9 @@ const LayoutSideBarLeft = ({ children, showOn = 'gtSm', ...props }: ViewProps & 
 }
 
 export const LayoutStateFrame = ({ children, ...props }: YStackProps) => {
+  const media = useMedia()
   return (
-    <YStack $sm={{ justifyContent: 'center' }} $gtSm={{ pt: 80 }} flex={1} {...props}>
+    <YStack justifyContent={media.sm ? 'center' : undefined} pt={media.gtSm ? 80 : undefined} flex={1} {...props}>
       <YStack p="$medium" paddingTop="$medium" alignItems="center" gap="$medium">
         {children}
       </YStack>
@@ -52,15 +51,13 @@ export const LayoutStateFrame = ({ children, ...props }: YStackProps) => {
 }
 
 const LayoutMainBarLeft = ({ children }: ViewProps) => {
+  const media = useMedia()
   return (
     <View
-      width="100%"
-      $gtSm={{
-        width: columnWidth,
-        height: '100%',
-        pt: padding,
-        marginLeft: 'auto',
-      }}
+      width={media.gtSm ? columnWidth : '100%'}
+      height={media.gtSm ? '100%' : undefined}
+      pt={media.gtSm ? padding : undefined}
+      marginLeft={media.gtSm ? 'auto' : undefined}
     >
       {children}
     </View>

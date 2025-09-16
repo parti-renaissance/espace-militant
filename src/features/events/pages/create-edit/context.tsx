@@ -170,7 +170,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
         setValue('category', 'reunion-d-equipe')
         setValue('visibility', 'invitation_agora')
         setMode('online') 
-      } else {
+      } else if (edit?.visibility === "invitation_agora") {
         setValue('visibility', 'public')
       }
     }, [isAgoraLeader])

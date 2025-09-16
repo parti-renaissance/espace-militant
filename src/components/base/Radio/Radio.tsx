@@ -19,7 +19,7 @@ export const RadioGroupZone = styled(ThemeableStack, {
   justifyContent: 'center',
   cursor: 'pointer',
   animation: 'bouncy',
-  '$group-hover': { backgroundColor: '$blue2' },
+  // '$group-hover': { backgroundColor: '$blue2' }, // Disabled for Expo 53 compatibility
   focusStyle: {
     backgroundColor: '$blue2',
   },

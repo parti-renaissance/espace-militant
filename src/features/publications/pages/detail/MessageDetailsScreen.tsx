@@ -47,10 +47,12 @@ export const HeaderMesssageDetails: React.FC = () => {
 }
 
 export const MessageDetailsScreenSkeleton: React.FC = () => {
+  const media = useMedia()
+
   return (
     <ScrollView backgroundColor="$surface" flex={1}>
 
-      <YStack gap="$medium" $gtSm={{ maxWidth: 600, width: '100%', marginHorizontal: 'auto'}}>  
+      <YStack gap="$medium" maxWidth={media.gtSm ? 600 : undefined} width={media.gtSm ? '100%' : undefined} marginHorizontal={media.gtSm ? 'auto' : undefined}>  
         <HeaderMesssageDetails />
         <SkeCard>
           <SkeCard.Content>
@@ -69,10 +71,12 @@ export const MessageDetailsScreenSkeleton: React.FC = () => {
 }
 
 export const MessageDetailsScreenDeny: React.FC<MessageDetailsScreenDenyProps> = ({ error }) => {
+  const media = useMedia()
+
   return (
     <ScrollView backgroundColor="$surface" flex={1}>
 
-      <YStack gap="$medium" $gtSm={{ maxWidth: 600, width: '100%', marginHorizontal: 'auto'}}>
+      <YStack gap="$medium" maxWidth={media.gtSm ? 600 : undefined} width={media.gtSm ? '100%' : undefined} marginHorizontal={media.gtSm ? 'auto' : undefined}>
         <HeaderMesssageDetails />
         <VoxCard>
           <VoxCard.Content>
@@ -93,6 +97,7 @@ export const MessageDetailsScreenDeny: React.FC<MessageDetailsScreenDenyProps> =
 
 const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoading, error }) => {
   const params = useLocalSearchParams()
+  const media = useMedia()
   const [showCongratulations, setShowCongratulations] = useState(false)
 
   useEffect(() => {
@@ -115,7 +120,7 @@ const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoa
 
   return (
     <ScrollView backgroundColor="$surface" flex={1} contentContainerStyle={{ paddingBottom: 100 }}>
-      <YStack gap="$medium" $gtSm={{ maxWidth: 600, width: '100%', marginHorizontal: 'auto'}}>
+      <YStack gap="$medium" maxWidth={media.gtSm ? 600 : undefined} width={media.gtSm ? '100%' : undefined} marginHorizontal={media.gtSm ? 'auto' : undefined}>
         <HeaderMesssageDetails />
         <PublicationCard
           showFullContent={true}

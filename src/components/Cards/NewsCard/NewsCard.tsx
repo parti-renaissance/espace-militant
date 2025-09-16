@@ -4,6 +4,7 @@ import { genericErrorThrower } from '@/services/common/errors/generic-errors'
 import { Bell, ExternalLink } from '@tamagui/lucide-icons'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb, XStack } from 'tamagui'
+import { useHits } from '@/services/hits/hook'
 
 export type NewsVoxCardProps = {
   onShow?: () => void
@@ -20,9 +21,18 @@ export type NewsVoxCardProps = {
 } & VoxCardFrameProps
 
 const NewsCard = ({ payload, ...props }: NewsVoxCardProps) => {
+  const { trackClick } = useHits()
+  
   const onShow = async () => {
     if (payload.ctaLink) {
       const url = payload.ctaLink
+      
+      trackClick({
+        object_type: 'news',
+        target_url: url,
+        button_name: payload.ctaLabel || undefined,
+      })
+      
       try {
         if (isWeb) {
           window.open(url, '_blank')

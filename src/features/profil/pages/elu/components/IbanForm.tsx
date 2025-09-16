@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Pen, X } from '@tamagui/lucide-icons'
 import { Link } from 'expo-router'
 import { Controller, useForm } from 'react-hook-form'
-import { isWeb, XStack, YStack } from 'tamagui'
+import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import * as z from 'zod'
 import { smellsLikeIbanRegex } from './utils'
 
@@ -66,6 +66,7 @@ const schema = z.object({
 })
 
 export default function (props: Props) {
+  const media = useMedia()
   const { control, handleSubmit, reset, formState, setError } = useForm({
     defaultValues: {
       account_name: '',
@@ -105,11 +106,11 @@ export default function (props: Props) {
         </VoxHeader>
       }
     >
-      <VoxCard $gtMd={{ maxWidth: 500 }} $md={{ shadowColor: 'transparent' }} height="100%">
+      <VoxCard maxWidth={media.gtMd ? 500 : undefined} shadowColor={media.md ? 'transparent' : undefined} height="100%">
         <VoxCard.Content>
           <XStack justifyContent="space-between" alignItems="flex-start">
             <Text.LG>Renseigner mes informations bancaires</Text.LG>
-            <VoxButton $md={{ display: 'none' }} variant="text" theme="gray" iconLeft={X} size="sm" onPress={props.onClose} />
+            <VoxButton display={media.md ? 'none' : undefined} variant="text" theme="gray" iconLeft={X} size="sm" onPress={props.onClose} />
           </XStack>
           <Text.P>
             Les informations suivantes (Nom, Prénom, Pays de résidence, Adresse postale, E-mail) doivent être renseignées et à jour dans vos informations

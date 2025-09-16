@@ -1,6 +1,7 @@
-import { memo, NamedExoticComponent } from 'react'
+import { memo } from 'react'
 import i18n from '@/utils/i18n'
-import { IconProps } from '@tamagui/helpers-icon'
+import type { IconComponent } from '@/models/common.model'
+import type { IconProps } from '@tamagui/helpers-icon'
 import { getHours, isSameDay } from 'date-fns'
 import { format } from 'date-fns-tz'
 import { ZStack } from 'tamagui'
@@ -18,7 +19,7 @@ export const getFormatedVoxCardDate = (props: { start: Date; end?: Date; timeZon
   }
 }
 
-export const createDoubleIcon = (props: { icon: NamedExoticComponent<IconProps>; middleIconOffset?: number }) => {
+export const createDoubleIcon = (props: { icon: IconComponent; middleIconOffset?: number }) => {
   const DoubleIcon = (iconProps: any) => {
     const { size = 16, color = '$textPrimary', ...otherProps } = iconProps
     return (
@@ -36,7 +37,7 @@ export const createDoubleIcon = (props: { icon: NamedExoticComponent<IconProps>;
       </ZStack>
     )
   }
-  DoubleIcon.displayName = `Double${props.icon.displayName || 'Icon'}`
+  DoubleIcon.displayName = `DoubleIcon`
 
   return memo<IconProps>(DoubleIcon)
 }

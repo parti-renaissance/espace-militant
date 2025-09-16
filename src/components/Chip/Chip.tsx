@@ -1,5 +1,5 @@
-import { ComponentProps, NamedExoticComponent } from 'react'
-import { IconProps } from '@tamagui/helpers-icon'
+import { ComponentProps } from 'react'
+import type { IconComponent } from '@/models/common.model'
 import { styled, XStack } from 'tamagui'
 import Text from '../base/Text'
 
@@ -30,7 +30,7 @@ export type ChipProps = {
   children: string
 } & ComponentProps<typeof ChipFrame>
 
-const Chip = ({ children, ...props }: ChipProps & { icon?: NamedExoticComponent<IconProps> }) => {
+const Chip = ({ children, ...props }: ChipProps & { icon?: IconComponent }) => {
   return (
     <ChipFrame {...props} theme={props.theme ?? 'gray'}>
       {props.icon && <props.icon color={props.alert ? 'white' : '$color5'} testID={`chip-icon`} size={12} />}
