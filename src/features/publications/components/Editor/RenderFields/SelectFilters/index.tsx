@@ -250,7 +250,7 @@ export default function SelectFilters({
         }
         withKeyboard={false}
       >
-        <YStack w="100%" $gtMd={{ maxWidth: 480 }}>
+        <YStack w="100%" maxWidth={media.gtMd ? 480 : undefined}>
           {media.gtMd ? (
             <Header />
           ) : null}

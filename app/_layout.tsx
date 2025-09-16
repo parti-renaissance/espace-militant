@@ -9,7 +9,7 @@ import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks
 import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen'
 import useDeepLinkHandler from '@/hooks/useDeepLinkHandler'
 import useImportFont from '@/hooks/useImportFont'
-import TamaguiProvider from '@/tamagui/provider'
+import { TamaguiProvider } from 'tamagui'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { isSupported } from '@firebase/messaging'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
@@ -21,6 +21,7 @@ import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { isWeb, ViewProps } from 'tamagui'
 import { useHits } from '@/services/hits/hook'
+import config from 'tamagui.config'
 
 if (isWeb) {
   require('@tamagui/core/reset.css')
@@ -122,7 +123,7 @@ function Root() {
       <StatusBar animated style="dark" />
       <ToastProvider swipeDirection="up">
         <QueryClientProvider client={queryClient}>
-          <TamaguiProvider>
+          <TamaguiProvider config={config} defaultTheme="light">
             <ThemeProvider value={DefaultTheme}>
               <BottomSheetModalProvider>
                 <SessionProvider>

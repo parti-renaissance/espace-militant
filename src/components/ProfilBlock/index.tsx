@@ -14,7 +14,7 @@ import { RestProfilResponse } from '@/services/profile/schema'
 import { Delete, Plus, Repeat2, Settings2 } from '@tamagui/lucide-icons'
 import { ImageResult, manipulateAsync, SaveFormat } from 'expo-image-manipulator'
 import * as ImagePicker from 'expo-image-picker'
-import { XStack, YStack } from 'tamagui'
+import { useMedia, XStack, YStack } from 'tamagui'
 import ImageCroper from './CropImg'
 
 const dropDownItems = [
@@ -123,8 +123,10 @@ const UploadPP = (props: { profil: RestProfilResponse }) => {
 export default function ({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
   const { data: profil } = useGetProfil()
   const { tags } = useGetTags({ tags: [UserTagEnum.ELU, UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] })
+  const media = useMedia()
+  
   return profil ? (
-    <VoxCard $sm={{ bg: 'transparent' }} {...props}>
+    <VoxCard bg={media.sm ? 'transparent' : undefined} {...props}>
       <VoxCard.Content>
         <YStack justifyContent="center" alignItems="center" gap="$medium">
           {editablePicture ? (

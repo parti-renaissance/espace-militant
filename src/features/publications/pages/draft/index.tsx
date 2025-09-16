@@ -74,7 +74,7 @@ const DraftPage = () => {
   if (isLoading) return (
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn>
-        <YStack alignItems="center" marginTop={16} maxWidth={520} $sm={{ maxWidth: '100%' }} alignSelf="center" width="100%" gap="$small">
+        <YStack alignItems="center" marginTop={16} maxWidth={media.sm ? '100%' : 520} alignSelf="center" width="100%" gap="$small">
           {Array.from({ length: 5 }).map((_, i) => (
             <SkeCard key={i} width="100%" height={195}>
               <SkeCard.Content>
@@ -96,7 +96,7 @@ const DraftPage = () => {
   return (
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn>
-        <YStack paddingTop='$medium' $gtSm={{ paddingTop: '$xxlarge' }}>
+        <YStack paddingTop={media.gtSm ? '$xxlarge' : '$medium'}>
           <FlatList
             data={publications}
             contentContainerStyle={{ maxWidth: media.sm ? '100%' : 520, alignSelf: 'center', width: '100%', paddingBottom: 100 }}

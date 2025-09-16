@@ -7,7 +7,7 @@ const { generate } = require('@storybook/react-native/scripts/generate')
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getSentryExpoConfig(__dirname, {
   // [Web-only]: Enables CSS support in Metro.
-  isCSSEnabled: false,
+  isCSSEnabled: true,
 })
 config.resolver.sourceExts.push('cjs')
 

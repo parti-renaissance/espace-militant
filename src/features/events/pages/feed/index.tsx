@@ -120,9 +120,7 @@ const EventList = () => {
   return (
     <>
       <PageLayout.SideBarLeft
-        $gtSm={{
-          paddingTop: '$xxlarge',
-        }}
+        paddingTop={media.gtSm ? '$xxlarge' : undefined}
       >
         <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
           <YStack gap="$medium">
@@ -176,7 +174,7 @@ const EventList = () => {
                       <EmptyStateSection isAuth={isAuth} />
                     ) : (
                       <XStack justifyContent="center">
-                        <XStack gap="$small" $md={{ paddingLeft: '$medium' }} $gtLg={{ paddingVertical: section.index === 0 ? '$large' : 0 }}>
+                        <XStack gap="$small" paddingLeft={media.md ? '$medium' : undefined} paddingVertical={media.gtLg ? (section.index === 0 ? '$large' : 0) : undefined}>
                           <Text.MD color={section.data.length === 0 ? '$textDisabled' : '$gray4'} semibold>
                             {activeTab === 'myEvents' ? 'MES ' : ''}
                             {`événements ${section.title}`.toUpperCase()}
@@ -207,9 +205,7 @@ const EventList = () => {
         </YStack>
       </PageLayout.MainSingleColumn>
       <PageLayout.SideBarRight
-        $gtSm={{
-          paddingTop: '$xxlarge',
-        }}
+        paddingTop={media.gtSm ? '$xxlarge' : undefined}
       >
         <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
           <EventsHeader mode="aside" value={activeTab} onChange={setActiveTab} />

@@ -10,7 +10,7 @@ import { useAction } from '@/services/actions/hook'
 import { ActionStatus, isFullAction } from '@/services/actions/schema'
 import { ArrowLeft, PenLine } from '@tamagui/lucide-icons'
 import { isBefore } from 'date-fns'
-import { ScrollView, Sheet, XStack, YStack } from 'tamagui'
+import { ScrollView, Sheet, useMedia, XStack, YStack } from 'tamagui'
 import ParticipantAvatar from './ActionParticipants'
 import { mapPayload, useSheetPosition } from './utils'
 
@@ -22,6 +22,7 @@ type ActionBottomSheetProps = {
 }
 
 export const SideActionList = ({ actionQuery, onEdit, onOpenChange }: Readonly<ActionBottomSheetProps>) => {
+  const media = useMedia()
   const { setPosition } = useSheetPosition(1)
   const { data: action, isLoading } = actionQuery
   const isMyAction = action && isFullAction(action) && action.editable
@@ -62,7 +63,7 @@ export const SideActionList = ({ actionQuery, onEdit, onOpenChange }: Readonly<A
           flex={1}
         >
           {payload && action ? (
-            <ActionCard payload={payload} asFull $gtSm={{ borderWidth: 0, borderColor: '$white1' }}>
+            <ActionCard payload={payload} asFull borderWidth={media.gtSm ? 0 : undefined} borderColor={media.gtSm ? '$white1' : undefined}>
               {!isBefore(action.date, new Date()) && !isMyAction ? <SubscribeButton disabled={action.status === ActionStatus.CANCELLED} large isRegister={!!action?.user_registered_at} id={action.uuid} /> : null}
               {!isBefore(action.date, new Date()) && isMyAction ? (
                 <VoxButton theme="purple" full size="lg" variant="soft" iconLeft={PenLine} pop onPress={onEdit}>

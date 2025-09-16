@@ -9,7 +9,7 @@ import { usePostElectDeclaration } from '@/services/profile/hook'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Euro, X } from '@tamagui/lucide-icons'
 import { Controller, useForm } from 'react-hook-form'
-import { View, XStack } from 'tamagui'
+import { useMedia, View, XStack } from 'tamagui'
 import * as z from 'zod'
 
 type Props = {
@@ -23,6 +23,7 @@ const schema = z.object({
 })
 
 export default function (props: Props) {
+  const media = useMedia()
   const { control, handleSubmit, reset, formState, setError } = useForm({
     defaultValues: {
       revenue_amount: props.declaration ?? 0,
@@ -59,11 +60,11 @@ export default function (props: Props) {
         </VoxHeader>
       }
     >
-      <VoxCard $gtMd={{ maxWidth: 500 }} $md={{ shadowColor: 'transparent' }}>
+      <VoxCard maxWidth={media.gtMd ? 500 : undefined} shadowColor={media.md ? 'transparent' : undefined}>
         <VoxCard.Content>
           <XStack justifyContent="space-between" alignItems="flex-start">
-            <Text.LG>Déclarer mes indemnités d’élu</Text.LG>
-            <VoxButton $md={{ display: 'none' }} variant="text" theme="gray" iconLeft={X} size="sm" onPress={props.onClose} />
+            <Text.LG>Déclarer mes indemnités d'élu</Text.LG>
+            <VoxButton display={media.md ? 'none' : undefined} variant="text" theme="gray" iconLeft={X} size="sm" onPress={props.onClose} />
           </XStack>
           <Text.P>
             Montant mensuel de l’ensemble des indemnités brutes perçues au titre du ou des mandats locaux et mandats annexes (EPCI, Syndicats intercommunaux).

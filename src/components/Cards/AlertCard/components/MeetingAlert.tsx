@@ -7,7 +7,7 @@ import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomShe
 import VoxCard from '@/components/VoxCard/VoxCard'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
 import { AlertTriangle, Check, ExternalLink, QrCode, Share2, Ticket } from '@tamagui/lucide-icons'
-import { Image, XStack, YStack } from 'tamagui'
+import { Image, useMedia, XStack, YStack } from 'tamagui'
 
 export type MeetingAlertCollapsedProps = {
   payload: RestAlertsResponse[0]
@@ -16,9 +16,11 @@ export type MeetingAlertCollapsedProps = {
 } & AlertVoxCardProps
 
 const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsResponse[0]; isOpen: boolean; closeModal: () => void }) => {
+  const media = useMedia()
+  
   return (
     <ModalOrBottomSheet open={isOpen} onClose={closeModal}>
-      <YStack $sm={{ marginBottom: '$9' }} padding={'$11'} gap={'$8'} alignSelf={'center'} alignItems="center" maxWidth={480}>
+      <YStack marginBottom={media.sm ? '$9' : undefined} padding={'$11'} gap={'$8'} alignSelf={'center'} alignItems="center" maxWidth={480}>
         <Text semibold fontSize={'$6'} color="$textPrimary">
           {payload.data?.first_name} {payload.data?.last_name}
         </Text>

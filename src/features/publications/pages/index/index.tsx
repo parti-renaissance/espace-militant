@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PageLayout from "@/components/layouts/PageLayout/PageLayout";
-import { Image, ScrollView, XStack, YStack } from "tamagui";
+import { Image, ScrollView, useMedia, XStack, YStack } from "tamagui";
 import { VoxButton } from "@/components/Button";
 import { Link } from "expo-router";
 import Text from "@/components/base/Text";
@@ -89,6 +89,7 @@ const PostCard = ({ title, description, image, href, icon }: { title: string, de
 }
 
 const MessagePageIndex = () => {
+  const media = useMedia()
   const { data: scopes } = useGetExecutiveScopes();
   const [selectedScope, setSelectedScope] = useState<string | undefined>(() => {
     if (!scopes?.default?.code) return undefined;
@@ -111,7 +112,7 @@ const MessagePageIndex = () => {
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn>
         <ScrollView backgroundColor="$surface" flex={1}>
-          <YStack gap="$xlarge" maxWidth={520} width="100%" marginHorizontal="auto" paddingTop='$medium' $gtSm={{ paddingTop: '$xxlarge' }} paddingBottom={100} $sm={{ maxWidth: '100%', paddingHorizontal: '$medium' }}>
+          <YStack gap="$xlarge" maxWidth={media.sm ? '100%' : 520} width="100%" marginHorizontal="auto" paddingTop={media.gtSm ? '$xxlarge' : '$medium'} paddingBottom={100} paddingHorizontal={media.sm ? '$medium' : undefined}>
             <HelpCard />
             {scopeOptions.length > 0 && (
               <MessageScopeSelector label="Pour" value={selectedScope} onChange={setSelectedScope} />

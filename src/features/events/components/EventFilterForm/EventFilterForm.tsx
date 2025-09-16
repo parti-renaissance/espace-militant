@@ -3,7 +3,7 @@ import { TextInput } from 'react-native'
 import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
 import SearchBox from '@/components/Search/SearchBox'
 import { eventFiltersState } from '@/features/events/store/filterStore'
-import { YStack } from 'tamagui'
+import { useMedia, YStack } from 'tamagui'
 
 type EventFiltersProps = {
   onSearchFocus?: () => void
@@ -34,6 +34,7 @@ const AssemblySelectWrapper = memo(({ zone, defaultAssembly, onDetailChange }: A
 AssemblySelectWrapper.displayName = 'AssemblySelectWrapper'
 
 const EventFilters = ({ onSearchFocus }: EventFiltersProps) => {
+  const media = useMedia()
   const { value, setValue, searchInputRef } = eventFiltersState()
 
   const handleAssemblyChange = useCallback((x?: { value: string; label: string }) => {
@@ -45,7 +46,7 @@ const EventFilters = ({ onSearchFocus }: EventFiltersProps) => {
   }, [])
 
   return (
-    <YStack gap="$medium" $lg={{ flexDirection: 'row', gap: '$small' }}>
+    <YStack gap={media.lg ? '$small' : '$medium'} flexDirection={media.lg ? 'row' : undefined}>
       <AssemblySelectWrapper zone={value.zone} onDetailChange={handleAssemblyChange} />
       <YStack flex={1}>
         <SearchBox

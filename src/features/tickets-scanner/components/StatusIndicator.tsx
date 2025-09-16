@@ -1,6 +1,6 @@
 import React from 'react'
 import { QrCode, TicketCheck, TicketX } from '@tamagui/lucide-icons'
-import { YStack } from 'tamagui'
+import { useMedia, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import { ScanTicketResponse } from '@/services/tickets/schema'
 
@@ -9,6 +9,7 @@ interface StatusIndicatorProps {
 }
 
 export default function StatusIndicator({ ticket }: StatusIndicatorProps) {
+  const media = useMedia()
   const getStatusConfig = (statusCode: string) => {
     switch (statusCode) {
       case 'valid':
@@ -47,7 +48,7 @@ export default function StatusIndicator({ ticket }: StatusIndicatorProps) {
   const IconComponent = config.icon
 
   return (
-    <YStack gap="$small" alignItems="center" justifyContent="center">
+    <YStack gap={media.sm ? '$small' : '$medium'} alignItems="center" justifyContent="center">
       <YStack backgroundColor={config.color} w={64} h={64} borderRadius={32} justifyContent="center" alignItems="center">
         <IconComponent size={32} color="white" />
       </YStack>

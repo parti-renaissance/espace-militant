@@ -39,7 +39,7 @@ export default function ActionForm({ onClose, uuid, scope }: Props) {
       </Text>
       <View>
         {uuid && isLoading ? (
-          <SkeCard minWidth={370} $gtSm={{ borderRadius: 'unset' }}>
+          <SkeCard minWidth={370} borderRadius={media.gtSm ? 'unset' : undefined}>
             <SkeCard.Title />
             <SkeCard.Title />
             <SkeCard.Description />

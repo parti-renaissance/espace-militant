@@ -34,7 +34,7 @@ const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forced
   return (
     <VoxHeader
       backgroundColor={backgroundColor}
-      {...(hideOnMdUp ? { $gtMd: { display: 'none' } } : {})}
+      display={hideOnMdUp ? (gtSm ? 'none' : undefined) : undefined}
     >
       <YStack flex={1} position="relative" minHeight={48}>
         <XStack position="absolute" left={0} top={0} bottom={0} zIndex={1}>

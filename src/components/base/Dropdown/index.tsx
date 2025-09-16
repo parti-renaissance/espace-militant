@@ -4,7 +4,7 @@ import Text from '@/components/base/Text'
 import { useLazyRef } from '@/hooks/useLazyRef'
 import type { IconComponent } from '@/models/common.model'
 import { Check } from '@tamagui/lucide-icons'
-import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
+import { styled, ThemeableStack, useMedia, XStack, YStack } from 'tamagui'
 
 export const DropdownItemFrame = styled(ThemeableStack, {
   padding: '$medium',
@@ -162,6 +162,7 @@ export function DropdownWrapper<A extends string>({
   onSelect,
   ...props
 }: DropdownProps<A> & { children: React.ReactNode; open?: boolean; onOpenChange?: (x: boolean) => void }) {
+  const media = useMedia()
   const open = props.open ?? false
   const setOpen = props.onOpenChange ?? (() => {})
   const container = React.useRef<ComponentRef<typeof TouchableOpacity> | null>(null)
@@ -186,7 +187,7 @@ export function DropdownWrapper<A extends string>({
     <TouchableOpacity ref={container}>
       <Modal visible={open} transparent animationType="fade" onRequestClose={handleClose}>
         <TouchableOpacity style={{ flex: 1 }} onPress={handleClose}>
-          <Dropdown {...props} onSelect={handleSelect} position="absolute" top={dropdownTop} alignSelf="center" minWidth={230} />
+          <Dropdown {...props} onSelect={handleSelect} position="absolute" top={dropdownTop} alignSelf="center" minWidth={media.sm ? 230 : undefined} />
         </TouchableOpacity>
       </Modal>
       {children}

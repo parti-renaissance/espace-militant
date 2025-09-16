@@ -58,13 +58,10 @@ export default function QuitConfirmModal({ isOpen, onClose, onConfirm, messageId
         }
         <YStack
           paddingHorizontal="$medium"
-          marginVertical="$xxxlarge"
+          marginVertical={media.gtSm ? "$xxlarge" : "$xxxlarge"}
           gap="$large"
           alignItems="center"
-          $gtSm={{
-            width: 500,
-            marginVertical: "$xxlarge",
-          }}
+          width={media.gtSm ? 500 : undefined}
         >
           <YStack gap="$medium" alignItems="center">
             <File size={32} color="$blue5" />
@@ -94,7 +91,7 @@ export default function QuitConfirmModal({ isOpen, onClose, onConfirm, messageId
               </Text.SM>
             </YStack>
           </YStack>
-          <YStack gap="$large" $sm={{ gap: '$xxxlarge' }} alignItems="center" justifyContent="center" >
+          <YStack gap={media.sm ? '$xxxlarge' : '$large'} alignItems="center" justifyContent="center" >
             <VoxButton
               theme="orange"
               variant='outlined'
@@ -120,13 +117,10 @@ export default function QuitConfirmModal({ isOpen, onClose, onConfirm, messageId
       <ModalOrBottomSheet open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} allowDrag>
         <YStack
           paddingHorizontal="$medium"
-          marginVertical="$xxxlarge"
+          marginVertical={media.gtSm ? "$xxlarge" : "$xxxlarge"}
           gap="$large"
           alignItems="center"
-          $gtSm={{
-            width: 480,
-            marginVertical: "$xxlarge",
-          }}
+          width={media.gtSm ? 480 : undefined}
         >
           <YStack gap="$medium" alignItems="center">
             <Trash2 size={32} color="$orange5" />

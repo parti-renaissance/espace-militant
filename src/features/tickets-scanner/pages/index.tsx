@@ -4,7 +4,7 @@ import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-ca
 import { useScanTicket } from '@/services/tickets/hook'
 import { ScanTicketResponse } from '@/services/tickets/schema'
 import { Tickets, CameraOff } from '@tamagui/lucide-icons'
-import { YStack, XStack, ScrollView, View } from 'tamagui'
+import { YStack, XStack, ScrollView, View, useMedia } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import StatusIndicator, { StatusIndicatorSkeleton } from '../components/StatusIndicator'
 import VoxCard from '@/components/VoxCard/VoxCard'
@@ -16,6 +16,7 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 const { width, height } = Dimensions.get('window')
 
 export default function TicketScannerPage() {
+  const media = useMedia()
   const [permission, requestPermission] = useCameraPermissions()
   const [scanned, setScanned] = useState(false)
   const [ticketData, setTicketData] = useState<ScanTicketResponse | null>(null)
@@ -158,7 +159,7 @@ export default function TicketScannerPage() {
 
       <YStack flex={1}>
         <ScrollView flex={1} showsVerticalScrollIndicator={false}>
-          <YStack $gtSm={{ maxWidth: 520 }} paddingBottom={100} width="100%" marginHorizontal="auto">
+          <YStack maxWidth={media.gtSm ? 520 : undefined} paddingBottom={100} width="100%" marginHorizontal="auto">
             {scanTicketMutation.isPending ? (
               <SkeCard>
                 <SkeCard.Content>

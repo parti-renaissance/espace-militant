@@ -70,7 +70,7 @@ export const EventSubscribeButton = ({ uuid, slug, isPremium, userUuid, ...butto
             </VoxHeader>
           }
         >
-          <VoxCard.Content $gtMd={{ maxHeight: height, maxWidth: 390 }}>
+          <VoxCard.Content maxHeight={media.gtMd ? height : undefined} maxWidth={media.gtMd ? 390 : undefined}>
             {media.gtMd ? (
               <XStack justifyContent="space-between" alignItems="center" flex={1} height={50}>
                 <Text.LG>M’inscrire à l’événement</Text.LG>

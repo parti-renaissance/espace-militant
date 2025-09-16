@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 import { View, } from 'tamagui';
 import { LinearGradient  } from 'expo-linear-gradient';
-import { TouchableHighlight } from 'react-native';
+import { Pressable } from 'react-native';
 import Text from '../base/Text';
 
 type FutureButtonProps = {
@@ -71,16 +71,14 @@ export default function FutureButton({
       </Animated.View>
 
       {/* Bouton au-dessus (statique) */}
-      <TouchableHighlight
+      <Pressable
         onPress={onPress}
         disabled={disabled}
         style={{ borderRadius: 999, paddingHorizontal: 24, paddingVertical: 16, backgroundColor: '#290A42', alignItems: 'center', justifyContent: 'center' }}
-        underlayColor="#3A185C"
-        activeOpacity={0.7}
         aria-label={label}
       >
         {children || <Text.LG regular>{label}</Text.LG>}
-      </TouchableHighlight>
+      </Pressable>
     </View>
   );
 }

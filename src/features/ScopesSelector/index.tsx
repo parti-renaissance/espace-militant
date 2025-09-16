@@ -52,9 +52,7 @@ export default function ScopesSelector() {
   const MultiScopeStep = useCallback(() => {
     return (
       <YStack
-        $gtSm={{
-          width: 390,
-        }}
+        width={media.gtSm ? 390 : undefined}
         gap="$medium"
       >
         <YStack flex={1}>
@@ -94,9 +92,7 @@ export default function ScopesSelector() {
   const OneScopeStep = () => {
     return (
       <YStack
-        $gtSm={{
-          width: 390,
-        }}
+        width={media.gtSm ? 390 : undefined}
         gap="$medium"
       >
         <HeaderOneScope />
@@ -122,9 +118,7 @@ export default function ScopesSelector() {
   const SecondStep = () => {
     return (
       <YStack
-        $gtSm={{
-          width: 390,
-        }}
+        width={media.gtSm ? 390 : undefined}
         gap="$medium"
       >
         <HeaderOneScope />
@@ -149,10 +143,8 @@ export default function ScopesSelector() {
   return (
     <ModalOrPageV2 open={shouldOpen}>
       <YStack
-        $sm={{ flex: 1 }}
-        $gtSm={{
-          maxHeight: height * 0.8 - viewport.top - viewport.bottom,
-        }}
+        flex={media.sm ? 1 : undefined}
+        maxHeight={media.gtSm ? height * 0.8 - viewport.top - viewport.bottom : undefined}
       >
         <ScrollView style={{ flex: 1, paddingBottom: viewport.bottom }}>{!hasSelectedScope ? <FirstStep /> : <SecondStep />}</ScrollView>
       </YStack>

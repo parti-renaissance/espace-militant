@@ -42,6 +42,8 @@ const TabFrame = styled(ThemeableStack, {
   justifyContent: 'center',
   alignItems: 'center',
   height: 54,
+  backgroundColor: 'transparent',
+  borderWidth: 0,
 })
 
 const TabBarFrame = styled(ThemeableStack, {

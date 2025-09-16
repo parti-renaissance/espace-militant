@@ -1,7 +1,7 @@
 import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Text from '@/components/base/Text'
 import { styled } from '@tamagui/core'
-import { ThemeableStack, XStack } from 'tamagui'
+import { ThemeableStack, useMedia, XStack } from 'tamagui'
 
 type CheckboxGroupProps = {
   options: {
@@ -19,6 +19,7 @@ const CheckboxGroupFrame = styled(ThemeableStack, {
 })
 
 export default function CheckboxGroup({ options, value, onChange }: CheckboxGroupProps) {
+  const media = useMedia()
   const handlePress = (item: string) => () => {
     if (value.includes(item)) {
       onChange(value.filter((v) => v !== item))
@@ -35,8 +36,7 @@ export default function CheckboxGroup({ options, value, onChange }: CheckboxGrou
           key={option.value}
           flexGrow={1}
           flexShrink={1}
-          flexBasis={'48%'}
-          $md={{ flexBasis: '100%' }}
+          flexBasis={media.md ? '48%' : '100%'}
           gap="$small"
           group
           onPress={handlePress(option.value)}

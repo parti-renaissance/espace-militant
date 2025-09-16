@@ -10,7 +10,7 @@ import { useGetDetailProfil, useGetInstances, useGetTags, useIsAdherentDues } fr
 import { RestInstancesResponse } from '@/services/profile/schema'
 import { Info, UserPlus } from '@tamagui/lucide-icons'
 import { Link } from 'expo-router'
-import { isWeb, Separator, View, XStack, YStack } from 'tamagui'
+import { isWeb, Separator, useMedia, View, XStack, YStack } from 'tamagui'
 import ScrollView from '../../components/ScrollView'
 import ChangeCommitteeModal from './components/ChangeCommittee'
 import { DoubleCircle, DoubleDiamond, DoubleTriangle, DoubleSquare } from './components/icons'
@@ -29,6 +29,7 @@ const isCirconscription = (instance: any): instance is Instance & { type: 'circo
 const isAgora = (instance: any): instance is Instance & { type: 'agora' } => instance.type === 'agora'
 
 const InstancesScreen = () => {
+  const media = useMedia()
   const { data } = useGetInstances()
   const { tags } = useGetTags({ tags: [UserTagEnum.SYMPATHISANT] })
   const isAdherentDues = useIsAdherentDues()
@@ -232,7 +233,7 @@ const InstancesScreen = () => {
       />
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
         <ScrollView>
-          <YStack gap="$medium" flex={1} $sm={{ pt: 8, gap: 8 }}>
+          <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
             <InstanceCard
               title="Mon assemblée"
               icon={DoubleCircle}
