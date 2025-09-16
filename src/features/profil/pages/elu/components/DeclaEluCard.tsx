@@ -110,7 +110,7 @@ const EluNonOk = (props: { declaration: number; cotisation: number; onPressDecla
         <Text.BR />
         Vous avez déclaré une indemnités d’élu de {props.declaration} €.
       </Text.P>
-      <XStack $sm={{ flexDirection: 'column' }} gap="$medium" justifyContent="space-between">
+      <XStack flexDirection={media.sm ? 'column' : undefined} gap="$medium" justifyContent="space-between">
         <ButtonDeclaration theme="gray" full={media.sm} alignSelf="flex-start" onPress={props.onPressDeclaForm}>
           Modifier ma declaration
         </ButtonDeclaration>

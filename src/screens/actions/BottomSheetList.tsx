@@ -5,7 +5,7 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 import EmptyState from '@/screens/actions/EmptyAction'
 import { RestAction } from '@/services/actions/schema'
 import { useGetProfil } from '@/services/profile/hook'
-import { ScrollView, Sheet, XStack, YStack } from 'tamagui'
+import { ScrollView, Sheet, useMedia, XStack, YStack } from 'tamagui'
 import { mapPayload } from './utils'
 import type { useSheetPosition } from './utils'
 
@@ -49,6 +49,7 @@ export const ActionList = (props: ActionListProps) => {
 type ContainerListProps = ActionListProps & { postionConfig: ReturnType<typeof useSheetPosition>; open: boolean; onOpenChange: (x: boolean) => void }
 
 export const SideList = (props: ContainerListProps & { children: React.ReactNode }) => {
+  const media = useMedia()
   return (
     <XStack
       zIndex={100}
@@ -62,7 +63,7 @@ export const SideList = (props: ContainerListProps & { children: React.ReactNode
       bottom={0}
       top={0}
     >
-      <YStack elevation={5} width={500} flex={1} backgroundColor={'$gray1'}>
+      <YStack elevation={5} width={media.gtSm ? 500 : undefined} flex={1} backgroundColor={'$gray1'}>
         <ScrollView
           contentContainerStyle={{
             p: '$medium',

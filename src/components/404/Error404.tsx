@@ -2,25 +2,21 @@
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 // import { Image } from 'expo-image'
 import { Link } from 'expo-router'
-import { Image, View, YStack } from 'tamagui'
+import { Image, useMedia, View, YStack } from 'tamagui'
 import Text from '../base/Text'
 import { VoxButton } from '../Button'
 
 export default function Error404() {
+  const media = useMedia()
+  
   return (
     <PageLayout>
-      <PageLayout.StateFrame justifyContent="center" $gtSm={{ mt: 0 }}>
+      <PageLayout.StateFrame justifyContent="center" mt={media.gtSm ? 0 : undefined}>
         <Image
           source={require('../../assets/images/404.png')}
           resizeMode="contain"
-          $md={{
-            width: 400,
-            height: 400,
-          }}
-          $sm={{
-            width: 300,
-            height: 300,
-          }}
+          width={media.md ? 400 : (media.sm ? 300 : undefined)}
+          height={media.md ? 400 : (media.sm ? 300 : undefined)}
         />
         <YStack gap="$large" justifyContent="center" alignItems="center">
           <YStack gap="$medium">

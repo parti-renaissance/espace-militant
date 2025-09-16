@@ -1,5 +1,5 @@
 import { createContext, memo, ReactElement, useCallback, useContext } from 'react'
-import { styled, ThemeableStack, withStaticProperties, YStackProps } from 'tamagui'
+import { styled, ThemeableStack, useMedia, withStaticProperties, YStackProps } from 'tamagui'
 import _Tab, { TabProps } from './Tab'
 
 const TabMemo = memo(_Tab)
@@ -20,26 +20,26 @@ type TabsFrameProps<A extends string> = YStackProps & {
 const StyledFrame = styled(ThemeableStack, {
   gap: 16,
   padding: 16,
-  $gtSm: {
-    gap: 24,
-    padding: 24,
-  },
   variants: {
     grouped: {
       true: {
         bg: '$white1',
-        $gtMd: {
-          bg: '$colorTransparent',
-        },
       },
     },
   },
 } as const)
 
 function TabsFrame<A extends string>({ children, value, onChange, grouped, ...rest }: TabsFrameProps<A>) {
+  const media = useMedia()
   return (
     <TabsContext.Provider value={{ activeTab: value, setActiveTab: onChange, grouped }}>
-      <StyledFrame grouped={grouped} {...rest}>
+      <StyledFrame 
+        grouped={grouped} 
+        gap={media.gtSm ? 24 : 16}
+        padding={media.gtSm ? 24 : 16}
+        bg={grouped && media.gtMd ? '$colorTransparent' : (grouped ? '$white1' : undefined)}
+        {...rest}
+      >
         {children}
       </StyledFrame>
     </TabsContext.Provider>

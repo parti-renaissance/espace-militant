@@ -22,7 +22,7 @@ export default function AppLayout() {
   return (
     <PortalLayout>
       {shouldShowHeader ? (
-        <VoxHeader justifyContent="space-between" display="none" $gtSm={{ display: 'flex' }} safeAreaView={true}>
+        <VoxHeader justifyContent="space-between" display={media.sm ? 'none' : 'flex'} safeAreaView={true}>
           <XStack flex={1} flexBasis={0}>
             <Link href="/" replace>
               <EuCampaignIllustration cursor="pointer" showText={media.gtLg} />

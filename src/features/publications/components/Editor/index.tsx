@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useRef, useMemo, useEffect, useCallbac
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uniqueId } from 'lodash'
 import { useForm, FormProvider } from 'react-hook-form'
-import { getTokenValue, isWeb, YStack } from 'tamagui'
+import { getTokenValue, isWeb, YStack, useMedia } from 'tamagui'
 import { useLocalSearchParams, router } from 'expo-router'
 import { StyleRendererContextProvider } from './context/styleRenderContext'
 import { getHTML } from './HtmlOneRenderer'
@@ -41,7 +41,8 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   const searchParams = useLocalSearchParams<{ scope?: string; template?: string }>()
   const scopeFromQuery = searchParams?.scope
   const templateFromQuery = searchParams?.template
-  
+  const media = useMedia()
+
   const messageQueryParams = useMemo(() => ({
     messageId: props.messageId ?? '', 
     scope: scopeFromQuery ?? '', 
@@ -186,14 +187,8 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
         maxWidth={520}
         width="100%"
         flexGrow={1}
-        $gtSm={
-          isWeb
-            ? {
-              paddingTop: '$large',
-              paddingBottom: 170 + getTokenValue('$medium'),
-            }
-            : undefined
-        }
+        paddingTop={(media.gtSm && isWeb) ? '$large' : undefined}
+        paddingBottom={(media.gtSm && isWeb) ? 170 + getTokenValue('$medium') : undefined}
       >
         <YStack flex={1} gap="$medium" position="relative">
           <StyleRendererContextProvider value={props.theme}>

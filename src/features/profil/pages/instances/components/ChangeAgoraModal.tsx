@@ -60,8 +60,8 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
       onEndReached={() => hasNextPage && fetchNextPage()}
       onEndReachedThreshold={0.5}
       ListHeaderComponent={
-        <Text.P $gtSm={{ pb: 16 }}>
-          Vous ne pouvez être membre que d’une seule agora.
+        <Text.P pb={media.gtSm ? 16 : undefined}>
+          Vous ne pouvez être membre que d'une seule agora.
         </Text.P>
       }
       renderItem={({ item: agora }) => (

@@ -25,11 +25,9 @@ export default function ProfilLayout({ children }: { children: React.ReactNode }
           fallback={
             <YStack
               gap="$medium"
-              $gtSm={{
-                pt: '$large',
-                pl: '$large',
-                pr: '$large',
-              }}
+              pt={media.gtSm ? '$large' : undefined}
+              pl={media.gtSm ? '$large' : undefined}
+              pr={media.gtSm ? '$large' : undefined}
               pb={'$11'}
             >
               {[1, 2, 3].map((x) => (
@@ -48,11 +46,9 @@ export default function ProfilLayout({ children }: { children: React.ReactNode }
       fallback={
         <YStack
           gap="$medium"
-          $gtSm={{
-            pt: '$medium',
-            pl: '$medium',
-            pr: '$medium',
-          }}
+          pt={media.gtSm ? '$medium' : undefined}
+          pl={media.gtSm ? '$medium' : undefined}
+          pr={media.gtSm ? '$medium' : undefined}
           pb={'$11'}
         >
           {[1, 2, 3].map((x) => (

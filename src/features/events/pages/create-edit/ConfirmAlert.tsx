@@ -8,7 +8,7 @@ import VoxSimpleModal from '@/components/VoxSimpleModal'
 import { EventFormData } from '@/features/events/pages/create-edit/schema'
 import { BellDot, Mail } from '@tamagui/lucide-icons'
 import { Control, Controller, useWatch } from 'react-hook-form'
-import { Theme, XStack, YStack } from 'tamagui'
+import { Theme, useMedia, XStack, YStack } from 'tamagui'
 import getVisibilityOptions from './visibility-options'
 import { useCountInvitationsEvent } from '@/services/events/hook'
 import LoaderView from '@/screens/shared/LoaderView'
@@ -82,6 +82,7 @@ const CountInvitation = (props: {
 
 const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
   const insideRef = useRef<ModalRef>(null)
+  const media = useMedia()
 
   const visibility = useWatch({ control: props.control, name: 'visibility' })
 
@@ -104,7 +105,7 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
 
   return (
     <VoxSimpleModal ref={insideRef}>
-      <VoxCard.Content justifyContent="space-between" gap="$large" $sm={{ maxWidth: 350 }} maxWidth={500}>
+      <VoxCard.Content justifyContent="space-between" gap="$large" maxWidth={media.sm ? 350 : 500}>
         <YStack gap="$medium">
           <Text.LG semibold>{props.title}</Text.LG>
           <VisibilityReview visibility={visibility} />

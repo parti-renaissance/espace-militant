@@ -6,11 +6,12 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 import * as metatags from '@/config/metatags'
 import ResourcesList from '@/screens/tools/ResourcesList'
 import Head from 'expo-router/head'
-import { View, YStack } from 'tamagui'
+import { useMedia, View, YStack } from 'tamagui'
 
 const RessourceCardSkeleton = () => {
+  const media = useMedia()
   return (
-    <SkeCard borderColor="gray2" $gtSm={{ flex: 1 }} borderRadius="$8">
+    <SkeCard borderColor="gray2" flex={media.gtSm ? 1 : undefined} borderRadius="$8">
       <SkeCard.Content>
         <YStack height="$8" />
         <SkeCard.Description />
@@ -20,8 +21,9 @@ const RessourceCardSkeleton = () => {
 }
 
 const DoubleRessourceCardSkeleton = () => {
+  const media = useMedia()
   return (
-    <YStack gap="$medium" $gtSm={{ flexDirection: 'row' }}>
+    <YStack gap="$medium" flexDirection={media.gtSm ? 'row' : undefined}>
       <RessourceCardSkeleton />
       <RessourceCardSkeleton />
     </YStack>
@@ -29,8 +31,9 @@ const DoubleRessourceCardSkeleton = () => {
 }
 
 const ToolsSkeleton = () => {
+  const media = useMedia()
   return (
-    <YStack gap="$medium" padding="$medium" $sm={{ paddingTop: '$medium' }}>
+    <YStack gap="$medium" padding="$medium" paddingTop={media.sm ? '$medium' : undefined}>
       <DoubleRessourceCardSkeleton />
       <DoubleRessourceCardSkeleton />
       <DoubleRessourceCardSkeleton />

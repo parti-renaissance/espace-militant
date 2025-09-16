@@ -9,7 +9,7 @@ import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { useScrollToTop } from '@react-navigation/native'
 import { useFocusEffect } from 'expo-router'
-import { getToken, Spinner, useMedia, YStack, XStack } from 'tamagui'
+import { getToken, Spinner, useMedia, YStack, XStack, styled } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { VoxButton } from '@/components/Button'
@@ -90,11 +90,11 @@ const HomeFeedList = () => {
   const header = useMemo(() => (
     alerts.length > 0 || shouldShowNotificationCard
       ? (
-          <YStack gap={8} $gtSm={{ gap: 16, }}>
+          <YStack gap={media.sm ? 8 : 16}>
             {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
             {alerts.length > 0 ? <AlertStack alerts={alerts} /> : null}
             {alerts.length > 0 || hasFeature('publications') ? (
-              <XStack justifyContent="space-between" alignItems="center" px="$medium" $gtSm={{ px: 0 }}>
+              <XStack justifyContent="space-between" alignItems="center" px={media.sm ? "$medium" : "$0"}>
                 <Text.MD color="$gray4" semibold>
                   Dernières actualités
                 </Text.MD>

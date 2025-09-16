@@ -36,7 +36,7 @@ const DashboardScreen = () => {
   return (
     <>
       <ScrollView>
-        <YStack gap="$medium" flex={1} $sm={{ pt: 8 + insets.top }}>
+        <YStack gap="$medium" flex={1} pt={media.sm ? 8 + insets.top : undefined}>
           <ProfilBlock />
           {media.sm && <ProfilMenu />}
           <VoxCard>

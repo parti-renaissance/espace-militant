@@ -5,14 +5,15 @@ import { useUserStore } from '@/store/user-store'
 import { X } from '@tamagui/lucide-icons'
 import { addMonths } from 'date-fns'
 import { Link } from 'expo-router'
-import { Image, isWeb, XStack, YStack } from 'tamagui'
+import { Image, isWeb, useMedia, XStack, YStack } from 'tamagui'
 
 export default function NotificationSubscribeCard() {
   const userStore = useUserStore()
+  const media = useMedia()
   const handleClose = () => userStore.setHideReSubscribeAlert(addMonths(new Date(), 1).toISOString())
 
   return (
-    <VoxCard $sm={{ bg: 'transparent' }}>
+    <VoxCard bg={media.sm ? 'transparent' : undefined}>
       <VoxCard.Content>
         <XStack justifyContent="flex-end" gap="$medium">
           <VoxButton variant="text" shrink iconLeft={X} onPress={handleClose} />

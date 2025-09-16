@@ -6,10 +6,12 @@ import { useSession } from '@/ctx/SessionProvider'
 import { EventItemProps } from '@/features/events/types'
 import { isEventHasNationalLive, isEventStarted } from '../utils'
 import EventLiveCountDown from './EventLiveCountDown'
+import { useMedia } from 'tamagui'
 
 export const EventLive = ({ event }: EventItemProps) => {
   const [started, setStarted] = useState(isEventStarted(event))
   const { session } = useSession()
+  const media = useMedia()
 
   useEffect(() => {
     const tID = setInterval(() => {
@@ -27,11 +29,8 @@ export const EventLive = ({ event }: EventItemProps) => {
     return (
       <VoxCard backgroundColor="black" borderWidth={0}>
         <VoxCard.Content
-          height={50}
-          $sm={{
-            height: 110,
-            paddingTop: 70,
-          }}
+          height={media.sm ? 110 : 50}
+          paddingTop={media.sm ? 70 : undefined}
           justifyContent="center"
         >
           <EventLiveCountDown
@@ -47,7 +46,7 @@ export const EventLive = ({ event }: EventItemProps) => {
 
   if (started && isEventHasNationalLive(event)) {
     return (
-      <VoxCard backgroundColor="black" overflow="hidden" borderWidth={0} $sm={{paddingTop: 90}}>
+      <VoxCard backgroundColor="black" overflow="hidden" borderWidth={0} paddingTop={media.sm ? 90 : undefined}>
         <VimeoPlayer url={`${clientEnv.OAUTH_BASE_URL}/live-event/${event.slug}?token=${session?.accessToken}`} height={500} />
       </VoxCard>
     )

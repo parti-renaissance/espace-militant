@@ -9,9 +9,10 @@ import * as metatags from '@/config/metatags'
 import HomeFeedList from '@/features/homefeed/HomeFeedList'
 import ScopeModal from '@/features/ScopesSelector'
 import Head from 'expo-router/head'
-import { YStack } from 'tamagui'
+import { useMedia, YStack } from 'tamagui'
 
 const HomeScreen: React.FC = () => {
+  const media = useMedia()
   return (
     <>
       <Head>
@@ -19,9 +20,7 @@ const HomeScreen: React.FC = () => {
       </Head>
       <PageLayout webScrollable>
         <PageLayout.SideBarLeft
-          $gtSm={{
-            paddingTop: '$xxlarge',
-          }}
+          paddingTop={media.gtSm ? '$xxlarge' : undefined}
         >
           <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
             <YStack gap="$medium">
@@ -32,7 +31,7 @@ const HomeScreen: React.FC = () => {
         <PageLayout.MainSingleColumn>
           <BoundarySuspenseWrapper
             fallback={
-              <YStack gap="$xxlarge" padding="$xxlarge" $sm={{ paddingHorizontal: 0 }}>
+              <YStack gap="$xxlarge" padding="$xxlarge" paddingHorizontal={media.sm ? 0 : undefined}>
                 <SkeCard>
                   <SkeCard.Content>
                     <SkeCard.Chip />
@@ -81,9 +80,7 @@ const HomeScreen: React.FC = () => {
           </BoundarySuspenseWrapper>
         </PageLayout.MainSingleColumn>
         <PageLayout.SideBarRight
-          $gtSm={{
-            paddingTop: '$xxlarge',
-          }}
+          paddingTop={media.gtSm ? '$xxlarge' : undefined}
         >
           <StickyBox offsetTop="$xxlarge" offsetBottom="$xlarge">
             <YStack>

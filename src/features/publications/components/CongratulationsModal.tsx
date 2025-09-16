@@ -2,7 +2,7 @@ import React from 'react'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import { VoxButton } from '@/components/Button'
 import { Check, Eye, Home } from '@tamagui/lucide-icons'
-import { View, YStack } from 'tamagui'
+import { useMedia, View, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import { router } from 'expo-router'
 
@@ -12,15 +12,15 @@ interface CongratulationsModalProps {
 }
 
 export default function CongratulationsModal({ isOpen, onClose }: CongratulationsModalProps) {
+  const media = useMedia()
+  
   return (
     <ModalOrBottomSheet open={isOpen} onClose={onClose} allowDrag>
       <YStack
         padding="$large"
         gap="$medium"
         alignItems="center"
-        $gtMd={{
-          width: 480,
-        }}
+        width={media.gtMd ? 480 : undefined}
       >
         <View backgroundColor="$blue4" borderRadius={20} width={40} height={40} justifyContent="center" alignItems="center">
           <Check size={24} color="white" />

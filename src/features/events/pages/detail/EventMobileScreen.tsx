@@ -14,7 +14,7 @@ import { EventToggleSubscribeButton } from '@/features/events/components/EventTo
 import { EventItemProps } from '@/features/events/types'
 import { RestItemEvent } from '@/services/events/schema'
 import { StatusBar } from 'expo-status-bar'
-import { getTokenValue, Image, XStack, YStack, YStackProps } from 'tamagui'
+import { getTokenValue, Image, useMedia, XStack, YStack, YStackProps } from 'tamagui'
 import { EventLive } from '../../components/EventLive'
 import EventMDXRenderer from '../../components/EventMDXRenderer'
 import EventParticipantsSection from '../../components/EventParticipantsSection'
@@ -85,13 +85,14 @@ const BottomCTA = (props: EventItemProps) => {
 }
 
 const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
+  const media = useMedia()
   const fallbackImage = getEventDetailImageFallback(event)
   const isFull = isEventFull(event)
   const insets = useSafeAreaInsets()
   return (
     <PageLayout.MainSingleColumn backgroundColor="black">
       <StatusBar animated style="light" />
-      <ScrollStack marginTop={insets.top} backgroundColor="$textSurface">
+      <ScrollStack marginTop={insets.top} backgroundColor={media.sm ? "$textSurface" : undefined}>
         <YStack>
           <EventLive event={event} userUuid={userUuid} />
           <VoxCard overflow="hidden" pb={66} borderWidth={0}>

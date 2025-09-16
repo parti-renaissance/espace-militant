@@ -1,17 +1,16 @@
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import StickyBox from '@/components/StickyBox/StickyBox'
-import { View } from 'tamagui'
+import { useMedia, View } from 'tamagui'
 
 function FormationDesktopLayout({ topVisual, leftComponent, children }: { topVisual: number; children: React.ReactNode; leftComponent?: React.ReactNode }) {
+  const media = useMedia()
   return (
     <PageLayout marginTop={-topVisual} bg="transparent" webScrollable>
       {leftComponent ? (
         <PageLayout.SideBarLeft
           showOn="gtSm"
-          $md={{
-            width: 200,
-            pl: '$medium',
-          }}
+          width={media.md ? 200 : undefined}
+          pl={media.md ? '$medium' : undefined}
         >
           <StickyBox offsetTop="$medium" offsetBottom="$xxxlarge">
             <View marginTop={topVisual}>{leftComponent}</View>

@@ -51,7 +51,7 @@ const ChangeCommitteeList = ({ currentUuid, ...props }: { currentUuid: string | 
       data={list}
       key={key}
       numColumns={media.gtSm ? 2 : undefined}
-      ListHeaderComponent={<Text.P $gtSm={{ pb: 16 }}>Vous pouvez seulement changer de comité au sein de votre Assemblée.</Text.P>}
+      ListHeaderComponent={<Text.P pb={media.gtSm ? 16 : undefined}>Vous pouvez seulement changer de comité au sein de votre Assemblée.</Text.P>}
       renderItem={({ item: committee }) => (
         <MemorizedMembershipCard
           title={committee.name}

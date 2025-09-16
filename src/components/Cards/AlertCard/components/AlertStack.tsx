@@ -117,7 +117,7 @@ const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed }) => 
   )
 
   return (
-    <YStack gap={8} $sm={{ marginBottom: '$medium' }} animation="quick" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }}>
+    <YStack gap={8} marginBottom={media.sm ? '$medium' : undefined} animation="quick" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }}>
       <XStack justifyContent="space-between" alignItems="center" flexShrink={1} height={32} px={media.gtSm ? 0 : '$medium'}>
         <Text.MD color="$gray4" semibold>
           {alerts.length > 1 ? `Infos à la une` : 'Info à la une'}
@@ -141,7 +141,7 @@ const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed }) => 
           ) : null}
         </AnimatePresence>
       </XStack>
-      <YStack mx="$medium" $gtSm={{ margin: 0 }}>
+      <YStack mx="$medium" margin={media.gtSm ? 0 : undefined}>
         {alerts.length === 1 ? (
           alerts.map((alert, i) => (
             <AlertCard key={i} payload={alert} />
@@ -155,7 +155,7 @@ const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed }) => 
         )}
       </YStack>
       {alerts.length > 1 ? (
-        <YStack height={36} mt="$medium" $gtSm={{mt: '$small'}}>
+        <YStack height={36} mt={media.gtSm ? '$small' : '$medium'}>
           <AnimatePresence>
             {(hasMultiple && collapsed) ? (
               <XStack justifyContent="center" mt="$2" zIndex={100}>
