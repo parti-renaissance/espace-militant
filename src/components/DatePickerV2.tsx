@@ -104,7 +104,7 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabl
       <DateTimePickerModal
         disabled={disabled}
         locale="fr"
-        date={value}
+        date={value ? value : new Date()}
         confirmTextIOS="Valider"
         cancelTextIOS="Annuler"
         isVisible={isDatePickerVisible}
