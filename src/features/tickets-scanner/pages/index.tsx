@@ -144,22 +144,22 @@ export default function TicketScannerPage() {
             barcodeTypes: ['qr'],
           }}
         />
-        <View 
-          position="absolute" 
-          top={0} 
-          left={0} 
-          right={0} 
-          bottom={0} 
-          backgroundColor="transparent" 
-          justifyContent="center" 
+        <View
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          backgroundColor="transparent"
+          justifyContent="center"
           alignItems="center"
         >
           <View width={150} height={150} marginTop={32} justifyContent="center" alignItems="center">
-            <View width="100%" height="100%" borderWidth={8} borderColor={scanned ? '#E0C600' : '#F5D900'} borderRadius={10} backgroundColor="transparent" justifyContent="center" alignItems="center">
+            <View width="100%" height="100%" borderWidth={8} borderColor={scanned ? '$gray7' : '#F5D900'} borderRadius={10} backgroundColor="transparent" justifyContent="center" alignItems="center">
               {scanTicketMutation.isPending && <ActivityIndicator size="large" color="#F5D900" />}
             </View>
           </View>
-          <Text color="white" fontSize={14} textAlign="center" marginTop={15} paddingHorizontal={20}>
+          <Text color="white" fontSize={14} textAlign="center" opacity={scanned ? 0 : 1} marginTop={15} paddingHorizontal={20}>
             Pointez la caméra vers le QR code du ticket
           </Text>
         </View>
@@ -243,25 +243,26 @@ export default function TicketScannerPage() {
                     </VoxCard.Content>
                   </VoxCard>
                 )}
-                <YStack gap="$small" mx="$medium">
-                  <Text.LG secondary>Historique des scans</Text.LG>
-                  {ticketData.scan_history && ticketData.scan_history.length > 0 ? (
-                    ticketData.scan_history.map((scan, index) => (
-                      <XStack key={index} alignItems="center" justifyContent="space-between">
-                        <Text.SM primary medium>
-                          {new Date(scan.date).toLocaleString('fr-FR')}
-                        </Text.SM>
-                        <Text.SM secondary>
-                          {scan.name} ({scan.public_id})
-                        </Text.SM>
+                {ticketData.scan_history ? (
+                  <YStack gap="$small" mx="$medium">
+                    <Text.LG secondary>Historique des scans</Text.LG>
+                    {ticketData.scan_history && ticketData.scan_history.length > 0 ? (
+                      ticketData.scan_history.map((scan, index) => (
+                        <XStack key={index} alignItems="center" justifyContent="space-between">
+                          <Text.SM primary medium>
+                            {new Date(scan.date).toLocaleString('fr-FR')}
+                          </Text.SM>
+                          <Text.SM secondary>
+                            {scan.name} ({scan.public_id})
+                          </Text.SM>
 
-                      </XStack>
-                    ))
-                  ) : (
-                    <Text.SM secondary regular>Aucun historique de scan</Text.SM>
-                  )}
-                </YStack>
-
+                        </XStack>
+                      ))
+                    ) : (
+                      <Text.SM secondary regular>Aucun historique de scan</Text.SM>
+                    )}
+                  </YStack>
+                ) : null }
               </YStack>
             )}
           </YStack>
