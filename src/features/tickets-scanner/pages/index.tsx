@@ -135,7 +135,7 @@ export default function TicketScannerPage() {
 
   return (
     <YStack flex={1} backgroundColor="$textSurface">
-      <YStack height={height * 0.4} backgroundColor="black">
+      <YStack height={height * 0.4} backgroundColor="black" position="relative">
         <CameraView
           style={{ flex: 1 }}
           facing="back"
@@ -143,18 +143,26 @@ export default function TicketScannerPage() {
           barcodeScannerSettings={{
             barcodeTypes: ['qr'],
           }}
+        />
+        <View 
+          position="absolute" 
+          top={0} 
+          left={0} 
+          right={0} 
+          bottom={0} 
+          backgroundColor="transparent" 
+          justifyContent="center" 
+          alignItems="center"
         >
-          <View flex={1} backgroundColor="transparent" justifyContent="center" alignItems="center">
-            <View width={150} height={150} marginTop={32} justifyContent="center" alignItems="center">
-              <View width="100%" height="100%" borderWidth={8} borderColor={scanned ? '#E0C600' : '#F5D900'} borderRadius={10} backgroundColor="transparent" justifyContent="center" alignItems="center">
-                {scanTicketMutation.isPending && <ActivityIndicator size="large" color="#F5D900" />}
-              </View>
+          <View width={150} height={150} marginTop={32} justifyContent="center" alignItems="center">
+            <View width="100%" height="100%" borderWidth={8} borderColor={scanned ? '#E0C600' : '#F5D900'} borderRadius={10} backgroundColor="transparent" justifyContent="center" alignItems="center">
+              {scanTicketMutation.isPending && <ActivityIndicator size="large" color="#F5D900" />}
             </View>
-            <Text color="white" fontSize={14} textAlign="center" marginTop={15} paddingHorizontal={20}>
-              Pointez la caméra vers le QR code du ticket
-            </Text>
           </View>
-        </CameraView>
+          <Text color="white" fontSize={14} textAlign="center" marginTop={15} paddingHorizontal={20}>
+            Pointez la caméra vers le QR code du ticket
+          </Text>
+        </View>
       </YStack>
 
       <YStack flex={1}>
