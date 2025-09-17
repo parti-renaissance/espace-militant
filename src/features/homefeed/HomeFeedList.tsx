@@ -88,7 +88,7 @@ const HomeFeedList = () => {
   }, [])
 
   const header = useMemo(() => (
-    alerts.length > 0 || shouldShowNotificationCard
+    alerts.length > 0 || shouldShowNotificationCard || hasFeature('publications')
       ? (
           <YStack gap={media.sm ? 8 : 16}>
             {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
