@@ -17,7 +17,7 @@ export type MeetingAlertCollapsedProps = {
 
 const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsResponse[0]; isOpen: boolean; closeModal: () => void }) => {
   const media = useMedia()
-  
+
   return (
     <ModalOrBottomSheet open={isOpen} onClose={closeModal}>
       <YStack marginBottom={media.sm ? '$9' : undefined} padding={'$11'} gap={'$8'} alignSelf={'center'} alignItems="center" maxWidth={480}>
@@ -30,9 +30,11 @@ const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsRespo
           </Text>
         )}
         <Image src={payload.data?.ticket_url} width={240} height={240} resizeMode="contain" />
-        <VoxButton alignSelf={'center'} variant="outlined" iconRight={ExternalLink} onPress={createOnShow(payload.data?.info_url)}>
-          Voir les infos pratiques
-        </VoxButton>
+        {payload.data?.info_url ? (
+          <VoxButton alignSelf={'center'} variant="outlined" iconRight={ExternalLink} onPress={createOnShow(payload.data?.info_url)}>
+            Voir les infos pratiques
+          </VoxButton>
+        ) : null}
       </YStack>
     </ModalOrBottomSheet>
   )
@@ -78,10 +80,10 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
             <Text.SM my="$medium">{payload.description}</Text.SM>
           )}
           <XStack key="actions" gap="$small">
-            {payload.share_url ? (
+            {payload.share_url && !hasTicket ? (
               <VoxButton
-                variant={hasTicket ? 'contained' : 'outlined'}
-                theme={hasTicket ? 'blue' : 'gray'}
+                variant={'outlined'}
+                theme={'gray'}
                 size="sm"
                 iconLeft={Share2}
                 onPress={() => {
@@ -91,24 +93,36 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
                 Partager
               </VoxButton>
             ) : null}
-            {payload.cta_label && (
+            {
+              hasTicket ? (
+                <VoxButton
+                  variant={'contained'}
+                  theme={'blue'}
+                  size="sm"
+                  iconLeft={QrCode}
+                  onPress={() => {
+                    setIsTicketOpen(true)
+                  }}
+                >
+                  Mon billet
+                </VoxButton>
+              ) : null
+            }
+            {payload.cta_label ? (
               <VoxButton
-                variant={alreadySubscribed ? 'soft' : 'contained'}
+                variant={hasTicket ? 'outlined' : (alreadySubscribed ? 'soft' : 'contained')}
                 size="sm"
                 disabled={!payload.cta_url}
-                iconLeft={hasTicket ? QrCode : Ticket}
+                iconLeft={hasTicket ? undefined : Ticket}
+                iconRight={hasTicket ? ExternalLink : undefined}
                 theme={hasTicket ? 'gray' : 'blue'}
                 onPress={() => {
-                  if (hasTicket) {
-                    setIsTicketOpen(true)
-                  } else {
-                    onShow()
-                  }
+                  onShow()
                 }}
               >
                 {payload.cta_label}
               </VoxButton>
-            )}
+            ) : null}
           </XStack>
         </YStack>
       </VoxCard.Content>
