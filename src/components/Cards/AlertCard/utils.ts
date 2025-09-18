@@ -4,7 +4,7 @@ import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 import { useHits } from '@/services/hits/hook'
 
-export const createOnShow = (url: string | null, buttonLabel: string | null) => {
+export const createOnShow = (url: string | null, buttonLabel?: string | null) => {
   const { trackClick } = useHits()
   
   return () => {
