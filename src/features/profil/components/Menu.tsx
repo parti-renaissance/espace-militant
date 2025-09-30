@@ -51,7 +51,7 @@ const ProfilMenu = () => {
       </Menu>
       {clientEnv.ENVIRONMENT === 'staging' ? (
         <Menu>
-          <Link href="/storybook" asChild={!isWeb}>
+          <Link href="/tools/storybook" asChild={!isWeb}>
             <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} icon={PenLine} last={true}>
               StoryBook
             </Menu.Item>
