@@ -1,3 +1,3 @@
-import PollsScreen from "@/screens/polls/PollsScreen";
+import FieldSurveysListPage from "@/features/field-surveys/pages/list";
 
-export default PollsScreen;
+export default FieldSurveysListPage;
