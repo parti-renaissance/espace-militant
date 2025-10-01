@@ -119,7 +119,13 @@ export default function AppLayout() {
 
           <Stack.Screen name="porte-a-porte/building-detail" options={{ title: '' }} />
           <Stack.Screen name="porte-a-porte/tunnel" options={{ presentation: 'fullScreenModal', headerShown: false }} />
-          <Stack.Screen name="questionnaires/index" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="questionnaires/index"
+            options={{
+              headerShown: true,
+              header: () => { return <ProfilHeader title="Questionnaires terrain" hideOnMdUp={true} /> }
+            }}
+          />
           <Stack.Screen name="questionnaires/[id]" options={{ headerShown: false }} />
           <Stack.Screen
             name="scanner"
