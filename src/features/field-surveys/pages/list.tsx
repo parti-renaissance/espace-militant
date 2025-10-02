@@ -24,12 +24,13 @@ const ContentWrapper = styled(YStack, {
   width: '100%',
   alignSelf: 'center',
   paddingHorizontal: '$medium',
-  marginTop: '-128px',
+  transform: 'translateY(-128px)',
   gap: '$medium',
   $sm: {
     gap: 0,
     paddingHorizontal: 0,
-    marginTop: '-48px',
+    marginTop: '0px',
+    transform: 'translateY(-48px)'
   },
 })
 
@@ -270,7 +271,7 @@ const FieldSurveysListPage: React.FC = () => {
       <Container>
         <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} />
         <ContentWrapper>
-          <VoxCard inside={media.sm ? true : false} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'red' : undefined} elevation={media.sm ? 1 : undefined}>
+          <VoxCard inside={media.sm ? true : false} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
             <VoxCard.Content>
               <VoxCard bg={media.sm ? '$textOutline' : '$blue1'} inside>
                 <VoxCard.Content p={media.sm ? '$medium' : '$large'}>
