@@ -127,6 +127,7 @@ export default function AppLayout() {
             }}
           />
           <Stack.Screen name="questionnaires/[id]/index" options={{ headerShown: false }} />
+          <Stack.Screen name="questionnaires/[id]/success" options={{ headerShown: false }} />
           <Stack.Screen
             name="scanner"
             options={{

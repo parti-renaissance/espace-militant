@@ -1,3 +1,3 @@
-import PollDetailSuccess from "@/screens/pollDetail/PollDetailSuccessScreen";
+import FieldSurveySuccessPage from "@/features/field-surveys/pages/success";
 
-export default PollDetailSuccess;
+export default FieldSurveySuccessPage;
