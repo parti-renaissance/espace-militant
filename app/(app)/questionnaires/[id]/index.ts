@@ -1,2 +1,2 @@
-import PollDetailScreen from "@/screens/pollDetail/PollDetailScreen";
-export default PollDetailScreen;
+import FieldSurveyDetailsPage from "@/features/field-surveys/pages/details";
+export default FieldSurveyDetailsPage;

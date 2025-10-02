@@ -126,7 +126,7 @@ export default function AppLayout() {
               header: () => { return <ProfilHeader title="Questionnaires terrain" hideOnMdUp={true} /> }
             }}
           />
-          <Stack.Screen name="questionnaires/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="questionnaires/[id]/index" options={{ headerShown: false }} />
           <Stack.Screen
             name="scanner"
             options={{
