@@ -5,7 +5,7 @@ import TabBar from '@/components/TabBar/TabBar'
 import { ROUTES } from '@/config/routes'
 import { useSession } from '@/ctx/SessionProvider'
 import PageHeader from '@/features/profil/components/PageHeader'
-import { HeartHandshake, Link2, Send } from '@tamagui/lucide-icons'
+import { ClipboardCheck, HeartHandshake, Link2, Send } from '@tamagui/lucide-icons'
 import { Link, Slot, Tabs } from 'expo-router'
 import { isWeb, useMedia, View, XStack } from 'tamagui'
 import { useGetProfil } from '@/services/profile/hook'
@@ -47,6 +47,11 @@ const exectParams = (x: string, canShowHeader: boolean) => {
     case 'parrainages':
       return {
         header: () => <PageHeader title="Parrainages" icon={HeartHandshake} backArrow={false} />,
+        headerShown: canShowHeader,
+      }
+    case 'questionnaires':
+      return {
+        header: () => <PageHeader title="Questionnaires terrain" icon={ClipboardCheck} backArrow={false} />,
         headerShown: canShowHeader,
       }
     default:

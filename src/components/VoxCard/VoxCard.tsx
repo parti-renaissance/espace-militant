@@ -39,7 +39,7 @@ export type VoxCardFrameProps = ComponentProps<typeof CardFrame>
 export const VoxCardFrame = CardFrame.styleable(({ children, ...props }: VoxCardFrameProps, ref) => {
   return (
     <CardFrame {...props} ref={ref}>
-      <YStack gap="$medium">{children}</YStack>
+      <YStack gap="$medium" flex={1}>{children}</YStack>
     </CardFrame>
   )
 })
