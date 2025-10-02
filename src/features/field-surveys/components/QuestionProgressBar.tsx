@@ -19,13 +19,15 @@ const ProgressFill = styled(YStack, {
 const QuestionProgressBar: React.FC<{
   questions: FieldSurveyQuestion[]
   currentIndex: number
-}> = ({ questions, currentIndex }) => {
-  const progressPercentage = ((currentIndex + 1) / questions.length) * 100
+  totalSteps?: number
+}> = ({ questions, currentIndex, totalSteps }) => {
+  const total = totalSteps || questions.length
+  const progressPercentage = ((currentIndex + 1) / total) * 100
 
   return (
     <YStack gap="$small">
       <Text.MD>
-        Étape {currentIndex + 1}/{questions.length}
+        Étape {currentIndex + 1}/{total}
       </Text.MD>
       <ProgressBar>
         <ProgressFill width={`${progressPercentage}%`} />

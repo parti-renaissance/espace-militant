@@ -41,15 +41,19 @@ const SimpleFieldQuestion: React.FC<{
   onChange: (value: string) => void
 }> = ({ question, value, onChange }) => {
   return (
-    <YStack gap="$medium">
-      <Text.LG semibold>{question.content}</Text.LG>
+    <YStack flex={1}>
+      <Text.LG semibold mb="$medium">{question.content}</Text.LG>
       <TextArea
-        placeholder="Votre réponse..."
+        placeholder="Votre réponse"
         value={value}
         onChangeText={onChange}
         minHeight={100}
-        backgroundColor="$gray2"
-        borderColor="$gray6"
+        flex={1}
+        focusStyle={{
+          outlineColor: '$blue4',
+        }}
+        borderWidth={0}
+        backgroundColor="$gray1"
         borderRadius="$medium"
         padding="$medium"
       />
@@ -57,18 +61,27 @@ const SimpleFieldQuestion: React.FC<{
   )
 }
 
-// Composant pour les questions à choix unique
+type Question = {
+  id: number;
+  content: string;
+  type: "simple_field" | "unique_choice" | "multiple_choice";
+  choices: {
+    id: number | string;
+    content: string;
+  }[];
+}
+
 const UniqueChoiceQuestion: React.FC<{
-  question: FieldSurveyQuestion
+  question: Question
   value: string | null
   onChange: (value: string | null) => void
 }> = ({ question, value, onChange }) => {
-  const handleChoicePress = (choiceContent: string) => {
+  const handleChoicePress = (choice: string) => {
     // Si la réponse est déjà sélectionnée, on la désélectionne
-    if (value === choiceContent) {
+    if (value === choice) {
       onChange(null)
     } else {
-      onChange(choiceContent)
+      onChange(choice)
     }
   }
 
@@ -79,8 +92,8 @@ const UniqueChoiceQuestion: React.FC<{
         {question.choices.map((choice) => (
           <ChoiceItem
             key={choice.id}
-            selected={value === choice.content}
-            onPress={() => handleChoicePress(choice.content)}
+            selected={value === String(choice.id)}
+            onPress={() => handleChoicePress(String(choice.id))}
           >
             <Text.MD semibold textAlign="center" textWrap="balance">{choice.content}</Text.MD>
           </ChoiceItem>
@@ -96,10 +109,10 @@ const MultipleChoiceQuestion: React.FC<{
   value: string[]
   onChange: (value: string[]) => void
 }> = ({ question, value, onChange }) => {
-  const handleChoiceToggle = (choiceContent: string) => {
-    const newValue = value.includes(choiceContent)
-      ? value.filter(v => v !== choiceContent)
-      : [...value, choiceContent]
+  const handleChoiceToggle = (choice: string) => {
+    const newValue = value.includes(choice)
+      ? value.filter(v => v !== choice)
+      : [...value, choice]
     onChange(newValue)
   }
 
@@ -111,8 +124,8 @@ const MultipleChoiceQuestion: React.FC<{
         {question.choices.map((choice) => (
           <ChoiceItem
             key={choice.id}
-            selected={value.includes(choice.content)}
-            onPress={() => handleChoiceToggle(choice.content)}
+            selected={value.includes(String(choice.id))}
+            onPress={() => handleChoiceToggle(String(choice.id))}
           >
             <Text.MD semibold textAlign="center" textWrap="balance">{choice.content}</Text.MD>
           </ChoiceItem>

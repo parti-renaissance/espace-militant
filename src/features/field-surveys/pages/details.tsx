@@ -15,6 +15,8 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { VoxHeader } from '@/components/Header/Header'
 import { MultipleChoiceQuestion, SimpleFieldQuestion, UniqueChoiceQuestion } from '../components/FieldQuestion'
 import QuestionProgressBar from '../components/QuestionProgressBar'
+import RespondentProfile, { RespondentProfileData } from '../components/RespondentProfile'
+import ContactPreferences, { ContactPreferencesData } from '../components/ContactPreferences'
 
 // Types pour les réponses
 interface Answer {
@@ -31,7 +33,6 @@ interface QuestionAnswer {
 
 const Container = styled(YStack, {
   flex: 1,
-  paddingBottom: '$xxlarge',
 })
 
 const ContentWrapper = styled(YStack, {
@@ -55,7 +56,18 @@ const FieldSurveyDetailsPage: React.FC = () => {
   const insets = useSafeAreaInsets()
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState<QuestionAnswer[]>([])
-
+  const [respondentProfile, setRespondentProfile] = useState<RespondentProfileData>({
+    gender: null,
+    ageRange: null,
+    profession: null,
+  })
+  const [contactPreferences, setContactPreferences] = useState<ContactPreferencesData>({
+    wantsToStayInformed: null,
+    firstName: '',
+    lastName: '',
+    emailAddress: '',
+  })
+  const [submitLoading, setSubmitLoading] = useState(false)
   const { data: survey, isLoading, error } = useFieldSurvey(id || '')
   const submitAnswers = useSubmitFieldSurveyAnswers()
 
@@ -69,9 +81,24 @@ const FieldSurveyDetailsPage: React.FC = () => {
     return answers.find(a => a.questionId === currentQuestion.id)
   }, [answers, currentQuestion])
 
+  const totalSteps = useMemo(() => {
+    if (!survey) return 0
+    return survey.questions.length + 2 // +2 pour les étapes supplémentaires
+  }, [survey])
+
   const isLastQuestion = useMemo(() => {
     if (!survey) return false
-    return currentQuestionIndex === survey.questions.length - 1
+    return currentQuestionIndex === totalSteps - 1
+  }, [survey, currentQuestionIndex, totalSteps])
+
+  const isRespondentProfileStep = useMemo(() => {
+    if (!survey) return false
+    return currentQuestionIndex === survey.questions.length
+  }, [survey, currentQuestionIndex])
+
+  const isContactPreferencesStep = useMemo(() => {
+    if (!survey) return false
+    return currentQuestionIndex === survey.questions.length + 1
   }, [survey, currentQuestionIndex])
 
   const isFirstQuestion = currentQuestionIndex === 0
@@ -119,11 +146,19 @@ const FieldSurveyDetailsPage: React.FC = () => {
     })
 
     try {
+      setSubmitLoading(true)
+
       await submitAnswers.mutateAsync({
         survey: survey.id,
         type: survey.type,
-        agreedToStayInContact: true,
+        lastName: contactPreferences.lastName || undefined,
+        firstName: contactPreferences.firstName || undefined,
+        emailAddress: contactPreferences.emailAddress || undefined,
+        agreedToStayInContact: contactPreferences.wantsToStayInformed === 'Oui',
         agreedToTreatPersonalData: true,
+        gender: respondentProfile.gender || undefined,
+        ageRange: respondentProfile.ageRange || undefined,
+        profession: respondentProfile.profession || undefined,
         answers: formattedAnswers,
       })
 
@@ -134,10 +169,32 @@ const FieldSurveyDetailsPage: React.FC = () => {
       })
     } catch (error) {
       console.error('Erreur lors de la soumission:', error)
+    } finally {
+      setSubmitLoading(false)
     }
   }
 
   const renderQuestion = () => {
+    // Étapes supplémentaires
+    if (isRespondentProfileStep) {
+      return (
+        <RespondentProfile
+          data={respondentProfile}
+          onChange={setRespondentProfile}
+        />
+      )
+    }
+
+    if (isContactPreferencesStep) {
+      return (
+        <ContactPreferences
+          data={contactPreferences}
+          onChange={setContactPreferences}
+        />
+      )
+    }
+
+    // Questions normales du questionnaire
     if (!currentQuestion) return null
 
     switch (currentQuestion.type) {
@@ -221,14 +278,14 @@ const FieldSurveyDetailsPage: React.FC = () => {
   )
 
   const NavigationButtons = () => (
-    <XStack 
-      gap="$medium" 
-      justifyContent="space-between" 
-      pt="$medium" 
+    <XStack
+      gap="$medium"
+      justifyContent="space-between"
+      pt="$medium"
       px={media.sm ? '$medium' : 0}
       pb={media.sm ? Math.max(16, Math.min(insets.bottom, 80)) : 0}
-      backgroundColor="white" 
-      borderTopWidth={1} 
+      backgroundColor="white"
+      borderTopWidth={1}
       borderTopColor="$textOutline20"
     >
       <VoxButton
@@ -238,6 +295,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
         display={isFirstQuestion ? 'none' : 'flex'}
         flex={media.sm ? undefined : 1}
         shrink={media.sm}
+        disabled={submitLoading}
         size="xl"
       >
         Précédent
@@ -250,6 +308,8 @@ const FieldSurveyDetailsPage: React.FC = () => {
         onPress={handleNext}
         flex={1}
         size="xl"
+        loading={submitLoading}
+        disabled={submitLoading}
       >
         {isLastQuestion ? 'Terminer' : 'Suivant'}
       </VoxButton>
@@ -258,28 +318,29 @@ const FieldSurveyDetailsPage: React.FC = () => {
 
   return (
     <YStack flex={1} backgroundColor={media.sm ? 'white' : '$textSurface'}>
-      { media.sm ? (
+      {media.sm ? (
         <VoxHeader alignItems="center" justifyContent="center">
           <VoxHeader.Title>Questionnaire</VoxHeader.Title>
         </VoxHeader>
-      ) : null }
+      ) : null}
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: media.sm ? 80 : 40 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        <Container>
+        <Container flex={1}>
           {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
-          <ContentWrapper>
+          <ContentWrapper flex={1}>
             {isLoading && <LoadingState />}
             {error && <ErrorState />}
             {!survey && !isLoading && !error && <ErrorState />}
             {survey && !error && !isLoading && (
-              <VoxCard inside={media.sm ? true : false} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
-                <VoxCard.Content gap="$large">
+              <VoxCard inside={media.sm ? true : false} flex={media.sm ? 1 : undefined} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
+                <VoxCard.Content gap="$large" flex={1}>
                   <Text.MD secondary mb="$small">{survey.name}</Text.MD>
                   <QuestionProgressBar
                     questions={survey.questions}
                     currentIndex={currentQuestionIndex}
+                    totalSteps={totalSteps}
                   />
                   {renderQuestion()}
                   {media.gtSm && (
@@ -291,7 +352,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
           </ContentWrapper>
         </Container>
       </ScrollView>
-      
+
       {media.sm && survey && !error && !isLoading && (
         <NavigationButtons />
       )}
