@@ -17,6 +17,8 @@ import { MultipleChoiceQuestion, SimpleFieldQuestion, UniqueChoiceQuestion } fro
 import QuestionProgressBar from '../components/QuestionProgressBar'
 import RespondentProfile, { RespondentProfileData } from '../components/RespondentProfile'
 import ContactPreferences, { ContactPreferencesData } from '../components/ContactPreferences'
+import { AutoSaveErrorIndicator } from '@/features/publications/components/Editor/AutoSaveErrorIndicator'
+import QuitConfirmModal from '../components/QuitConfirmModal'
 
 // Types pour les réponses
 interface Answer {
@@ -45,8 +47,7 @@ const ContentWrapper = styled(YStack, {
   $sm: {
     gap: 0,
     paddingHorizontal: 0,
-    marginTop: '0px',
-    transform: 'translateY(-48px)'
+    transform: 'translateY(0)'
   },
 })
 
@@ -70,6 +71,16 @@ const FieldSurveyDetailsPage: React.FC = () => {
   const [submitLoading, setSubmitLoading] = useState(false)
   const { data: survey, isLoading, error } = useFieldSurvey(id || '')
   const submitAnswers = useSubmitFieldSurveyAnswers()
+  const [displayQuitModal, setDisplayQuitModal] = useState(false)
+
+  const handleQuit = () => {
+    setDisplayQuitModal(false)
+    if (router.canGoBack()) {
+      router.back()
+    } else {
+      router.replace('/questionnaires')
+    }
+  }
 
   const currentQuestion = useMemo(() => {
     if (!survey) return null
@@ -317,46 +328,72 @@ const FieldSurveyDetailsPage: React.FC = () => {
   )
 
   return (
-    <YStack flex={1} backgroundColor={media.sm ? 'white' : '$textSurface'}>
-      {media.sm ? (
-        <VoxHeader alignItems="center" justifyContent="center">
-          <VoxHeader.Title>Questionnaire</VoxHeader.Title>
-        </VoxHeader>
-      ) : null}
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Container flex={1}>
-          {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
-          <ContentWrapper flex={1}>
-            {isLoading && <LoadingState />}
-            {error && <ErrorState />}
-            {!survey && !isLoading && !error && <ErrorState />}
-            {survey && !error && !isLoading && (
-              <VoxCard inside={media.sm ? true : false} flex={media.sm ? 1 : undefined} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
-                <VoxCard.Content gap="$large" flex={1}>
-                  <Text.MD secondary mb="$small">{survey.name}</Text.MD>
-                  <QuestionProgressBar
-                    questions={survey.questions}
-                    currentIndex={currentQuestionIndex}
-                    totalSteps={totalSteps}
-                  />
-                  {renderQuestion()}
-                  {media.gtSm && (
-                    <NavigationButtons />
-                  )}
-                </VoxCard.Content>
-              </VoxCard>
-            )}
-          </ContentWrapper>
-        </Container>
-      </ScrollView>
+    <>
+      <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} />
+      <YStack flex={1} backgroundColor={media.sm ? 'white' : '$textSurface'}>
+        {media.sm ? (
+          <VoxHeader alignItems="center" justifyContent="center">
+            <XStack flex={1} alignItems="center" justifyContent="center" width="100%">
+              <XStack flex={1} alignContent="flex-start" w={100}>
+                <VoxButton
+                  size="lg"
+                  variant="text"
+                  theme="orange"
+                  onPress={() => {
+                    if (answers.length > 0) {
+                      setDisplayQuitModal(true)
+                    } else {
+                      handleQuit()
+                    }
+                  }}
+                >
+                  Quitter
+                </VoxButton>
+              </XStack>
+              <XStack maxWidth={520} justifyContent="center">
+                <VoxHeader.Title>Questionnaire</VoxHeader.Title>
+              </XStack>
+              <XStack flex={1} justifyContent="flex-end" w={100}>
 
-      {media.sm && survey && !error && !isLoading && (
-        <NavigationButtons />
-      )}
-    </YStack>
+              </XStack>
+            </XStack>
+          </VoxHeader>
+        ) : null}
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <Container flex={1}>
+            {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
+            <ContentWrapper flex={1}>
+              {isLoading && <LoadingState />}
+              {error && <ErrorState />}
+              {!survey && !isLoading && !error && <ErrorState />}
+              {survey && !error && !isLoading && (
+                <VoxCard inside={media.sm ? true : false} flex={media.sm ? 1 : undefined} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
+                  <VoxCard.Content gap="$large" flex={1}>
+                    <Text.MD secondary mb="$small">{survey.name}</Text.MD>
+                    <QuestionProgressBar
+                      questions={survey.questions}
+                      currentIndex={currentQuestionIndex}
+                      totalSteps={totalSteps}
+                    />
+                    {renderQuestion()}
+                    {media.gtSm && (
+                      <NavigationButtons />
+                    )}
+                  </VoxCard.Content>
+                </VoxCard>
+              )}
+            </ContentWrapper>
+          </Container>
+        </ScrollView>
+
+        {media.sm && survey && !error && !isLoading && (
+          <NavigationButtons />
+        )}
+      </YStack>
+    </>
   )
 }
 
