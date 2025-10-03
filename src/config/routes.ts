@@ -74,7 +74,7 @@ export const ROUTES: TabRoute[] = [
     theme: 'gray',
     hidden: true,
     hiddenMobile: true,
-    disabled: !(clientEnv.ENVIRONMENT === 'staging')
+    disabled: false
   },
   {
     name: 'profil',

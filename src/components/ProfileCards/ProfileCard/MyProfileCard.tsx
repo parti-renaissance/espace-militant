@@ -152,19 +152,11 @@ export default function MyProfileCard() {
             Formations
           </Menu.Item>
         </Link>
-        {clientEnv.ENVIRONMENT === 'staging'
-          ? (
-            <Link href="/questionnaires" asChild={!isWeb}>
-              <Menu.Item size="sm" icon={ClipboardCheck} showArrow >
-                Questionnaires (Staging)
-              </Menu.Item>
-            </Link>
-          ) : (
-            <Menu.Item size="sm" icon={ClipboardCheck} showArrow disabled>
-              Questionnaires (bientôt disponible)
-            </Menu.Item>
-          )
-        }
+        <Link href="/questionnaires" asChild={!isWeb}>
+          <Menu.Item size="sm" icon={ClipboardCheck} showArrow >
+            Questionnaires
+          </Menu.Item>
+        </Link>
       </YStack>
     </VoxCard>
   )
