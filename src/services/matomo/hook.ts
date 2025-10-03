@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import clientEnv from '@/config/clientEnv'
-import * as api from '@/features/matomo/api'
+import * as api from '@/services/matomo/api'
 import { usePathname } from 'expo-router'
 
 const matomoApiObject =

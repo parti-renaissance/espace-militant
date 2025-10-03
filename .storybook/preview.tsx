@@ -1,5 +1,5 @@
-import React from 'react-native'
-import { Stack } from 'tamagui'
+import React from 'react'
+import { YStack } from 'tamagui'
 
 /** @type{import("@storybook/react").Preview} */
 const preview = {
@@ -15,11 +15,11 @@ const preview = {
 
   decorators: [
     (Story) => (
-      <Stack flex={1} width="100%" backgroundColor="$white1" justifyContent="center" alignItems="center">
-        <Stack flex={1} width="100%" $gtSm={{ maxWidth: 800 }} backgroundColor="$white1" justifyContent="center" alignItems="center">
+      <YStack flex={1} width="100%" backgroundColor="$white1" justifyContent="center" alignItems="center">
+        <YStack flex={1} width="100%" $gtSm={{ maxWidth: 800 }} backgroundColor="$white1" justifyContent="center" alignItems="center">
           <Story />
-        </Stack>
-      </Stack>
+        </YStack>
+      </YStack>
     ),
   ],
 }
