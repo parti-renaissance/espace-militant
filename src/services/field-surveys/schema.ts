@@ -24,6 +24,7 @@ export const FieldSurveyTypeSchema = z.enum(['local', 'national'])
 export const FieldSurveySchema = z.object({
   uuid: z.string(),
   id: z.number(),
+  created_at: z.string().optional(),
   type: FieldSurveyTypeSchema,
   questions: z.array(FieldSurveyQuestionSchema),
   name: z.string(),

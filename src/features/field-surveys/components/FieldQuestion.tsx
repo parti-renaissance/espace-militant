@@ -56,6 +56,8 @@ const SimpleFieldQuestion: React.FC<{
         backgroundColor="$gray1"
         borderRadius="$medium"
         padding="$medium"
+        verticalAlign="top"
+        style={{ textAlignVertical: 'top' }}
       />
     </YStack>
   )
@@ -63,7 +65,7 @@ const SimpleFieldQuestion: React.FC<{
 
 type Question = {
   id: number;
-  content: string;
+  content?: string;
   type: "simple_field" | "unique_choice" | "multiple_choice";
   choices: {
     id: number | string;
