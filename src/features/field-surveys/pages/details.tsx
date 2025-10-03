@@ -105,6 +105,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
     firstName: '',
     lastName: '',
     emailAddress: '',
+    postalCode: '',
   })
   const [submitLoading, setSubmitLoading] = useState(false)
   const { data: survey, isLoading, error } = useFieldSurvey(id || '')
@@ -199,6 +200,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
         lastName: contactPreferences.lastName || undefined,
         firstName: contactPreferences.firstName || undefined,
         emailAddress: contactPreferences.emailAddress || undefined,
+        postalCode: contactPreferences.postalCode || undefined,
         agreedToStayInContact: contactPreferences.wantsToStayInformed === 'Oui',
         agreedToTreatPersonalData: true,
         gender: respondentProfile.gender || undefined,

@@ -10,6 +10,7 @@ interface ContactPreferencesData {
   firstName: string
   lastName: string
   emailAddress: string
+  postalCode: string
 }
 
 interface ContactPreferencesProps {
@@ -32,6 +33,10 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({ data, onChange 
 
   const handleEmailChange = (value: string) => {
     onChange({ ...data, emailAddress: value })
+  }
+
+  const handlePostalCodeChange = (value: string) => {
+    onChange({ ...data, postalCode: value })
   }
 
   const wantsToStayInformedChoices = [
@@ -88,6 +93,14 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({ data, onChange 
             onChangeText={handleEmailChange}
             keyboardType="email-address"
             autoCapitalize="none"
+            color="gray"
+          />
+
+          <VoxInput
+            placeholder="Code postal"
+            value={data.postalCode}
+            onChangeText={handlePostalCodeChange}
+            keyboardType="numeric"
             color="gray"
           />
         </YStack>
