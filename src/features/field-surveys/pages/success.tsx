@@ -25,8 +25,7 @@ const ContentWrapper = styled(YStack, {
   $sm: {
     gap: 0,
     paddingHorizontal: 0,
-    marginTop: '0px',
-    transform: 'translateY(-48px)'
+    transform: 'translateY(0)'
   },
 })
 
