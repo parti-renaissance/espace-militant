@@ -271,21 +271,21 @@ const FieldSurveysListPage: React.FC = () => {
       <Container>
         <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} />
         <ContentWrapper>
-          <VoxCard inside={media.sm ? true : false} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
-            <VoxCard.Content>
-              <VoxCard bg={media.sm ? '$textOutline' : '$blue1'} inside>
-                <VoxCard.Content p={media.sm ? '$medium' : '$large'}>
+          <VoxCard borderRadius="$medium" bg="white" mx={media.sm ? '$medium': 0}>
+            <VoxCard.Content p={media.sm ? 12 : '$medium'}>
+              <VoxCard bg="$blue1" inside>
+                <VoxCard.Content p={media.sm ? 12 : '$medium'}>
                   <XStack gap="$large">
                     <YStack gap="$medium" flexShrink={1}>
-                      <YStack gap="$small" display={media.sm ? 'none' : 'flex'}>
-                        <Text.LG semibold>Questionnaires de terrain</Text.LG>
+                      <YStack gap="$small">
+                        <Text semibold fontSize={media.sm ? 14 : 16}>Questionnaires de terrain</Text>
                         <VoxCard.Chip theme="blue" backgroundColor="white">
                           {`${surveysCount} questionnaire${surveysCount > 1 ? 's' : ''} disponible${surveysCount > 1 ? 's' : ''}`}
                         </VoxCard.Chip>
                       </YStack>
-                      <Text.SM color={media.sm ? '$textPrimary' : '$textSecondary'}>
+                      <Text fontSize={media.sm ? 12 : 14} color="$textSecondary">
                         Les questionnaires de terrains sont faits pour aller à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à porte.
-                      </Text.SM>
+                      </Text>
                     </YStack>
                     <Image source={require('../assets/notepad-survey.png')} objectFit="contain" display={media.sm ? 'none' : 'block'} width={129} height={126} mr="$medium" />
                   </XStack>
