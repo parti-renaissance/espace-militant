@@ -3,7 +3,7 @@ import { ScrollView, TouchableOpacity } from 'react-native'
 import { ImageBackground, Image } from 'expo-image'
 import { router, useLocalSearchParams } from 'expo-router'
 import { XStack, YStack, styled, useMedia } from 'tamagui'
-import { ArrowLeft, ArrowRight, SendHorizontal } from '@tamagui/lucide-icons'
+import { ArrowLeft, ArrowRight, ClipboardCheck, SendHorizontal } from '@tamagui/lucide-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
 import redirectToStore from '@/helpers/redirectToStore'
@@ -367,34 +367,30 @@ const FieldSurveyDetailsPage: React.FC = () => {
     <>
       <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} />
       <YStack flex={1} backgroundColor={media.sm ? 'white' : '$textSurface'}>
-        {media.sm ? (
-          <VoxHeader alignItems="center" justifyContent="center">
-            <XStack flex={1} alignItems="center" justifyContent="center" width="100%">
-              <XStack flex={1} alignContent="flex-start" w={100}>
-                <VoxButton
-                  size="lg"
-                  variant="text"
-                  theme="orange"
-                  onPress={() => {
-                    if (answers.length > 0) {
-                      setDisplayQuitModal(true)
-                    } else {
-                      handleQuit()
-                    }
-                  }}
-                >
-                  Quitter
-                </VoxButton>
-              </XStack>
-              <XStack maxWidth={520} justifyContent="center">
-                <VoxHeader.Title>Questionnaire</VoxHeader.Title>
-              </XStack>
-              <XStack flex={1} justifyContent="flex-end" w={100}>
-
-              </XStack>
+        <VoxHeader alignItems="center" justifyContent="center">
+          <XStack flex={1} alignItems="center" justifyContent="center" width="100%">
+            <XStack flex={1} alignContent="flex-start" w={100}>
+              <VoxButton
+                size="lg"
+                variant="text"
+                theme="orange"
+                onPress={() => {
+                  if (answers.length > 0) {
+                    setDisplayQuitModal(true)
+                  } else {
+                    handleQuit()
+                  }
+                }}
+              >
+                Quitter
+              </VoxButton>
             </XStack>
-          </VoxHeader>
-        ) : null}
+            <XStack maxWidth={520} justifyContent="center">
+              <VoxHeader.Title icon={media.gtSm ? ClipboardCheck : undefined}>Questionnaires</VoxHeader.Title>
+            </XStack>
+            <XStack flex={1} justifyContent="flex-end" w={100}></XStack>
+          </XStack>
+        </VoxHeader>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
