@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react'
-import { FlatList, StyleSheet, View } from 'react-native'
+import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { BuildingSelectedParams } from '@/data/store/SendDoorToDoorPollAnswersJobQueue'
 import { router } from 'expo-router'
@@ -84,7 +84,7 @@ const DoorToDoorPollDetailScreenLoaded: FunctionComponent<Props> = ({
         visitStartDateISOString,
       })
       .then(() => {
-        router.replace('/(tabs)/porte-a-porte/tunnel/success')
+        router.replace('/porte-a-porte/tunnel/success')
       })
       .catch((error) => {
         AlertUtils.showNetworkAlert(error, postAnswers)
@@ -95,7 +95,11 @@ const DoorToDoorPollDetailScreenLoaded: FunctionComponent<Props> = ({
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
       <LoadingOverlay visible={isLoading} />
-      <View style={styles.content}>
+      <KeyboardAvoidingView 
+      style={styles.content} 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
         <PollDetailProgressBar style={styles.progress} viewModel={progressViewModel} />
         <View
           style={styles.questionContainer}
@@ -135,7 +139,7 @@ const DoorToDoorPollDetailScreenLoaded: FunctionComponent<Props> = ({
           onNext={() => setStep(currentStep + 1)}
           onSubmit={postAnswers}
         />
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }
