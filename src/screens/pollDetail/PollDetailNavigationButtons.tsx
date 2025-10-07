@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   center: {
     flexGrow: 1,
-    width: '100%',
+    flexShrink: 1,
     maxWidth: 520,
     marginHorizontal: 'auto',
   },
@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     minWidth: Spacing.minWidthButton,
+    marginEnd: Spacing.unit,
   },
   right: {
     flex: 1,
