@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { ScrollView, TouchableOpacity } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native'
 import { ImageBackground, Image } from 'expo-image'
 import { router, useLocalSearchParams } from 'expo-router'
 import { XStack, YStack, styled, useMedia } from 'tamagui'
@@ -12,14 +12,12 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { useFieldSurvey, useSubmitFieldSurveyAnswers } from '@/services/field-surveys/hook'
-import { FieldSurveyQuestion } from '@/services/field-surveys/schema'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { VoxHeader } from '@/components/Header/Header'
 import { MultipleChoiceQuestion, SimpleFieldQuestion, UniqueChoiceQuestion } from '../components/FieldQuestion'
 import QuestionProgressBar from '../components/QuestionProgressBar'
 import RespondentProfile, { RespondentProfileData } from '../components/RespondentProfile'
 import ContactPreferences, { ContactPreferencesData } from '../components/ContactPreferences'
-import { AutoSaveErrorIndicator } from '@/features/publications/components/Editor/AutoSaveErrorIndicator'
 import QuitConfirmModal from '../components/QuitConfirmModal'
 
 // Types pour les réponses
@@ -330,7 +328,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
       justifyContent="space-between"
       pt="$medium"
       px={media.sm ? '$medium' : 0}
-      pb={media.sm ? Math.max(16, Math.min(insets.bottom, 80)) : 0}
+      pb={media.sm ? insets.bottom || '$medium' : 0}
       backgroundColor="white"
       borderTopWidth={1}
       borderTopColor="$textOutline20"
@@ -366,95 +364,97 @@ const FieldSurveyDetailsPage: React.FC = () => {
   return (
     <>
       <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} />
-      <YStack flex={1} backgroundColor={media.sm ? 'white' : '$textSurface'}>
-        <VoxHeader alignItems="center" justifyContent="center">
-          <XStack flex={1} alignItems="center" justifyContent="center" width="100%">
-            <XStack flex={1} alignContent="flex-start" w={100}>
-              <VoxButton
-                size="lg"
-                variant="text"
-                theme="orange"
-                onPress={() => {
-                  if (answers.length > 0) {
-                    setDisplayQuitModal(true)
-                  } else {
-                    handleQuit()
-                  }
-                }}
-              >
-                Quitter
-              </VoxButton>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? -65 : 0}>
+        <YStack flex={1} backgroundColor={media.sm ? 'white' : '$textSurface'}>
+          <VoxHeader alignItems="center" justifyContent="center">
+            <XStack flex={1} alignItems="center" justifyContent="center" width="100%">
+              <XStack flex={1} alignContent="flex-start" w={100}>
+                <VoxButton
+                  size="lg"
+                  variant="text"
+                  theme="orange"
+                  onPress={() => {
+                    if (answers.length > 0) {
+                      setDisplayQuitModal(true)
+                    } else {
+                      handleQuit()
+                    }
+                  }}
+                >
+                  Quitter
+                </VoxButton>
+              </XStack>
+              <XStack maxWidth={520} justifyContent="center">
+                <VoxHeader.Title icon={media.gtSm ? ClipboardCheck : undefined}>Questionnaires</VoxHeader.Title>
+              </XStack>
+              <XStack flex={1} justifyContent="flex-end" w={100}></XStack>
             </XStack>
-            <XStack maxWidth={520} justifyContent="center">
-              <VoxHeader.Title icon={media.gtSm ? ClipboardCheck : undefined}>Questionnaires</VoxHeader.Title>
-            </XStack>
-            <XStack flex={1} justifyContent="flex-end" w={100}></XStack>
-          </XStack>
-        </VoxHeader>
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <Container flex={1}>
-            {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
-            <ContentWrapper flex={1}>
-              <SideLeft>
-              </SideLeft>
-              <Main>
-                {isLoading && <LoadingState />}
-                {error && <ErrorState />}
-                {!survey && !isLoading && !error && <ErrorState />}
-                {survey && !error && !isLoading && (
-                  <VoxCard inside={media.sm ? true : false} flex={media.sm ? 1 : undefined} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
-                    <VoxCard.Content gap="$large" flex={1}>
-                      <Text.MD secondary mb="$small">{survey.name}</Text.MD>
-                      <QuestionProgressBar
-                        questions={survey.questions}
-                        currentIndex={currentQuestionIndex}
-                        totalSteps={totalSteps}
-                      />
-                      {renderQuestion()}
-                      {media.gtSm && (
-                        <NavigationButtons />
-                      )}
+          </VoxHeader>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 16 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <Container flex={1}>
+              {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
+              <ContentWrapper flex={1}>
+                <SideLeft>
+                </SideLeft>
+                <Main>
+                  {isLoading && <LoadingState />}
+                  {error && <ErrorState />}
+                  {!survey && !isLoading && !error && <ErrorState />}
+                  {survey && !error && !isLoading && (
+                    <VoxCard inside={media.sm ? true : false} flex={media.sm ? 1 : undefined} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
+                      <VoxCard.Content gap="$large" flex={1}>
+                        <Text.MD secondary mb="$small">{survey.name}</Text.MD>
+                        <QuestionProgressBar
+                          questions={survey.questions}
+                          currentIndex={currentQuestionIndex}
+                          totalSteps={totalSteps}
+                        />
+                        {renderQuestion()}
+                        {media.gtSm && (
+                          <NavigationButtons />
+                        )}
+                      </VoxCard.Content>
+                    </VoxCard>
+                  )}
+                </Main>
+                <SideRight>
+                  <VoxCard>
+                    <VoxCard.Content>
+                      <VoxCard inside overflow="hidden">
+                        <LinearGradient colors={['#EBF3FF', '#EEF9EE']} start={[0, 0]} end={[0.8, 1]} style={{ flex: 1 }}>
+                          <VoxCard.Content pb={0}>
+                            <Text.SM semibold lineHeight={20} textAlign="center">
+                              Téléchargez l'application mobile pour utiliser les questionnaires sur le terrain.
+                            </Text.SM>
+                            <XStack flex={1} justifyContent={'center'} gap={'$medium'}>
+                              <TouchableOpacity onPress={redirectToAndroid}>
+                                <Image source={require('@/assets/images/stores/google-play.png')} contentFit="contain" style={{ width: 120, height: 45 }} />
+                              </TouchableOpacity>
+                              <TouchableOpacity onPress={redirectToApple}>
+                                <Image source={require('@/assets/images/stores/app-store.png')} contentFit="contain" style={{ width: 120, height: 45 }} />
+                              </TouchableOpacity>
+                            </XStack>
+                            <YStack pl="$medium" width="100%" alignItems="center">
+                              <Image source={require('../assets/proto-alertes-mobile.png')} contentFit="contain" style={{ width: '100%', height: 180 }} />
+                            </YStack>
+                          </VoxCard.Content>
+                        </LinearGradient>
+                      </VoxCard>
                     </VoxCard.Content>
                   </VoxCard>
-                )}
-              </Main>
-              <SideRight>
-                <VoxCard>
-                  <VoxCard.Content>
-                    <VoxCard inside overflow="hidden">
-                      <LinearGradient colors={['#EBF3FF', '#EEF9EE']} start={[0, 0]} end={[0.8, 1]} style={{ flex: 1 }}>
-                        <VoxCard.Content pb={0}>
-                          <Text.SM semibold lineHeight={20} textAlign="center">
-                            Téléchargez l'application mobile pour utiliser les questionnaires sur le terrain.
-                          </Text.SM>
-                          <XStack flex={1} justifyContent={'center'} gap={'$medium'}>
-                            <TouchableOpacity onPress={redirectToAndroid}>
-                              <Image source={require('@/assets/images/stores/google-play.png')} contentFit="contain" style={{ width: 120, height: 45 }} />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={redirectToApple}>
-                              <Image source={require('@/assets/images/stores/app-store.png')} contentFit="contain" style={{ width: 120, height: 45 }} />
-                            </TouchableOpacity>
-                          </XStack>
-                          <YStack pl="$medium" width="100%" alignItems="center">
-                            <Image source={require('../assets/proto-alertes-mobile.png')} contentFit="contain" style={{ width: '100%', height: 180 }} />
-                          </YStack>
-                        </VoxCard.Content>
-                      </LinearGradient>
-                    </VoxCard>
-                  </VoxCard.Content>
-                </VoxCard>
-              </SideRight>
-            </ContentWrapper>
-          </Container>
-        </ScrollView>
+                </SideRight>
+              </ContentWrapper>
+            </Container>
+          </ScrollView>
 
-        {media.sm && survey && !error && !isLoading && (
-          <NavigationButtons />
-        )}
-      </YStack>
+          {media.sm && survey && !error && !isLoading && (
+            <NavigationButtons />
+          )}
+        </YStack>
+      </KeyboardAvoidingView>
     </>
   )
 }
