@@ -7,7 +7,7 @@ import { useHits } from '@/services/hits/hook'
 export const ButtonRenderer = ({
   data,
   edgePosition,
-  displayToolbar,
+  displayToolbar = true,
   allowHits = false,
   publicationUuid,
 }: { 
@@ -40,8 +40,8 @@ export const ButtonRenderer = ({
   return (
     <YStack
       style={wrapperStyle}
-      paddingTop={displayToolbar ? (Number(paddingTop) || 0) + 8 : paddingTop}
-      paddingBottom={displayToolbar ? (Number(paddingBottom) || 0) + 8 : paddingBottom}
+      paddingTop={displayToolbar ? (Number(paddingTop) || 8) + 8 : paddingTop}
+      paddingBottom={displayToolbar ? (Number(paddingBottom) || 8) + 8 : paddingBottom}
       paddingLeft={paddingLeft}
       paddingRight={paddingRight}
     >
