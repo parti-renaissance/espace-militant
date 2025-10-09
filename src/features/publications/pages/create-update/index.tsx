@@ -107,7 +107,6 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
         isOpen={displayQuitModal}
         onConfirm={handleQuit}
         onClose={() => {
-          console.log('onClose');
           setDisplayQuitModal(false)
         }}
         messageId={currentMessageId}
