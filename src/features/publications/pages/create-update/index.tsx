@@ -65,8 +65,8 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const isInitialLoading = !wasInitiallyInCreation && (isMessageLoading || isSendersLoading || isMessageContentLoading || isMessageFiltersLoading)
 
   // Hook de sauvegarde automatique
-  const { 
-    debouncedSave, 
+  const {
+    debouncedSave,
     immediateSave,
     isPending: isAutoSaving,
     lastSaved,
@@ -88,7 +88,13 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
 
   const handleQuit = () => {
     setDisplayQuitModal(false)
-    if (router.canGoBack()) {
+    if (isWeb) {
+      if (props?.messageId) {
+        router.replace('/publications/brouillons')
+      } else {
+        router.replace('/publications')
+      }
+    } else if (router.canGoBack()) {
       router.back()
     } else {
       router.replace('/publications')
@@ -97,7 +103,15 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
 
   return (
     <>
-      <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} messageId={currentMessageId} scope={props?.scope} />
+      <QuitConfirmModal
+        isOpen={displayQuitModal}
+        onConfirm={handleQuit}
+        onClose={() => {
+          setDisplayQuitModal(false)
+        }}
+        messageId={currentMessageId}
+        scope={props?.scope}
+      />
       <StickyBox webOnly style={{ zIndex: 10 }}>
         <YStack overflow={media.gtSm ? 'hidden' : undefined} zIndex={media.gtSm ? 10 : undefined}>
           <VoxHeader>
@@ -116,7 +130,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
                 <AutoSaveErrorIndicator
                   hasError={hasError}
                 />
-                
+
               </XStack>
               <XStack maxWidth={520} justifyContent="center">
                 <VoxHeader.Title icon={media.gtSm ? Speech : undefined}>{media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
