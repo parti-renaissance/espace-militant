@@ -158,7 +158,7 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
                   <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={ArrowDownToLine} onPress={handleMoveDown(field.value.field)} />
                 </Animated.View>
                 <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$white4" shrink iconLeft={X} onPress={handleUnSelect} />
+                  <VoxButton size="lg" variant="soft" backgroundColor="$gray3" hoverStyle={{ backgroundColor: '$gray4' }} pressStyle={{ backgroundColor: '$gray5' }} shrink iconLeft={X} onPress={handleUnSelect} />
                 </Animated.View>
               </AnimatedToolBarFrame>
             )}

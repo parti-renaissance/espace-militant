@@ -11,7 +11,7 @@ import { RichTextRenderer } from '@/features/publications/components/Editor/Node
 import { ImageRenderer } from '@/features/publications/components/Editor/NodeRenderer/ImageRenderer'
 import { ButtonRenderer } from '@/features/publications/components/Editor/NodeRenderer/ButtonRenderer'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
-import { XStack, YStack } from 'tamagui'
+import { useMedia, XStack, YStack } from 'tamagui'
 
 export type PublicationCardProps = {
   title?: string | null
@@ -23,6 +23,8 @@ export type PublicationCardProps = {
 }
 
 const PublicationCard = ({ title, description, author, date, uuid, showFullContent = false }: PublicationCardProps) => {
+  const media = useMedia()
+
   const renderContent = () => {
     if (!description) return null
 
@@ -121,7 +123,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
   }
 
   return (
-    <VoxCard>
+    <VoxCard borderLeftWidth={media.sm ? 0 : 1} borderRightWidth={media.sm ? 0 : 1}>
       <VoxCard.Content padding={0} gap={0}>
         <YStack px="$medium" pt="$medium" pb="$small" gap="$medium">
           {author && author.first_name && author.last_name && author.uuid && <SenderView sender={author as SenderViewProps} datetime={date ? relativeDateFormatter(date) : undefined} />}

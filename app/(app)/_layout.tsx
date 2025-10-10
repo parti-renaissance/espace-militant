@@ -106,7 +106,7 @@ export default function AppLayout() {
             options={({ route }) => ({
               header: () => {
                 return media.sm ? (
-                  <ProfilHeader title="" backgroundColor="$textSurface" forcedBackTitle="Retour" forcedBackPath={isWeb ? '/' : undefined} />
+                  <ProfilHeader title="" backgroundColor="white" forcedBackTitle="Retour" forcedBackPath={isWeb ? '/' : undefined} />
                 ) : null
               },
               animation: route.params && 'withoutAnimation' in route.params ? 'none' : 'slide_from_right',

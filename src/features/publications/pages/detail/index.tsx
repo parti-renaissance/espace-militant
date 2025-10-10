@@ -6,16 +6,20 @@ import { RestGetMessageContentResponse, RestGetMessageResponse } from '@/service
 import PublicationCard from '@/components/Cards/PublicationCard/PublicationCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { router, useLocalSearchParams } from 'expo-router'
-import { ArrowLeft } from '@tamagui/lucide-icons'
+import { ArrowLeft, Eye, PieChart } from '@tamagui/lucide-icons'
 import { VoxHeader } from '@/components/Header/Header'
 import { useMedia } from 'tamagui'
 import CongratulationsModal from '../../components/CongratulationsModal'
+import { RestPublicationStatsResponse } from '@/services/stats/schema'
+import PublicationGlobalStatsCards from './components/PublicationGlobalStatsCards'
+import BreadCrumbV2 from '@/components/BreadCrumb/BreadCrumbV2'
 
 interface MessageDetailsScreenProps {
   data?: RestGetMessageResponse
   content?: RestGetMessageContentResponse
   isLoading?: boolean
   error?: Error
+  stats?: RestPublicationStatsResponse
 }
 
 interface MessageDetailsScreenDenyProps {
@@ -51,8 +55,7 @@ export const MessageDetailsScreenSkeleton: React.FC = () => {
 
   return (
     <ScrollView backgroundColor="$surface" flex={1}>
-
-      <YStack gap="$medium" maxWidth={media.gtSm ? 600 : undefined} width={media.gtSm ? '100%' : undefined} marginHorizontal={media.gtSm ? 'auto' : undefined}>  
+      <YStack gap="$medium" maxWidth={media.gtSm ? 600 : undefined} width={media.gtSm ? '100%' : undefined} marginHorizontal={media.gtSm ? 'auto' : undefined}>
         <HeaderMesssageDetails />
         <SkeCard>
           <SkeCard.Content>
@@ -75,7 +78,6 @@ export const MessageDetailsScreenDeny: React.FC<MessageDetailsScreenDenyProps> =
 
   return (
     <ScrollView backgroundColor="$surface" flex={1}>
-
       <YStack gap="$medium" maxWidth={media.gtSm ? 600 : undefined} width={media.gtSm ? '100%' : undefined} marginHorizontal={media.gtSm ? 'auto' : undefined}>
         <HeaderMesssageDetails />
         <VoxCard>
@@ -95,10 +97,11 @@ export const MessageDetailsScreenDeny: React.FC<MessageDetailsScreenDenyProps> =
   )
 }
 
-const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoading, error }) => {
+const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoading, error, stats }) => {
   const params = useLocalSearchParams()
   const media = useMedia()
   const [showCongratulations, setShowCongratulations] = useState(false)
+  const [activeSection, setActiveSection] = useState('read')
 
   useEffect(() => {
     if (params.congratulations) {
@@ -119,19 +122,43 @@ const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoa
   }
 
   return (
-    <ScrollView backgroundColor="$surface" flex={1} contentContainerStyle={{ paddingBottom: 100 }}>
-      <YStack gap="$medium" maxWidth={media.gtSm ? 600 : undefined} width={media.gtSm ? '100%' : undefined} marginHorizontal={media.gtSm ? 'auto' : undefined}>
-        <HeaderMesssageDetails />
-        <PublicationCard
-          showFullContent={true}
-          title={data.subject}
-          description={data?.json_content}
-          author={data.sender}
-          uuid={data.uuid}
-        />
-      </YStack>
-      <CongratulationsModal isOpen={showCongratulations} onClose={handleCloseCongratulations} />
-    </ScrollView>
+    <>
+      {media.sm && (
+        <YStack gap="$medium" >
+          <BreadCrumbV2 items={[{ id: "read", label: 'Lecture', icon: <Eye size={16} /> }, { id: "stats", label: 'Statistiques', icon: <PieChart size={16} /> }]} value={activeSection} onChange={(v) => { setActiveSection(v) }} />
+        </YStack>
+      )}
+      <ScrollView backgroundColor="$surface" flex={1} contentContainerStyle={{ paddingBottom: 100 }}>
+        <YStack gap="$medium" maxWidth={media.gtSm ? 600 : undefined} width={media.gtSm ? '100%' : undefined} marginHorizontal={media.gtSm ? 'auto' : undefined}>
+          <HeaderMesssageDetails />
+          {
+            (activeSection === 'read' || media.gtSm) && (
+              <YStack gap="$medium" pt={media.sm ? '$medium' : 0}>
+                <PublicationCard
+                  showFullContent={true}
+                  title={data.subject}
+                  description={data?.json_content}
+                  author={data.sender}
+                  uuid={data.uuid}
+                />
+              </YStack>
+            )
+          }
+
+          {stats && (activeSection === 'stats' || media.gtSm) && (
+            <YStack gap="$medium" pt={media.sm ? '$medium' : '$large'}>
+              <XStack gap="$small" px="$medium">
+                <PieChart size={20} />
+                <Text.LG semibold>Statistiques de publication</Text.LG>
+              </XStack>
+              <PublicationGlobalStatsCards stats={stats} />
+            </YStack>
+          )
+          }
+        </YStack>
+        <CongratulationsModal isOpen={showCongratulations} onClose={handleCloseCongratulations} />
+      </ScrollView>
+    </>
   )
 }
 
