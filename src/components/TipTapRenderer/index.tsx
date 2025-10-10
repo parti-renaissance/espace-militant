@@ -7,8 +7,16 @@ import VoxCard from '../VoxCard/VoxCard'
 import * as S from './schema'
 import * as U from './utils'
 import { Svg, LinearGradient, Rect, Defs, Stop } from 'react-native-svg'
+import { useHits } from '@/services/hits/hook'
+import { ObjectType } from '@/services/hits/schema'
 
 type RenderFn<A, P extends object = Record<string, unknown>> = (props: { data: A } & P) => React.ReactNode
+
+type HitsContext = {
+  object_id?: string
+  object_type?: ObjectType
+  onLinkClick?: (target_url: string, button_name: string) => void
+}
 
 // Composant wrapper pour limiter le nombre de lignes
 const LimitedContent = ({ children, numberOfLines }: { children: React.ReactNode; numberOfLines?: number }) => {
@@ -50,12 +58,19 @@ const RenderHardBreak: RenderFn<S.TipHardBreak> = () =>
     <Text.BR />
   )
 
-const RenderText: RenderFn<S.TipText> = ({ data }) => {
+const RenderText: RenderFn<S.TipText, HitsContext> = ({ data, onLinkClick }) => {
   const marks = data.marks?.map(({ type }) => type)
   const link = data.marks?.find(U.isTipLinkMark)
+
+  const handlePress = () => {
+    if (link && onLinkClick) {
+      onLinkClick(link.attrs.href, data.text)
+    }
+  }
+
   if (link) {
     return (
-      <Link href={link.attrs.href as Href} target="_blank">
+      <Link href={link.attrs.href as Href} target="_blank" onPress={handlePress}>
         <Text.MD
           color="$blue5"
           textDecorationLine="underline"
@@ -75,12 +90,12 @@ const RenderText: RenderFn<S.TipText> = ({ data }) => {
   )
 }
 
-const RenderParagraph: RenderFn<S.TipParagraph> = ({ data }) => {
+const RenderParagraph: RenderFn<S.TipParagraph, HitsContext> = ({ data, onLinkClick }) => {
   return data.content ? (
     <Text.MD tag="p" marginVertical={0} color="$gray8">
       {data.content.map((x, i) => {
         if (U.isTipNonSupported(x)) return <RenderNonSupported key={x.type + i} data={x} />
-        if (U.isTipText(x)) return <RenderText key={x.type + i} data={x} />
+        if (U.isTipText(x)) return <RenderText key={x.type + i} data={x} onLinkClick={onLinkClick} />
         if (U.isTipHardBreak(x)) return <RenderHardBreak key={x.type + i} data={x} />
         return null
       })}
@@ -90,7 +105,7 @@ const RenderParagraph: RenderFn<S.TipParagraph> = ({ data }) => {
   )
 }
 
-const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
+const RenderHeading: RenderFn<S.TipHeading, HitsContext> = ({ data, onLinkClick }) => {
   const { level } = data.attrs
 
   if (!data.content) return null
@@ -111,9 +126,15 @@ const RenderHeading: RenderFn<S.TipHeading> = ({ data }) => {
       }
       const fontSize = fontSizeMap[level as keyof typeof fontSizeMap] || 16
 
+      const handlePress = () => {
+        if (link && onLinkClick) {
+          onLinkClick(link.attrs.href, x.text)
+        }
+      }
+
       if (link) {
         return (
-          <Link key={x.type + i} href={link.attrs.href as Href} target="_blank">
+          <Link key={x.type + i} href={link.attrs.href as Href} target="_blank" onPress={handlePress}>
             <Text
               fontSize={fontSize}
               color="$blue5"
@@ -154,26 +175,26 @@ type ListItemOptions = {
   }
 }
 
-const RenderListItem: RenderFn<S.TipListItem, ListItemOptions> = ({ data: { content }, options }) => {
+const RenderListItem: RenderFn<S.TipListItem, ListItemOptions & HitsContext> = ({ data: { content }, options, onLinkClick }) => {
   return (
     <XStack gap="$small" alignItems="center">
       {options?.type === 'number' ? <Text.XSM secondary>{options.number}.</Text.XSM> : <Text.SM secondary>•</Text.SM>}
-      {content?.map((x, i) => <RenderParagraph key={x.type + i} data={x} />)}
+      {content?.map((x, i) => <RenderParagraph key={x.type + i} data={x} onLinkClick={onLinkClick} />)}
     </XStack>
   )
 }
 
-const RenderBulletList: RenderFn<S.TipBulletList> = ({ data: { content } }) => {
+const RenderBulletList: RenderFn<S.TipBulletList, HitsContext> = ({ data: { content }, onLinkClick }) => {
   return (
     <YStack paddingLeft="$small" mb="$small">
       {content.map((x, i) => (
-        <RenderListItem key={x.type + i} data={x} />
+        <RenderListItem key={x.type + i} data={x} onLinkClick={onLinkClick} />
       ))}
     </YStack>
   )
 }
 
-const RenderOrderedList: RenderFn<S.TipOrderedList> = ({ data: { content } }) => {
+const RenderOrderedList: RenderFn<S.TipOrderedList, HitsContext> = ({ data: { content }, onLinkClick }) => {
   return (
     <YStack paddingLeft="$small" mb="$small">
       {content.map((x, i) => (
@@ -184,13 +205,14 @@ const RenderOrderedList: RenderFn<S.TipOrderedList> = ({ data: { content } }) =>
             type: 'number',
             number: i + 1,
           }}
+          onLinkClick={onLinkClick}
         />
       ))}
     </YStack>
   )
 }
 
-export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLines?: number }> = ({ data, numberOfLines, ...props }) => {
+export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLines?: number } & HitsContext> = ({ data, numberOfLines, onLinkClick, ...props }) => {
   const id = props.id ?? 'no-id'
 
   const content = data.map((x, i) => {
@@ -199,19 +221,19 @@ export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLine
     }
 
     if (U.isTipParagraph(x)) {
-      return <RenderParagraph key={id + i + x.type} data={x} />
+      return <RenderParagraph key={id + i + x.type} data={x} onLinkClick={onLinkClick} />
     }
 
     if (U.isTipHeading(x)) {
-      return <RenderHeading key={id + i + x.type} data={x} />
+      return <RenderHeading key={id + i + x.type} data={x} onLinkClick={onLinkClick} />
     }
 
     if (U.isTipBulletList(x)) {
-      return <RenderBulletList key={id + i + x.type} data={x} />
+      return <RenderBulletList key={id + i + x.type} data={x} onLinkClick={onLinkClick} />
     }
 
     if (U.isTipOrderedList(x)) {
-      return <RenderOrderedList key={id + i + x.type} data={x} />
+      return <RenderOrderedList key={id + i + x.type} data={x} onLinkClick={onLinkClick} />
     }
 
     return null
@@ -220,8 +242,29 @@ export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLine
   return <LimitedContent numberOfLines={numberOfLines}>{content}</LimitedContent>
 }
 
-export const TipTapRenderer = (props: { content: string; id?: string; numberOfLines?: number }) => {
+export const TipTapRenderer = (props: {
+  content: string
+  id?: string
+  numberOfLines?: number
+  object_id?: string
+  object_type?: ObjectType
+}) => {
+  const { trackClick } = useHits()
   const { content, type } = U.parseJsonEditorContent(props.content)
+
+  const onLinkClick = React.useMemo(() => {
+    if (!props.object_id || !props.object_type) return undefined
+
+    return (target_url: string, button_name: string) => {
+      trackClick({
+        object_id: props.object_id,
+        object_type: props.object_type,
+        target_url,
+        button_name,
+      })
+    }
+  }, [props.object_id, props.object_type, trackClick])
+
   if (type === 'string') {
     return (
       <LimitedContent numberOfLines={props.numberOfLines}>
@@ -231,7 +274,14 @@ export const TipTapRenderer = (props: { content: string; id?: string; numberOfLi
   } else {
     return (
       <YStack>
-        <RenderContent id={props.id} data={content.content} numberOfLines={props.numberOfLines} />
+        <RenderContent
+          id={props.id}
+          data={content.content}
+          numberOfLines={props.numberOfLines}
+          object_id={props.object_id}
+          object_type={props.object_type}
+          onLinkClick={onLinkClick}
+        />
       </YStack>
     )
   }

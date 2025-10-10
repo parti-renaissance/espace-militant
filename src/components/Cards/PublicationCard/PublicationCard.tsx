@@ -52,6 +52,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                       id={`content-text-${index}`}
                       data={item as S.RichTextNode}
                       displayToolbar={false}
+                      object_id={uuid || undefined}
                     />
                   )
                 }
@@ -94,6 +95,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                     data={firstTextItem as S.RichTextNode}
                     displayToolbar={false}
                     numberOfLines={3}
+                    object_id={uuid || undefined}
                   />
                 )}
               </YStack>
@@ -108,6 +110,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                 data={firstItem as S.RichTextNode}
                 displayToolbar={false}
                 numberOfLines={4}
+                object_id={uuid || undefined}
               />
             )
           }

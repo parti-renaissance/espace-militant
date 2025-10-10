@@ -111,7 +111,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
           ) : null}
           <View gap="$small" flexDirection={media.gtSm ? 'row' : undefined}>
             <VoxCard inside backgroundColor="$gray1" justifyContent="center" alignItems="center" minWidth={140}>
-              <VoxCard.Content justifyContent="center" alignItems="center" gap="$small">
+              <VoxCard.Content justifyContent="center" alignItems="center" gap="$small" h="100%">
                 {isLoadingNumbers ? (
                   <View alignItems="center" justifyContent="center" height={52}>
                     <Spinner color="$purple5" />
