@@ -185,7 +185,7 @@ export function useHits() {
 
       // Throttle click per (object_type, identifier)
       if (event_type === 'click' && params.object_type) {
-        const identifier = params.object_id || params.target_url || params.button_name || 'unknown'
+        const identifier = params.target_url || params.button_name || params.object_id || 'unknown'
         const key = `click:${params.object_type}:${identifier}`
         
         const shouldSkip = await mutex.runExclusive(async () => {
