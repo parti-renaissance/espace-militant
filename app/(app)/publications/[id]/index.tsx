@@ -4,7 +4,7 @@ import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/Boun
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import * as metatags from '@/config/metatags'
 import { ForbiddenError, UnauthorizedError } from '@/core/errors'
-import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSkeleton } from '@/features/publications/pages/detail/MessageDetailsScreen'
+import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSkeleton } from '@/features/publications/pages/detail'
 import { useGetMessage } from '@/services/publications/hook'
 import { useUserStore } from '@/store/user-store'
 import { useSession } from '@/ctx/SessionProvider'
@@ -13,6 +13,8 @@ import Head from 'expo-router/head'
 import { useHits } from '@/services/hits/hook'
 import { cleanupUrlParams } from '@/utils/urlCleanup'
 import { resolveSource } from '@/utils/sourceResolver'
+import { usePublicationStats } from '@/services/stats/hook'
+import { YStack } from 'tamagui'
 
 const MessageDetailsPage: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
@@ -25,24 +27,22 @@ const MessageDetailsPage: React.FC = () => {
   if (!params.id) return <Error404 />
 
   return (
-    <PageLayout webScrollable>
-      <BoundarySuspenseWrapper
-        fallback={<MessageDetailsScreenSkeleton />}
-        errorChildren={(payload) => {
-          if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
-            return <MessageDetailsScreenDeny error={payload.error} />
-          } else {
-            return (
-              <PageLayout.StateFrame>
-                <DefaultErrorFallback {...payload} />
-              </PageLayout.StateFrame>
-            )
-          }
-        }}
-      >
-        <MessageDetailScreen id={params.id} />
-      </BoundarySuspenseWrapper>
-    </PageLayout>
+    <BoundarySuspenseWrapper
+      fallback={<MessageDetailsScreenSkeleton />}
+      errorChildren={(payload) => {
+        if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
+          return <MessageDetailsScreenDeny error={payload.error} />
+        } else {
+          return (
+            <PageLayout.StateFrame>
+              <DefaultErrorFallback {...payload} />
+            </PageLayout.StateFrame>
+          )
+        }
+      }}
+    >
+      <MessageDetailScreen id={params.id} />
+    </BoundarySuspenseWrapper>
   )
 }
 
@@ -61,21 +61,25 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
     source?: string
   }>()
   const sentRef = React.useRef<string | null>(null)
+  const { data: publicationStats, isLoading: isStatsLoading, error: statsError } = usePublicationStats({
+    uuid: props.id,
+    scope: defaultScope!
+  })
 
   React.useEffect(() => {
     if (!isMessageLoading && !messageError && messageData) {
       if (sentRef.current !== props.id) {
         sentRef.current = props.id
-        
-        trackOpen({ 
-          object_type: 'publication', 
-          object_id: props.id, 
-          source : resolveSource(searchParams.source),
+
+        trackOpen({
+          object_type: 'publication',
+          object_id: props.id,
+          source: resolveSource(searchParams.source),
           utm_source: searchParams.utm_source,
           utm_campaign: searchParams.utm_campaign,
           referrer_code: searchParams.ref
         })
-        
+
         cleanupUrlParams(['source'])
       }
     }
@@ -91,7 +95,9 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
       <Head>
         <title>{metatags.createTitle(messageData?.subject || 'Détails du message')}</title>
       </Head>
-      <MessageDetailsScreen data={messageData} isLoading={isMessageLoading} error={messageError} />
+      <YStack flex={1}>
+        <MessageDetailsScreen data={messageData} isLoading={isMessageLoading} error={messageError} stats={publicationStats} />
+      </YStack>
     </>
   )
 }
