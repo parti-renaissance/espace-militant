@@ -65,6 +65,7 @@ export default function DateInput({
       theme={color}
       alignItems="center"
       justifyContent="space-between"
+      size={size}
     >
       <FormFrame.Label>{label}</FormFrame.Label>
       

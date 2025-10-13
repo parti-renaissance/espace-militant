@@ -17,7 +17,7 @@ import { StatusBar } from 'expo-status-bar'
 import { getTokenValue, Image, useMedia, XStack, YStack, YStackProps } from 'tamagui'
 import { EventLive } from '../../components/EventLive'
 import EventMDXRenderer from '../../components/EventMDXRenderer'
-import EventParticipantsSection from '../../components/EventParticipantsSection'
+import EventManagementSection from '../../components/EventManagementSection'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../utils'
 import { ScrollStack } from './EventComponents'
 import { LockForbiddenContent, LockPublicAuthAdhCard } from './SubscribeCard'
@@ -124,7 +124,7 @@ const EventMobileScreen = ({ event, userUuid }: EventItemProps) => {
               ) : null}
               <EventShareGroup event={event} />
             </VoxCard.Content>
-            <EventParticipantsSection event={event} userUuid={userUuid} />
+            <EventManagementSection event={event} userUuid={userUuid} />
           </VoxCard>
         </YStack>
       </ScrollStack>

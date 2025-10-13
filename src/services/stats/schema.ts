@@ -36,3 +36,26 @@ export type RestPublicationStatsUniqueClicks = z.infer<typeof RestPublicationSta
 export type RestPublicationStatsUniqueImpressions = z.infer<typeof RestPublicationStatsUniqueImpressionsSchema>
 export type RestPublicationStatsUniqueOpens = z.infer<typeof RestPublicationStatsUniqueOpensSchema>
 
+const RestEventStatsUniqueImpressionsSchema = z.object({
+  list: z.number(),
+  timeline: z.number(),
+  total: z.number(),
+})
+
+const RestEventStatsUniqueOpensSchema = z.object({
+  direct_link: z.number(),
+  list: z.number(),
+  notification: z.number(),
+  timeline: z.number(),
+  total: z.number(),
+})
+
+export const RestEventStatsResponseSchema = z.object({
+  unique_impressions: RestEventStatsUniqueImpressionsSchema,
+  unique_opens: RestEventStatsUniqueOpensSchema,
+})
+
+export type RestEventStatsResponse = z.infer<typeof RestEventStatsResponseSchema>
+export type RestEventStatsUniqueImpressions = z.infer<typeof RestEventStatsUniqueImpressionsSchema>
+export type RestEventStatsUniqueOpens = z.infer<typeof RestEventStatsUniqueOpensSchema>
+
