@@ -11,3 +11,12 @@ export const getPublicationStats = (props: { uuid: string; scope: string }) =>
     type: 'private',
   })()
 
+export const getEventStats = (props: { uuid: string; scope: string }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/stats/event/${props.uuid}?scope=${props.scope}`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestEventStatsResponseSchema,
+    type: 'private',
+  })()
+
