@@ -1,11 +1,11 @@
-import React, { memo, useMemo, useState, useEffect, useCallback } from 'react'
+import React, { memo, useState, useEffect, useCallback } from 'react'
 import { Control, Controller, useFormContext } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import SenderView from '../../SenderView'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
-import { RestAvailableSendersResponse, RestGetMessageFiltersResponse, RestGetMessageResponse } from '@/services/publications/schema'
+import { RestAvailableSendersResponse, RestGetMessageFiltersResponse, RestGetMessageResponse, RestAvailableSender } from '@/services/publications/schema'
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated'
 import SelectFilters, { SelectedFiltersType } from './SelectFilters'
 import { FilterValue } from './SelectFilters/type'
@@ -37,12 +37,11 @@ export const MetaDataForm = memo((props: {
   onMetaDataChange?: () => void,
   messageFilters?: RestGetMessageFiltersResponse,
   messageId?: string,
-  scope: string
+  scope: string,
+  onSenderChange: (sender: RestAvailableSender) => void,
+  selectedSender: RestAvailableSender | null
 }) => {
   const { setValue } = useFormContext<S.GlobalForm>()
-  const senderToDisplay = useMemo(() => {
-    return props.message?.sender || (props.availableSenders && props.availableSenders.length > 0 ? props.availableSenders[0] : null)
-  }, [props.message?.sender, props.availableSenders])
 
   const [filters, setFilters] = useState<SelectedFiltersType>(() => {
     if (props.messageFilters) {
@@ -145,7 +144,12 @@ export const MetaDataForm = memo((props: {
 
   return (
     <YStack backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ? '$medium' : 0}>
-      <SenderView sender={senderToDisplay} datetime="1 min." />
+      <SenderView 
+        sender={props.selectedSender} 
+        availableSenders={props.availableSenders} 
+        datetime="1 min."
+        onSenderSelect={props.onSenderChange}
+      />
       <Animated.View style={[animatedStyle, { justifyContent: 'center' }]}>
         <Controller
           control={props.control}

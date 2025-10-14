@@ -7,6 +7,7 @@ export const RestPostMessageRequestSchema = z.object({
   subject: z.string(),
   content: z.string(),
   json_content: z.string(),
+  sender: z.string().optional(),
 })
 
 export type RestPostMessageRequest = z.infer<typeof RestPostMessageRequestSchema>

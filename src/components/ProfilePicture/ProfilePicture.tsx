@@ -9,7 +9,7 @@ type ProfilePictureProps = {
   fullName: string
   src?: string
   alt: string
-  size?: Token
+  size?: Token | number
   textColor?: string
   rounded?: boolean
   fontWeight?: 'unset' | GetThemeValueForKey<'fontWeight'>
@@ -33,7 +33,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
     .join('')
 
   const Shape = rounded ? Circle : Square
-  const sizeValue = getTokenValue(size, 'size')
+  const sizeValue = typeof size === 'number' ? size : getTokenValue(size, 'size')
   const content = src ? (
     <Image
       alt={alt}

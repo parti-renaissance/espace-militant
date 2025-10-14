@@ -29,15 +29,16 @@ export type ZipMessageFunction = (
     theme: S.MessageStyle
   ) => void
   
-  export type ImmediateSaveFunction = (
-    formValues: S.MessageFormValues,
-    fields: S.FieldsArray,
-    metaData: S.MessageMetaData,
-    sender: RestAvailableSender | null,
-    zipMessageFn: ZipMessageFunction,
-    getHTMLFn: GetHTMLFunction,
-    theme: S.MessageStyle
-  ) => Promise<void> 
+export type ImmediateSaveFunction = (
+  formValues: S.MessageFormValues,
+  fields: S.FieldsArray,
+  metaData: S.MessageMetaData,
+  sender: RestAvailableSender | null,
+  zipMessageFn: ZipMessageFunction,
+  getHTMLFn: GetHTMLFunction,
+  theme: S.MessageStyle,
+  throwOnError?: boolean
+) => Promise<void>
 
 export const useAutoSave = (props: {
   messageId?: string
@@ -110,7 +111,8 @@ export const useAutoSave = (props: {
     zipMessageFn: ZipMessageFunction,
     getHTMLFn: GetHTMLFunction,
     theme: S.MessageStyle,
-    forceSave = false
+    forceSave = false,
+    throwOnError = false
   ) => {
     const currentContent = JSON.stringify({ formValues, fields, metaData })
     const contentHash = `${currentContent}_${Date.now()}`
@@ -145,6 +147,7 @@ export const useAutoSave = (props: {
           label: metaData.subject,
           json_content: JSON.stringify(message),
           content: htmlContent,
+          sender: sender?.uuid || undefined,
         },
       })
 
@@ -158,6 +161,9 @@ export const useAutoSave = (props: {
     } catch (error) {
       console.error('Error saving message:', error)
       setHasError(true)
+      if (throwOnError) {
+        throw error // Re-throw uniquement si demandé
+      }
     } finally {
       pendingSaves.current.delete(contentHash)
     }
@@ -184,10 +190,11 @@ export const useAutoSave = (props: {
     sender: RestAvailableSender | null,
     zipMessageFn: ZipMessageFunction,
     getHTMLFn: GetHTMLFunction,
-    theme: S.MessageStyle
+    theme: S.MessageStyle,
+    throwOnError = false
   ) => {
     debouncedSave.cancel() // Annuler les sauvegardes en attente
-    return performSave(formValues, fields, metaData, sender, zipMessageFn, getHTMLFn, theme, true) // Force save
+    return performSave(formValues, fields, metaData, sender, zipMessageFn, getHTMLFn, theme, true, throwOnError)
   }, [performSave, debouncedSave])
 
   return {
