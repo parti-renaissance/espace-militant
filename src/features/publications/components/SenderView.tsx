@@ -1,8 +1,10 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useState } from "react"
 import { XStack, YStack } from "tamagui"
 import Text from "@/components/base/Text"
 import ProfilePicture from "@/components/ProfilePicture"
-import { Clock } from "@tamagui/lucide-icons"
+import { Clock, UserCog } from "@tamagui/lucide-icons"
+import { VoxButton } from "@/components/Button"
+import SendersSelectModal from "./SendersSelectModal"
 
 export type SenderProfileProps = {
   sender: {
@@ -15,7 +17,7 @@ export type SenderProfileProps = {
 
 const SenderProfile = ({ sender }: SenderProfileProps) => {
   const profilePictureProps = useMemo(() => ({
-    size: "$4" as const,
+    size: 40,
     rounded: true,
     src: sender.pictureLink,
     alt: "Profile picture",
@@ -56,7 +58,18 @@ export type SenderViewProps = {
   scope?: string | null
 }
 
-export const SenderView = ({sender, datetime}: {sender: SenderViewProps | null, datetime?: string}) => {
+export const SenderView = ({ 
+  sender, 
+  datetime, 
+  availableSenders,
+  onSenderSelect
+}: { 
+  sender: SenderViewProps | null
+  datetime?: string
+  availableSenders?: SenderViewProps[]
+  onSenderSelect?: (sender: SenderViewProps) => void
+}) => {
+  const [showSenderModal, setShowSenderModal] = useState(false)
 
   const senderProps = useMemo(() => {
     if (!sender) {
@@ -66,7 +79,7 @@ export const SenderView = ({sender, datetime}: {sender: SenderViewProps | null, 
         pictureLink: undefined
       }
     }
-    
+
     return {
       name: `${sender?.first_name} ${sender?.last_name}`,
       role: sender?.role || undefined,
@@ -80,30 +93,47 @@ export const SenderView = ({sender, datetime}: {sender: SenderViewProps | null, 
   }, [sender])
 
   return (
-    <YStack gap="$medium">
-      <XStack justifyContent="space-between" gap="$small">
-        <XStack
-          backgroundColor={sender?.theme?.soft ?? '$gray1'}
-          borderRadius={999}
-          paddingVertical={4}
-          paddingHorizontal={8}
-          alignItems="center"
-          flexShrink={1}
-        >
-          <Text.SM semibold color={sender?.theme?.primary ?? '$gray5'} ellipsizeMode="tail" numberOfLines={1}>
-            {sender?.instance ?? 'Instance inconnue'} {sender?.zone ? `• ${sender?.zone}` : ''}
-          </Text.SM>
-        </XStack>
-        {datetime && (
-          <XStack gap="$small" alignItems="center">
-            <Clock size={16} color="$textSecondary" />
-            <Text.SM secondary>{datetime}</Text.SM>
+    <>
+      <YStack gap="$medium">
+        <XStack justifyContent="space-between" gap="$small">
+          <XStack
+            backgroundColor={sender?.theme?.soft ?? '$gray1'}
+            borderRadius={999}
+            paddingVertical={4}
+            paddingHorizontal={8}
+            alignItems="center"
+            flexShrink={1}
+          >
+            <Text.SM semibold color={sender?.theme?.primary ?? '$gray5'} ellipsizeMode="tail" numberOfLines={1}>
+              {sender?.instance ?? 'Instance inconnue'} {sender?.zone ? `• ${sender?.zone}` : ''}
+            </Text.SM>
           </XStack>
-        )}
-      </XStack>
-      {memoizedSender}
-    </YStack>
-
+          {datetime && (
+            <XStack gap="$small" alignItems="center">
+              <Clock size={16} color="$textSecondary" />
+              <Text.SM secondary>{datetime}</Text.SM>
+            </XStack>
+          )}
+        </XStack>
+        <XStack gap="$small" alignItems="center" justifyContent="space-between">
+          {memoizedSender}
+          {availableSenders && availableSenders.length > 0 && (
+            <YStack justifyContent="center" alignItems="center">
+              <VoxButton size="md" variant="soft" textColor="$textSecondary" shrink iconLeft={UserCog} onPress={() => setShowSenderModal(true)} />
+            </YStack>
+          )}
+        </XStack>
+      </YStack>
+      {availableSenders && availableSenders.length > 0 && (
+        <SendersSelectModal
+          open={showSenderModal}
+          onClose={() => setShowSenderModal(false)}
+          availableSenders={availableSenders}
+          selectedSender={sender}
+          onSenderSelect={onSenderSelect}
+        />
+      )}
+    </>
   )
 }
 

@@ -200,7 +200,7 @@ export default function SelectFilters({
 
   const Header = useCallback(() => {
     return (
-      <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderColor="$gray1" padding="$medium">
+      <XStack h={64} justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderColor="$gray1" padding="$medium">
         <Text.LG semibold>Destinataires</Text.LG>
         <XStack gap="$small">
           <VoxButton onPress={handleCloseModal} theme="blue" variant="soft" iconLeft={Save} size="sm">
