@@ -29,27 +29,44 @@ const StatCard: React.FC<{ value: string | number; label: string }> = ({ value, 
   </YStack>
 )
 
-const PerformanceRow: React.FC<{
+const StatsSectionRow: React.FC<{
   category: string;
-  total: { percentage: string; count: number | string };
-  subcategories: Array<{ label: string; percentage: string; count: number | string }>
+  total: { percentage?: string; count: number | string };
+  subcategories: Array<{ 
+    label: string; 
+    percentage?: string; 
+    count: number | string;
+    subItems?: Array<{ label: string; count: number | string }>
+  }>
 }> = ({ category, total, subcategories }) => (
   <YStack gap={12}>
     <XStack justifyContent="space-between" alignItems="center">
       <Text.MD medium>{category}</Text.MD>
       <XStack gap="$small" alignItems="center">
-        <Text.MD semibold secondary>{total.percentage}</Text.MD>
+        { total.percentage && (
+          <Text.MD semibold secondary>{total.percentage}</Text.MD>
+        )}
         <Text.MD semibold>{total.count}</Text.MD>
       </XStack>
     </XStack>
     {subcategories.map((sub, index) => (
-      <XStack key={index} justifyContent="space-between" alignItems="center">
-        <Text.SM>{sub.label}</Text.SM>
-        <XStack gap="$small" alignItems="center">
-          <Text.SM secondary>{sub.percentage}</Text.SM>
-          <Text.SM>{sub.count}</Text.SM>
+      <YStack key={index} gap={12}>
+        <XStack justifyContent="space-between" alignItems="center">
+          <Text.SM>{sub.label}</Text.SM>
+          <XStack gap="$small" alignItems="center">
+            { sub.percentage && (
+              <Text.SM secondary>{sub.percentage}</Text.SM>
+            )}
+            <Text.SM>{sub.count}</Text.SM>
+          </XStack>
         </XStack>
-      </XStack>
+        {sub.subItems && sub.subItems.map((subItem, subIndex) => (
+          <XStack key={subIndex} justifyContent="space-between" alignItems="center">
+            <Text fontSize={10}>{subItem.label}</Text>
+            <Text fontSize={10}>{subItem.count}</Text>
+          </XStack>
+        ))}
+      </YStack>
     ))}
   </YStack>
 )
@@ -99,17 +116,68 @@ const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ st
   )
 }
 
-const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ stats }) => {
-  const openRate = stats.unique_opens.total_rate / 100
-  const clickRate = stats.unique_clicks.total_rate / 100
+const DiffusionDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ stats }) => {
 
-  // Calcul des taux d'ouvertures par source
-  const notificationOpenRate = stats.unique_opens.total > 0
-    ? (stats.unique_opens.notification / stats.unique_opens.total) * 100
-    : 0
-  const timelineOpenRate = stats.unique_opens.total > 0
-    ? (stats.unique_opens.timeline / stats.unique_opens.total) * 100
-    : 0
+  return (
+    <VoxCard>
+      <VoxCard.Content>
+        <YStack gap="$medium">
+          <Text.LG semibold secondary>Détails de diffusion</Text.LG>
+
+          <YStack gap={12}>
+            <StatsSectionRow
+              category="Contacts notifiés"
+              total={{
+                count: 'N/A'
+              }}
+              subcategories={[
+                {
+                  label: "Par notification mobile",
+                  count: stats.unique_notifications,
+                  subItems: [
+                    {
+                      label: "Web",
+                      count: 'N/A'
+                    },
+                    {
+                      label: "iOS",
+                      count: 'N/A'
+                    },
+                    {
+                      label: "Android",
+                      count: 'N/A'
+                    },
+                  ]
+                },
+                {
+                  label: "Par email",
+                  count: stats.unique_emails
+                },
+                {
+                  label: "Par les deux",
+                  count: 'N/A'
+                },
+              ]}
+            />
+
+            <Separator borderColor="$textOutline" />
+
+            <StatsSectionRow
+              category="Impressions uniques sur l’espace militant"
+              total={{
+                count: stats.unique_impressions.total
+              }}
+              subcategories={[]}
+            />
+
+          </YStack>
+        </YStack>
+      </VoxCard.Content>
+    </VoxCard>
+  )
+}
+
+const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ stats }) => {
 
   return (
     <VoxCard>
@@ -118,26 +186,26 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
           <Text.LG semibold secondary>Détails de performance</Text.LG>
 
           <YStack gap={12}>
-            <PerformanceRow
+            <StatsSectionRow
               category="Ouvertures uniques"
               total={{
-                percentage: NumberFormatter.formatPercent(openRate),
+                percentage: "N/A%",
                 count: stats.unique_opens.total
               }}
               subcategories={[
                 {
                   label: "Depuis la notification",
-                  percentage: NumberFormatter.formatPercent(notificationOpenRate / 100),
+                  percentage: "N/A%",
                   count: stats.unique_opens.notification
                 },
                 {
                   label: "Depuis l'espace militant",
-                  percentage: NumberFormatter.formatPercent(timelineOpenRate / 100),
+                  percentage: "N/A%",
                   count: stats.unique_opens.timeline
                 },
                 {
                   label: "Depuis l'email",
-                  percentage: "0%",
+                  percentage: "N/A%",
                   count: "N/A"
                 }
               ]}
@@ -145,10 +213,10 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
 
             <Separator borderColor="$textOutline" />
 
-            <PerformanceRow
+            <StatsSectionRow
               category="Clics uniques"
               total={{
-                percentage: NumberFormatter.formatPercent(clickRate),
+                percentage: "N/A%",
                 count: stats.unique_clicks.total
               }}
               subcategories={[
@@ -168,10 +236,10 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
             <Separator borderColor="$textOutline" />
 
             {/* Désabonnements */}
-            <PerformanceRow
+            <StatsSectionRow
               category="Désabonnements aux emails"
               total={{
-                percentage: "0%",
+                percentage: "N/A%",
                 count: "N/A"
               }}
               subcategories={[]}
@@ -220,6 +288,7 @@ export const PublicationGlobalStatsCards: React.FC<PublicationGlobalStatsCardsPr
   return (
     <YStack gap="$medium">
       <GlobalStatsCard stats={stats} />
+      <DiffusionDetailsCard stats={stats} />
       <PerformanceDetailsCard stats={stats} />
       <DefinitionsCard stats={stats} />
     </YStack>
