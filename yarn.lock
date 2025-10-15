@@ -41,9 +41,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@10play/tentap-editor@npm:^0.6.1":
-  version: 0.6.1
-  resolution: "@10play/tentap-editor@npm:0.6.1"
+"@10play/tentap-editor@npm:0.7.5-alpha.0":
+  version: 0.7.5-alpha.0
+  resolution: "@10play/tentap-editor@npm:0.7.5-alpha.0"
   dependencies:
     "@tiptap/extension-blockquote": "npm:^2.2.1"
     "@tiptap/extension-bold": "npm:^2.2.1"
@@ -78,7 +78,7 @@ __metadata:
     react: "*"
     react-native: "*"
     react-native-webview: "*"
-  checksum: 10c0/5ed225dea4e75db3ecceb039b0e3d2074433afde997cbd0f3621cfe755e324a2b2acba5f9349a119da2162dc671af50d4791785b5f049f3953bcca3966c7e491
+  checksum: 10c0/ca0682d3db490e27ed366a853b379360094a7bbd6b2cea0984295cd7e3bf42d2bb63d591e55de28a8dbbd641678f7e32429483942466cf2f4d1a460513575b88
   languageName: node
   linkType: hard
 
@@ -28926,7 +28926,7 @@ __metadata:
   resolution: "vox@workspace:."
   dependencies:
     "@10play/react-native-web-webview": "npm:^0.0.3"
-    "@10play/tentap-editor": "npm:^0.6.1"
+    "@10play/tentap-editor": "npm:0.7.5-alpha.0"
     "@babel/core": "npm:^7.25.2"
     "@eslint/js": "npm:^9.3.0"
     "@expo/webpack-config": "npm:~19.0.1"
