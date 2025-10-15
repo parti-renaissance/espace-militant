@@ -104,11 +104,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="publications/[id]/index"
             options={({ route }) => ({
-              header: () => {
-                return media.sm ? (
-                  <ProfilHeader title="" backgroundColor="white" forcedBackTitle="Retour" forcedBackPath={isWeb ? '/' : undefined} />
-                ) : null
-              },
+              headerShown: false,
               animation: route.params && 'withoutAnimation' in route.params ? 'none' : 'slide_from_right',
             })}
           />

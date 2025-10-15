@@ -6,7 +6,7 @@ import { RestGetMessageContentResponse, RestGetMessageResponse } from '@/service
 import PublicationCard from '@/components/Cards/PublicationCard/PublicationCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { router, useLocalSearchParams } from 'expo-router'
-import { ArrowLeft, Eye, PieChart } from '@tamagui/lucide-icons'
+import { ArrowLeft, Eye, PieChart, Sparkle } from '@tamagui/lucide-icons'
 import { VoxHeader } from '@/components/Header/Header'
 import { useMedia } from 'tamagui'
 import CongratulationsModal from '../../components/CongratulationsModal'
@@ -123,9 +123,9 @@ const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoa
 
   return (
     <>
-      {media.sm && (
+      {(stats && media.sm) && (
         <YStack gap="$medium" >
-          <BreadCrumbV2 items={[{ id: "read", label: 'Lecture', icon: <Eye size={16} /> }, { id: "stats", label: 'Statistiques', icon: <PieChart size={16} /> }]} value={activeSection} onChange={(v) => { setActiveSection(v) }} />
+          <BreadCrumbV2 items={[{ id: "read", label: 'Lecture', icon: Eye }, { id: "stats", label: 'Statistiques', icon: PieChart, color: '$purple5' }]} value={activeSection} onChange={(v) => { setActiveSection(v) }} />
         </YStack>
       )}
       <ScrollView backgroundColor="$surface" flex={1} contentContainerStyle={{ paddingBottom: 100 }}>
@@ -146,11 +146,24 @@ const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoa
           }
 
           {stats && (activeSection === 'stats' || media.gtSm) && (
-            <YStack gap="$medium" pt={media.sm ? '$medium' : '$large'}>
-              <XStack gap="$small" px="$medium">
+            <YStack gap={media.sm ? 0 : "$medium"} pt={media.sm ? 0 : '$large'}>
+              <XStack gap="$small" px="$medium" display={media.sm ? 'none' : 'flex'}>
                 <PieChart size={20} />
                 <Text.LG semibold>Statistiques de publication</Text.LG>
               </XStack>
+              <VoxCard bg="$purple1" borderWidth={0}>
+                <VoxCard.Content>
+                  <XStack gap="$medium" alignItems="center">
+                  <Text.SM color="$purple6">
+                    Vous pouvez voir ces statistiques uniquement car vous êtes Cadre avec un rôle au sein de l’instance qui l’a envoyée.
+                  </Text.SM>
+                  <YStack>
+                    <Sparkle size={20} color="$purple6" />
+                  </YStack>
+                  </XStack>
+                  
+                </VoxCard.Content>
+              </VoxCard>
               <PublicationGlobalStatsCards stats={stats} />
             </YStack>
           )

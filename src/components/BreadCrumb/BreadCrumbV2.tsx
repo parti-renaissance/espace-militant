@@ -1,10 +1,12 @@
 import Text from '@/components/base/Text'
+import type { IconComponent } from '@/models/common.model'
 import { XStack, YStack } from 'tamagui'
 
 type BreadCrumbItem = {
   id: string
   label: string
-  icon?: React.ReactNode
+  icon?: IconComponent
+  color?: string
 }
 
 type BreadCrumbV2Props = {
@@ -22,6 +24,7 @@ const BreadCrumbV2 = ({ items, value, onChange }: BreadCrumbV2Props) => {
     >
       {items.map((item, index) => {
         const isActive = item.id === value
+        const Icon = item.icon
         
         return (
           <XStack
@@ -37,8 +40,8 @@ const BreadCrumbV2 = ({ items, value, onChange }: BreadCrumbV2Props) => {
             flex={1}
           >
             <XStack alignItems="center" gap={8}>
-              {item.icon}
-              <Text.MD semibold>{item.label}</Text.MD>
+              {Icon && <Icon size={16} color={item.color ?? '$textPrimary'} />}
+              <Text.MD semibold color={item.color ?? '$textPrimary'}>{item.label}</Text.MD>
             </XStack>
             
             {isActive && (
@@ -48,7 +51,7 @@ const BreadCrumbV2 = ({ items, value, onChange }: BreadCrumbV2Props) => {
                 left={0}
                 right={0}
                 height={2}
-                backgroundColor="$textPrimary"
+                backgroundColor={item.color ?? '$textPrimary'}
               />
             )}
           </XStack>

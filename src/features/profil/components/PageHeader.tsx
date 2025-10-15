@@ -13,9 +13,10 @@ type ProfilHeaderProps = {
   backgroundColor?: string
   backPath?: Href
   forcedBackPath?: Href
+  withoutBorder?: boolean
 }
 
-const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forcedBackTitle, backgroundColor = 'white', backPath = '/', forcedBackPath }: ProfilHeaderProps) => {
+const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forcedBackTitle, backgroundColor = 'white', backPath = '/', forcedBackPath, withoutBorder = false }: ProfilHeaderProps) => {
   const router = useRouter()
   const navigation = useNavigation()
   const { gtSm } = useMedia()
@@ -35,6 +36,7 @@ const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forced
     <VoxHeader
       backgroundColor={backgroundColor}
       display={hideOnMdUp ? (gtSm ? 'none' : undefined) : undefined}
+      borderWidth={withoutBorder ? 0 : undefined}
     >
       <YStack flex={1} position="relative" minHeight={48}>
         <XStack position="absolute" left={0} top={0} bottom={0} zIndex={1}>
