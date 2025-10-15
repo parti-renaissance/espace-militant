@@ -112,7 +112,7 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
     : 0
 
   return (
-    <VoxCard display="none">
+    <VoxCard>
       <VoxCard.Content>
         <YStack gap="$medium">
           <Text.LG semibold secondary>Détails de performance</Text.LG>
@@ -185,7 +185,7 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
 
 const DefinitionsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ stats }) => {
   return (
-    <VoxCard display="none">
+    <VoxCard>
       <VoxCard.Content>
         <YStack gap="$small">
           <Text.SM lineHeight={20}>

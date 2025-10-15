@@ -14,7 +14,8 @@ import { useHits } from '@/services/hits/hook'
 import { cleanupUrlParams } from '@/utils/urlCleanup'
 import { resolveSource } from '@/utils/sourceResolver'
 import { usePublicationStats } from '@/services/stats/hook'
-import { YStack } from 'tamagui'
+import { isWeb, YStack, useMedia } from 'tamagui'
+import ProfilHeader from '@/features/profil/components/PageHeader'
 
 const MessageDetailsPage: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
@@ -48,6 +49,7 @@ const MessageDetailsPage: React.FC = () => {
 
 function MessageDetailScreen(props: Readonly<{ id: string }>) {
   const { defaultScope } = useUserStore()
+  const media = useMedia()
   const { data: messageData, isLoading: isMessageLoading, error: messageError } = useGetMessage({
     messageId: props.id,
     scope: defaultScope!,
@@ -87,6 +89,9 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
 
   return (
     <>
+    {media.sm ? (
+      <ProfilHeader title="" backgroundColor="white" forcedBackTitle="Retour" forcedBackPath={isWeb ? '/' : undefined} withoutBorder={!!publicationStats} />
+    ) : null}
       <RouterStack.Screen
         options={{
           title: messageData?.subject || 'Détails du message',
