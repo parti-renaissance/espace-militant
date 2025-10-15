@@ -97,16 +97,22 @@ const DraftPage = () => {
     <PageLayout webScrollable>
       <PageLayout.MainSingleColumn>
         <YStack paddingTop={media.gtSm ? '$xxlarge' : '$medium'}>
-          <FlatList
-            data={publications}
-            contentContainerStyle={{ maxWidth: media.sm ? '100%' : 520, alignSelf: 'center', width: '100%', paddingBottom: 100 }}
-            renderItem={({ item }) => <PublicationItem item={item} scope={scopeFromParams} />}
-            keyExtractor={(item) => item.uuid}
-            onEndReached={handleEndReached}
-            onEndReachedThreshold={0.2}
-            ListFooterComponent={isFetchingNextPage ? <View alignItems="center" margin={16}><Spinner color="$blue9" /></View> : null}
-            ListEmptyComponent={<View alignItems="center" margin={16}><Text.MD color="$gray6">Aucune publication trouvée</Text.MD></View>}
-          />
+          {
+            publications.length > 0 ? (
+              <FlatList
+                data={publications}
+                contentContainerStyle={{ maxWidth: media.sm ? '100%' : 520, alignSelf: 'center', width: '100%', paddingBottom: 100 }}
+                renderItem={({ item }) => <PublicationItem item={item} scope={scopeFromParams} />}
+                keyExtractor={(item) => item.uuid}
+                onEndReached={handleEndReached}
+                onEndReachedThreshold={0.2}
+                ListFooterComponent={isFetchingNextPage ? <View alignItems="center" margin={16}><Spinner color="$blue9" /></View> : null}
+                ListEmptyComponent={<View alignItems="center" margin={16}><Text.MD color="$gray6">Aucune publication trouvée</Text.MD></View>}
+              />
+            ) : (
+              <View alignItems="center" margin={16}><Text.MD color="$gray6">Aucune publication trouvée</Text.MD></View>
+            )
+          }
         </YStack>
       </PageLayout.MainSingleColumn>
     </PageLayout>
