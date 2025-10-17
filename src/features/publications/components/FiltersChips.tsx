@@ -3,7 +3,7 @@ import { Undo2, CircleX, EqualNot } from '@tamagui/lucide-icons'
 import { XStack, YStack } from 'tamagui'
 import { AVAILABLE_FILTERS } from './Editor/RenderFields/SelectFilters/AdvancedFilters'
 
-type FilterValue =
+export type FilterValue =
   | string
   | number
   | boolean
@@ -12,15 +12,16 @@ type FilterValue =
   | { start: string; end: string }
   | Record<string, string>
   | Record<string, string>[]
+  | { uuid: string; type: string; code: string; name: string }
+  | { uuid: string; type: string; code: string; name: string }[]
   | undefined
   | null
 
 export type SelectedFiltersType = Record<string, FilterValue>
 
 export type FiltersChipsProps = {
-  selectedFilters: SelectedFiltersType
-  defaultValues?: SelectedFiltersType
-  onFilterChange: (filterKey: string, value: FilterValue) => void
+  selectedFilters: Record<string, FilterValue>
+  onFilterChange?: (filterKey: string, value: FilterValue) => void
   isStatic?: boolean
 }
 
@@ -92,7 +93,29 @@ const hasDefaultValue = (key: string, defaultValues: SelectedFiltersType): boole
   return key in defaultValues && defaultValues[key] !== null && defaultValues[key] !== undefined
 }
 
-export const FiltersChips = ({ selectedFilters, defaultValues = {}, onFilterChange, isStatic = false }: FiltersChipsProps) => {
+export const calculateDefaultValues = (selectedFilters: Record<string, FilterValue>): SelectedFiltersType => {
+  const defaults: SelectedFiltersType = {}
+  
+  // Valeur par défaut de zone : zones[0] si dispo, sinon zone initiale
+  if (selectedFilters.zones && Array.isArray(selectedFilters.zones) && selectedFilters.zones.length > 0) {
+    const firstZone = selectedFilters.zones[0]
+    if (firstZone && typeof firstZone === 'object' && 'uuid' in firstZone) {
+      defaults.zone = firstZone
+    }
+  } else if (selectedFilters.zone && typeof selectedFilters.zone === 'object' && 'uuid' in selectedFilters.zone) {
+    defaults.zone = selectedFilters.zone
+  }
+  
+  // Adherent est la valeur par défaut pour adherent_tags
+  defaults.adherent_tags = 'adherent'
+  
+  return defaults
+}
+
+export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false }: FiltersChipsProps) => {
+  // Calculer automatiquement les valeurs par défaut
+  const defaultValues = calculateDefaultValues(selectedFilters)
+  
   // Exclure 'zones' de l'affichage (on garde seulement 'zone')
   const excludedKeys = ['zones']
   
@@ -125,6 +148,8 @@ export const FiltersChips = ({ selectedFilters, defaultValues = {}, onFilterChan
   }
 
   const handleChipPress = (key: string) => {
+    if (isStatic || !onFilterChange) return
+    
     // Si le filtre a une valeur par défaut, on remet la valeur par défaut
     if (hasDefaultValue(key, defaultValues)) {
       onFilterChange(key, defaultValues[key])

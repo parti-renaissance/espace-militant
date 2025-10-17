@@ -15,7 +15,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
 import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
 import SelectQuickFiltersItem from './QuickFilter/SelectQuickFiltersItem'
-import { FiltersChips } from '../../../FiltersChips'
+import { FiltersChips, calculateDefaultValues } from '../../../FiltersChips'
 
 interface SelectFiltersProps {
   updateFilter: (updatedFilter: { [code: string]: FilterValue }) => void
@@ -116,23 +116,8 @@ export default function SelectFilters({
     return undefined
   }, [selectedFilters.zone, selectedFilters.zones, selectedFilters.committee]) // update when zone changes
 
-  const defaultFiltersValues = useMemo(() => {
-    const defaults: SelectedFiltersType = {}
-    
-    if (selectedFilters.zones && Array.isArray(selectedFilters.zones) && selectedFilters.zones.length > 0) {
-      const firstZone = selectedFilters.zones[0]
-      if (firstZone && typeof firstZone === 'object' && 'uuid' in firstZone) {
-        defaults.zone = firstZone
-      }
-    } else if (selectedFilters.zone && typeof selectedFilters.zone === 'object' && 'uuid' in selectedFilters.zone) {
-      defaults.zone = selectedFilters.zone
-    }
-    
-    // Adherent est la valeur par défaut pour adherent_tags
-    defaults.adherent_tags = 'adherent'
-    
-    return defaults
-  }, []) // Calculé une seule fois au montage
+  // Calculer les valeurs par défaut une seule fois au montage
+  const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
@@ -283,7 +268,7 @@ export default function SelectFilters({
         }
         withKeyboard={false}
       >
-        <YStack width={media.gtMd ? 480 : undefined}>
+        <YStack width={media.gtMd ? 500 : undefined}>
           {media.gtMd ? (
             <Header />
           ) : null}
@@ -291,7 +276,6 @@ export default function SelectFilters({
             {/* Affichage des filtres actifs sous forme de chips */}
             <FiltersChips
               selectedFilters={selectedFilters}
-              defaultValues={defaultFiltersValues}
               onFilterChange={handleFilterChange}
             />
             <YStack gap="$medium">
