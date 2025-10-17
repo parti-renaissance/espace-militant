@@ -5,7 +5,7 @@ import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import * as metatags from '@/config/metatags'
 import { ForbiddenError, UnauthorizedError } from '@/core/errors'
 import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSkeleton } from '@/features/publications/pages/detail'
-import { useGetMessage } from '@/services/publications/hook'
+import { useGetMessage, useGetMessageFilters } from '@/services/publications/hook'
 import { useUserStore } from '@/store/user-store'
 import { useSession } from '@/ctx/SessionProvider'
 import { Redirect, Stack as RouterStack, useLocalSearchParams, useGlobalSearchParams } from 'expo-router'
@@ -68,6 +68,11 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
     scope: defaultScope!
   })
 
+  const { data: messageFilters } = useGetMessageFilters({
+    messageId: props.id,
+    scope: defaultScope!,
+  })
+
   React.useEffect(() => {
     if (!isMessageLoading && !messageError && messageData) {
       if (sentRef.current !== props.id) {
@@ -101,7 +106,7 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
         <title>{metatags.createTitle(messageData?.subject || 'Détails du message')}</title>
       </Head>
       <YStack flex={1}>
-        <MessageDetailsScreen data={messageData} isLoading={isMessageLoading} error={messageError} stats={publicationStats} />
+        <MessageDetailsScreen data={messageData} isLoading={isMessageLoading} error={messageError} stats={publicationStats} filters={messageFilters} />
       </YStack>
     </>
   )
