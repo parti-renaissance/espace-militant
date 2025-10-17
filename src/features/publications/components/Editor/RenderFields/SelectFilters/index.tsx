@@ -15,6 +15,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
 import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
 import SelectQuickFiltersItem from './QuickFilter/SelectQuickFiltersItem'
+import { FiltersChips } from '../../../FiltersChips'
 
 interface SelectFiltersProps {
   updateFilter: (updatedFilter: { [code: string]: FilterValue }) => void
@@ -38,6 +39,7 @@ export default function SelectFilters({
   const media = useMedia()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isAdvancedFilters, setIsAdvancedFilters] = useState(false)
+  const [zoneResetKey, setZoneResetKey] = useState(0)
   const quickFilters: HierarchicalQuickFilterType[] = useMemo(() => getHierarchicalQuickFilters(), [])
   const queryClient = useQueryClient();
 
@@ -61,12 +63,12 @@ export default function SelectFilters({
     } else {
       // En mode filtres rapides : on réinitialise les filtres avancés non protégés
       const protectedFilters = ['zone', 'zones', 'committee']
-      
+
       // Protéger static_tags si sa valeur est liée à la rentrée
       if (currentFilters.static_tags === 'national_event:rentree-2025' || currentFilters.static_tags === '!national_event:rentree-2025') {
         protectedFilters.push('static_tags')
       }
-      
+
       protectedFilters.forEach(filterKey => {
         if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
           mergedFilters[filterKey] = currentFilters[filterKey]
@@ -112,13 +114,31 @@ export default function SelectFilters({
     }
 
     return undefined
-  }, [isModalOpen]) // update defaultValue only when modal state changes
+  }, [selectedFilters.zone, selectedFilters.zones, selectedFilters.committee]) // update when zone changes
+
+  const defaultFiltersValues = useMemo(() => {
+    const defaults: SelectedFiltersType = {}
+    
+    if (selectedFilters.zones && Array.isArray(selectedFilters.zones) && selectedFilters.zones.length > 0) {
+      const firstZone = selectedFilters.zones[0]
+      if (firstZone && typeof firstZone === 'object' && 'uuid' in firstZone) {
+        defaults.zone = firstZone
+      }
+    } else if (selectedFilters.zone && typeof selectedFilters.zone === 'object' && 'uuid' in selectedFilters.zone) {
+      defaults.zone = selectedFilters.zone
+    }
+    
+    // Adherent est la valeur par défaut pour adherent_tags
+    defaults.adherent_tags = 'adherent'
+    
+    return defaults
+  }, []) // Calculé une seule fois au montage
 
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
       const item = quickFilters.find(d => d.value === selectedQuickFilterId)
       let baseLabel = item ? item.label : 'Sélectionné'
-      
+
       // Check if static_tags contains rentree-2025 to add rentrée information
       if (selectedFilters.static_tags) {
         const staticTagsValue = selectedFilters.static_tags
@@ -198,6 +218,19 @@ export default function SelectFilters({
     setIsAdvancedFilters(!isAdvancedFilters)
   }, [isAdvancedFilters])
 
+  const handleFilterChange = useCallback((filterKey: string, value: FilterValue) => {
+    // Si on remet la zone à sa valeur par défaut, incrémenter le compteur pour forcer le rechargement de GlobalSearch
+    if (filterKey === 'zone' && defaultFiltersValues.zone && 
+        typeof value === 'object' && value !== null && 'uuid' in value && 
+        typeof defaultFiltersValues.zone === 'object' && 'uuid' in defaultFiltersValues.zone) {
+      if (value.uuid === defaultFiltersValues.zone.uuid) {
+        setZoneResetKey(prev => prev + 1)
+      }
+    }
+    
+    updateFilter({ [filterKey]: value })
+  }, [updateFilter, defaultFiltersValues, setZoneResetKey])
+
   const Header = useCallback(() => {
     return (
       <XStack h={64} justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderColor="$gray1" padding="$medium">
@@ -250,11 +283,17 @@ export default function SelectFilters({
         }
         withKeyboard={false}
       >
-        <YStack w="100%" maxWidth={media.gtMd ? 480 : undefined}>
+        <YStack width={media.gtMd ? 480 : undefined}>
           {media.gtMd ? (
             <Header />
           ) : null}
           <YStack gap="$medium" padding="$medium">
+            {/* Affichage des filtres actifs sous forme de chips */}
+            <FiltersChips
+              selectedFilters={selectedFilters}
+              defaultValues={defaultFiltersValues}
+              onFilterChange={handleFilterChange}
+            />
             <YStack gap="$medium">
               <YStack gap="$small">
                 <XStack alignItems="center" flexWrap="wrap">
@@ -286,6 +325,7 @@ export default function SelectFilters({
 
             <YStack gap="$small" w="100%">
               <GlobalSearch
+                key={`zone-search-${zoneResetKey}`}
                 provider={zoneProvider}
                 onSelect={handleZoneSelect}
                 onReset={handleZoneAndCommitteeReset}
