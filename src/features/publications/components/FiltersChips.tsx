@@ -1,5 +1,5 @@
 import { VoxButton } from '@/components/Button'
-import { Undo2, CircleX } from '@tamagui/lucide-icons'
+import { Undo2, CircleX, EqualNot } from '@tamagui/lucide-icons'
 import { XStack, YStack } from 'tamagui'
 import { AVAILABLE_FILTERS } from './Editor/RenderFields/SelectFilters/AdvancedFilters'
 
@@ -139,8 +139,11 @@ export const FiltersChips = ({ selectedFilters, defaultValues = {}, onFilterChan
       <XStack flexWrap="wrap" gap="$small">
         {activeFilters.map(([key, value]) => {
           const label = getFilterLabel(key, value)
-
-          console.log('key', key, 'value', value, 'defaultValues', defaultValues)
+          
+          // Détecter si la valeur commence par "!" (négation)
+          const isNegation = typeof value === 'string' && value.startsWith('!')
+          const theme = isNegation ? 'orange' : 'gray'
+          const iconLeft = isNegation ? EqualNot : undefined
           
           // Si le filtre a une valeur par défaut
           if (hasDefaultValue(key, defaultValues)) {
@@ -150,8 +153,9 @@ export const FiltersChips = ({ selectedFilters, defaultValues = {}, onFilterChan
               <VoxButton
                 key={key}
                 size="xxs"
-                theme="gray"
+                theme={theme}
                 variant={isDefault ? "outlined" : "contained"}
+                iconLeft={iconLeft}
                 iconRight={!isDefault && !isStatic ? Undo2 : undefined}
                 onPress={() => handleChipPress(key)}
                 testID={`filter-chip-${key}`}
@@ -167,8 +171,9 @@ export const FiltersChips = ({ selectedFilters, defaultValues = {}, onFilterChan
             <VoxButton
               key={key}
               size="xxs"
-              theme="gray"
+              theme={theme}
               variant="contained"
+              iconLeft={iconLeft}
               iconRight={!isStatic ? CircleX : undefined}
               onPress={() => handleChipPress(key)}
               testID={`filter-chip-${key}`}
