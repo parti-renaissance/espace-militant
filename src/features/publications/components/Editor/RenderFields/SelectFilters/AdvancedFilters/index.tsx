@@ -8,7 +8,7 @@ import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/pub
 import { SelectedFiltersType } from '../type'
 
 // Filtres temporaires en attendant la mise à jour de l'API
-const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
+export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
   {
     label: "Filtres militants",
     color: "#3B82F6",

@@ -1,7 +1,7 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useState, useEffect } from 'react'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useGetIsMessageTilSync, useSendMessage, useGetMessageCountRecipients } from '@/services/publications/hook'
+import { useGetIsMessageTilSync, useSendMessage, useGetMessageCountRecipients, useGetMessageFilters } from '@/services/publications/hook'
 import { RestAvailableSender } from '@/services/publications/schema'
 import { AlertTriangle, ArrowLeft, ExternalLink, Link as LinkIcon, RefreshCcw, SendHorizontal } from '@tamagui/lucide-icons'
 import { ExternalPathString, Link, router } from 'expo-router'
@@ -11,6 +11,7 @@ import Text from '@/components/base/Text'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 import SenderView from '../SenderView'
 import { useToastController } from '@tamagui/toast'
+import { FiltersChips, FilterValue } from '../FiltersChips'
 
 type ConfirmationModalProps = {
   payload?: {
@@ -37,6 +38,20 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
     enabled: Boolean(payload?.messageId && payload?.scope),
   })
 
+  const { data: messageFilters, refetch: refetchMessageFilters } = useGetMessageFilters({
+    messageId: payload?.messageId,
+    scope: payload?.scope,
+    enabled: Boolean(payload?.messageId && payload?.scope),
+  })
+
+  useEffect(() => {
+    console.log('isModalOpen', isModalOpen)
+    if (isModalOpen) {
+      console.log('refetchMessageFilters')
+      refetchMessageFilters()
+    }
+  }, [isModalOpen, refetchMessageFilters])
+
   const isLoadingNumbers = isSyncLoading || isFetchingRecipients
 
   const { mutate, isPending } = useSendMessage({
@@ -50,6 +65,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
     }, {
       onSuccess: () => {
         modalSheetRef.current?.dismiss()
+        setIsModalOpen(false)
         router.dismissAll()
         router.push({
           pathname: '/publications/[id]',
@@ -95,6 +111,12 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
           <SenderView sender={isMessageTilSync?.sender || defaultSender || null} />
           <Text.LG semibold>{isMessageTilSync?.subject || defaultTitle}</Text.LG>
         </YStack>
+        {messageFilters && (
+          <FiltersChips 
+            selectedFilters={messageFilters as Record<string, FilterValue>}
+            isStatic 
+          />
+        )}
         <YStack gap="$medium" position="relative">
           {syncError ? (
             <YStack position="absolute" inset={0} bottom={0} zIndex={1}>
@@ -223,7 +245,14 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
         </VoxCard>
 
         <XStack gap="$small" justifyContent="space-between">
-          <VoxButton theme="gray" variant="outlined" iconLeft={ArrowLeft} onPress={() => modalSheetRef.current?.dismiss()} disabled={isSyncLoading}>
+          <VoxButton 
+          theme="gray" 
+          variant="outlined" 
+          iconLeft={ArrowLeft} 
+          onPress={() => { modalSheetRef.current?.dismiss(); setIsModalOpen(false) }} 
+          disabled={isSyncLoading}
+          loading={isSyncLoading}
+          >
             Retour à l'édition
           </VoxButton>
           <VoxButton

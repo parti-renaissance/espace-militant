@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { YStack, ScrollView, XStack } from 'tamagui'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import Text from '@/components/base/Text'
-import { RestGetMessageContentResponse, RestGetMessageResponse } from '@/services/publications/schema'
+import { RestGetMessageContentResponse, RestGetMessageResponse, RestGetMessageFiltersResponse } from '@/services/publications/schema'
 import PublicationCard from '@/components/Cards/PublicationCard/PublicationCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { router, useLocalSearchParams } from 'expo-router'
@@ -13,6 +13,7 @@ import CongratulationsModal from '../../components/CongratulationsModal'
 import { RestPublicationStatsResponse } from '@/services/stats/schema'
 import PublicationGlobalStatsCards from './components/PublicationGlobalStatsCards'
 import BreadCrumbV2 from '@/components/BreadCrumb/BreadCrumbV2'
+import { FiltersChips, FilterValue } from '../../components/FiltersChips'
 
 interface MessageDetailsScreenProps {
   data?: RestGetMessageResponse
@@ -20,6 +21,7 @@ interface MessageDetailsScreenProps {
   isLoading?: boolean
   error?: Error
   stats?: RestPublicationStatsResponse
+  filters?: RestGetMessageFiltersResponse
 }
 
 interface MessageDetailsScreenDenyProps {
@@ -97,7 +99,7 @@ export const MessageDetailsScreenDeny: React.FC<MessageDetailsScreenDenyProps> =
   )
 }
 
-const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoading, error, stats }) => {
+const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoading, error, stats, filters }) => {
   const params = useLocalSearchParams()
   const media = useMedia()
   const [showCongratulations, setShowCongratulations] = useState(false)
@@ -141,6 +143,14 @@ const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoa
                   author={data.sender}
                   uuid={data.uuid}
                 />
+                {filters && (
+                  <VoxCard gap="$medium" bg="$textOutline" mt="$medium">
+                    <VoxCard.Content>
+                      <Text.SM medium>À qui cette publication est-elle adressée ?</Text.SM>
+                      <FiltersChips selectedFilters={filters as Record<string, FilterValue>} isStatic />
+                    </VoxCard.Content>
+                  </VoxCard>
+                )}
               </YStack>
             )
           }
@@ -154,14 +164,14 @@ const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoa
               <VoxCard bg="$purple1" borderWidth={0}>
                 <VoxCard.Content>
                   <XStack gap="$medium" alignItems="center">
-                  <Text.SM color="$purple6">
-                    Vous pouvez voir ces statistiques uniquement car vous êtes Cadre avec un rôle au sein de l’instance qui l’a envoyée.
-                  </Text.SM>
-                  <YStack>
-                    <Sparkle size={20} color="$purple6" />
-                  </YStack>
+                    <Text.SM color="$purple6">
+                      Vous pouvez voir ces statistiques uniquement car vous êtes Cadre avec un rôle au sein de l’instance qui l’a envoyée.
+                    </Text.SM>
+                    <YStack>
+                      <Sparkle size={20} color="$purple6" />
+                    </YStack>
                   </XStack>
-                  
+
                 </VoxCard.Content>
               </VoxCard>
               <PublicationGlobalStatsCards stats={stats} />
