@@ -397,6 +397,12 @@ export const MyEditor = forwardRef<EditorRef, { onChange: (x: Payloads) => void;
               <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
             </XStack>
           ) : null}
+          { Platform.OS === 'android' ? (
+            <YStack padding="$medium" bg="$textSurface">
+              <Text.SM semibold>Un bug peut affecter la sélection de texte sur Android empêchant le déplacement du curseur. </Text.SM>
+              <Text.SM>Nous travaillons à la correction de ce problème. En attendant, si vous l'avez, vous pouvez reprendre l'écriture de votre publication sur navigateur.</Text.SM>
+            </YStack>
+          ) : null}
           <YStack flex={1} padding="$medium">
             <RichText editor={editor} />
           </YStack>
