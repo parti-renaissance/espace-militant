@@ -75,8 +75,7 @@ export const ButtonFrameStyled = styled(View, {
         height: 22,
         minWidth: 22,
         gap: 4,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
+        paddingHorizontal: 8
       },
       xs: {
         height: 24,
@@ -208,6 +207,11 @@ export const ButtonText = styled(Text.MD, {
   },
 
   variants: {
+    size: {
+      xxs: {
+        fontSize: 12,
+      },
+    },
     pop: {
       true: {
         color: '$colorPop',
@@ -264,7 +268,7 @@ export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
           />
         ) : null}
         {children ? (
-          <ButtonText {...customTextProps} pop={props.pop}>
+          <ButtonText {...customTextProps} pop={props.pop} size={props.size}>
             {children}
           </ButtonText>
         ) : null}
