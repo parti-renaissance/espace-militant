@@ -211,6 +211,11 @@ export const ButtonText = styled(Text.MD, {
       xxs: {
         fontSize: 12,
       },
+      xs: {},
+      sm: {},
+      md: {},
+      lg: {},
+      xl: {},
     },
     pop: {
       true: {
