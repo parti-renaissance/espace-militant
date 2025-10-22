@@ -23,6 +23,7 @@ export type SelectProps<A extends string> = {
   options: Readonly<Array<SelectOption<A>>>
   onChange?: (value: A | null) => void
   onDetailChange?: (value: { value: A; label: string | React.ReactNode[]; subLabel?: string }) => void
+  onOpen?: () => void
   onBlur?: () => void
   disabled?: boolean
   noValuePlaceholder?: string
