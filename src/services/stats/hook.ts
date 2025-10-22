@@ -7,6 +7,8 @@ export const usePublicationStats = (props: { uuid: string; scope: string; enable
     queryFn: () => api.getPublicationStats({ uuid: props.uuid, scope: props.scope }),
     enabled: props.enabled !== false,
     staleTime: (query) => query.state.error ? 0 : 60 * 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   })
 }
 
@@ -16,6 +18,8 @@ export const useEventStats = (props: { uuid: string; scope: string; enabled?: bo
     queryFn: () => api.getEventStats({ uuid: props.uuid, scope: props.scope }),
     enabled: props.enabled !== false,
     staleTime: (query) => query.state.error ? 0 : 60 * 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   })
 }
 
