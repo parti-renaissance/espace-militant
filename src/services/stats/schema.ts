@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 const RestPublicationStatsUniqueClicksSchema = z.object({
+  app: z.number(),
+  app_rate: z.number(),
+  email: z.number(),
+  email_rate: z.number(),
   total: z.number(),
   total_rate: z.number(),
 })
@@ -13,21 +17,38 @@ const RestPublicationStatsUniqueImpressionsSchema = z.object({
 
 const RestPublicationStatsUniqueOpensSchema = z.object({
   direct_link: z.number(),
+  email: z.number(),
+  email_rate: z.number(),
   list: z.number(),
   notification: z.number(),
+  notification_rate: z.number(),
   timeline: z.number(),
+  timeline_rate: z.number(),
   total: z.number(),
   total_rate: z.number(),
 })
 
+const RestPublicationStatsUnsubscribedSchema = z.object({
+  total: z.number(),
+  total_rate: z.number(),
+})
+
+const RestPublicationStatsNotificationsSchema = z.object({
+  android: z.number(),
+  ios: z.number(),
+  web: z.number(),
+})
+
 export const RestPublicationStatsResponseSchema = z.object({
   contacts: z.number(),
+  notifications: RestPublicationStatsNotificationsSchema,
   sent_at: z.string(),
   unique_clicks: RestPublicationStatsUniqueClicksSchema,
   unique_emails: z.number(),
   unique_impressions: RestPublicationStatsUniqueImpressionsSchema,
   unique_notifications: z.number(),
   unique_opens: RestPublicationStatsUniqueOpensSchema,
+  unsubscribed: RestPublicationStatsUnsubscribedSchema,
   visible_count: z.number(),
 })
 
@@ -35,6 +56,8 @@ export type RestPublicationStatsResponse = z.infer<typeof RestPublicationStatsRe
 export type RestPublicationStatsUniqueClicks = z.infer<typeof RestPublicationStatsUniqueClicksSchema>
 export type RestPublicationStatsUniqueImpressions = z.infer<typeof RestPublicationStatsUniqueImpressionsSchema>
 export type RestPublicationStatsUniqueOpens = z.infer<typeof RestPublicationStatsUniqueOpensSchema>
+export type RestPublicationStatsUnsubscribed = z.infer<typeof RestPublicationStatsUnsubscribedSchema>
+export type RestPublicationStatsNotifications = z.infer<typeof RestPublicationStatsNotificationsSchema>
 
 const RestEventStatsUniqueImpressionsSchema = z.object({
   list: z.number(),
