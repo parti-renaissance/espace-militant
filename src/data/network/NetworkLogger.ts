@@ -33,7 +33,7 @@ export const logHttpError = async (error: AxiosError, title?: string) => {
         body: JSON.stringify(body),
       },
     },
-    error.response?.status !== 401,
+    error.response?.status !== 401 && error.response?.status !== 403,
   )
 }
 

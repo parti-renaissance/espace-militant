@@ -76,8 +76,8 @@ const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ st
   const formattedDate = DateFormatter.format(sentDate, 'dd MMMM yyyy')
   const formattedTime = DateFormatter.format(sentDate, 'HH:mm')
 
-  const openRate = stats.unique_opens.total_rate / 100
-  const clickRate = stats.unique_clicks.total_rate / 100
+  const openRate = stats.unique_opens.total_rate
+  const clickRate = stats.unique_clicks.total_rate
 
   return (
     <VoxCard>
@@ -106,8 +106,8 @@ const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ st
 
             {/* Second row */}
             <XStack gap="$small">
-              <StatCard value={NumberFormatter.formatPercent(openRate)} label="Ouvertures" />
-              <StatCard value={NumberFormatter.formatPercent(clickRate)} label="Clics" />
+              <StatCard value={`${NumberFormatter.formatStatsPercent(openRate, true)}%`} label="Ouvertures" />
+              <StatCard value={`${NumberFormatter.formatStatsPercent(clickRate, true)}%`} label="Clics" />
             </XStack>
           </YStack>
         </YStack>
@@ -128,7 +128,7 @@ const DiffusionDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = 
             <StatsSectionRow
               category="Contacts notifiés"
               total={{
-                count: 'N/A'
+                count: stats.contacts
               }}
               subcategories={[
                 {
@@ -137,25 +137,21 @@ const DiffusionDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = 
                   subItems: [
                     {
                       label: "Web",
-                      count: 'N/A'
+                      count: stats.notifications.web
                     },
                     {
                       label: "iOS",
-                      count: 'N/A'
+                      count: stats.notifications.ios
                     },
                     {
                       label: "Android",
-                      count: 'N/A'
+                      count: stats.notifications.android
                     },
                   ]
                 },
                 {
                   label: "Par email",
                   count: stats.unique_emails
-                },
-                {
-                  label: "Par les deux",
-                  count: 'N/A'
                 },
               ]}
             />
@@ -189,24 +185,24 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
             <StatsSectionRow
               category="Ouvertures uniques"
               total={{
-                percentage: "N/A%",
+                percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.total_rate)}%`,
                 count: stats.unique_opens.total
               }}
               subcategories={[
                 {
                   label: "Depuis la notification",
-                  percentage: "N/A%",
+                  percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.notification_rate)}%`,
                   count: stats.unique_opens.notification
                 },
                 {
                   label: "Depuis l'espace militant",
-                  percentage: "N/A%",
+                  percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.timeline_rate)}%`,
                   count: stats.unique_opens.timeline
                 },
                 {
                   label: "Depuis l'email",
-                  percentage: "N/A%",
-                  count: "N/A"
+                  percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.email_rate)}%`,
+                  count: stats.unique_opens.email
                 }
               ]}
             />
@@ -216,19 +212,19 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
             <StatsSectionRow
               category="Clics uniques"
               total={{
-                percentage: "N/A%",
+                percentage: `${NumberFormatter.formatStatsPercent(stats.unique_clicks.total_rate)}%`,
                 count: stats.unique_clicks.total
               }}
               subcategories={[
                 {
                   label: "Depuis l'espace militant",
-                  percentage: "0%",
-                  count: "N/A"
+                  percentage: `${NumberFormatter.formatStatsPercent(stats.unique_clicks.app_rate)}%`,
+                  count: stats.unique_clicks.app
                 },
                 {
                   label: "Depuis l'email",
-                  percentage: "0%",
-                  count: "N/A"
+                  percentage: `${NumberFormatter.formatStatsPercent(stats.unique_clicks.email_rate)}%`,
+                  count: stats.unique_clicks.email
                 }
               ]}
             />
@@ -239,8 +235,8 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
             <StatsSectionRow
               category="Désabonnements aux emails"
               total={{
-                percentage: "N/A%",
-                count: "N/A"
+                percentage: `${NumberFormatter.formatStatsPercent(stats.unsubscribed.total_rate)}%`,
+                count: stats.unsubscribed.total
               }}
               subcategories={[]}
             />
