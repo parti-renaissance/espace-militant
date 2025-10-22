@@ -164,7 +164,7 @@ export default function SelectFilters({
     queryClient.refetchQueries({
       queryKey: ['message-count-recipients', messageId],
     })
-  }, [])
+  }, [messageId, queryClient])
 
   const handleQuickFilterSelection = useCallback((itemId: string) => {
     const item = quickFilters.find(d => d.value === itemId)
