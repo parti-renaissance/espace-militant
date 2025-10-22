@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, useMemo, useEffect } from 'react'
+import React, { memo, useCallback, useState, useMemo, useEffect, useRef } from 'react'
 import { useDebounceValue, YStack } from 'tamagui'
 import Select from '@/components/base/Select/SelectV3'
 import { GlobalSearchProps, SearchResult } from './types'
@@ -34,6 +34,7 @@ function GlobalSearch({
   const [query, setQuery] = useState<string>('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [isFetching, setIsFetching] = useState(false)
+  const hasLoadedInitialResults = useRef(false)
   
   // Handle defaultValue which can be {value, label}, label string, or undefined
   const defaultOption = useMemo(() => {
@@ -58,7 +59,7 @@ function GlobalSearch({
 
   const performSearch = useCallback(async (searchQuery: string) => {
 
-    if (searchQuery.length < 2 || !provider.isSearchable(searchQuery)) {
+    if (!provider.isSearchable(searchQuery)) {
       return
     }
 
@@ -80,12 +81,22 @@ function GlobalSearch({
   }, [provider, scope])
 
   useEffect(() => {
-    performSearch(debouncedQuery)
+    if (debouncedQuery.length > 0) {
+      performSearch(debouncedQuery)
+    }
   }, [debouncedQuery, performSearch])
 
   const onInput = useCallback((text: string) => {
     setQuery(text)
   }, [])
+
+  const onOpen = useCallback(() => {
+    // Charge les résultats initiaux uniquement à l'ouverture du select (et une seule fois)
+    if (!hasLoadedInitialResults.current) {
+      performSearch('')
+      hasLoadedInitialResults.current = true
+    }
+  }, [performSearch])
 
   const onResultSelect = useCallback(async (id: string) => {
     if (id === '') {
@@ -179,6 +190,7 @@ function GlobalSearch({
         placeholder={searchPlaceholder}
         value={valueMemo}
         onChange={onResultSelect}
+        onOpen={onOpen}
         icon={providerIcon}
         searchable
         searchableOptions={{
