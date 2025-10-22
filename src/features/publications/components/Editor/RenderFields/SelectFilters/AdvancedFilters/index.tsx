@@ -76,8 +76,7 @@ export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
         options: {
           choices: {
             "female": "Femme",
-            "male": "Homme",
-            "other": "Autre"
+            "male": "Homme"
           }
         }
       }
