@@ -53,7 +53,7 @@ export class ZoneProvider implements SearchProvider {
   }
 
   isSearchable(query: string): boolean {
-    return query.length >= 2 && /[a-zA-Z]/.test(query)
+    return query.length >= 2 && /[a-zA-Z0-9]/.test(query)
   }
 
   getIcon(): IconComponent {
