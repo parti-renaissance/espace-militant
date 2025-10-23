@@ -146,7 +146,7 @@ export const MetaDataForm = memo((props: {
     <YStack backgroundColor="white" borderTopRightRadius="$medium" borderTopLeftRadius="$medium" paddingHorizontal="$medium" paddingTop="$large" paddingBottom={props.displayToolbar ? '$medium' : 0}>
       <SenderView 
         sender={props.selectedSender} 
-        availableSenders={props.availableSenders} 
+        availableSenders={props.displayToolbar ? props.availableSenders : undefined} 
         datetime="1 min."
         onSenderSelect={props.onSenderChange}
       />
