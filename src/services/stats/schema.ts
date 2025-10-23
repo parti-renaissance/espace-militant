@@ -16,6 +16,8 @@ const RestPublicationStatsUniqueImpressionsSchema = z.object({
 })
 
 const RestPublicationStatsUniqueOpensSchema = z.object({
+  app: z.number(),
+  app_rate: z.number(),
   direct_link: z.number(),
   email: z.number(),
   email_rate: z.number(),
@@ -23,7 +25,6 @@ const RestPublicationStatsUniqueOpensSchema = z.object({
   notification: z.number(),
   notification_rate: z.number(),
   timeline: z.number(),
-  timeline_rate: z.number(),
   total: z.number(),
   total_rate: z.number(),
 })

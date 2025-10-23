@@ -196,8 +196,8 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
                 },
                 {
                   label: "Depuis l'espace militant",
-                  percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.timeline_rate)}%`,
-                  count: stats.unique_opens.timeline
+                  percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.app_rate)}%`,
+                  count: stats.unique_opens.app
                 },
                 {
                   label: "Depuis l'email",
