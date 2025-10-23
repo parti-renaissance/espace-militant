@@ -45,7 +45,7 @@ export const RestPublicationStatsResponseSchema = z.object({
   notifications: RestPublicationStatsNotificationsSchema,
   sent_at: z.string(),
   unique_clicks: RestPublicationStatsUniqueClicksSchema,
-  unique_emails: z.number(),
+  unique_emails: z.number().nullable(),
   unique_impressions: RestPublicationStatsUniqueImpressionsSchema,
   unique_notifications: z.number(),
   unique_opens: RestPublicationStatsUniqueOpensSchema,
