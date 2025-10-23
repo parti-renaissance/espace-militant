@@ -10,7 +10,7 @@ interface PublicationGlobalStatsCardsProps {
   stats: RestPublicationStatsResponse
 }
 
-const StatCard: React.FC<{ value: string | number; label: string }> = ({ value, label }) => (
+const StatCard: React.FC<{ value: string | number; label: string, small?: boolean }> = ({ value, label, small = false }) => (
   <YStack
     backgroundColor="$gray1"
     borderRadius="$4"
@@ -20,7 +20,7 @@ const StatCard: React.FC<{ value: string | number; label: string }> = ({ value, 
     flex={1}
     minHeight={80}
   >
-    <Text fontSize={24} fontWeight="600" color="$purple5">
+    <Text fontSize={small ? 16 : 24} textAlign="center" fontWeight="600" color="$purple5">
       {value}
     </Text>
     <Text.SM color="$gray10" textAlign="center" fontWeight="500">
@@ -100,7 +100,7 @@ const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ st
             {/* First row */}
             <XStack gap="$small">
               <StatCard value={stats.unique_notifications} label="Notifications" />
-              <StatCard value={stats.unique_emails} label="Emails" />
+              <StatCard value={stats.unique_emails === null ? 'En cours d‘envoi' : stats.unique_emails} label="Emails" small={stats.unique_emails === null} />
               <StatCard value={stats.unique_impressions.total} label="Impressions" />
             </XStack>
 
@@ -151,7 +151,7 @@ const DiffusionDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = 
                 },
                 {
                   label: "Par email",
-                  count: stats.unique_emails
+                  count: stats.unique_emails === null ? 'En cours d‘envoi' : stats.unique_emails
                 },
               ]}
             />
@@ -196,8 +196,8 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
                 },
                 {
                   label: "Depuis l'espace militant",
-                  percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.timeline_rate)}%`,
-                  count: stats.unique_opens.timeline
+                  percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.app_rate)}%`,
+                  count: stats.unique_opens.app
                 },
                 {
                   label: "Depuis l'email",

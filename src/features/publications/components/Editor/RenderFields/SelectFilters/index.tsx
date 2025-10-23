@@ -114,10 +114,10 @@ export default function SelectFilters({
     }
 
     return undefined
-  }, [selectedFilters.zone, selectedFilters.zones, selectedFilters.committee]) // update when zone changes
+  }, [selectedFilters.zone, selectedFilters.zones, selectedFilters.committee, messageId]) // update when zone changes
 
-  // Calculer les valeurs par défaut une seule fois au montage
-  const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), []) // eslint-disable-line react-hooks/exhaustive-deps
+  // Calculer les valeurs par défaut en fonction de messageId et des zones disponibles
+  const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), [messageId, selectedFilters.zones, selectedFilters.zone])
 
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
@@ -214,7 +214,9 @@ export default function SelectFilters({
     }
     
     updateFilter({ [filterKey]: value })
-  }, [updateFilter, defaultFiltersValues, setZoneResetKey])
+  }, [updateFilter, defaultFiltersValues, setZoneResetKey, messageId])
+
+  console.log('zoneResetKey', zoneResetKey, defaultFiltersValues?.zone)
 
   const Header = useCallback(() => {
     return (

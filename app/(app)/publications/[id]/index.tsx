@@ -65,12 +65,14 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
   const sentRef = React.useRef<string | null>(null)
   const { data: publicationStats, isLoading: isStatsLoading, error: statsError } = usePublicationStats({
     uuid: props.id,
-    scope: defaultScope!
+    scope: defaultScope!,
+    enabled: messageData?.editable === true,
   })
 
   const { data: messageFilters } = useGetMessageFilters({
     messageId: props.id,
     scope: defaultScope!,
+    enabled: messageData?.editable === true,
   })
 
   React.useEffect(() => {

@@ -130,6 +130,7 @@ export const RestGetMessageResponseSchema = z.object({
   synchronized: z.boolean(),
   preview_link: z.string().nullable(),
   json_content: z.string().nullish(),
+  editable: z.boolean().nullish(),
 })
 
 export type RestGetMessageResponse = z.infer<typeof RestGetMessageResponseSchema>

@@ -101,7 +101,7 @@ const HomeFeedList = () => {
                 {hasFeature('publications') && (
                   <Link href="/publications" asChild>
                     <VoxButton variant="soft" size="sm" theme="purple" iconLeft={Sparkle}>
-                      Nouvelle publication (Bêta)
+                      Nouvelle publication
                     </VoxButton>
                   </Link>
                 )}
