@@ -58,7 +58,7 @@ const ToolBarContainer = styled(ThemeableStack, {
   justifyContent: 'center',
   alignItems: 'stretch',
   alignContent: 'stretch',
-  backgroundColor: 'rgba(145,158,171,0.3)',
+  backgroundColor: 'rgba(166, 175, 184, 0.3)',
   padding: 10,
   // borderRadius: '$large',
   minHeight: 56,
@@ -80,7 +80,8 @@ const ToolBarFrame = styled(ThemeableStack, {
 const AnimatedToolBarFrame = Animated.createAnimatedComponent(ToolBarFrame)
 
 const ToolBarItemFrame = styled(ThemeableStack, {
-  padding: '$medium',
+  paddingHorizontal: 20,
+  paddingVertical: 1,
   gap: '$medium',
   backgroundColor: 'white',
   flexDirection: 'row',
@@ -305,7 +306,7 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
           </YStack>
         </Animated.View>
         <AnimatedToolBarFrame style={frameAnimatedStyle}>
-          <XStack height={TOOLBAR_ITEM_HEIGHT} justifyContent="space-between" gap="$medium" alignItems="center">
+          <XStack height={TOOLBAR_ITEM_HEIGHT} justifyContent="space-between" gap="$medium" alignItems="center" bg="white">
             <Text.LG padding="$medium" numberOfLines={1}>Ajouter un élément</Text.LG>
             <YStack padding="$medium" cursor="pointer">
               <X color="$textPrimary" onPress={props.onClose} size={24} />

@@ -2,9 +2,10 @@ import { z } from 'zod'
 
 // Schémas pour les zones
 export const ZoneAutocompleteRequestSchema = z.object({
-  q: z.string().min(1),
+  q: z.string(),
   scope: z.string().optional(),
   'types[]': z.array(z.string()).optional(),
+  searchEvenEmptyTerm: z.number().optional(),
 })
 
 export const ZoneAutocompleteResponseSchema = z.array(z.object({

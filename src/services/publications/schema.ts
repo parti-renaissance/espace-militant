@@ -7,6 +7,7 @@ export const RestPostMessageRequestSchema = z.object({
   subject: z.string(),
   content: z.string(),
   json_content: z.string(),
+  sender: z.string().optional(),
 })
 
 export type RestPostMessageRequest = z.infer<typeof RestPostMessageRequestSchema>
@@ -129,6 +130,7 @@ export const RestGetMessageResponseSchema = z.object({
   synchronized: z.boolean(),
   preview_link: z.string().nullable(),
   json_content: z.string().nullish(),
+  editable: z.boolean().nullish(),
 })
 
 export type RestGetMessageResponse = z.infer<typeof RestGetMessageResponseSchema>

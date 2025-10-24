@@ -4,20 +4,23 @@ import { VoxButton } from '@/components/Button'
 import { NavBar, ProfileNav, VoxHeader } from '@/components/Header/Header'
 import { PortalLayout } from '@/components/layouts/PortalLayout'
 import { ArrowLeft, FileEdit, Speech } from '@tamagui/lucide-icons'
-import { Link, Stack, usePathname } from 'expo-router'
+import { Link, Stack, usePathname, useSegments } from 'expo-router'
 import { isWeb, useMedia, View, XStack } from 'tamagui'
 import ProfilHeader from '@/features/profil/components/PageHeader'
 
 export default function AppLayout() {
   const media = useMedia()
   const pathname = usePathname()
+  const segments = useSegments()
   const hideHeaderRoutes = [
     '/publications/creer',
     '/publications/brouillons',
     '/publications',
   ]
 
-  const shouldShowHeader = media.gtSm && !hideHeaderRoutes.includes(pathname)
+  const isQuestionnairesRoute = segments[1] === 'questionnaires' && segments[2] === '[id]'
+
+  const shouldShowHeader = media.gtSm && !hideHeaderRoutes.includes(pathname) && !isQuestionnairesRoute
 
   return (
     <PortalLayout>
@@ -101,11 +104,7 @@ export default function AppLayout() {
           <Stack.Screen
             name="publications/[id]/index"
             options={({ route }) => ({
-              header: () => {
-                return media.sm ? (
-                  <ProfilHeader title="" backgroundColor="$textSurface" forcedBackTitle="Retour" forcedBackPath={isWeb ? '/' : undefined} />
-                ) : null
-              },
+              headerShown: false,
               animation: route.params && 'withoutAnimation' in route.params ? 'none' : 'slide_from_right',
             })}
           />

@@ -10,9 +10,9 @@ import { RenderFields } from './RenderFields'
 import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
-import { useGetAvailableSenders, useGetMessage } from '@/services/publications/hook'
+import { useGetMessage } from '@/services/publications/hook'
 import * as S from './schemas/messageBuilderSchema'
-import { RestAvailableSender, RestGetMessageFiltersResponse } from '@/services/publications/schema'
+import { RestAvailableSender, RestGetMessageFiltersResponse, RestAvailableSendersResponse } from '@/services/publications/schema'
 import { DebouncedSaveFunction, ImmediateSaveFunction } from './hooks/useAutoSave'
 
 export { getHTML, defaultTheme }
@@ -24,12 +24,14 @@ export type MessageEditorProps = {
   displayToolbar?: boolean
   messageId?: string
   onDisplayToolbarChange?: (display: boolean) => void
-  sender: RestAvailableSender
+  sender: RestAvailableSender | null
   onMessageIdCreated?: (messageId: string) => void
   messageFilters?: RestGetMessageFiltersResponse
   onDebouncedSave: DebouncedSaveFunction
   onImmediateSave: ImmediateSaveFunction
   createdMessageId?: string | null
+  onSenderChange?: (sender: RestAvailableSender | null) => void
+  availableSenders?: RestAvailableSendersResponse
 }
 
 export type MessageEditorRef = {
@@ -50,12 +52,6 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   }), [props.messageId, scopeFromQuery])
   
   const { data: message } = useGetMessage(messageQueryParams)
-  
-  const availableSendersQueryParams = useMemo(() => ({
-    scope: message?.author.scope ?? scopeFromQuery ?? ''
-  }), [message?.author.scope, scopeFromQuery])
-  
-  const { data: availableSenders } = useGetAvailableSenders(availableSendersQueryParams)
 
   const defaultData = useMemo(() => {
     if (props.defaultValue) {
@@ -161,6 +157,17 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
     onDebouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender, zipMessage, getHTML, defaultTheme)
   }, [onDebouncedSave, getValues, props.sender])
 
+  const handleSenderChange = useCallback((newSender: RestAvailableSender) => {
+    props.onSenderChange?.(newSender)
+    // Sauvegarder immédiatement avec le nouveau sender
+    const currentValues = getValues()
+    const fields = renderFieldsRef.current?.getFields() ?? []
+    onImmediateSave(currentValues.formValues, fields, currentValues.metaData, newSender, zipMessage, getHTML, defaultTheme, true)
+      .catch(() => {
+        props.onSenderChange?.(null)
+      })
+  }, [props.onSenderChange, getValues, onImmediateSave])
+
   useImperativeHandle(ref, () => ({
     submit: handleSubmit(
       (x) => {
@@ -199,12 +206,14 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
                 defaultStruct={defaultData.struct}
                 editorMethods={editorMethods}
                 displayToolbar={props.displayToolbar}
-                availableSenders={availableSenders}
+                availableSenders={props.availableSenders}
                 message={message}
                 onNodeChange={handleNodeChange}
                 messageFilters={props.messageFilters}
                 messageId={props.messageId}
                 scope={scopeFromQuery ?? ''}
+                onSenderChange={handleSenderChange}
+                selectedSender={props.sender}
               />
             </FormProvider>
           </StyleRendererContextProvider>

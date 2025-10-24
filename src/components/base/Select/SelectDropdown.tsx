@@ -106,6 +106,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
         if (frameRef.current) {
           setModalPosition()
           modalRef.current?.open()
+          props.onOpen?.()
         }
         setTimeout(() => queryInputRef.current?.focus(), 100)
       },
@@ -115,7 +116,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
       },
       setModalPosition,
     }),
-    [],
+    [props.onOpen],
   )
 
   const handleClose = () => {

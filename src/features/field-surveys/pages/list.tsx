@@ -195,44 +195,52 @@ const SurveyList: React.FC<{ surveys: FieldSurvey[] }> = ({ surveys }) => {
 
 }
 
-const EmptyState: React.FC = () => (
-  <VoxCard>
-    <VoxCard.Content>
-      <YStack alignItems="center" justifyContent="center" padding="$xxlarge" gap="$xlarge">
-        <Circle size={88} backgroundColor="$blue1" >
-          <FileQuestion size={40} color="$blue4" />
-        </Circle>
-        <Text.LG semibold primary textWrap="balance" maxWidth={480} textAlign="center">Il n'y a actuellement aucun questionnaire en cours sur votre zone.</Text.LG>
-        <YStack marginTop="$large">
-          <VoxButton variant="outlined" iconLeft={ArrowLeft} onPress={() => { router.canGoBack() ? router.back() : router.navigate('/') }}>
-            Retour
-          </VoxButton>
+const EmptyState: React.FC = () => {
+  const media = useMedia()
+  return (
+    <VoxCard borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} inside={media.sm ? true : false}>
+      <VoxCard.Content>
+        <YStack alignItems="center" justifyContent="center" padding="$xxlarge" gap="$xlarge">
+          <Circle size={88} backgroundColor="$blue1" >
+            <FileQuestion size={40} color="$blue4" />
+          </Circle>
+          <Text.LG semibold primary textWrap="balance" maxWidth={480} textAlign="center">Il n'y a actuellement aucun questionnaire en cours sur votre zone.</Text.LG>
+          <YStack marginTop="$large">
+            <VoxButton variant="outlined" iconLeft={ArrowLeft} onPress={() => { router.canGoBack() ? router.back() : router.navigate('/') }}>
+              Retour
+            </VoxButton>
+          </YStack>
         </YStack>
-      </YStack>
-    </VoxCard.Content>
-  </VoxCard>
-)
+      </VoxCard.Content>
+    </VoxCard>
+  )
+}
 
-const ErrorState: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
-  <VoxCard>
-    <VoxCard.Content>
-      <YStack alignItems="center" justifyContent="center" padding="$xxlarge" gap="$medium">
-        <Text.LG color="$red10">Erreur de chargement</Text.LG>
-        <Text.SM color="$gray10" textAlign="center">
-          Impossible de charger les questionnaires. Vérifiez votre connexion internet.
-        </Text.SM>
-        <YStack>
-          <VoxButton variant="outlined" iconLeft={RotateCw} onPress={onRetry}>
-            Réessayer
-          </VoxButton>
+const ErrorState: React.FC<{ onRetry: () => void }> = ({ onRetry }) => {
+  const media = useMedia()
+  return (
+    <VoxCard borderWidth = { media.sm ? 0 : 1 } shadowColor = { media.sm ? 'transparent' : undefined } elevation = { media.sm ? 0 : undefined } inside = { media.sm ? true : false } >
+      <VoxCard.Content>
+        <YStack alignItems="center" justifyContent="center" padding="$xxlarge" gap="$medium">
+          <Text.LG color="$red10">Erreur de chargement</Text.LG>
+          <Text.SM color="$gray10" textAlign="center">
+            Impossible de charger les questionnaires. Vérifiez votre connexion internet.
+          </Text.SM>
+          <YStack>
+            <VoxButton variant="outlined" iconLeft={RotateCw} onPress={onRetry}>
+              Réessayer
+            </VoxButton>
+          </YStack>
         </YStack>
-      </YStack>
-    </VoxCard.Content>
-  </VoxCard>
-)
+      </VoxCard.Content>
+  </VoxCard >
+  )
+}
 
-const LoadingState: React.FC = () => (
-  <VoxCard>
+const LoadingState: React.FC = () => {
+  const media = useMedia()
+  return (
+  <VoxCard borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} inside={media.sm ? true : false}>
     <VoxCard.Content>
       <YStack>
         <YStack gap="$xsmall">
@@ -242,9 +250,10 @@ const LoadingState: React.FC = () => (
         <SkeCard.Separator my="$medium" />
         <SkeCard.Image />
       </YStack>
-    </VoxCard.Content>
+      </VoxCard.Content>
   </VoxCard>
-)
+  )
+}
 
 const FieldSurveysListPage: React.FC = () => {
   const { data: surveys, isLoading, error, refresh, isRefetching } = useFieldSurveysWithRefresh()
@@ -265,27 +274,27 @@ const FieldSurveysListPage: React.FC = () => {
           colors={['#007AFF']}
         />
       }
-      contentContainerStyle={{ flexGrow: 1, paddingBottom: 40, backgroundColor: media.sm ? 'white' : '$textSurface'}}
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: 40, backgroundColor: media.sm ? 'white' : '$textSurface' }}
       showsVerticalScrollIndicator={false}
     >
       <Container>
         <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} />
         <ContentWrapper>
-          <VoxCard inside={media.sm ? true : false} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
-            <VoxCard.Content>
-              <VoxCard bg={media.sm ? '$textOutline' : '$blue1'} inside>
-                <VoxCard.Content p={media.sm ? '$medium' : '$large'}>
+          <VoxCard borderRadius="$medium" bg="white" mx={media.sm ? '$medium' : 0}>
+            <VoxCard.Content p={media.sm ? 12 : '$medium'}>
+              <VoxCard bg="$blue1" inside>
+                <VoxCard.Content p={media.sm ? 12 : '$medium'}>
                   <XStack gap="$large">
                     <YStack gap="$medium" flexShrink={1}>
-                      <YStack gap="$small" display={media.sm ? 'none' : 'flex'}>
-                        <Text.LG semibold>Questionnaires de terrain</Text.LG>
+                      <YStack gap="$small">
+                        <Text semibold fontSize={media.sm ? 14 : 16}>Questionnaires de terrain</Text>
                         <VoxCard.Chip theme="blue" backgroundColor="white">
                           {`${surveysCount} questionnaire${surveysCount > 1 ? 's' : ''} disponible${surveysCount > 1 ? 's' : ''}`}
                         </VoxCard.Chip>
                       </YStack>
-                      <Text.SM color={media.sm ? '$textPrimary' : '$textSecondary'}>
+                      <Text fontSize={media.sm ? 12 : 14} color="$textSecondary">
                         Les questionnaires de terrains sont faits pour aller à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à porte.
-                      </Text.SM>
+                      </Text>
                     </YStack>
                     <Image source={require('../assets/notepad-survey.png')} objectFit="contain" display={media.sm ? 'none' : 'block'} width={129} height={126} mr="$medium" />
                   </XStack>

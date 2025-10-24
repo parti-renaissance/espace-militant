@@ -51,22 +51,31 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const { data: messageContent, isLoading: isMessageContentLoading, error: messageContentError } = useGetMessageContent(messageQueryParams)
 
   const availableSendersQueryParams = useMemo(() => ({
-    scope: messageData?.author.scope ?? props?.scope ?? ''
-  }), [messageData?.author.scope, props?.scope])
+    scope: props?.scope ?? messageData?.author?.scope ?? ''
+  }), [messageData?.author?.scope, props?.scope])
 
   const { data: availableSenders, isLoading: isSendersLoading } = useGetAvailableSenders(availableSendersQueryParams)
 
+  const [manuallySelectedSender, setManuallySelectedSender] = useState<RestAvailableSender | null>(null)
+
   const selectedSender = useMemo(() => {
-    if (messageData?.sender) { return messageData.sender }
-    if (availableSenders && availableSenders.length > 0) { return availableSenders[0] }
+    if (manuallySelectedSender) {
+      return manuallySelectedSender
+    }
+    if (messageData?.sender) {
+      return messageData.sender
+    }
+    if (availableSenders && availableSenders.length > 0) {
+      return availableSenders[0]
+    }
     return null
-  }, [messageData?.sender, availableSenders])
+  }, [manuallySelectedSender, messageData?.sender, availableSenders])
 
   const isInitialLoading = !wasInitiallyInCreation && (isMessageLoading || isSendersLoading || isMessageContentLoading || isMessageFiltersLoading)
 
   // Hook de sauvegarde automatique
-  const { 
-    debouncedSave, 
+  const {
+    debouncedSave,
     immediateSave,
     isPending: isAutoSaving,
     lastSaved,
@@ -88,16 +97,34 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
 
   const handleQuit = () => {
     setDisplayQuitModal(false)
-    if (router.canGoBack()) {
+    if (isWeb) {
+      if (props?.messageId) {
+        router.replace(`/publications/brouillons?scope=${props?.scope ?? messageData?.author?.scope ?? ''}`)
+      } else {
+        router.replace('/publications')
+      }
+    } else if (router.canGoBack()) {
       router.back()
     } else {
       router.replace('/publications')
     }
   }
 
+  const handleSenderChange = (newSender: RestAvailableSender | null) => {
+    setManuallySelectedSender(newSender)
+  }
+
   return (
     <>
-      <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} messageId={currentMessageId} scope={props?.scope} />
+      <QuitConfirmModal
+        isOpen={displayQuitModal}
+        onConfirm={handleQuit}
+        onClose={() => {
+          setDisplayQuitModal(false)
+        }}
+        messageId={currentMessageId}
+        scope={props?.scope}
+      />
       <StickyBox webOnly style={{ zIndex: 10 }}>
         <YStack overflow={media.gtSm ? 'hidden' : undefined} zIndex={media.gtSm ? 10 : undefined}>
           <VoxHeader>
@@ -116,7 +143,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
                 <AutoSaveErrorIndicator
                   hasError={hasError}
                 />
-                
+
               </XStack>
               <XStack maxWidth={520} justifyContent="center">
                 <VoxHeader.Title icon={media.gtSm ? Speech : undefined}>{media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
@@ -196,11 +223,13 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
                 onDisplayToolbarChange={(displayToolbar) => {
                   setMode(displayToolbar ? 'edit' : 'preview')
                 }}
-                sender={selectedSender as RestAvailableSender}
+                sender={selectedSender}
                 messageFilters={messageFiltersData}
                 onDebouncedSave={debouncedSave}
                 onImmediateSave={immediateSave}
                 createdMessageId={createdMessageId}
+                onSenderChange={handleSenderChange}
+                availableSenders={availableSenders}
               />
             </PageLayout.MainSingleColumn>
           </BoundarySuspenseWrapper>

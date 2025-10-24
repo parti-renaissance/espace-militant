@@ -39,13 +39,19 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
     resolver: zodResolver(S.ButtonNodeValidationSchema),
   })
 
-  const onSubmit = useDebouncedCallback(
-    handleSubmit((data) => {
-      props.onChange(data)
+  const onSubmit = useDebouncedCallback(() => {
+    const values = control._formValues
+    const hasContent = values.content?.text?.length > 0 || values.content?.link?.length > 0
+    
+    if (hasContent) {
+      handleSubmit((data) => {
+        props.onChange(data)
+        props.onBlur()
+      })()
+    } else {
       props.onBlur()
-    }),
-    100,
-  )
+    }
+  }, 100)
 
   return (
     <ViewportModal

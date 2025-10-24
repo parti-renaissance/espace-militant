@@ -24,7 +24,8 @@ export class ZoneProvider implements SearchProvider {
       const response = await getZoneAutocomplete({
         q: query,
         scope,
-        'types[]': ['borough', 'city', 'canton', 'department', 'region', 'country', 'district', 'foreign_district'] // Contrainte Mailchimp
+        'types[]': ['borough', 'city', 'canton', 'department', 'region', 'country', 'district', 'foreign_district'], // Contrainte Mailchimp
+        searchEvenEmptyTerm: query.length === 0 ? 1 : undefined,
       })
 
       return response.map(zone => ({
@@ -53,7 +54,8 @@ export class ZoneProvider implements SearchProvider {
   }
 
   isSearchable(query: string): boolean {
-    return query.length >= 2 && /[a-zA-Z]/.test(query)
+    // Permet les recherches vides (pour le chargement initial) ou avec au moins 2 caractères alphanumériques
+    return query.length === 0 || (query.length >= 2 && /[a-zA-Z0-9]/.test(query))
   }
 
   getIcon(): IconComponent {

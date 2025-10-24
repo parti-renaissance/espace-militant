@@ -9,7 +9,7 @@ import { isWeb, YStack } from 'tamagui'
 import { MetaDataForm } from './MetaDataForm'
 import { RenderField } from './RenderField'
 import { EditorInsertionToolbar } from '../EditorInsertionToolbar'
-import { RestAvailableSendersResponse, RestGetMessageResponse, RestGetMessageFiltersResponse } from '@/services/publications/schema'
+import { RestAvailableSendersResponse, RestGetMessageResponse, RestGetMessageFiltersResponse, RestAvailableSender } from '@/services/publications/schema'
 
 type RenderFieldsProps = {
   defaultStruct: S.FieldsArray
@@ -22,6 +22,8 @@ type RenderFieldsProps = {
   messageFilters?: RestGetMessageFiltersResponse
   messageId?: string
   scope: string
+  onSenderChange: (sender: RestAvailableSender) => void
+  selectedSender: RestAvailableSender | null
 }
 
 export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function RenderFields(props, ref) {
@@ -129,8 +131,10 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
       messageFilters={props.messageFilters}
       messageId={props.messageId}
       scope={props.scope}
+      onSenderChange={props.onSenderChange}
+      selectedSender={props.selectedSender}
     />
-  ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar, props.onNodeChange, props.messageFilters, props.messageId, props.scope])
+  ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar, props.onNodeChange, props.messageFilters, props.messageId, props.scope, props.onSenderChange, props.selectedSender])
 
   return (
     <YStack flex={1} overflow="hidden">

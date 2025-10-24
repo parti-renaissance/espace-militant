@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { KeyboardAvoidingView } from 'react-native'
+import { KeyboardAvoidingView, Platform } from 'react-native'
 import { Images } from '@/assets/editor-icons'
 import { SelectFrames as SF } from '@/components/base/Select/Frames'
 import Text from '@/components/base/Text'
@@ -13,11 +13,12 @@ import { useDebouncedCallback } from 'use-debounce'
 import { PublicSans } from './PublicSans'
 import ModalOrPageBase from './ViewportModal'
 
-export enum ToolbarContext {
+enum ToolbarContext {
   Main,
   Link,
   Heading,
 }
+
 const customFont = (primary?: boolean) => `
 ${PublicSans}
 * {
@@ -147,18 +148,26 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
   {
     onPress:
       ({ editor }) =>
-      () =>
-        editor.undo(),
+        () =>
+          editor.undo(),
     active: () => false,
     disabled: ({ editorState }) => !editorState.canUndo,
     image: () => Images.undo,
   },
-
   {
     onPress:
       ({ editor }) =>
-      () =>
-        editor.toggleBold(),
+        () =>
+          editor.redo(),
+    active: () => false,
+    disabled: ({ editorState }) => !editorState.canRedo,
+    image: () => Images.redo,
+  },
+  {
+    onPress:
+      ({ editor }) =>
+        () =>
+          editor.toggleBold(),
     active: ({ editorState }) => editorState.isBoldActive,
     disabled: ({ editorState }) => !editorState.canToggleBold,
     image: () => Images.bold,
@@ -166,27 +175,17 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
   {
     onPress:
       ({ editor }) =>
-      () =>
-        editor.toggleItalic(),
+        () =>
+          editor.toggleItalic(),
     active: ({ editorState }) => editorState.isItalicActive,
     disabled: ({ editorState }) => !editorState.canToggleItalic,
     image: () => Images.italic,
   },
-
   {
     onPress:
       ({ editor }) =>
-      () =>
-        editor.toggleOrderedList(),
-    active: ({ editorState }) => editorState.isOrderedListActive,
-    disabled: ({ editorState }) => !editorState.canToggleOrderedList,
-    image: () => Images.orderedList,
-  },
-  {
-    onPress:
-      ({ editor }) =>
-      () =>
-        editor.toggleBulletList(),
+        () =>
+          editor.toggleBulletList(),
     active: ({ editorState }) => editorState.isBulletListActive,
     disabled: ({ editorState }) => !editorState.canToggleBulletList,
     image: () => Images.bulletList,
@@ -194,11 +193,29 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
   {
     onPress:
       ({ editor }) =>
-      () =>
-        editor.redo(),
-    active: () => false,
-    disabled: ({ editorState }) => !editorState.canRedo,
-    image: () => Images.redo,
+        () =>
+          editor.toggleOrderedList(),
+    active: ({ editorState }) => editorState.isOrderedListActive,
+    disabled: ({ editorState }) => !editorState.canToggleOrderedList,
+    image: () => Images.orderedList,
+  },
+  {
+    onPress:
+      ({ setToolbarContext, editorState, editor }) =>
+        () => {
+          if (Platform.OS === 'android') {
+            setTimeout(() => {
+              editor.setSelection(
+                editorState.selection.from,
+                editorState.selection.to
+              )
+            })
+          }
+          setToolbarContext(ToolbarContext.Link)
+        },
+    active: ({ editorState }) => editorState.isLinkActive,
+    disabled: ({ editorState }) => !editorState.isLinkActive && !editorState.canSetLink,
+    image: () => Images.link,
   },
 ]
 
@@ -379,6 +396,12 @@ export const MyEditor = forwardRef<EditorRef, { onChange: (x: Payloads) => void;
             <XStack paddingVertical="$small" borderBottomColor="$textOutline" borderBottomWidth={1}>
               <Toolbar editor={editor} items={TOOLBAR_ITEMS} />
             </XStack>
+          ) : null}
+          { Platform.OS === 'android' ? (
+            <YStack padding="$medium" bg="$textSurface">
+              <Text.SM semibold>Un bug peut affecter la sélection de texte sur Android empêchant le déplacement du curseur. </Text.SM>
+              <Text.SM>Nous travaillons à la correction de ce problème. En attendant, si vous l'avez, vous pouvez reprendre l'écriture de votre publication sur navigateur.</Text.SM>
+            </YStack>
           ) : null}
           <YStack flex={1} padding="$medium">
             <RichText editor={editor} />

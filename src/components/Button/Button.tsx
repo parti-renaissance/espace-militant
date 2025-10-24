@@ -71,10 +71,16 @@ export const ButtonFrameStyled = styled(View, {
       },
     },
     size: {
+      xxs: {
+        height: 22,
+        minWidth: 22,
+        gap: 4,
+        paddingHorizontal: 8
+      },
       xs: {
         height: 24,
         minWidth: 24,
-        gap: 2,
+        gap: 4,
       },
       sm: {
         height: 32,
@@ -120,9 +126,29 @@ const InverseSoftFrame = styled(ButtonFrameStyled, {
 const OutlinedFrame = styled(ButtonFrameStyled, {
   name: 'VoxButtonOutlined',
   borderColor: '$borderColor',
-  hoverStyle: {
-    borderColor: '$borderColorHover',
-    backgroundColor: '$backgroundHover',
+  variants: {
+    asChip: {
+      true: {
+        hoverStyle: {
+          borderColor: '$borderColor',
+          backgroundColor: '$background',
+        },
+        pressStyle: {
+          borderColor: '$borderColor',
+          backgroundColor: '$background',
+        },
+        focusStyle: {
+          borderColor: '$borderColor',
+          backgroundColor: '$background',
+        },
+      },
+      false: {
+        hoverStyle: {
+          borderColor: '$borderColorHover',
+          backgroundColor: '$backgroundHover',
+        },
+      },
+    },
   },
 })
 
@@ -152,9 +178,9 @@ const ButtonFrame = forwardRef<
   TamaguiElement,
   React.ComponentPropsWithoutRef<typeof ButtonFrameStyled> & { variant?: 'outlined' | 'text' | 'soft' | 'contained'; inverse?: boolean }
 >(({ variant, inverse, ...props }, ref) => {
-  const Frame = getFrame(props.asChip ? 'text' : variant, inverse)
+  const Frame = getFrame(variant ? variant : (props.asChip ? 'text' : undefined), inverse)
   const outlinedException =
-    variant === 'outlined' && (props.theme === 'gray' || !props.theme)
+    variant === 'outlined' && (props.theme === 'gray' || !props.theme) && !props.asChip
       ? {
         borderColor: '$textOutline32',
       }
@@ -181,6 +207,16 @@ export const ButtonText = styled(Text.MD, {
   },
 
   variants: {
+    size: {
+      xxs: {
+        fontSize: 12,
+      },
+      xs: {},
+      sm: {},
+      md: {},
+      lg: {},
+      xl: {},
+    },
     pop: {
       true: {
         color: '$colorPop',
@@ -237,7 +273,7 @@ export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
           />
         ) : null}
         {children ? (
-          <ButtonText {...customTextProps} pop={props.pop}>
+          <ButtonText {...customTextProps} pop={props.pop} size={props.size}>
             {children}
           </ButtonText>
         ) : null}
