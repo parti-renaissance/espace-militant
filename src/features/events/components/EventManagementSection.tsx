@@ -17,7 +17,8 @@ const EventManagementSection = ({ event }: EventItemProps) => {
   const { handleDownload, isPending } = useFileDownload()
   const { data: stats } = useEventStats({
     uuid: event.uuid,
-    scope: event?.organizer?.scope ?? UserScopesEnum.National
+    scope: event?.organizer?.scope ?? UserScopesEnum.National,
+    enabled: event.object_state === 'full' && event.editable,
   })
 
   if (!isEventFull(event) || !event.editable) {
