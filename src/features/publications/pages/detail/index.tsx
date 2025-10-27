@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { RefreshControl } from 'react-native'
 import { YStack, ScrollView, XStack } from 'tamagui'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import Text from '@/components/base/Text'
@@ -22,6 +23,8 @@ interface MessageDetailsScreenProps {
   error?: Error
   stats?: RestPublicationStatsResponse
   filters?: RestGetMessageFiltersResponse
+  onRefreshStats?: () => void
+  isRefreshingStats?: boolean
 }
 
 interface MessageDetailsScreenDenyProps {
@@ -99,7 +102,7 @@ export const MessageDetailsScreenDeny: React.FC<MessageDetailsScreenDenyProps> =
   )
 }
 
-const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoading, error, stats, filters }) => {
+const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoading, error, stats, filters, onRefreshStats, isRefreshingStats }) => {
   const params = useLocalSearchParams()
   const media = useMedia()
   const [showCongratulations, setShowCongratulations] = useState(false)
@@ -130,7 +133,16 @@ const MessageDetailsScreen: React.FC<MessageDetailsScreenProps> = ({ data, isLoa
           <BreadCrumbV2 items={[{ id: "read", label: 'Lecture', icon: Eye }, { id: "stats", label: 'Statistiques', icon: PieChart, color: '$purple5' }]} value={activeSection} onChange={(v) => { setActiveSection(v) }} />
         </YStack>
       )}
-      <ScrollView backgroundColor="$textSurface" flex={1} contentContainerStyle={{ paddingBottom: 100 }}>
+      <ScrollView 
+        backgroundColor="$textSurface" 
+        flex={1} 
+        contentContainerStyle={{ paddingBottom: 100 }}
+        refreshControl={
+          stats && onRefreshStats ? (
+            <RefreshControl refreshing={isRefreshingStats || false} onRefresh={onRefreshStats} />
+          ) : undefined
+        }
+      >
         <YStack gap="$medium" maxWidth={media.gtSm ? 600 : undefined} width={media.gtSm ? '100%' : undefined} marginHorizontal={media.gtSm ? 'auto' : undefined}>
           <HeaderMesssageDetails />
           {
