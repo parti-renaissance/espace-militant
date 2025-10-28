@@ -63,7 +63,7 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
     source?: string
   }>()
   const sentRef = React.useRef<string | null>(null)
-  const { data: publicationStats, isLoading: isStatsLoading, error: statsError } = usePublicationStats({
+  const { data: publicationStats, isLoading: isStatsLoading, error: statsError, refetch: refetchStats, isRefetching: isRefetchingStats } = usePublicationStats({
     uuid: props.id,
     scope: defaultScope!,
     enabled: messageData?.editable === true,
@@ -108,7 +108,17 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
         <title>{metatags.createTitle(messageData?.subject || 'Détails du message')}</title>
       </Head>
       <YStack flex={1}>
-        <MessageDetailsScreen data={messageData} isLoading={isMessageLoading} error={messageError} stats={publicationStats} filters={messageFilters} />
+        <MessageDetailsScreen 
+          data={messageData} 
+          isLoading={isMessageLoading} 
+          error={messageError} 
+          stats={publicationStats} 
+          filters={messageFilters}
+          onRefreshStats={() => {
+            refetchStats()
+          }}
+          isRefreshingStats={isRefetchingStats}
+        />
       </YStack>
     </>
   )
