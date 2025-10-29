@@ -45,9 +45,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
   })
 
   useEffect(() => {
-    console.log('isModalOpen', isModalOpen)
     if (isModalOpen) {
-      console.log('refetchMessageFilters')
       refetchMessageFilters()
     }
   }, [isModalOpen, refetchMessageFilters])

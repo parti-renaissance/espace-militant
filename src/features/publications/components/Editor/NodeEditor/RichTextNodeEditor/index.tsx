@@ -25,7 +25,6 @@ export const RichTextNodeEditor = (props: NodeEditorProps) => {
 
   const handleOnChange = (x: Payloads) => {
     setValue('content', x)
-    console.log('handleOnChange', x)
     onSubmit()
   }
 
