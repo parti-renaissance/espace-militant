@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { LayoutChangeEvent } from 'react-native'
-import { XStack, Text, Stack } from 'tamagui'
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { XStack, Text } from 'tamagui'
 
 type Option = { label: string; value: string }
 export type OptionsTuple = [Option, Option]
@@ -17,12 +18,35 @@ const PADDING = 4
 const BigSwitch = ({ options, value, onChange }: Props) => {
   const [containerW, setContainerW] = useState<number>(0)
   const prevW = useRef<number>(0)
+  const isInitialMount = useRef(true)
 
   const isFirst = value === options[0].value
   const innerW = Math.max(0, containerW - PADDING * 2)
   const halfW = innerW / 2
 
-  const translateX = useMemo(() => (isFirst ? 0 : halfW), [isFirst, halfW])
+  const translateX = useSharedValue(0)
+
+  useEffect(() => {
+    const targetX = isFirst ? 0 : halfW
+    if (isInitialMount.current) {
+      translateX.value = targetX
+      isInitialMount.current = false
+    } else {
+      translateX.value = withTiming(targetX, {
+        duration: 300,
+      })
+    }
+  }, [isFirst, halfW, translateX])
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateX: translateX.value,
+        },
+      ],
+    }
+  })
 
   const onLayout = useCallback((e: LayoutChangeEvent) => {
     const w = e.nativeEvent.layout.width
@@ -48,16 +72,19 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
       role="tablist"
       aria-label="Big switch"
     >
-      <Stack
-        position="absolute"
-        top={PADDING}
-        bottom={PADDING}
-        left={PADDING}
-        width={halfW}
-        borderRadius={999}
-        backgroundColor="$white1"
-        animation="medium"
-        transform={[{ translateX }]}
+      <Animated.View
+        style={[
+          {
+            position: 'absolute',
+            top: PADDING,
+            bottom: PADDING,
+            left: PADDING,
+            width: halfW,
+            borderRadius: 999,
+            backgroundColor: 'white',
+          },
+          animatedStyle,
+        ]}
       />
 
       <XStack
