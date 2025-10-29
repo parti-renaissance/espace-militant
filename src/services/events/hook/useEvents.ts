@@ -125,6 +125,7 @@ export const usePaginatedEventPartcipants = (props: { eventId: string }) => {
       }
       return firstPageParam - 1
     },
+    refetchOnMount: true,
   })
 }
 
