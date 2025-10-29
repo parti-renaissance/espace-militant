@@ -12,6 +12,7 @@ import { isWeb, XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import { PublicSans } from './PublicSans'
 import ModalOrPageBase from './ViewportModal'
+import { normalizeHtmlLinks, normalizeJsonLinks } from '@/utils/normalizeUrl'
 
 enum ToolbarContext {
   Main,
@@ -210,6 +211,7 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
                 editorState.selection.to
               )
             })
+
           }
           setToolbarContext(ToolbarContext.Link)
         },
@@ -428,7 +430,8 @@ function ModalEditor(props: { onChange: (x: Payloads) => void; onBlur: () => voi
     mutateAsync().then((x) => {
       props.onChange({
         ...x,
-        json: JSON.stringify(x.json),
+        html: normalizeHtmlLinks(x.html),
+        json: JSON.stringify(normalizeJsonLinks(x.json)),
       })
       props.onBlur()
     })

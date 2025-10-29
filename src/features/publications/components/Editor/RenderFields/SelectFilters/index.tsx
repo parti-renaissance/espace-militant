@@ -216,8 +216,6 @@ export default function SelectFilters({
     updateFilter({ [filterKey]: value })
   }, [updateFilter, defaultFiltersValues, setZoneResetKey, messageId])
 
-  console.log('zoneResetKey', zoneResetKey, defaultFiltersValues?.zone)
-
   const Header = useCallback(() => {
     return (
       <XStack h={64} justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderColor="$gray1" padding="$medium">
