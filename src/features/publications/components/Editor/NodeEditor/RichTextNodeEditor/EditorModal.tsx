@@ -6,6 +6,7 @@ import { Save, Text as TextIcon } from '@tamagui/lucide-icons'
 import { useMutation } from '@tanstack/react-query'
 import { isWeb, XStack } from 'tamagui'
 import ViewportModal from './ViewportModal'
+import { normalizeHtmlLinks, normalizeJsonLinks } from '@/utils/normalizeUrl'
 
 type EditorModalProps = {
   value: Payloads
@@ -26,7 +27,8 @@ const EditorModal = ({ value, onChange, onBlur, present, onClose }: EditorModalP
     mutateAsync().then((x) => {
       onChange({
         ...x,
-        json: JSON.stringify(x.json),
+        html: normalizeHtmlLinks(x.html),
+        json: JSON.stringify(normalizeJsonLinks(x.json)),
       })
     })
   }
