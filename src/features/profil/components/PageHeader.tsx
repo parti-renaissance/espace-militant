@@ -38,7 +38,7 @@ const ProfilHeader = ({ icon, title, backArrow = true, hideOnMdUp = true, forced
       display={hideOnMdUp ? (gtSm ? 'none' : undefined) : undefined}
       borderWidth={withoutBorder ? 0 : undefined}
     >
-      <YStack flex={1} position="relative" minHeight={48}>
+      <YStack flex={1} position="relative" minHeight={48} height="100%" maxHeight={58}>
         <XStack position="absolute" left={0} top={0} bottom={0} zIndex={1}>
           {backArrow ? (
             <VoxHeader.LeftButton 
