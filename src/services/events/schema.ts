@@ -186,6 +186,13 @@ export const RestPostPublicEventSubsciptionRequest = z.object({
 })
 
 // ------------ Rest Event Participants --------------
+export const RestEventReferrerSchema = z.object({
+  uuid: z.string().uuid(),
+  first_name: z.string(),
+  last_name: z.string(),
+  image_url: z.string().nullable(),
+})
+
 export const RestEventParticipantsRequest = z.object({ page: z.number() })
 export const RestEventParticipantsResponse = createRestPaginationSchema(
   z.object({
@@ -201,6 +208,7 @@ export const RestEventParticipantsResponse = createRestPaginationSchema(
     tags: z.array(activistTagSchema).nullable(),
     confirmed_at: z.string().nullable(),
     status: z.string().nullable(),
+    referrer: RestEventReferrerSchema.nullable(),
   }),
 )
 

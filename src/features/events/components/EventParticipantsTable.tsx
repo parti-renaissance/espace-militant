@@ -5,7 +5,7 @@ import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { usePaginatedEventPartcipants } from '@/services/events/hook'
-import { getHumanFormattedDate, getHumanFormattedDateShort } from '@/utils/date'
+import { getHumanFormattedDate } from '@/utils/date'
 import { XStack, YStack } from 'tamagui'
 import StatusBadge from './EventParticipantsStatusBadge'
 
@@ -113,7 +113,7 @@ export const EventParticipantsTable = ({ eventId, displayInvitationStatus = fals
             })}
           </Table.Col>
 
-          <Table.Col>
+          <Table.Col maxWidth={110}>
             <Table.Row.Header>
               <Text.SM textAlign="center" semibold>
                 Code Postal
@@ -123,6 +123,29 @@ export const EventParticipantsTable = ({ eventId, displayInvitationStatus = fals
               return (
                 <Table.Row key={'postal_code' + uuid}>
                   <Text.SM textAlign="center">{postal_code ?? 'Non indiqué'}</Text.SM>
+                </Table.Row>
+              )
+            })}
+          </Table.Col>
+
+          <Table.Col maxWidth={250}>
+            <Table.Row.Header>
+              <Text.SM semibold>Inscrit via</Text.SM>
+            </Table.Row.Header>
+            {currentPage?.items.map(({ referrer, uuid }) => {
+              return (
+                <Table.Row key={'referrer' + uuid}>
+                  {referrer ? (
+                    <XStack gap="$medium" alignItems="center" flexShrink={1}>
+                      <YStack flexShrink={1}>
+                        <Text.SM>
+                          {referrer.first_name} {referrer.last_name}
+                        </Text.SM>
+                      </YStack>
+                    </XStack>
+                  ) : (
+                    <Text.SM secondary>-</Text.SM>
+                  )}
                 </Table.Row>
               )
             })}
