@@ -1,5 +1,6 @@
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { uniqueId } from 'lodash'
+import { normalizeUrl } from '@/utils/normalizeUrl'
 
 type NodeCreator<I extends S.Node> = () => I
 
@@ -52,10 +53,7 @@ export const zipMessage = (states: S.MessageFormValues, struct: S.FieldsArray, m
       const node = states[type]?.[id]
       if (node) {
         if (node.type === 'button' && node.content?.link) {
-          const link = node.content.link
-          if (!link.startsWith('http://') && !link.startsWith('https://')) {
-            node.content.link = `https://${link}`
-          }
+          node.content.link = normalizeUrl(node.content.link)
         }
         acc.content.push(node)
       }

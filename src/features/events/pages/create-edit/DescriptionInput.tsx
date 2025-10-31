@@ -5,19 +5,64 @@ import { SelectFrames as SF } from '@/components/base/Select/Frames'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
-import { CoreBridge, PlaceholderBridge, RichText, TenTapStartKit, Toolbar, ToolbarItem, useEditorBridge } from '@10play/tentap-editor'
+import { 
+  BoldBridge,
+  CodeBridge,
+  ItalicBridge,
+  HistoryBridge,
+  StrikeBridge,
+  OrderedListBridge,
+  HeadingBridge,
+  ListItemBridge,
+  BulletListBridge,
+  BlockquoteBridge,
+  UnderlineBridge,
+  TaskListBridge,
+  LinkBridge,
+  ColorBridge,
+  HighlightBridge,
+  CoreBridge,
+  PlaceholderBridge,
+  HardBreakBridge,
+  RichText,
+  Toolbar,
+  ToolbarItem,
+  useEditorBridge 
+} from '@10play/tentap-editor'
 import { Pen, Save } from '@tamagui/lucide-icons'
 import { useMutation } from '@tanstack/react-query'
 import { isWeb, XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import { PublicSans } from './PublicSans'
 import ModalOrPageBase from './ViewportModal'
+import { normalizeHtmlLinks, normalizeJsonLinks } from '@/utils/normalizeUrl'
 
 enum ToolbarContext {
   Main,
   Link,
   Heading,
 }
+
+// Custom editor extensions without image support
+// CoreBridge and PlaceholderBridge are configured separately for each editor
+const editorExtensions = [
+  BoldBridge,
+  HistoryBridge,
+  CodeBridge,
+  ItalicBridge,
+  StrikeBridge,
+  UnderlineBridge,
+  OrderedListBridge,
+  HeadingBridge,
+  BulletListBridge,
+  BlockquoteBridge,
+  TaskListBridge,
+  LinkBridge,
+  ColorBridge,
+  HighlightBridge,
+  ListItemBridge,
+  HardBreakBridge,
+]
 
 const customFont = (primary?: boolean) => `
 ${PublicSans}
@@ -210,6 +255,7 @@ const TOOLBAR_ITEMS: ToolbarItem[] = [
                 editorState.selection.to
               )
             })
+
           }
           setToolbarContext(ToolbarContext.Link)
         },
@@ -233,9 +279,7 @@ export const MyRenderer = (props: { value: string; matchContent?: boolean; prima
     initialContent: parseJsonEditorContent(props.value),
     dynamicHeight: props.matchContent,
     bridgeExtensions: [
-      // It is important to spread StarterKit BEFORE our extended plugin,
-      // as plugin duplicated will be ignored
-      ...TenTapStartKit,
+      ...editorExtensions,
       CoreBridge.configureCSS(
         customFont(props.primary) + ` #root div .ProseMirror {overflow: hidden; text-overflow: ellipsis;} #root div .ProseMirror p { text-overflow: ellipsis;}`,
       ), // Custom font
@@ -323,7 +367,7 @@ export const MyEditor2 = forwardRef<EditorRef, { onChange?: () => void; value: P
     bridgeExtensions: [
       // It is important to spread StarterKit BEFORE our extended plugin,
       // as plugin duplicated will be ignored
-      ...TenTapStartKit,
+      ...editorExtensions,
       CoreBridge.configureCSS(customFontEdit), // Custom font
       PlaceholderBridge.configureExtension({
         placeholder: 'Décrivez votre événement...',
@@ -371,7 +415,7 @@ export const MyEditor = forwardRef<EditorRef, { onChange: (x: Payloads) => void;
       bridgeExtensions: [
         // It is important to spread StarterKit BEFORE our extended plugin,
         // as plugin duplicated will be ignored
-        ...TenTapStartKit,
+        ...editorExtensions,
         CoreBridge.configureCSS(customFontEdit), // Custom font
         PlaceholderBridge.configureExtension({
           placeholder: props.placeholder ?? 'Décrivez votre événement...',
@@ -428,7 +472,8 @@ function ModalEditor(props: { onChange: (x: Payloads) => void; onBlur: () => voi
     mutateAsync().then((x) => {
       props.onChange({
         ...x,
-        json: JSON.stringify(x.json),
+        html: normalizeHtmlLinks(x.html),
+        json: JSON.stringify(normalizeJsonLinks(x.json)),
       })
       props.onBlur()
     })
