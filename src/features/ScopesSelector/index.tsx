@@ -129,11 +129,13 @@ export default function ScopesSelector() {
           <YStack pt={0} gap="$medium">
             <Image p="$medium" source={media.gtSm ? tutoNavDesktopImg : tutoNavMobileImg} />
             <Text.SM>Vous pouvez changer de rôle principal à tout moment depuis votre profil.</Text.SM>
-            <XStack alignSelf="center" paddingVertical="$medium">
-              <VoxButton theme="purple" pop iconRight={ArrowRight} onPress={() => setShouldOpen(false)}>
-                C'est noté !
-              </VoxButton>
-            </XStack>
+            <YStack width="100%" justifyContent="center" alignItems="center" mb="$large">
+              <XStack paddingVertical="$medium">
+                <VoxButton theme="purple" iconRight={ArrowRight} onPress={() => setShouldOpen(false)}>
+                  C'est noté !
+                </VoxButton>
+              </XStack>
+            </YStack>
           </YStack>
         </YStack>
       </YStack>
@@ -146,7 +148,13 @@ export default function ScopesSelector() {
         flex={media.sm ? 1 : undefined}
         maxHeight={media.gtSm ? height * 0.8 - viewport.top - viewport.bottom : undefined}
       >
-        <ScrollView style={{ flex: 1, paddingBottom: viewport.bottom }}>{!hasSelectedScope ? <FirstStep /> : <SecondStep />}</ScrollView>
+        <ScrollView 
+          style={{ flex: 1, paddingBottom: viewport.bottom }}
+          keyboardShouldPersistTaps="handled"
+          scrollEventThrottle={16}
+        >
+          {!hasSelectedScope ? <FirstStep /> : <SecondStep />}
+        </ScrollView>
       </YStack>
     </ModalOrPageV2>
   )
