@@ -2,7 +2,7 @@ import { forwardRef, RefObject, useCallback, useEffect } from 'react'
 import { Control } from 'react-hook-form'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, withDelay, Easing } from 'react-native-reanimated'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
-import { Image, Text as TextIcon, MousePointerSquare, X, Plus } from '@tamagui/lucide-icons'
+import { Image, Text as TextIcon, MousePointerSquare, X, Plus, Paperclip } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { EditorMethods } from './types'
@@ -173,7 +173,7 @@ export type MessageEditorToolBarRef = {
 
 const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props, ref) => {
   const animatedFrameHeight = useAnimatedState({
-    openValue: TOOLBAR_ITEM_HEIGHT * 4,
+    openValue: TOOLBAR_ITEM_HEIGHT * 5,
     closedValue: 36,
     isOpen: props.showAddBar || false,
     openDelay: ANIMATION_CONFIG.delays.frame,
@@ -330,6 +330,13 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
             title="Bouton"
             icon={MousePointerSquare}
             onPress={() => handleAddField('button')}
+            visible={props.showAddBar}
+          />
+
+          <ToolBarItem
+            title="Pièce jointe"
+            icon={Paperclip}
+            onPress={() => handleAddField('attachment')}
             visible={props.showAddBar}
           />
         </AnimatedToolBarFrame>

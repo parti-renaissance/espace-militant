@@ -134,4 +134,30 @@ export default {
       },
     },
   },
+  attachment: {
+    global: {
+      wrapper: { paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
+      container: {
+        backgroundColor: '#F3F4F6',
+        borderRadius: 8,
+        paddingTop: 22,
+        paddingBottom: 22,
+        paddingLeft: 12,
+        paddingRight: 12,
+      },
+      base: {},
+    },
+    leading: {
+      wrapper: { paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
+    },
+    trailing: {
+      wrapper: { paddingTop: 8, paddingBottom: 40, paddingLeft: 16, paddingRight: 16 },
+    },
+    middle: {
+      wrapper: { paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
+    },
+    alone: {
+      wrapper: { paddingTop: 8, paddingBottom: 40, paddingLeft: 16, paddingRight: 16 },
+    },
+  },
 } satisfies S.MessageStyle

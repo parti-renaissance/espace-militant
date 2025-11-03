@@ -26,6 +26,13 @@ const createButton: NodeCreator<S.ButtonNode> = () => {
   }
 }
 
+const createAttachment: NodeCreator<S.AttachmentNode> = () => {
+  return {
+    type: 'attachment',
+    content: null,
+  }
+}
+
 export const createNodeByType = (type: S.NodeType) => {
   switch (type) {
     case 'image':
@@ -34,6 +41,8 @@ export const createNodeByType = (type: S.NodeType) => {
       return createButton()
     case 'richtext':
       return createRichText()
+    case 'attachment':
+      return createAttachment()
   }
 }
 
