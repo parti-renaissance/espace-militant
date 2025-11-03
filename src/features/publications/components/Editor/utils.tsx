@@ -66,6 +66,10 @@ export const zipMessage = (states: S.MessageFormValues, struct: S.FieldsArray, m
 export const unZipMessage = (x: S.Message) => {
   return x.content.reduce<{ states: S.MessageFormValues; struct: S.FieldsArray; metaData: S.MessageMetaData }>(
     (acc, next) => {
+      if (!acc.states[next.type]) {
+        console.warn(`Type de node non supporté: ${next.type}`)
+        return acc
+      }
       const uuid = uniqueId()
       acc.states[next.type][uuid] = next
       acc.struct.push({ id: uuid, type: next.type })
