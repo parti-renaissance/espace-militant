@@ -141,7 +141,7 @@ export default function ScopesSelector() {
   }
 
   return (
-    <ModalOrPageV2 open={shouldOpen}>
+    <ModalOrPageV2 open={shouldOpen} onClose={() => setShouldOpen(false)}>
       <YStack
         flex={media.sm ? 1 : undefined}
         maxHeight={media.gtSm ? height * 0.8 - viewport.top - viewport.bottom : undefined}
