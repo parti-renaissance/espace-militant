@@ -65,8 +65,11 @@ export const ButtonNodeValidationSchema = z.object({
       .refine(
         (value) => {
           if (!value.trim()) return false
-          const regex = /^(http:\/\/|https:\/\/)?(www\.)?[a-zA-Z0-9-_\.]+\.[a-zA-Z]+(:\d+)?(\/[a-zA-Z\d\.\-_+]*)*[a-zA-Z.!@#$%&=-_'":,.?\d*)(]*$/
-          return regex.test(value)
+          if (value.startsWith('mailto:') || value.startsWith('tel:') || value.startsWith('sms:')) {
+            return true
+          }
+          const webRegex = /^(www\.)?[a-zA-Z0-9-_\.]+\.[a-zA-Z]+(:\d+)?(\/[a-zA-Z\d\.\-_+]*)*[a-zA-Z.!@#$%&=-_'":,.?\d*)(]*$/
+          return webRegex.test(value)
         },
         {
           message: 'Veuillez saisir un lien valide',
