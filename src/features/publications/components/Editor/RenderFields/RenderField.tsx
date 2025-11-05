@@ -9,7 +9,7 @@ import { RichTextRenderer } from '@/features/publications/components/Editor/Node
 import { NodeSelectorWrapper } from '@/features/publications/components/Editor/NodeSelectorWrapper'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { EditorMethods } from '@/features/publications/components/Editor/types'
-import { Image as ImageIcon, FileDown } from '@tamagui/lucide-icons'
+import { Image as ImageIcon } from '@tamagui/lucide-icons'
 import { Control, Controller } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
 import { AttachmentNodeEditor } from '../NodeEditor/AttachmentNodeEditor'

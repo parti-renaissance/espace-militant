@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, memo } from 'react'
 import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Input from '@/components/base/Input/Input'
@@ -43,7 +43,7 @@ type ImportFileCardProps = {
   disabled: boolean
 }
 
-const ImportFileCard = (props: ImportFileCardProps) => {
+const ImportFileCard = memo((props: ImportFileCardProps) => {
   if (props.isLoading) {
     return (
       <YStack backgroundColor="$textSurface" borderWidth={1} borderColor="$textOutline32" borderStyle="dashed" borderRadius="$medium" padding="$medium" gap="$medium" alignItems="center" justifyContent="center" height={258}>
@@ -130,7 +130,7 @@ const ImportFileCard = (props: ImportFileCardProps) => {
       </YStack>
     </YStack>
   )
-}
+})
 
 type NodeEditorProps = {
   value: S.AttachmentNode
@@ -140,6 +140,15 @@ type NodeEditorProps = {
 }
 
 export const AttachmentNodeEditor = (props: NodeEditorProps) => {
+
+  if (!props.present) {
+    return null
+  }
+
+  return <AttachmentNodeEditorContent {...props} />
+}
+
+const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
   const insets = useSafeAreaInsets()
   const media = useMedia()
   const isIosMobile = media.sm && Platform.OS === 'ios'
@@ -151,7 +160,7 @@ export const AttachmentNodeEditor = (props: NodeEditorProps) => {
   const [uploadError, setUploadError] = useState<string | undefined>(undefined)
   const hasInitializedTitle = useRef(false)
 
-  const { control, handleSubmit, setValue } = useForm({
+  const { control, handleSubmit, setValue, getValues } = useForm({
     defaultValues: {
       ...props.value,
       content: props.value.content ?? {
@@ -175,7 +184,8 @@ export const AttachmentNodeEditor = (props: NodeEditorProps) => {
       setValue('content.name', payload.filename)
 
       // Seulement au premier upload ou si le title est vide
-      if (!hasInitializedTitle.current || !control._formValues.content?.title) {
+      const currentTitle = getValues('content.title')
+      if (!hasInitializedTitle.current || !currentTitle) {
         setValue('content.title', payload.filename)
         hasInitializedTitle.current = true
       }
@@ -193,7 +203,7 @@ export const AttachmentNodeEditor = (props: NodeEditorProps) => {
           setUploadError('Une erreur est survenue lors de l\'importation du fichier. Veuillez réessayer.')
         })
     }
-  }, [documentSelector.data, uploadFile, setValue, scope])
+  }, [documentSelector.data, scope])
 
   const onSubmit = useDebouncedCallback(() => {
     const values = control._formValues

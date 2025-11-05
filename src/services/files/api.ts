@@ -29,7 +29,7 @@ export const uploadFile = async (
       },
       ({ totalBytesSent, totalBytesExpectedToSend }) => {
         const progress = parseFloat((totalBytesSent / (totalBytesExpectedToSend || 1)).toFixed(2))
-        progressCb && progressCb(progress)
+        progressCb?.(progress)
       },
     )
     return uploadTask
@@ -61,7 +61,7 @@ export const uploadFile = async (
       data: await convertBlobUrlToFormData(props),
       onUploadProgress: (progressEvent) => {
         const progress = parseFloat((progressEvent.loaded / (progressEvent.total || 1)).toFixed(2))
-        progressCb && progressCb(progress)
+        progressCb?.(progress)
       },
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -92,7 +92,7 @@ export const uploadPublicationFile = async (
       },
       ({ totalBytesSent, totalBytesExpectedToSend }) => {
         const progress = parseFloat((totalBytesSent / (totalBytesExpectedToSend || 1)).toFixed(2))
-        progressCb && progressCb(progress)
+        progressCb?.(progress)
       },
     )
     return uploadTask
@@ -124,7 +124,7 @@ export const uploadPublicationFile = async (
       data: await convertBlobUrlToFormData(props, 'upload'),
       onUploadProgress: (progressEvent) => {
         const progress = parseFloat((progressEvent.loaded / (progressEvent.total || 1)).toFixed(2))
-        progressCb && progressCb(progress)
+        progressCb?.(progress)
       },
       headers: {
         'Content-Type': 'multipart/form-data',

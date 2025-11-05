@@ -115,6 +115,12 @@
           "calendarPermission": "Autorisez $(PRODUCT_NAME) à ajouter des événements à votre calendrier"
         }
       ],
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
       "@react-native-firebase/app",
       "@react-native-firebase/messaging"
     ],
