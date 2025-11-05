@@ -60,8 +60,7 @@ const SelectOverlay = styled(ThemeableStack, {
   zIndex: 1,
   cursor: 'pointer',
   hoverStyle: {
-    backgroundColor: '$gray8',
-    opacity: 0.08,
+    backgroundColor: '#2633401a',
   },
   variants: {
     selected: {

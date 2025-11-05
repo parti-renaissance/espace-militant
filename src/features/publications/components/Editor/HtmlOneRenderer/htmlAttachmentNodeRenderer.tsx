@@ -28,7 +28,7 @@ export const attachmentRenderer = (props: { theme: S.MessageStyle; data: S.Attac
               <td data-id="__react-email-column" class="padding-responsive" align="center" style="text-align: center;" style="${stringifyCSSProperties({ paddingTop, paddingBottom, paddingLeft, paddingRight } as CSSProperties)}">
                   <a
                       href="${props.data.content.url ?? '#'}"
-                      download="${props.data.content.name ?? 'fichier'}"
+                      download="${props.data.content.title ?? 'fichier'}"
                       style="${stringifyCSSProperties(containerStyles)}"
                       target="_blank"
                   >
@@ -39,7 +39,7 @@ export const attachmentRenderer = (props: { theme: S.MessageStyle; data: S.Attac
                               </td>
                               <td style="vertical-align: middle;">
                                   <div style="color: #212b36; font-size: 14px; font-weight: 500;">
-                                      ${props.data.content.name ?? ''}
+                                      ${props.data.content.title ?? ''}
                                   </div>
                               </td>
                           </tr>

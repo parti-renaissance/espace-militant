@@ -10,6 +10,7 @@ import Text from '@/components/base/Text'
 import { RichTextRenderer } from '@/features/publications/components/Editor/NodeRenderer/RichTextRenderer'
 import { ImageRenderer } from '@/features/publications/components/Editor/NodeRenderer/ImageRenderer'
 import { ButtonRenderer } from '@/features/publications/components/Editor/NodeRenderer/ButtonRenderer'
+import { AttachmentRenderer } from '@/features/publications/components/Editor/NodeRenderer/AttachmentRenderer'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { useMedia, XStack, YStack } from 'tamagui'
 
@@ -64,6 +65,15 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                       data={item as S.ButtonNode}
                       displayToolbar={false}
                       allowHits={true}
+                    />
+                  )
+                }
+                if (item.type === 'attachment') {
+                  return (
+                    <AttachmentRenderer
+                      key={`content-attachment-${index}`}
+                      data={item as S.AttachmentNode}
+                      displayToolbar={false}
                     />
                   )
                 }

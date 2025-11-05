@@ -61,13 +61,12 @@ const EmptyRichTextRender = (props: { data: S.RichTextNode; edgePosition?: 'lead
 
 const EmptyAttachmentRenderer = (props: { data: S.AttachmentNode; edgePosition?: 'leading' | 'trailing' | 'alone'; senderThemeColor?: string }) => {
   const { wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
-  const iconColor = props.senderThemeColor || '#4291E1'
   return (
-    <FormFrame borderRadius={0} height={100} style={wrapperStyle}>
+    <FormFrame borderRadius={0} height={120} style={wrapperStyle}>
       <YStack flex={1} justifyContent="center" alignItems="center" paddingVertical="$large">
         <XStack gap="$small">
-          <FileDown size={16} color={iconColor} />
-          <Text.MD>Ajouter une pièce jointe</Text.MD>
+          <ImageIcon size={16} color="$blue5" />
+          <Text.MD color="$blue5">Ajouter une pièce jointe</Text.MD>
         </XStack>
       </YStack>
     </FormFrame>

@@ -87,6 +87,7 @@ export const AttachmentNodeSchema = z.object({
   content: z
     .object({
       name: z.string(),
+      title: z.string(),
       url: z.string(),
       size: z.number().optional(),
     })
@@ -99,10 +100,17 @@ export const AttachmentNodeValidationSchema = z.object({
   content: z.object({
     name: z
       .string({
+        required_error: 'Le fichier est requis',
+      }),
+    title: z
+      .string({
         required_error: 'Veuillez saisir le nom du fichier',
       })
-      .min(1, {
-        message: 'Le nom du fichier doit être au moins 1 caractère',
+      .min(2, {
+        message: 'Le nom du fichier doit faire minimum 2 caractères',
+      })
+      .max(60, {
+        message: 'Le nom du fichier doit faire maximum 60 caractères',
       }),
     url: z
       .string({

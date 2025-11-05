@@ -45,7 +45,7 @@ export const AttachmentRenderer = ({
         <FileDown size={16} color={iconColor} />
         <YStack>
           <Text.MD semibold numberOfLines={1}>
-            {data.content.name}
+            {data.content.title}
           </Text.MD>
         </YStack>
       </XStack>
