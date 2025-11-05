@@ -9,3 +9,11 @@ export const useUploadFile = () => {
   })
   return { ...mut, progress }
 }
+
+export const useUploadPublicationFile = () => {
+  const [progress, setProgress] = useState(0)
+  const mut = useMutation({
+    mutationFn: (args: Parameters<typeof api.uploadPublicationFile>[0]) => api.uploadPublicationFile(args, setProgress),
+  })
+  return { ...mut, progress }
+}

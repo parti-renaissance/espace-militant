@@ -1,7 +1,7 @@
 import type { TextStyle, ViewStyle } from 'react-native'
 import z from 'zod'
 
-export const nodeTypesArray = ['image', 'richtext', 'button'] as const satisfies NodeType[]
+export const nodeTypesArray = ['image', 'richtext', 'button', 'attachment'] as const satisfies NodeType[]
 
 export const ImageNodeSchema = z.object({
   type: z.literal('image'),
@@ -81,7 +81,51 @@ export const ButtonNodeValidationSchema = z.object({
 
 export type ButtonNode = z.infer<typeof ButtonNodeSchema>
 
-export const NodeSchema = z.union([ImageNodeSchema, RichTextNodeSchema, ButtonNodeSchema])
+export const AttachmentNodeSchema = z.object({
+  type: z.literal('attachment'),
+  marks: z.array(z.string()).optional(),
+  content: z
+    .object({
+      name: z.string(),
+      title: z.string(),
+      url: z.string(),
+      size: z.number().optional(),
+    })
+    .nullish(),
+})
+
+export const AttachmentNodeValidationSchema = z.object({
+  type: z.literal('attachment'),
+  marks: z.array(z.string()).optional(),
+  content: z.object({
+    name: z
+      .string({
+        required_error: 'Le fichier est requis',
+      }),
+    title: z
+      .string({
+        required_error: 'Veuillez saisir le nom du fichier',
+      })
+      .min(2, {
+        message: 'Le nom du fichier doit faire minimum 2 caractères',
+      })
+      .max(60, {
+        message: 'Le nom du fichier doit faire maximum 60 caractères',
+      }),
+    url: z
+      .string({
+        required_error: 'Veuillez fournir un fichier',
+      })
+      .min(1, {
+        message: 'Veuillez fournir un fichier',
+      }),
+    size: z.number().optional(),
+  }),
+})
+
+export type AttachmentNode = z.infer<typeof AttachmentNodeSchema>
+
+export const NodeSchema = z.union([ImageNodeSchema, RichTextNodeSchema, ButtonNodeSchema, AttachmentNodeSchema])
 
 export type Node = z.infer<typeof NodeSchema>
 export type NodeType = z.infer<typeof NodeSchema>['type']
