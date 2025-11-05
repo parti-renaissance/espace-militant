@@ -2,7 +2,7 @@
   "expo": {
     "slug": "vox",
     "scheme": "vox",
-    "version": "5.18.0",
+    "version": "5.19.0",
     "owner": "parti-renaissance",
     "runtimeVersion": {
       "policy": "appVersion"
@@ -125,7 +125,7 @@
       "@react-native-firebase/messaging"
     ],
     "extra": {
-      "eas_update_version": "7",
+      "eas_update_version": "0",
       "router": {
         "origin": false
       },
