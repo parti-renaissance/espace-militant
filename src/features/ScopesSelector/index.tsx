@@ -1,15 +1,13 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useWindowDimensions } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
 import { ArrowRight } from '@tamagui/lucide-icons'
 import { xor } from 'lodash'
 import { Image, useMedia, XStack, YStack } from 'tamagui'
 import { ScopeItem } from './components/ScopeItem'
 import { ScopeList } from './components/ScopeList'
-import ModalOrPageV2, { useModalOrPageScrollView } from './components/ViewportModal'
 import { getFormatedScope } from './utils'
 
 const tutoNavMobileImg = require('@/features/ScopesSelector/assets/mobile-nav-tuto.png')
@@ -21,14 +19,13 @@ export default function ScopesSelector() {
   const [selectedScope, setSelectedScope] = useState(scopes.default?.code)
   const [hasSelectedScope, setHasSelectedScope] = useState(false)
   const scopesCodeList = useMemo(() => scopes.list.map((scope) => scope.code), [scopes])
-  const [shouldOpen, setShouldOpen] = useState(
-    !scopes.lastAvailableScopes || scopes.lastAvailableScopes.length === 0 || xor(scopesCodeList, scopes.lastAvailableScopes).length > 0,
-  )
+  // const [shouldOpen, setShouldOpen] = useState(
+  //   !scopes.lastAvailableScopes || scopes.lastAvailableScopes.length === 0 || xor(scopesCodeList, scopes.lastAvailableScopes).length > 0,
+  // )
 
-  const ScrollView = useModalOrPageScrollView()
+  const [shouldOpen, setShouldOpen] = useState(true)
+
   const media = useMedia()
-  const viewport = useSafeAreaInsets()
-  const { height } = useWindowDimensions()
 
   if (scopes.list.length === 0) {
     return null
@@ -122,11 +119,11 @@ export default function ScopesSelector() {
         gap="$medium"
       >
         <HeaderOneScope />
-        <YStack gap="$medium" paddingHorizontal="$medium">
+        <YStack gap="$medium" paddingHorizontal="$medium" alignItems="center">
           <Text.LG semibold>C’est maintenant votre rôle principal sur cet appareil</Text.LG>
           <Text.SM multiline>Il vous ouvre des fonctionnalités Cadre qui sont indiquées en violet dans votre espace Militant.</Text.SM>
           <Text.SM multiline>Et l’accès à l’espace Cadre depuis le volet gauche de la page d’accueil.</Text.SM>
-          <YStack pt={0} gap="$medium">
+          <YStack pt={0} gap="$medium" alignItems="center">
             <Image p="$medium" source={media.gtSm ? tutoNavDesktopImg : tutoNavMobileImg} />
             <Text.SM>Vous pouvez changer de rôle principal à tout moment depuis votre profil.</Text.SM>
             <YStack width="100%" justifyContent="center" alignItems="center" mb="$large">
@@ -143,19 +140,8 @@ export default function ScopesSelector() {
   }
 
   return (
-    <ModalOrPageV2 open={shouldOpen} onClose={() => setShouldOpen(false)}>
-      <YStack
-        flex={media.sm ? 1 : undefined}
-        maxHeight={media.gtSm ? height * 0.8 - viewport.top - viewport.bottom : undefined}
-      >
-        <ScrollView 
-          style={{ flex: 1, paddingBottom: viewport.bottom }}
-          keyboardShouldPersistTaps="handled"
-          scrollEventThrottle={16}
-        >
-          {!hasSelectedScope ? <FirstStep /> : <SecondStep />}
-        </ScrollView>
-      </YStack>
-    </ModalOrPageV2>
+    <ModalOrBottomSheet open={shouldOpen} onClose={() => setShouldOpen(false)} allowDrag={hasSelectedScope}>
+      {!hasSelectedScope ? <FirstStep /> : <SecondStep />}
+    </ModalOrBottomSheet>
   )
 }
