@@ -2,7 +2,7 @@ import { Linking } from 'react-native'
 import Text from '@/components/base/Text'
 import { useThemeStyle } from '@/features/publications/components/Editor/hooks/useThemeStyle'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
-import { FileDown } from '@tamagui/lucide-icons'
+import { Paperclip } from '@tamagui/lucide-icons'
 import { XStack, YStack } from 'tamagui'
 
 export const AttachmentRenderer = ({
@@ -42,7 +42,7 @@ export const AttachmentRenderer = ({
         onPress={handlePress}
         cursor="pointer"
       >
-        <FileDown size={16} color={iconColor} />
+        <Paperclip size={16} color={iconColor} />
         <YStack>
           <Text.MD semibold numberOfLines={1}>
             {data.content.title}

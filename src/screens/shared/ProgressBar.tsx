@@ -7,8 +7,10 @@ type Props = Readonly<{
 }>
 
 const ProgressBar = (props: Props) => {
+  const progressValue = Math.round(props.progress * 100)
+  
   return (
-    <Progress value={props.progress * 100}>
+    <Progress value={progressValue}>
       <Progress.Indicator bg={props.color} animation="bouncy" />
     </Progress>
   )

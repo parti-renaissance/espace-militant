@@ -7,7 +7,7 @@ import { VoxHeader } from '@/components/Header/Header'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FileDown, Save, Upload, UploadCloud, FileCheck2, AlertTriangle } from '@tamagui/lucide-icons'
+import { Save, Upload, UploadCloud, FileCheck2, AlertTriangle, Paperclip } from '@tamagui/lucide-icons'
 import { Controller, useForm } from 'react-hook-form'
 import { getTokenValue, useMedia, XStack, YStack, Spinner } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
@@ -174,36 +174,45 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
   })
 
   useEffect(() => {
-    if (documentSelector.data) {
-      const payload = documentSelector.data
-
-      if (payload.error) {
-        return
-      }
-      
-      setValue('content.name', payload.filename)
-
-      // Seulement au premier upload ou si le title est vide
-      const currentTitle = getValues('content.title')
-      if (!hasInitializedTitle.current || !currentTitle) {
-        setValue('content.title', payload.filename)
-        hasInitializedTitle.current = true
-      }
-
-      setUploadError(undefined)
-      uploadFile({ uri: payload.uri, filename: payload.filename, dataType: payload.dataType, scope })
-        .then((x) => {
-          setValue('content.url', x.url)
-          setValue('content.size', payload.size)
-        })
-        .catch((error) => {
-          console.error('Upload error:', error)
-          setValue('content.url', '')
-          setValue('content.size', undefined)
-          setUploadError('Une erreur est survenue lors de l\'importation du fichier. Veuillez réessayer.')
-        })
+    if (!documentSelector.data) {
+      return
     }
-  }, [documentSelector.data, scope])
+
+    const payload = documentSelector.data
+
+    if (payload.error) {
+      setUploadError(payload.error)
+      return
+    }
+    
+    console.log('Starting file upload:', {
+      filename: payload.filename,
+      size: payload.size,
+      dataType: payload.dataType,
+      uri: payload.uri
+    })
+    
+    setValue('content.name', payload.filename)
+
+    const currentTitle = getValues('content.title')
+    if (!hasInitializedTitle.current || !currentTitle) {
+      setValue('content.title', payload.filename)
+      hasInitializedTitle.current = true
+    }
+
+    setUploadError(undefined)
+    uploadFile({ uri: payload.uri, filename: payload.filename, dataType: payload.dataType, scope })
+      .then((x) => {
+        setValue('content.url', x.url)
+        setValue('content.size', payload.size)
+      })
+      .catch((error) => {
+        console.error('Upload error:', error)
+        setValue('content.url', '')
+        setValue('content.size', undefined)
+        setUploadError('Une erreur est survenue lors de l\'importation du fichier. Veuillez réessayer.')
+      })
+  }, [documentSelector.data, scope, uploadFile, setValue, getValues])
 
   const onSubmit = useDebouncedCallback(() => {
     const values = control._formValues
@@ -220,7 +229,6 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
   }, 100)
 
   const handleImportFile = () => {
-    documentSelector.reset()
     setUploadError(undefined)
     documentSelector.mutate()
   }
@@ -235,7 +243,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
         <VoxHeader.NoSafeFrame height={56} backgroundColor="white">
           <XStack alignItems="center" flex={1} width="100%">
             <XStack flexGrow={1}>
-              <VoxHeader.Title icon={FileDown}>Pièce jointe</VoxHeader.Title>
+              <VoxHeader.Title icon={Paperclip}>Pièce jointe</VoxHeader.Title>
             </XStack>
             <XStack flex={1} justifyContent="flex-end">
               <VoxButton
