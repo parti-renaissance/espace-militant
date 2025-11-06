@@ -126,6 +126,8 @@ export const uploadPublicationFile = async (
         const progress = parseFloat((progressEvent.loaded / (progressEvent.total || 1)).toFixed(2))
         progressCb?.(progress)
       },
+      maxBodyLength: 100 * 1024 * 1024, // 100MB
+      maxContentLength: 100 * 1024 * 1024, // 100MB
       headers: {
         'Content-Type': 'multipart/form-data',
       },

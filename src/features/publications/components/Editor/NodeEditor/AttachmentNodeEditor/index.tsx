@@ -174,36 +174,45 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
   })
 
   useEffect(() => {
-    if (documentSelector.data) {
-      const payload = documentSelector.data
-
-      if (payload.error) {
-        return
-      }
-      
-      setValue('content.name', payload.filename)
-
-      // Seulement au premier upload ou si le title est vide
-      const currentTitle = getValues('content.title')
-      if (!hasInitializedTitle.current || !currentTitle) {
-        setValue('content.title', payload.filename)
-        hasInitializedTitle.current = true
-      }
-
-      setUploadError(undefined)
-      uploadFile({ uri: payload.uri, filename: payload.filename, dataType: payload.dataType, scope })
-        .then((x) => {
-          setValue('content.url', x.url)
-          setValue('content.size', payload.size)
-        })
-        .catch((error) => {
-          console.error('Upload error:', error)
-          setValue('content.url', '')
-          setValue('content.size', undefined)
-          setUploadError('Une erreur est survenue lors de l\'importation du fichier. Veuillez réessayer.')
-        })
+    if (!documentSelector.data) {
+      return
     }
-  }, [documentSelector.data, scope])
+
+    const payload = documentSelector.data
+
+    if (payload.error) {
+      setUploadError(payload.error)
+      return
+    }
+    
+    console.log('Starting file upload:', {
+      filename: payload.filename,
+      size: payload.size,
+      dataType: payload.dataType,
+      uri: payload.uri
+    })
+    
+    setValue('content.name', payload.filename)
+
+    const currentTitle = getValues('content.title')
+    if (!hasInitializedTitle.current || !currentTitle) {
+      setValue('content.title', payload.filename)
+      hasInitializedTitle.current = true
+    }
+
+    setUploadError(undefined)
+    uploadFile({ uri: payload.uri, filename: payload.filename, dataType: payload.dataType, scope })
+      .then((x) => {
+        setValue('content.url', x.url)
+        setValue('content.size', payload.size)
+      })
+      .catch((error) => {
+        console.error('Upload error:', error)
+        setValue('content.url', '')
+        setValue('content.size', undefined)
+        setUploadError('Une erreur est survenue lors de l\'importation du fichier. Veuillez réessayer.')
+      })
+  }, [documentSelector.data, scope, uploadFile, setValue, getValues])
 
   const onSubmit = useDebouncedCallback(() => {
     const values = control._formValues
@@ -220,7 +229,6 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
   }, 100)
 
   const handleImportFile = () => {
-    documentSelector.reset()
     setUploadError(undefined)
     documentSelector.mutate()
   }
