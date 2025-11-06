@@ -2,7 +2,7 @@ import { forwardRef, RefObject, useCallback, useEffect } from 'react'
 import { Control } from 'react-hook-form'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, withDelay, Easing } from 'react-native-reanimated'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
-import { Image, Text as TextIcon, MousePointerSquare, X, Plus, FileDown } from '@tamagui/lucide-icons'
+import { Image, Text as TextIcon, MousePointerSquare, X, Plus, Paperclip } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { EditorMethods } from './types'
@@ -335,7 +335,7 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
 
           <ToolBarItem
             title="Pièce jointe"
-            icon={FileDown}
+            icon={Paperclip}
             onPress={() => handleAddField('attachment')}
             visible={props.showAddBar}
           />

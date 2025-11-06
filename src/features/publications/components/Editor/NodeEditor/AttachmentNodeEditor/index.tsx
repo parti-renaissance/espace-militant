@@ -7,7 +7,7 @@ import { VoxHeader } from '@/components/Header/Header'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FileDown, Save, Upload, UploadCloud, FileCheck2, AlertTriangle } from '@tamagui/lucide-icons'
+import { Save, Upload, UploadCloud, FileCheck2, AlertTriangle, Paperclip } from '@tamagui/lucide-icons'
 import { Controller, useForm } from 'react-hook-form'
 import { getTokenValue, useMedia, XStack, YStack, Spinner } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
@@ -243,7 +243,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
         <VoxHeader.NoSafeFrame height={56} backgroundColor="white">
           <XStack alignItems="center" flex={1} width="100%">
             <XStack flexGrow={1}>
-              <VoxHeader.Title icon={FileDown}>Pièce jointe</VoxHeader.Title>
+              <VoxHeader.Title icon={Paperclip}>Pièce jointe</VoxHeader.Title>
             </XStack>
             <XStack flex={1} justifyContent="flex-end">
               <VoxButton
