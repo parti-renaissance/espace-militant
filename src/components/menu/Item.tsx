@@ -3,6 +3,9 @@ import type { IconProps } from '@tamagui/helpers-icon'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { styled, TamaguiElement, XStack } from 'tamagui'
 import Text from '../base/Text'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import * as magicLinkTypes from '@/services/magic-link/schema'
+import type { IconComponent } from '@/models/common.model'
 
 const ItemFrame = styled(XStack, {
   animation: '100ms',
@@ -87,10 +90,22 @@ const ItemText = styled(Text, {
 
 const Item = forwardRef<
   TamaguiElement,
-  ComponentPropsWithoutRef<typeof ItemFrame> & { children: string | string[]; icon: React.ExoticComponent<IconProps>; showArrow?: boolean }
->(({ children, icon: Icon, showArrow, ...props }, ref) => {
+  ComponentPropsWithoutRef<typeof ItemFrame> & { 
+    children: string | string[]
+    icon: IconComponent
+    showArrow?: boolean
+    externalSlug?: magicLinkTypes.Slugs
+  }
+>(({ children, icon: Icon, showArrow, externalSlug, ...props }, ref) => {
+  const externalLink = useOpenExternalContent({ 
+    slug: externalSlug ?? 'adhesion',
+  })
+  
+  const handlePress = externalSlug ? externalLink.open({}) : props.onPress
+  const isDisabled = externalSlug ? externalLink.isPending : props.disabled
+  
   return (
-    <ItemFrame {...props} ref={ref}>
+    <ItemFrame {...props} onPress={handlePress} disabled={isDisabled} ref={ref}>
       <Icon size={props.size === 'lg' ? 16 : '$1'} color="$textPrimary" marginRight={8} />
       <XStack width="100%" flexShrink={1}>
         <ItemText size={'sm'} active={props.active}>

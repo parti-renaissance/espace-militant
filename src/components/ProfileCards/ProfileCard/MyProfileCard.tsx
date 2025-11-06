@@ -4,7 +4,6 @@ import InfoCard from '@/components/InfoCard/InfoCard'
 import Menu from '@/components/menu/Menu'
 import ProfilBlock from '@/components/ProfilBlock'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import clientEnv from '@/config/clientEnv'
 import RenewMembershipButton from '@/features/profil/pages/donations/components/RenewMembershipButton'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
@@ -147,11 +146,9 @@ export default function MyProfileCard() {
             Ressources
           </Menu.Item>
         </Link>
-        <Link href="/formations" asChild={!isWeb}>
-          <Menu.Item size="sm" icon={GraduationCap} showArrow>
-            Formations
-          </Menu.Item>
-        </Link>
+        <Menu.Item size="sm" icon={GraduationCap} showArrow externalSlug="formation">
+          Formations
+        </Menu.Item>
         <Link href="/questionnaires" asChild={!isWeb}>
           <Menu.Item size="sm" icon={ClipboardCheck} showArrow >
             Questionnaires

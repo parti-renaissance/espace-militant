@@ -10,6 +10,7 @@ import { useUserStore } from '@/store/user-store'
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet'
 import Menu from '../menu/Menu'
 import { TabBarNavProps } from './types'
+import { ROUTES } from '@/config/routes'
 
 const GoToAdminCard = () => {
   const { user: session } = useUserStore()
@@ -83,7 +84,16 @@ const MoreSheet = forwardRef<
             <Menu>
               {navProps.state.routes.map((route, index) => {
                 const { options } = navProps.descriptors[route.key]
+                const routeConfig = ROUTES.find(r => r.name === route.name)
                 const label = options.tabBarLabel ?? options.title ?? route.name
+                
+                const handlePress = () => {
+                  if (!routeConfig?.externalSlug) {
+                    navProps.navigation.navigate(route.name)
+                  }
+                  bsRef.current?.close()
+                }
+                
                 return (
                   <Menu.Item
                     key={route.key}
@@ -92,10 +102,8 @@ const MoreSheet = forwardRef<
                     active={navProps.state.index === index + navProps.mainNavLength}
                     // @ts-expect-error icon is not in the type
                     icon={options.tabBarIcon}
-                    onPress={() => {
-                      navProps.navigation.navigate(route.name)
-                      bsRef.current?.close()
-                    }}
+                    onPress={handlePress}
+                    externalSlug={routeConfig?.externalSlug}
                   >
                     {label}
                   </Menu.Item>

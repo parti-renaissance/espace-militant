@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export type Slugs = 'adhesion' | 'donation' | 'contribution' | 'cadre'
+export type Slugs = 'adhesion' | 'donation' | 'contribution' | 'cadre' | 'formation'
 
 export type RestGetMagicLinkRequest = z.infer<typeof RestGetMagicLinkRequestSchema>
 export const RestGetMagicLinkRequestSchema = z
