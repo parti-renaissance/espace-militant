@@ -8,6 +8,7 @@ import { Image, useMedia, XStack, YStack } from 'tamagui'
 import { ScopeItem } from './components/ScopeItem'
 import { ScopeList } from './components/ScopeList'
 import { getFormatedScope } from './utils'
+import { xor } from 'lodash'
 
 const tutoNavMobileImg = require('@/features/ScopesSelector/assets/mobile-nav-tuto.png')
 const tutoNavDesktopImg = require('@/features/ScopesSelector/assets/sidebar-tuto.png')
@@ -18,11 +19,9 @@ export default function ScopesSelector() {
   const [selectedScope, setSelectedScope] = useState(scopes.default?.code)
   const [hasSelectedScope, setHasSelectedScope] = useState(false)
   const scopesCodeList = useMemo(() => scopes.list.map((scope) => scope.code), [scopes])
-  // const [shouldOpen, setShouldOpen] = useState(
-  //   !scopes.lastAvailableScopes || scopes.lastAvailableScopes.length === 0 || xor(scopesCodeList, scopes.lastAvailableScopes).length > 0,
-  // )
-
-  const [shouldOpen, setShouldOpen] = useState(true)
+  const [shouldOpen, setShouldOpen] = useState(
+    !scopes.lastAvailableScopes || scopes.lastAvailableScopes.length === 0 || xor(scopesCodeList, scopes.lastAvailableScopes).length > 0,
+  )
 
   const media = useMedia()
 
