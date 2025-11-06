@@ -67,6 +67,7 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
       onDismiss={onCloseModal}
       topInset={insets.top}
       snapPoints={snapPoints}
+      enableDynamicSizing={!snapPoints}
       handleIndicatorStyle={{
         backgroundColor: '#D2DCE5',
         width: 48,
