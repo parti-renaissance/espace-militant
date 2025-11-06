@@ -74,6 +74,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                       key={`content-attachment-${index}`}
                       data={item as S.AttachmentNode}
                       displayToolbar={false}
+                      senderThemeColor={author?.theme?.primary ?? undefined}
                     />
                   )
                 }
