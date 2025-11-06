@@ -17,7 +17,7 @@ import { SignInButton, SignUpButton } from '../Buttons/AuthButton'
 import Container from '../layouts/Container'
 import ProfilePicture from '../ProfilePicture'
 import AuthFallbackWrapper from '../Skeleton/AuthFallbackWrapper'
-import { VoxButton } from '../Button'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
 const ButtonNav = styled(ThemeableStack, {
   tag: 'button',
@@ -53,6 +53,29 @@ const NavItem = (props: { route: (typeof ROUTES)[number]; isActive: boolean }) =
   const [isHover, setIsHover] = React.useState(false)
   const activeColor = (props.isActive || isHover) && props.route.theme !== 'gray' ? '$color5' : '$textPrimary'
   const path = props.route.name === '(home)' ? '/' : (`/${props.route.name}` as const)
+  
+  const externalLink = useOpenExternalContent({ 
+    slug: props.route.externalSlug ?? 'adhesion',
+  })
+  
+  if (props.route.externalSlug) {
+    return (
+      <ButtonNav 
+        onPress={externalLink.open({})}
+        onHoverIn={() => setIsHover(true)} 
+        onHoverOut={() => setIsHover(false)} 
+        theme={props.route.theme} 
+        active={props.isActive}
+        disabled={externalLink.isPending}
+      >
+        <props.route.icon color={activeColor} size={16} />
+        <Text.MD color={activeColor} fontWeight={'500'}>
+          {props.route.screenName}
+        </Text.MD>
+      </ButtonNav>
+    )
+  }
+  
   return (
     <Link href={path} asChild={!isWeb} key={props.route.name}>
       <ButtonNav onHoverIn={() => setIsHover(true)} onHoverOut={() => setIsHover(false)} theme={props.route.theme} active={props.isActive}>
