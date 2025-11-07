@@ -1,8 +1,8 @@
-import React, { memo, ReactNode, RefObject, useMemo } from 'react'
+import React, { memo, ReactNode, RefObject, useMemo, useCallback } from 'react'
 import { GestureResponderEvent } from 'react-native'
 import Text from '@/components/base/Text'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
-import { Control, Controller } from 'react-hook-form'
+import { Control, useFormContext, useWatch } from 'react-hook-form'
 import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
 import { EditorMethods } from './types'
 import MessageEditorEditToolbar from './EditToolBar'
@@ -148,18 +148,17 @@ const MemoWrapper = memo(
     editorMethods: RefObject<EditorMethods>
     field: S.FieldsArray[number]
     control: Control<S.GlobalForm>
-    addBarOpenForFieldId: string | null
-    onChangeAddBarOpenFieldId: (id: string | null) => void
+    onShowAddBarTop: () => void
+    onShowAddBarBottom: () => void
     onCloseAddBar: () => void
     displayToolbar: boolean
+    showAddBarTop: boolean
+    showAddBarBottom: boolean
+    selectedField: S.GlobalForm['selectedField']
   }) => {
-    const topKey = props.field.id + ':top'
-    const bottomKey = props.field.id + ':bottom'
     const displayBottomAddBar = props.edgePosition === 'alone' || props.edgePosition === 'trailing'
-    const showAddBarTop = props.addBarOpenForFieldId === topKey
-    const showAddBarBottom = props.addBarOpenForFieldId === bottomKey
 
-    const animatedHeight = useSharedValue((props.selected) ? 120 : 0.1)
+    const animatedHeight = useSharedValue(props.selected ? 120 : 0.1)
 
     const animatedStyle = useAnimatedStyle(() => {
       return {
@@ -171,9 +170,9 @@ const MemoWrapper = memo(
     })
 
     React.useEffect(() => {
-      const shouldAnimate = (props.selected) && props.displayToolbar
+      const shouldAnimate = props.selected && props.displayToolbar
       animatedHeight.value = shouldAnimate ? 120 : 0.1
-    }, [props.selected, props.displayToolbar])
+    }, [props.selected, props.displayToolbar, animatedHeight])
 
     const handlePress = (e: GestureResponderEvent) => {
       if (!props.selected && props.displayToolbar) {
@@ -188,8 +187,8 @@ const MemoWrapper = memo(
           editorMethods={props.editorMethods}
           field={props.field}
           display={props.displayToolbar}
-          showAddBar={showAddBarTop}
-          onShowAddBar={() => props.onChangeAddBarOpenFieldId(topKey)}
+          showAddBar={props.showAddBarTop}
+          onShowAddBar={props.onShowAddBarTop}
           onCloseAddBar={props.onCloseAddBar}
         />
         <AnimatedWrapperFrame
@@ -198,7 +197,7 @@ const MemoWrapper = memo(
           style={animatedStyle}
         >
           {props.displayToolbar && (
-            <MessageEditorEditToolbar selected={props.selected} control={props.control} editorMethods={props.editorMethods} />
+            <MessageEditorEditToolbar selected={props.selected} selectedField={props.selectedField} editorMethods={props.editorMethods} />
           )}
 
           <Wrapper.Overlay>
@@ -215,8 +214,8 @@ const MemoWrapper = memo(
             field={props.field}
             asLast={true}
             display={props.displayToolbar}
-            showAddBar={showAddBarBottom}
-            onShowAddBar={() => props.onChangeAddBarOpenFieldId(bottomKey)}
+            showAddBar={props.showAddBarBottom}
+            onShowAddBar={props.onShowAddBarBottom}
             onCloseAddBar={props.onCloseAddBar}
           />
         ) : null}
@@ -229,52 +228,65 @@ MemoWrapper.displayName = 'MemoWrapper'
 
 export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToolbar?: boolean }) => {
   const content = useMemo(() => props.children, [props.children])
+  const displayToolbar = props.displayToolbar ?? true
+
+  const { setValue } = useFormContext<S.GlobalForm>()
+  const selectedField = useWatch({ control: props.control, name: 'selectedField' })
+  const addBarOpenForFieldId = useWatch({ control: props.control, name: 'addBarOpenForFieldId' })
+
+  const topKey = useMemo(() => `${props.field.id}:top`, [props.field.id])
+  const bottomKey = useMemo(() => `${props.field.id}:bottom`, [props.field.id])
+
+  const isSelected = selectedField?.field?.id === props.field.id
+  const selectedFieldForWrapper = isSelected ? selectedField : null
+
+  const showAddBarTop = addBarOpenForFieldId === topKey
+  const showAddBarBottom = addBarOpenForFieldId === bottomKey
+
+  const handlePress = useCallback(
+    (e: GestureResponderEvent) => {
+      e.stopPropagation()
+      setValue('selectedField', { edit: false, field: props.field }, { shouldDirty: false, shouldTouch: false, shouldValidate: false })
+      setValue('addBarOpenForFieldId', null, { shouldDirty: false, shouldTouch: false, shouldValidate: false })
+      if (!displayToolbar) {
+        props.editorMethods.current?.setEditorMode('edit')
+      }
+    },
+    [displayToolbar, props.editorMethods, props.field, setValue],
+  )
+
+  const handleShowAddBarTop = useCallback(() => {
+    setValue('addBarOpenForFieldId', topKey, { shouldDirty: false, shouldTouch: false, shouldValidate: false })
+    setValue('selectedField', null, { shouldDirty: false, shouldTouch: false, shouldValidate: false })
+  }, [setValue, topKey])
+
+  const handleShowAddBarBottom = useCallback(() => {
+    setValue('addBarOpenForFieldId', bottomKey, { shouldDirty: false, shouldTouch: false, shouldValidate: false })
+    setValue('selectedField', null, { shouldDirty: false, shouldTouch: false, shouldValidate: false })
+  }, [setValue, bottomKey])
+
+  const handleCloseAddBar = useCallback(() => {
+    setValue('addBarOpenForFieldId', null, { shouldDirty: false, shouldTouch: false, shouldValidate: false })
+  }, [setValue])
 
   return (
-    <Controller
-      render={({ field }) => (
-        <Controller
-          name="addBarOpenForFieldId"
-          control={props.control}
-          render={({ field: addBarField }) => {
-            const handlePress = (e: GestureResponderEvent) => {
-              e.stopPropagation()
-              field.onChange({ edit: false, field: props.field })
-              addBarField.onChange(null)
-              if (!props.displayToolbar) {
-                props.editorMethods.current?.setEditorMode('edit')
-              }
-            }
-            const handleShowAddBar = (key: string) => {
-              addBarField.onChange(key)
-              field.onChange(null)
-            }
-            const handleCloseAddBar = () => {
-              addBarField.onChange(null)
-            }
-
-            return (
-              <MemoWrapper
-                selected={field?.value?.field?.id === props.field.id}
-                onWrapperPress={handlePress}
-                htmlId={`field-${props.field.type}-${props.field.id}`}
-                children={content}
-                error={props.error}
-                edgePosition={props.edgePosition}
-                editorMethods={props.editorMethods}
-                field={props.field}
-                control={props.control}
-                addBarOpenForFieldId={typeof addBarField.value === 'string' || addBarField.value === null ? addBarField.value : null}
-                onChangeAddBarOpenFieldId={handleShowAddBar}
-                onCloseAddBar={handleCloseAddBar}
-                displayToolbar={props.displayToolbar ?? true}
-              />
-            )
-          }}
-        />
-      )}
+    <MemoWrapper
+      selected={isSelected}
+      onWrapperPress={handlePress}
+      htmlId={`field-${props.field.type}-${props.field.id}`}
+      children={content}
+      error={props.error}
+      edgePosition={props.edgePosition}
+      editorMethods={props.editorMethods}
+      field={props.field}
       control={props.control}
-      name="selectedField"
+      onShowAddBarTop={handleShowAddBarTop}
+      onShowAddBarBottom={handleShowAddBarBottom}
+      onCloseAddBar={handleCloseAddBar}
+      displayToolbar={displayToolbar}
+      showAddBarTop={showAddBarTop}
+      showAddBarBottom={showAddBarBottom}
+      selectedField={selectedFieldForWrapper}
     />
   )
 })
