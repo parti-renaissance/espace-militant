@@ -158,7 +158,6 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
   const documentSelector = useDocumentSelector()
   const { mutateAsync: uploadFile, progress, isPending } = useUploadPublicationFile()
   const [uploadError, setUploadError] = useState<string | undefined>(undefined)
-  const hasInitializedTitle = useRef(false)
 
   const { control, handleSubmit, setValue, getValues } = useForm({
     defaultValues: {
@@ -185,19 +184,11 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
       return
     }
     
-    console.log('Starting file upload:', {
-      filename: payload.filename,
-      size: payload.size,
-      dataType: payload.dataType,
-      uri: payload.uri
-    })
-    
     setValue('content.name', payload.filename)
 
     const currentTitle = getValues('content.title')
-    if (!hasInitializedTitle.current || !currentTitle) {
+    if (!currentTitle) {
       setValue('content.title', payload.filename)
-      hasInitializedTitle.current = true
     }
 
     setUploadError(undefined)

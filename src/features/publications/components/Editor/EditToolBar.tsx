@@ -2,7 +2,6 @@ import { forwardRef, RefObject, useCallback } from 'react'
 import { VoxButton } from '@/components/Button'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2, X } from '@tamagui/lucide-icons'
-import { Control, Controller } from 'react-hook-form'
 import { styled, ThemeableStack } from 'tamagui'
 import { EditorMethods } from './types'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, withDelay, Easing } from 'react-native-reanimated'
@@ -46,9 +45,9 @@ const ToolBarFrame = styled(ThemeableStack, {
 const AnimatedToolBarFrame = Animated.createAnimatedComponent(ToolBarFrame)
 
 type MessageEditorToolBarProps = {
-  control: Control<S.GlobalForm>
   editorMethods: RefObject<EditorMethods>
   selected: boolean
+  selectedField: S.GlobalForm['selectedField']
 }
 
 export type MessageEditorToolBarRef = {
@@ -92,80 +91,77 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
     }
   })
 
-  const handleUnSelect = useCallback(() => props.editorMethods.current?.unSelect(), [])
-  const handleEditField = useCallback(
-    (x: S.FieldsArray[number]) => () => {
-      props.editorMethods.current?.editField(x)
-    },
-    [],
-  )
-  const handleMoveUp = useCallback(
-    (x: S.FieldsArray[number]) => () => {
-      props.editorMethods.current?.moveField(x, -1)
-      setTimeout(() => props.editorMethods.current?.scrollToField(x))
-    },
-    [],
-  )
-  const handleMoveDown = useCallback(
-    (x: S.FieldsArray[number]) => () => {
-      props.editorMethods.current?.moveField(x, +1)
-      setTimeout(() => props.editorMethods.current?.scrollToField(x))
-    },
-    [],
-  )
-  const handleDeleteField = useCallback((x: S.FieldsArray[number]) => () => props.editorMethods.current?.removeField(x), [])
+  const currentField = props.selectedField?.field
+
+  const handleUnSelect = useCallback(() => {
+    props.editorMethods.current?.unSelect()
+  }, [props.editorMethods])
+
+  const handleEditField = useCallback(() => {
+    if (!currentField) return
+    props.editorMethods.current?.editField(currentField)
+  }, [currentField, props.editorMethods])
+
+  const handleMoveUp = useCallback(() => {
+    if (!currentField) return
+    props.editorMethods.current?.moveField(currentField, -1)
+    setTimeout(() => props.editorMethods.current?.scrollToField(currentField))
+  }, [currentField, props.editorMethods])
+
+  const handleMoveDown = useCallback(() => {
+    if (!currentField) return
+    props.editorMethods.current?.moveField(currentField, +1)
+    setTimeout(() => props.editorMethods.current?.scrollToField(currentField))
+  }, [currentField, props.editorMethods])
+
+  const handleDeleteField = useCallback(() => {
+    if (!currentField) return
+    props.editorMethods.current?.removeField(currentField)
+  }, [currentField, props.editorMethods])
+
+  React.useEffect(() => {
+    if (props.selected && currentField) {
+      animatedToolBarOpacity.value = 1
+      animatedToolBarWidth.value = TOOLBAR_WIDTH_EXPANDED
+      animatedOpacity.value = withTiming(0.8, {
+        duration: ANIMATION_DURATION + ANIMATION_DELAY,
+        easing: Easing.out(Easing.quad),
+      })
+    } else if (!props.selected) {
+      animatedToolBarOpacity.value = 0
+      animatedToolBarWidth.value = TOOLBAR_WIDTH_COLLAPSED
+      animatedOpacity.value = withTiming(0, {
+        duration: ANIMATION_DURATION + ANIMATION_DELAY,
+        easing: Easing.out(Easing.quad),
+      })
+    }
+  }, [props.selected, currentField, animatedToolBarOpacity, animatedToolBarWidth, animatedOpacity])
 
   return (
-    <Controller
-      control={props.control}
-      name="selectedField"
-      render={({ field }) => {
-        React.useEffect(() => {
-          if (field.value && props.selected) {
-            animatedToolBarOpacity.value = 1
-            animatedToolBarWidth.value = TOOLBAR_WIDTH_EXPANDED
-            animatedOpacity.value = withTiming(0.8, {
-              duration: ANIMATION_DURATION + ANIMATION_DELAY,
-              easing: Easing.out(Easing.quad),
-            })
-          } else if (!props.selected) {
-            animatedToolBarOpacity.value = 0
-            animatedToolBarWidth.value = TOOLBAR_WIDTH_COLLAPSED
-            animatedOpacity.value = withTiming(0, {
-              duration: ANIMATION_DURATION + ANIMATION_DELAY,
-              easing: Easing.out(Easing.quad),
-            })
-          }
-        }, [field.value, props.selected])
-
-        return (
-          <AnimatedToolBarPositioner
-            onPress={(e) => e.stopPropagation()}
-            style={[animatedStyle, { pointerEvents: props.selected ? 'auto' : 'none' }]}
-          >
-            {field.value?.field && (
-              <AnimatedToolBarFrame style={animatedToolBarStyle}>
-                <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={Pencil} onPress={handleEditField(field.value.field)} />
-                </Animated.View>
-                <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={Trash2} onPress={handleDeleteField(field.value.field)} />
-                </Animated.View>
-                <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={ArrowUpToLine} onPress={handleMoveUp(field.value.field)} />
-                </Animated.View>
-                <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={ArrowDownToLine} onPress={handleMoveDown(field.value.field)} />
-                </Animated.View>
-                <Animated.View style={animatedButtonStyle}>
-                  <VoxButton size="lg" variant="soft" backgroundColor="$gray3" hoverStyle={{ backgroundColor: '$gray4' }} pressStyle={{ backgroundColor: '$gray5' }} shrink iconLeft={X} onPress={handleUnSelect} />
-                </Animated.View>
-              </AnimatedToolBarFrame>
-            )}
-          </AnimatedToolBarPositioner >
-        )
-      }}
-    />
+    <AnimatedToolBarPositioner
+      onPress={(e) => e.stopPropagation()}
+      style={[animatedStyle, { pointerEvents: props.selected ? 'auto' : 'none' }]}
+    >
+      {currentField && (
+        <AnimatedToolBarFrame style={animatedToolBarStyle}>
+          <Animated.View style={animatedButtonStyle}>
+            <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={Pencil} onPress={handleEditField} />
+          </Animated.View>
+          <Animated.View style={animatedButtonStyle}>
+            <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={Trash2} onPress={handleDeleteField} />
+          </Animated.View>
+          <Animated.View style={animatedButtonStyle}>
+            <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={ArrowUpToLine} onPress={handleMoveUp} />
+          </Animated.View>
+          <Animated.View style={animatedButtonStyle}>
+            <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={ArrowDownToLine} onPress={handleMoveDown} />
+          </Animated.View>
+          <Animated.View style={animatedButtonStyle}>
+            <VoxButton size="lg" variant="soft" backgroundColor="$gray3" hoverStyle={{ backgroundColor: '$gray4' }} pressStyle={{ backgroundColor: '$gray5' }} shrink iconLeft={X} onPress={handleUnSelect} />
+          </Animated.View>
+        </AnimatedToolBarFrame>
+      )}
+    </AnimatedToolBarPositioner>
   )
 })
 
