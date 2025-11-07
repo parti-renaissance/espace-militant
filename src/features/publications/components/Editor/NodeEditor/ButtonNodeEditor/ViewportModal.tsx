@@ -3,7 +3,7 @@ import { Modal, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
-import { isWeb, Sheet, useMedia, useWindowDimensions, View } from 'tamagui'
+import { isWeb, Sheet, useMedia, View } from 'tamagui'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
