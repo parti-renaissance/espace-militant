@@ -3,7 +3,7 @@ import { Modal, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
-import { isWeb, Sheet, useMedia, useWindowDimensions, View } from 'tamagui'
+import { isWeb, Sheet, useMedia, View } from 'tamagui'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
@@ -22,9 +22,6 @@ export const useModalOrPageScrollView = () => {
  */
 export default function ViewportModal({ children, onClose, open, header }: ModalOrPageBaseProps) {
   const viewport = useMedia()
-  const size = useWindowDimensions()
-
-  const width = Math.min((size.width * 80) / 100, 480)
 
   const sheetModalRef = useRef<BottomSheetModal>(null)
 
@@ -49,7 +46,7 @@ export default function ViewportModal({ children, onClose, open, header }: Modal
           }}
         >
           <View style={styles.modalView}>
-            <CardFrame width={width}>
+            <CardFrame width={480}>
               {header ? header : null}
               {children}
             </CardFrame>

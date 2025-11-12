@@ -2,7 +2,7 @@
   "expo": {
     "slug": "vox",
     "scheme": "vox",
-    "version": "5.18.0",
+    "version": "5.19.0",
     "owner": "parti-renaissance",
     "runtimeVersion": {
       "policy": "appVersion"
@@ -115,11 +115,17 @@
           "calendarPermission": "Autorisez $(PRODUCT_NAME) à ajouter des événements à votre calendrier"
         }
       ],
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
       "@react-native-firebase/app",
       "@react-native-firebase/messaging"
     ],
     "extra": {
-      "eas_update_version": "7",
+      "eas_update_version": "0",
       "router": {
         "origin": false
       },

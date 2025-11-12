@@ -29,7 +29,7 @@ export const uploadFile = async (
       },
       ({ totalBytesSent, totalBytesExpectedToSend }) => {
         const progress = parseFloat((totalBytesSent / (totalBytesExpectedToSend || 1)).toFixed(2))
-        progressCb && progressCb(progress)
+        progressCb?.(progress)
       },
     )
     return uploadTask
@@ -61,7 +61,7 @@ export const uploadFile = async (
       data: await convertBlobUrlToFormData(props),
       onUploadProgress: (progressEvent) => {
         const progress = parseFloat((progressEvent.loaded / (progressEvent.total || 1)).toFixed(2))
-        progressCb && progressCb(progress)
+        progressCb?.(progress)
       },
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -70,7 +70,73 @@ export const uploadFile = async (
   })()
 }
 
-async function convertBlobUrlToFormData(props: { uri: string; filename: string; dataType?: string }): Promise<FormData> {
+export const uploadPublicationFile = async (
+  props: { uri: string; filename: string; dataType?: string; scope: string },
+  progressCb?: (progress: number) => void,
+): Promise<{ url: string }> => {
+  const PUBLICATION_API_URL = `${clientEnv.API_BASE_URL}/api/v3/upload/publication?scope=${props.scope}`
+
+  if (Platform.OS !== 'web') {
+    const accessToken = useUserStore.getState().user?.accessToken
+    const uploadTask = createUploadTask(
+      PUBLICATION_API_URL,
+      props.uri,
+      {
+        httpMethod: 'POST',
+        uploadType: FileSystemUploadType.MULTIPART,
+        fieldName: 'upload',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          ['X-App-version']: getFullVersion(),
+        },
+      },
+      ({ totalBytesSent, totalBytesExpectedToSend }) => {
+        const progress = parseFloat((totalBytesSent / (totalBytesExpectedToSend || 1)).toFixed(2))
+        progressCb?.(progress)
+      },
+    )
+    return uploadTask
+      .uploadAsync()
+      .then((x) => {
+        if (x?.body) {
+          const body = JSON.parse(x.body)
+          if (body.url) {
+            return { url: body.url }
+          }
+          throw body
+        }
+        throw new Error('upload failed')
+      })
+      .catch((error) => {
+        return parseError(error, [])
+      })
+  }
+
+  return api({
+    method: 'post',
+    path: PUBLICATION_API_URL,
+    requestSchema: z.void(),
+    responseSchema: z.object({
+      url: z.string(),
+    }),
+    type: 'private',
+    axiosConfig: {
+      data: await convertBlobUrlToFormData(props, 'upload'),
+      onUploadProgress: (progressEvent) => {
+        const progress = parseFloat((progressEvent.loaded / (progressEvent.total || 1)).toFixed(2))
+        progressCb?.(progress)
+      },
+      maxBodyLength: 100 * 1024 * 1024, // 100MB
+      maxContentLength: 100 * 1024 * 1024, // 100MB
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
+  })()
+}
+
+
+async function convertBlobUrlToFormData(props: { uri: string; filename: string; dataType?: string }, fieldName: string = 'file'): Promise<FormData> {
   try {
     // Fetch the Blob from the Blob URL
     const response = await fetch(props.uri)
@@ -82,7 +148,7 @@ async function convertBlobUrlToFormData(props: { uri: string; filename: string; 
     const formData = new FormData()
 
     // Append the Blob to the FormData object
-    formData.append('file', file, props.filename) // Replace 'filename.ext' with the desired file name and extension
+    formData.append(fieldName, file, props.filename)
 
     return formData
   } catch (error) {

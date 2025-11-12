@@ -3,6 +3,7 @@ import Error404 from '@/components/404/Error404'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import * as metatags from '@/config/metatags'
+import clientEnv from '@/config/clientEnv'
 import { ForbiddenError, UnauthorizedError } from '@/core/errors'
 import EventDetailsScreen, { EventDetailsScreenDeny, EventDetailsScreenSkeleton } from '@/features/events/pages/detail/EventDetailsScreen'
 import { useGetEvent } from '@/services/events/hook'
@@ -11,6 +12,8 @@ import Head from 'expo-router/head'
 import { useHits } from '@/services/hits/hook'
 import { cleanupUrlParams } from '@/utils/urlCleanup'
 import { resolveSource } from '@/utils/sourceResolver'
+
+const BASE_URL = `https://${clientEnv.ASSOCIATED_DOMAIN}`
 
 const HomeScreen: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
@@ -49,6 +52,7 @@ function EventDetailScreen(props: Readonly<{ id: string }>) {
     source?: string
   }>()
   const sentRef = React.useRef<string | null>(null)
+  const ogUrl = `${BASE_URL}/evenements/${props.id}`
 
   React.useEffect(() => {
     if (!isEventLoading && !eventError && data) {
@@ -77,7 +81,12 @@ function EventDetailScreen(props: Readonly<{ id: string }>) {
         }}
       />
       <Head>
-        <title>{metatags.createTitle(data?.name || 'Détails de l\'événement')}</title>
+        <title>{metatags.createTitle(data?.name || "Détails de l'événement")}</title>
+        <meta key="og-title" property="og:title" content={metatags.createTitle('Rejoignez nos événements')} />
+        <meta key="og-description" property="og:description" content="Découvrez l'actualité militante et inscrivez-vous aux événements près de chez vous." />
+        <meta key="og-image" property="og:image" content={`${BASE_URL}/og-evenement.png`} />
+        <meta key="og-url" property="og:url" content={ogUrl} />
+        <meta key="og-type" property="og:type" content="event" />
       </Head>
       <EventDetailsScreen data={data} />
     </>

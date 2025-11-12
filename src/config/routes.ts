@@ -3,6 +3,7 @@ import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Li
 import { ThemeName } from 'tamagui'
 import clientEnv from './clientEnv'
 import { IconComponent } from '@/models/common.model'
+import * as magicLinkTypes from '@/services/magic-link/schema'
 
 export type TabRoute = {
   name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'parrainages' | 'questionnaires' | 'scanner'
@@ -13,6 +14,7 @@ export type TabRoute = {
   hiddenMobile?: boolean | ((profile?: RestProfilResponse) => boolean)
   disabled?: boolean
   href?: string
+  externalSlug?: magicLinkTypes.Slugs
   theme: ThemeName
 }
 
@@ -50,6 +52,7 @@ export const ROUTES: TabRoute[] = [
     theme: 'gray',
     hidden: true,
     hiddenMobile: true,
+    // externalSlug: 'formation',
   },
   {
     name: 'ressources',

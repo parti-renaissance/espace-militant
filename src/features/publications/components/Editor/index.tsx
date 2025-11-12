@@ -118,9 +118,18 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   }, [createdMessageId, scopeFromQuery, props.onMessageIdCreated])
 
   const renderFieldsRef = useRef<RenderFieldRef>(null)
+  const generateFieldId = useCallback((): string => {
+    const usedFieldIds = new Set((renderFieldsRef.current?.getFields() ?? []).map((currentField) => currentField.id))
+    let candidateId = ''
+    do {
+      candidateId = uniqueId('field_')
+    } while (usedFieldIds.has(candidateId))
+    return candidateId
+  }, [])
+
   const editorMethods = useRef({
     addField: (node: S.NodeType | S.Node, afterField?: S.FieldsArray[number], atStart?: boolean) => {
-      const field = { id: `field_${uniqueId()}`, type: typeof node === 'string' ? node : node.type }
+      const field = { id: generateFieldId(), type: typeof node === 'string' ? node : node.type }
       setValue(`formValues.${field.type}.${field.id}`, typeof node === 'string' ? createNodeByType(node) : node)
       setValue(`selectedField`, { edit: true, field })
       renderFieldsRef.current?.addField(field, afterField, atStart)
