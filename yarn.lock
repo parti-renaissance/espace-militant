@@ -6485,16 +6485,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@shopify/react-native-skia@npm:v2.0.0-next.4":
-  version: 2.0.0-next.4
-  resolution: "@shopify/react-native-skia@npm:2.0.0-next.4"
+"@shopify/react-native-skia@npm:^2.3.10":
+  version: 2.3.10
+  resolution: "@shopify/react-native-skia@npm:2.3.10"
   dependencies:
     canvaskit-wasm: "npm:0.40.0"
     react-reconciler: "npm:0.31.0"
   peerDependencies:
     react: ">=19.0"
     react-native: ">=0.78"
-    react-native-reanimated: ^3.0
+    react-native-reanimated: ">=3.19.1"
   peerDependenciesMeta:
     react-native:
       optional: true
@@ -6502,7 +6502,7 @@ __metadata:
       optional: true
   bin:
     setup-skia-web: scripts/setup-canvaskit.js
-  checksum: 10c0/a1b7be938dec0fa82d54d5271c6deed13bf149843ddb03cc3353cfd06f559fd8fec81d3d89dad21df0c1b99ba048615191bf99270d985cb6ccef22c4e099c3e0
+  checksum: 10c0/21a6c199f61e08a1dee5621ef2766f73b141871210ff8e84958856776547ada71c2a7c02444ca3c059d7586b01027d8d625383883054679f53651fb590d931b6
   languageName: node
   linkType: hard
 
@@ -28953,7 +28953,7 @@ __metadata:
     "@rnmapbox/maps": "npm:10.1.42"
     "@ronradtke/react-native-markdown-display": "npm:^8.0.0"
     "@sentry/react-native": "npm:~6.14.0"
-    "@shopify/react-native-skia": "npm:v2.0.0-next.4"
+    "@shopify/react-native-skia": "npm:^2.3.10"
     "@storybook/addon-ondevice-actions": "npm:^7.6.16"
     "@storybook/addon-ondevice-controls": "npm:^7.6.16"
     "@storybook/react-native": "npm:^7.6.16"
