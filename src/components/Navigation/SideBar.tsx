@@ -109,7 +109,7 @@ export const SideBar = ({ collapsed = false }: { collapsed?: boolean }) => {
           <NavItem iconLeft={GraduationCap} text="Formations" externalLink collapsed={collapsed} disabled />
           <NavItem iconLeft={Link} text="Ressources" isNew externalLink collapsed={collapsed} />
           <NavItem iconLeft={ClipboardCheck} text="Questionnaires" externalLink collapsed={collapsed} />
-          <YStack mt={32}>
+          <YStack mt={32} display="none">
             <NavItem iconLeft={Sparkle} text="CADRE" outlined collapsed={collapsed} iconRight={ChevronRight} theme="purple" isNew onPress={() => {
               console.log('CADRE clicked');
             }} />
