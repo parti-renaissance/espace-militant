@@ -16,6 +16,7 @@ export default function AppLayout() {
     '/publications/creer',
     '/publications/brouillons',
     '/publications',
+    '/tools/test',
   ]
 
   const isQuestionnairesRoute = segments[1] === 'questionnaires' && segments[2] === '[id]'
@@ -142,6 +143,8 @@ export default function AppLayout() {
               },
             }}
           />
+
+          <Stack.Screen name="tools/test" options={{ headerShown: false }} />
         </Stack>
       </View>
     </PortalLayout>
