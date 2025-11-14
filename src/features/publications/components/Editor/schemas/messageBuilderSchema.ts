@@ -68,7 +68,7 @@ export const ButtonNodeValidationSchema = z.object({
           if (value.startsWith('mailto:') || value.startsWith('tel:') || value.startsWith('sms:')) {
             return true
           }
-          const webRegex = /^(www\.)?[a-zA-Z0-9-_\.]+\.[a-zA-Z]+(:\d+)?(\/[a-zA-Z\d\.\-_+]*)*[a-zA-Z.!@#$%&=-_'":,.?\d*)(]*$/
+          const webRegex = /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-._]+\.[a-zA-Z]+(:\d+)?(\/[a-zA-Z\d.-_+]*)*[a-zA-Z.!@#$%&=-_'":,?\d*)]*$/
           return webRegex.test(value)
         },
         {
