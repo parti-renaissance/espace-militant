@@ -14,7 +14,7 @@ const NavItemFrame = styled(XStack, {
   paddingRight: 12,
   paddingVertical: 6,
   cursor: 'pointer',
-  backgroundColor: 'white',
+  backgroundColor: 'transparent',
   borderRadius: 8,
   userSelect: 'none',
   hoverStyle: { backgroundColor: '$gray1' },
@@ -37,8 +37,8 @@ const NavItemFrame = styled(XStack, {
       true: {
         opacity: 0.5,
         cursor: 'not-allowed',
-        hoverStyle: { backgroundColor: 'white' },
-        pressStyle: { backgroundColor: 'white' },
+        hoverStyle: { backgroundColor: 'transparent' },
+        pressStyle: { backgroundColor: 'transparent' },
       },
     },
     shape: {
