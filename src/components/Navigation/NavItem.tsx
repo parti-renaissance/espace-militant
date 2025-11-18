@@ -10,11 +10,12 @@ import ProfilePicture from '@/components/ProfilePicture/ProfilePicture'
 const NavItemFrame = styled(XStack, {
   alignItems: 'center',
   gap: 8,
+  height: 40,
   paddingLeft: 6,
   paddingRight: 12,
   paddingVertical: 6,
   cursor: 'pointer',
-  backgroundColor: 'white',
+  backgroundColor: 'transparent',
   borderRadius: 8,
   userSelect: 'none',
   hoverStyle: { backgroundColor: '$gray1' },
@@ -35,10 +36,9 @@ const NavItemFrame = styled(XStack, {
     },
     disabled: {
       true: {
-        opacity: 0.5,
         cursor: 'not-allowed',
-        hoverStyle: { backgroundColor: 'white' },
-        pressStyle: { backgroundColor: 'white' },
+        hoverStyle: { backgroundColor: 'transparent' },
+        pressStyle: { backgroundColor: 'transparent' },
       },
     },
     shape: {
@@ -55,21 +55,54 @@ const NavItemFrame = styled(XStack, {
       true: {
         width: 40,
         height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 6,
       },
     },
-    outlined: {
+  },
+} as const)
+
+const NavCadreItemFrame = styled(NavItemFrame, {
+  borderWidth: 1,
+  borderColor: '$purple5',
+  hoverStyle: {
+    backgroundColor: '$purple1',
+  },
+  pressStyle: {
+    backgroundColor: '$purple2',
+  },
+  focusVisibleStyle: {
+    outlineWidth: 2,
+    outlineColor: '$purple5',
+    outlineStyle: 'solid',
+    outlineOffset: 2,
+  },
+  variants: {
+    active: {
       true: {
-        borderWidth: 1,
-        borderColor: '$color2',
-        backgroundColor: 'transparent',
+        backgroundColor: '$purple1',
+        hoverStyle: {
+          backgroundColor: '$purple2',
+        },
+        pressStyle: {
+          backgroundColor: '$purple3',
+        },
+      },
+    },
+    disabled: {
+      true: {
+        cursor: 'not-allowed',
+        hoverStyle: { backgroundColor: 'transparent' },
+        pressStyle: { backgroundColor: 'transparent' },
       },
     },
   },
 } as const)
 
 const NewChip = () => (
-  <YStack bg="$color5" borderRadius={4} paddingHorizontal={4} paddingVertical={4}>
-    <Text fontSize={7} bold color="white">
+  <YStack bg="$color5" borderRadius={4} paddingHorizontal={4} paddingVertical={4} height={15}>
+    <Text fontSize={7} bold color="white" lineHeight={8}>
       NEW
     </Text>
   </YStack>
@@ -87,7 +120,9 @@ const IconContainer = styled(YStack, {
       default: { backgroundColor: 'white' },
       active: { backgroundColor: '$gray1' },
       danger: { backgroundColor: '#FFEBEC' },
-      disabled: { backgroundColor: '$gray1', opacity: 0.6 },
+      disabled: { backgroundColor: 'white' },
+      cadre: { backgroundColor: '$white' },
+      cadreActive: { backgroundColor: '$purple1' },
     },
   },
   defaultVariants: {
@@ -95,7 +130,7 @@ const IconContainer = styled(YStack, {
   },
 } as const)
 
-type IconTone = 'default' | 'active' | 'danger' | 'disabled'
+type IconTone = 'default' | 'active' | 'danger' | 'disabled' | 'cadre' | 'cadreActive'
 type NavItemProfilePictureProps = Omit<ComponentProps<typeof ProfilePicture>, 'rounded'> & { rounded?: boolean }
 
 type NavItemContextValue = { collapsed: boolean }
@@ -111,9 +146,9 @@ export type NavItemProps = {
   profilePicture?: NavItemProfilePictureProps
   dangerAccent?: boolean
   collapsed?: boolean
-  outlined?: boolean
   href?: Href
   onPress?: PressableProps['onPress']
+  frame?: 'default' | 'cadre'
 } & ComponentPropsWithoutRef<typeof NavItemFrame>
 
 export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
@@ -132,31 +167,31 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
       profilePicture,
       dangerAccent,
       collapsed,
-      outlined,
       tabIndex,
       role,
+      frame = 'default',
       ...props
     },
     ref,
   ) => {
     const router = useRouter()
-    const contentColor = disabled ? '$textDisabled' : '$textPrimary'
+    const contentColor = disabled ? '$gray3' : frame === 'cadre' ? '$purple6' : '$textPrimary'
 
     const iconTone = useMemo<IconTone>(() => {
       if (dangerAccent) return 'danger'
       if (disabled) return 'disabled'
+      if (frame === 'cadre' && active) return 'cadreActive'
+      if (frame === 'cadre') return 'cadre'
       if (active) return 'active'
       return 'default'
-    }, [dangerAccent, disabled, active])
+    }, [dangerAccent, disabled, active, frame])
 
-    const iconColor =
-      iconTone === 'danger'
-        ? '#FD393D'
-        : outlined
-          ? '$color5'
-          : active && theme
-            ? '$color5'
-            : contentColor
+    const iconColor = useMemo(() => {
+      if (dangerAccent) return '#FD393D'
+      if (frame === 'cadre') return '$purple5'
+      if (active) return '$color5'
+      return contentColor
+    }, [dangerAccent, disabled, active, theme, contentColor, frame])
 
     const { collapsed: contextCollapsed } = useNavItemContext()
     const resolvedCollapsed = collapsed ?? contextCollapsed
@@ -178,9 +213,9 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
         return (
           <IconContainer
             tone={iconTone}
-            marginRight={resolvedCollapsed ? 0 : 6}
-            $group-hover={{ backgroundColor: dangerAccent ? '#FFEBEC' : active ? '$gray2' : '$gray1' }}
-            $group-press={{ backgroundColor: dangerAccent ? '#FFEBEC' : active ? '$gray3' : '$gray2' }}
+            marginRight={resolvedCollapsed ? 0 : 2}
+            $group-hover={{ backgroundColor: dangerAccent ? '#FFEBEC' : (active && frame === 'cadre') ? '$purple2' : frame === 'cadre' ? '$purple1' : disabled ? 'white' : active ? '$gray2' : '$gray1' }}
+            $group-press={{ backgroundColor: dangerAccent ? '#FFEBEC' : (active && frame === 'cadre') ? '$purple3' : frame === 'cadre' ? '$purple2' : disabled ? 'white' : active ? '$gray3' : '$gray2' }}
           >
             <IconLeft size={16} color={iconColor} />
           </IconContainer>
@@ -215,11 +250,13 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
     const shouldAttachPressToFrame = !shouldRenderAsWebLink && (Boolean(onPress) || Boolean(href))
     const shouldUseButtonTag = shouldAttachPressToFrame && !disabled && isWeb
 
+    const FrameComponent = frame === 'cadre' ? NavCadreItemFrame : NavItemFrame
+
     const navItemContent = (
       <NavItemContext.Provider value={{ collapsed: resolvedCollapsed }}>
-        <NavItemFrame
+        <FrameComponent
           {...props}
-          group // <-- important : active les $group-* descendants
+          group
           active={active}
           disabled={disabled}
           theme={theme}
@@ -227,7 +264,6 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
           ref={ref}
           collapsed={resolvedCollapsed}
           shape={shape}
-          outlined={outlined}
           tabIndex={resolvedTabIndex}
           role={resolvedRole}
           tag={shouldUseButtonTag ? 'button' : undefined}
@@ -242,14 +278,14 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
                   {text}
                 </Text.MD>
               </XStack>
-              <XStack alignItems="center" gap={4}>
+              <XStack alignItems="center" gap={8}>
                 {isNew ? <NewChip /> : null}
                 {externalLink ? <ExternalLink size={12} color="$gray4" /> : null}
                 {IconRight ? <IconRight size={16} color="$color5" /> : null}
               </XStack>
             </>
           )}
-        </NavItemFrame>
+        </FrameComponent>
       </NavItemContext.Provider>
     )
 
