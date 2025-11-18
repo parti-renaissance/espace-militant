@@ -1,37 +1,75 @@
-import EuCampaignIllustration from "@/assets/illustrations/EuCampaignIllustration"
-import { styled, YStack, XStack } from "tamagui"
-import { NavItem } from "./NavItem"
-import { ClipboardCheck, Calendar, Home, Link, HeartHandshake, Zap, GraduationCap, BellOff, CaptionsOff, ChevronRight, Sparkle, ScrollText, Flag, Users, Network, Goal, Vote, RefreshCcw, CircleHelp, LifeBuoy } from "@tamagui/lucide-icons"
 import { useState } from "react"
+import { styled, YStack, XStack } from "tamagui"
+import { ClipboardCheck, Calendar, Home, Link, HeartHandshake, Zap, GraduationCap, BellOff, CaptionsOff, ChevronRight, Sparkle, ScrollText, Flag, Users, Network, Goal, Vote, RefreshCcw, CircleHelp, LifeBuoy } from "@tamagui/lucide-icons"
+import EuCampaignIllustration from "@/assets/illustrations/EuCampaignIllustration"
+import { NavItem } from "./NavItem"
 import Text from "../base/Text"
 
-const SideBarWrapper = styled(XStack, {
+export const WIDTH_MILITANT = 248;
+export const WIDTH_COLLAPSED = 58;
+export const MARGINS = {
+  small: 8,
+  medium: 12,
+  large: 16,
+};
+
+
+export type SideBarState = 'floating' | 'militant' | 'collapsed' | 'cadre'
+
+export const SideBarArea = styled(XStack, {
   position: 'relative',
   zIndex: 100,
   justifyContent: 'flex-start',
-  $lg: {
-    width: 248 + 8,
+  variants: {
+    state: {
+      floating: {
+        width: 0,
+      },
+      militant: {
+        $lg: {
+          width: WIDTH_MILITANT + MARGINS.small,
+        },
+        $xl: {
+          width: WIDTH_MILITANT + MARGINS.medium,
+        },
+        width: WIDTH_MILITANT + MARGINS.large,
+      },
+      collapsed: {
+        $lg: {
+          width: WIDTH_COLLAPSED + MARGINS.small,
+        },
+        $xl: {
+          width: WIDTH_COLLAPSED + MARGINS.medium,
+        },
+        width: WIDTH_COLLAPSED + MARGINS.large,
+      },
+      cadre: {
+        $lg: {
+          width: MARGINS.small + WIDTH_COLLAPSED + MARGINS.small + WIDTH_MILITANT,
+        },
+        $xl: {
+          width: MARGINS.medium + WIDTH_COLLAPSED + MARGINS.medium + WIDTH_MILITANT,
+        },
+        width: MARGINS.large + WIDTH_COLLAPSED + MARGINS.large + WIDTH_MILITANT,
+      },
+    },
   },
-  $xl: {
-    width: 248 + 12,
+  defaultVariants: {
+    state: 'militant',
   },
-  width: 248 + 16,
 })
 
 const SideBarContainer = styled(YStack, {
   $lg: {
-    marginTop: 8,
-    marginBottom: 8,
-    marginLeft: 8,
+    my: MARGINS.small,
+    ml: MARGINS.small,
   },
   $xl: {
-    marginTop: 12,
-    marginBottom: 12,
-    marginLeft: 12,
+    my: MARGINS.medium,
+    ml: MARGINS.medium,
   },
-  marginTop: 16,
-  marginBottom: 16,
-  marginLeft: 16,
+  my: MARGINS.large,
+  ml: MARGINS.large,
 
   paddingTop: 20,
   paddingBottom: 8,
@@ -44,14 +82,33 @@ const SideBarContainer = styled(YStack, {
   borderWidth: 1,
   borderStyle: 'solid',
   borderColor: '$textOutline',
-  width: 248,
+  width: WIDTH_MILITANT,
   justifyContent: 'space-between',
   gap: 16,
   variants: {
     collapsed: {
       true: {
-        width: 58,
+        width: WIDTH_COLLAPSED,
         alignItems: 'center',
+      },
+    },
+    isMilitantInCadreMode: {
+      true: {
+        borderTopRightRadius: 4,
+        borderBottomRightRadius: 4,
+      },
+    },
+    isCadre: {
+      true: {
+        $lg: {
+          marginLeft: 4,
+        },
+        $xl: {
+          marginLeft: 4,
+        },
+        marginLeft: 4,
+        borderTopLeftRadius: 4,
+        borderBottomLeftRadius: 4,
       },
     },
   },
@@ -59,6 +116,7 @@ const SideBarContainer = styled(YStack, {
 
 const LogoContainer = styled(YStack, {
   paddingHorizontal: 8,
+  paddingVertical: 8,
   variants: {
     collapsed: {
       true: {
@@ -107,12 +165,16 @@ const Line = styled(YStack, {
   top: -12,
 })
 
-export const SideBar = () => {
+interface SideBarProps {
+  state?: SideBarState
+}
+
+export const SideBar = ({ state = 'militant' }: SideBarProps) => {
   const [displayNavCadre, setDisplayNavCadre] = useState(false)
 
   return (
-    <SideBarWrapper>
-      <SideBarContainer collapsed={displayNavCadre}>
+    <SideBarArea state={state}>
+      <SideBarContainer collapsed={displayNavCadre} isMilitantInCadreMode={displayNavCadre}>
         <LogoContainer collapsed={displayNavCadre}>
           <EuCampaignIllustration showText={!displayNavCadre} />
         </LogoContainer>
@@ -125,7 +187,7 @@ export const SideBar = () => {
           <NavItem iconLeft={Link} text="Ressources" isNew externalLink collapsed={displayNavCadre} />
           <NavItem iconLeft={ClipboardCheck} text="Questionnaires" externalLink collapsed={displayNavCadre} />
           <YStack mt={32}>
-            <NavItem iconLeft={Sparkle} text="CADRE" outlined collapsed={displayNavCadre} iconRight={ChevronRight} theme="purple" isNew onPress={() => {
+            <NavItem iconLeft={Sparkle} frame="cadre" active={displayNavCadre} text="CADRE" collapsed={displayNavCadre} iconRight={ChevronRight} theme="purple" isNew onPress={() => {
               setDisplayNavCadre(!displayNavCadre);
             }} />
           </YStack>
@@ -142,7 +204,7 @@ export const SideBar = () => {
       </SideBarContainer>
       {
         displayNavCadre && (
-          <SideBarContainer>
+          <SideBarContainer isCadre>
             <LogoContainer >
               <Text fontSize={20} medium>CADRE</Text>
             </LogoContainer>
@@ -150,12 +212,12 @@ export const SideBar = () => {
 
             </YStack>
             <MenuContainer>
-              <Line/>
-              <NavItem iconLeft={ScrollText} text="Mes publications" theme="purple" active={displayNavCadre}/>
+              <Line />
+              <NavItem iconLeft={ScrollText} text="Mes publications" theme="purple" active={displayNavCadre} />
               <NavItem iconLeft={Flag} text="Mes militants" theme="purple" externalLink />
               <NavItem iconLeft={Users} text="Mon équipe" theme="purple" externalLink />
               <NavItem iconLeft={Network} text="Gestion des comités" theme="purple" externalLink />
-              <NavItem iconLeft={Goal} text="Gestion des circonscriptions" theme="purple" externalLink />
+              <NavItem iconLeft={Goal} disabled text="Gestion des circonscriptions" theme="purple" externalLink />
               <NavItem iconLeft={Vote} text="Votes et consultations" theme="purple" externalLink />
             </MenuContainer>
             <MenuFooterContainer>
@@ -166,6 +228,6 @@ export const SideBar = () => {
           </SideBarContainer>
         )
       }
-    </SideBarWrapper>
+    </SideBarArea>
   )
 }

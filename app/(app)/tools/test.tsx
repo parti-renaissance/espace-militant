@@ -1,12 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Head from 'expo-router/head'
 import * as metatags from '@/config/metatags'
-import { ScrollView, View, XStack, YStack, styled } from 'tamagui'
-import { SideBar } from '@/components/Navigation/SideBar'
+import { YStack } from 'tamagui'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import Text from '@/components/base/Text'
-import { VoxButton } from '@/components/Button/Button'
-import { Menu } from '@tamagui/lucide-icons'
+import Layout from '@/components/Navigation/Layout'
 
 function TestScreen() {
   return (
@@ -19,37 +17,13 @@ function TestScreen() {
   )
 }
 
-const LayoutContainer = styled(XStack, {
-  $lg: {
-    marginTop: 8,
-    marginBottom: 8,
-    marginLeft: 8,
-    gap: 8,
-  },
-  $xl: {
-    marginTop: 12,
-    marginBottom: 12,
-    marginLeft: 12,
-    gap: 12,
-  },
-
-  marginTop: 16,
-  marginBottom: 16,
-  marginLeft: 16,
-  gap: 16,
-
-  justifyContent: 'center',
-})
-
 const TestPage = () => {
   return (
-    <View flex={1} backgroundColor="$textSurface">
-      <XStack flex={1}>
-        <SideBar />
-        <ScrollView flex={1}>
-          <LayoutContainer>
-            <View flex={2} maxWidth={520}>
-              <YStack gap={16}>
+    <Layout sidebarState="militant">
+      <Layout.ScrollView>
+        <Layout.Container>
+          <Layout.Main>
+            <YStack gap={16}>
                 <VoxCard>
                   <VoxCard.Content>
                     <Text.LG>Test 1</Text.LG>
@@ -95,20 +69,18 @@ const TestPage = () => {
                     <Text.MD>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sed pellentesque libero, id lobortis elit. Aliquam ut urna ex. Aliquam et nisi risus. Donec tortor purus, molestie eu sem sed, hendrerit ullamcorper felis. Proin ut velit id dui venenatis feugiat. Nullam sed orci urna. Phasellus sollicitudin risus id tellus mattis finibus. Donec turpis nunc, malesuada nec convallis suscipit, faucibus in dolor. Curabitur non diam in dolor porta hendrerit eu sit amet ex.</Text.MD>
                   </VoxCard.Content>
                 </VoxCard>
-              </YStack>
-            </View>
-            <View flex={1} maxWidth={280} height={400} position="sticky" top={8}>
-              <VoxCard>
-                <VoxCard.Content>
-                  <Text.LG>Side Bar</Text.LG>
-                </VoxCard.Content>
-              </VoxCard>
-            </View>
-          </LayoutContainer>
-        </ScrollView>
-      </XStack>
-
-    </View>
+            </YStack>
+          </Layout.Main>
+          <Layout.SideBar isSticky maxWidth={280} height={400}>
+            <VoxCard>
+              <VoxCard.Content>
+                <Text.LG>Side Bar</Text.LG>
+              </VoxCard.Content>
+            </VoxCard>
+          </Layout.SideBar>
+        </Layout.Container>
+      </Layout.ScrollView>
+    </Layout>
   )
 }
 
