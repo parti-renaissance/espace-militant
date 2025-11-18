@@ -1,4 +1,4 @@
-import { ComponentProps, ComponentPropsWithoutRef, createContext, forwardRef, useContext, useMemo } from 'react'
+import { ComponentProps, ComponentPropsWithoutRef, createContext, forwardRef, useContext, useMemo, useRef, useState } from 'react'
 import { ExternalLink } from '@tamagui/lucide-icons'
 import { styled, TamaguiElement, XStack, YStack, isWeb } from 'tamagui'
 import { Link, useRouter, type Href } from 'expo-router'
@@ -6,6 +6,7 @@ import type { PressableProps } from 'react-native'
 import Text from '@/components/base/Text'
 import type { IconComponent } from '@/models/common.model'
 import ProfilePicture from '@/components/ProfilePicture/ProfilePicture'
+import { NavItemDropdown, type NavItemSubItem } from './NavItemDropdown'
 
 const NavItemFrame = styled(XStack, {
   alignItems: 'center',
@@ -24,7 +25,7 @@ const NavItemFrame = styled(XStack, {
     outlineWidth: 2,
     outlineColor: '$color5',
     outlineStyle: 'solid',
-    outlineOffset: 2,
+    outlineOffset: 0,
   },
   variants: {
     active: {
@@ -76,7 +77,7 @@ const NavCadreItemFrame = styled(NavItemFrame, {
     outlineWidth: 2,
     outlineColor: '$purple5',
     outlineStyle: 'solid',
-    outlineOffset: 2,
+    outlineOffset: 0,
   },
   variants: {
     active: {
@@ -149,6 +150,8 @@ export type NavItemProps = {
   href?: Href
   onPress?: PressableProps['onPress']
   frame?: 'default' | 'cadre'
+  subItems?: NavItemSubItem[]
+  dropdownVerticalPosition?: 'top' | 'bottom' // Position verticale du dropdown
 } & ComponentPropsWithoutRef<typeof NavItemFrame>
 
 export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
@@ -170,11 +173,15 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
       tabIndex,
       role,
       frame = 'default',
+      subItems,
+      dropdownVerticalPosition = 'bottom',
       ...props
     },
     ref,
   ) => {
     const router = useRouter()
+    const [dropdownOpen, setDropdownOpen] = useState(false)
+    const frameRef = useRef<HTMLElement | null>(null)
     const contentColor = disabled ? '$gray3' : frame === 'cadre' ? '$purple6' : '$textPrimary'
 
     const iconTone = useMemo<IconTone>(() => {
@@ -239,6 +246,13 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
         }
         return
       }
+      
+      // Si le NavItem a des subItems, ouvrir le dropdown au lieu de naviguer
+      if (subItems && subItems.length > 0) {
+        setDropdownOpen(!dropdownOpen)
+        return
+      }
+      
       onPress?.(event)
       if (href && !isWeb) {
         router.push(href)
@@ -247,7 +261,8 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
 
     const resolvedTabIndex = shouldRenderAsWebLink ? undefined : tabIndex ?? (disabled ? -1 : 0)
     const resolvedRole = shouldRenderAsWebLink ? role : role ?? 'button'
-    const shouldAttachPressToFrame = !shouldRenderAsWebLink && (Boolean(onPress) || Boolean(href))
+    // Attacher onPress au Frame si on a subItems, onPress, href, ou si ce n'est pas un lien web
+    const shouldAttachPressToFrame = (Boolean(subItems && subItems.length > 0)) || (!shouldRenderAsWebLink && (Boolean(onPress) || Boolean(href)))
     const shouldUseButtonTag = shouldAttachPressToFrame && !disabled && isWeb
 
     const FrameComponent = frame === 'cadre' ? NavCadreItemFrame : NavItemFrame
@@ -261,7 +276,14 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
           disabled={disabled}
           theme={theme}
           onPress={shouldAttachPressToFrame ? handlePress : undefined}
-          ref={ref}
+          ref={(node) => {
+            if (typeof ref === 'function') {
+              ref(node)
+            } else if (ref) {
+              ref.current = node
+            }
+            frameRef.current = node as HTMLElement | null
+          }}
           collapsed={resolvedCollapsed}
           shape={shape}
           tabIndex={resolvedTabIndex}
@@ -289,20 +311,36 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
       </NavItemContext.Provider>
     )
 
-    if (shouldRenderAsWebLink && href) {
-      return (
-        <Link
-          href={href}
-          onPress={handlePress}
-          style={{ textDecorationLine: 'none' }}
-          aria-disabled={disabled || undefined}
-        >
-          {navItemContent}
-        </Link>
-      )
-    }
+    // Si on a des subItems, on ne doit pas utiliser Link même si href est défini
+    const shouldUseLink = shouldRenderAsWebLink && href && !(subItems && subItems.length > 0)
+    
+    const navItemWithDropdown = (
+      <>
+        {shouldUseLink ? (
+          <Link
+            href={href}
+            onPress={handlePress}
+            style={{ textDecorationLine: 'none' }}
+            aria-disabled={disabled || undefined}
+          >
+            {navItemContent}
+          </Link>
+        ) : (
+          navItemContent
+        )}
+        {subItems && subItems.length > 0 && (
+          <NavItemDropdown
+            open={dropdownOpen}
+            onClose={() => setDropdownOpen(false)}
+            subItems={subItems}
+            triggerRef={frameRef}
+            verticalPosition={dropdownVerticalPosition}
+          />
+        )}
+      </>
+    )
 
-    return navItemContent
+    return navItemWithDropdown
   },
 )
 

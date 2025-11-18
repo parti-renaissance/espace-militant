@@ -1,8 +1,9 @@
 import { useState } from "react"
 import { styled, YStack, XStack } from "tamagui"
-import { ClipboardCheck, Calendar, Home, Link, HeartHandshake, Zap, GraduationCap, BellOff, CaptionsOff, ChevronRight, Sparkle, ScrollText, Flag, Users, Network, Goal, Vote, RefreshCcw, CircleHelp, LifeBuoy } from "@tamagui/lucide-icons"
+import { ClipboardCheck, Calendar, Home, Link, HeartHandshake, Zap, GraduationCap, BellOff, CaptionsOff, ChevronRight, Sparkle, ScrollText, Flag, Users, Network, Goal, Vote, RefreshCcw, CircleHelp, LifeBuoy, FileText, Settings, Ellipsis } from "@tamagui/lucide-icons"
 import EuCampaignIllustration from "@/assets/illustrations/EuCampaignIllustration"
 import { NavItem } from "./NavItem"
+import { ScopeSelector } from "./ScopeSelector"
 import Text from "../base/Text"
 
 export const WIDTH_MILITANT = 248;
@@ -18,7 +19,7 @@ export type SideBarState = 'floating' | 'militant' | 'collapsed' | 'cadre'
 
 export const SideBarArea = styled(XStack, {
   position: 'relative',
-  zIndex: 100,
+  zIndex: 1000,
   justifyContent: 'flex-start',
   variants: {
     state: {
@@ -157,12 +158,12 @@ const MenuFooterContainer = styled(YStack, {
 } as const)
 
 const Line = styled(YStack, {
-  height: 44 * 6,
+  height: 44 * 7,
   width: 1,
   backgroundColor: '$purple3',
   position: 'absolute',
   left: 20,
-  top: -12,
+  top: -16,
 })
 
 interface SideBarProps {
@@ -171,6 +172,11 @@ interface SideBarProps {
 
 export const SideBar = ({ state = 'militant' }: SideBarProps) => {
   const [displayNavCadre, setDisplayNavCadre] = useState(false)
+  const [selectedScope, setSelectedScope] = useState<{ id: string; name: string; role?: string } | undefined>({
+    id: 'scope-92',
+    name: 'Assemblée - Hauts-de-Seine (92)',
+    role: 'Responsable communication',
+  })
 
   return (
     <SideBarArea state={state}>
@@ -186,6 +192,41 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
           <NavItem iconLeft={GraduationCap} text="Formations" externalLink collapsed={displayNavCadre} disabled />
           <NavItem iconLeft={Link} text="Ressources" isNew externalLink collapsed={displayNavCadre} />
           <NavItem iconLeft={ClipboardCheck} text="Questionnaires" externalLink collapsed={displayNavCadre} />
+          <NavItem
+            iconLeft={Ellipsis}
+            text="Plus"
+            collapsed={displayNavCadre}
+            dropdownVerticalPosition="top"
+            subItems={[
+              {
+                id: 'plus-documents',
+                text: 'Documents',
+                customContent: (
+                  <NavItem
+                    text="Documents"
+                    iconLeft={FileText}
+                    onPress={() => {
+                      console.log('Documents sélectionné')
+                    }}
+                  />
+                )
+              },
+              {
+                id: 'plus-parametres',
+                text: 'Autres',
+                customContent: (
+                  <NavItem
+                    text="Autres"
+                    iconLeft={Settings}
+                    isNew
+                    onPress={() => {
+                      console.log('Autres sélectionné')
+                    }}
+                  />
+                )
+              },
+            ]}
+          />
           <YStack mt={32}>
             <NavItem iconLeft={Sparkle} frame="cadre" active={displayNavCadre} text="CADRE" collapsed={displayNavCadre} iconRight={ChevronRight} theme="purple" isNew onPress={() => {
               setDisplayNavCadre(!displayNavCadre);
@@ -209,7 +250,30 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
               <Text fontSize={20} medium>CADRE</Text>
             </LogoContainer>
             <YStack>
-
+              <ScopeSelector
+                scopes={[
+                  {
+                    id: 'scope-92',
+                    name: 'Assemblée - Hauts-de-Seine (92)',
+                    role: 'Responsable communication',
+                  },
+                  {
+                    id: 'scope-75',
+                    name: 'Hauts-de-Seine (92-3)',
+                    role: 'Délégué de circonscription',
+                  },
+                  {
+                    id: 'scope-13',
+                    name: 'La Garenne-Colombes',
+                    role: 'Responsable comité local',
+                  },
+                ]}
+                selectedScope={selectedScope}
+                onScopeSelect={(scope) => {
+                  setSelectedScope(scope)
+                  console.log('Scope sélectionné:', scope)
+                }}
+              />
             </YStack>
             <MenuContainer>
               <Line />
@@ -219,6 +283,43 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
               <NavItem iconLeft={Network} text="Gestion des comités" theme="purple" externalLink />
               <NavItem iconLeft={Goal} disabled text="Gestion des circonscriptions" theme="purple" externalLink />
               <NavItem iconLeft={Vote} text="Votes et consultations" theme="purple" externalLink />
+              <NavItem
+                iconLeft={Ellipsis}
+                text="Plus"
+                dropdownVerticalPosition="top"
+                subItems={[
+                  {
+                    id: 'plus-espace-cadre',
+                    text: 'Espace cadre',
+                    customContent: (
+                      <NavItem
+                        text="Espace cadre"
+                        theme="purple"
+                        iconLeft={ScrollText}
+                        externalLink
+                        onPress={() => {
+                          console.log('Espace cadre sélectionné')
+                        }}
+                      />
+                    )
+                  },
+                  {
+                    id: 'plus-parametres',
+                    text: 'Autres',
+                    customContent: (
+                      <NavItem
+                        text="Autres"
+                        theme="purple"
+                        iconLeft={Settings}
+                        isNew
+                        onPress={() => {
+                          console.log('Autres sélectionné')
+                        }}
+                      />
+                    )
+                  },
+                ]}
+              />
             </MenuContainer>
             <MenuFooterContainer>
               <NavItem iconLeft={RefreshCcw} text="Dernières mises à jour" theme="purple" />
