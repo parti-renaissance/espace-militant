@@ -171,7 +171,7 @@ interface SideBarProps {
 }
 
 export const SideBar = ({ state = 'militant' }: SideBarProps) => {
-  const [displayNavCadre, setDisplayNavCadre] = useState(false)
+  const [displayNavCadre, setDisplayNavCadre] = useState(state === 'cadre')
   const [selectedScope, setSelectedScope] = useState<{ id: string; name: string; role?: string } | undefined>({
     id: 'scope-92',
     name: 'Assemblée - Hauts-de-Seine (92)',
@@ -186,12 +186,12 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
         </LogoContainer>
         <MenuContainer collapsed={displayNavCadre}>
           <NavItem iconLeft={Home} text="Accueil" active={!displayNavCadre} collapsed={displayNavCadre} href="/" />
-          <NavItem iconLeft={Calendar} text="Événements" collapsed={displayNavCadre} />
-          <NavItem iconLeft={Zap} text="Actions" collapsed={displayNavCadre} />
-          <NavItem iconLeft={HeartHandshake} text="Parrainages" isNew collapsed={displayNavCadre} />
+          <NavItem iconLeft={Calendar} text="Événements" collapsed={displayNavCadre} href="/tools/test" />
+          <NavItem iconLeft={Zap} text="Actions" collapsed={displayNavCadre} href="/tools/test" />
+          <NavItem iconLeft={HeartHandshake} text="Parrainages" isNew collapsed={displayNavCadre} href="/tools/test" />
           <NavItem iconLeft={GraduationCap} text="Formations" externalLink collapsed={displayNavCadre} disabled />
-          <NavItem iconLeft={Link} text="Ressources" isNew externalLink collapsed={displayNavCadre} />
-          <NavItem iconLeft={ClipboardCheck} text="Questionnaires" externalLink collapsed={displayNavCadre} />
+          <NavItem iconLeft={Link} text="Ressources" isNew externalLink collapsed={displayNavCadre} href="/tools/test" />
+          <NavItem iconLeft={ClipboardCheck} text="Questionnaires" externalLink collapsed={displayNavCadre} href="/tools/test" />
           <NavItem
             iconLeft={Ellipsis}
             text="Plus"
@@ -277,7 +277,7 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
             </YStack>
             <MenuContainer>
               <Line />
-              <NavItem iconLeft={ScrollText} text="Mes publications" theme="purple" active={displayNavCadre} />
+              <NavItem iconLeft={ScrollText} text="Mes publications" theme="purple" active={displayNavCadre && state === 'cadre'} href="/tools/test/cadre" />
               <NavItem iconLeft={Flag} text="Mes militants" theme="purple" externalLink />
               <NavItem iconLeft={Users} text="Mon équipe" theme="purple" externalLink />
               <NavItem iconLeft={Network} text="Gestion des comités" theme="purple" externalLink />
