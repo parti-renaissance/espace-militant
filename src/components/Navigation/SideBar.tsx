@@ -1,10 +1,13 @@
-import { useState } from "react"
+import { ComponentProps, useState } from "react"
 import { styled, YStack, XStack } from "tamagui"
 import { ClipboardCheck, Calendar, Home, Link, HeartHandshake, Zap, GraduationCap, BellOff, CaptionsOff, ChevronRight, Sparkle, ScrollText, Flag, Users, Network, Goal, Vote, RefreshCcw, CircleHelp, LifeBuoy, FileText, Settings, Ellipsis } from "@tamagui/lucide-icons"
 import EuCampaignIllustration from "@/assets/illustrations/EuCampaignIllustration"
 import { NavItem } from "./NavItem"
 import { ScopeSelector } from "./ScopeSelector"
 import Text from "../base/Text"
+import type { NavItemSubItem } from "./NavItemDropdown"
+import { useVisibleNavItems } from "./useVisibleNavItems"
+import type { Href } from "expo-router"
 
 export const WIDTH_MILITANT = 248;
 export const WIDTH_COLLAPSED = 58;
@@ -141,11 +144,6 @@ const MenuContainer = styled(YStack, {
   },
 } as const)
 
-const MenuItem = styled(XStack, {
-  height: 40,
-  backgroundColor: 'yellow',
-})
-
 const MenuFooterContainer = styled(YStack, {
   gap: 4,
   variants: {
@@ -170,6 +168,20 @@ interface SideBarProps {
   state?: SideBarState
 }
 
+type NavItemConfig = {
+  id: string
+  iconLeft: typeof Home
+  text: string
+  href?: ComponentProps<typeof NavItem>['href']
+  isNew?: boolean
+  externalLink?: boolean
+  disabled?: boolean
+  active?: boolean
+  onPress?: () => void
+  theme?: 'blue' | 'purple'
+  frame?: 'default' | 'cadre'
+}
+
 export const SideBar = ({ state = 'militant' }: SideBarProps) => {
   const [displayNavCadre, setDisplayNavCadre] = useState(state === 'cadre')
   const [selectedScope, setSelectedScope] = useState<{ id: string; name: string; role?: string } | undefined>({
@@ -177,6 +189,84 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
     name: 'Assemblée - Hauts-de-Seine (92)',
     role: 'Responsable communication',
   })
+  
+  // Configuration des items du menu militant
+  const militantNavItems: NavItemConfig[] = [
+    { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/', active: !displayNavCadre },
+    { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/tools/test' },
+    { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/tools/test' },
+    { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', isNew: true, href: '/tools/test' },
+    { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalLink: true, disabled: true },
+    { id: 'ressources', iconLeft: Link, text: 'Ressources', isNew: true, externalLink: true, href: '/tools/test' },
+    { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', externalLink: true, href: '/tools/test' },
+  ]
+
+  // Configuration des items du menu cadre
+  const cadreNavItems: NavItemConfig[] = [
+    { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', active: displayNavCadre && state === 'cadre', href: '/tools/test/cadre' },
+    { id: 'militants', iconLeft: Flag, text: 'Mes militants', theme: 'purple', externalLink: true },
+    { id: 'equipe', iconLeft: Users, text: 'Mon équipe', theme: 'purple', externalLink: true },
+    { id: 'comites', iconLeft: Network, text: 'Gestion des comités', theme: 'purple', externalLink: true },
+    { id: 'circonscriptions', iconLeft: Goal, text: 'Gestion des circonscriptions', theme: 'purple', disabled: true, externalLink: true },
+    { id: 'votes', iconLeft: Vote, text: 'Votes et consultations', theme: 'purple', externalLink: true },
+  ]
+
+  // Utiliser le hook pour gérer la visibilité des items du menu militant
+  const {
+    visibleItems: visibleMilitantNavItems,
+    hiddenItems: hiddenMilitantNavItems,
+    onLayout: onMilitantMenuLayout,
+  } = useVisibleNavItems<NavItemConfig>({
+    items: militantNavItems,
+    hasCadreButton: true,
+    isVisible: true,
+  })
+
+  // Utiliser le hook pour gérer la visibilité des items du menu cadre
+  const {
+    visibleItems: visibleCadreNavItems,
+    hiddenItems: hiddenCadreNavItems,
+    onLayout: onCadreMenuLayout,
+  } = useVisibleNavItems<NavItemConfig>({
+    items: cadreNavItems,
+    hasCadreButton: false,
+    isVisible: displayNavCadre,
+  })
+
+  // Créer les subItems pour le menu "Plus" militant
+  const militantPlusSubItems: NavItemSubItem[] = hiddenMilitantNavItems.map((item) => ({
+      id: `plus-${item.id}`,
+      text: item.text,
+      customContent: (
+        <NavItem
+          text={item.text}
+          iconLeft={item.iconLeft}
+          href={item.href}
+          isNew={item.isNew}
+          externalLink={item.externalLink}
+          disabled={item.disabled}
+          active={item.active}
+          onPress={item.onPress}
+        />
+      )
+    }))
+
+  const cadrePlusSubItems: NavItemSubItem[] =  hiddenCadreNavItems.map((item) => ({
+      id: `plus-${item.id}`,
+      text: item.text,
+      customContent: (
+        <NavItem
+          text={item.text}
+          iconLeft={item.iconLeft}
+          theme={item.theme}
+          href={item.href}
+          isNew={item.isNew}
+          externalLink={item.externalLink}
+          disabled={item.disabled}
+          active={item.active}
+      />
+    )
+  }))
 
   return (
     <SideBarArea state={state}>
@@ -184,49 +274,30 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
         <LogoContainer collapsed={displayNavCadre}>
           <EuCampaignIllustration showText={!displayNavCadre} />
         </LogoContainer>
-        <MenuContainer collapsed={displayNavCadre}>
-          <NavItem iconLeft={Home} text="Accueil" active={!displayNavCadre} collapsed={displayNavCadre} href="/" />
-          <NavItem iconLeft={Calendar} text="Événements" collapsed={displayNavCadre} href="/tools/test" />
-          <NavItem iconLeft={Zap} text="Actions" collapsed={displayNavCadre} href="/tools/test" />
-          <NavItem iconLeft={HeartHandshake} text="Parrainages" isNew collapsed={displayNavCadre} href="/tools/test" />
-          <NavItem iconLeft={GraduationCap} text="Formations" externalLink collapsed={displayNavCadre} disabled />
-          <NavItem iconLeft={Link} text="Ressources" isNew externalLink collapsed={displayNavCadre} href="/tools/test" />
-          <NavItem iconLeft={ClipboardCheck} text="Questionnaires" externalLink collapsed={displayNavCadre} href="/tools/test" />
-          <NavItem
-            iconLeft={Ellipsis}
-            text="Plus"
-            collapsed={displayNavCadre}
-            dropdownVerticalPosition="top"
-            subItems={[
-              {
-                id: 'plus-documents',
-                text: 'Documents',
-                customContent: (
-                  <NavItem
-                    text="Documents"
-                    iconLeft={FileText}
-                    onPress={() => {
-                      console.log('Documents sélectionné')
-                    }}
-                  />
-                )
-              },
-              {
-                id: 'plus-parametres',
-                text: 'Autres',
-                customContent: (
-                  <NavItem
-                    text="Autres"
-                    iconLeft={Settings}
-                    isNew
-                    onPress={() => {
-                      console.log('Autres sélectionné')
-                    }}
-                  />
-                )
-              },
-            ]}
-          />
+        <MenuContainer collapsed={displayNavCadre} onLayout={onMilitantMenuLayout}>
+          {visibleMilitantNavItems.map((item) => (
+            <NavItem
+              key={item.id}
+              iconLeft={item.iconLeft}
+              text={item.text}
+              href={item.href}
+              isNew={item.isNew}
+              externalLink={item.externalLink}
+              disabled={item.disabled}
+              active={item.active}
+              collapsed={displayNavCadre}
+              onPress={item.onPress}
+            />
+          ))}
+          {hiddenMilitantNavItems.length > 0 && (
+            <NavItem
+              iconLeft={Ellipsis}
+              text="Plus"
+              collapsed={displayNavCadre}
+              dropdownVerticalPosition="top"
+              subItems={militantPlusSubItems}
+            />
+          )}
           <YStack mt={32}>
             <NavItem iconLeft={Sparkle} frame="cadre" active={displayNavCadre} text="CADRE" collapsed={displayNavCadre} iconRight={ChevronRight} theme="purple" isNew onPress={() => {
               setDisplayNavCadre(!displayNavCadre);
@@ -275,51 +346,30 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
                 }}
               />
             </YStack>
-            <MenuContainer>
+            <MenuContainer onLayout={onCadreMenuLayout}>
               <Line />
-              <NavItem iconLeft={ScrollText} text="Mes publications" theme="purple" active={displayNavCadre && state === 'cadre'} href="/tools/test/cadre" />
-              <NavItem iconLeft={Flag} text="Mes militants" theme="purple" externalLink />
-              <NavItem iconLeft={Users} text="Mon équipe" theme="purple" externalLink />
-              <NavItem iconLeft={Network} text="Gestion des comités" theme="purple" externalLink />
-              <NavItem iconLeft={Goal} disabled text="Gestion des circonscriptions" theme="purple" externalLink />
-              <NavItem iconLeft={Vote} text="Votes et consultations" theme="purple" externalLink />
-              <NavItem
-                iconLeft={Ellipsis}
-                text="Plus"
-                dropdownVerticalPosition="top"
-                subItems={[
-                  {
-                    id: 'plus-espace-cadre',
-                    text: 'Espace cadre',
-                    customContent: (
-                      <NavItem
-                        text="Espace cadre"
-                        theme="purple"
-                        iconLeft={ScrollText}
-                        externalLink
-                        onPress={() => {
-                          console.log('Espace cadre sélectionné')
-                        }}
-                      />
-                    )
-                  },
-                  {
-                    id: 'plus-parametres',
-                    text: 'Autres',
-                    customContent: (
-                      <NavItem
-                        text="Autres"
-                        theme="purple"
-                        iconLeft={Settings}
-                        isNew
-                        onPress={() => {
-                          console.log('Autres sélectionné')
-                        }}
-                      />
-                    )
-                  },
-                ]}
-              />
+              {visibleCadreNavItems.map((item) => (
+                <NavItem
+                  key={item.id}
+                  iconLeft={item.iconLeft}
+                  text={item.text}
+                  theme={item.theme}
+                  href={item.href}
+                  isNew={item.isNew}
+                  externalLink={item.externalLink}
+                  disabled={item.disabled}
+                  active={item.active}
+                />
+              ))}
+              {hiddenCadreNavItems.length > 0 && (
+                <NavItem
+                  iconLeft={Ellipsis}
+                  text="Plus"
+                  theme="purple"
+                  dropdownVerticalPosition="top"
+                  subItems={cadrePlusSubItems}
+                />
+              )}
             </MenuContainer>
             <MenuFooterContainer>
               <NavItem iconLeft={RefreshCcw} text="Dernières mises à jour" theme="purple" />

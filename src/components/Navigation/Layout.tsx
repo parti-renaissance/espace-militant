@@ -64,9 +64,10 @@ const Layout = ({ children, sidebarState, ...props }: LayoutProps) => {
   return (
     <LayoutRoot {...props}>
       <LayoutWrapper>
-        {sidebarState && <SideBar state={sidebarState} />}
+        {sidebarState && <SideBar state={sidebarState} /* TODO: pass nav config here */ />}
         {children}
       </LayoutWrapper>
+      {/* TODO: Add navbar here */}
     </LayoutRoot>
   )
 }
