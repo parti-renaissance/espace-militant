@@ -145,7 +145,7 @@ export default function AppLayout() {
             }}
           />
 
-          <Stack.Screen name="tools/test" options={{ headerShown: false }} />
+          <Stack.Screen name="tools/test/index" options={{ headerShown: false }} />
           <Stack.Screen name="tools/test/cadre" options={{ headerShown: false }} />
         </Stack>
       </View>

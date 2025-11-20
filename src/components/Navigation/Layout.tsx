@@ -1,6 +1,8 @@
 import React from 'react'
-import { ScrollView, View, XStack, styled, withStaticProperties, ViewProps } from 'tamagui'
+import { ScrollView, View, XStack, styled, withStaticProperties, ViewProps, useMedia } from 'tamagui'
 import { SideBar, SideBarState } from '@/components/Navigation/SideBar'
+import ConfigurableTabBar from '@/components/Navigation/TabBar'
+
 
 const LayoutRoot = styled(View, {
   flex: 1,
@@ -61,12 +63,17 @@ interface LayoutProps extends ViewProps {
 }
 
 const Layout = ({ children, sidebarState, ...props }: LayoutProps) => {
+  const media = useMedia()
+
   return (
     <LayoutRoot {...props}>
       <LayoutWrapper>
-        {sidebarState && <SideBar state={sidebarState} />}
+        {sidebarState && media.gtSm && <SideBar state={sidebarState} />}
         {children}
       </LayoutWrapper>
+      {!media.gtSm && (
+        <ConfigurableTabBar tabOrder={['accueil', 'evenements', 'cadreSheet', 'actions', 'more']} />
+      )}
     </LayoutRoot>
   )
 }
@@ -120,4 +127,3 @@ export default withStaticProperties(Layout, {
   Main,
   SideBar: SideBarComponent,
 })
-
