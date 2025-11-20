@@ -1,4 +1,4 @@
-import { ComponentProps, useState } from "react"
+import { ComponentProps, useState, useMemo } from "react"
 import { styled, YStack, XStack } from "tamagui"
 import { ClipboardCheck, Calendar, Home, Link, HeartHandshake, Zap, GraduationCap, BellOff, CaptionsOff, ChevronRight, Sparkle, ScrollText, Flag, Users, Network, Goal, Vote, RefreshCcw, CircleHelp, LifeBuoy, FileText, Settings, Ellipsis } from "@tamagui/lucide-icons"
 import EuCampaignIllustration from "@/assets/illustrations/EuCampaignIllustration"
@@ -7,6 +7,7 @@ import { ScopeSelector } from "./ScopeSelector"
 import Text from "../base/Text"
 import type { NavItemSubItem } from "./NavItemDropdown"
 import { useVisibleNavItems } from "./useVisibleNavItems"
+import { usePathname } from "expo-router"
 import type { Href } from "expo-router"
 
 export const WIDTH_MILITANT = 248;
@@ -168,7 +169,7 @@ interface SideBarProps {
   state?: SideBarState
 }
 
-type NavItemConfig = {
+export type NavItemConfig = {
   id: string
   iconLeft: typeof Home
   text: string
@@ -178,11 +179,14 @@ type NavItemConfig = {
   disabled?: boolean
   active?: boolean
   onPress?: () => void
-  theme?: 'blue' | 'purple'
+  theme?: 'blue' | 'purple' | 'green' | 'orange'
   frame?: 'default' | 'cadre'
 }
 
+import { cadreNavItems, militantNavItems } from "@/config/navigationItems"
+
 export const SideBar = ({ state = 'militant' }: SideBarProps) => {
+  const pathname = usePathname()
   const [displayNavCadre, setDisplayNavCadre] = useState(state === 'cadre')
   const [selectedScope, setSelectedScope] = useState<{ id: string; name: string; role?: string } | undefined>({
     id: 'scope-92',
@@ -190,34 +194,39 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
     role: 'Responsable communication',
   })
   
-  // Configuration des items du menu militant
-  const militantNavItems: NavItemConfig[] = [
-    { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/', active: !displayNavCadre },
-    { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/tools/test' },
-    { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/tools/test' },
-    { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', isNew: true, href: '/tools/test' },
-    { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalLink: true, disabled: true },
-    { id: 'ressources', iconLeft: Link, text: 'Ressources', isNew: true, externalLink: true, href: '/tools/test' },
-    { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', externalLink: true, href: '/tools/test' },
-  ]
+  // Helper pour déterminer si un item est actif
+  const isItemActive = useMemo(() => {
+    return (item: NavItemConfig) => {
+      if (!item.href) return false
+      const normalizedPathname = pathname.replace(/\/$/, '') || '/'
+      const normalizedHref = item.href.replace(/\/$/, '') || '/'
+      return normalizedHref === normalizedPathname
+    }
+  }, [pathname])
 
-  // Configuration des items du menu cadre
-  const cadreNavItems: NavItemConfig[] = [
-    { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', active: displayNavCadre && state === 'cadre', href: '/tools/test/cadre' },
-    { id: 'militants', iconLeft: Flag, text: 'Mes militants', theme: 'purple', externalLink: true },
-    { id: 'equipe', iconLeft: Users, text: 'Mon équipe', theme: 'purple', externalLink: true },
-    { id: 'comites', iconLeft: Network, text: 'Gestion des comités', theme: 'purple', externalLink: true },
-    { id: 'circonscriptions', iconLeft: Goal, text: 'Gestion des circonscriptions', theme: 'purple', disabled: true, externalLink: true },
-    { id: 'votes', iconLeft: Vote, text: 'Votes et consultations', theme: 'purple', externalLink: true },
-  ]
+  // Ajouter la propriété active aux items militant
+  const militantNavItemsWithActive = useMemo(() => {
+    return militantNavItems.map(item => ({
+      ...item,
+      active: isItemActive(item),
+    }))
+  }, [isItemActive])
 
+  // Ajouter la propriété active aux items cadre
+  const cadreNavItemsWithActive = useMemo(() => {
+    return cadreNavItems.map(item => ({
+      ...item,
+      active: isItemActive(item),
+    }))
+  }, [isItemActive])
+  
   // Utiliser le hook pour gérer la visibilité des items du menu militant
   const {
     visibleItems: visibleMilitantNavItems,
     hiddenItems: hiddenMilitantNavItems,
     onLayout: onMilitantMenuLayout,
   } = useVisibleNavItems<NavItemConfig>({
-    items: militantNavItems,
+    items: militantNavItemsWithActive,
     hasCadreButton: true,
     isVisible: true,
   })
@@ -228,7 +237,7 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
     hiddenItems: hiddenCadreNavItems,
     onLayout: onCadreMenuLayout,
   } = useVisibleNavItems<NavItemConfig>({
-    items: cadreNavItems,
+    items: cadreNavItemsWithActive,
     hasCadreButton: false,
     isVisible: displayNavCadre,
   })
