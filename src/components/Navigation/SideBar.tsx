@@ -1,14 +1,16 @@
-import { ComponentProps, useState, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { styled, YStack, XStack } from "tamagui"
-import { ClipboardCheck, Calendar, Home, Link, HeartHandshake, Zap, GraduationCap, BellOff, CaptionsOff, ChevronRight, Sparkle, ScrollText, Flag, Users, Network, Goal, Vote, RefreshCcw, CircleHelp, LifeBuoy, FileText, Settings, Ellipsis } from "@tamagui/lucide-icons"
+import { BellOff, CaptionsOff, ChevronRight, Sparkle, Ellipsis } from "@tamagui/lucide-icons"
 import EuCampaignIllustration from "@/assets/illustrations/EuCampaignIllustration"
 import { NavItem } from "./NavItem"
 import { ScopeSelector } from "./ScopeSelector"
+import { HelpMenuItems } from "./HelpMenuItems"
 import Text from "../base/Text"
 import type { NavItemSubItem } from "./NavItemDropdown"
 import { useVisibleNavItems } from "./useVisibleNavItems"
 import { usePathname } from "expo-router"
-import type { Href } from "expo-router"
+import { cadreNavItems, militantNavItems, type NavItemConfig } from "@/config/navigationItems"
+import { isNavItemActive } from "./utils"
 
 export const WIDTH_MILITANT = 248;
 export const WIDTH_COLLAPSED = 58;
@@ -116,6 +118,19 @@ const SideBarContainer = styled(YStack, {
         borderBottomLeftRadius: 4,
       },
     },
+    hasBoxShadow: {
+      true: {
+        shadowColor: 'rgba(0, 0, 0, 1)',
+        shadowOffset: { width: 2, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
+        boxShadow: '2px 2px 8px 0 rgba(0, 0, 0, 0.08)',
+      },
+      false: {
+        boxShadow: 'none',
+      },
+    },
   },
 } as const)
 
@@ -157,69 +172,49 @@ const MenuFooterContainer = styled(YStack, {
 } as const)
 
 const Line = styled(YStack, {
-  height: 44 * 7,
-  width: 1,
   backgroundColor: '$purple3',
   position: 'absolute',
   left: 20,
   top: -16,
+  bottom: 16,
+  width: 1,
+  height: '100%',
 })
 
 interface SideBarProps {
   state?: SideBarState
 }
 
-export type NavItemConfig = {
-  id: string
-  iconLeft: typeof Home
-  text: string
-  href?: ComponentProps<typeof NavItem>['href']
-  isNew?: boolean
-  externalLink?: boolean
-  disabled?: boolean
-  active?: boolean
-  onPress?: () => void
-  theme?: 'blue' | 'purple' | 'green' | 'orange'
-  frame?: 'default' | 'cadre'
-}
-
-import { cadreNavItems, militantNavItems } from "@/config/navigationItems"
-
 export const SideBar = ({ state = 'militant' }: SideBarProps) => {
   const pathname = usePathname()
   const [displayNavCadre, setDisplayNavCadre] = useState(state === 'cadre')
-  const [selectedScope, setSelectedScope] = useState<{ id: string; name: string; role?: string } | undefined>({
-    id: 'scope-92',
-    name: 'Assemblée - Hauts-de-Seine (92)',
-    role: 'Responsable communication',
-  })
-  
-  // Helper pour déterminer si un item est actif
-  const isItemActive = useMemo(() => {
-    return (item: NavItemConfig) => {
-      if (!item.href) return false
-      const normalizedPathname = pathname.replace(/\/$/, '') || '/'
-      const normalizedHref = item.href.replace(/\/$/, '') || '/'
-      return normalizedHref === normalizedPathname
-    }
+
+  // Ajouter la propriété active aux items militant et filtrer selon displayIn
+  const militantNavItemsWithActive = useMemo(() => {
+    return militantNavItems
+      .filter(item => {
+        const displayIn = item.displayIn ?? 'all'
+        return displayIn === 'all' || displayIn === 'sidebar'
+      })
+      .map(item => ({
+        ...item,
+        active: isNavItemActive(pathname, item.href),
+      }))
   }, [pathname])
 
-  // Ajouter la propriété active aux items militant
-  const militantNavItemsWithActive = useMemo(() => {
-    return militantNavItems.map(item => ({
-      ...item,
-      active: isItemActive(item),
-    }))
-  }, [isItemActive])
-
-  // Ajouter la propriété active aux items cadre
+  // Ajouter la propriété active aux items cadre et filtrer selon displayIn
   const cadreNavItemsWithActive = useMemo(() => {
-    return cadreNavItems.map(item => ({
-      ...item,
-      active: isItemActive(item),
-    }))
-  }, [isItemActive])
-  
+    return cadreNavItems
+      .filter(item => {
+        const displayIn = item.displayIn ?? 'all'
+        return displayIn === 'all' || displayIn === 'sidebar'
+      })
+      .map(item => ({
+        ...item,
+        active: isNavItemActive(pathname, item.href),
+      }))
+  }, [pathname])
+
   // Utiliser le hook pour gérer la visibilité des items du menu militant
   const {
     visibleItems: visibleMilitantNavItems,
@@ -244,35 +239,37 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
 
   // Créer les subItems pour le menu "Plus" militant
   const militantPlusSubItems: NavItemSubItem[] = hiddenMilitantNavItems.map((item) => ({
-      id: `plus-${item.id}`,
-      text: item.text,
-      customContent: (
-        <NavItem
-          text={item.text}
-          iconLeft={item.iconLeft}
-          href={item.href}
-          isNew={item.isNew}
-          externalLink={item.externalLink}
-          disabled={item.disabled}
-          active={item.active}
-          onPress={item.onPress}
-        />
-      )
-    }))
+    id: `plus-${item.id}`,
+    text: item.text,
+    customContent: (
+      <NavItem
+        text={item.text}
+        iconLeft={item.iconLeft}
+        href={item.href}
+        isNew={item.isNew}
+        externalLink={item.externalLink}
+        disabled={item.disabled}
+        active={item.active}
+        onPress={item.onPress}
+        inner={true}
+      />
+    )
+  }))
 
-  const cadrePlusSubItems: NavItemSubItem[] =  hiddenCadreNavItems.map((item) => ({
-      id: `plus-${item.id}`,
-      text: item.text,
-      customContent: (
-        <NavItem
-          text={item.text}
-          iconLeft={item.iconLeft}
-          theme={item.theme}
-          href={item.href}
-          isNew={item.isNew}
-          externalLink={item.externalLink}
-          disabled={item.disabled}
-          active={item.active}
+  const cadrePlusSubItems: NavItemSubItem[] = hiddenCadreNavItems.map((item) => ({
+    id: `plus-${item.id}`,
+    text: item.text,
+    customContent: (
+      <NavItem
+        text={item.text}
+        iconLeft={item.iconLeft}
+        theme={item.theme}
+        href={item.href}
+        isNew={item.isNew}
+        externalLink={item.externalLink}
+        disabled={item.disabled}
+        active={item.active}
+        inner={true}
       />
     )
   }))
@@ -320,70 +317,50 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
             text="Mon profil"
             profilePicture={{ src: 'https://staging-utilisateur.parti-renaissance.fr/assets/images/profile/2b332ff46df16603e15449a9a2da0dcf.webp', alt: 'Mon profil', fullName: 'John Doe' }}
             collapsed={displayNavCadre}
+            href="/dev/profil"
+            active={isNavItemActive(pathname, '/dev/profil')}
           />
         </MenuFooterContainer>
       </SideBarContainer>
       {
         displayNavCadre && (
-          <SideBarContainer isCadre>
-            <LogoContainer >
+          <SideBarContainer isCadre hasBoxShadow={state !== 'cadre'}>
+            <LogoContainer pb={0}>
               <Text fontSize={20} medium>CADRE</Text>
             </LogoContainer>
             <YStack>
-              <ScopeSelector
-                scopes={[
-                  {
-                    id: 'scope-92',
-                    name: 'Assemblée - Hauts-de-Seine (92)',
-                    role: 'Responsable communication',
-                  },
-                  {
-                    id: 'scope-75',
-                    name: 'Hauts-de-Seine (92-3)',
-                    role: 'Délégué de circonscription',
-                  },
-                  {
-                    id: 'scope-13',
-                    name: 'La Garenne-Colombes',
-                    role: 'Responsable comité local',
-                  },
-                ]}
-                selectedScope={selectedScope}
-                onScopeSelect={(scope) => {
-                  setSelectedScope(scope)
-                  console.log('Scope sélectionné:', scope)
-                }}
-              />
+              <ScopeSelector />
             </YStack>
             <MenuContainer onLayout={onCadreMenuLayout}>
-              <Line />
-              {visibleCadreNavItems.map((item) => (
-                <NavItem
-                  key={item.id}
-                  iconLeft={item.iconLeft}
-                  text={item.text}
-                  theme={item.theme}
-                  href={item.href}
-                  isNew={item.isNew}
-                  externalLink={item.externalLink}
-                  disabled={item.disabled}
-                  active={item.active}
-                />
-              ))}
-              {hiddenCadreNavItems.length > 0 && (
-                <NavItem
-                  iconLeft={Ellipsis}
-                  text="Plus"
-                  theme="purple"
-                  dropdownVerticalPosition="top"
-                  subItems={cadrePlusSubItems}
-                />
-              )}
+              <YStack gap={4}>
+                <Line />
+                {visibleCadreNavItems.map((item) => (
+                  <NavItem
+                    key={item.id}
+                    iconLeft={item.iconLeft}
+                    text={item.text}
+                    theme={item.theme}
+                    href={item.href}
+                    isNew={item.isNew}
+                    externalLink={item.externalLink}
+                    disabled={item.disabled}
+                    active={item.active}
+                  />
+                ))}
+                {hiddenCadreNavItems.length > 0 && (
+                  <NavItem
+                    iconLeft={Ellipsis}
+                    text="Plus"
+                    theme="purple"
+                    dropdownVerticalPosition="top"
+                    subItems={cadrePlusSubItems}
+                  />
+                )}
+              </YStack>
+
             </MenuContainer>
             <MenuFooterContainer>
-              <NavItem iconLeft={RefreshCcw} text="Dernières mises à jour" theme="purple" />
-              <NavItem iconLeft={CircleHelp} text="Demande de retours" theme="purple" />
-              <NavItem iconLeft={LifeBuoy} text="Centre d'aide" theme="purple" />
+              <HelpMenuItems variant="navItem" />
             </MenuFooterContainer>
           </SideBarContainer>
         )

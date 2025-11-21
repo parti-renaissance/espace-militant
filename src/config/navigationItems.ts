@@ -1,15 +1,33 @@
-import { Home, Calendar, Zap, HeartHandshake, GraduationCap, Link, ClipboardCheck, ScrollText, Flag, Users, Network, Goal, Vote } from '@tamagui/lucide-icons'
-import { NavItemConfig } from '@/components/Navigation/SideBar'
+import { ComponentProps } from 'react'
+import { Home, Calendar, Zap, HeartHandshake, GraduationCap, Link, ClipboardCheck, ScrollText, Flag, Users, Network, Goal, Vote, CircleUser } from '@tamagui/lucide-icons'
+import { NavItem } from '@/components/Navigation/NavItem'
+import type { IconComponent } from '@/models/common.model'
+
+export type NavItemConfig = {
+  id: string
+  iconLeft: IconComponent
+  text: string
+  href?: ComponentProps<typeof NavItem>['href']
+  isNew?: boolean
+  externalLink?: boolean
+  disabled?: boolean
+  active?: boolean
+  onPress?: () => void
+  theme?: 'blue' | 'purple' | 'green' | 'orange'
+  frame?: 'default' | 'cadre'
+  displayIn?: 'sidebar' | 'tabbar' | 'all'
+}
 
 // Configuration des items du menu militant
 export const militantNavItems: NavItemConfig[] = [
   { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/dev/accueil', theme: 'blue' },
   { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/dev/evenements', theme: 'blue' },
   { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/dev/actions', theme: 'blue' },
-  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', isNew: true, href: '/dev/parrainages', theme: 'blue' },
+  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/dev/parrainages', theme: 'blue' },
   { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalLink: true, disabled: true },
-  { id: 'ressources', iconLeft: Link, text: 'Ressources', isNew: true, externalLink: true, href: '/dev/ressources' },
-  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', externalLink: true, href: '/dev/questionnaires' },
+  { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/dev/ressources' },
+  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', isNew: true, href: '/dev/questionnaires' },
+  { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/dev/profil', theme: 'blue', displayIn: 'tabbar' },
 ]
 
 // Configuration des items du menu cadre

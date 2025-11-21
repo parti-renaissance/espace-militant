@@ -5,12 +5,14 @@ import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanima
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet'
 import { NavItem } from '@/components/Navigation/NavItem'
-import { NavItemConfig } from '@/components/Navigation/SideBar'
+import { type NavItemConfig } from '@/config/navigationItems'
 import { YStack } from 'tamagui'
 
 interface NavSheetProps {
   onClose?: () => void
   items: NavItemConfig[]
+  ListHeaderComponent?: React.ReactNode
+  ListFooterComponent?: React.ReactNode
 }
 
 export interface NavSheetRef {
@@ -18,7 +20,7 @@ export interface NavSheetRef {
   close: () => void
 }
 
-const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items }, ref) => {
+const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListHeaderComponent, ListFooterComponent }, ref) => {
   const insets = useSafeAreaInsets()
   const bsRef = useRef<BottomSheet>(null)
   const zIndex = useSharedValue(-10)
@@ -52,7 +54,7 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items }, ref
   ), [])
 
   return (
-    <Animated.View style={[styles.container, { bottom: 54 + insets.bottom + 9 }, styleContainer]}>
+    <Animated.View style={[styles.container, { bottom: 54 + insets.bottom + 10 }, styleContainer]}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheet
           ref={bsRef}
@@ -66,25 +68,38 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items }, ref
           }}
         >
           <BottomSheetView style={styles.contentContainer}>
-            <YStack padding={16} gap={8}>
-              {items.map((item) => (
-                <NavItem
-                  key={item.id}
-                  text={item.text}
-                  iconLeft={item.iconLeft}
-                  href={item.href}
-                  isNew={item.isNew}
-                  externalLink={item.externalLink}
-                  disabled={item.disabled}
-                  active={item.active}
-                  onPress={(e) => {
-                    item.onPress?.()
-                    bsRef.current?.close()
-                  }}
-                  theme={item.theme}
-                  frame={item.frame}
-                />
-              ))}
+            <YStack paddingVertical={8}>
+              {ListHeaderComponent && (
+                <YStack>
+                  {ListHeaderComponent}
+                </YStack>
+              )}
+              <YStack gap={4} paddingHorizontal={16}>
+                {items.map((item) => (
+                  <NavItem
+                    key={item.id}
+                    text={item.text}
+                    iconLeft={item.iconLeft}
+                    href={item.href}
+                    isNew={item.isNew}
+                    externalLink={item.externalLink}
+                    disabled={item.disabled}
+                    active={item.active}
+                    onPress={(e) => {
+                      item.onPress?.()
+                      bsRef.current?.close()
+                    }}
+                    theme={item.theme}
+                    frame={item.frame}
+                  />
+                ))}
+              </YStack>
+
+              {ListFooterComponent && (
+                <YStack>
+                  {ListFooterComponent}
+                </YStack>
+              )}
             </YStack>
           </BottomSheetView>
         </BottomSheet>

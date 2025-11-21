@@ -1,10 +1,13 @@
 import React from 'react'
 import { ScrollView, View, XStack, styled, withStaticProperties, ViewProps, useMedia } from 'tamagui'
+import { StyleSheet, StyleProp, ViewStyle } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SideBar, SideBarState } from '@/components/Navigation/SideBar'
 import ConfigurableTabBar from '@/components/Navigation/TabBar'
 
 
 const LayoutRoot = styled(View, {
+  height: '100dvh',
   flex: 1,
   backgroundColor: '$textSurface',
 })
@@ -19,17 +22,17 @@ const LayoutScrollView = styled(ScrollView, {
 
 const LayoutContainer = styled(XStack, {
   $lg: {
-    my: 8,
-    mx: 16,
+    py: 8,
+    px: 16,
     gap: 8,
   },
   $xl: {
-    my: 12,
-    mx: 24,
+    py: 12,
+    px: 24,
     gap: 12,
   },
-  my: 16,
-  mx: 32,
+  py: 16,
+  px: 32,
   gap: 16,
   justifyContent: 'center',
 })
@@ -80,10 +83,29 @@ const Layout = ({ children, sidebarState, ...props }: LayoutProps) => {
 
 interface ScrollViewProps extends React.ComponentProps<typeof ScrollView> {
   children: React.ReactNode
+  safeArea?: boolean
 }
 
-const ScrollViewComponent = ({ children, ...props }: ScrollViewProps) => {
-  return <LayoutScrollView {...props}>{children}</LayoutScrollView>
+const ScrollViewComponent = ({ children, safeArea, contentContainerStyle, ...props }: ScrollViewProps) => {
+  const insets = useSafeAreaInsets()
+  return (
+    <LayoutScrollView
+      {...props}
+      contentContainerStyle={
+        StyleSheet.flatten([
+          contentContainerStyle as StyleProp<ViewStyle>,
+          safeArea && {
+            paddingBottom: insets.bottom,
+            paddingTop: insets.top,
+            paddingLeft: insets.left,
+            paddingRight: insets.right,
+          },
+        ]) as ScrollViewProps['contentContainerStyle']
+      }
+    >
+      {children}
+    </LayoutScrollView>
+  )
 }
 
 interface ContainerProps extends React.ComponentProps<typeof XStack> {

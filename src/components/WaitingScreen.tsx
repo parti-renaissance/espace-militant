@@ -14,6 +14,7 @@ export default function WaitingScreen() {
       left={0}
       width="100%"
       pointerEvents="none"
+      zIndex={1000}
     >
       <EuCampaignIllustration />
       <Spinner color="$blue9" size="large" />
