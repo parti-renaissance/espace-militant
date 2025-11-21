@@ -1,6 +1,6 @@
 import { ComponentProps, ComponentPropsWithoutRef, createContext, forwardRef, useContext, useMemo, useRef, useState } from 'react'
 import { ExternalLink } from '@tamagui/lucide-icons'
-import { styled, TamaguiElement, XStack, YStack, isWeb } from 'tamagui'
+import { styled, TamaguiElement, XStack, YStack, isWeb, useMedia } from 'tamagui'
 import { Link, useRouter, type Href } from 'expo-router'
 import type { PressableProps } from 'react-native'
 import Text from '@/components/base/Text'
@@ -12,6 +12,9 @@ const NavItemFrame = styled(XStack, {
   alignItems: 'center',
   gap: 8,
   height: 40,
+  $sm: {
+    height: 48,
+  },
   paddingLeft: 6,
   paddingRight: 12,
   paddingVertical: 6,
@@ -28,11 +31,14 @@ const NavItemFrame = styled(XStack, {
     outlineOffset: 0,
   },
   variants: {
+    inner: {
+      true: {
+        borderRadius: 4,
+      },
+    },
     active: {
       true: {
         backgroundColor: '$gray1',
-        hoverStyle: { backgroundColor: '$gray2' },
-        pressStyle: { backgroundColor: '$gray3' },
       },
     },
     disabled: {
@@ -66,11 +72,13 @@ const NavItemFrame = styled(XStack, {
 
 const NavCadreItemFrame = styled(NavItemFrame, {
   borderWidth: 1,
-  borderColor: '$purple5',
+  borderColor: '$purple2',
   hoverStyle: {
+    borderColor: '$purple1',
     backgroundColor: '$purple1',
   },
   pressStyle: {
+    borderColor: '$purple2',
     backgroundColor: '$purple2',
   },
   focusVisibleStyle: {
@@ -82,6 +90,7 @@ const NavCadreItemFrame = styled(NavItemFrame, {
   variants: {
     active: {
       true: {
+        borderColor: '$purple1',
         backgroundColor: '$purple1',
         hoverStyle: {
           backgroundColor: '$purple2',
@@ -101,13 +110,16 @@ const NavCadreItemFrame = styled(NavItemFrame, {
   },
 } as const)
 
-const NewChip = () => (
-  <YStack bg="$color5" borderRadius={4} paddingHorizontal={4} paddingVertical={4} height={15}>
-    <Text fontSize={7} bold color="white" lineHeight={8}>
-      NEW
-    </Text>
-  </YStack>
-)
+const NewChip = () => {
+  const media = useMedia()
+  return (
+    <YStack bg="$color5" borderRadius={4} paddingHorizontal={media.sm ? 5 : 4} paddingVertical={media.sm ? 6 : 4} height={media.sm ? 19 : 15}>
+      <Text fontSize={media.sm ? 9 : 7} bold color="white" lineHeight={media.sm ? 9 : 8}>
+        NEW
+      </Text>
+    </YStack>
+  )
+}
 
 const IconContainer = styled(YStack, {
   width: 28,
@@ -152,6 +164,7 @@ export type NavItemProps = {
   frame?: 'default' | 'cadre'
   subItems?: NavItemSubItem[]
   dropdownVerticalPosition?: 'top' | 'bottom' // Position verticale du dropdown
+  inner?: boolean
 } & ComponentPropsWithoutRef<typeof NavItemFrame>
 
 export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
@@ -175,14 +188,16 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
       frame = 'default',
       subItems,
       dropdownVerticalPosition = 'bottom',
+      inner = false,
       ...props
     },
     ref,
   ) => {
     const router = useRouter()
+    const media = useMedia()
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const frameRef = useRef<HTMLElement | null>(null)
-    const contentColor = disabled ? '$gray3' : frame === 'cadre' ? '$purple6' : '$textPrimary'
+    const contentColor = disabled ? '$textOutline32' : frame === 'cadre' ? '$purple6' : '$textPrimary'
 
     const iconTone = useMemo<IconTone>(() => {
       if (dangerAccent) return 'danger'
@@ -221,8 +236,8 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
           <IconContainer
             tone={iconTone}
             marginRight={resolvedCollapsed ? 0 : 2}
-            $group-hover={{ backgroundColor: dangerAccent ? '#FFEBEC' : (active && frame === 'cadre') ? '$purple2' : frame === 'cadre' ? '$purple1' : disabled ? 'white' : active ? '$gray2' : '$gray1' }}
-            $group-press={{ backgroundColor: dangerAccent ? '#FFEBEC' : (active && frame === 'cadre') ? '$purple3' : frame === 'cadre' ? '$purple2' : disabled ? 'white' : active ? '$gray3' : '$gray2' }}
+            $group-hover={{ backgroundColor: dangerAccent ? '#FFEBEC' : (active && frame === 'cadre') ? '$purple2' : frame === 'cadre' ? '$purple1' : disabled ? 'white' : '$gray1' }}
+            $group-press={{ backgroundColor: dangerAccent ? '#FFEBEC' : (active && frame === 'cadre') ? '$purple3' : frame === 'cadre' ? '$purple2' : disabled ? 'white' : '$gray2' }}
           >
             <IconLeft size={16} color={iconColor} />
           </IconContainer>
@@ -272,6 +287,7 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
         <FrameComponent
           {...props}
           group
+          inner={inner}
           active={active}
           disabled={disabled}
           theme={theme}
@@ -302,7 +318,7 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
               </XStack>
               <XStack alignItems="center" gap={8}>
                 {isNew ? <NewChip /> : null}
-                {externalLink ? <ExternalLink size={12} color="$gray4" /> : null}
+                {externalLink ? <ExternalLink size={media.sm ? 14 : 12} color="$gray4" /> : null}
                 {IconRight ? <IconRight size={16} color="$color5" /> : null}
               </XStack>
             </>

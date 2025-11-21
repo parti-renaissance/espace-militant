@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, cloneElement, isValidElement } from 'react'
 import { FlatList, GestureResponderEvent, Modal } from 'react-native'
-import { styled, XStack, YStack } from 'tamagui'
+import { styled, XStack, YStack, useMedia } from 'tamagui'
 import { DropdownFrame, DropdownItem } from '../base/Dropdown'
 import type { IconComponent } from '@/models/common.model'
 import Text from '../base/Text'
@@ -52,6 +52,10 @@ const DropdownContainer = styled(YStack, {
   position: 'absolute',
   zIndex: 2,
   width: 240,
+  $sm: {
+    width: '100%',
+    padding: 16,
+  },
 })
 
 const MemoItem = React.memo(DropdownItem)
@@ -64,10 +68,12 @@ export const NavItemDropdown = ({
   verticalPosition = 'bottom',
   helpText,
 }: NavItemDropdownProps) => {
+  const media = useMedia()
+  const isMobile = media.sm
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
 
   useEffect(() => {
-    if (!open || !triggerRef.current) return
+    if (!open || !triggerRef.current || isMobile) return
 
     const updatePosition = () => {
       if (!triggerRef.current) return
@@ -99,7 +105,7 @@ export const NavItemDropdown = ({
       window.removeEventListener('scroll', updatePosition, true)
       window.removeEventListener('resize', updatePosition)
     }
-  }, [open, triggerRef, verticalPosition])
+  }, [open, triggerRef, verticalPosition, isMobile])
 
   const handleBackdropPress = useCallback(
     (event: GestureResponderEvent) => {
@@ -123,16 +129,20 @@ export const NavItemDropdown = ({
 
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
-      <OverlayContainer>
+      <OverlayContainer
+        justifyContent={isMobile ? 'center' : undefined}
+        alignItems={isMobile ? 'center' : undefined}
+      >
         <Overlay onPress={handleBackdropPress} />
 
         <DropdownContainer
-          top={dropdownPosition.top}
-          left={dropdownPosition.left}
-          transform={verticalPosition === 'top' ? [{ translateY: '-100%' }] : undefined}
+          top={isMobile ? undefined : dropdownPosition.top}
+          left={isMobile ? undefined : dropdownPosition.left}
+          transform={!isMobile && verticalPosition === 'top' ? [{ translateY: '-100%' }] : undefined}
           onStartShouldSetResponder={() => true}
+          position={isMobile ? 'relative' : 'absolute'}
         >
-          <DropdownFrame size="lg" p={4} borderRadius={8}>
+          <DropdownFrame size="lg" p={4} borderRadius={8} borderColor="white">
             {helpText && (
               <XStack p={8} mb={0} mt={4} mx={4} borderRadius={8} bg="$textSurface">
                 <YStack flexShrink={1}>

@@ -5,7 +5,7 @@ import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
-import { LogOut, PenLine } from '@tamagui/lucide-icons'
+import { BugPlay, LogOut, PenLine } from '@tamagui/lucide-icons'
 import { Href, Link, usePathname } from 'expo-router'
 import omit from 'lodash/omit'
 import { isWeb, useMedia, YStack } from 'tamagui'
@@ -50,6 +50,7 @@ const ProfilMenu = () => {
           ))}
       </Menu>
       {clientEnv.ENVIRONMENT === 'staging' ? (
+        <>
         <Menu>
           <Link href="/tools/storybook" asChild={!isWeb}>
             <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} icon={PenLine} last={true}>
@@ -57,6 +58,15 @@ const ProfilMenu = () => {
             </Menu.Item>
           </Link>
         </Menu>
+        <Menu>
+          <Link href="/dev/accueil" asChild={!isWeb}>
+          <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} icon={BugPlay} last={true}>
+            Nouvelle Navigation 
+          </Menu.Item>
+          </Link>
+        </Menu>
+        </>
+        
       ) : null}
       <Menu>
         <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} onPress={signOut} icon={LogOut} last={true}>

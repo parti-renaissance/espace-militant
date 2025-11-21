@@ -14,13 +14,13 @@ const RouteName = styled(Text, {
   color: '$textPrimary',
 })
 
-export default function ActionsPage() {
+export default function RessourcesPage() {
   return (
     <Layout.ScrollView safeArea>
       <Layout.Container>
-        <Layout.Main maxWidth="auto">
+        <Layout.Main>
           <CenterContainer>
-            <RouteName>Actions</RouteName>
+            <RouteName>Ressources</RouteName>
           </CenterContainer>
         </Layout.Main>
       </Layout.Container>

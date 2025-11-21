@@ -4,11 +4,13 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } f
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Text from '@/components/base/Text'
 import { MoreHorizontal, Sparkle } from '@tamagui/lucide-icons'
-import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, XStack } from 'tamagui'
+import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, XStack, YStack } from 'tamagui'
 import NavSheet, { NavSheetRef } from '@/components/Navigation/NavSheet'
-import { NavItemConfig } from '@/components/Navigation/SideBar'
 import { useRouter, usePathname } from 'expo-router'
-import { militantNavItems, cadreNavItems } from '@/config/navigationItems'
+import { militantNavItems, cadreNavItems, type NavItemConfig } from '@/config/navigationItems'
+import { isNavItemActive } from './utils'
+import { ScopeSelector } from './ScopeSelector'
+import { HelpMenuItems } from './HelpMenuItems'
 
 const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
 const SAVProps: any = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
@@ -94,7 +96,7 @@ const Tab = ({ isFocus, name, onPress, onLayout, label, icon: Icon, theme = 'gra
       opacity: interpolate(scale.value, [0, 1], [1, 0]),
     }
   })
-  
+
   const activeColor = propActiveColor ?? 'black'
   const inactiveColor = propInactiveColor ?? 'gray'
   const color = isFocus ? activeColor : inactiveColor
@@ -129,32 +131,53 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
   const pathname = usePathname()
   const [activeSpecialTab, setActiveSpecialTab] = useState<string | null>(null)
   const themes = getThemes()
-  const navItems = militantNavItems
+
+  // Filter items based on displayIn property (default to 'all')
+  const navItems = useMemo(() => {
+    return militantNavItems.filter(item => {
+      const displayIn = item.displayIn ?? 'all'
+      return displayIn === 'all' || displayIn === 'tabbar'
+    })
+  }, [])
 
   // Helper to get config by ID
-  const getAllItems = useMemo(() => [...navItems, ...navCadreItems], [navCadreItems])
+  const getAllItems = useMemo(() => [...navItems, ...navCadreItems], [navItems, navCadreItems])
   const getConfig = (id: string) => getAllItems.find((item) => item.id === id)
-    
+
   // Identify items for sheets
-  const cadreItems = useMemo(() => navCadreItems, [navCadreItems])
+  const cadreItems = useMemo(() => {
+    const filtered = navCadreItems.filter(item => {
+      const displayIn = item.displayIn ?? 'all'
+      return displayIn === 'all' || displayIn === 'tabbar'
+    })
+    // Add active state based on current pathname (including sub-routes)
+    return filtered.map(item => ({
+      ...item,
+      active: isNavItemActive(pathname, item.href),
+    }))
+  }, [navCadreItems, pathname])
   const visibleItemIds = useMemo(() => tabOrder, [tabOrder])
-  const moreItems = useMemo(() => 
-    navItems.filter((item) => !visibleItemIds.includes(item.id)), 
-    [navItems, visibleItemIds]
-  )
+  const moreItems = useMemo(() => {
+    const filtered = navItems.filter((item) => !visibleItemIds.includes(item.id))
+    // Add active state based on current pathname (including sub-routes)
+    return filtered.map(item => ({
+      ...item,
+      active: isNavItemActive(pathname, item.href),
+    }))
+  }, [navItems, visibleItemIds, pathname])
 
   // Map pathname to route ID
   const currentRouteId = useMemo(() => {
     // Normalize pathname (remove trailing slash)
     const normalizedPathname = pathname.replace(/\/$/, '') || '/'
-    
+
     // Find matching nav item by exact href match
     const matchingItem = getAllItems.find(item => {
       if (!item.href) return false
       const normalizedHref = item.href.replace(/\/$/, '') || '/'
       return normalizedHref === normalizedPathname
     })
-    
+
     return matchingItem?.id || null
   }, [pathname, getAllItems])
 
@@ -162,16 +185,16 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
   const activeTabKey = useMemo(() => {
     // Check if manually set (opened sheet)
     if (activeSpecialTab) return activeSpecialTab
-    
+
     // If no route found, activate "Autre" (more)
     if (!currentRouteId) {
       if (visibleItemIds.includes('more')) return 'more'
       return visibleItemIds[0] || 'accueil'
     }
-    
+
     // Check direct match with visible tabs
     if (visibleItemIds.includes(currentRouteId)) return currentRouteId
-    
+
     // Check if route is a cadre item
     if (cadreItems.some(item => item.id === currentRouteId)) {
       if (visibleItemIds.includes('cadreSheet')) return 'cadreSheet'
@@ -181,7 +204,7 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
     if (moreItems.some(item => item.id === currentRouteId)) {
       if (visibleItemIds.includes('more')) return 'more'
     }
-    
+
     // Fallback to "Autre" (more) if route not found in any category
     if (visibleItemIds.includes('more')) return 'more'
     return visibleItemIds[0] || 'accueil'
@@ -206,7 +229,7 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
     if (activeTabKey) {
       const pos = getPositionFromKey(activeTabKey)
       position.value = withSpring(pos, springConfig)
-      
+
       // Determine active color based on the active tab
       let theme = 'gray'
       if (activeTabKey === 'cadreSheet') theme = 'purple'
@@ -275,11 +298,11 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
       if (config.onPress) {
         config.onPress()
       } else if (config.href) {
-        router.push(config.href)
+        router.replace(config.href)
       }
     }
   }
-  
+
   const handleSheetClose = () => {
     setActiveSpecialTab(null)
   }
@@ -302,7 +325,7 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
           <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
           {visibleItemIds.map((id) => {
             const isFocus = activeTabKey === id
-            
+
             if (id === 'more') {
               return (
                 <MemoTab
@@ -319,9 +342,9 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
                 />
               )
             }
-            
+
             if (id === 'cadreSheet') {
-               return (
+              return (
                 <MemoTab
                   key="cadreSheet"
                   name="cadreSheet"
@@ -357,16 +380,22 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
           })}
         </TabBarComponent>
       </SAV>
-      
+
       <NavSheet
         ref={moreSheetRef}
         onClose={handleSheetClose}
         items={moreItems}
       />
-       <NavSheet
+      <NavSheet
         ref={cadreSheetRef}
         onClose={handleSheetClose}
         items={cadreItems}
+        ListHeaderComponent={
+          <YStack paddingHorizontal={16}>
+            <ScopeSelector />
+          </YStack>
+        }
+        ListFooterComponent={<HelpMenuItems variant="button" />}
       />
     </>
   )

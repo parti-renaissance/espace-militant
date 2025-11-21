@@ -1,8 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 import { ChevronsUpDown } from '@tamagui/lucide-icons'
 import { NavItemDropdown, type NavItemSubItem } from './NavItemDropdown'
 import Text from '../base/Text'
+import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
+import { getFormatedScope } from '@/features/ScopesSelector/utils'
 
 export type Scope = {
   id: string
@@ -10,16 +12,11 @@ export type Scope = {
   role?: string
 }
 
-type ScopeSelectorProps = {
-  scopes: Scope[]
-  selectedScope?: Scope
-  onScopeSelect?: (scope: Scope) => void
-}
-
 const SelectorContainer = styled(XStack, {
   p: 12,
   gap: '$small',
   cursor: 'pointer',
+  justifyContent: 'space-between',
   borderRadius: 8,
   hoverStyle: { backgroundColor: '$purple1' },
   pressStyle: { backgroundColor: '$purple2' },
@@ -37,6 +34,9 @@ const ScopeItemFrame = styled(ThemeableStack, {
   cursor: 'pointer',
   marginBottom: 4,
   maxWidth: 380,
+  $sm: {
+    maxWidth: '100%',
+  },
   hoverStyle: {
     backgroundColor: '$gray1',
   },
@@ -104,13 +104,45 @@ const ScopeItem = ({ scope, selected, onPress, last }: ScopeItemProps) => {
   )
 }
 
-export const ScopeSelector = ({
-  scopes,
-  selectedScope,
-  onScopeSelect,
-}: ScopeSelectorProps) => {
+export const ScopeSelector = () => {
+  const { data: fetchedData } = useGetExecutiveScopes()
+  const { mutate: mutateScope } = useMutateExecutiveScope()
+
+  const scopes = useMemo(() => {
+    if (!fetchedData?.list) return []
+    return fetchedData.list.map((scope) => {
+      const { name, description } = getFormatedScope(scope)
+      return {
+        id: scope.code,
+        name: description || scope.name,
+        role: name,
+      }
+    })
+  }, [fetchedData])
+
+  const selectedScope = useMemo(() => {
+    if (!fetchedData?.default) return undefined
+    const def = fetchedData.default
+    const { name, description } = getFormatedScope(def)
+    return {
+      id: def.code,
+      name: description || def.name,
+      role: name,
+    }
+  }, [fetchedData])
+
+  const handleScopeSelect = (scopeItem: Scope) => {
+    const scopesCodeList = fetchedData?.list.map((s) => s.code) || []
+    mutateScope({
+      scope: scopeItem.id,
+      lastAvailableScopes: scopesCodeList,
+    })
+  }
+
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const triggerRef = useRef<HTMLElement | null>(null)
+
+  if (scopes.length === 0) return null
 
   const subItems: NavItemSubItem[] = scopes.map((scope, index) => ({
     id: scope.id,
@@ -122,13 +154,13 @@ export const ScopeSelector = ({
         scope={scope}
         selected={selectedScope?.id === scope.id}
         onPress={() => {
-          onScopeSelect?.(scope)
+          handleScopeSelect(scope)
         }}
         last={scopes.length - 1 === index}
       />
     ),
     onPress: () => {
-      onScopeSelect?.(scope)
+      handleScopeSelect(scope)
     },
   }))
 
