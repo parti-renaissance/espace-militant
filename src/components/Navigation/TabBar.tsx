@@ -231,12 +231,11 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
       position.value = withSpring(pos, springConfig)
 
       // Determine active color based on the active tab
-      let theme = 'gray'
+      let theme = 'blue'
       if (activeTabKey === 'cadreSheet') theme = 'purple'
-      else if (activeTabKey === 'more') theme = 'gray'
       else {
         const config = getAllItems.find((item) => item.id === activeTabKey)
-        theme = config?.theme || 'gray'
+        theme = config?.theme || 'blue'
       }
       // Wait a bit for animation to complete
       setTimeout(() => {
@@ -336,9 +335,9 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
                   onLayout={handleSaveLayout('more')}
                   label="Autre"
                   icon={MoreHorizontal}
-                  theme="gray"
-                  activeColor={themes.light.color5.val}
-                  inactiveColor={themes.light.textPrimary.val}
+                  theme="blue"
+                  activeColor="$color5"
+                  inactiveColor="$textPrimary"
                 />
               )
             }
@@ -354,8 +353,8 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
                   label="Cadre"
                   icon={Sparkle}
                   theme="purple"
-                  activeColor={themes.light.purple5.val}
-                  inactiveColor={themes.light.textPrimary.val}
+                  activeColor="$purple5"
+                  inactiveColor="$textPrimary"
                 />
               )
             }

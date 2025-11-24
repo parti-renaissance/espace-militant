@@ -141,14 +141,15 @@ export const NavItemDropdown = ({
           transform={!isMobile && verticalPosition === 'top' ? [{ translateY: '-100%' }] : undefined}
           onStartShouldSetResponder={() => true}
           position={isMobile ? 'relative' : 'absolute'}
+          maxWidth={420}
         >
           <DropdownFrame size="lg" p={4} borderRadius={8} borderColor="white">
             {helpText && (
-              <XStack p={8} mb={0} mt={4} mx={4} borderRadius={8} bg="$textSurface">
-                <YStack flexShrink={1}>
+              <XStack p={8} mb={0} mt={4} mx={4} borderRadius={8} bg="$textSurface" justifyContent="space-between" alignItems="center">
+                <YStack flexShrink={1} textWrap="balance">
                   <Text.SM primary semibold lineHeight={20}>{helpText}</Text.SM>
                 </YStack>
-                <YStack p={6}>
+                <YStack p={6} alignSelf="flex-start">
                   <Info size={24} color="$blue5" />
                 </YStack>
               </XStack>
