@@ -63,7 +63,6 @@ const NavItemFrame = styled(XStack, {
         width: 40,
         height: 40,
         alignItems: 'center',
-        justifyContent: 'center',
         paddingHorizontal: 6,
       },
     },
@@ -93,9 +92,11 @@ const NavCadreItemFrame = styled(NavItemFrame, {
         borderColor: '$purple1',
         backgroundColor: '$purple1',
         hoverStyle: {
+          borderColor: '$purple2',
           backgroundColor: '$purple2',
         },
         pressStyle: {
+          borderColor: '$purple3',
           backgroundColor: '$purple3',
         },
       },
@@ -134,7 +135,7 @@ const IconContainer = styled(YStack, {
       active: { backgroundColor: '$gray1' },
       danger: { backgroundColor: '#FFEBEC' },
       disabled: { backgroundColor: 'white' },
-      cadre: { backgroundColor: '$white' },
+      cadre: { backgroundColor: 'white' },
       cadreActive: { backgroundColor: '$purple1' },
     },
   },
@@ -306,22 +307,20 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
           role={resolvedRole}
           tag={shouldUseButtonTag ? 'button' : undefined}
         >
-          {resolvedCollapsed ? (
-            leftContent
-          ) : (
-            <>
-              <XStack flex={1} alignItems="center" height={28} gap={2}>
-                {leftContent}
-                <Text.MD flex={1} color={contentColor} medium numberOfLines={1}>
-                  {text}
-                </Text.MD>
-              </XStack>
-              <XStack alignItems="center" gap={8}>
-                {isNew ? <NewChip /> : null}
-                {externalLink ? <ExternalLink size={media.sm ? 14 : 12} color="$gray4" /> : null}
-                {IconRight ? <IconRight size={16} color="$color5" /> : null}
-              </XStack>
-            </>
+          <XStack flex={resolvedCollapsed ? 0 : 1} alignItems="center" height={28} gap={2}>
+            {leftContent}
+            {!resolvedCollapsed && (
+              <Text.MD flex={1} color={contentColor} medium numberOfLines={1}>
+                {text}
+              </Text.MD>
+            )}
+          </XStack>
+          {!resolvedCollapsed && (
+            <XStack alignItems="center" gap={8}>
+              {isNew ? <NewChip /> : null}
+              {externalLink ? <ExternalLink size={media.sm ? 14 : 12} color="$gray4" /> : null}
+              {IconRight ? <IconRight size={16} color="$color5" /> : null}
+            </XStack>
           )}
         </FrameComponent>
       </NavItemContext.Provider>
