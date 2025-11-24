@@ -63,9 +63,10 @@ const LayoutSideBar = styled(View, {
 interface LayoutProps extends ViewProps {
   children: React.ReactNode
   sidebarState?: SideBarState
+  hideTabBar?: boolean
 }
 
-const Layout = ({ children, sidebarState, ...props }: LayoutProps) => {
+const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) => {
   const media = useMedia()
 
   return (
@@ -74,9 +75,7 @@ const Layout = ({ children, sidebarState, ...props }: LayoutProps) => {
         {sidebarState && media.gtSm && <SideBar state={sidebarState} />}
         {children}
       </LayoutWrapper>
-      {!media.gtSm && (
-        <ConfigurableTabBar tabOrder={['accueil', 'evenements', 'cadreSheet', 'actions', 'more']} />
-      )}
+      {!media.gtSm && <ConfigurableTabBar hide={hideTabBar} />}
     </LayoutRoot>
   )
 }

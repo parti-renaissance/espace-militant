@@ -1,7 +1,10 @@
-import React from 'react'
-import { View, Text, styled } from 'tamagui'
+import React, { useState } from 'react'
+import { View, styled, XStack } from 'tamagui'
 import Layout from '@/components/Navigation/Layout'
 import { Stack } from 'expo-router'
+import { VoxButton } from '@/components/Button'
+import Text from '@/components/base/Text'
+import { Minus, Plus } from '@tamagui/lucide-icons'
 
 const CenterContainer = styled(View, {
   justifyContent: 'center',
@@ -16,6 +19,8 @@ const RouteName = styled(Text, {
 })
 
 export default function AccueilPage() {
+  const [count, setCount] = useState(0)
+
   return (
     <Layout.ScrollView safeArea>
       <Layout.Container>
@@ -25,6 +30,22 @@ export default function AccueilPage() {
             <RouteName>Accueil 2</RouteName>
             <RouteName>Accueil 3</RouteName>
             <RouteName>Accueil 4</RouteName>
+            <XStack gap="$medium" alignItems="center">
+              <VoxButton
+                onPress={() => setCount(count - 1)}
+                shrink
+                iconLeft={Minus}
+                iconSize={16}
+              />
+              <Text.LG>{count}</Text.LG>
+              <VoxButton
+                onPress={() => setCount(count + 1)}
+                shrink
+                iconLeft={Plus}
+                iconSize={16}
+              />
+              
+            </XStack>
             <RouteName>Accueil 5</RouteName>
             <RouteName>Accueil 6</RouteName>
             <RouteName>Accueil 7</RouteName>

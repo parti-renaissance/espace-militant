@@ -1,12 +1,15 @@
-import React from 'react'
-import { Slot, Stack } from 'expo-router'
-import Layout from '@/components/Navigation/Layout'
+import React, { useLayoutEffect } from 'react'
+import { Slot } from 'expo-router'
+import { useLayoutContext } from '@/components/Navigation/LayoutContext'
 
 export default function AppNewLayout() {
-  return (
-    <Layout sidebarState='cadre'>
-      <Slot />
-    </Layout>
-  )
-}
+  const { sidebarState, setSidebarState } = useLayoutContext()
 
+  useLayoutEffect(() => {
+    if (sidebarState !== 'cadre') {
+      setSidebarState('cadre')
+    }
+  }, [sidebarState, setSidebarState])
+
+  return <Slot />
+}
