@@ -235,7 +235,7 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
     onLayout: onMilitantMenuLayout,
   } = useVisibleNavItems<NavItemConfig>({
     items: militantNavItemsWithActive,
-    hasCadreButton: true,
+    hasCadreButton: hasExecutiveScopes ?? false,
     isVisible: true,
   })
 
