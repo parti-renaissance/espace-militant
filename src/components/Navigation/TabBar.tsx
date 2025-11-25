@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, LayoutRectangle, Platform, SafeAreaView as RNSafeAreaView, StyleSheet } from 'react-native'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -278,7 +278,6 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     if (id === 'more') {
       if (activeSpecialTab === 'more') {
         moreSheetRef.current?.close()
-        setActiveSpecialTab(null)
       } else {
         moreSheetRef.current?.expand()
         cadreSheetRef.current?.close()
@@ -289,7 +288,6 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     if (id === 'cadreSheet') {
       if (activeSpecialTab === 'cadreSheet') {
         cadreSheetRef.current?.close()
-        setActiveSpecialTab(null)
       } else {
         cadreSheetRef.current?.expand()
         moreSheetRef.current?.close()
@@ -303,19 +301,26 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     cadreSheetRef.current?.close()
     setActiveSpecialTab(null)
 
+    if (id === currentRouteId) return
+
     const config = getConfig(id)
     if (config) {
       if (config.onPress) {
         config.onPress()
       } else if (config.href) {
-        router.replace(config.href)
+        router.navigate(config.href)
       }
     }
   }
 
-  const handleSheetClose = () => {
-    setActiveSpecialTab(null)
-  }
+  const handleSheetClose = useCallback((id?: string) => {
+    setActiveSpecialTab((current) => {
+      if (current === id) {
+        return null
+      }
+      return current
+    })
+  }, [])
 
   // Get active color based on theme
   const getActiveColor = useMemo(() => {
@@ -393,12 +398,12 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
 
       <NavSheet
         ref={moreSheetRef}
-        onClose={handleSheetClose}
+        onClose={() => handleSheetClose('more')}
         items={moreItems}
       />
       <NavSheet
         ref={cadreSheetRef}
-        onClose={handleSheetClose}
+        onClose={() => handleSheetClose('cadreSheet')}
         items={cadreItems}
         ListHeaderComponent={
           <YStack paddingHorizontal={16}>

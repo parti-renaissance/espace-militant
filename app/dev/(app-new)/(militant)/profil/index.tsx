@@ -95,6 +95,9 @@ export default function ProfilPage() {
                   <Link href="/dev/profil/informations-personnelles" asChild>
                     <VoxButton>Informations personnelles</VoxButton>
                   </Link>
+                  <Link href="/dev/profil/cotisations-et-dons" asChild>
+                    <VoxButton>Cotisations et dons</VoxButton>
+                  </Link>
                 </YStack>
 
               </CenterContainer>
