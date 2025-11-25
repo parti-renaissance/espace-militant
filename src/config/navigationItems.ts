@@ -8,6 +8,7 @@ export type NavItemConfig = {
   iconLeft: IconComponent
   text: string
   href?: ComponentProps<typeof NavItem>['href']
+  routeName?: string
   isNew?: boolean
   externalLink?: boolean
   disabled?: boolean
@@ -20,19 +21,19 @@ export type NavItemConfig = {
 
 // Configuration des items du menu militant
 export const militantNavItems: NavItemConfig[] = [
-  { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/dev/accueil', theme: 'blue' },
-  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/dev/evenements', theme: 'blue' },
-  { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/dev/actions', theme: 'blue' },
-  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/dev/parrainages', theme: 'blue' },
+  { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/dev/accueil', routeName: '(militant)/accueil', theme: 'blue' },
+  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/dev/evenements', routeName: '(militant)/evenements', theme: 'blue' },
+  { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/dev/actions', routeName: '(militant)/actions', theme: 'blue' },
+  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/dev/parrainages', routeName: '(militant)/parrainages', theme: 'blue' },
   { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalLink: true, disabled: true },
-  { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/dev/ressources' },
-  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', isNew: true, href: '/dev/questionnaires' },
-  { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/dev/profil', theme: 'blue', displayIn: 'tabbar' },
+  { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/dev/ressources', routeName: '(militant)/ressources' },
+  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', isNew: true, href: '/dev/questionnaires', routeName: '(militant)/questionnaires' },
+  { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/dev/profil', routeName: '(militant)/profil', theme: 'blue', displayIn: 'tabbar' },
 ]
 
 // Configuration des items du menu cadre
 export const cadreNavItems: NavItemConfig[] = [
-  { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/dev/cadre/publications' },
+  { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/dev/cadre/publications', routeName: 'cadre/publications' },
   { id: 'militants', iconLeft: Flag, text: 'Mes militants', theme: 'purple', externalLink: true },
   { id: 'equipe', iconLeft: Users, text: 'Mon équipe', theme: 'purple', externalLink: true },
   { id: 'comites', iconLeft: Network, text: 'Gestion des comités', theme: 'purple', externalLink: true },

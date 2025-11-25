@@ -1,6 +1,7 @@
 import { CircleUser, Sparkle, HelpingHand, LandPlot, Settings2, MessageCircle, TreeDeciduous, KeyRound } from '@tamagui/lucide-icons'
 import { NavItem } from '@/components/Navigation/NavItem'
 import Layout from '@/components/Navigation/Layout'
+import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 import { VoxCard } from '@/components/VoxCard/VoxCard'
 import { usePathname } from 'expo-router'
 import React from 'react'
@@ -21,6 +22,7 @@ const RouteName = styled(Text, {
 })
 
 export default function CommunicationsPage() {
+  useHideTabBar()
   const pathname = usePathname()
   const media = useMedia()
 

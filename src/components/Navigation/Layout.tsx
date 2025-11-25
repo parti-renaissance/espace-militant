@@ -17,6 +17,7 @@ const LayoutWrapper = styled(XStack, {
 })
 
 const LayoutScrollView = styled(ScrollView, {
+  backgroundColor: '$textSurface',
   flex: 1,
 })
 
@@ -63,9 +64,10 @@ const LayoutSideBar = styled(View, {
 interface LayoutProps extends ViewProps {
   children: React.ReactNode
   sidebarState?: SideBarState
+  hideTabBar?: boolean
 }
 
-const Layout = ({ children, sidebarState, ...props }: LayoutProps) => {
+const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) => {
   const media = useMedia()
 
   return (
@@ -74,9 +76,7 @@ const Layout = ({ children, sidebarState, ...props }: LayoutProps) => {
         {sidebarState && media.gtSm && <SideBar state={sidebarState} />}
         {children}
       </LayoutWrapper>
-      {!media.gtSm && (
-        <ConfigurableTabBar tabOrder={['accueil', 'evenements', 'cadreSheet', 'actions', 'more']} />
-      )}
+      {!media.gtSm && <ConfigurableTabBar hide={hideTabBar} />}
     </LayoutRoot>
   )
 }
@@ -88,6 +88,9 @@ interface ScrollViewProps extends React.ComponentProps<typeof ScrollView> {
 
 const ScrollViewComponent = ({ children, safeArea, contentContainerStyle, ...props }: ScrollViewProps) => {
   const insets = useSafeAreaInsets()
+  const media = useMedia()
+  const tabBarHeight = !media.gtSm ? 64 : 0
+
   return (
     <LayoutScrollView
       {...props}
@@ -95,7 +98,7 @@ const ScrollViewComponent = ({ children, safeArea, contentContainerStyle, ...pro
         StyleSheet.flatten([
           contentContainerStyle as StyleProp<ViewStyle>,
           safeArea && {
-            paddingBottom: insets.bottom,
+            paddingBottom: insets.bottom + tabBarHeight,
             paddingTop: insets.top,
             paddingLeft: insets.left,
             paddingRight: insets.right,

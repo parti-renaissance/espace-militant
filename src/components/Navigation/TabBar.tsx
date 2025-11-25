@@ -11,6 +11,7 @@ import { militantNavItems, cadreNavItems, type NavItemConfig } from '@/config/na
 import { isNavItemActive } from './utils'
 import { ScopeSelector } from './ScopeSelector'
 import { HelpMenuItems } from './HelpMenuItems'
+import { useGetUserScopes } from '@/services/profile/hook'
 
 const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
 const SAVProps: any = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
@@ -120,17 +121,27 @@ const MemoTab = React.memo(Tab)
 
 type ConfigurableTabBarProps = {
   hide?: boolean
-  tabOrder?: string[]
   navCadreItems?: NavItemConfig[]
 }
 
 const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'parrainages', 'actions', 'more']
+const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'actions', 'more']
 
-const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems = cadreNavItems }: ConfigurableTabBarProps = {} as ConfigurableTabBarProps) => {
+const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: ConfigurableTabBarProps = {} as ConfigurableTabBarProps) => {
   const router = useRouter()
   const pathname = usePathname()
   const [activeSpecialTab, setActiveSpecialTab] = useState<string | null>(null)
   const themes = getThemes()
+
+  const { data: userScopes } = useGetUserScopes()
+
+  const hasExecutiveScope = useMemo(() => {
+    return userScopes?.some((s) => s.apps.includes('data_corner')) ?? false
+  }, [userScopes])
+
+  const visibleItemIds = useMemo(() => {
+    return hasExecutiveScope ? CADRE_TAB_ORDER : DEFAULT_TAB_ORDER
+  }, [hasExecutiveScope])
 
   // Filter items based on displayIn property (default to 'all')
   const navItems = useMemo(() => {
@@ -156,7 +167,7 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
       active: isNavItemActive(pathname, item.href),
     }))
   }, [navCadreItems, pathname])
-  const visibleItemIds = useMemo(() => tabOrder, [tabOrder])
+
   const moreItems = useMemo(() => {
     const filtered = navItems.filter((item) => !visibleItemIds.includes(item.id))
     // Add active state based on current pathname (including sub-routes)
@@ -319,7 +330,7 @@ const ConfigurableTabBar = ({ hide, tabOrder = DEFAULT_TAB_ORDER, navCadreItems 
 
   return (
     <>
-      <SAV {...SAVProps} style={{ backgroundColor: 'white' }}>
+      <SAV {...SAVProps} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'white' }}>
         <TabBarComponent>
           <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
           {visibleItemIds.map((id) => {

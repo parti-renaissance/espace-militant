@@ -142,7 +142,8 @@ export const ScopeSelector = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const triggerRef = useRef<HTMLElement | null>(null)
 
-  if (scopes.length === 0) return null
+  const isEmpty = scopes.length === 0
+  const canSelect = scopes.length > 1
 
   const subItems: NavItemSubItem[] = scopes.map((scope, index) => ({
     id: scope.id,
@@ -164,7 +165,9 @@ export const ScopeSelector = () => {
     },
   }))
 
-  const displayScope = selectedScope || scopes[0]
+  const displayScope = !isEmpty
+    ? selectedScope || scopes[0]
+    : { id: 'empty', name: 'Responsabilité cadre', role: 'Aucun rôle disponible' }
 
   return (
     <>
@@ -172,10 +175,17 @@ export const ScopeSelector = () => {
         ref={(node) => {
           triggerRef.current = node as HTMLElement | null
         }}
-        onPress={() => setDropdownOpen(!dropdownOpen)}
+        onPress={() => canSelect && setDropdownOpen(!dropdownOpen)}
+        cursor={canSelect ? 'pointer' : 'default'}
+        hoverStyle={!canSelect ? { backgroundColor: 'transparent' } : undefined}
+        pressStyle={!canSelect ? { backgroundColor: 'transparent' } : undefined}
       >
         <YStack flexShrink={1} gap={4}>
-          <Text.MD semibold color="$purple6" numberOfLines={1}>
+          <Text.MD
+            semibold
+            color={'$purple6'}
+            numberOfLines={1}
+          >
             {displayScope.name}
           </Text.MD>
           {displayScope.role && (
@@ -184,18 +194,22 @@ export const ScopeSelector = () => {
             </Text.SM>
           )}
         </YStack>
-        <YStack flexShrink={0}>
-          <ChevronsUpDown size={16} color="$purple5" />
-        </YStack>
+        {canSelect && (
+          <YStack flexShrink={0}>
+            <ChevronsUpDown size={16} color="$purple5" />
+          </YStack>
+        )}
       </SelectorContainer>
-      <NavItemDropdown
-        open={dropdownOpen}
-        onClose={() => setDropdownOpen(false)}
-        triggerRef={triggerRef}
-        verticalPosition="bottom"
-        subItems={subItems}
-        helpText="Changer de rôle permet d'accéder aux contenus qui lui sont associés."
-      />
+      {canSelect && (
+        <NavItemDropdown
+          open={dropdownOpen}
+          onClose={() => setDropdownOpen(false)}
+          triggerRef={triggerRef}
+          verticalPosition="bottom"
+          subItems={subItems}
+          helpText="Changer de rôle permet d'accéder aux contenus qui lui sont associés."
+        />
+      )}
     </>
   )
 }
