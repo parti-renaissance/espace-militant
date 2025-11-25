@@ -17,6 +17,7 @@ const LayoutWrapper = styled(XStack, {
 })
 
 const LayoutScrollView = styled(ScrollView, {
+  backgroundColor: '$textSurface',
   flex: 1,
 })
 
@@ -87,6 +88,9 @@ interface ScrollViewProps extends React.ComponentProps<typeof ScrollView> {
 
 const ScrollViewComponent = ({ children, safeArea, contentContainerStyle, ...props }: ScrollViewProps) => {
   const insets = useSafeAreaInsets()
+  const media = useMedia()
+  const tabBarHeight = !media.gtSm ? 64 : 0
+
   return (
     <LayoutScrollView
       {...props}
@@ -94,7 +98,7 @@ const ScrollViewComponent = ({ children, safeArea, contentContainerStyle, ...pro
         StyleSheet.flatten([
           contentContainerStyle as StyleProp<ViewStyle>,
           safeArea && {
-            paddingBottom: insets.bottom,
+            paddingBottom: insets.bottom + tabBarHeight,
             paddingTop: insets.top,
             paddingLeft: insets.left,
             paddingRight: insets.right,

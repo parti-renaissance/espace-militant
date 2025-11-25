@@ -330,7 +330,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
 
   return (
     <>
-      <SAV {...SAVProps} style={{ backgroundColor: 'white' }}>
+      <SAV {...SAVProps} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'white' }}>
         <TabBarComponent>
           <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
           {visibleItemIds.map((id) => {

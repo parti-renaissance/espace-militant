@@ -6,7 +6,7 @@ import { NavItem } from "./NavItem"
 import { ScopeSelector } from "./ScopeSelector"
 import { HelpMenuItems } from "./HelpMenuItems"
 import Text from "../base/Text"
-import { useGetProfil } from "@/services/profile/hook"
+import { useGetExecutiveScopes, useGetProfil } from "@/services/profile/hook"
 import type { NavItemSubItem } from "./NavItemDropdown"
 import { useVisibleNavItems } from "./useVisibleNavItems"
 import { usePathname } from "expo-router"
@@ -189,7 +189,12 @@ interface SideBarProps {
 export const SideBar = ({ state = 'militant' }: SideBarProps) => {
   const pathname = usePathname()
   const { data: user } = useGetProfil()
+  const { data: executiveScopes } = useGetExecutiveScopes()
   const [displayNavCadre, setDisplayNavCadre] = useState(state === 'cadre')
+  const hasExecutiveScopes = useMemo(
+    () => executiveScopes?.list && executiveScopes.list.length > 0,
+    [executiveScopes],
+  )
 
   React.useEffect(() => {
     if (displayNavCadre && state !== 'cadre') {
@@ -313,11 +318,23 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
               active={hiddenMilitantNavItems.some(item => item.active)}
             />
           )}
-          <YStack mt={32}>
-            <NavItem iconLeft={Sparkle} frame="cadre" active={displayNavCadre} text="CADRE" collapsed={displayNavCadre} iconRight={ChevronRight} theme="purple" isNew onPress={() => {
-              setDisplayNavCadre(!displayNavCadre);
-            }} />
-          </YStack>
+          {hasExecutiveScopes && (
+            <YStack mt={32}>
+              <NavItem
+                iconLeft={Sparkle}
+                frame="cadre"
+                active={displayNavCadre}
+                text="CADRE"
+                collapsed={displayNavCadre}
+                iconRight={ChevronRight}
+                theme="purple"
+                isNew
+                onPress={() => {
+                  setDisplayNavCadre(!displayNavCadre)
+                }}
+              />
+            </YStack>
+          )}
         </MenuContainer>
         <MenuFooterContainer collapsed={displayNavCadre}>
           <NavItem iconLeft={BellOff} text="Abonnement emails" dangerAccent collapsed={displayNavCadre} />
@@ -335,10 +352,12 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
           />
         </MenuFooterContainer>
       </SideBarContainer>
-      {
-        displayNavCadre && (
-          <SideBarContainer isCadre hasBoxShadow={state !== 'cadre'}>
-            <LogoContainer pb={0}>
+      <SideBarContainer
+        isCadre
+        hasBoxShadow={state !== 'cadre'}
+        display={displayNavCadre ? 'flex' : 'none'}
+      >
+        <LogoContainer pb={0}>
               <Text fontSize={20} medium>CADRE</Text>
             </LogoContainer>
             <YStack>
@@ -377,8 +396,6 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
               <HelpMenuItems variant="navItem" />
             </MenuFooterContainer>
           </SideBarContainer>
-        )
-      }
     </SideBarArea>
   )
 }
