@@ -21,7 +21,7 @@ const RouteName = styled(Text, {
 })
 
 export default function CotisationsEtDonsPage() {
-  useHideTabBar()
+  // useHideTabBar()
   const pathname = usePathname()
   const media = useMedia()
 

@@ -270,8 +270,8 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
       }
       
       onPress?.(event)
-      if (href && !isWeb) {
-        router.push(href)
+      if (href && !isWeb && !active) {
+        router.navigate(href)
       }
     }
 

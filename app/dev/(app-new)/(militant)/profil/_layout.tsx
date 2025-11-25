@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
-import { Stack, usePathname } from 'expo-router'
-import { useLayoutContext } from '@/components/Navigation/LayoutContext'
+import { Stack } from 'expo-router'
 
 export default function ProfilLayout() {
   return (
@@ -13,6 +12,7 @@ export default function ProfilLayout() {
           backgroundColor: '#fafafb',
         },
       }}
+      initialRouteName="index"
     />
   )
 }

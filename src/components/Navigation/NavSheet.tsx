@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react'
+import React, { forwardRef, memo, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
@@ -24,10 +24,16 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
   const insets = useSafeAreaInsets()
   const bsRef = useRef<BottomSheet>(null)
   const zIndex = useSharedValue(-10)
+  const [currentIndex, setCurrentIndex] = useState(-1)
+
+  const handleSheetChange = useCallback((index: number) => {
+    setCurrentIndex(index)
+  }, [])
 
   const handleClose = useCallback(() => {
     onClose?.()
     zIndex.value = -10
+    setCurrentIndex(-1)
   }, [onClose])
 
   useImperativeHandle(ref, () => {
@@ -35,10 +41,12 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
       expand: () => {
         bsRef.current?.expand()
         zIndex.value = 10
+        setCurrentIndex(0)
       },
       close: () => {
         bsRef.current?.close()
         zIndex.value = -10
+        setCurrentIndex(-1)
       },
     }
   })
@@ -58,7 +66,8 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheet
           ref={bsRef}
-          index={-1}
+          index={currentIndex}
+          onChange={handleSheetChange}
           backdropComponent={renderBackdrop}
           onClose={handleClose}
           enablePanDownToClose
@@ -124,5 +133,5 @@ const styles = StyleSheet.create({
   },
 })
 
-export default NavSheet
+export default memo(NavSheet)
 
