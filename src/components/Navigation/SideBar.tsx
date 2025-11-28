@@ -184,9 +184,10 @@ const Line = styled(YStack, {
 
 interface SideBarProps {
   state?: SideBarState
+  navCadreItems: NavItemConfig[]
 }
 
-export const SideBar = ({ state = 'militant' }: SideBarProps) => {
+export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => {
   const pathname = usePathname()
   const { data: user } = useGetProfil()
   const { data: executiveScopes } = useGetExecutiveScopes()
@@ -217,7 +218,7 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
 
   // Ajouter la propriété active aux items cadre et filtrer selon displayIn
   const cadreNavItemsWithActive = useMemo(() => {
-    return cadreNavItems
+    return navCadreItems
       .filter(item => {
         const displayIn = item.displayIn ?? 'all'
         return displayIn === 'all' || displayIn === 'sidebar'
@@ -226,7 +227,7 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
         ...item,
         active: isNavItemActive(pathname, item.href),
       }))
-  }, [pathname])
+  }, [pathname, navCadreItems])
 
   // Utiliser le hook pour gérer la visibilité des items du menu militant
   const {
@@ -377,6 +378,7 @@ export const SideBar = ({ state = 'militant' }: SideBarProps) => {
                     externalLink={item.externalLink}
                     disabled={item.disabled}
                     active={item.active}
+                    onPress={item.onPress}
                   />
                 ))}
                 {hiddenCadreNavItems.length > 0 && (

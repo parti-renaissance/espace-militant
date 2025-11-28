@@ -74,7 +74,7 @@ const ReferralsDesktopScreenAllow = () => {
       onScroll={handleScroll}
       scrollEventThrottle={16}
     >
-      <View backgroundColor="$orange1" pt="$6" pb={48 + 32}>
+      <View backgroundColor="$orange1" pt="$6" pb={52}>
         <View maxWidth={480} width="100%" margin="auto">
           <ReferralScoreCard
             fullName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}

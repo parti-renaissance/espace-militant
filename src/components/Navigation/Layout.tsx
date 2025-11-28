@@ -7,6 +7,7 @@ import ConfigurableTabBar from '@/components/Navigation/TabBar'
 import { YStack } from 'tamagui'
 import { ScrollContext } from './scrollContext'
 import useLayoutPadding, { UseLayoutPaddingOptions } from './hook/useLayoutPadding'
+import { useCadreNavItems } from '@/config/navigationItems'
 
 const SAFE_AREA_PADDING = 16
 
@@ -43,14 +44,17 @@ interface LayoutProps extends ViewProps {
 
 const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) => {
   const media = useMedia()
+  const cadreNavItems = useCadreNavItems()
+
+  console.log('cadreNavItems', cadreNavItems)
 
   return (
     <LayoutRoot {...props}>
       <LayoutWrapper>
-        {sidebarState && media.gtSm && <SideBar state={sidebarState} />}
+        {sidebarState && media.gtSm && <SideBar state={sidebarState} navCadreItems={cadreNavItems} />}
         {children}
       </LayoutWrapper>
-      {!media.gtSm && <ConfigurableTabBar hide={hideTabBar} />}
+      {!media.gtSm && <ConfigurableTabBar hide={hideTabBar} navCadreItems={cadreNavItems} />}
     </LayoutRoot>
   )
 }
