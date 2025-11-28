@@ -2,6 +2,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useMedia } from "tamagui"
 
 const SAFE_AREA_PADDING = 16
+const TABBAR_HEIGHT_SM = 64
 
 type PaddingConfig = {
     /** Active le padding de base et le safe padding en haut */
@@ -71,7 +72,7 @@ type PaddingConfig = {
   
       return {
         paddingTop: py + SAFE_AREA_PADDING + (enableTop ? insets.top : 0),
-        paddingBottom: py + SAFE_AREA_PADDING + (enableBottom ? insets.bottom : 0),
+        paddingBottom: py + SAFE_AREA_PADDING + (enableBottom ? insets.bottom : 0) + (media.sm ? TABBAR_HEIGHT_SM : 0),
         paddingLeft: px + (enableLeft ? insets.left : 0),
         paddingRight: px + (enableRight ? insets.right : 0),
       }

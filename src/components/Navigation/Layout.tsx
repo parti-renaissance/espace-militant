@@ -68,7 +68,7 @@ const ContentContainer = styled(XStack, {
   gap: 32,
 })
 
-const Container = ({ children }: { children: React.ReactNode }) => {
+const Container = ({ children, ...props }: { children: React.ReactNode } & ViewProps) => {
   const insets = useSafeAreaInsets()
   const layoutRef = useRef<HTMLDivElement>(null)
   const media = useMedia()
@@ -81,6 +81,7 @@ const Container = ({ children }: { children: React.ReactNode }) => {
       pl={media.gtLg ? insets.left : (media.gtMd ? (insets.left) : insets.left)}
       pr={insets.right}
       overflowY={isWeb ? 'auto' : undefined}
+      {...props}
     >
       <YStack width="100%" flexGrow={1}>
         <ScrollContext.Provider value={{ layoutRef: layoutRef as React.RefObject<HTMLDivElement>, scrollActive: Boolean(isWeb && media.gtSm) }}>

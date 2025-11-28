@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native'
 import { ImageBackground, Image } from 'expo-image'
 import { router, useLocalSearchParams } from 'expo-router'
-import { XStack, YStack, styled, useMedia } from 'tamagui'
+import { XStack, YStack, isWeb, styled, useMedia } from 'tamagui'
 import { ArrowLeft, ArrowRight, ClipboardCheck, SendHorizontal } from '@tamagui/lucide-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -21,6 +21,7 @@ import ContactPreferences, { ContactPreferencesData } from '../components/Contac
 import QuitConfirmModal from '../components/QuitConfirmModal'
 import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
 import Layout from '@/components/Navigation/Layout'
+import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 
 // Types pour les réponses
 interface Answer {
@@ -86,6 +87,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  useHideTabBar()
 
   const redirectToAndroid = () => {
     redirectToStore('android')
@@ -114,7 +116,13 @@ const FieldSurveyDetailsPage: React.FC = () => {
 
   const handleQuit = () => {
     setDisplayQuitModal(false)
-    router.replace('/dev/(app-new)/(militant)/questionnaires')
+    if (isWeb) {
+      router.push('/dev/(app-new)/(militant)/questionnaires')
+    } else if (router.canGoBack?.()) {
+      router.back()
+    } else {
+      router.replace('/dev/(app-new)/(militant)/questionnaires')
+    }
   }
 
   const currentQuestion = useMemo(() => {
@@ -210,7 +218,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
       })
 
       // Navigation vers la page de succès
-      router.push({
+      router.replace({
         pathname: '/dev/(app-new)/(militant)/questionnaires/[id]/success',
         params: { id: survey.uuid }
       })

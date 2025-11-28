@@ -1,7 +1,7 @@
 import React from 'react'
 import { ImageBackground } from 'expo-image'
 import { router, useLocalSearchParams } from 'expo-router'
-import { Circle, XStack, YStack, styled, useMedia } from 'tamagui'
+import { Circle, XStack, YStack, isWeb, styled, useMedia } from 'tamagui'
 import { RotateCcw, ThumbsUp } from '@tamagui/lucide-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -10,6 +10,7 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { VoxHeader } from '@/components/Header/Header'
 import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 
 const Container = styled(YStack, {
   flex: 1,
@@ -33,7 +34,8 @@ const FieldSurveySuccessPage: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
   const media = useMedia()
   const insets = useSafeAreaInsets()
-
+  useHideTabBar()
+  
   const handleRestart = () => {
     // Navigation vers le questionnaire avec réinitialisation
     router.replace({
@@ -43,7 +45,13 @@ const FieldSurveySuccessPage: React.FC = () => {
   }
 
   const handleBackToList = () => {
-    router.push('/dev/(app-new)/(militant)/questionnaires')
+    if (isWeb) {
+      router.push('/dev/(app-new)/(militant)/questionnaires')
+    } else if (router.canGoBack?.()) {
+      router.back()
+    } else {
+      router.replace('/dev/(app-new)/(militant)/questionnaires')
+    }
   }
 
   const FixedButtons = () => (
@@ -88,7 +96,6 @@ const FieldSurveySuccessPage: React.FC = () => {
         </VoxHeader>
       ) : null}
       <LayoutScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
         <Container flex={1}>
