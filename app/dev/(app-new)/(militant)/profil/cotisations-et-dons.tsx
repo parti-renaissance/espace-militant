@@ -1,13 +1,15 @@
 import { CircleUser, Sparkle, HelpingHand, LandPlot, Settings2, MessageCircle, TreeDeciduous, KeyRound } from '@tamagui/lucide-icons'
 import { NavItem } from '@/components/Navigation/NavItem'
-import Layout from '@/components/Navigation/Layout'
+import Layout, { useLayoutPadding } from '@/components/Navigation/Layout'
 import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 import { VoxCard } from '@/components/VoxCard/VoxCard'
 import { usePathname } from 'expo-router'
 import React from 'react'
-import { View, Text, styled, YStack } from 'tamagui'
+import { View, Text, styled, YStack, ScrollView } from 'tamagui'
 import { isNavItemActive } from '@/components/Navigation/utils'
 import { useMedia } from 'tamagui'
+import { RefreshControl } from 'react-native'
+import EditInformations from '@/features/profil/pages/donations/index'
 
 const CenterContainer = styled(View, {
   justifyContent: 'center',
@@ -21,9 +23,18 @@ const RouteName = styled(Text, {
 })
 
 export default function CotisationsEtDonsPage() {
-  // useHideTabBar()
+  useHideTabBar()
+
+  return (
+    <Layout.Container>
+      <CotisationsEtDonsContent />
+    </Layout.Container>
+  )
+}
+
+function CotisationsEtDonsContent() {
   const pathname = usePathname()
-  const media = useMedia()
+  const padding = useLayoutPadding({ safeArea: true })
 
   const navItems = [
     {
@@ -85,38 +96,30 @@ export default function CotisationsEtDonsPage() {
   ]
 
   return (
-    <Layout.ScrollView safeArea>
-      <Layout.Container>
-        <Layout.Main>
-          <VoxCard borderRadius={16}>
-            <VoxCard.Content>
-              <CenterContainer gap={16}>
-                <RouteName>Cotisations et dons</RouteName>
-                <YStack gap={16}>
-                </YStack>
-              </CenterContainer>
-            </VoxCard.Content>
-          </VoxCard>
-        </Layout.Main>
-        {media.gtSm && (
-          <Layout.SideBar maxWidth={280} isSticky>
-            <VoxCard borderRadius={16}>
-              <VoxCard.Content>
-                {navItems.map((item) => (
-                  <NavItem
-                    key={item.id}
-                    text={item.text}
-                    iconLeft={item.iconLeft}
-                    href={item.href}
-                    active={item.active}
-                  />
-                ))}
-              </VoxCard.Content>
-            </VoxCard>
-          </Layout.SideBar>
-        )}
-      </Layout.Container>
-    </Layout.ScrollView>
+    <>
+      <Layout.Main>
+        <ScrollView
+          contentContainerStyle={{ paddingTop: padding.paddingTop, paddingBottom: padding.paddingBottom }}
+        >
+          <EditInformations />
+        </ScrollView>
+      </Layout.Main>
+
+      <Layout.SideBar isSticky>
+        <VoxCard borderRadius={16}>
+          <VoxCard.Content p="$small">
+            {navItems.map((item) => (
+              <NavItem
+                key={item.id}
+                text={item.text}
+                iconLeft={item.iconLeft}
+                href={item.href}
+                active={item.active}
+              />
+            ))}
+          </VoxCard.Content>
+        </VoxCard>
+      </Layout.SideBar>
+    </>
   )
 }
-

@@ -1,71 +1,65 @@
-import React, { useState } from 'react'
-import { View, styled, XStack } from 'tamagui'
-import Layout from '@/components/Navigation/Layout'
-import { Stack } from 'expo-router'
-import { VoxButton } from '@/components/Button'
+import React, { useState, useCallback } from 'react'
+import Layout, { useLayoutPadding } from '@/components/Navigation/Layout'
 import Text from '@/components/base/Text'
-import { Minus, Plus } from '@tamagui/lucide-icons'
-
-const CenterContainer = styled(View, {
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: '$medium',
-})
-
-const RouteName = styled(Text, {
-  fontSize: '$8',
-  fontWeight: 'bold',
-  color: '$textPrimary',
-})
+import { FlatList } from 'react-native'
+import { View, YStack, isWeb } from 'tamagui'
+import { usePageLayoutScroll } from '@/components/Navigation/usePageLayoutScroll'
 
 export default function AccueilPage() {
-  const [count, setCount] = useState(0)
-
   return (
-    <Layout.ScrollView safeArea>
-      <Layout.Container>
-        <Layout.Main>
-          <CenterContainer>
-            <RouteName>Accueil 1</RouteName>
-            <RouteName>Accueil 2</RouteName>
-            <RouteName>Accueil 3</RouteName>
-            <RouteName>Accueil 4</RouteName>
-            <XStack gap="$medium" alignItems="center">
-              <VoxButton
-                onPress={() => setCount(count - 1)}
-                shrink
-                iconLeft={Minus}
-                iconSize={16}
-              />
-              <Text.LG>{count}</Text.LG>
-              <VoxButton
-                onPress={() => setCount(count + 1)}
-                shrink
-                iconLeft={Plus}
-                iconSize={16}
-              />
-              
-            </XStack>
-            <RouteName>Accueil 5</RouteName>
-            <RouteName>Accueil 6</RouteName>
-            <RouteName>Accueil 7</RouteName>
-            <RouteName>Accueil 8</RouteName>
-            <RouteName>Accueil 9</RouteName>
-            <RouteName>Accueil 10</RouteName>
-            <RouteName>Accueil 11</RouteName>
-            <RouteName>Accueil 12</RouteName>
-            <RouteName>Accueil 13</RouteName>
-            <RouteName>Accueil 14</RouteName>
-            <RouteName>Accueil 15</RouteName>
-            <RouteName>Accueil 16</RouteName>
-            <RouteName>Accueil 17</RouteName>
-            <RouteName>Accueil 18</RouteName>
-            <RouteName>Accueil 19</RouteName>
-            <RouteName>Accueil 20</RouteName>
-          </CenterContainer>
-        </Layout.Main>
-      </Layout.Container>
-    </Layout.ScrollView>
+    <Layout.Container>
+      <AccueilContent />
+    </Layout.Container>
   )
 }
 
+function AccueilContent() {
+  const [data, setData] = useState<number[]>(Array.from({ length: 20 }, (_, index) => index))
+  const padding = useLayoutPadding({ safeArea: true })
+  
+  const hasMore = data.length < 100
+
+  // 🔥 Logique de chargement unique (useCallback pour la stabilité)
+  const loadMore = useCallback(() => {
+    console.log('loadMore')
+    if (!hasMore) return
+    console.log('length', data.length)
+    setData((currentData) => [
+      ...currentData,
+      ...Array.from({ length: 20 }, (_, index) => index + currentData.length),
+    ])
+  }, [hasMore, data])
+
+
+  // 1. Web : Utilisation du hook pour la détection sur le conteneur parent
+  usePageLayoutScroll({
+    onEndReached: hasMore ? loadMore : undefined,
+    onEndReachedThreshold: 0.4,
+  })
+
+  return (
+    <>
+      <Layout.Main>
+        <FlatList
+          contentContainerStyle={{ gap: 16, paddingTop: padding.paddingTop, paddingBottom: padding.paddingBottom }}
+          data={data}
+          scrollEnabled={!isWeb}
+          renderItem={({ item }) => (
+            <View key={item} height={100} backgroundColor={`$blue${(item + 5) % 7 + 1}`}>
+              <Text>Feed Item {item + 1}</Text>
+            </View>
+          )}
+          
+          // 2. Natif : Utilisation des props natives de la FlatList
+          onEndReachedThreshold={0.4}
+          onEndReached={isWeb ? undefined : (hasMore ? loadMore : undefined)} // Appel de la fonction unique
+        />
+      </Layout.Main>
+      <Layout.SideBar isSticky>
+        <YStack bg="$orange3" height={500} alignItems="center" justifyContent="center">
+          <Text>Contenu colonne 2</Text>
+        </YStack>
+      </Layout.SideBar>
+    </>
+  )
+}

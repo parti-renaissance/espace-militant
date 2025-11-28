@@ -1,9 +1,9 @@
-import { VoxButton } from '@/components/Button'
 import { CircleUser, Sparkle, HelpingHand, LandPlot, Settings2, MessageCircle, TreeDeciduous, KeyRound } from '@tamagui/lucide-icons'
 import { NavItem } from '@/components/Navigation/NavItem'
 import Layout from '@/components/Navigation/Layout'
+import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 import { VoxCard } from '@/components/VoxCard/VoxCard'
-import { Link, usePathname } from 'expo-router'
+import { usePathname } from 'expo-router'
 import React from 'react'
 import { View, Text, styled, YStack } from 'tamagui'
 import { isNavItemActive } from '@/components/Navigation/utils'
@@ -20,7 +20,17 @@ const RouteName = styled(Text, {
   color: '$textPrimary',
 })
 
-export default function ProfilPage() {
+export default function IndexPage() {
+  useHideTabBar()
+
+  return (
+    <Layout.Container>
+      <IndexContent />
+    </Layout.Container>
+  )
+}
+
+function IndexContent() {
   const pathname = usePathname()
   const media = useMedia()
 
@@ -82,49 +92,33 @@ export default function ProfilPage() {
       active: isNavItemActive(pathname, '/dev/profil/mot-de-passe'),
     },
   ]
-
+  
   return (
-    <Layout.ScrollView safeArea>
-      <Layout.Container>
-        <Layout.Main>
-          <VoxCard borderRadius={16}>
-            <VoxCard.Content>
-              <CenterContainer gap={16}>
-                <RouteName>Mon profil</RouteName>
-                <YStack gap={16}>
-                  <Link href="/dev/profil/informations-personnelles" asChild>
-                    <VoxButton>Informations personnelles</VoxButton>
-                  </Link>
-                  <Link href="/dev/profil/cotisations-et-dons" asChild>
-                    <VoxButton>Cotisations et dons</VoxButton>
-                  </Link>
-                </YStack>
-
-              </CenterContainer>
-            </VoxCard.Content>
-          </VoxCard>
-
-        </Layout.Main>
-        {media.gtSm && (
-          <Layout.SideBar maxWidth={280} isSticky>
-            <VoxCard borderRadius={16}>
-              <VoxCard.Content>
-                {navItems.map((item) => (
-                  <NavItem
-                    key={item.id}
-                    text={item.text}
-                    iconLeft={item.iconLeft}
-                    href={item.href}
-                    active={item.active}
-                  />
-                ))}
-              </VoxCard.Content>
-            </VoxCard>
-          </Layout.SideBar>
-        )}
-      </Layout.Container>
-    </Layout.ScrollView>
-
+    <>
+      <Layout.Main>
+        <VoxCard borderRadius={16}>
+          <VoxCard.Content>
+            <CenterContainer>
+              <RouteName>Mon profil</RouteName>
+            </CenterContainer>
+          </VoxCard.Content>
+        </VoxCard>
+      </Layout.Main>
+      <Layout.SideBar isSticky>
+        <VoxCard borderRadius={16}>
+          <VoxCard.Content>
+            {navItems.map((item) => (
+              <NavItem
+                key={item.id}
+                text={item.text}
+                iconLeft={item.iconLeft}
+                href={item.href}
+                active={item.active}
+              />
+            ))}
+          </VoxCard.Content>
+        </VoxCard>
+      </Layout.SideBar>
+    </>
   )
 }
-

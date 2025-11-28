@@ -16,15 +16,18 @@ const RouteName = styled(Text, {
 
 export default function ParrainagesPage() {
   return (
-    <Layout.ScrollView safeArea>
-      <Layout.Container>
-        <Layout.Main>
-          <CenterContainer>
-            <RouteName>Parrainages</RouteName>
-          </CenterContainer>
-        </Layout.Main>
-      </Layout.Container>
-    </Layout.ScrollView>
+    <Layout.Container>
+      <ParrainagesContent />
+    </Layout.Container>
   )
 }
 
+function ParrainagesContent() {
+  return (
+    <Layout.Main>
+      <CenterContainer>
+        <RouteName>Parrainages</RouteName>
+      </CenterContainer>
+    </Layout.Main>
+  )
+}

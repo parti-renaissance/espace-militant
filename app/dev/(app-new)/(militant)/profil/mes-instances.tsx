@@ -22,6 +22,15 @@ const RouteName = styled(Text, {
 
 export default function MesInstancesPage() {
   useHideTabBar()
+
+  return (
+    <Layout.Container>
+      <MesInstancesContent />
+    </Layout.Container>
+  )
+}
+
+function MesInstancesContent() {
   const pathname = usePathname()
   const media = useMedia()
 
@@ -83,40 +92,33 @@ export default function MesInstancesPage() {
       active: isNavItemActive(pathname, '/dev/profil/mot-de-passe'),
     },
   ]
-
+  
   return (
-    <Layout.ScrollView safeArea>
-      <Layout.Container>
-        <Layout.Main>
-          <VoxCard borderRadius={16}>
-            <VoxCard.Content>
-              <CenterContainer gap={16}>
-                <RouteName>Mes instances</RouteName>
-                <YStack gap={16}>
-                </YStack>
-              </CenterContainer>
-            </VoxCard.Content>
-          </VoxCard>
-        </Layout.Main>
-        {media.gtSm && (
-          <Layout.SideBar maxWidth={280} isSticky>
-            <VoxCard borderRadius={16}>
-              <VoxCard.Content>
-                {navItems.map((item) => (
-                  <NavItem
-                    key={item.id}
-                    text={item.text}
-                    iconLeft={item.iconLeft}
-                    href={item.href}
-                    active={item.active}
-                  />
-                ))}
-              </VoxCard.Content>
-            </VoxCard>
-          </Layout.SideBar>
-        )}
-      </Layout.Container>
-    </Layout.ScrollView>
+    <>
+      <Layout.Main>
+        <VoxCard borderRadius={16}>
+          <VoxCard.Content>
+            <CenterContainer>
+              <RouteName>Mes instances</RouteName>
+            </CenterContainer>
+          </VoxCard.Content>
+        </VoxCard>
+      </Layout.Main>
+      <Layout.SideBar isSticky>
+        <VoxCard borderRadius={16}>
+          <VoxCard.Content>
+            {navItems.map((item) => (
+              <NavItem
+                key={item.id}
+                text={item.text}
+                iconLeft={item.iconLeft}
+                href={item.href}
+                active={item.active}
+              />
+            ))}
+          </VoxCard.Content>
+        </VoxCard>
+      </Layout.SideBar>
+    </>
   )
 }
-

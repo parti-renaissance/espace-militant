@@ -1,10 +1,13 @@
-import React from 'react'
-import { ScrollView, View, XStack, styled, withStaticProperties, ViewProps, useMedia } from 'tamagui'
+import React, { useRef } from 'react'
+import { ScrollView, View, XStack, styled, withStaticProperties, ViewProps, useMedia, isWeb } from 'tamagui'
 import { StyleSheet, StyleProp, ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SideBar, SideBarState } from '@/components/Navigation/SideBar'
 import ConfigurableTabBar from '@/components/Navigation/TabBar'
+import { YStack } from 'tamagui'
+import { ScrollContext } from './scrollContext'
 
+const SAFE_AREA_PADDING = 16
 
 const LayoutRoot = styled(View, {
   height: '100dvh',
@@ -16,50 +19,26 @@ const LayoutWrapper = styled(XStack, {
   flex: 1,
 })
 
-const LayoutScrollView = styled(ScrollView, {
-  backgroundColor: '$textSurface',
-  flex: 1,
-})
-
-const LayoutContainer = styled(XStack, {
-  $lg: {
-    py: 8,
-    px: 16,
-    gap: 8,
-  },
-  $xl: {
-    py: 12,
-    px: 24,
-    gap: 12,
-  },
-  py: 16,
-  px: 32,
-  gap: 16,
-  justifyContent: 'center',
-})
-
-const LayoutMain = styled(View, {
-  flex: 2,
-  maxWidth: 520,
-})
-
 const LayoutSideBar = styled(View, {
   flex: 1,
+  $sm: {
+    display: 'none',
+  },
   variants: {
     isSticky: {
       true: {
         position: 'sticky',
         $lg: {
-          top: 8,
+          top: 8 + SAFE_AREA_PADDING,
         },
         $xl: {
-          top: 12,
+          top: 12 + SAFE_AREA_PADDING,
         },
-        top: 16,
+        top: 16 + SAFE_AREA_PADDING,
       },
     },
   },
-})
+} as const)
 
 interface LayoutProps extends ViewProps {
   children: React.ReactNode
@@ -81,54 +60,57 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
   )
 }
 
-interface ScrollViewProps extends React.ComponentProps<typeof ScrollView> {
-  children: React.ReactNode
-  safeArea?: boolean
-}
+const ContentContainer = styled(XStack, {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "flex-start",
+  $lg: {
+    gap: 16,
+  },
+  $xl: {
+    gap: 24,
+  },
+  gap: 32,
+})
 
-const ScrollViewComponent = ({ children, safeArea, contentContainerStyle, ...props }: ScrollViewProps) => {
+const Container = ({ children }: { children: React.ReactNode }) => {
   const insets = useSafeAreaInsets()
+  const layoutRef = useRef<HTMLDivElement>(null)
   const media = useMedia()
-  const tabBarHeight = !media.gtSm ? 64 : 0
 
   return (
-    <LayoutScrollView
-      {...props}
-      contentContainerStyle={
-        StyleSheet.flatten([
-          contentContainerStyle as StyleProp<ViewStyle>,
-          safeArea && {
-            paddingBottom: insets.bottom + tabBarHeight,
-            paddingTop: insets.top,
-            paddingLeft: insets.left,
-            paddingRight: insets.right,
-          },
-        ]) as ScrollViewProps['contentContainerStyle']
-      }
+    <YStack alignItems="center"
+      ref={layoutRef}
+      flex={1}
+      bg="$textSurface"
+      pl={media.gtLg ? insets.left : (media.gtMd ? (insets.left) : insets.left)}
+      pr={insets.right}
+      overflowY={isWeb ? 'auto' : undefined}
     >
-      {children}
-    </LayoutScrollView>
+      <YStack width="100%" flexGrow={1}>
+        <ScrollContext.Provider value={{ layoutRef: layoutRef as React.RefObject<HTMLDivElement>, scrollActive: Boolean(isWeb && media.gtSm) }}>
+          <ContentContainer>
+            {children}
+          </ContentContainer>
+        </ScrollContext.Provider>
+      </YStack>
+    </YStack>
   )
 }
 
-interface ContainerProps extends React.ComponentProps<typeof XStack> {
-  children: React.ReactNode
-}
+const MainContainer = styled(View, {
+  flex: 2,
+  maxWidth: 520,
+  $sm: {
+    maxWidth: '100%',
+  },
+})
 
-const Container = ({ children, ...props }: ContainerProps) => {
-  return <LayoutContainer {...props}>{children}</LayoutContainer>
-}
-
-interface MainProps extends ViewProps {
-  children: React.ReactNode
-  maxWidth?: number | string
-}
-
-const Main = ({ children, maxWidth = 520, ...props }: MainProps) => {
+const Main = ({ children, maxWidth = 520 }: { children: React.ReactNode, maxWidth?: number | string }) => {
   return (
-    <LayoutMain maxWidth={maxWidth} {...props}>
+    <MainContainer maxWidth={maxWidth} >
       {children}
-    </LayoutMain>
+    </MainContainer>
   )
 }
 
@@ -138,16 +120,50 @@ interface SideBarProps extends ViewProps {
   maxWidth?: number | string
 }
 
-const SideBarComponent = (props: SideBarProps) => {
+const SideBarComponent = ({ children, isSticky, maxWidth = 320, ...props }: SideBarProps) => {
   return (
-    <LayoutSideBar isSticky={props.isSticky} maxWidth={props.maxWidth} {...props}>
-      {props.children}
+    <LayoutSideBar isSticky={isSticky} maxWidth={maxWidth} {...props}>
+      {children}
     </LayoutSideBar>
   )
 }
 
+export const useLayoutPadding = (
+  options: {
+    safeArea?: boolean
+    safeAreaTop?: boolean
+    safeAreaBottom?: boolean
+    safeAreaLeft?: boolean
+    safeAreaRight?: boolean
+  } = {}
+) => {
+  const media = useMedia()
+  const insets = useSafeAreaInsets()
+
+  let py = 16
+  if (media.xl) py = 12
+  if (media.lg) py = 8
+  if (media.sm) py = 8
+
+  let px = 32
+  if (media.xl) px = 24
+  if (media.lg) px = 16
+  if (media.sm) px = 0
+
+  const enableTop = options.safeAreaTop ?? options.safeArea ?? false
+  const enableBottom = options.safeAreaBottom ?? options.safeArea ?? false
+  const enableLeft = options.safeAreaLeft ?? options.safeArea ?? false
+  const enableRight = options.safeAreaRight ?? options.safeArea ?? false
+
+  return {
+    paddingTop: py + SAFE_AREA_PADDING + (enableTop ? insets.top : 0),
+    paddingBottom: py + SAFE_AREA_PADDING + (enableBottom ? insets.bottom : 0),
+    paddingLeft: px + (enableLeft ? insets.left : 0),
+    paddingRight: px + (enableRight ? insets.right : 0),
+  }
+}
+
 export default withStaticProperties(Layout, {
-  ScrollView: ScrollViewComponent,
   Container,
   Main,
   SideBar: SideBarComponent,
