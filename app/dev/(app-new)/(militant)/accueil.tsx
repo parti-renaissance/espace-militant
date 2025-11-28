@@ -1,9 +1,8 @@
 import React, { useState, useCallback } from 'react'
-import Layout, { useLayoutPadding } from '@/components/Navigation/Layout'
+import Layout from '@/components/Navigation/Layout'
 import Text from '@/components/base/Text'
-import { FlatList } from 'react-native'
-import { View, YStack, isWeb } from 'tamagui'
-import { usePageLayoutScroll } from '@/components/Navigation/usePageLayoutScroll'
+import { View, YStack } from 'tamagui'
+import LayoutFlatList from '@/components/Navigation/LayoutFlatList'
 
 export default function AccueilPage() {
   return (
@@ -15,11 +14,9 @@ export default function AccueilPage() {
 
 function AccueilContent() {
   const [data, setData] = useState<number[]>(Array.from({ length: 20 }, (_, index) => index))
-  const padding = useLayoutPadding({ safeArea: true })
   
   const hasMore = data.length < 100
 
-  // 🔥 Logique de chargement unique (useCallback pour la stabilité)
   const loadMore = useCallback(() => {
     console.log('loadMore')
     if (!hasMore) return
@@ -30,29 +27,20 @@ function AccueilContent() {
     ])
   }, [hasMore, data])
 
-
-  // 1. Web : Utilisation du hook pour la détection sur le conteneur parent
-  usePageLayoutScroll({
-    onEndReached: hasMore ? loadMore : undefined,
-    onEndReachedThreshold: 0.4,
-  })
-
   return (
     <>
       <Layout.Main>
-        <FlatList
-          contentContainerStyle={{ gap: 16, paddingTop: padding.paddingTop, paddingBottom: padding.paddingBottom }}
+        <LayoutFlatList
+          padding="left"
           data={data}
-          scrollEnabled={!isWeb}
           renderItem={({ item }) => (
-            <View key={item} height={100} backgroundColor={`$blue${(item + 5) % 7 + 1}`}>
+            <View mb="$medium" key={item} height={100} backgroundColor={`$blue${(item + 5) % 7 + 1}`}>
               <Text>Feed Item {item + 1}</Text>
             </View>
           )}
-          
-          // 2. Natif : Utilisation des props natives de la FlatList
           onEndReachedThreshold={0.4}
-          onEndReached={isWeb ? undefined : (hasMore ? loadMore : undefined)} // Appel de la fonction unique
+          onEndReached={loadMore}
+          hasMore={hasMore}
         />
       </Layout.Main>
       <Layout.SideBar isSticky>

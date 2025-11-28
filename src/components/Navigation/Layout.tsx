@@ -6,6 +6,7 @@ import { SideBar, SideBarState } from '@/components/Navigation/SideBar'
 import ConfigurableTabBar from '@/components/Navigation/TabBar'
 import { YStack } from 'tamagui'
 import { ScrollContext } from './scrollContext'
+import useLayoutPadding, { UseLayoutPaddingOptions } from './hook/useLayoutPadding'
 
 const SAFE_AREA_PADDING = 16
 
@@ -28,13 +29,7 @@ const LayoutSideBar = styled(View, {
     isSticky: {
       true: {
         position: 'sticky',
-        $lg: {
-          top: 8 + SAFE_AREA_PADDING,
-        },
-        $xl: {
-          top: 12 + SAFE_AREA_PADDING,
-        },
-        top: 16 + SAFE_AREA_PADDING,
+        top: 0,
       },
     },
   },
@@ -114,53 +109,20 @@ const Main = ({ children, maxWidth = 520 }: { children: React.ReactNode, maxWidt
   )
 }
 
-interface SideBarProps extends ViewProps {
+interface SideBarProps extends Omit<ViewProps, 'padding'> {
   children: React.ReactNode
   isSticky?: boolean
   maxWidth?: number | string
+  padding?: UseLayoutPaddingOptions
 }
 
-const SideBarComponent = ({ children, isSticky, maxWidth = 320, ...props }: SideBarProps) => {
+const SideBarComponent = ({ children, isSticky, maxWidth = 320, padding = 'right', ...props }: SideBarProps) => {
+  const paddingValues = useLayoutPadding(padding)
   return (
-    <LayoutSideBar isSticky={isSticky} maxWidth={maxWidth} {...props}>
+    <LayoutSideBar isSticky={isSticky} maxWidth={maxWidth} {...paddingValues} {...props}>
       {children}
     </LayoutSideBar>
   )
-}
-
-export const useLayoutPadding = (
-  options: {
-    safeArea?: boolean
-    safeAreaTop?: boolean
-    safeAreaBottom?: boolean
-    safeAreaLeft?: boolean
-    safeAreaRight?: boolean
-  } = {}
-) => {
-  const media = useMedia()
-  const insets = useSafeAreaInsets()
-
-  let py = 16
-  if (media.xl) py = 12
-  if (media.lg) py = 8
-  if (media.sm) py = 8
-
-  let px = 32
-  if (media.xl) px = 24
-  if (media.lg) px = 16
-  if (media.sm) px = 0
-
-  const enableTop = options.safeAreaTop ?? options.safeArea ?? false
-  const enableBottom = options.safeAreaBottom ?? options.safeArea ?? false
-  const enableLeft = options.safeAreaLeft ?? options.safeArea ?? false
-  const enableRight = options.safeAreaRight ?? options.safeArea ?? false
-
-  return {
-    paddingTop: py + SAFE_AREA_PADDING + (enableTop ? insets.top : 0),
-    paddingBottom: py + SAFE_AREA_PADDING + (enableBottom ? insets.bottom : 0),
-    paddingLeft: px + (enableLeft ? insets.left : 0),
-    paddingRight: px + (enableRight ? insets.right : 0),
-  }
 }
 
 export default withStaticProperties(Layout, {

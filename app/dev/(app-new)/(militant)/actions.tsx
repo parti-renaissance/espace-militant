@@ -1,9 +1,8 @@
 import React, { useState, useCallback } from 'react'
-import Layout, { useLayoutPadding } from '@/components/Navigation/Layout'
+import Layout from '@/components/Navigation/Layout'
 import Text from '@/components/base/Text'
-import { ScrollView } from 'react-native'
-import { View, YStack, isWeb } from 'tamagui'
-import { usePageLayoutScroll } from '@/components/Navigation/usePageLayoutScroll'
+import { View, YStack } from 'tamagui'
+import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
 
 export default function ActionsPage() {
   return (
@@ -15,11 +14,9 @@ export default function ActionsPage() {
 
 function ActionsContent() {
   const [data, setData] = useState<number[]>(Array.from({ length: 20 }, (_, index) => index))
-  const padding = useLayoutPadding({ safeArea: true })
 
   const hasMore = data.length < 100
 
-  // 🔥 Logique de chargement unique (useCallback pour la stabilité)
   const loadMore = useCallback(() => {
     console.log('loadMore')
     if (!hasMore) return
@@ -30,38 +27,14 @@ function ActionsContent() {
     ])
   }, [hasMore, data])
 
-
-  // 1. Web : Utilisation du hook pour la détection sur le conteneur parent
-  usePageLayoutScroll({
-    onEndReached: hasMore ? loadMore : undefined,
-    onEndReachedThreshold: 0.4,
-  })
-
-  // 2. Natif : Fonction de gestion pour la ScrollView
-  const handleNativeScroll = (event: any) => {
-    if (isWeb || !hasMore) return
-
-    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent
-    const paddingToBottom = 20
-    
-    // Détection manuelle de fin de défilement en Natif
-    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom) {
-      loadMore() // Appel de la fonction unique
-    }
-  }
-
-
   return (
     <>
       <Layout.Main>
-        <ScrollView
-          contentContainerStyle={{ gap: 16, paddingTop: padding.paddingTop, paddingBottom: padding.paddingBottom }}
-          // Défilement activé uniquement en natif (si le conteneur n'est pas déjà défilant)
-          scrollEnabled={!isWeb} 
-          
-          // Connexion au gestionnaire natif
-          onScroll={handleNativeScroll} 
-          scrollEventThrottle={16} 
+        <LayoutScrollView
+          padding="left"
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.4}
+          hasMore={hasMore}
         >
           <YStack gap={16}>
             {data.map((item) => (
@@ -70,7 +43,7 @@ function ActionsContent() {
               </View>
             ))}
           </YStack>
-        </ScrollView>
+        </LayoutScrollView>
       </Layout.Main>
       <Layout.SideBar isSticky>
         <YStack bg="$orange3" height={500} alignItems="center" justifyContent="center">
