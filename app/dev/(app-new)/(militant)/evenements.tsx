@@ -16,15 +16,18 @@ const RouteName = styled(Text, {
 
 export default function EvenementsPage() {
   return (
-    <Layout.ScrollView safeArea>
-      <Layout.Container>
-        <Layout.Main maxWidth="auto">
-          <CenterContainer>
-            <RouteName>Événements</RouteName>
-          </CenterContainer>
-        </Layout.Main>
-      </Layout.Container>
-    </Layout.ScrollView>
+    <Layout.Container>
+      <EvenementsContent />
+    </Layout.Container>
   )
 }
 
+function EvenementsContent() {
+  return (
+    <Layout.Main>
+      <CenterContainer>
+        <RouteName>Evenements</RouteName>
+      </CenterContainer>
+    </Layout.Main>
+  )
+}

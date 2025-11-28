@@ -331,11 +331,21 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     }
   }, [themes])
 
-  if (hide) return null
-
   return (
     <>
-      <SAV {...SAVProps} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'white' }}>
+      <SAV
+        {...SAVProps}
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: 'white',
+          opacity: hide ? 0 : 1,
+          pointerEvents: hide ? 'none' : 'auto',
+          ...(isWeb && hide ? { display: 'none' } : {}),
+        }}
+      >
         <TabBarComponent>
           <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
           {visibleItemIds.map((id) => {

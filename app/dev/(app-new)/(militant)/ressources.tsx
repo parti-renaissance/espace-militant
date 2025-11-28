@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, Text, styled } from 'tamagui'
 import Layout from '@/components/Navigation/Layout'
+import ResourcesList from '@/screens/tools/ResourcesList'
 
 const CenterContainer = styled(View, {
   flex: 1,
@@ -16,15 +17,16 @@ const RouteName = styled(Text, {
 
 export default function RessourcesPage() {
   return (
-    <Layout.ScrollView safeArea>
-      <Layout.Container>
-        <Layout.Main>
-          <CenterContainer>
-            <RouteName>Ressources</RouteName>
-          </CenterContainer>
-        </Layout.Main>
-      </Layout.Container>
-    </Layout.ScrollView>
+    <Layout.Container>
+      <RessourcesContent />
+    </Layout.Container>
   )
 }
 
+function RessourcesContent() {
+  return (
+    <Layout.Main maxWidth={992}>
+      <ResourcesList />
+    </Layout.Main>
+  )
+}
