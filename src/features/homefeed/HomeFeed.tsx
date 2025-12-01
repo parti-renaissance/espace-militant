@@ -8,7 +8,7 @@ import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { useScrollToTop } from '@react-navigation/native'
 import { useFocusEffect } from 'expo-router'
-import { getToken, Spinner, useMedia, YStack, XStack } from 'tamagui'
+import { getToken, Spinner, useMedia, YStack, XStack, ScrollView } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { VoxButton } from '@/components/Button'
@@ -23,6 +23,7 @@ import { Platform } from 'react-native'
 import Layout from '@/components/Navigation/Layout'
 import LayoutFlatList from '@/components/Navigation/LayoutFlatList'
 import AppDownloadCTA from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
+import { MyProfileCardNoLinks } from '@/components/ProfileCards/ProfileCard/MyProfileCard'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 
@@ -50,7 +51,22 @@ const HomeFeed = () => {
   const { data: paginatedFeed, fetchNextPage, hasNextPage, ...feedQuery } = useGetPaginatedFeed()
   const { data: alerts, ...alertQuery } = useAlerts()
   const { hasFeature } = useGetExecutiveScopes()
+
+  // ----------------------------------------------------
+  // --- Zone de correction du bug onViewableItemsChanged ---
+  // ----------------------------------------------------
   const { trackImpression } = useHits()
+
+  // 1. Créer une référence pour la fonction de tracking (référence stable)
+  const trackImpressionRef = useRef(trackImpression)
+
+  // 2. Mettre à jour la référence à chaque rendu lorsque trackImpression change
+  useEffect(() => {
+    // @ts-ignore: trackImpression n'a pas le même type que TrackParams => corrigé plus haut avec l'import type
+    trackImpressionRef.current = trackImpression
+  }, [trackImpression])
+  // ----------------------------------------------------
+
   const feedData = paginatedFeed?.pages.map((page) => page?.hits ?? []).flat()
 
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
@@ -113,11 +129,13 @@ const HomeFeed = () => {
       : null
   ), [alerts, shouldShowNotificationCard, hasFeature, media.sm])
 
+  // 3. onViewableItemsChanged utilise la référence stable et a une dépendance vide
   const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     if (Platform.OS !== 'web') {
       viewableItems.forEach((viewToken) => {
         if (viewToken.isViewable && viewToken.item) {
-          trackImpression({
+          // Utilisation de la référence stable (.current) pour appeler la fonction la plus récente
+          trackImpressionRef.current({
             object_type: viewToken.item.type,
             object_id: viewToken.item.objectID,
             source: 'page_timeline',
@@ -125,12 +143,12 @@ const HomeFeed = () => {
         }
       })
     }
-  }, [trackImpression])
+  }, []) // ⬅️ Liste de dépendances VIDE pour la stabilité
 
-  const viewabilityConfig = {
+  const viewabilityConfig = useMemo(() => ({
     itemVisiblePercentThreshold: 50,
     minimumViewTime: 400,
-  }
+  }), [])
 
   return (
     <>
@@ -161,14 +179,20 @@ const HomeFeed = () => {
           }
         />
       </Layout.Main>
-      <Layout.SideBar isSticky>
-        <YStack alignItems="center" justifyContent="center">
-          <AppDownloadCTA />
-        </YStack>
-      </Layout.SideBar>
+      {media.gtMd ? (
+        <Layout.SideBar isSticky>
+          <ScrollView contentContainerStyle={{ height: '100dvh' }}>
+            <YStack alignItems="center" justifyContent="center" gap="$medium">
+              <MyProfileCardNoLinks />
+              <AppDownloadCTA />
+              
+            </YStack>
+          </ScrollView>
+        </Layout.SideBar>
+      ) : null
+      }
     </>
   )
 }
 
 export default HomeFeed
-
