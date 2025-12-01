@@ -46,8 +46,6 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
   const media = useMedia()
   const cadreNavItems = useCadreNavItems()
 
-  console.log('cadreNavItems', cadreNavItems)
-
   return (
     <LayoutRoot {...props}>
       <LayoutWrapper>

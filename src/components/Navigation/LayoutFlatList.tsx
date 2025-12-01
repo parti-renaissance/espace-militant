@@ -1,27 +1,37 @@
 import React, { useCallback } from 'react'
-import { FlatList, FlatListProps } from 'react-native'
+import { FlatList, FlatListProps, RefreshControl, Platform } from 'react-native'
 import { isWeb } from 'tamagui'
 import { usePageLayoutScroll } from '@/components/Navigation/usePageLayoutScroll'
 import useLayoutPadding, { type UseLayoutPaddingOptions } from '@/components/Navigation/hook/useLayoutPadding'
 
-type LayoutFlatListProps<T> = Omit<FlatListProps<T>, 'onEndReached' | 'data' | 'renderItem'> & {
+type LayoutFlatListProps<T> = Omit<FlatListProps<T>, 'onEndReached' | 'data' | 'renderItem' | 'refreshControl'> & {
   data: FlatListProps<T>['data']
   renderItem: FlatListProps<T>['renderItem']
   onEndReached?: () => void
   onEndReachedThreshold?: number
   hasMore?: boolean
   padding?: UseLayoutPaddingOptions
+  refreshing?: boolean
+  onRefresh?: () => void
+  refreshControl?: React.ReactElement
 }
 
-export default function LayoutFlatList<T>({
-  onEndReached,
-  onEndReachedThreshold = 0.4,
-  hasMore = false,
-  padding = true,
-  data,
-  renderItem,
-  ...rest
-}: LayoutFlatListProps<T>) {
+function LayoutFlatListInner<T>(
+  {
+    onEndReached,
+    onEndReachedThreshold = 0.4,
+    hasMore = false,
+    padding = true,
+    data,
+    renderItem,
+    contentContainerStyle,
+    refreshing,
+    onRefresh,
+    refreshControl,
+    ...rest
+  }: LayoutFlatListProps<T>,
+  ref: React.Ref<FlatList<T>>
+) {
   const paddingValues = useLayoutPadding(padding)
 
   const loadMore = useCallback(() => {
@@ -37,20 +47,39 @@ export default function LayoutFlatList<T>({
 
   const nativeOnEndReached = !isWeb && onEndReached ? loadMore : undefined
 
+  const refreshControlElement = refreshControl ?? (refreshing !== undefined && onRefresh ? (
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  ) : undefined)
+
   return (
     <FlatList<T>
+      ref={ref}
       data={data}
       renderItem={renderItem}
       scrollEnabled={!isWeb}
       onEndReached={nativeOnEndReached}
       onEndReachedThreshold={onEndReachedThreshold}
-      contentContainerStyle={{
-        paddingTop: paddingValues.paddingTop,
-        paddingBottom: paddingValues.paddingBottom,
-        paddingLeft: paddingValues.paddingLeft,
-        paddingRight: paddingValues.paddingRight,
-      }}
+      refreshControl={refreshControlElement}
+      contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
+      contentContainerStyle={[
+        {
+          paddingTop: Platform.OS === 'ios' ? 0 : paddingValues.paddingTop, 
+          paddingBottom: paddingValues.paddingBottom,
+          paddingLeft: paddingValues.paddingLeft,
+          paddingRight: paddingValues.paddingRight,
+        },
+        contentContainerStyle,
+      ]}
       {...rest}
     />
   )
 }
+
+const LayoutFlatListForwarded = React.forwardRef(LayoutFlatListInner)
+LayoutFlatListForwarded.displayName = 'LayoutFlatList'
+
+const LayoutFlatList = LayoutFlatListForwarded as <T>(
+  props: LayoutFlatListProps<T> & { ref?: React.Ref<FlatList<T>> }
+) => React.ReactElement
+
+export default LayoutFlatList
