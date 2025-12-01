@@ -37,11 +37,11 @@ export default function AppDownloadCTA({ variant = 'date' }: AppDownloadCTAProps
       <ProfileCallToActionLayout.Actions>
         <View flexDirection={'row'} flex={1} justifyContent={'center'} gap={'$medium'}>
           <TouchableOpacity onPress={redirectToApple}>
-            <Image source={require('./Assets/Apple.png')} resizeMode={'contain'} width={130} height={45} />
+            <Image source={require('./Assets/Apple.png')} resizeMode={'contain'} width={115} height={40} />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={redirectToAndroid}>
-            <Image source={require('./Assets/Google.png')} resizeMode={'contain'} width={130} height={45} />
+            <Image source={require('./Assets/Google.png')} resizeMode={'contain'} width={115} height={40} />
           </TouchableOpacity>
         </View>
       </ProfileCallToActionLayout.Actions>
