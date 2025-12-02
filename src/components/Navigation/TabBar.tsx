@@ -13,6 +13,8 @@ import { ScopeSelector } from './ScopeSelector'
 import { HelpMenuItems } from './HelpMenuItems'
 import { useGetUserScopes } from '@/services/profile/hook'
 
+type Theme = 'blue' | 'purple' | 'green' | 'orange'
+
 const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
 const SAVProps: any = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
 
@@ -68,14 +70,13 @@ type TabProps = {
   onPress: () => void
   label: string
   icon: any
-  theme?: string
-  activeColor?: string
-  inactiveColor?: string
+  theme?: Theme
   onLayout: (e: LayoutChangeEvent) => void
 }
 
-const Tab = ({ isFocus, name, onPress, onLayout, label, icon: Icon, theme = 'gray', activeColor: propActiveColor, inactiveColor: propInactiveColor }: TabProps) => {
+const Tab = ({ isFocus, name, onPress, onLayout, label, icon: Icon, theme = 'blue' }: TabProps) => {
   const scale = useSharedValue(0)
+  const themes = getThemes()
 
   const handlePress = () => {
     scale.value = withSpring(1, { duration: 350 })
@@ -98,8 +99,8 @@ const Tab = ({ isFocus, name, onPress, onLayout, label, icon: Icon, theme = 'gra
     }
   })
 
-  const activeColor = propActiveColor ?? 'black'
-  const inactiveColor = propInactiveColor ?? 'gray'
+  const activeColor = themes.light[`${theme}5`]?.val ?? themes.light.color5.val
+  const inactiveColor = themes.light.textPrimary.val
   const color = isFocus ? activeColor : inactiveColor
 
   return (
@@ -242,12 +243,14 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
       position.value = withSpring(pos, springConfig)
 
       // Determine active color based on the active tab
-      let theme = 'blue'
-      if (activeTabKey === 'cadreSheet') theme = 'purple'
-      else {
+      let theme: Theme = 'blue'
+      if (activeTabKey === 'cadreSheet') {
+        theme = 'purple'
+      } else if (activeTabKey !== 'more') {
         const config = getAllItems.find((item) => item.id === activeTabKey)
-        theme = config?.theme || 'blue'
+        theme = (config?.theme ?? 'blue') as Theme
       }
+      
       // Wait a bit for animation to complete
       setTimeout(() => {
         activeColor.value = themes.light[`${theme}1`]?.val ?? themes.light.gray1.val
@@ -322,15 +325,6 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     })
   }, [])
 
-  // Get active color based on theme
-  const getActiveColor = useMemo(() => {
-    return (theme?: string) => {
-      if (!theme || theme === 'gray') return themes.light.color5.val
-      const themeColor = themes.light[`${theme}5` as keyof typeof themes.light]
-      return themeColor?.val ?? themes.light.color5.val
-    }
-  }, [themes])
-
   return (
     <>
       <SAV
@@ -362,8 +356,6 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
                   label="Autre"
                   icon={MoreHorizontal}
                   theme="blue"
-                  activeColor="$color5"
-                  inactiveColor="$textPrimary"
                 />
               )
             }
@@ -379,8 +371,6 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
                   label="Cadre"
                   icon={Sparkle}
                   theme="purple"
-                  activeColor="$purple5"
-                  inactiveColor="$textPrimary"
                 />
               )
             }
@@ -397,9 +387,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
                 onLayout={handleSaveLayout(id)}
                 label={config.text}
                 icon={config.iconLeft}
-                theme={config.theme}
-                activeColor={getActiveColor(config.theme)}
-                inactiveColor={themes.light.textPrimary.val}
+                theme={(config.theme ?? 'blue') as Theme}
               />
             )
           })}
