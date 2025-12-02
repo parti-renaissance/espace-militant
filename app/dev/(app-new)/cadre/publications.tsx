@@ -4,7 +4,7 @@ import Layout from '@/components/Navigation/Layout'
 
 export default function PublicationsPage() {
   return (
-    <Layout.Container>
+    <Layout.Container sidebarState="cadre">
       <PublicationsContent />
     </Layout.Container>
   )

@@ -21,7 +21,6 @@ import ContactPreferences, { ContactPreferencesData } from '../components/Contac
 import QuitConfirmModal from '../components/QuitConfirmModal'
 import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
 import Layout from '@/components/Navigation/Layout'
-import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 
 // Types pour les réponses
 interface Answer {
@@ -87,7 +86,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  useHideTabBar()
+
 
   const redirectToAndroid = () => {
     redirectToStore('android')
@@ -403,6 +402,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
           <LayoutScrollView
             contentContainerStyle={{ flexGrow: 1, paddingBottom: 16 }}
             showsVerticalScrollIndicator={false}
+            disablePadding
           >
             <Container flex={1}>
               {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}

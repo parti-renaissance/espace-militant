@@ -4,10 +4,8 @@ import Layout from '@/components/Navigation/Layout'
 import * as metatags from '@/config/metatags'
 import EventFormScreen, { EventFormScreenSkeleton } from '@/features_next/events/pages/create-edit'
 import Head from 'expo-router/head'
-import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 
 const CreateEventScreen: React.FC = () => {
-  useHideTabBar()
 
   return (
     <Layout.Container>

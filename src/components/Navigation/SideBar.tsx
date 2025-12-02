@@ -22,7 +22,7 @@ export const MARGINS = {
 };
 
 
-export type SideBarState = 'floating' | 'militant' | 'collapsed' | 'cadre'
+export type SideBarState = 'floating' | 'militant' | 'collapsed' | 'cadre' | 'hide'
 
 export const SideBarArea = styled(XStack, {
   position: 'relative',
@@ -60,12 +60,16 @@ export const SideBarArea = styled(XStack, {
         },
         width: MARGINS.large + WIDTH_COLLAPSED + MARGINS.large + WIDTH_MILITANT,
       },
+      hide: {
+        width: 0,
+        display: 'none',
+      },
     },
   },
   defaultVariants: {
     state: 'militant',
   },
-})
+} as const)
 
 const SideBarContainer = styled(YStack, {
   $lg: {

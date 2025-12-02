@@ -1,12 +1,10 @@
 import Layout from '@/components/Navigation/Layout'
-import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 import InstancesScreen from '@/features_next/profil/pages/instances'
 
 export default function MesInstancesPage() {
-  useHideTabBar()
 
   return (
-    <Layout.Container>
+    <Layout.Container hideTabBar={true}>
       <InstancesScreen />
     </Layout.Container>
   )
