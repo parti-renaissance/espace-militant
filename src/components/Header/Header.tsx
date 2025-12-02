@@ -247,6 +247,7 @@ const VoxHeaderContainerStyled = styled(Container, {
 const VoxHeaderFrameRouter = ({
   safeAreaView = true,
   borderWidth,
+  display,
   ...props
 }: React.ComponentProps<typeof VoxHeaderFrameStyled> & { safeAreaView?: boolean }) => {
   const styles = useStyle(props)
@@ -262,6 +263,7 @@ const VoxHeaderFrameRouter = ({
       style={isWeb ? undefined : { paddingTop: safeAreaView ? insets.top : 0, zIndex: 5 }}
       backgroundColor={backgroundColor}
       borderWidth={borderWidth}
+      display={display}
     >
       <VoxHeaderFrameStyled {...props} />
     </VoxHeaderContainerStyled>
