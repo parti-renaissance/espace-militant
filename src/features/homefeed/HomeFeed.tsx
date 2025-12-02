@@ -62,7 +62,6 @@ const HomeFeed = () => {
 
   // 2. Mettre à jour la référence à chaque rendu lorsque trackImpression change
   useEffect(() => {
-    // @ts-ignore: trackImpression n'a pas le même type que TrackParams => corrigé plus haut avec l'import type
     trackImpressionRef.current = trackImpression
   }, [trackImpression])
   // ----------------------------------------------------

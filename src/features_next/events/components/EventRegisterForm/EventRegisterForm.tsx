@@ -225,50 +225,6 @@ const EventRegisterForm = (props: {
   )
 }
 
-function DialogMentionLegale(props: { onPress?: () => void }) {
-  const media = useMedia()
-
-  return media.gtSm ? (
-    <Dialog modal>
-      <Dialog.Trigger>
-        <Text color="$black1" fontSize="$1" textAlign="center" textDecorationLine="underline">
-          Mention d’informations relatives au traitement de mes données
-        </Text>
-      </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay key="overlay" animation="slow" opacity={0.5} enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-        <Dialog.Content
-          bordered
-          elevate
-          key="content"
-          animateOnly={['transform', 'opacity']}
-          animation={[
-            'quicker',
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
-          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
-          maxWidth={600}
-        >
-          <ScrollView justifyContent="center" height="100%" maxHeight={isWeb ? 'calc(100vh - 100px)' : undefined}>
-            <MentionLegale />
-          </ScrollView>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
-  ) : (
-    <Button variant="text" onPress={props.onPress} width="100%" size="md">
-      <Button.Text color="$black1" fontWeight="$4" fontSize="$1" textAlign="center" textDecorationLine="underline">
-        Mention d’informations relatives au traitement de mes données
-      </Button.Text>
-    </Button>
-  )
-}
-
 function MentionLegale() {
   return (
     <YStack gap="$medium" flex={1} height="100%">

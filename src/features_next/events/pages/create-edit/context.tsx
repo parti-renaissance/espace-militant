@@ -222,7 +222,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
             })
           }
         }
-      } catch (e) {
+      } catch {
         errorImage = true
       }
 

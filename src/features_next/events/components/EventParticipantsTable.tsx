@@ -74,7 +74,7 @@ export const EventParticipantsTable = ({ eventId, displayInvitationStatus = fals
                   <Text.SM semibold>Statut</Text.SM>
                 </Table.Row.Header>
 
-                {currentPage?.items.map(({ status, confirmed_at, uuid }) => {
+                {currentPage?.items.map(({ status, uuid }) => {
                   return (
                     <Table.Row key={'tags' + uuid}>
                       <YStack>

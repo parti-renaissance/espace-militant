@@ -45,7 +45,7 @@ const editorExtensions = [
 const parseJsonEditorContent = (x: string) => {
   try {
     return JSON.parse(x)
-  } catch (e) {
+  } catch {
     return x
   }
 }

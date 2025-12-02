@@ -224,7 +224,6 @@ const EventFormAside = () => {
 }
 
 const EventFormActions = () => {
-  const media = useMedia()
   const { isPending, isUploadImagePending, isUploadDeletePending, onSubmit, editMode, event, editEventScope } = useEventFormContext()
 
   return (
