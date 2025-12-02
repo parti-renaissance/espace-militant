@@ -6,7 +6,7 @@ import { SideBar, SideBarState } from '@/components/Navigation/SideBar'
 import ConfigurableTabBar from '@/components/Navigation/TabBar'
 import { YStack } from 'tamagui'
 import { ScrollContext } from './scrollContext'
-import useLayoutPadding, { UseLayoutPaddingOptions } from './hook/useLayoutPadding'
+import useLayoutSpacing, { UseLayoutSpacingOptions } from './hook/useLayoutSpacing'
 import { useCadreNavItems } from '@/config/navigationItems'
 
 const SAFE_AREA_PADDING = 16
@@ -116,13 +116,21 @@ interface SideBarProps extends Omit<ViewProps, 'padding'> {
   children: React.ReactNode
   isSticky?: boolean
   maxWidth?: number | string
-  padding?: UseLayoutPaddingOptions
+  padding?: UseLayoutSpacingOptions
 }
 
 const SideBarComponent = ({ children, isSticky, maxWidth = 320, padding = 'right', ...props }: SideBarProps) => {
-  const paddingValues = useLayoutPadding(padding)
+  const spacingValues = useLayoutSpacing(padding)
   return (
-    <LayoutSideBar isSticky={isSticky} maxWidth={maxWidth} {...paddingValues} {...props}>
+    <LayoutSideBar
+      isSticky={isSticky}
+      maxWidth={maxWidth}
+      ml={spacingValues.paddingLeft}
+      mr={spacingValues.paddingRight}
+      pt={spacingValues.paddingTop}
+      pb={spacingValues.paddingBottom}
+      {...props}
+    >
       {children}
     </LayoutSideBar>
   )

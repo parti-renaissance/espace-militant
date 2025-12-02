@@ -160,3 +160,40 @@ export default function MyProfileCard() {
     </VoxCard>
   )
 }
+
+export function MyProfileCardNoLinks() {
+  const { user: session } = useUserStore()
+  const user = useGetProfil({ enabled: !!session })
+  const profile = user?.data
+  const statusAdh = profile ? getMembershipCardStatus(profile.tags) : null
+  const showEluCard = (profile?.tags ?? []).map((tag) => tag.code).find((x) => ['elu:attente_declaration', 'elu:cotisation_nok'].includes(x))
+
+  if (!profile) {
+    return null
+  }
+
+  if (!session) {
+    return null
+  }
+
+  return (
+    <VoxCard bg="$white" overflow="hidden">
+      <YStack>
+        <VoxCard.Content>
+          <BoundarySuspenseWrapper>
+            <>
+              <ProfilBlock
+                editablePicture={false}
+                inside
+                bg="$textSurface"
+              />
+
+              {!showEluCard && statusAdh ? <MembershipCard status={statusAdh} /> : null}
+              {showEluCard ? <EluCard /> : null}
+            </>
+          </BoundarySuspenseWrapper>
+        </VoxCard.Content>
+      </YStack>
+    </VoxCard>
+  )
+}

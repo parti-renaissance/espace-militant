@@ -1,15 +1,18 @@
 import React, { useCallback } from 'react'
-import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, ScrollViewProps } from 'react-native'
+import { NativeScrollEvent, NativeSyntheticEvent, Platform, RefreshControl, ScrollView, ScrollViewProps } from 'react-native'
 import { isWeb } from 'tamagui'
 import { usePageLayoutScroll } from '@/components/Navigation/usePageLayoutScroll'
-import useLayoutPadding, { type UseLayoutPaddingOptions } from '@/components/Navigation/hook/useLayoutPadding'
+import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/Navigation/hook/useLayoutSpacing'
 
 type LayoutScrollViewProps = Omit<ScrollViewProps, 'onEndReached'> & {
   onEndReached?: () => void
   onEndReachedThreshold?: number
   hasMore?: boolean
-  padding?: UseLayoutPaddingOptions
+  padding?: UseLayoutSpacingOptions
   children: React.ReactNode
+  refreshControl?: React.ReactElement
+  refreshing?: boolean
+  onRefresh?: () => void
 }
 
 export default function LayoutScrollView({
@@ -18,9 +21,12 @@ export default function LayoutScrollView({
   hasMore = false,
   padding = true,
   children,
+  refreshControl,
+  refreshing,
+  onRefresh,
   ...rest
 }: LayoutScrollViewProps) {
-  const paddingValues = useLayoutPadding(padding)
+  const spacingValues = useLayoutSpacing(padding)
 
   const loadMore = useCallback(() => {
     if (onEndReached && hasMore) {
@@ -46,17 +52,24 @@ export default function LayoutScrollView({
     }
   }, [onEndReached, hasMore, loadMore, onEndReachedThreshold])
 
+  const refreshControlElement = refreshControl ?? (refreshing !== undefined && onRefresh ? (
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  ) : undefined)
+  
   return (
     <ScrollView
       scrollEnabled={!isWeb}
       onScroll={handleNativeScroll}
       scrollEventThrottle={16}
-      contentContainerStyle={{
-        paddingTop: paddingValues.paddingTop,
-        paddingBottom: paddingValues.paddingBottom,
-        paddingLeft: paddingValues.paddingLeft,
-        paddingRight: paddingValues.paddingRight,
-      }}
+      refreshControl={refreshControlElement}
+      contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
+      contentContainerStyle={[
+        {
+          paddingTop: Platform.OS === 'ios' ? 0 : spacingValues.paddingTop, 
+          paddingBottom: spacingValues.paddingBottom,
+        },
+        rest.contentContainerStyle,
+      ]}
       {...rest}
     >
       {children}
