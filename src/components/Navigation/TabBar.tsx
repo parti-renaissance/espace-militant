@@ -124,8 +124,8 @@ type ConfigurableTabBarProps = {
   navCadreItems?: NavItemConfig[]
 }
 
-const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'parrainages', 'actions', 'more']
-const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'actions', 'more']
+const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'parrainages', 'ressources', 'more']
+const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'ressources', 'more']
 
 const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: ConfigurableTabBarProps = {} as ConfigurableTabBarProps) => {
   const router = useRouter()

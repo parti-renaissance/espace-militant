@@ -10,7 +10,7 @@ import { useGetExecutiveScopes, useGetProfil } from "@/services/profile/hook"
 import type { NavItemSubItem } from "./NavItemDropdown"
 import { useVisibleNavItems } from "./useVisibleNavItems"
 import { usePathname } from "expo-router"
-import { cadreNavItems, militantNavItems, type NavItemConfig } from "@/config/navigationItems"
+import { militantNavItems, type NavItemConfig } from "@/config/navigationItems"
 import { isNavItemActive } from "./utils"
 
 export const WIDTH_MILITANT = 248;
