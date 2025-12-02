@@ -1,8 +1,9 @@
 import React from 'react'
 import Layout from '@/components/Navigation/Layout'
-import ResourcesList from '@/screens/tools/ResourcesList'
+import ResourcesList from '@/features_next/resources/pages/index'
 import Header from '@/components/Navigation/Header'
 import { Link2 } from '@tamagui/lucide-icons'
+import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
 
 export default function RessourcesPage() {
   return (
@@ -17,8 +18,12 @@ export default function RessourcesPage() {
 
 function RessourcesContent() {
   return (
-    <Layout.Main maxWidth={992} >
-      <ResourcesList />
-    </Layout.Main>
+    <>
+      <LayoutScrollView contentContainerStyle={{ alignItems: 'center' }}>
+        <Layout.Main maxWidth={992}>
+          <ResourcesList />
+        </Layout.Main>
+      </LayoutScrollView>
+    </>
   )
 }

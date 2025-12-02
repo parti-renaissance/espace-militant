@@ -24,6 +24,7 @@ export default function LayoutScrollView({
   refreshControl,
   refreshing,
   onRefresh,
+  contentContainerStyle,
   ...rest
 }: LayoutScrollViewProps) {
   const spacingValues = useLayoutSpacing(padding)
@@ -68,7 +69,7 @@ export default function LayoutScrollView({
           paddingTop: Platform.OS === 'ios' ? 0 : spacingValues.paddingTop, 
           paddingBottom: spacingValues.paddingBottom,
         },
-        rest.contentContainerStyle,
+        contentContainerStyle,
       ]}
       {...rest}
     >
