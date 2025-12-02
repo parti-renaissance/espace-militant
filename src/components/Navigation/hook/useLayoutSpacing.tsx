@@ -4,32 +4,32 @@ import { useMedia } from "tamagui"
 const SAFE_AREA_PADDING = 16
 const TABBAR_HEIGHT_SM = 64
 
-type PaddingConfig = {
-    /** Active le padding de base et le safe padding en haut */
+type SpacingConfig = {
+    /** Active l'espacement de base et le safe spacing en haut */
     top?: boolean
-    /** Active le padding de base et le safe padding en bas */
+    /** Active l'espacement de base et le safe spacing en bas */
     bottom?: boolean
-    /** Active le padding de base et le safe padding à gauche */
+    /** Active l'espacement de base et le safe spacing à gauche */
     left?: boolean
-    /** Active le padding de base et le safe padding à droite */
+    /** Active l'espacement de base et le safe spacing à droite */
     right?: boolean
-    /** Active les safe paddings sur tous les côtés (par défaut: true) */
+    /** Active les safe spacings sur tous les côtés (par défaut: true) */
     safeArea?: boolean
-    /** Active uniquement le safe padding en haut (surcharge safeArea) */
+    /** Active uniquement le safe spacing en haut (surcharge safeArea) */
     safeAreaTop?: boolean
-    /** Active uniquement le safe padding en bas (surcharge safeArea) */
+    /** Active uniquement le safe spacing en bas (surcharge safeArea) */
     safeAreaBottom?: boolean
-    /** Active uniquement le safe padding à gauche (surcharge safeArea) */
+    /** Active uniquement le safe spacing à gauche (surcharge safeArea) */
     safeAreaLeft?: boolean
-    /** Active uniquement le safe padding à droite (surcharge safeArea) */
+    /** Active uniquement le safe spacing à droite (surcharge safeArea) */
     safeAreaRight?: boolean
   }
   
-  type PaddingPreset = 'left' | 'right' | true | false
+  type SpacingPreset = 'left' | 'right' | true | false
   
-  export type UseLayoutPaddingOptions = PaddingConfig | PaddingPreset
+  export type UseLayoutSpacingOptions = SpacingConfig | SpacingPreset
   
-  export default function useLayoutPadding(options: UseLayoutPaddingOptions = true) {
+  export default function useLayoutSpacing(options: UseLayoutSpacingOptions = true) {
     const media = useMedia()
     const insets = useSafeAreaInsets()
   
@@ -43,8 +43,8 @@ type PaddingConfig = {
     if (media.lg) px = 16
     if (media.sm) px = 0
   
-    // Calculer les paddings de base avec safe areas
-    const basePadding = (() => {
+    // Calculer les espacements de base avec safe areas
+    const baseSpacing = (() => {
       if (options === false) {
         return {
           paddingTop: 0,
@@ -80,37 +80,38 @@ type PaddingConfig = {
   
     // Appliquer les presets et la configuration par côté
     if (options === false) {
-      return basePadding
+      return baseSpacing
     }
   
     if (options === true) {
-      return basePadding
+      return baseSpacing
     }
   
     if (options === 'left') {
       return {
-        paddingTop: basePadding.paddingTop,
-        paddingBottom: basePadding.paddingBottom,
-        paddingLeft: basePadding.paddingLeft,
+        paddingTop: baseSpacing.paddingTop,
+        paddingBottom: baseSpacing.paddingBottom,
+        paddingLeft: baseSpacing.paddingLeft,
         paddingRight: 0,
       }
     }
   
     if (options === 'right') {
       return {
-        paddingTop: basePadding.paddingTop,
-        paddingBottom: basePadding.paddingBottom,
+        paddingTop: baseSpacing.paddingTop,
+        paddingBottom: baseSpacing.paddingBottom,
         paddingLeft: 0,
-        paddingRight: basePadding.paddingRight,
+        paddingRight: baseSpacing.paddingRight,
       }
     }
   
     // Configuration personnalisée
-    const config = options as PaddingConfig
+    const config = options as SpacingConfig
     return {
-      paddingTop: config.top === false ? 0 : basePadding.paddingTop,
-      paddingBottom: config.bottom === false ? 0 : basePadding.paddingBottom,
-      paddingLeft: config.left === false ? 0 : basePadding.paddingLeft,
-      paddingRight: config.right === false ? 0 : basePadding.paddingRight,
+      paddingTop: config.top === false ? 0 : baseSpacing.paddingTop,
+      paddingBottom: config.bottom === false ? 0 : baseSpacing.paddingBottom,
+      paddingLeft: config.left === false ? 0 : baseSpacing.paddingLeft,
+      paddingRight: config.right === false ? 0 : baseSpacing.paddingRight,
     }
   }
+

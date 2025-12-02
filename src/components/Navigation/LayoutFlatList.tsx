@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { FlatList, FlatListProps, RefreshControl, Platform } from 'react-native'
 import { isWeb } from 'tamagui'
 import { usePageLayoutScroll } from '@/components/Navigation/usePageLayoutScroll'
-import useLayoutPadding, { type UseLayoutPaddingOptions } from '@/components/Navigation/hook/useLayoutPadding'
+import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/Navigation/hook/useLayoutSpacing'
 
 type LayoutFlatListProps<T> = Omit<FlatListProps<T>, 'onEndReached' | 'data' | 'renderItem' | 'refreshControl'> & {
   data: FlatListProps<T>['data']
@@ -10,7 +10,7 @@ type LayoutFlatListProps<T> = Omit<FlatListProps<T>, 'onEndReached' | 'data' | '
   onEndReached?: () => void
   onEndReachedThreshold?: number
   hasMore?: boolean
-  padding?: UseLayoutPaddingOptions
+  padding?: UseLayoutSpacingOptions
   refreshing?: boolean
   onRefresh?: () => void
   refreshControl?: React.ReactElement
@@ -32,7 +32,7 @@ function LayoutFlatListInner<T>(
   }: LayoutFlatListProps<T>,
   ref: React.Ref<FlatList<T>>
 ) {
-  const paddingValues = useLayoutPadding(padding)
+  const spacingValues = useLayoutSpacing(padding)
 
   const loadMore = useCallback(() => {
     if (onEndReached && hasMore) {
@@ -63,10 +63,8 @@ function LayoutFlatListInner<T>(
       contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
       contentContainerStyle={[
         {
-          paddingTop: Platform.OS === 'ios' ? 0 : paddingValues.paddingTop, 
-          paddingBottom: paddingValues.paddingBottom,
-          paddingLeft: paddingValues.paddingLeft,
-          paddingRight: paddingValues.paddingRight,
+          paddingTop: Platform.OS === 'ios' ? 0 : spacingValues.paddingTop, 
+          paddingBottom: spacingValues.paddingBottom,
         },
         contentContainerStyle,
       ]}

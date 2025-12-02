@@ -1,10 +1,9 @@
 import { Suspense } from 'react'
 import { VoxButton } from '@/components/Button'
-import PageLayout from '@/components/layouts/PageLayout/PageLayout'
 import { NotFoundError } from '@/core/errors'
 import { QueryErrorResetBoundary } from '@tanstack/react-query'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
-import { Image, Spinner, View, YStack } from 'tamagui'
+import { Image, Spinner, useMedia, View, YStack } from 'tamagui'
 import Error404 from './404/Error404'
 import Text from './base/Text'
 
@@ -35,35 +34,40 @@ export const DefaultErrorFallback = ({ resetErrorBoundary, error }: FallbackProp
   )
 }
 
-const BoundarySuspenseWrapper = (props: BoundarySuspenseWrapperProps) => (
-  <QueryErrorResetBoundary>
-    {({ reset }) => (
-      <ErrorBoundary
-        onReset={reset}
-        fallbackRender={(EBprops) =>
-          props.errorChildren ? (
-            props.errorChildren(EBprops)
-          ) : (
-            <PageLayout.StateFrame>
-              <DefaultErrorFallback {...EBprops} />
-            </PageLayout.StateFrame>
-          )
-        }
-      >
-        <Suspense
-          fallback={
-            props.fallback ?? (
-              <YStack justifyContent="center" alignItems="center" flex={1} width="100%">
-                <Spinner size="large" color="$blue6" />
+const BoundarySuspenseWrapper = (props: BoundarySuspenseWrapperProps) => {
+  const media = useMedia()
+  return (
+    <QueryErrorResetBoundary>
+      {({ reset }) => (
+        <ErrorBoundary
+          onReset={reset}
+          fallbackRender={(EBprops) =>
+            props.errorChildren ? (
+              props.errorChildren(EBprops)
+            ) : (
+              <YStack justifyContent={media.sm ? 'center' : undefined} pt={media.gtSm ? 80 : undefined} flex={1} {...props}>
+                <YStack p="$medium" paddingTop="$medium" alignItems="center" gap="$medium">
+                  <DefaultErrorFallback {...EBprops} />
+                </YStack>
               </YStack>
             )
           }
         >
-          {props.children}
-        </Suspense>
-      </ErrorBoundary>
-    )}
-  </QueryErrorResetBoundary>
-)
+          <Suspense
+            fallback={
+              props.fallback ?? (
+                <YStack justifyContent="center" alignItems="center" flex={1} width="100%">
+                  <Spinner size="large" color="$blue6" />
+                </YStack>
+              )
+            }
+          >
+            {props.children}
+          </Suspense>
+        </ErrorBoundary>
+      )}
+    </QueryErrorResetBoundary>
+  )
+}
 
 export default BoundarySuspenseWrapper

@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, Text, styled } from 'tamagui'
 import Layout from '@/components/Navigation/Layout'
+import EventFeed from '@/features_next/events/pages/feed'
 
 const CenterContainer = styled(View, {
   flex: 1,
@@ -24,10 +25,6 @@ export default function EvenementsPage() {
 
 function EvenementsContent() {
   return (
-    <Layout.Main>
-      <CenterContainer>
-        <RouteName>Evenements</RouteName>
-      </CenterContainer>
-    </Layout.Main>
+    <EventFeed />
   )
 }
