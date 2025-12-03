@@ -233,7 +233,7 @@ const InstancesScreen = () => {
         onClose={() => setOpenChangeAgora(false)}
       />
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-        <LayoutScrollView padding="left">
+        <LayoutScrollView>
           <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
             <InstanceCard
               title="Mon assemblée"

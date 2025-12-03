@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react'
 import { usePathname } from 'expo-router'
-import { BellOff, CaptionsOff, ChevronRight, Sparkle, Ellipsis } from '@tamagui/lucide-icons'
+import { BellOff, CaptionsOff, ChevronRight, Sparkle, Ellipsis, LogIn, UserPlus } from '@tamagui/lucide-icons'
 import { styled, YStack, XStack } from 'tamagui'
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
 import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
 import { NavItem } from './NavItem'
 import { ScopeSelector } from './ScopeSelector'
 import { HelpMenuItems } from './HelpMenuItems'
@@ -13,6 +14,7 @@ import { isNavItemActive } from '@/components/AppStructure/utils'
 import { useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
 import useCheckNotificationsState from '@/hooks/notifications/useCheckNotificationsState'
+import { useSession } from '@/ctx/SessionProvider'
 
 export const WIDTH_MILITANT = 248;
 export const WIDTH_COLLAPSED = 58;
@@ -193,8 +195,9 @@ interface SideBarProps {
 }
 
 export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => {
+  const { isAuth, signIn, signUp } = useSession()
   const pathname = usePathname()
-  const { data: user } = useGetProfil()
+  const { data: user } = useGetProfil({ enabled: isAuth })
   const { data: executiveScopes } = useGetExecutiveScopes()
   const militantNavItems = useMilitantNavItems()
   const [displayNavCadre, setDisplayNavCadre] = useState(state === 'cadre')
@@ -345,29 +348,65 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
           )}
         </MenuContainer>
         <MenuFooterContainer collapsed={displayNavCadre}>
-          {/** TODO: Add back when we have email subscription
-          <NavItem iconLeft={BellOff} text="Abonnement emails" dangerAccent collapsed={displayNavCadre} />
-          */}
-          {notificationGranted === false && (
-            <NavItem
-              iconLeft={BellOff}
-              text="Notifications"
-              dangerAccent
-              collapsed={displayNavCadre}
-              onPress={triggerNotificationRequest}
-            />
+          {isAuth ? (
+            <>
+              {/** TODO: Add back when we have email subscription
+              <NavItem iconLeft={BellOff} text="Abonnement emails" dangerAccent collapsed={displayNavCadre} />
+              */}
+              {notificationGranted === false && (
+                <NavItem
+                  iconLeft={BellOff}
+                  text="Notifications"
+                  dangerAccent
+                  collapsed={displayNavCadre}
+                  onPress={triggerNotificationRequest}
+                />
+              )}
+              <NavItem
+                text="Mon profil"
+                profilePicture={{
+                  src: user?.image_url ?? undefined,
+                  alt: 'Mon profil',
+                  fullName: user ? `${user.first_name} ${user.last_name}` : 'John Doe',
+                }}
+                collapsed={displayNavCadre}
+                href="/(militant)/profil"
+                active={isNavItemActive(pathname, '/(militant)/profil')}
+              />
+            </>
+          ) : (
+            <YStack gap={24} p={12} >
+              <YStack gap={16}>
+                <Text.MD semibold textWrap="balance">
+                  Je me connecte à <Text.MD semibold color="$blue5">mon espace</Text.MD>
+                </Text.MD>
+                <VoxButton
+                  variant="outlined"
+                  size="lg"
+                  width="100%"
+                  theme="blue"
+                  onPress={() => signIn()}
+                >
+                  Me connecter
+                </VoxButton>
+              </YStack>
+
+              <YStack gap={16}>
+                <Text.MD semibold textWrap="balance">
+                  Adhérez pour débloquer <Text.MD semibold color="$yellow5">tous les contenus et fonctionnalités</Text.MD>
+                </Text.MD>
+                <VoxButton
+                  variant="contained"
+                  size="lg"
+                  width="100%"
+                  theme="yellow"
+                  onPress={() => signUp()}
+                >
+                  J'adhère
+                </VoxButton>
+              </YStack>
+            </YStack>
           )}
-          <NavItem
-            text="Mon profil"
-            profilePicture={{
-              src: user?.image_url ?? undefined,
-              alt: 'Mon profil',
-              fullName: user ? `${user.first_name} ${user.last_name}` : 'John Doe',
-            }}
-            collapsed={displayNavCadre}
-            href="/dev/profil"
-            active={isNavItemActive(pathname, '/dev/profil')}
-          />
         </MenuFooterContainer>
       </SideBarContainer>
       <SideBarContainer

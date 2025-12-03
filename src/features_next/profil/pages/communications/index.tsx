@@ -15,7 +15,7 @@ const CommunicationsScreen = () => {
   return (
     <ProfilLayout>
     <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-      <LayoutScrollView padding="left">
+      <LayoutScrollView>
         <YStack gap="$medium" flex={1} pt={media.sm ? '$medium' : undefined}>
           <ForceBirthdateModal />
 

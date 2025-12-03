@@ -21,7 +21,7 @@ export const CancelButton = (props: EventHandleButtonProps) => {
   const handlePress = useDebouncedCallback(
     () =>
       mutateAsync(props).then(() => {
-        router.replace('/dev/evenements')
+        router.replace('/(militant)/evenements')
       }),
     200,
   )
@@ -56,7 +56,7 @@ export const DeleteButton = (props: EventHandleButtonProps) => {
   const handlePress = useDebouncedCallback(
     () =>
       mutateAsync(props).then(() => {
-        router.replace('/dev/evenements')
+        router.replace('/(militant)/evenements')
       }),
     200,
   )

@@ -12,6 +12,7 @@ import { HelpMenuItems } from '@/components/AppStructure/Navigation/HelpMenuItem
 import { isNavItemActive } from '@/components/AppStructure/utils'
 import { useMilitantNavItems, cadreNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useGetUserScopes } from '@/services/profile/hook'
+import { useSession } from '@/ctx/SessionProvider'
 
 type Theme = 'blue' | 'purple' | 'green' | 'orange'
 
@@ -134,8 +135,14 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
   const [activeSpecialTab, setActiveSpecialTab] = useState<string | null>(null)
   const themes = getThemes()
   const militantNavItems = useMilitantNavItems()
+  const { isAuth } = useSession()
+  const { data: userScopes } = useGetUserScopes({ enabled: isAuth })
 
-  const { data: userScopes } = useGetUserScopes()
+  if (!isAuth) {
+    return null
+  }
+
+  
 
   const hasExecutiveScope = useMemo(() => {
     return userScopes?.some((s) => s.apps.includes('data_corner')) ?? false

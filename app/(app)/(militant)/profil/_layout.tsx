@@ -1,7 +1,13 @@
 import React, { useEffect } from 'react'
-import { Stack } from 'expo-router'
+import { Redirect, Stack } from 'expo-router'
+import { useSession } from '@/ctx/SessionProvider'
 
 export default function ProfilLayout() {
+  const { isAuth } = useSession()
+  if (!isAuth) {
+    return <Redirect href={'/evenements'} />
+  }
+
   return (
     <Stack
       screenOptions={{

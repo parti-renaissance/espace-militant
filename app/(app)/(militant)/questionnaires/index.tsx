@@ -4,7 +4,7 @@ import FieldSurveysListPage from '@/features_next/field-surveys/pages/list'
 
 export default function QuestionnairesPage() {
   return (
-    <Layout.Container>
+    <Layout.Container safeHorizontalPadding={false}>
       <FieldSurveysListPage />
     </Layout.Container>
   )

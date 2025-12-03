@@ -6,6 +6,7 @@ import ConfigurableTabBar from '@/components/AppStructure/Navigation/TabBar'
 import useLayoutSpacing, { UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
 import { useCadreNavItems } from '@/config/navigationItems'
 import { useLayoutContext, ScrollContext } from './LayoutContext'
+import { useSession } from '@/ctx/SessionProvider'
 
 const LayoutRoot = styled(View, {
   height: '100dvh',
@@ -71,13 +72,15 @@ interface ContainerProps extends ViewProps {
   hideSideBar?: boolean
   hideTabBar?: boolean
   sidebarState?: SideBarState
+  safeHorizontalPadding?: boolean
 }
 
-const Container = ({ children, hideSideBar, hideTabBar, sidebarState, ...props }: ContainerProps) => {
+const Container = ({ children, hideSideBar, hideTabBar, sidebarState, safeHorizontalPadding = true, ...props }: ContainerProps) => {
   const insets = useSafeAreaInsets()
   const layoutRef = useRef<HTMLDivElement>(null)
   const media = useMedia()
   const { setHideSideBar, setHideTabBar, setSidebarState } = useLayoutContext()
+  const spacingValues = useLayoutSpacing({ left: true, right: true })
   
   useEffect(() => {
     setSidebarState(sidebarState ?? 'militant');
@@ -102,7 +105,10 @@ const Container = ({ children, hideSideBar, hideTabBar, sidebarState, ...props }
     >
       <YStack width="100%" flexGrow={1}>
         <ScrollContext.Provider value={{ layoutRef: layoutRef as React.RefObject<HTMLDivElement>, scrollActive: Boolean(isWeb && media.gtSm) }}>
-          <ContentContainer>
+          <ContentContainer style={safeHorizontalPadding ? {
+            paddingLeft: spacingValues.paddingLeft,
+            paddingRight: spacingValues.paddingRight,
+          } : undefined}>
             {children}
           </ContentContainer>
         </ScrollContext.Provider>
@@ -140,8 +146,6 @@ const SideBarComponent = ({ children, isSticky, maxWidth = 320, padding = 'right
     <LayoutSideBar
       isSticky={isSticky}
       maxWidth={maxWidth}
-      ml={spacingValues.paddingLeft}
-      mr={spacingValues.paddingRight}
       pt={spacingValues.paddingTop}
       pb={spacingValues.paddingBottom}
       {...props}

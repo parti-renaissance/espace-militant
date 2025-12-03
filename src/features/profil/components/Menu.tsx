@@ -58,15 +58,7 @@ const ProfilMenu = () => {
             </Menu.Item>
           </Link>
         </Menu>
-        <Menu>
-          <Link href="/dev/accueil" asChild={!isWeb}>
-          <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} icon={BugPlay} last={true}>
-            Nouvelle Navigation 
-          </Menu.Item>
-          </Link>
-        </Menu>
         </>
-        
       ) : null}
       <Menu>
         <Menu.Item theme="orange" size={media.sm ? 'lg' : 'sm'} showArrow={media.sm} onPress={signOut} icon={LogOut} last={true}>

@@ -31,7 +31,7 @@ const NewEventBtn = ({ children, ...props }: YStackProps & { children: string })
 const EventsHeader = ({ mode, value, onChange }: { mode: 'list' | 'aside'; value: 'events' | 'myEvents'; onChange: (x: 'events' | 'myEvents') => void }) => {
   const insets = useSafeAreaInsets()
   const { isAuth } = useSession()
-  const hasFeature = isAuth ? useGetExecutiveScopes().hasFeature : undefined
+  const { hasFeature } = useGetExecutiveScopes()
   const canCreate = isAuth && hasFeature ? hasFeature('events') : false
   const media = useMedia()
 

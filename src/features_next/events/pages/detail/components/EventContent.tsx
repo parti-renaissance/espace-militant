@@ -43,7 +43,7 @@ const BackButton = () => {
       if (window.history.length > 1) {
         router.back()
       } else {
-        router.push('/dev/evenements')
+        router.push('/(militant)/evenements')
       }
     } else {
       if (router.canGoBack()) {

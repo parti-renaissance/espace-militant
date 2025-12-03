@@ -15,7 +15,7 @@ export const EventItemHandleButton = ({ event, userUuid, buttonProps }: EventIte
   return isEventEditable(event) ? (
     <Link
       href={{
-        pathname: '/dev/evenements/[id]/modifier',
+        pathname: '/(militant)/evenements/[id]/modifier',
         params: { id: event.slug! },
       }}
       asChild={!isWeb}

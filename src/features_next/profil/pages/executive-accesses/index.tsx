@@ -10,7 +10,7 @@ import ChangeScope from './components/ScopeList'
 const ExecutivesAccessesScreen = () => {
   return (
     <ProfilLayout>
-      <LayoutScrollView padding="left">
+      <LayoutScrollView>
         <VoxCard>
           <VoxCard.Content>
             <XStack gap={6} alignItems="center">

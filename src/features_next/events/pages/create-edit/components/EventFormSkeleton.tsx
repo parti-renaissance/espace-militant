@@ -15,7 +15,7 @@ import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 const DesktopSkeleton = (props?: { editMode?: boolean }) => {
   return (
     <Layout.Main maxWidth={920}>
-      <LayoutScrollView padding="left">
+      <LayoutScrollView>
         <XStack paddingBottom="$medium" flex={1}>
           <SkeCard.Button />
         </XStack>
@@ -73,7 +73,7 @@ const MobileSkeleton = (props?: { editMode?: boolean }) => {
         <VoxHeader>
           <XStack alignItems="center" flex={1} width="100%">
             <XStack alignContent="flex-start">
-              <Link href={navigation.canGoBack() ? '../' : '/dev/evenements'} replace asChild={!isWeb}>
+              <Link href={navigation.canGoBack() ? '../' : '/(militant)/evenements'} replace asChild={!isWeb}>
                 <VoxButton size="lg" variant="soft" theme="orange">
                   Annuler
                 </VoxButton>

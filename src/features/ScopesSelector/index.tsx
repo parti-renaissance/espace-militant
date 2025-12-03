@@ -16,16 +16,16 @@ const tutoNavDesktopImg = require('@/features/ScopesSelector/assets/sidebar-tuto
 export default function ScopesSelector() {
   const { data: scopes } = useGetExecutiveScopes()
   const { mutate: mutateScope } = useMutateExecutiveScope()
-  const [selectedScope, setSelectedScope] = useState(scopes.default?.code)
+  const [selectedScope, setSelectedScope] = useState(scopes?.default?.code)
   const [hasSelectedScope, setHasSelectedScope] = useState(false)
-  const scopesCodeList = useMemo(() => scopes.list.map((scope) => scope.code), [scopes])
+  const scopesCodeList = useMemo(() => scopes?.list?.map((scope) => scope.code) ?? [], [scopes])
   const [shouldOpen, setShouldOpen] = useState(
-    !scopes.lastAvailableScopes || scopes.lastAvailableScopes.length === 0 || xor(scopesCodeList, scopes.lastAvailableScopes).length > 0,
+    !scopes?.lastAvailableScopes || scopes.lastAvailableScopes.length === 0 || xor(scopesCodeList, scopes.lastAvailableScopes).length > 0,
   )
 
   const media = useMedia()
 
-  if (scopes.list.length === 0) {
+  if (!scopes || !scopes.list || scopes.list.length === 0) {
     return null
   }
 
@@ -58,7 +58,7 @@ export default function ScopesSelector() {
             <Text.SM>Choisissez en un principal.</Text.SM>
           </YStack>
           <YStack>
-            <ScopeList scopes={scopes.list} onChange={handleChange} value={selectedScope} />
+            <ScopeList scopes={scopes?.list ?? []} onChange={handleChange} value={selectedScope} />
           </YStack>
         </YStack>
         <YStack p="$medium" pt={0} alignItems="center" gap="$medium">
@@ -74,9 +74,9 @@ export default function ScopesSelector() {
   }, [scopes, selectedScope, handleChange, handleSubmit])
 
   const HeaderOneScope = () => {
-    const _scope = scopes.list.find((x) => x.code === selectedScope)
+    const _scope = scopes?.list?.find((x) => x.code === selectedScope)
     if (!_scope) return null
-    const { name, description } = getFormatedScope(scopes.list.find((x) => x.code === selectedScope)!)
+    const { name, description } = getFormatedScope(_scope)
     return (
       <YStack backgroundColor="$purple1" paddingVertical="$xxlarge" paddingHorizontal="$large">
         <ScopeItem title={name} pop description={description ?? ''} showButton={false} selected />

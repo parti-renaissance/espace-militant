@@ -3,7 +3,7 @@ import FieldSurveyDetailsScreen from "@/features_next/field-surveys/pages/detail
 
 export default function QuestionnairesDetailsPage() {
   return (
-    <Layout.Container hideSideBar={true} hideTabBar={true}>
+    <Layout.Container hideSideBar={true} hideTabBar={true} safeHorizontalPadding={false}>
       <FieldSurveyDetailsScreen />
     </Layout.Container>
   )

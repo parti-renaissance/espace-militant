@@ -63,7 +63,7 @@ export default function ChangePasswordScreen() {
   return (
     <ProfilLayout>
     <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-      <LayoutScrollView padding="left">
+      <LayoutScrollView>
         <VoxCard>
           <VoxCard.Content>
             <Text.LG>Modifier mon mot de passe</Text.LG>

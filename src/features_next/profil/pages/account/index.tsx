@@ -16,18 +16,18 @@ const AccountScreen = () => {
 
   return (
     <ProfilLayout>
-    <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-      <LayoutScrollView padding="left">
-        <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
-          <ForceBirthdateModal />
+      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
+        <LayoutScrollView>
+          <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
+            <ForceBirthdateModal />
 
-          <InformationsForm profile={profile} />
-          <ContactForm profile={profile} />
-          <LocationForm profile={profile} />
-          <RSForm profile={profile} />
-        </YStack>
-      </LayoutScrollView>
-    </KeyboardAvoidingView>
+            <InformationsForm profile={profile} />
+            <ContactForm profile={profile} />
+            <LocationForm profile={profile} />
+            <RSForm profile={profile} />
+          </YStack>
+        </LayoutScrollView>
+      </KeyboardAvoidingView>
     </ProfilLayout>
   )
 }

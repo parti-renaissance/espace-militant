@@ -120,7 +120,7 @@ const UploadPP = (props: { profil: RestProfilResponse }) => {
   )
 }
 
-export default function ({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
+export default function ProfilBlock({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
   const { data: profil } = useGetProfil()
   const { tags } = useGetTags({ tags: [UserTagEnum.ELU, UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] })
   const media = useMedia()

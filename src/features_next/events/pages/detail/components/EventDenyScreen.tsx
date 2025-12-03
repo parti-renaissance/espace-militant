@@ -39,7 +39,7 @@ const AdhButton = () => {
 const BackButton = () => {
   const { canGoBack } = useNavigation()
   return (
-    <Link href={canGoBack() ? '../' : '/dev/evenements'} asChild={!isWeb}>
+    <Link href={canGoBack() ? '../' : '/(militant)/evenements'} asChild={!isWeb}>
       <VoxButton variant="text" iconLeft={ArrowLeft} borderRadius={16}>
         Événements
       </VoxButton>
@@ -132,7 +132,7 @@ const MobileDeny = ({ error }: { error: DetailedAPIErrorPayload }) => {
 const DesktopDeny = ({ error }: { error: DetailedAPIErrorPayload }) => {
   return (
     <Layout.Main maxWidth={920}>
-      <LayoutScrollView padding="left">
+      <LayoutScrollView>
         <XStack alignItems="flex-start" alignSelf="flex-start" pb="$medium">
           <BackButton />
         </XStack>

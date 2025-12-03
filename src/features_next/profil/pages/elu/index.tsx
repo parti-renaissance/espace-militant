@@ -17,7 +17,7 @@ const EluScreen = () => {
   return (
     <ProfilLayout>
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-        <LayoutScrollView padding="left">
+        <LayoutScrollView>
           <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
             <ForceBirthdateModal />
             <InfoEluCard profil={profile} />

@@ -63,7 +63,7 @@ const roundMinutesToNextDecimal = (date: Date) => {
 }
 const useEventFormData = ({ edit }: EventFormProps) => {
   const scopes = useGetExecutiveScopes()
-  const scopeOptions = useMemo(() => scopes.data.list.filter((x) => x.features.includes('events')).map(getFormatedScope), [scopes.data.list])
+  const scopeOptions = useMemo(() => scopes.data?.list?.filter((x) => x.features.includes('events')).map(getFormatedScope) ?? [], [scopes.data])
   const { data } = useGetSuspenseProfil({ enabled: true })
 
   const isAuthor = useMemo(() => {

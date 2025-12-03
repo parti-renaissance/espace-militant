@@ -36,7 +36,7 @@ const DashboardScreen = () => {
 
   return (
     <ProfilLayout>
-      <LayoutScrollView padding="left">
+      <LayoutScrollView>
         <YStack gap="$medium" flex={1} pt={media.sm ? 8 + insets.top : undefined}>
           <ProfilBlock />
           {media.sm && <ProfilMenu />}

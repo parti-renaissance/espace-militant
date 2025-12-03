@@ -92,11 +92,12 @@ const MessagePageIndex = () => {
   const media = useMedia()
   const { data: scopes } = useGetExecutiveScopes();
   const [selectedScope, setSelectedScope] = useState<string | undefined>(() => {
-    if (!scopes?.default?.code) return undefined;
+    const defaultCode = scopes?.default?.code;
+    if (!defaultCode) return undefined;
     const available = (scopes?.list || [])
       .filter((scope) => scope.features.includes("publications"))
       .map((scope) => scope.code);
-    return available.includes(scopes.default.code) ? scopes.default.code : undefined;
+    return available.includes(defaultCode) ? defaultCode : undefined;
   });
 
   // Preload senders for the selected scope
