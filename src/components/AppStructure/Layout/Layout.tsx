@@ -7,8 +7,6 @@ import useLayoutSpacing, { UseLayoutSpacingOptions } from '@/components/AppStruc
 import { useCadreNavItems } from '@/config/navigationItems'
 import { useLayoutContext, ScrollContext } from './LayoutContext'
 
-const SAFE_AREA_PADDING = 16
-
 const LayoutRoot = styled(View, {
   height: '100dvh',
   flex: 1,

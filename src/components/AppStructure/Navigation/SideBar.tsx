@@ -12,6 +12,7 @@ import { useVisibleNavItems } from '@/components/AppStructure/hooks/useVisibleNa
 import { isNavItemActive } from '@/components/AppStructure/utils'
 import { useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
+import useCheckNotificationsState from '@/hooks/notifications/useCheckNotificationsState'
 
 export const WIDTH_MILITANT = 248;
 export const WIDTH_COLLAPSED = 58;
@@ -197,6 +198,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
   const { data: executiveScopes } = useGetExecutiveScopes()
   const militantNavItems = useMilitantNavItems()
   const [displayNavCadre, setDisplayNavCadre] = useState(state === 'cadre')
+  const { notificationGranted, triggerNotificationRequest } = useCheckNotificationsState()
   const hasExecutiveScopes = useMemo(
     () => executiveScopes?.list && executiveScopes.list.length > 0,
     [executiveScopes],
@@ -343,8 +345,18 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
           )}
         </MenuContainer>
         <MenuFooterContainer collapsed={displayNavCadre}>
+          {/** TODO: Add back when we have email subscription
           <NavItem iconLeft={BellOff} text="Abonnement emails" dangerAccent collapsed={displayNavCadre} />
-          <NavItem iconLeft={CaptionsOff} text="Notifications mobile" dangerAccent collapsed={displayNavCadre} />
+          */}
+          {notificationGranted === false && (
+            <NavItem
+              iconLeft={BellOff}
+              text="Notifications"
+              dangerAccent
+              collapsed={displayNavCadre}
+              onPress={triggerNotificationRequest}
+            />
+          )}
           <NavItem
             text="Mon profil"
             profilePicture={{
@@ -364,45 +376,45 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
         display={displayNavCadre ? 'flex' : 'none'}
       >
         <LogoContainer pb={0}>
-              <Text fontSize={20} medium>CADRE</Text>
-            </LogoContainer>
-            <YStack>
-              <ScopeSelector />
-            </YStack>
-            <MenuContainer onLayout={onCadreMenuLayout}>
-              <YStack gap={4}>
-                <Line />
-                {visibleCadreNavItems.map((item) => (
-                  <NavItem
-                    key={item.id}
-                    iconLeft={item.iconLeft}
-                    text={item.text}
-                    theme={item.theme}
-                    href={item.href}
-                    isNew={item.isNew}
-                    externalLink={item.externalLink}
-                    disabled={item.disabled}
-                    active={item.active}
-                    onPress={item.onPress}
-                  />
-                ))}
-                {hiddenCadreNavItems.length > 0 && (
-                  <NavItem
-                    iconLeft={Ellipsis}
-                    text="Plus"
-                    theme="purple"
-                    dropdownVerticalPosition="top"
-                    subItems={cadrePlusSubItems}
-                    active={hiddenCadreNavItems.some(item => item.active)}
-                  />
-                )}
-              </YStack>
+          <Text fontSize={20} medium>CADRE</Text>
+        </LogoContainer>
+        <YStack>
+          <ScopeSelector />
+        </YStack>
+        <MenuContainer onLayout={onCadreMenuLayout}>
+          <YStack gap={4}>
+            <Line />
+            {visibleCadreNavItems.map((item) => (
+              <NavItem
+                key={item.id}
+                iconLeft={item.iconLeft}
+                text={item.text}
+                theme={item.theme}
+                href={item.href}
+                isNew={item.isNew}
+                externalLink={item.externalLink}
+                disabled={item.disabled}
+                active={item.active}
+                onPress={item.onPress}
+              />
+            ))}
+            {hiddenCadreNavItems.length > 0 && (
+              <NavItem
+                iconLeft={Ellipsis}
+                text="Plus"
+                theme="purple"
+                dropdownVerticalPosition="top"
+                subItems={cadrePlusSubItems}
+                active={hiddenCadreNavItems.some(item => item.active)}
+              />
+            )}
+          </YStack>
 
-            </MenuContainer>
-            <MenuFooterContainer>
-              <HelpMenuItems variant="navItem" />
-            </MenuFooterContainer>
-          </SideBarContainer>
+        </MenuContainer>
+        <MenuFooterContainer>
+          <HelpMenuItems variant="navItem" />
+        </MenuFooterContainer>
+      </SideBarContainer>
     </SideBarArea>
   )
 }

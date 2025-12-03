@@ -201,7 +201,6 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
     const contentColor = disabled ? '$textOutline32' : frame === 'cadre' ? '$purple6' : '$textPrimary'
 
     const iconTone = useMemo<IconTone>(() => {
-      if (dangerAccent) return 'danger'
       if (disabled) return 'disabled'
       if (frame === 'cadre' && active) return 'cadreActive'
       if (frame === 'cadre') return 'cadre'
@@ -237,8 +236,8 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
           <IconContainer
             tone={iconTone}
             marginRight={resolvedCollapsed ? 0 : 2}
-            $group-hover={{ backgroundColor: dangerAccent ? '#FFEBEC' : (active && frame === 'cadre') ? '$purple2' : frame === 'cadre' ? '$purple1' : disabled ? 'white' : '$gray1' }}
-            $group-press={{ backgroundColor: dangerAccent ? '#FFEBEC' : (active && frame === 'cadre') ? '$purple3' : frame === 'cadre' ? '$purple2' : disabled ? 'white' : '$gray2' }}
+            $group-hover={{ backgroundColor: (active && frame === 'cadre') ? '$purple2' : frame === 'cadre' ? '$purple1' : disabled ? 'white' : '$gray1' }}
+            $group-press={{ backgroundColor: (active && frame === 'cadre') ? '$purple3' : frame === 'cadre' ? '$purple2' : disabled ? 'white' : '$gray2' }}
           >
             <IconLeft size={16} color={iconColor} />
           </IconContainer>
@@ -249,8 +248,8 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
     })()
 
     const shape: ComponentProps<typeof NavItemFrame>['shape'] = resolvedCollapsed
-      ? (profilePicture || dangerAccent) ? 'pillBoth' : 'default'
-      : (profilePicture || dangerAccent) ? 'pillLeft' : 'default'
+      ? (profilePicture) ? 'pillBoth' : 'default'
+      : (profilePicture) ? 'pillLeft' : 'default'
 
     const shouldRenderAsWebLink = Boolean(href && isWeb)
 

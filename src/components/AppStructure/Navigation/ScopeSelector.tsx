@@ -18,8 +18,9 @@ const SelectorContainer = styled(XStack, {
   cursor: 'pointer',
   justifyContent: 'space-between',
   borderRadius: 8,
-  hoverStyle: { backgroundColor: '$purple1' },
-  pressStyle: { backgroundColor: '$purple2' },
+  backgroundColor: '$purple1',
+  hoverStyle: { backgroundColor: '$purple2' },
+  pressStyle: { backgroundColor: '$purple3' },
 })
 
 const ScopeItemFrame = styled(ThemeableStack, {
