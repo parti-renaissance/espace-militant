@@ -1,0 +1,36 @@
+import React from 'react'
+import { Redirect, useLocalSearchParams } from 'expo-router'
+import { useSession } from '@/ctx/SessionProvider'
+import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { AccessDeny } from '@/components/AccessDeny'
+import { Layout } from '@/components/AppStructure'
+import { useUserStore } from '@/store/user-store'
+import MessageEditorPage from '@/features_next/publications/pages/create-update'
+
+export default function PublicationsCreatePage() {
+  const params = useLocalSearchParams<{ id?: string; scope?: string }>()
+  const { isAuth } = useSession()
+  const { hasFeature } = useGetExecutiveScopes()
+  const { defaultScope } = useUserStore()
+
+  if (!isAuth) {
+    return <Redirect href={'/(app)/(tabs)/evenements/'} />
+  }
+
+  if (!hasFeature('publications')) {
+    return <AccessDeny />
+  }
+
+
+
+  return (
+    <Layout.Container hideSideBar hideTabBar>
+      <MessageEditorPage
+        scope={params.scope ?? defaultScope ?? ''}
+        messageId={params.id}
+      />
+    </Layout.Container>
+
+  )
+}
+

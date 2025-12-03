@@ -20,7 +20,7 @@ export const DefaultErrorFallback = ({ resetErrorBoundary, error }: FallbackProp
     return <Error404 />
   }
   return (
-    <>
+    <YStack flex={1} justifyContent="center" alignItems="center" gap="$medium" padding="$medium">
       <Image source={require('../assets/images/blocs.png')} height={200} width={200} objectFit={'contain'} />
       <Text color="$gray6" textAlign="center">
         Une erreur est survenue. Veuillez recharger la page.
@@ -30,7 +30,7 @@ export const DefaultErrorFallback = ({ resetErrorBoundary, error }: FallbackProp
           Réessayer
         </VoxButton>
       </View>
-    </>
+    </YStack>
   )
 }
 
