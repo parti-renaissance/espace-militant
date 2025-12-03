@@ -4,11 +4,12 @@ import { Platform } from 'react-native'
 import Layout from '@/components/Navigation/Layout'
 import { LayoutContext, useLayoutContext } from '@/components/Navigation/LayoutContext'
 import { SideBarState } from '@/components/Navigation/SideBar'
-import { militantNavItems, cadreNavItems } from '@/config/navigationItems'
+import { useMilitantNavItems, cadreNavItems } from '@/config/navigationItems'
 import { isWeb } from 'tamagui'
 
 function AppNewLayoutContent() {
   const { sidebarState, hideTabBar, hideSideBar, setSidebarState } = useLayoutContext()
+  const militantNavItems = useMilitantNavItems()
   
   const effectiveSidebarState = useMemo(() => 
     hideSideBar ? 'hide' : sidebarState,

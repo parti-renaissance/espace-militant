@@ -7,7 +7,7 @@ import { MoreHorizontal, Sparkle } from '@tamagui/lucide-icons'
 import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, XStack, YStack } from 'tamagui'
 import NavSheet, { NavSheetRef } from '@/components/Navigation/NavSheet'
 import { useRouter, usePathname } from 'expo-router'
-import { militantNavItems, cadreNavItems, type NavItemConfig } from '@/config/navigationItems'
+import { useMilitantNavItems, cadreNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { isNavItemActive } from './utils'
 import { ScopeSelector } from './ScopeSelector'
 import { HelpMenuItems } from './HelpMenuItems'
@@ -133,6 +133,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
   const pathname = usePathname()
   const [activeSpecialTab, setActiveSpecialTab] = useState<string | null>(null)
   const themes = getThemes()
+  const militantNavItems = useMilitantNavItems()
 
   const { data: userScopes } = useGetUserScopes()
 

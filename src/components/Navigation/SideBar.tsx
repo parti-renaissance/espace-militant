@@ -10,7 +10,7 @@ import { useGetExecutiveScopes, useGetProfil } from "@/services/profile/hook"
 import type { NavItemSubItem } from "./NavItemDropdown"
 import { useVisibleNavItems } from "./useVisibleNavItems"
 import { usePathname } from "expo-router"
-import { militantNavItems, type NavItemConfig } from "@/config/navigationItems"
+import { useMilitantNavItems, type NavItemConfig } from "@/config/navigationItems"
 import { isNavItemActive } from "./utils"
 
 export const WIDTH_MILITANT = 248;
@@ -195,6 +195,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
   const pathname = usePathname()
   const { data: user } = useGetProfil()
   const { data: executiveScopes } = useGetExecutiveScopes()
+  const militantNavItems = useMilitantNavItems()
   const [displayNavCadre, setDisplayNavCadre] = useState(state === 'cadre')
   const hasExecutiveScopes = useMemo(
     () => executiveScopes?.list && executiveScopes.list.length > 0,
@@ -218,7 +219,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
         ...item,
         active: isNavItemActive(pathname, item.href),
       }))
-  }, [pathname])
+  }, [pathname, militantNavItems])
 
   // Ajouter la propriété active aux items cadre et filtrer selon displayIn
   const cadreNavItemsWithActive = useMemo(() => {
