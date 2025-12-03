@@ -52,7 +52,7 @@ export const ROUTES: TabRoute[] = [
     theme: 'gray',
     hidden: true,
     hiddenMobile: true,
-    // externalSlug: 'formation',
+    externalSlug: 'formation',
   },
   {
     name: 'ressources',
