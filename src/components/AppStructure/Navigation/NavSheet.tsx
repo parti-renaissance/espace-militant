@@ -4,9 +4,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet'
-import { NavItem } from '@/components/Navigation/NavItem'
-import { type NavItemConfig } from '@/config/navigationItems'
 import { YStack } from 'tamagui'
+import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
+import { type NavItemConfig } from '@/config/navigationItems'
 
 interface NavSheetProps {
   onClose?: () => void

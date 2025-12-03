@@ -1,5 +1,5 @@
 import React from 'react'
-import Layout from '@/components/Navigation/Layout'
+import Layout from '@/components/AppStructure/Layout/Layout'
 import HomeFeed from '@/features/homefeed/HomeFeed'
 
 export default function AccueilPage() {

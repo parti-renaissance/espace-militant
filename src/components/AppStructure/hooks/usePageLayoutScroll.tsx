@@ -1,7 +1,7 @@
 import { RefObject, useContext, useEffect, useRef, useCallback } from 'react'
 import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import { isWeb } from 'tamagui'
-import { ScrollContext } from './scrollContext' // Assurez-vous que le chemin est correct
+import { ScrollContext } from '@/components/AppStructure/Layout/LayoutContext'
 
 type Props = {
   onEndReached?: () => void

@@ -1,10 +1,10 @@
 import { useState, useRef, useMemo } from 'react'
-import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 import { ChevronsUpDown } from '@tamagui/lucide-icons'
+import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
+import Text from '@/components/base/Text'
 import { NavItemDropdown, type NavItemSubItem } from './NavItemDropdown'
-import Text from '../base/Text'
-import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
 import { getFormatedScope } from '@/features/ScopesSelector/utils'
+import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
 
 export type Scope = {
   id: string

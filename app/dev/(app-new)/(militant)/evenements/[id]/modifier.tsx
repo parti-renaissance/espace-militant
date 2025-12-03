@@ -1,14 +1,14 @@
 import React from 'react'
-import Error404 from '@/components/404/Error404'
-import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
-import Layout from '@/components/Navigation/Layout'
-import * as metatags from '@/config/metatags'
-import EventFormScreen, { EventFormScreenSkeleton } from '@/features_next/events/pages/create-edit'
-import { isEventEditable } from '@/features/events/utils'
-import { useGetEvent } from '@/services/events/hook'
-import { RestFullEvent } from '@/services/events/schema'
 import { useLocalSearchParams } from 'expo-router'
 import Head from 'expo-router/head'
+import Error404 from '@/components/404/Error404'
+import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import * as metatags from '@/config/metatags'
+import { isEventEditable } from '@/features/events/utils'
+import EventFormScreen, { EventFormScreenSkeleton } from '@/features_next/events/pages/create-edit'
+import { useGetEvent } from '@/services/events/hook'
+import { RestFullEvent } from '@/services/events/schema'
 
 const EditEventScreen: React.FC = () => {
   

@@ -12,7 +12,7 @@ import { useFieldSurveysWithRefresh } from '@/services/field-surveys/hook'
 import { FieldSurvey } from '@/services/field-surveys/schema'
 import { getFormattedDate } from '@/utils/date'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 
 const Container = styled(YStack, {

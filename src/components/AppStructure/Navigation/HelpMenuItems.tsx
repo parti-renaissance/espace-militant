@@ -1,9 +1,9 @@
 import React from 'react'
 import { ScrollView } from 'react-native'
-import { YStack } from 'tamagui'
 import { RefreshCcw, CircleHelp, LifeBuoy } from '@tamagui/lucide-icons'
-import { NavItem } from './NavItem'
+import { YStack } from 'tamagui'
 import { VoxButton } from '@/components/Button'
+import { NavItem } from './NavItem'
 import type { IconComponent } from '@/models/common.model'
 
 type HelpMenuItem = {

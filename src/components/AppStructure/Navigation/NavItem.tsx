@@ -1,11 +1,11 @@
 import { ComponentProps, ComponentPropsWithoutRef, createContext, forwardRef, useContext, useMemo, useRef, useState } from 'react'
+import type { PressableProps } from 'react-native'
+import { Link, useRouter, type Href } from 'expo-router'
 import { ExternalLink } from '@tamagui/lucide-icons'
 import { styled, TamaguiElement, XStack, YStack, isWeb, useMedia } from 'tamagui'
-import { Link, useRouter, type Href } from 'expo-router'
-import type { PressableProps } from 'react-native'
 import Text from '@/components/base/Text'
-import type { IconComponent } from '@/models/common.model'
 import ProfilePicture from '@/components/ProfilePicture/ProfilePicture'
+import type { IconComponent } from '@/models/common.model'
 import { NavItemDropdown, type NavItemSubItem } from './NavItemDropdown'
 
 const NavItemFrame = styled(XStack, {

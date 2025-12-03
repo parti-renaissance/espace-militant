@@ -1,11 +1,10 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { Stack, Tabs } from 'expo-router'
-import { Platform } from 'react-native'
-import Layout from '@/components/Navigation/Layout'
-import { LayoutContext, useLayoutContext } from '@/components/Navigation/LayoutContext'
-import { SideBarState } from '@/components/Navigation/SideBar'
-import { useMilitantNavItems, cadreNavItems } from '@/config/navigationItems'
 import { isWeb } from 'tamagui'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import { LayoutContext, useLayoutContext } from '@/components/AppStructure/Layout/LayoutContext'
+import { SideBarState } from '@/components/AppStructure/Navigation/SideBar'
+import { useMilitantNavItems, cadreNavItems } from '@/config/navigationItems'
 
 function AppNewLayoutContent() {
   const { sidebarState, hideTabBar, hideSideBar, setSidebarState } = useLayoutContext()

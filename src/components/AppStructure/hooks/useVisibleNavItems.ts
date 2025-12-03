@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from "react"
-import type { LayoutChangeEvent } from "react-native"
+import { useState, useMemo, useCallback } from 'react'
+import type { LayoutChangeEvent } from 'react-native'
 
 // Valeurs par défaut (peuvent être surchargées via les props)
 const DEFAULT_ITEM_HEIGHT = 44 // 40px hauteur + 4px gap

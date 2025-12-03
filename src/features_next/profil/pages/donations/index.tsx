@@ -8,7 +8,7 @@ import DonationHistoryCard from './components/DonationHistoryCard'
 import DonationTaxReceiptCard from './components/DonationTaxReceiptsCard'
 import MembershipCard from './components/MembershipCard'
 import ProfilLayout from '@/features_next/profil/components/Layout'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 const DonationsScreen = () => {
   const { data: profile } = useGetDetailProfil()

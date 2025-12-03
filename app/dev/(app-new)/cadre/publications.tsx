@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text } from 'tamagui'
-import Layout from '@/components/Navigation/Layout'
+import Layout from '@/components/AppStructure/Layout/Layout'
 
 export default function PublicationsPage() {
   return (

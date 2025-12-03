@@ -8,7 +8,7 @@ import DeclaEluCard from './components/DeclaEluCard'
 import DeclaMandateEluCard from './components/DeclaMandateEluCard'
 import InfoEluCard from './components/InfoEluCard'
 import ProfilLayout from '@/features_next/profil/components/Layout'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 const EluScreen = () => {
   const { data: profile } = useGetElectProfil()

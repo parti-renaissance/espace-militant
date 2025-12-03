@@ -1,5 +1,5 @@
 import React from 'react'
-import Layout from '@/components/Navigation/Layout'
+import Layout from '@/components/AppStructure/Layout/Layout'
 import EventFeed from '@/features_next/events/pages/feed'
 
 export default function EvenementsPage() {

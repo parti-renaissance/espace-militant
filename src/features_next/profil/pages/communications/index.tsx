@@ -5,7 +5,7 @@ import { useMedia, YStack } from 'tamagui'
 import ContactForm from '../account/form/ContactForm'
 import ForceBirthdateModal from '../account/form/ForceBirthdateModal'
 import NotificationForm from './components/NotificationForm'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 
 const CommunicationsScreen = () => {

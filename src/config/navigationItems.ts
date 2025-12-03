@@ -1,6 +1,6 @@
 import { ComponentProps, useMemo } from 'react'
 import { Home, Calendar, Zap, HeartHandshake, GraduationCap, Link, ClipboardCheck, ScrollText, Flag, Users, Network, Goal, Vote, CircleUser } from '@tamagui/lucide-icons'
-import { NavItem } from '@/components/Navigation/NavItem'
+import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
 import type { IconComponent } from '@/models/common.model'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'

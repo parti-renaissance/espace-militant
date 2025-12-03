@@ -1,4 +1,4 @@
-import Layout from '@/components/Navigation/Layout'
+import Layout from '@/components/AppStructure/Layout/Layout'
 import ExecutiveAccessesScreen from '@/features_next/profil/pages/executive-accesses'
 
 export default function AccesCadrePage() {

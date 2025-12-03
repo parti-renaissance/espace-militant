@@ -9,8 +9,8 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { Calendar, Info } from '@tamagui/lucide-icons'
 import { Link, useNavigation } from 'expo-router'
 import { isWeb, XStack, YStack } from 'tamagui'
-import Layout from '@/components/Navigation/Layout'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 const DesktopSkeleton = (props?: { editMode?: boolean }) => {
   return (

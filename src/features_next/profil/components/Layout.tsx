@@ -1,10 +1,10 @@
 import { CircleUser, Sparkle, HelpingHand, LandPlot, Settings2, MessageCircle, TreeDeciduous, KeyRound } from "@tamagui/lucide-icons"
-import { isNavItemActive } from "@/components/Navigation/utils"
+import { isNavItemActive } from "@/components/AppStructure/utils"
 import { usePathname } from "expo-router"
 import { useMedia } from "tamagui"
-import Layout from "@/components/Navigation/Layout"
+import Layout from "@/components/AppStructure/Layout/Layout"
 import VoxCard from "@/components/VoxCard/VoxCard"
-import { NavItem } from "@/components/Navigation/NavItem"
+import { NavItem } from "@/components/AppStructure/Navigation/NavItem"
 
 function ProfilLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

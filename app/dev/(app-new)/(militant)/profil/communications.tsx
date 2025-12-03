@@ -1,4 +1,4 @@
-import Layout from '@/components/Navigation/Layout'
+import Layout from '@/components/AppStructure/Layout/Layout'
 import CommunicationsScreen from '@/features_next/profil/pages/communications'
 
 export default function CommunicationsPage() {

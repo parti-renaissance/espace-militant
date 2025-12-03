@@ -1,9 +1,9 @@
 import React from 'react'
-import Layout from '@/components/Navigation/Layout'
-import ResourcesList from '@/features_next/resources/pages/index'
-import Header from '@/components/Navigation/Header'
 import { Link2 } from '@tamagui/lucide-icons'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import Header from '@/components/AppStructure/Header'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import ResourcesList from '@/features_next/resources/pages/index'
 
 export default function RessourcesPage() {
   return (

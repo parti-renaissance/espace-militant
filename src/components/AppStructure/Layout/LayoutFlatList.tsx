@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react'
 import { FlatList, FlatListProps, RefreshControl, Platform } from 'react-native'
 import { isWeb } from 'tamagui'
-import { usePageLayoutScroll } from '@/components/Navigation/usePageLayoutScroll'
-import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/Navigation/hook/useLayoutSpacing'
+import { usePageLayoutScroll } from '@/components/AppStructure/hooks/usePageLayoutScroll'
+import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
 
 type LayoutFlatListProps<T> = Omit<FlatListProps<T>, 'onEndReached' | 'data' | 'renderItem' | 'refreshControl'> & {
   data: FlatListProps<T>['data']

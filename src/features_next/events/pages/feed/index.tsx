@@ -14,8 +14,8 @@ import EventsHeader from './components/Header'
 import EventsListSkeleton from './components/Skeleton'
 import { useHits } from '@/services/hits/hook'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
-import Layout from '@/components/Navigation/Layout'
-import LayoutFlatList from '@/components/Navigation/LayoutFlatList'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 
 const EventCard = memo(({ event, userUuid, source }: { event: RestItemEvent | RestPublicItemEvent; userUuid?: string; source: string }) => {
   if (Platform.OS === 'web') {

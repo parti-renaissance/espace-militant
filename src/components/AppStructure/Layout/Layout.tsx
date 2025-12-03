@@ -1,14 +1,11 @@
 import React, { useRef, useEffect } from 'react'
-import { ScrollView, View, XStack, styled, withStaticProperties, ViewProps, useMedia, isWeb } from 'tamagui'
-import { StyleSheet, StyleProp, ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { SideBar, SideBarState } from '@/components/Navigation/SideBar'
-import ConfigurableTabBar from '@/components/Navigation/TabBar'
-import { YStack } from 'tamagui'
-import { ScrollContext } from './scrollContext'
-import useLayoutSpacing, { UseLayoutSpacingOptions } from './hook/useLayoutSpacing'
+import { View, XStack, styled, withStaticProperties, ViewProps, useMedia, isWeb, YStack } from 'tamagui'
+import { SideBar, SideBarState } from '@/components/AppStructure/Navigation/SideBar'
+import ConfigurableTabBar from '@/components/AppStructure/Navigation/TabBar'
+import useLayoutSpacing, { UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
 import { useCadreNavItems } from '@/config/navigationItems'
-import { useLayoutContext } from './LayoutContext'
+import { useLayoutContext, ScrollContext } from './LayoutContext'
 
 const SAFE_AREA_PADDING = 16
 

@@ -1,4 +1,4 @@
-import Layout from '@/components/Navigation/Layout'
+import Layout from '@/components/AppStructure/Layout/Layout'
 import AccountScreen from '@/features_next/profil/pages/account'
 
 export default function InformationsPersonnellesPage() {

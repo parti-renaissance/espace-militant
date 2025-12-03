@@ -18,8 +18,8 @@ import { Platform } from 'react-native'
 import { EventLive } from '@/features_next/events/components/EventLive'
 import EventManagementSection from '@/features_next/events/components/EventManagementSection'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../../utils'
-import Layout from '@/components/Navigation/Layout'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import { TipTapRenderer } from '@/components/TipTapRenderer'
 
 const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 'time_zone'>> & { showTime?: boolean }) => {

@@ -1,7 +1,7 @@
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useMedia } from "tamagui"
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useMedia } from 'tamagui'
 
-const SAFE_AREA_PADDING = 16
+const SAFE_AREA_PADDING = 24
 const TABBAR_HEIGHT_SM = 64
 
 type SpacingConfig = {

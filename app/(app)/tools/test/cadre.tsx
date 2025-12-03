@@ -4,7 +4,7 @@ import * as metatags from '@/config/metatags'
 import { YStack } from 'tamagui'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import Text from '@/components/base/Text'
-import Layout from '@/components/Navigation/Layout'
+import Layout from '@/components/AppStructure/Layout/Layout'
 
 function TestScreen() {
   return (

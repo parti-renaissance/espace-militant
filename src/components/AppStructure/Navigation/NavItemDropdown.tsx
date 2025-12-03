@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState, cloneElement, isValidElement } from 'react'
 import { FlatList, GestureResponderEvent, Modal } from 'react-native'
-import { styled, XStack, YStack, useMedia } from 'tamagui'
-import { DropdownFrame, DropdownItem } from '../base/Dropdown'
-import type { IconComponent } from '@/models/common.model'
-import Text from '../base/Text'
 import { Info } from '@tamagui/lucide-icons'
+import { styled, XStack, YStack, useMedia } from 'tamagui'
+import { DropdownFrame, DropdownItem } from '@/components/base/Dropdown'
+import Text from '@/components/base/Text'
+import type { IconComponent } from '@/models/common.model'
 
 export type NavItemSubItem = {
   id: string

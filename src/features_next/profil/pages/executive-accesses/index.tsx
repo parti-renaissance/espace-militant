@@ -3,7 +3,7 @@ import { Sparkle } from '@tamagui/lucide-icons'
 import { XStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 import ChangeScope from './components/ScopeList'
 

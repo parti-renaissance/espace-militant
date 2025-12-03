@@ -1,9 +1,9 @@
 import React from 'react'
+import Head from 'expo-router/head'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
-import Layout from '@/components/Navigation/Layout'
+import Layout from '@/components/AppStructure/Layout/Layout'
 import * as metatags from '@/config/metatags'
 import EventFormScreen, { EventFormScreenSkeleton } from '@/features_next/events/pages/create-edit'
-import Head from 'expo-router/head'
 
 const CreateEventScreen: React.FC = () => {
 

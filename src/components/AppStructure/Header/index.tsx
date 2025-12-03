@@ -1,8 +1,8 @@
+import { Href, useNavigation, useRouter } from 'expo-router'
+import { ArrowLeft } from '@tamagui/lucide-icons'
+import { Media, useMedia, XStack, YStack } from 'tamagui'
 import { VoxHeader } from '@/components/Header/Header'
 import type { IconComponent } from '@/models/common.model'
-import { ArrowLeft } from '@tamagui/lucide-icons'
-import { Href, useNavigation, useRouter } from 'expo-router'
-import { Media, useMedia, XStack, YStack } from 'tamagui'
 
 type NavigationConfig = {
   showBackButton?: boolean

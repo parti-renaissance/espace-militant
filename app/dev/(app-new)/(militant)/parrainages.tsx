@@ -1,8 +1,8 @@
 import React from 'react'
-import Layout from '@/components/Navigation/Layout'
-import ReferralsScreen from '@/features_next/referrals/pages/index'
-import Header from '@/components/Navigation/Header'
 import { HeartHandshake } from '@tamagui/lucide-icons'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import Header from '@/components/AppStructure/Header'
+import ReferralsScreen from '@/features_next/referrals/pages/index'
 
 export default function ParrainagesPage() {
   return (

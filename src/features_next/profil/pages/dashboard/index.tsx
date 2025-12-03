@@ -13,7 +13,7 @@ import ProfilMenu from '@/features/profil/components/Menu'
 import Version from '../../components/Version'
 import DonationCard from '../donations/components/DonationCard'
 import MembershipCard from '../donations/components/MembershipCard'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 
 const DashboardScreen = () => {

@@ -1,17 +1,17 @@
-import React, { useState, useMemo } from "react"
-import { styled, YStack, XStack } from "tamagui"
-import { BellOff, CaptionsOff, ChevronRight, Sparkle, Ellipsis } from "@tamagui/lucide-icons"
-import EuCampaignIllustration from "@/assets/illustrations/EuCampaignIllustration"
-import { NavItem } from "./NavItem"
-import { ScopeSelector } from "./ScopeSelector"
-import { HelpMenuItems } from "./HelpMenuItems"
-import Text from "../base/Text"
-import { useGetExecutiveScopes, useGetProfil } from "@/services/profile/hook"
-import type { NavItemSubItem } from "./NavItemDropdown"
-import { useVisibleNavItems } from "./useVisibleNavItems"
-import { usePathname } from "expo-router"
-import { useMilitantNavItems, type NavItemConfig } from "@/config/navigationItems"
-import { isNavItemActive } from "./utils"
+import React, { useState, useMemo } from 'react'
+import { usePathname } from 'expo-router'
+import { BellOff, CaptionsOff, ChevronRight, Sparkle, Ellipsis } from '@tamagui/lucide-icons'
+import { styled, YStack, XStack } from 'tamagui'
+import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import Text from '@/components/base/Text'
+import { NavItem } from './NavItem'
+import { ScopeSelector } from './ScopeSelector'
+import { HelpMenuItems } from './HelpMenuItems'
+import type { NavItemSubItem } from './NavItemDropdown'
+import { useVisibleNavItems } from '@/components/AppStructure/hooks/useVisibleNavItems'
+import { isNavItemActive } from '@/components/AppStructure/utils'
+import { useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
+import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
 
 export const WIDTH_MILITANT = 248;
 export const WIDTH_COLLAPSED = 58;

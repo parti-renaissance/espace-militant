@@ -19,8 +19,8 @@ import QuestionProgressBar from '../components/QuestionProgressBar'
 import RespondentProfile, { RespondentProfileData } from '../components/RespondentProfile'
 import ContactPreferences, { ContactPreferencesData } from '../components/ContactPreferences'
 import QuitConfirmModal from '../components/QuitConfirmModal'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
-import Layout from '@/components/Navigation/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import Layout from '@/components/AppStructure/Layout/Layout'
 
 // Types pour les réponses
 interface Answer {

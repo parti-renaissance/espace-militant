@@ -7,7 +7,7 @@ import ForceBirthdateModal from './form/ForceBirthdateModal'
 import InformationsForm from './form/InformationForm'
 import LocationForm from './form/LocationForm'
 import RSForm from './form/RSForm'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 
 const AccountScreen = () => {

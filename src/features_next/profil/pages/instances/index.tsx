@@ -19,7 +19,7 @@ import { CommitteeCreationButton } from './components/CommitteeCreationButton'
 import { CommitteeCandidateButton } from './components/CommitteeCandidateButton'
 import { useLeaveMyAgora } from '@/services/agoras/hook'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 
 type Instance = RestInstancesResponse[number]

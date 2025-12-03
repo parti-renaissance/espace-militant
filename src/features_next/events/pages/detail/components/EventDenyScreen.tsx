@@ -10,8 +10,8 @@ import { LandPlot, ArrowLeft } from '@tamagui/lucide-icons'
 import { DetailedAPIErrorPayload, ForbiddenError, UnauthorizedError } from '@/core/errors'
 import { useSession } from '@/ctx/SessionProvider'
 import { isWeb } from 'tamagui'
-import Layout from '@/components/Navigation/Layout'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 const AdhButton = () => {

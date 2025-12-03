@@ -9,7 +9,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { VoxHeader } from '@/components/Header/Header'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 const Container = styled(YStack, {
   flex: 1,

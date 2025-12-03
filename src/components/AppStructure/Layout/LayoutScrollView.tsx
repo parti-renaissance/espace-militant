@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react'
 import { NativeScrollEvent, NativeSyntheticEvent, Platform, RefreshControl, ScrollView, ScrollViewProps } from 'react-native'
 import { isWeb } from 'tamagui'
-import { usePageLayoutScroll } from '@/components/Navigation/usePageLayoutScroll'
-import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/Navigation/hook/useLayoutSpacing'
+import { usePageLayoutScroll } from '@/components/AppStructure/hooks/usePageLayoutScroll'
+import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
 
 type LayoutScrollViewProps = Omit<ScrollViewProps, 'onEndReached'> & {
   onEndReached?: () => void
