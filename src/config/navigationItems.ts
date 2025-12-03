@@ -24,16 +24,39 @@ export type NavItemConfig = {
 }
 
 // Configuration des items du menu militant
-export const militantNavItems: NavItemConfig[] = [
-  { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/dev/accueil', routeName: '(militant)/accueil', theme: 'blue' },
-  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/dev/evenements', routeName: '(militant)/evenements', theme: 'blue' },
-  { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/dev/actions', routeName: '(militant)/actions', theme: 'blue' },
-  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/dev/parrainages', routeName: '(militant)/parrainages', theme: 'blue' },
-  { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalLink: true, disabled: true },
+const militantNavItemsConfig: NavItemConfig[] = [
+  { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/dev/accueil', routeName: '(militant)/accueil' },
+  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/dev/evenements', routeName: '(militant)/evenements' },
+  // { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/dev/actions', routeName: '(militant)/actions', theme: 'blue' },
+  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/dev/parrainages', routeName: '(militant)/parrainages' },
+  { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalUrlSlug: '/formations' },
   { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/dev/ressources', routeName: '(militant)/ressources' },
-  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', isNew: true, href: '/dev/questionnaires', routeName: '(militant)/questionnaires' },
-  { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/dev/profil', routeName: '(militant)/profil', theme: 'blue', displayIn: 'tabbar' },
-]
+  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', href: '/dev/questionnaires', routeName: '(militant)/questionnaires' },
+  { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/dev/profil', routeName: '(militant)/profil', displayIn: 'tabbar' },
+] as const;
+
+export const useMilitantNavItems = (): NavItemConfig[] => {
+  const openExternalContentHook = useOpenExternalContent({ slug: 'formation' });
+
+  return useMemo(() => {
+    return militantNavItemsConfig.map((item) => {
+      const config: NavItemConfig = {
+        ...item,
+        externalLink: item.externalUrlSlug ? true : false,
+      };
+
+      if (item.externalUrlSlug) {
+        config.onPress = () => {
+          openExternalContentHook.open({ state: item.externalUrlSlug })();
+        };
+      }
+
+      return config;
+    });
+  }, [openExternalContentHook]);
+};
+
+export const militantNavItems: NavItemConfig[] = []
 
 const cadreNavItemsConfig: NavItemConfig[] = [
   { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/dev/cadre/publications', routeName: 'cadre/publications'  },

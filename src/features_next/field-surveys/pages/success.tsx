@@ -10,7 +10,6 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { VoxHeader } from '@/components/Header/Header'
 import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
-import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 
 const Container = styled(YStack, {
   flex: 1,
@@ -34,7 +33,6 @@ const FieldSurveySuccessPage: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
   const media = useMedia()
   const insets = useSafeAreaInsets()
-  useHideTabBar()
   
   const handleRestart = () => {
     // Navigation vers le questionnaire avec réinitialisation
@@ -97,6 +95,7 @@ const FieldSurveySuccessPage: React.FC = () => {
       ) : null}
       <LayoutScrollView
         showsVerticalScrollIndicator={false}
+        disablePadding
       >
         <Container flex={1}>
           {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}

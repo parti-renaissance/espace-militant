@@ -9,10 +9,8 @@ import { useGetEvent } from '@/services/events/hook'
 import { RestFullEvent } from '@/services/events/schema'
 import { useLocalSearchParams } from 'expo-router'
 import Head from 'expo-router/head'
-import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 
 const EditEventScreen: React.FC = () => {
-  useHideTabBar()
   
   return (
     <Layout.Container>

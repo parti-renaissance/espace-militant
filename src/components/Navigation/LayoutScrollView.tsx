@@ -9,6 +9,7 @@ type LayoutScrollViewProps = Omit<ScrollViewProps, 'onEndReached'> & {
   onEndReachedThreshold?: number
   hasMore?: boolean
   padding?: UseLayoutSpacingOptions
+  disablePadding?: boolean
   children: React.ReactNode
   refreshControl?: React.ReactElement
   refreshing?: boolean
@@ -20,10 +21,12 @@ export default function LayoutScrollView({
   onEndReachedThreshold = 0.4,
   hasMore = false,
   padding = true,
+  disablePadding = false,
   children,
   refreshControl,
   refreshing,
   onRefresh,
+  contentContainerStyle,
   ...rest
 }: LayoutScrollViewProps) {
   const spacingValues = useLayoutSpacing(padding)
@@ -64,11 +67,11 @@ export default function LayoutScrollView({
       refreshControl={refreshControlElement}
       contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
       contentContainerStyle={[
-        {
+        !disablePadding && {
           paddingTop: Platform.OS === 'ios' ? 0 : spacingValues.paddingTop, 
           paddingBottom: spacingValues.paddingBottom,
         },
-        rest.contentContainerStyle,
+        contentContainerStyle,
       ]}
       {...rest}
     >

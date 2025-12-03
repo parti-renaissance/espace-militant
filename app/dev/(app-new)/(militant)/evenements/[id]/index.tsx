@@ -12,12 +12,10 @@ import Head from 'expo-router/head'
 import { useHits } from '@/services/hits/hook'
 import { cleanupUrlParams } from '@/utils/urlCleanup'
 import { resolveSource } from '@/utils/sourceResolver'
-import { useHideTabBar } from '@/components/Navigation/LayoutContext'
 
 const BASE_URL = `https://${clientEnv.ASSOCIATED_DOMAIN}`
 
 const EventDetailScreen: React.FC = () => {
-  useHideTabBar()
   
   const params = useLocalSearchParams<{ id: string }>()
   if (!params.id) return <Error404 />

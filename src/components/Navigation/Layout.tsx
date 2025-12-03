@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useEffect } from 'react'
 import { ScrollView, View, XStack, styled, withStaticProperties, ViewProps, useMedia, isWeb } from 'tamagui'
 import { StyleSheet, StyleProp, ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -8,6 +8,7 @@ import { YStack } from 'tamagui'
 import { ScrollContext } from './scrollContext'
 import useLayoutSpacing, { UseLayoutSpacingOptions } from './hook/useLayoutSpacing'
 import { useCadreNavItems } from '@/config/navigationItems'
+import { useLayoutContext } from './LayoutContext'
 
 const SAFE_AREA_PADDING = 16
 
@@ -70,10 +71,29 @@ const ContentContainer = styled(XStack, {
   gap: 32,
 })
 
-const Container = ({ children, ...props }: { children: React.ReactNode } & ViewProps) => {
+interface ContainerProps extends ViewProps {
+  children: React.ReactNode
+  hideSideBar?: boolean
+  hideTabBar?: boolean
+  sidebarState?: SideBarState
+}
+
+const Container = ({ children, hideSideBar, hideTabBar, sidebarState, ...props }: ContainerProps) => {
   const insets = useSafeAreaInsets()
   const layoutRef = useRef<HTMLDivElement>(null)
   const media = useMedia()
+  const { setHideSideBar, setHideTabBar, setSidebarState } = useLayoutContext()
+  
+  useEffect(() => {
+    setSidebarState(sidebarState ?? 'militant');
+    setHideSideBar(hideSideBar ?? false);
+    setHideTabBar(hideTabBar ?? false);
+  
+    return () => {
+      setHideSideBar(false);
+      setHideTabBar(false);
+    };
+  }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, sidebarState]);
 
   return (
     <YStack alignItems="center"

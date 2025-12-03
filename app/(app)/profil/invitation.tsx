@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import ProfilLayout from '@/features/profil/components/ProfilPage'
-import ReferralForm from '@/features/referrals/components/ReferralForm'
+import { ReferralForm } from '@/features_next/referrals/components/Form'
 import { useRouter } from 'expo-router'
 import { View } from 'tamagui'
 

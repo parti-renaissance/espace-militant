@@ -4,7 +4,7 @@ import FieldSurveySuccessScreen from '@/features_next/field-surveys/pages/succes
 
 export default function QuestionnairesSuccessPage() {
   return (
-    <Layout.Container>
+    <Layout.Container hideTabBar={true}>
       <FieldSurveySuccessScreen />
     </Layout.Container>
   )

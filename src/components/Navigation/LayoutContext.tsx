@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from 'react'
+import { createContext, useContext } from 'react'
 import { SideBarState } from './SideBar'
 
 interface LayoutContextType {
@@ -6,6 +6,8 @@ interface LayoutContextType {
   setSidebarState: (state: SideBarState) => void
   hideTabBar: boolean
   setHideTabBar: (hide: boolean) => void
+  hideSideBar: boolean
+  setHideSideBar: (hide: boolean) => void
 }
 
 export const LayoutContext = createContext<LayoutContextType>({
@@ -13,16 +15,9 @@ export const LayoutContext = createContext<LayoutContextType>({
   setSidebarState: () => {},
   hideTabBar: false,
   setHideTabBar: () => {},
+  hideSideBar: false,
+  setHideSideBar: () => {},
 })
 
 export const useLayoutContext = () => useContext(LayoutContext)
-
-export const useHideTabBar = () => {
-  const { setHideTabBar } = useLayoutContext()
-  
-  useEffect(() => {
-    setHideTabBar(true)
-    return () => setHideTabBar(false)
-  }, [setHideTabBar])
-}
 
