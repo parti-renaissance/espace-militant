@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { styled, ThemeableStack, View, YStack } from "tamagui"
+import { styled, ThemeableStack, YStack } from "tamagui"
 import { EditorMethods } from "./types"
 import { memo, RefObject } from "react"
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'

@@ -5,10 +5,9 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import { LayoutContext, useLayoutContext } from '@/components/AppStructure/Layout/LayoutContext'
 import { SideBarState } from '@/components/AppStructure/Navigation/SideBar'
 import { useMilitantNavItems, useCadreNavItems } from '@/config/navigationItems'
-import { useSession } from '@/ctx/SessionProvider'
 
 function AppNewLayoutContent() {
-  const { sidebarState, hideTabBar, hideSideBar, setSidebarState } = useLayoutContext()
+  const { sidebarState, hideTabBar, hideSideBar } = useLayoutContext()
   const militantNavItems = useMilitantNavItems()
   const cadreNavItems = useCadreNavItems()
   

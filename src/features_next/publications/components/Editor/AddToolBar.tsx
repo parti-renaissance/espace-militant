@@ -171,7 +171,7 @@ export type MessageEditorToolBarRef = {
   toggleAddBar: (show: boolean) => void
 }
 
-const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props, ref) => {
+const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props) => {
   const animatedFrameHeight = useAnimatedState({
     openValue: TOOLBAR_ITEM_HEIGHT * 5,
     closedValue: 36,

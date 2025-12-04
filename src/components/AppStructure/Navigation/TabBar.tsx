@@ -4,7 +4,7 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } f
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, usePathname } from 'expo-router'
 import { MoreHorizontal, Sparkle } from '@tamagui/lucide-icons'
-import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, XStack, YStack } from 'tamagui'
+import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import NavSheet, { NavSheetRef } from '@/components/AppStructure/Navigation/NavSheet'
 import { ScopeSelector } from '@/components/AppStructure/Navigation/ScopeSelector'
@@ -13,11 +13,12 @@ import { isNavItemActive } from '@/components/AppStructure/utils'
 import { useMilitantNavItems, cadreNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useGetUserScopes } from '@/services/profile/hook'
 import { useSession } from '@/ctx/SessionProvider'
+import type { IconComponent } from '@/models/common.model'
 
 type Theme = 'blue' | 'purple' | 'green' | 'orange'
 
 const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
-const SAVProps: any = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
+const SAVProps: { edges?: ('bottom' | 'top' | 'left' | 'right')[] } = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
 
 const springConfig = {
   duration: 2000,
@@ -70,12 +71,12 @@ type TabProps = {
   isFocus: boolean
   onPress: () => void
   label: string
-  icon: any
+  icon: IconComponent
   theme?: Theme
   onLayout: (e: LayoutChangeEvent) => void
 }
 
-const Tab = ({ isFocus, name, onPress, onLayout, label, icon: Icon, theme = 'blue' }: TabProps) => {
+const Tab = ({ isFocus, onPress, onLayout, label, icon: Icon, theme = 'blue' }: TabProps) => {
   const scale = useSharedValue(0)
   const themes = getThemes()
 
@@ -105,7 +106,7 @@ const Tab = ({ isFocus, name, onPress, onLayout, label, icon: Icon, theme = 'blu
   const color = isFocus ? activeColor : inactiveColor
 
   return (
-    <TabBarComponent.Tab theme={theme as any} onPress={handlePress} group onLayout={onLayout} flex={1} width={50}>
+    <TabBarComponent.Tab theme={theme} onPress={handlePress} group onLayout={onLayout} flex={1} width={50}>
       {Icon && (
         <Animated.View style={[animatedIconStyle]}>
           <Icon color={color} size={16} focused={isFocus} />

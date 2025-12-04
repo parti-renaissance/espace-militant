@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { usePathname } from 'expo-router'
-import { BellOff, CaptionsOff, ChevronRight, Sparkle, Ellipsis, LogIn, UserPlus } from '@tamagui/lucide-icons'
+import { BellOff, ChevronRight, Sparkle, Ellipsis } from '@tamagui/lucide-icons'
 import { styled, YStack, XStack } from 'tamagui'
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
 import Text from '@/components/base/Text'

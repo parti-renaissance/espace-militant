@@ -13,7 +13,7 @@ import { useHits } from '@/services/hits/hook'
 import { cleanupUrlParams } from '@/utils/urlCleanup'
 import { resolveSource } from '@/utils/sourceResolver'
 import { usePublicationStats } from '@/services/stats/hook'
-import { isWeb, YStack, useMedia } from 'tamagui'
+import { isWeb, useMedia } from 'tamagui'
 import ProfilHeader from '@/features/profil/components/PageHeader'
 import Layout from '@/components/AppStructure/Layout/Layout'
 
@@ -61,7 +61,7 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
     source?: string
   }>()
   const sentRef = React.useRef<string | null>(null)
-  const { data: publicationStats, isLoading: isStatsLoading, error: statsError, refetch: refetchStats, isRefetching: isRefetchingStats } = usePublicationStats({
+  const { data: publicationStats, refetch: refetchStats, isRefetching: isRefetchingStats } = usePublicationStats({
     uuid: props.id,
     scope: defaultScope!,
     enabled: messageData?.editable === true,

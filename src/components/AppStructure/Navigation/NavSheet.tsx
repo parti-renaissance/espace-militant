@@ -94,7 +94,7 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
                     externalLink={item.externalLink}
                     disabled={item.disabled}
                     active={item.active}
-                    onPress={(e) => {
+                    onPress={() => {
                       item.onPress?.()
                       bsRef.current?.close()
                     }}

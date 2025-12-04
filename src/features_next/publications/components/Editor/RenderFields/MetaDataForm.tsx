@@ -15,7 +15,7 @@ import { useGetMessageCountRecipientsPartial } from '@/services/publications/hoo
 import { useDebouncedCallback } from 'use-debounce'
 
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
-  const { committee, ...filtersWithoutCommittee } = filters
+  const { committee: _committee, ...filtersWithoutCommittee } = filters
 
   const mappedFilters = { ...filtersWithoutCommittee }
 
@@ -102,7 +102,7 @@ export const MetaDataForm = memo((props: {
   const debouncedPutMessageFilters = useDebouncedCallback(
     (mappedFilters: SelectedFiltersType) => {
       putMessageFilters(mappedFilters, {
-        onError: (error) => {
+        onError: () => {
           // En cas d'erreur, on revient aux filtres précédents
           setFilters(filters)
           setQuickFilterId(quickFilterId)

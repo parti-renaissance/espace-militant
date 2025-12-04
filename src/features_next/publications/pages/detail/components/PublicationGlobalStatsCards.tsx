@@ -247,7 +247,7 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
   )
 }
 
-const DefinitionsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ stats }) => {
+const DefinitionsCard: React.FC<{ stats: RestPublicationStatsResponse }> = () => {
   return (
     <VoxCard bg="$textOutline">
       <VoxCard.Content>

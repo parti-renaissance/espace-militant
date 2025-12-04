@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import VoxCard from '@/components/VoxCard/VoxCard';
-import { Spinner, getToken, XStack, YStack, useMedia } from 'tamagui';
+import { Spinner, getToken, XStack, YStack } from 'tamagui';
 import Text from '@/components/base/Text';
 import { Clock, PenLine, ArrowLeft } from '@tamagui/lucide-icons';
 import { relativeDateFormatter } from '@/utils/DateFormatter';

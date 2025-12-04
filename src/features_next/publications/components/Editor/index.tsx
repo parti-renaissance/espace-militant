@@ -71,7 +71,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
           const node = createNodeByType(field.type)
           states[field.type][field.id] = node
         })
-      } catch (e) {
+      } catch {
         struct = []
         states = getDefaultFormValues()
       }

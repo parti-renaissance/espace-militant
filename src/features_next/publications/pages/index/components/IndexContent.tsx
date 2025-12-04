@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, useMedia, XStack, YStack, getToken } from "tamagui";
+import { Image, useMedia, XStack, YStack } from "tamagui";
 import { VoxButton } from "@/components/Button";
 import { Link } from "expo-router";
 import Text from "@/components/base/Text";
@@ -94,8 +94,6 @@ interface IndexContentProps {
 }
 
 export function IndexContent({ scopeOptions, selectedScope, onScopeChange }: IndexContentProps) {
-  const media = useMedia()
-
   return (
     <Layout.Main>
       <LayoutScrollView>

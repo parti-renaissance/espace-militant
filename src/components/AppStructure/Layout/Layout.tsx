@@ -6,7 +6,6 @@ import ConfigurableTabBar from '@/components/AppStructure/Navigation/TabBar'
 import useLayoutSpacing, { UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
 import { useCadreNavItems } from '@/config/navigationItems'
 import { useLayoutContext, ScrollContext } from './LayoutContext'
-import { useSession } from '@/ctx/SessionProvider'
 
 const LayoutRoot = styled(View, {
   height: '100dvh',

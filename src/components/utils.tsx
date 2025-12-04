@@ -20,7 +20,7 @@ export const getFormatedVoxCardDate = (props: { start: Date; end?: Date; timeZon
 }
 
 export const createDoubleIcon = (props: { icon: IconComponent; middleIconOffset?: number }) => {
-  const DoubleIcon = (iconProps: any) => {
+  const DoubleIcon = (iconProps: IconProps) => {
     const { size = 16, color = '$textPrimary', ...otherProps } = iconProps
     return (
       <ZStack height={size} width={size}>

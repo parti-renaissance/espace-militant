@@ -165,14 +165,14 @@ export const NavItemDropdown = ({
                 if (item.customContent) {
                   // Wrapper le customContent pour fermer le dropdown au clic
                   if (isValidElement(item.customContent)) {
-                    const originalOnPress = (item.customContent as any).props?.onPress
-                    const enhancedContent = cloneElement(item.customContent as React.ReactElement<any>, {
-                      onPress: (e: any) => {
+                    const originalOnPress = (item.customContent as React.ReactElement<{ onPress?: (e: unknown) => void }>).props?.onPress
+                    const enhancedContent = cloneElement(item.customContent as React.ReactElement<{ onPress?: (e: unknown) => void }>, {
+                      onPress: (e: unknown) => {
                         originalOnPress?.(e)
                         item.onPress?.()
                         onClose()
                       },
-                    } as any)
+                    })
                     return <>{enhancedContent}</>
                   }
                   

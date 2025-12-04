@@ -78,12 +78,6 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
     })
   }
 
-  const handleSendTestMessage = () => {
-    if (isSyncFetching) return
-    toast.show('Test envoyé', { message: 'Le test a été envoyé avec succès', type: 'success' })
-    mutate({ scope: payload?.scope || '', test: true })
-  }
-
   const handleCopyUrl = useHandleCopyUrl()
 
   useImperativeHandle(ref, () => ({

@@ -3,7 +3,7 @@ import { stringifyCSSProperties } from 'react-style-stringify'
 import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
 import { RestAvailableSendersResponse } from '@/services/publications/schema'
 
-const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | undefined, datetime?: string) => {
+const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | undefined, _datetime?: string) => {
   if (!sender) {
     return ''
   }

@@ -54,7 +54,7 @@ export type MessageEditorToolBarRef = {
   toggleAddBar: (show: boolean) => void
 }
 
-const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props, ref) => {
+const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props) => {
   const animatedOpacity = useSharedValue(0)
   const animatedToolBarOpacity = useSharedValue(0)
   const animatedToolBarWidth = useSharedValue(TOOLBAR_WIDTH_COLLAPSED)

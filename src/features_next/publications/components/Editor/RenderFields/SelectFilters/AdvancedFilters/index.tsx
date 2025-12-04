@@ -186,10 +186,11 @@ interface AdvancedFiltersProps {
 }
 
 export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterChange }: AdvancedFiltersProps) {
-  const { data: filterCollection, isLoading, error } = useGetFilterCollection({ 
-    scope: scope || '', 
-    enabled: false
-  })
+  // Disabled for now - will be enabled when backend is ready
+  // const { data: filterCollection, isLoading, error } = useGetFilterCollection({ 
+  //   scope: scope || '', 
+  //   enabled: false
+  // })
 
 //   if (isLoading) {
 //     return (

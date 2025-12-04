@@ -39,7 +39,9 @@ const ViewportModal = forwardRef<ViewportModalRef, ViewportModalSheet>(({ childr
           style={styles.centeredView}
           onPress={(e) => {
             e.stopPropagation()
-            e.target == e.currentTarget && onClose?.()
+            if (e.target === e.currentTarget) {
+              onClose?.()
+            }
           }}
         >
           <View style={styles.modalView}>

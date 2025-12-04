@@ -78,7 +78,6 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
     debouncedSave,
     immediateSave,
     isPending: isAutoSaving,
-    lastSaved,
     hasError,
     createdMessageId,
   } = useAutoSave({

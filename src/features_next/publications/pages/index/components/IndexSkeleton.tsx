@@ -5,8 +5,6 @@ import Layout from '@/components/AppStructure/Layout/Layout';
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView';
 
 export function IndexSkeleton() {
-  const media = useMedia()
-
   return (
     <Layout.Main>
       <LayoutScrollView>
