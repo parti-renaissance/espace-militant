@@ -107,6 +107,7 @@ export default function MyProfileCard() {
   const profile = user?.data
   const statusAdh = profile ? getMembershipCardStatus(profile.tags) : null
   const showEluCard = (profile?.tags ?? []).map((tag) => tag.code).find((x) => ['elu:attente_declaration', 'elu:cotisation_nok'].includes(x))
+  const { open: openFormations, isPending: isPendingFormations } = useOpenExternalContent({ slug: 'formation' })
 
   if (!profile) {
     return null
@@ -147,11 +148,15 @@ export default function MyProfileCard() {
             Ressources
           </Menu.Item>
         </Link>
-        <Link href="/formations" asChild={!isWeb}>
-          <Menu.Item size="sm" icon={GraduationCap} showArrow>
-            Formations
-          </Menu.Item>
-        </Link>
+        <Menu.Item 
+          size="sm" 
+          icon={GraduationCap} 
+          showArrow
+          onPress={openFormations()}
+          disabled={isPendingFormations}
+        >
+          Formations
+        </Menu.Item>
         <Link href="/questionnaires" asChild={!isWeb}>
           <Menu.Item size="sm" icon={ClipboardCheck} showArrow >
             Questionnaires
