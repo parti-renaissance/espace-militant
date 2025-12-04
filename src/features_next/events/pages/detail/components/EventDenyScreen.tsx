@@ -10,8 +10,8 @@ import { LandPlot, ArrowLeft } from '@tamagui/lucide-icons'
 import { DetailedAPIErrorPayload, ForbiddenError, UnauthorizedError } from '@/core/errors'
 import { useSession } from '@/ctx/SessionProvider'
 import { isWeb } from 'tamagui'
-import Layout from '@/components/Navigation/Layout'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 const AdhButton = () => {
@@ -39,7 +39,7 @@ const AdhButton = () => {
 const BackButton = () => {
   const { canGoBack } = useNavigation()
   return (
-    <Link href={canGoBack() ? '../' : '/dev/evenements'} asChild={!isWeb}>
+    <Link href={canGoBack() ? '../' : '/(militant)/evenements'} asChild={!isWeb}>
       <VoxButton variant="text" iconLeft={ArrowLeft} borderRadius={16}>
         Événements
       </VoxButton>
@@ -132,7 +132,7 @@ const MobileDeny = ({ error }: { error: DetailedAPIErrorPayload }) => {
 const DesktopDeny = ({ error }: { error: DetailedAPIErrorPayload }) => {
   return (
     <Layout.Main maxWidth={920}>
-      <LayoutScrollView padding="left">
+      <LayoutScrollView>
         <XStack alignItems="flex-start" alignSelf="flex-start" pb="$medium">
           <BackButton />
         </XStack>

@@ -85,7 +85,7 @@ const EventRegisterForm = (props: {
     mutateAsync(payloadWithTracking)
       .then(() => {
         action.resetForm()
-        router.replace('/dev/evenements')
+        router.replace('/(militant)/evenements')
       })
       .catch((error) => {
         if (error instanceof PublicEventSubscriptionFormError) {

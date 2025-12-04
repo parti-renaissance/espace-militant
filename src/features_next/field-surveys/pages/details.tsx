@@ -19,8 +19,8 @@ import QuestionProgressBar from '../components/QuestionProgressBar'
 import RespondentProfile, { RespondentProfileData } from '../components/RespondentProfile'
 import ContactPreferences, { ContactPreferencesData } from '../components/ContactPreferences'
 import QuitConfirmModal from '../components/QuitConfirmModal'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
-import Layout from '@/components/Navigation/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import Layout from '@/components/AppStructure/Layout/Layout'
 
 // Types pour les réponses
 interface Answer {
@@ -116,11 +116,11 @@ const FieldSurveyDetailsPage: React.FC = () => {
   const handleQuit = () => {
     setDisplayQuitModal(false)
     if (isWeb) {
-      router.push('/dev/(app-new)/(militant)/questionnaires')
+      router.push('/(militant)/questionnaires')
     } else if (router.canGoBack?.()) {
       router.back()
     } else {
-      router.replace('/dev/(app-new)/(militant)/questionnaires')
+      router.replace('/(militant)/questionnaires')
     }
   }
 
@@ -218,7 +218,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
 
       // Navigation vers la page de succès
       router.replace({
-        pathname: '/dev/(app-new)/(militant)/questionnaires/[id]/success',
+        pathname: '/(app)/(militant)/questionnaires/[id]/success',
         params: { id: survey.uuid }
       })
     } catch (error) {
@@ -371,7 +371,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
   )
 
   return (
-    <Layout.Container>
+    <>
       <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? -65 : 0}>
         <YStack flex={1} backgroundColor={media.sm ? 'white' : '$textSurface'}>
@@ -465,7 +465,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
           )}
         </YStack>
       </KeyboardAvoidingView>
-    </Layout.Container>
+    </>
   )
 }
 

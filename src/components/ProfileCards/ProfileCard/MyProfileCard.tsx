@@ -16,7 +16,8 @@ import { Link } from 'expo-router'
 import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 
 export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
-  const { data: { default: default_scope } = {} } = useGetExecutiveScopes()
+  const { data } = useGetExecutiveScopes()
+  const default_scope = data?.default
   const isCadre = profil?.cadre_auth_path && default_scope
   const { open: openCadre, isPending } = useOpenExternalContent({ slug: 'cadre' })
 
@@ -27,7 +28,7 @@ export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
     <VoxCard
       inside={true}
       bg="$purple1"
-      onPress={openCadre({ state: `/?scope=${default_scope.code}` })}
+      onPress={openCadre({ state: `/?scope=${default_scope?.code ?? ''}` })}
       cursor="pointer"
       animation="100ms"
       disabled={isPending}

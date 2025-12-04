@@ -19,7 +19,7 @@ import EventHandleActions from '../../../components/EventHandleActions'
 import { useEventFormContext } from '../context'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 export default function EventFormMobileScreen() {
   const media = useMedia()

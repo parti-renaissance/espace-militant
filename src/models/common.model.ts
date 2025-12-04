@@ -5,4 +5,4 @@ export interface LabelValueModel<T = string> {
   value: T
 }
 
-export type IconComponent = (propsIn: IconProps) => JSX.Element
+export type IconComponent = React.ComponentType<IconProps>

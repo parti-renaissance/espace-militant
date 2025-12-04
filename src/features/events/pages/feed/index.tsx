@@ -13,7 +13,7 @@ import EventListItem from '@/features/events/components/EventListItem'
 import { eventFiltersState } from '@/features/events/store/filterStore'
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
 import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
-import { useGetSuspenseProfil } from '@/services/profile/hook'
+import { useGetProfil } from '@/services/profile/hook'
 import { useScrollToTop } from '@react-navigation/native'
 import { ChevronDown } from '@tamagui/lucide-icons'
 import { isPast } from 'date-fns'
@@ -49,7 +49,7 @@ const splitEvents = (events: RestItemEvent[] | RestPublicItemEvent[]) => {
 const EventList = () => {
   const media = useMedia()
   const { session, isAuth } = useSession()
-  const user = useGetSuspenseProfil({ enabled: Boolean(session) })
+  const user = useGetProfil({ enabled: Boolean(session) })
   const listRef = useRef<SectionList>(null)
   useScrollToTop(listRef)
 

@@ -103,7 +103,7 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
 }
 
 export const unstable_settings = {
-  initialRouteName: '(tabs)',
+  initialRouteName: '(app)',
 }
 
 function Root() {

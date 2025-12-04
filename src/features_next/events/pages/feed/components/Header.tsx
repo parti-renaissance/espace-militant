@@ -18,7 +18,7 @@ const NewEventBtn = ({ children, ...props }: YStackProps & { children: string })
   if (!hasFeature('events')) return null
   return (
     <YStack {...props}>
-      <Link href="/dev/evenements/creer" asChild={!isWeb}>
+      <Link href="/(militant)/evenements/creer" asChild={!isWeb}>
         <VoxButton variant="soft" size="xl" theme="purple" iconLeft={Sparkle}>
           {children}
         </VoxButton>
@@ -29,7 +29,7 @@ const NewEventBtn = ({ children, ...props }: YStackProps & { children: string })
 
 const EventsHeader = ({ mode, value, onChange }: { mode: 'compact' | 'aside'; value: 'events' | 'myEvents'; onChange: (x: 'events' | 'myEvents') => void }) => {
   const { isAuth } = useSession()
-  const hasFeature = isAuth ? useGetExecutiveScopes().hasFeature : undefined
+  const { hasFeature } = useGetExecutiveScopes()
   const canCreate = isAuth && hasFeature ? hasFeature('events') : false
   const media = useMedia()
 

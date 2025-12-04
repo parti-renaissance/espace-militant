@@ -11,6 +11,7 @@ import * as FileSystem from 'expo-file-system'
 import { isWeb } from 'tamagui'
 import { GenericResponseError } from '../common/errors/generic-errors'
 import { ProfilChangePasswordFormError } from './error'
+import { useSession } from '@/ctx/SessionProvider'
 
 export const PROFIL_QUERY_KEY = 'profil'
 
@@ -55,9 +56,19 @@ export const useGetSuspenseUserScopes = () => {
 }
 
 export const useGetExecutiveScopes = () => {
-  const { data, ...rest } = useGetSuspenseUserScopes()
+  const { isAuth } = useSession()
+  const queryClient = useQueryClient()
+  const cachedData = queryClient.getQueryData<Awaited<ReturnType<typeof api.getUserScopes>>>(['userScopes'])
+  const { data: suspenseData, ...rest } = useGetUserScopes({ enabled: isAuth })
   const { defaultScope: localDefaultScopeCode, lastAvailableScopes } = useUserStore()
-  const cadre_scopes = data?.filter((s) => s.apps.includes('data_corner'))
+
+  const dataToUse = suspenseData || cachedData
+  
+  if (!isAuth || !dataToUse) {
+    return { data: null, isLoading: false, isError: false, hasFeature: () => false }
+  }
+  
+  const cadre_scopes = dataToUse?.filter((s) => s.apps.includes('data_corner'))
   const [scopeWithMoreFeatures] = cadre_scopes?.sort((a, b) => (b.features.length > a.features.length ? 1 : -1)) || []
   const localDefaultScope = localDefaultScopeCode ? cadre_scopes?.find((s) => s.code === localDefaultScopeCode) : undefined
   const defaultScope = localDefaultScope ?? scopeWithMoreFeatures

@@ -16,8 +16,8 @@ import { Link, useNavigation } from 'expo-router'
 import { Controller } from 'react-hook-form'
 import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import EventHandleActions from '../../../components/EventHandleActions'
-import Layout from '@/components/Navigation/Layout'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import { useEventFormContext } from '../context'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
@@ -312,7 +312,7 @@ const EventFormMain = () => {
 const BackButton = (props: { children?: React.ReactNode }) => {
   const { canGoBack } = useNavigation()
   return (
-    <Link href={canGoBack() ? '../' : '/dev/evenements'} asChild={!isWeb}>
+    <Link href={canGoBack() ? '../' : '/(militant)/evenements'} asChild={!isWeb}>
       <VoxButton variant="text" iconLeft={ArrowLeft} borderRadius={16}>
         {props.children ?? 'Annuler'}
       </VoxButton>
@@ -328,7 +328,7 @@ export const EventFormDesktopScreen = () => {
     <>
       {ConfirmAlert}
       <Layout.Main maxWidth={992}>
-        <LayoutScrollView padding="left">
+        <LayoutScrollView>
           <XStack paddingBottom="$medium" flex={1}>
             <BackButton />
           </XStack>

@@ -120,13 +120,13 @@ const UploadPP = (props: { profil: RestProfilResponse }) => {
   )
 }
 
-export default function ({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
+export default function ProfilBlock({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
   const { data: profil } = useGetProfil()
   const { tags } = useGetTags({ tags: [UserTagEnum.ELU, UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] })
   const media = useMedia()
   
   return profil ? (
-    <VoxCard bg={media.sm ? 'transparent' : undefined} {...props}>
+    <VoxCard bg={media.sm ? 'transparent' : undefined} borderWidth={media.sm ? 0 : undefined} {...props}>
       <VoxCard.Content>
         <YStack justifyContent="center" alignItems="center" gap="$medium">
           {editablePicture ? (

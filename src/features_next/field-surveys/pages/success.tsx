@@ -9,7 +9,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { VoxHeader } from '@/components/Header/Header'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 const Container = styled(YStack, {
   flex: 1,
@@ -37,18 +37,18 @@ const FieldSurveySuccessPage: React.FC = () => {
   const handleRestart = () => {
     // Navigation vers le questionnaire avec réinitialisation
     router.replace({
-      pathname: '/dev/(app-new)/(militant)/questionnaires/[id]',
+      pathname: '/(app)/(militant)/questionnaires/[id]',
       params: { id }
     })
   }
 
   const handleBackToList = () => {
     if (isWeb) {
-      router.push('/dev/(app-new)/(militant)/questionnaires')
+      router.push('/(app)/(militant)/questionnaires')
     } else if (router.canGoBack?.()) {
       router.back()
     } else {
-      router.replace('/dev/(app-new)/(militant)/questionnaires')
+      router.replace('/(app)/(militant)/questionnaires')
     }
   }
 

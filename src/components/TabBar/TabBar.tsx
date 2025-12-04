@@ -13,7 +13,7 @@ import FutureButton from '../Buttons/FutureButton'
 import { useGetUserScopes } from '@/services/profile/hook'
 
 const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
-const SAVProps: any = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
+const SAVProps: { edges?: ('bottom' | 'top' | 'left' | 'right')[] } = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
 
 const springConfig = {
   duration: 2000,

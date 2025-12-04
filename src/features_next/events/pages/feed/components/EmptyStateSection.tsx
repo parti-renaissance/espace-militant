@@ -18,7 +18,7 @@ const PowerUserEmptyState = () => {
         <Image src={EventIllustration} />
         <Text.MD secondary>Aucun événement à venir</Text.MD>
         <XStack>
-          <Link href="/dev/evenements/creer" asChild={!isWeb}>
+          <Link href="/(militant)/evenements/creer" asChild={!isWeb}>
             <VoxButton variant="outlined" size="md" theme="purple" iconLeft={Sparkle}>
               J’en organise un
             </VoxButton>

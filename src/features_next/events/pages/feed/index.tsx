@@ -5,7 +5,7 @@ import EventListItem from '@/features_next/events/components/EventListItem'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
 import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
-import { useGetSuspenseProfil } from '@/services/profile/hook'
+import { useGetProfil } from '@/services/profile/hook'
 import { useScrollToTop } from '@react-navigation/native'
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
 import { useDebounce, useDebouncedCallback } from 'use-debounce'
@@ -14,8 +14,8 @@ import EventsHeader from './components/Header'
 import EventsListSkeleton from './components/Skeleton'
 import { useHits } from '@/services/hits/hook'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
-import Layout from '@/components/Navigation/Layout'
-import LayoutFlatList from '@/components/Navigation/LayoutFlatList'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 
 const EventCard = memo(({ event, userUuid, source }: { event: RestItemEvent | RestPublicItemEvent; userUuid?: string; source: string }) => {
   if (Platform.OS === 'web') {
@@ -36,7 +36,7 @@ const EventCard = memo(({ event, userUuid, source }: { event: RestItemEvent | Re
 const EventFeed = () => {
   const media = useMedia()
   const { session, isAuth } = useSession()
-  const user = useGetSuspenseProfil({ enabled: Boolean(session) })
+  const user = useGetProfil({ enabled: Boolean(session) })
   
   const [activeTab, setActiveTab] = useState<'events' | 'myEvents'>('events')
   

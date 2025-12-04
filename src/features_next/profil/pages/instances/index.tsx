@@ -19,7 +19,7 @@ import { CommitteeCreationButton } from './components/CommitteeCreationButton'
 import { CommitteeCandidateButton } from './components/CommitteeCandidateButton'
 import { useLeaveMyAgora } from '@/services/agoras/hook'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 
 type Instance = RestInstancesResponse[number]
@@ -233,7 +233,7 @@ const InstancesScreen = () => {
         onClose={() => setOpenChangeAgora(false)}
       />
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-        <LayoutScrollView padding="left">
+        <LayoutScrollView>
           <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
             <InstanceCard
               title="Mon assemblée"

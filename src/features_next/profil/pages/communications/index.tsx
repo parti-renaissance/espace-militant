@@ -5,7 +5,7 @@ import { useMedia, YStack } from 'tamagui'
 import ContactForm from '../account/form/ContactForm'
 import ForceBirthdateModal from '../account/form/ForceBirthdateModal'
 import NotificationForm from './components/NotificationForm'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 
 const CommunicationsScreen = () => {
@@ -15,7 +15,7 @@ const CommunicationsScreen = () => {
   return (
     <ProfilLayout>
     <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-      <LayoutScrollView padding="left">
+      <LayoutScrollView>
         <YStack gap="$medium" flex={1} pt={media.sm ? '$medium' : undefined}>
           <ForceBirthdateModal />
 

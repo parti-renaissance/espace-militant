@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { XStack, YStack } from 'tamagui'
 import * as z from 'zod'
-import LayoutScrollView from '@/components/Navigation/LayoutScrollView'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 
 const ChangePasswordSchema = z
@@ -63,7 +63,7 @@ export default function ChangePasswordScreen() {
   return (
     <ProfilLayout>
     <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-      <LayoutScrollView padding="left">
+      <LayoutScrollView>
         <VoxCard>
           <VoxCard.Content>
             <Text.LG>Modifier mon mot de passe</Text.LG>

@@ -66,7 +66,7 @@ const roundMinutesToNextDecimal = (date: Date) => {
 }
 const useEventFormData = ({ edit }: EventFormProps) => {
   const scopes = useGetExecutiveScopes()
-  const scopeOptions = useMemo(() => scopes.data.list.filter((x) => x.features.includes('events')).map(getFormatedScope), [scopes.data.list])
+  const scopeOptions = useMemo(() => scopes.data?.list?.filter((x) => x.features.includes('events')).map(getFormatedScope) ?? [], [scopes.data])
   const { data } = useGetSuspenseProfil({ enabled: true })
 
   const isAuthor = useMemo(() => {
@@ -228,7 +228,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
       if (errorImage && newEvent.slug) {
         router.replace({
-          pathname: '/dev/evenements/[id]/modifier',
+          pathname: '/(militant)/evenements/[id]/modifier',
           params: {
             id: newEvent.slug,
           },
@@ -237,7 +237,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
         router.back()
       } else if (newEvent?.slug) {
         router.replace({
-          pathname: '/dev/evenements/[id]',
+          pathname: '/(militant)/evenements/[id]',
           params: {
             id: newEvent.slug,
             greet: editMode ? undefined : 'new',
@@ -247,7 +247,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
         router.back()
       } else {
         router.replace({
-          pathname: '/dev/evenements',
+          pathname: '/(militant)/evenements',
         })
       }
 

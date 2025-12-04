@@ -7,7 +7,7 @@ export default function ExecutiveRoleSelector() {
   const { data: scopes } = useGetExecutiveScopes()
   const { mutate: mutateScope } = useMutateExecutiveScope()
 
-  const formatedScopes = scopes?.list.map((scope) => ({
+  const formatedScopes = scopes?.list?.map((scope) => ({
     label: `${scope.name}`,
     subLabel: scope.zones.map(({ name, code }) => `${name} (${code})`).join(', '),
     value: scope.code,
@@ -18,7 +18,7 @@ export default function ExecutiveRoleSelector() {
     mutateScope({ scope: value })
   }
 
-  if (scopes.list.length === 0) return null
+  if (!scopes || !scopes.list || scopes.list.length === 0) return null
 
   return (
     <VoxCard inside>
@@ -29,10 +29,10 @@ export default function ExecutiveRoleSelector() {
           label="Changer de rôle actif"
           color="purple"
           size="xl"
-          options={formatedScopes}
+          options={formatedScopes ?? []}
           multiline
           onChange={handleChange}
-          value={scopes.default.code}
+          value={scopes.default?.code ?? ''}
         />
       </VoxCard.Content>
     </VoxCard>

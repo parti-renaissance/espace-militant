@@ -3,6 +3,7 @@ import * as metatags from '@/config/metatags'
 import Head from 'expo-router/head'
 import { pageConfigs } from '../configs'
 import PageLayout from './Layout'
+import { Header } from '@/components/AppStructure'
 
 type PageProps = {
   screenName: string

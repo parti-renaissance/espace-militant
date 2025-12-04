@@ -186,7 +186,7 @@ type PhoneInputProps = {
   placeholder: string
   value?: string
   onChange?: (v: string) => void
-  onBlur?: (fieldOrEvent: any) => void
+  onBlur?: (fieldOrEvent: unknown) => void
   error?: string
   countryCode?: string
   onChangeCountryCode?: (v: string) => void

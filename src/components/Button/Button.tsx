@@ -198,6 +198,8 @@ export const ButtonText = styled(Text.MD, {
   color: '$color',
   userSelect: 'none',
   semibold: true,
+  textAlign: 'center',
+  textWrap: 'balance',
 
   '$group-hover': {
     color: '$colorHover',
