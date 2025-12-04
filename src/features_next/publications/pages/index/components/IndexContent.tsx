@@ -9,6 +9,7 @@ import MessageScopeSelector from "../../../components/MessageScopeSelector";
 import { ImageSourcePropType, Platform } from "react-native";
 import Layout from '@/components/AppStructure/Layout/Layout';
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView';
+import { ContentBackButton } from "@/components/ContentBackButton";
 
 const postSimpleImage = require('@/assets/images/post-simple.png');
 const postWithCtaImage = require('@/assets/images/post-with-cta.png');
@@ -95,9 +96,10 @@ interface IndexContentProps {
 
 export function IndexContent({ scopeOptions, selectedScope, onScopeChange }: IndexContentProps) {
   return (
-    <Layout.Main>
+    <Layout.Main $sm={{ paddingHorizontal: 16 }}>
       <LayoutScrollView>
-        <YStack gap="$xlarge" width="100%" marginHorizontal="auto" paddingBottom={100}>
+        <ContentBackButton fallbackPath="/" />
+        <YStack gap="$xlarge" width="100%" marginHorizontal="auto" paddingBottom={100} pt="$medium">
           <HelpCard />
           {scopeOptions.length > 0 && (
             <MessageScopeSelector label="Pour" value={selectedScope} onChange={onScopeChange} />

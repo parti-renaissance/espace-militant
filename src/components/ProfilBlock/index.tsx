@@ -126,7 +126,7 @@ export default function ProfilBlock({ editablePicture = true, ...props }: Compon
   const media = useMedia()
   
   return profil ? (
-    <VoxCard bg={media.sm ? 'transparent' : undefined} {...props}>
+    <VoxCard bg={media.sm ? 'transparent' : undefined} borderWidth={media.sm ? 0 : undefined} {...props}>
       <VoxCard.Content>
         <YStack justifyContent="center" alignItems="center" gap="$medium">
           {editablePicture ? (

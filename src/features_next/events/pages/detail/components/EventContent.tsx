@@ -1,6 +1,7 @@
 import React, { Children, isValidElement } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { VoxButton } from '@/components/Button'
+import { ContentBackButton } from '@/components/ContentBackButton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { CategoryChip } from '@/features/events/components/CategoryChip'
 import { EventAuthComponent } from '@/features_next/events/components/EventAuthComponent'
@@ -14,7 +15,6 @@ import { RestItemEvent } from '@/services/events/schema'
 import { XStack, YStack, useMedia } from 'tamagui'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { useRouter } from 'expo-router'
-import { Platform } from 'react-native'
 import { EventLive } from '@/features_next/events/components/EventLive'
 import EventManagementSection from '@/features_next/events/components/EventManagementSection'
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../../utils'
@@ -32,37 +32,6 @@ const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 
       end={props.finish_at ? new Date(props.finish_at) : undefined}
       timeZone={props.time_zone}
     />
-  )
-}
-
-const BackButton = () => {
-  const router = useRouter()
-
-  const handleBack = () => {
-    if (Platform.OS === 'web') {
-      if (window.history.length > 1) {
-        router.back()
-      } else {
-        router.push('/(militant)/evenements')
-      }
-    } else {
-      if (router.canGoBack()) {
-        router.back()
-      } else {
-        router.dismissAll()
-      }
-    }
-  }
-
-  return (
-    <VoxButton 
-      variant="text" 
-      iconLeft={ArrowLeft} 
-      borderRadius={16}
-      onPress={handleBack}
-    >
-      Retour
-    </VoxButton>
   )
 }
 
@@ -215,9 +184,7 @@ const DesktopLayout = (props: EventItemProps) => {
   return (
     <Layout.Main maxWidth={992}>
       <LayoutScrollView>
-        <XStack alignItems="flex-start" alignSelf="flex-start" pb="$medium">
-          <BackButton />
-        </XStack>
+        <ContentBackButton fallbackPath="/(militant)/evenements" />
         <YStack gap="$medium">
           <EventLive event={props.event} userUuid={props.userUuid} />
           <VoxCard>

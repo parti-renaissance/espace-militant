@@ -5,23 +5,27 @@ import { useGetExecutiveScopes } from "@/services/profile/hook";
 import { AccessDeny } from "@/components/AccessDeny";
 import Layout from '@/components/AppStructure/Layout/Layout'
 import MessagePageIndex from '@/features_next/publications/pages/index'
+import { Header } from '@/components/AppStructure';
 
 export default function PublicationsPage() {
   const { isAuth } = useSession()
-  const { hasFeature } = useGetExecutiveScopes()
+  const { hasFeature, isLoading } = useGetExecutiveScopes()
 
   if (!isAuth) {
     return <Redirect href={'/(app)/(tabs)/evenements/'} />
   }
 
-  if (!hasFeature('publications')) {
+  if (!hasFeature('publications') && !isLoading) {
     return <AccessDeny />
   }
 
   return (
-    <Layout.Container>
-      <MessagePageIndex />
-    </Layout.Container>
+    <>
+      <Header title="Publications" />
+      <Layout.Container alwaysShowScrollbar>
+        <MessagePageIndex />
+      </Layout.Container>
+    </>
   )
 }
 

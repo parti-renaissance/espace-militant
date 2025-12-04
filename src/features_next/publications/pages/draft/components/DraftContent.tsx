@@ -1,17 +1,17 @@
 import React, { useCallback } from 'react';
-import { Platform } from 'react-native';
-import { useRouter } from 'expo-router';
 import VoxCard from '@/components/VoxCard/VoxCard';
 import { Spinner, getToken, XStack, YStack } from 'tamagui';
 import Text from '@/components/base/Text';
-import { Clock, PenLine, ArrowLeft } from '@tamagui/lucide-icons';
+import { Clock, PenLine } from '@tamagui/lucide-icons';
 import { relativeDateFormatter } from '@/utils/DateFormatter';
 import { VoxButton } from '@/components/Button';
+import { ContentBackButton } from '@/components/ContentBackButton';
 import { RestMessageListItem } from '@/services/publications/schema';
 import SenderView from '../../../components/SenderView';
 import { InfiniteData } from '@tanstack/react-query';
 import Layout from '@/components/AppStructure/Layout/Layout';
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList';
+import { useRouter } from 'expo-router';
 
 interface DraftContentProps {
   data?: InfiniteData<unknown, unknown>
@@ -19,37 +19,6 @@ interface DraftContentProps {
   hasNextPage?: boolean
   isFetchingNextPage: boolean
   scopeFromParams?: string
-}
-
-const BackButton = () => {
-  const router = useRouter()
-
-  const handleBack = () => {
-    if (Platform.OS === 'web') {
-      if (router.canGoBack()) {
-        router.back()
-      } else {
-        router.push('/(militant)/publications')
-      }
-    } else {
-      if (router.canGoBack()) {
-        router.back()
-      } else {
-        router.dismissAll()
-      }
-    }
-  }
-
-  return (
-    <VoxButton 
-      variant="text" 
-      iconLeft={ArrowLeft} 
-      borderRadius={16}
-      onPress={handleBack}
-    >
-      Retour
-    </VoxButton>
-  )
 }
 
 const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: string }) => {
@@ -70,7 +39,6 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
   return (
     <VoxCard
       onPress={handlePress}
-      marginBottom="$small"
       cursor="pointer"
     >
       <VoxCard.Content>
@@ -117,9 +85,7 @@ export function DraftContent({ data, fetchNextPage, hasNextPage, isFetchingNextP
         onEndReachedThreshold={0.5}
         hasMore={hasNextPage ?? false}
         ListHeaderComponent={
-          <XStack alignItems="flex-start" alignSelf="flex-start">
-            <BackButton />
-          </XStack>
+          <ContentBackButton fallbackPath="/(militant)/publications" />
         }
         contentContainerStyle={{
           gap: getToken('$medium', 'space'),

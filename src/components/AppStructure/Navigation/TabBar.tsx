@@ -109,7 +109,7 @@ const Tab = ({ isFocus, onPress, onLayout, label, icon: Icon, theme = 'blue' }: 
     <TabBarComponent.Tab theme={theme} onPress={handlePress} group onLayout={onLayout} flex={1} width={50}>
       {Icon && (
         <Animated.View style={[animatedIconStyle]}>
-          <Icon color={color} size={16} focused={isFocus} />
+          <Icon color={color} size={16} />
         </Animated.View>
       )}
       <Animated.View style={[animatedTextStyle]}>
@@ -143,8 +143,6 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     return null
   }
 
-  
-
   const hasExecutiveScope = useMemo(() => {
     return userScopes?.some((s) => s.apps.includes('data_corner')) ?? false
   }, [userScopes])
@@ -159,7 +157,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
       const displayIn = item.displayIn ?? 'all'
       return displayIn === 'all' || displayIn === 'tabbar'
     })
-  }, [])
+  }, [militantNavItems])
 
   // Helper to get config by ID
   const getAllItems = useMemo(() => [...navItems, ...navCadreItems], [navItems, navCadreItems])
@@ -189,16 +187,9 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
 
   // Map pathname to route ID
   const currentRouteId = useMemo(() => {
-    // Normalize pathname (remove trailing slash)
-    const normalizedPathname = pathname.replace(/\/$/, '') || '/'
-
-    // Find matching nav item by exact href match
-    const matchingItem = getAllItems.find(item => {
-      if (!item.href) return false
-      const normalizedHref = item.href.replace(/\/$/, '') || '/'
-      return normalizedHref === normalizedPathname
-    })
-
+    // Find matching nav item using isNavItemActive helper
+    // This handles route groups (like /(militant)/) which don't appear in the URL
+    const matchingItem = getAllItems.find(item => isNavItemActive(pathname, item.href))
     return matchingItem?.id || null
   }, [pathname, getAllItems])
 
@@ -229,7 +220,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     // Fallback to "Autre" (more) if route not found in any category
     if (visibleItemIds.includes('more')) return 'more'
     return visibleItemIds[0] || 'accueil'
-  }, [currentRouteId, visibleItemIds, cadreItems, moreItems, activeSpecialTab])
+  }, [currentRouteId, visibleItemIds, cadreItems, moreItems, activeSpecialTab, pathname])
 
 
   const layoutsByKey = useRef(new Map<string, LayoutRectangle>())

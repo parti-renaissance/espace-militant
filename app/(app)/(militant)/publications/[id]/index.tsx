@@ -6,8 +6,7 @@ import { ForbiddenError, UnauthorizedError } from '@/core/errors'
 import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSkeleton } from '@/features_next/publications/pages/detail'
 import { useGetMessage, useGetMessageFilters } from '@/services/publications/hook'
 import { useUserStore } from '@/store/user-store'
-import { useSession } from '@/ctx/SessionProvider'
-import { Redirect, Stack as RouterStack, useLocalSearchParams, useGlobalSearchParams } from 'expo-router'
+import { Stack as RouterStack, useLocalSearchParams, useGlobalSearchParams } from 'expo-router'
 import Head from 'expo-router/head'
 import { useHits } from '@/services/hits/hook'
 import { cleanupUrlParams } from '@/utils/urlCleanup'
@@ -19,11 +18,6 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 
 const MessageDetailsPage: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
-  const { isAuth } = useSession()
-
-  if (!isAuth) {
-    return <Redirect href={'/(app)/(tabs)/evenements/'} />
-  }
 
   if (!params.id) return <Error404 />
 

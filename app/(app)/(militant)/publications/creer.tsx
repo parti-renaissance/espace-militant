@@ -24,7 +24,7 @@ export default function PublicationsCreatePage() {
 
 
   return (
-    <Layout.Container hideSideBar hideTabBar>
+    <Layout.Container alwaysShowScrollbar hideSideBar hideTabBar safeHorizontalPadding={false}>
       <MessageEditorPage
         scope={params.scope ?? defaultScope ?? ''}
         messageId={params.id}

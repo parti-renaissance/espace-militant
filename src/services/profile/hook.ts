@@ -57,14 +57,18 @@ export const useGetSuspenseUserScopes = () => {
 
 export const useGetExecutiveScopes = () => {
   const { isAuth } = useSession()
+  const queryClient = useQueryClient()
+  const cachedData = queryClient.getQueryData<Awaited<ReturnType<typeof api.getUserScopes>>>(['userScopes'])
   const { data: suspenseData, ...rest } = useGetUserScopes({ enabled: isAuth })
   const { defaultScope: localDefaultScopeCode, lastAvailableScopes } = useUserStore()
+
+  const dataToUse = suspenseData || cachedData
   
-  if (!isAuth || !suspenseData) {
+  if (!isAuth || !dataToUse) {
     return { data: null, isLoading: false, isError: false, hasFeature: () => false }
   }
   
-  const cadre_scopes = suspenseData?.filter((s) => s.apps.includes('data_corner'))
+  const cadre_scopes = dataToUse?.filter((s) => s.apps.includes('data_corner'))
   const [scopeWithMoreFeatures] = cadre_scopes?.sort((a, b) => (b.features.length > a.features.length ? 1 : -1)) || []
   const localDefaultScope = localDefaultScopeCode ? cadre_scopes?.find((s) => s.code === localDefaultScopeCode) : undefined
   const defaultScope = localDefaultScope ?? scopeWithMoreFeatures

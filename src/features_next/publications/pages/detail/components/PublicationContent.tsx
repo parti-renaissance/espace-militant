@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { RefreshControl, Platform } from 'react-native'
+import { RefreshControl } from 'react-native'
 import { YStack, XStack, useMedia } from 'tamagui'
 import Text from '@/components/base/Text'
 import { RestGetMessageContentResponse, RestGetMessageResponse, RestGetMessageFiltersResponse } from '@/services/publications/schema'
 import PublicationCard from '@/components/Cards/PublicationCard/PublicationCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useRouter, useLocalSearchParams } from 'expo-router'
-import { ArrowLeft, Eye, PieChart, Sparkle } from '@tamagui/lucide-icons'
+import { useLocalSearchParams } from 'expo-router'
+import { Eye, PieChart, Sparkle } from '@tamagui/lucide-icons'
 import CongratulationsModal from '../../../components/CongratulationsModal'
 import { RestPublicationStatsResponse } from '@/services/stats/schema'
 import PublicationGlobalStatsCards from './PublicationGlobalStatsCards'
@@ -14,7 +14,7 @@ import BreadCrumbV2 from '@/components/BreadCrumb/BreadCrumbV2'
 import { FiltersChips, FilterValue } from '../../../components/FiltersChips'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import { VoxButton } from '@/components/Button'
+import { ContentBackButton } from '@/components/ContentBackButton'
 
 interface PublicationContentProps {
   data: RestGetMessageResponse
@@ -23,37 +23,6 @@ interface PublicationContentProps {
   filters?: RestGetMessageFiltersResponse
   onRefreshStats?: () => void
   isRefreshingStats?: boolean
-}
-
-const BackButton = () => {
-  const router = useRouter()
-
-  const handleBack = () => {
-    if (Platform.OS === 'web') {
-      if (window.history.length > 1) {
-        router.back()
-      } else {
-        router.push('/publications/index')
-      }
-    } else {
-      if (router.canGoBack()) {
-        router.back()
-      } else {
-        router.dismissAll()
-      }
-    }
-  }
-
-  return (
-    <VoxButton 
-      variant="text" 
-      iconLeft={ArrowLeft} 
-      borderRadius={16}
-      onPress={handleBack}
-    >
-      Retour
-    </VoxButton>
-  )
 }
 
 export function PublicationContent({ data, stats, filters, onRefreshStats, isRefreshingStats }: PublicationContentProps) {
@@ -87,9 +56,7 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
         }
       >
         <YStack gap="$medium" width="100%" marginHorizontal="auto" paddingBottom={100}>
-          <XStack alignItems="flex-start" alignSelf="flex-start">
-            <BackButton />
-          </XStack>
+          <ContentBackButton fallbackPath="/publications/index" />
           {
             (activeSection === 'read' || media.gtSm) && (
               <YStack gap="$medium" pt={media.sm ? '$medium' : 0}>

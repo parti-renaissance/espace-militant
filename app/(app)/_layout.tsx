@@ -10,8 +10,8 @@ function AppNewLayoutContent() {
   const { sidebarState, hideTabBar, hideSideBar } = useLayoutContext()
   const militantNavItems = useMilitantNavItems()
   const cadreNavItems = useCadreNavItems()
-  
-  const effectiveSidebarState = useMemo(() => 
+
+  const effectiveSidebarState = useMemo(() =>
     hideSideBar ? 'hide' : sidebarState,
     [hideSideBar, sidebarState]
   )
@@ -20,12 +20,13 @@ function AppNewLayoutContent() {
   // Sur web : Stack (avec historique de navigation)
   const Navigator = isWeb ? Stack : Tabs
   const screenOptions = useMemo(() => isWeb
-    ? { headerShown: false }
+    ? { headerShown: false, contentStyle: { backgroundColor: '#fafafb' } }
     : {
-        headerShown: false,
-        tabBarStyle: { display: 'none' as const }, // custom tabbar and sidebar
-        lazy: true, // load pages only when they are opened
-      }, [])
+      headerShown: false,
+      tabBarStyle: { display: 'none' as const }, // custom tabbar and sidebar
+      lazy: true, // load pages only when they are opened
+      contentStyle: { backgroundColor: '#fafafb' },
+    }, [])
 
   return (
     <Layout sidebarState={effectiveSidebarState} hideTabBar={hideTabBar}>

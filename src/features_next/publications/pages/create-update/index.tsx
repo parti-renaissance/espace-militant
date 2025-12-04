@@ -20,6 +20,7 @@ import QuitConfirmModal from '../../components/QuitConfirmModal'
 import { useAutoSave } from '../../components/Editor/hooks/useAutoSave'
 import { AutoSaveErrorIndicator } from '../../components/Editor/AutoSaveErrorIndicator'
 import Error404 from '@/components/404/Error404'
+import { Header } from '@/components/AppStructure'
 
 const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const editorRef = useRef<MessageEditorRef>(null)
@@ -114,7 +115,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   }
 
   return (
-    <YStack flex={1}>
+    <YStack flex={1} backgroundColor="red">
       <QuitConfirmModal
         isOpen={displayQuitModal}
         onConfirm={handleQuit}
@@ -126,7 +127,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
       />
       <StickyBox webOnly style={{ zIndex: 10 }}>
         <YStack overflow={media.gtSm ? 'hidden' : undefined} zIndex={media.gtSm ? 10 : undefined}>
-          <VoxHeader>
+          <Header title="Nouvelle publication" icon={Speech} style={{ showOn: 'always' }}>
             <XStack flex={1} alignItems="center" justifyContent="center" width="100%">
               <XStack flex={1} alignContent="flex-start" w={100}>
                 <VoxButton
@@ -159,7 +160,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
                 </VoxButton>
               </XStack>
             </XStack>
-          </VoxHeader>
+          </Header>
         </YStack>
         <YStack backgroundColor="$textSurface" paddingTop={media.gtSm ? '$large' : undefined}>
           <YStack maxWidth={520} marginHorizontal='auto' width="100%" height={media.sm ? 60 : 76} px={media.sm ? '$medium' : undefined} py={media.sm ? '$small' : '$medium'} justifyContent='center'>
