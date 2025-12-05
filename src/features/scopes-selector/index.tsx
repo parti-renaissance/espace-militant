@@ -25,11 +25,7 @@ export default function ScopesSelector() {
 
   const media = useMedia()
 
-  if (!scopes || !scopes.list || scopes.list.length === 0) {
-    return null
-  }
-
-  const handleSubmit = (confirm?: boolean) => () => {
+  const handleSubmit = useCallback((confirm?: boolean) => () => {
     mutateScope({
       scope: selectedScope,
       lastAvailableScopes: scopesCodeList,
@@ -38,11 +34,11 @@ export default function ScopesSelector() {
     if (confirm) {
       setShouldOpen(false)
     }
-  }
+  }, [mutateScope, selectedScope, scopesCodeList])
 
-  const handleChange = (scope: string) => {
+  const handleChange = useCallback((scope: string) => {
     setSelectedScope(scope)
-  }
+  }, [])
 
   const MultiScopeStep = useCallback(() => {
     return (
@@ -71,7 +67,11 @@ export default function ScopesSelector() {
         </YStack>
       </YStack>
     )
-  }, [scopes, selectedScope, handleChange, handleSubmit])
+  }, [scopes, selectedScope, handleChange, handleSubmit, media.gtSm])
+
+  if (!scopes || !scopes.list || scopes.list.length === 0) {
+    return null
+  }
 
   const HeaderOneScope = () => {
     const _scope = scopes?.list?.find((x) => x.code === selectedScope)

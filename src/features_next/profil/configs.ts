@@ -1,6 +1,7 @@
 import { CircleUser, Sparkle, HelpingHand, LandPlot, Settings2, MessageCircle, TreeDeciduous, KeyRound } from "@tamagui/lucide-icons"
 import { RestProfilResponse } from "@/services/profile/schema"
 import type { Href } from "expo-router"
+import { UserTagEnum } from "@/core/entities/UserProfile"
 
 export type ProfilNavItemConfig = {
   id: string
@@ -28,6 +29,7 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
     title: 'Accès cadre',
     icon: Sparkle,
     iconLeft: Sparkle,
+    hiddenInMenu: (profile) => !profile?.cadre_access,
   },
   'cotisations-et-dons': {
     id: 'cotisations-et-dons',
@@ -68,6 +70,7 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
     title: 'Informations élu',
     icon: TreeDeciduous,
     iconLeft: TreeDeciduous,
+    hiddenInMenu: (profile) => !profile?.tags?.some((tag) => tag.type === UserTagEnum.ELU),
   },
   'mot-de-passe': {
     id: 'mot-de-passe',

@@ -183,7 +183,7 @@ export function MyProfileCardNoLinks() {
   }
 
   return (
-    <VoxCard bg="$white" overflow="hidden">
+    <VoxCard bg="$white" overflow="hidden" width="100%">
       <YStack>
         <VoxCard.Content>
           <BoundarySuspenseWrapper>

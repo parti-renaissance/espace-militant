@@ -1,6 +1,7 @@
 import Badge from '@/components/Badge'
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useGetTags } from '@/services/profile/hook'
 import { RestElectedProfileResponse, RestProfilResponse } from '@/services/profile/schema'
 import { isAfter } from 'date-fns'
@@ -23,9 +24,9 @@ const Tags = (props: { tags: RestProfilResponse['tags'] }) => {
   const mappedTags = props.tags.map(tagsMapping)
   return (
     <XStack gap="$small">
-      {mappedTags.map(({ theme, label }) => (
-        <XStack>
-          <Badge theme={theme} key={label}>
+      {mappedTags.map(({ theme, label }, index) => (
+        <XStack key={`${label}-${index}`}>
+          <Badge theme={theme}>
             {label}
           </Badge>
         </XStack>
@@ -43,9 +44,9 @@ const Elu = (props: { mandates: RestElectedProfileResponse['elect_mandates']; ta
       <Text.MD>Mandats rattachés au compte </Text.MD>
       <Text.P>Le bureau de l’Assemblée départementale vous a rattaché {activeMandates.length} mandats.</Text.P>
       <XStack gap={8} flexWrap="wrap">
-        {activeMandates.map((x) => (
-          <XStack>
-            <Badge theme="green" key={x.mandate_type}>
+        {activeMandates.map((x, index) => (
+          <XStack key={`${x.mandate_type}-${index}`}>
+            <Badge theme="green">
               {x.mandate_type_label}
             </Badge>
           </XStack>
@@ -56,7 +57,7 @@ const Elu = (props: { mandates: RestElectedProfileResponse['elect_mandates']; ta
 }
 
 export default function (props: { profil: RestElectedProfileResponse }) {
-  const { tags } = useGetTags({ tags: ['adherent', 'elu', 'sympathisant'] })
+  const { tags } = useGetTags({ tags: [UserTagEnum.ADHERENT, UserTagEnum.ELU, UserTagEnum.SYMPATHISANT] })
   const content = props.profil.elect_mandates.length > 0 ? <Elu mandates={props.profil.elect_mandates} tags={tags ?? []} /> : <NotElu />
   return (
     <VoxCard>

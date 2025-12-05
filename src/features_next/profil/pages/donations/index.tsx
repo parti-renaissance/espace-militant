@@ -10,23 +10,29 @@ import MembershipCard from './components/MembershipCard'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
-const DonationsScreen = () => {
+const DonationsContent = () => {
   const { data: profile } = useGetDetailProfil()
   const media = useMedia()
 
   return (
+    <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
+      <LayoutScrollView>
+        <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
+          <MembershipCard full other_party_membership={profile.other_party_membership} last_membership_donation={profile.last_membership_donation} />
+          <DonationCard full />
+          <DonationTaxReceiptCard />
+          <DonationHistoryCard />
+        </YStack>
+      </LayoutScrollView>
+    </KeyboardAvoidingView>
+  )
+}
+
+const DonationsScreen = () => {
+  return (
     <ProfilLayout>
       <ForceBirthdateModal />
-      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-        <LayoutScrollView>
-          <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
-            <MembershipCard full other_party_membership={profile.other_party_membership} last_membership_donation={profile.last_membership_donation} />
-            <DonationCard full />
-            <DonationTaxReceiptCard />
-            <DonationHistoryCard />
-          </YStack>
-        </LayoutScrollView>
-      </KeyboardAvoidingView>
+      <DonationsContent />
     </ProfilLayout>
   )
 }

@@ -132,6 +132,7 @@ export const useGetDetailProfil = () => {
     queryKey: ['profileDetail'],
     queryFn: () => api.getDetailedProfile(),
     staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
   })
 }
 
@@ -252,6 +253,8 @@ export const useGetElectProfil = () => {
   return useSuspenseQuery({
     queryKey: ['electProfile', userUuid],
     queryFn: () => api.getElectedProfil(userUuid!),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
   })
 }
 
