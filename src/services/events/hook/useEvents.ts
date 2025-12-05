@@ -43,7 +43,7 @@ export const useSuspensePaginatedEvents = (opts: { filters?: EventFilters; posta
   })
 }
 
-export const useSubscribeEvent = ({ id: eventId, slug }: { id: string; slug?: string; }) => {
+export const useSubscribeEvent = ({ id: eventId, slug }: { id: string; slug?: string }) => {
   const toast = useToastController()
   const queryClient = useQueryClient()
   return useMutation({
@@ -142,9 +142,7 @@ export const useCreateEvent = ({ editSlug, editUuid }: { editSlug?: string; edit
   const successMessage = editSlug ? 'Événement modifié avec succès' : 'Événement créé avec succès'
   const errorMessage = editSlug ? 'Impossible de modifier cet événement' : 'Impossible de créer cet événement'
   return useMutation({
-    mutationFn: editUuid
-      ? ({ payload, scope }: { payload: RestPostEventRequest; scope: string }) => api.updateEvent({ payload, eventId: editUuid, scope })
-      : api.createEvent,
+    mutationFn: editUuid ? ({ payload }: { payload: RestPostEventRequest; scope: string }) => api.updateEvent({ payload, eventId: editUuid }) : api.createEvent,
     onSuccess: (payload) => {
       toast.show('Succès', { message: successMessage, type: 'success' })
       if (editSlug) {
@@ -285,11 +283,7 @@ export const useCancelEvent = () => {
   })
 }
 
-export const useCountInvitationsEvent = ({
-  roles,
-  agora,
-  scope,
-}: RestPostCountInvitationsEventRequest & { scope: string }) => {
+export const useCountInvitationsEvent = ({ roles, agora, scope }: RestPostCountInvitationsEventRequest & { scope: string }) => {
   return useQuery({
     queryKey: [QUERY_KEY_SINGLE_EVENT, roles, agora, scope],
     queryFn: () =>
