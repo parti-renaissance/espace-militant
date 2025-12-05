@@ -18,7 +18,7 @@ export default function (props: CommonMembershipCardProps) {
     <VoxCard bg={props.full ? 'white' : '$yellow1'} inside>
       <HeaderFrame bg="$yellow1" borderRadius="$medium">
         <Image
-          source={require('@/features/profil/assets/cotisation-illu.png')}
+          source={require('@/features_next/profil/assets/cotisation-illu.png')}
           contentFit="contain"
           contentPosition={'left'}
           style={{

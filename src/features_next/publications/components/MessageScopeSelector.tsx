@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import Select, { SF, SelectOption } from "@/components/base/Select/SelectV3";
 import { useGetExecutiveScopes } from "@/services/profile/hook";
-import { getFormatedScope as getFormatedScopeData } from "@/features/ScopesSelector/utils";
+import { getFormatedScope as getFormatedScopeData } from "@/features/scopes-selector/utils";
 import { RestUserScopesResponse } from "@/services/profile/schema";
 import { Sparkle } from "@tamagui/lucide-icons";
 

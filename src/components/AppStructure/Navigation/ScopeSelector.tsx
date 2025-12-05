@@ -3,7 +3,7 @@ import { ChevronsUpDown } from '@tamagui/lucide-icons'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import { NavItemDropdown, type NavItemSubItem } from './NavItemDropdown'
-import { getFormatedScope } from '@/features/ScopesSelector/utils'
+import { getFormatedScope } from '@/features/scopes-selector/utils'
 import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
 
 export type Scope = {

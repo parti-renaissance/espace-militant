@@ -1,6 +1,6 @@
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import RenewMembershipButton from '@/features/profil/pages/donations/components/RenewMembershipButton'
+import RenewMembershipButton from '@/features_next/profil/pages/donations/components/RenewMembershipButton'
 import { FormationScreenProps } from '@/screens/formations/types'
 import { Image, XStack, YStack } from 'tamagui'
 

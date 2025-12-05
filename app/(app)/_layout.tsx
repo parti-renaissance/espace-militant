@@ -5,6 +5,7 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import { LayoutContext, useLayoutContext } from '@/components/AppStructure/Layout/LayoutContext'
 import { SideBarState } from '@/components/AppStructure/Navigation/SideBar'
 import { useMilitantNavItems, useCadreNavItems } from '@/config/navigationItems'
+import ScopesSelector from '@/features/scopes-selector'
 
 function AppNewLayoutContent() {
   const { sidebarState, hideTabBar, hideSideBar } = useLayoutContext()
@@ -24,12 +25,13 @@ function AppNewLayoutContent() {
     : {
       headerShown: false,
       tabBarStyle: { display: 'none' as const }, // custom tabbar and sidebar
-      lazy: true, // load pages only when they are opened
+      // lazy: true,
       contentStyle: { backgroundColor: '#fafafb' },
     }, [])
 
   return (
     <Layout sidebarState={effectiveSidebarState} hideTabBar={hideTabBar}>
+      <ScopesSelector />
       <Navigator screenOptions={screenOptions}>
         {militantNavItems
           .filter(item => item.routeName)

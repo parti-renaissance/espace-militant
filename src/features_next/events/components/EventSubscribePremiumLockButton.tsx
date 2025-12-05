@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef } from 'react'
 import { VoxButton } from '@/components/Button'
-import RenewMembershipButton from '@/features/profil/pages/donations/components/RenewMembershipButton'
+import RenewMembershipButton from '@/features_next/profil/pages/donations/components/RenewMembershipButton'
 import { RestItemEvent } from '@/services/events/schema'
 import { HelpingHand } from '@tamagui/lucide-icons'
 

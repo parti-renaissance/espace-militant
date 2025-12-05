@@ -1,100 +1,115 @@
-import { CircleUser, Sparkle, HelpingHand, LandPlot, Settings2, MessageCircle, TreeDeciduous, KeyRound, LogOut } from "@tamagui/lucide-icons"
+import { LogOut, PenLine, QrCode, DoorOpen, GraduationCap, Zap } from "@tamagui/lucide-icons"
 import { isNavItemActive } from "@/components/AppStructure/utils"
-import { usePathname } from "expo-router"
+import { Href, usePathname } from "expo-router"
 import { useMedia } from "tamagui"
 import Layout from "@/components/AppStructure/Layout/Layout"
 import VoxCard from "@/components/VoxCard/VoxCard"
 import { NavItem } from "@/components/AppStructure/Navigation/NavItem"
 import { useSession } from "@/ctx/SessionProvider"
+import { pageConfigs } from "../configs"
+import { useUserStore } from "@/store/user-store"
+import BoundarySuspenseWrapper from "@/components/BoundarySuspenseWrapper"
+import { SkeCard } from "@/components/Skeleton/CardSkeleton"
+import LayoutScrollView from "@/components/AppStructure/Layout/LayoutScrollView"
+import { useGetProfil } from "@/services/profile/hook"
+import clientEnv from "@/config/clientEnv"
+import Text from "@/components/base/Text"
 
 function ProfilLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const media = useMedia()
   const { signOut } = useSession()
+  const { user: credentials } = useUserStore()
+  const { data: profile } = useGetProfil({ enabled: true })
 
-  const navItems = [
-    {
-      id: 'index',
-      href: '/(militant)/profil' as const,
-      text: 'Mon profil',
-      iconLeft: CircleUser,
-      active: pathname === '/profil'
-    },
-    {
-      id: 'acces-cadre',
-      href: '/(militant)/profil/acces-cadre' as const,
-      text: 'Accès cadre',
-      iconLeft: Sparkle,
-      active: isNavItemActive(pathname, '/(militant)/profil/acces-cadre'),
-    },
-    {
-      id: 'cotisations-et-dons',
-      href: '/(militant)/profil/cotisations-et-dons' as const,
-      text: 'Cotisations et dons',
-      iconLeft: HelpingHand,
-      active: isNavItemActive(pathname, '/(militant)/profil/cotisations-et-dons'),
-    },
-    {
-      id: 'mes-instances',
-      href: '/(militant)/profil/mes-instances' as const,
-      text: 'Mes instances',
-      iconLeft: LandPlot,
-      active: isNavItemActive(pathname, '/(militant)/profil/mes-instances'),
-    },
-    {
-      id: 'informations-personnelles',
-      href: '/(militant)/profil/informations-personnelles' as const,
-      text: 'Informations personnelles',
-      iconLeft: Settings2,
-      active: isNavItemActive(pathname, '/(militant)/profil/informations-personnelles'),
-    },
-    {
-      id: 'communications',
-      href: '/(militant)/profil/communications' as const,
-      text: 'Communications',
-      iconLeft: MessageCircle,
-      active: isNavItemActive(pathname, '/(militant)/profil/communications'),
-    },
-    {
-      id: 'informations-elu',
-      href: '/(militant)/profil/informations-elu' as const,
-      text: 'Informations élu',
-      iconLeft: TreeDeciduous,
-      active: isNavItemActive(pathname, '/(militant)/profil/informations-elu'),
-    },
-    {
-      id: 'mot-de-passe',
-      href: '/(militant)/profil/mot-de-passe' as const,
-      text: 'Mot de passe',
-      iconLeft: KeyRound,
-      active: isNavItemActive(pathname, '/(militant)/profil/mot-de-passe'),
-    },
-  ]
+  console.log('ProfilLayout', pathname)
+
+  const visibleItems = Object.entries(pageConfigs)
+    .filter(([key, config]) => {
+      if (key === 'index' && !media.gtSm) return false
+      const hiddenInMenu = 'hiddenInMenu' in config ? config.hiddenInMenu : false
+      if (typeof hiddenInMenu === 'function') {
+        return !hiddenInMenu(profile)
+      }
+      return !hiddenInMenu
+    })
+
+  const SkeletonCard = () => (
+    <LayoutScrollView>
+      <SkeCard>
+        <SkeCard.Content>
+          <SkeCard.Title />
+          <SkeCard.Image />
+          <SkeCard.Description />
+        </SkeCard.Content>
+      </SkeCard>
+    </LayoutScrollView>
+  )
 
   return (
     <>
       <Layout.Main>
-        {children}
+        <BoundarySuspenseWrapper fallback={<SkeletonCard />}>
+          {children}
+        </BoundarySuspenseWrapper>
       </Layout.Main>
       {media.gtMd ? (
         <Layout.SideBar isSticky gap="$medium">
           <VoxCard borderRadius={16}>
             <VoxCard.Content padding="$small" gap={4}>
-              {navItems.map((item) => (
+              {visibleItems.map(([key, config]) => (
                 <NavItem
-                  key={item.id}
-                  text={item.text}
-                  iconLeft={item.iconLeft}
-                  href={item.href}
-                  active={item.active}
+                  key={config.id}
+                  text={config.text}
+                  iconLeft={config.iconLeft}
+                  // @ts-expect-error - href type mismatch due to config type definition
+                  href={config.href}
+                  active={config.id === 'index'
+                    ? pathname === '/profil'
+                    : isNavItemActive(pathname, config.href as string)}
                 />
               ))}
             </VoxCard.Content>
           </VoxCard>
+
+          {clientEnv.ENVIRONMENT === 'staging' && (
+            <VoxCard borderRadius={16}>
+              <VoxCard.Content padding="$small" gap={4}>
+                <Text.SM semibold secondary mx="$small" mt="$small">Outils de développement</Text.SM>
+                <NavItem
+                  text="StoryBook"
+                  iconLeft={PenLine}
+                  href="/tools/storybook"
+                />
+                <Text.SM semibold secondary mx="$small" mt="$medium">Anciens outils</Text.SM>
+                <NavItem
+                  text="Actions"
+                  iconLeft={Zap}
+                  href="/old/actions"
+                />
+                <NavItem
+                  text="Scanner"
+                  iconLeft={QrCode}
+                  href="/old/scanner"
+                />
+                <NavItem
+                  text="Porte à porte"
+                  iconLeft={DoorOpen}
+                  href="/old/porte-a-porte"
+                />
+                <NavItem
+                  text="Formations"
+                  iconLeft={GraduationCap}
+                  href="/old/formations"
+                />
+              </VoxCard.Content>
+            </VoxCard>
+          )}
+
           <VoxCard borderRadius={16}>
             <VoxCard.Content padding="$small" gap={4}>
               <NavItem
-                text="Déconnexion"
+                text={credentials?.isAdmin ? 'Quitter l‘impersonnification' : 'Me déconnecter'}
                 iconLeft={LogOut}
                 onPress={() => {
                   signOut()

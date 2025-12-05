@@ -10,13 +10,12 @@ import RSForm from './form/RSForm'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 
-const AccountScreen = () => {
+const AccountContent = () => {
   const { data: profile } = useGetDetailProfil()
   const media = useMedia()
 
   return (
-    <ProfilLayout>
-      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
         <LayoutScrollView>
           <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
             <ForceBirthdateModal />
@@ -28,6 +27,14 @@ const AccountScreen = () => {
           </YStack>
         </LayoutScrollView>
       </KeyboardAvoidingView>
+  )
+}
+
+const AccountScreen = () => {
+
+  return (
+    <ProfilLayout>
+      <AccountContent />
     </ProfilLayout>
   )
 }

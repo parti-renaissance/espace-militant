@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react'
-import { getThemeStyle } from '@/features/publications/components/Editor/hooks/useThemeStyle'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import { getThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { stringifyCSSProperties } from 'react-style-stringify'
 
 export const richTextRenderer = (props: { theme: S.MessageStyle; data: S.RichTextNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {

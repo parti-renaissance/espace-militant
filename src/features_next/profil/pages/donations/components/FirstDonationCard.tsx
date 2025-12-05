@@ -34,7 +34,7 @@ export default function (props: { full?: boolean }) {
         </YStack>
         <Image
           style={{ width: '100%', flex: 1, flexBasis: 0 }}
-          source={require('@/features/profil/assets/don-illu.png')}
+          source={require('@/features_next/profil/assets/don-illu.png')}
           contentFit="contain"
           contentPosition="right"
         />

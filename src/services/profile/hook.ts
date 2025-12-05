@@ -55,6 +55,44 @@ export const useGetSuspenseUserScopes = () => {
   })
 }
 
+const processExecutiveScopes = (
+  data: Awaited<ReturnType<typeof api.getUserScopes>> | undefined,
+  isAuth: boolean,
+  localDefaultScopeCode?: string | null,
+  lastAvailableScopes?: string[] | null,
+  additionalProps?: Record<string, unknown>,
+  isLoading?: boolean
+) => {
+  if (!isAuth || !data) {
+    return { 
+      data: null, 
+      isLoading: false, 
+      isError: false, 
+      hasFeature: () => false,
+      ...additionalProps,
+    }
+  }
+  
+  const cadre_scopes = data?.filter((s) => s.apps.includes('data_corner'))
+  const [scopeWithMoreFeatures] = cadre_scopes?.sort((a, b) => (b.features.length > a.features.length ? 1 : -1)) || []
+  const localDefaultScope = localDefaultScopeCode ? cadre_scopes?.find((s) => s.code === localDefaultScopeCode) : undefined
+  const defaultScope = localDefaultScope ?? scopeWithMoreFeatures
+  
+  return {
+    data: {
+      list: cadre_scopes,
+      default: defaultScope,
+      lastAvailableScopes,
+    },
+    hasFeature: (x: string) => {
+      const features = cadre_scopes?.flatMap((x) => x.features)
+      return features?.includes(x)
+    },
+    isLoading: isLoading ?? false,
+    ...additionalProps,
+  }
+}
+
 export const useGetExecutiveScopes = () => {
   const { isAuth } = useSession()
   const queryClient = useQueryClient()
@@ -64,26 +102,15 @@ export const useGetExecutiveScopes = () => {
 
   const dataToUse = suspenseData || cachedData
   
-  if (!isAuth || !dataToUse) {
-    return { data: null, isLoading: false, isError: false, hasFeature: () => false }
-  }
-  
-  const cadre_scopes = dataToUse?.filter((s) => s.apps.includes('data_corner'))
-  const [scopeWithMoreFeatures] = cadre_scopes?.sort((a, b) => (b.features.length > a.features.length ? 1 : -1)) || []
-  const localDefaultScope = localDefaultScopeCode ? cadre_scopes?.find((s) => s.code === localDefaultScopeCode) : undefined
-  const defaultScope = localDefaultScope ?? scopeWithMoreFeatures
-  return {
-    data: {
-      list: cadre_scopes,
-      default: defaultScope,
-      lastAvailableScopes,
-    },
-    ...rest,
-    hasFeature: (x: string) => {
-      const features = cadre_scopes?.flatMap((x) => x.features)
-      return features?.includes(x)
-    },
-  }
+  return processExecutiveScopes(dataToUse, isAuth, localDefaultScopeCode, lastAvailableScopes, rest, rest.isLoading)
+}
+
+export const useGetSuspenseExecutiveScopes = () => {
+  const { isAuth } = useSession()
+  const { data: suspenseData, isLoading, ...rest } = useGetSuspenseUserScopes()
+  const { defaultScope: localDefaultScopeCode, lastAvailableScopes } = useUserStore()
+
+  return processExecutiveScopes(suspenseData, isAuth, localDefaultScopeCode, lastAvailableScopes, rest, isLoading)
 }
 
 export const useMutateExecutiveScope = () => {
@@ -105,6 +132,7 @@ export const useGetDetailProfil = () => {
     queryKey: ['profileDetail'],
     queryFn: () => api.getDetailedProfile(),
     staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
   })
 }
 
@@ -225,6 +253,8 @@ export const useGetElectProfil = () => {
   return useSuspenseQuery({
     queryKey: ['electProfile', userUuid],
     queryFn: () => api.getElectedProfil(userUuid!),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
   })
 }
 

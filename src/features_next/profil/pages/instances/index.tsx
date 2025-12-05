@@ -29,7 +29,7 @@ const isAssembly = (instance: any): instance is Instance & { type: 'assembly' } 
 const isCirconscription = (instance: any): instance is Instance & { type: 'circonscription' } => instance.type === 'circonscription'
 const isAgora = (instance: any): instance is Instance & { type: 'agora' } => instance.type === 'agora'
 
-const InstancesScreen = () => {
+const InstancesContent = () => {
   const media = useMedia()
   const { data } = useGetInstances()
   const { tags } = useGetTags({ tags: [UserTagEnum.SYMPATHISANT] })
@@ -225,7 +225,7 @@ const InstancesScreen = () => {
 
 
   return (
-    <ProfilLayout>
+    <>
       <ChangeCommitteeModal currentCommitteeUuid={committee?.uuid ?? null} open={openChange} onClose={() => setOpenChange(false)} />
       <ChangeAgoraModal
         currentAgoraUuids={agoras.map((a) => a.uuid).filter((uuid): uuid is string => uuid !== null)}
@@ -342,6 +342,14 @@ const InstancesScreen = () => {
         </LayoutScrollView>
 
       </KeyboardAvoidingView>
+    </>
+  )
+}
+
+const InstancesScreen = () => {
+  return (
+    <ProfilLayout>
+      <InstancesContent />
     </ProfilLayout>
   )
 }

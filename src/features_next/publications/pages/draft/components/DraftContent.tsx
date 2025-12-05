@@ -31,7 +31,7 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
     }
 
     router.push({
-      pathname: '/app/publications/creer',
+      pathname: '/publications/creer',
       params: navigationParams,
     })
   }, [item.uuid, scope])

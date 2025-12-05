@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { SelectOption, SF } from '@/components/base/Select/SelectV3'
-import { createEventSchema, EventFormData } from '@/features/events/pages/create-edit/schema'
-import { getFormatedScope as getFormatedScopeData } from '@/features/ScopesSelector/utils'
+import { createEventSchema, EventFormData } from './schema'
+import { getFormatedScope as getFormatedScopeData } from '@/features/scopes-selector/utils'
 import { isPathExist } from '@/services/common/errors/utils'
 import { eventPostFormError } from '@/services/events/error'
 import { useCreateEvent, useDeleteEventImage, useMutationEventImage, useSuspenseGetCategories } from '@/services/events/hook'
@@ -95,7 +95,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const defaultValues = {
     isPastEvent,
-    scope: edit ? (edit.organizer?.scope ?? 'national') : scopes.data.default?.code,
+    scope: edit ? (edit.organizer?.scope ?? 'national') : scopes.data?.default?.code ?? 'national',
     name: edit?.name ?? '',
     image: edit?.image,
     category: edit?.category?.slug ?? '',
@@ -228,7 +228,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
       if (errorImage && newEvent.slug) {
         router.replace({
-          pathname: '/(militant)/evenements/[id]/modifier',
+          pathname: '/evenements/[id]/modifier',
           params: {
             id: newEvent.slug,
           },
@@ -237,7 +237,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
         router.back()
       } else if (newEvent?.slug) {
         router.replace({
-          pathname: '/(militant)/evenements/[id]',
+          pathname: '/evenements/[id]',
           params: {
             id: newEvent.slug,
             greet: editMode ? undefined : 'new',
@@ -247,7 +247,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
         router.back()
       } else {
         router.replace({
-          pathname: '/(militant)/evenements',
+          pathname: '/evenements',
         })
       }
 

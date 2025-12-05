@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef, useMemo } from 'react'
 import { VoxButton } from '@/components/Button'
-import { useStatusChip } from '@/features/events/hooks/useStatusChip'
+import { useStatusChip } from '@/features_next/events/hooks/useStatusChip'
 import { RestItemEvent } from '@/services/events/schema'
 import { XStack } from 'tamagui'
 import {

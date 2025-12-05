@@ -2,7 +2,7 @@ import React, { memo, RefObject, useCallback } from 'react'
 import { TextInput } from 'react-native'
 import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
 import SearchBox from '@/components/Search/SearchBox'
-import { eventFiltersState } from '@/features/events/store/filterStore'
+import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { useMedia, YStack } from 'tamagui'
 
 type EventFiltersProps = {

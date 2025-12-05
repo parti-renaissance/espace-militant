@@ -102,16 +102,16 @@ export const isEventToggleRegisterHided = (event: Partial<RestItemEvent>, userUu
 
 export const getEventItemImageFallback = (event: Partial<RestItemEvent>) => {
   if (isEventPartial(event)) {
-    return require('@/features/events/assets/images/event-fallback-private-lock.png')
+    return require('@/features_next/events/assets/images/event-fallback-private-lock.png')
   }
   return event.image?.url
 }
 
 export const getEventDetailImageFallback = (event: Partial<RestItemEvent>) => {
   if (isEventPartial(event)) {
-    return require('@/features/events/assets/images/event-fallback-private-lock.png')
+    return require('@/features_next/events/assets/images/event-fallback-private-lock.png')
   }
-  return event.image?.url ?? require('@/features/events/assets/images/event-fallback.png')
+  return event.image?.url ?? require('@/features_next/events/assets/images/event-fallback.png')
 }
 
 export const isEventHasNationalLive = (

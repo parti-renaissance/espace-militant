@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { useThemeStyle } from '@/features/publications/components/Editor/hooks/useThemeStyle'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import { useThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { Image, ImageStyle } from 'expo-image'
 import { YStack, View } from 'tamagui'
 

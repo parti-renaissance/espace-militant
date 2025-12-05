@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { TextStyle, ViewStyle } from 'react-native'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { styleRendererContext } from '../context/styleRenderContext'
 
 export const nodeHasMarks = <T extends S.Node>(node: T): node is T & { marks: S.HasMarks<T>[] } => {

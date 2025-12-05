@@ -2,14 +2,14 @@ import { ComponentProps } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { EventItemProps } from '@/features/events/types'
+import { EventItemProps } from '@/features_next/events/types'
 import { Copy, Share2, X } from '@tamagui/lucide-icons'
 import { Image, useMedia, XStack, YStack } from 'tamagui'
 import { useEventSharing } from '../EventShareGroup'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 
 // eslint-disable-next-line
-const EventIllustration = require('@/features/events/assets/images/event_illustration.png')
+const EventIllustration = require('@/features_next/events/assets/images/event_illustration.png')
 
 export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof ModalOrBottomSheet> } & EventItemProps) => {
   const { copyUrl, isShareAvailable, openShareDialog } = useEventSharing({ event: props.event })
