@@ -11,14 +11,8 @@ export default function EvenementsPage() {
         <title>{metatags.createTitle('Nos événements')}</title>
       </Head>
       <Layout.Container>
-        <EvenementsContent />
+        <EventFeed />
       </Layout.Container>
     </>
-  )
-}
-
-function EvenementsContent() {
-  return (
-    <EventFeed />
   )
 }

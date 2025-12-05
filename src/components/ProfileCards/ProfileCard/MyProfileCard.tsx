@@ -6,7 +6,7 @@ import ProfilBlock from '@/components/ProfilBlock'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import RenewMembershipButton from '@/features/profil/pages/donations/components/RenewMembershipButton'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
+import { useGetExecutiveScopes, useGetProfil, useGetSuspenseProfil } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
@@ -169,7 +169,7 @@ export default function MyProfileCard() {
 
 export function MyProfileCardNoLinks() {
   const { user: session } = useUserStore()
-  const user = useGetProfil({ enabled: !!session })
+  const user = useGetSuspenseProfil({ enabled: !!session })
   const profile = user?.data
   const statusAdh = profile ? getMembershipCardStatus(profile.tags) : null
   const showEluCard = (profile?.tags ?? []).map((tag) => tag.code).find((x) => ['elu:attente_declaration', 'elu:cotisation_nok'].includes(x))
