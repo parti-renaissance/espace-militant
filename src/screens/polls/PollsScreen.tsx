@@ -4,13 +4,11 @@ import { Colors, Spacing, Typography } from '../../styles'
 import i18n from '../../utils/i18n'
 import CircularIcon from '../shared/CircularIcon'
 import { StatefulView } from '../shared/StatefulView'
-import PageHeader from '@/features/profil/components/PageHeader'
 import PollRow from './PollRow'
 import { PollRowViewModel } from './PollRowViewModel'
 import PollsHeader from './PollsHeader'
 import { PollsScreenViewModel } from './PollsScreenViewModel'
 import { usePollsScreen } from './usePollsScreen.hook'
-import { ClipboardCheck } from '@tamagui/lucide-icons'
 import { useMedia } from 'tamagui'
 
 const PollsScreen = () => {
@@ -42,7 +40,7 @@ const PollsScreen = () => {
 
   return (
     <View style={styles.container}>
-      {media.sm ? <PageHeader title="Questionnaires" icon={ClipboardCheck} backArrow={false} /> : null}
+      {/* {media.sm ? <PageHeader title="Questionnaires" icon={ClipboardCheck} backArrow={false} /> : null} */}
       <StatefulView state={statefulState} contentComponent={PollContent} />
     </View>
   )

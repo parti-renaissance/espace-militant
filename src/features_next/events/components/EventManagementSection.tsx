@@ -1,7 +1,7 @@
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { EventItemProps } from '@/features/events/types'
+import { EventItemProps } from '@/features_next/events/types'
 import { useFileDownload } from '@/hooks/useFileDownload'
 import { getEventParticipantsFileEndpoint } from '@/services/events/api'
 import { Download, Sparkle } from '@tamagui/lucide-icons'

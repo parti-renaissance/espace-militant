@@ -5,6 +5,7 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import { LayoutContext, useLayoutContext } from '@/components/AppStructure/Layout/LayoutContext'
 import { SideBarState } from '@/components/AppStructure/Navigation/SideBar'
 import { useMilitantNavItems, useCadreNavItems } from '@/config/navigationItems'
+import ScopesSelector from '@/features/scopes-selector'
 
 function AppNewLayoutContent() {
   const { sidebarState, hideTabBar, hideSideBar } = useLayoutContext()
@@ -30,6 +31,7 @@ function AppNewLayoutContent() {
 
   return (
     <Layout sidebarState={effectiveSidebarState} hideTabBar={hideTabBar}>
+      <ScopesSelector />
       <Navigator screenOptions={screenOptions}>
         {militantNavItems
           .filter(item => item.routeName)

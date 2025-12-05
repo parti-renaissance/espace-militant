@@ -60,7 +60,8 @@ const processExecutiveScopes = (
   isAuth: boolean,
   localDefaultScopeCode?: string | null,
   lastAvailableScopes?: string[] | null,
-  additionalProps?: Record<string, unknown>
+  additionalProps?: Record<string, unknown>,
+  isLoading?: boolean
 ) => {
   if (!isAuth || !data) {
     return { 
@@ -87,6 +88,7 @@ const processExecutiveScopes = (
       const features = cadre_scopes?.flatMap((x) => x.features)
       return features?.includes(x)
     },
+    isLoading: isLoading ?? false,
     ...additionalProps,
   }
 }
@@ -100,15 +102,15 @@ export const useGetExecutiveScopes = () => {
 
   const dataToUse = suspenseData || cachedData
   
-  return processExecutiveScopes(dataToUse, isAuth, localDefaultScopeCode, lastAvailableScopes, rest)
+  return processExecutiveScopes(dataToUse, isAuth, localDefaultScopeCode, lastAvailableScopes, rest, rest.isLoading)
 }
 
 export const useGetSuspenseExecutiveScopes = () => {
   const { isAuth } = useSession()
-  const { data: suspenseData } = useGetSuspenseUserScopes()
+  const { data: suspenseData, isLoading, ...rest } = useGetSuspenseUserScopes()
   const { defaultScope: localDefaultScopeCode, lastAvailableScopes } = useUserStore()
 
-  return processExecutiveScopes(suspenseData, isAuth, localDefaultScopeCode, lastAvailableScopes)
+  return processExecutiveScopes(suspenseData, isAuth, localDefaultScopeCode, lastAvailableScopes, rest, isLoading)
 }
 
 export const useMutateExecutiveScope = () => {

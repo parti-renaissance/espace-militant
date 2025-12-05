@@ -1,5 +1,5 @@
 import { SelectOption } from '@/components/base/Select/SelectV3'
-import { EventFormData } from '@/features/events/pages/create-edit/schema'
+import { EventFormData } from './schema'
 import { Lock, LockKeyhole, Unlock, Ticket } from '@tamagui/lucide-icons'
 
 const ALL_VISIBILITY_OPTIONS: SelectOption<EventFormData['visibility']>[] = [

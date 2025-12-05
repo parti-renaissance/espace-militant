@@ -1,7 +1,7 @@
 import { Linking } from 'react-native'
 import Text from '@/components/base/Text'
-import { useThemeStyle } from '@/features/publications/components/Editor/hooks/useThemeStyle'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import { useThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { Paperclip } from '@tamagui/lucide-icons'
 import { XStack, YStack } from 'tamagui'
 

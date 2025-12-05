@@ -5,7 +5,7 @@ import { useToastController } from '@tamagui/toast'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/publications/api'
 import { RestAvailableSender, RestPostMessageRequest } from '@/services/publications/schema'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
 export type ZipMessageFunction = (
     formValues: S.MessageFormValues, 

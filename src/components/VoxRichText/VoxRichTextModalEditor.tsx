@@ -1,10 +1,8 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import { Save } from '@tamagui/lucide-icons'
-import { useMutation } from '@tanstack/react-query'
 import { XStack } from 'tamagui'
-import { useDebouncedCallback } from 'use-debounce'
 import { VoxRichTextEditor } from './VoxRichTextEditor'
 import { RichTextContent, EditorRef } from './types'
 import { normalizeHtmlLinks, normalizeJsonLinks } from '@/utils/normalizeUrl'
@@ -17,6 +15,7 @@ type VoxRichTextModalEditorProps = {
   onClose: () => void
   title?: string
   placeholder?: string
+  maxWidth?: number
 }
 
 export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({ 
@@ -25,29 +24,39 @@ export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({
   onChange, 
   onClose,
   title = 'Éditeur',
-  placeholder
+  placeholder,
+  maxWidth
 }) => {
   const editorRef = useRef<EditorRef | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
 
-  const { isPending, mutateAsync } = useMutation({
-    mutationFn: () => editorRef.current!.getData(),
-  })
-
-  const handleOnChange = useDebouncedCallback(() => {
-    mutateAsync().then((data) => {
+  const handleSave = async () => {
+    if (!editorRef.current) {
+      console.error('Editor ref is not available')
+      return
+    }
+    
+    setIsSaving(true)
+    try {
+      const data = await editorRef.current.getData()
       onChange({
         html: normalizeHtmlLinks(data.html),
         pure: data.pure,
         json: JSON.stringify(normalizeJsonLinks(data.json)),
       })
       onClose()
-    })
-  }, 200)
+    } catch (error) {
+      console.error('Error saving editor content:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   return (
     <ModalOrPageBase
       open={open}
       onClose={onClose}
+      maxWidth={maxWidth}
       header={
         <VoxHeader>
           <XStack alignItems="center" flex={1} width="100%">
@@ -61,9 +70,9 @@ export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({
                 theme="blue"
                 alignSelf="flex-end"
                 variant="text"
-                onPress={handleOnChange}
-                loading={isPending}
-                disabled={isPending}
+                onPress={handleSave}
+                loading={isSaving}
+                disabled={isSaving}
               >
                 Terminé
               </VoxButton>
@@ -72,7 +81,7 @@ export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({
         </VoxHeader>
       }
     >
-      {open ? <VoxRichTextEditor ref={editorRef} value={value} placeholder={placeholder} /> : null}
+      <VoxRichTextEditor ref={editorRef} value={value} placeholder={placeholder} />
     </ModalOrPageBase>
   )
 }

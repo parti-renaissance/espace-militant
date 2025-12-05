@@ -1,7 +1,7 @@
 import { ComponentProps } from 'react'
 import { ActionCard, ActionVoxCardProps } from '@/components/Cards/ActionCard'
 import { NewsCard, NewsVoxCardProps } from '@/components/Cards/NewsCard'
-import EventListItem from '@/features/events/components/EventListItem'
+import EventListItem from '@/features_next/events/components/EventListItem'
 import PublicationCard, { PublicationCardProps } from '@/components/Cards/PublicationCard/PublicationCard'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
 

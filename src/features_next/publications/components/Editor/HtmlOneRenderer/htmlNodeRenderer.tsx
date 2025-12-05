@@ -1,8 +1,8 @@
-import { attachmentRenderer } from '@/features/publications/components/Editor/HtmlOneRenderer/htmlAttachmentNodeRenderer'
-import { buttonRenderer } from '@/features/publications/components/Editor/HtmlOneRenderer/htmlButtonNodeRenderer'
-import { imageRenderer } from '@/features/publications/components/Editor/HtmlOneRenderer/htmlImageNodeRenderer'
-import { richTextRenderer } from '@/features/publications/components/Editor/HtmlOneRenderer/htmlRichTextNodeRender'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import { attachmentRenderer } from '@/features_next/publications/components/Editor/HtmlOneRenderer/htmlAttachmentNodeRenderer'
+import { buttonRenderer } from '@/features_next/publications/components/Editor/HtmlOneRenderer/htmlButtonNodeRenderer'
+import { imageRenderer } from '@/features_next/publications/components/Editor/HtmlOneRenderer/htmlImageNodeRenderer'
+import { richTextRenderer } from '@/features_next/publications/components/Editor/HtmlOneRenderer/htmlRichTextNodeRender'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { RestAvailableSendersResponse } from '@/services/publications/schema'
 import { containerRenderer } from './htmlContainerRenderer'
 

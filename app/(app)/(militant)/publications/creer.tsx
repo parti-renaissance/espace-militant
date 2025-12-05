@@ -14,7 +14,7 @@ export default function PublicationsCreatePage() {
   const { defaultScope } = useUserStore()
 
   if (!isAuth) {
-    return <Redirect href={'/(app)/(tabs)/evenements/'} />
+    return <Redirect href={'/evenements'} />
   }
 
   if (!hasFeature('publications')) {

@@ -1,6 +1,6 @@
 import { Text, TextStyle, Linking } from 'react-native'
-import { useThemeStyle } from '@/features/publications/components/Editor/hooks/useThemeStyle'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import { useThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { View, YStack } from 'tamagui'
 import { useHits } from '@/services/hits/hook'
 

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { styled, ThemeableStack, YStack } from "tamagui"
 import { EditorMethods } from "./types"
 import { memo, RefObject } from "react"
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { Control } from "react-hook-form"
 import MessageEditorAddToolbar from "./AddToolBar"
 import { Platform } from "react-native"

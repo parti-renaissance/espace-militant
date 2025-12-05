@@ -13,7 +13,6 @@ import { cleanupUrlParams } from '@/utils/urlCleanup'
 import { resolveSource } from '@/utils/sourceResolver'
 import { usePublicationStats } from '@/services/stats/hook'
 import { isWeb, useMedia } from 'tamagui'
-import ProfilHeader from '@/features/profil/components/PageHeader'
 import Layout from '@/components/AppStructure/Layout/Layout'
 
 const MessageDetailsPage: React.FC = () => {
@@ -96,9 +95,6 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
 
   return (
     <>
-      {media.sm ? (
-        <ProfilHeader title="" backgroundColor="white" forcedBackTitle="Retour" forcedBackPath={isWeb ? '/' : undefined} withoutBorder={!!publicationStats} />
-      ) : null}
       <RouterStack.Screen
         options={{
           title: messageData.subject || 'Détails du message',

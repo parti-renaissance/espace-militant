@@ -1,9 +1,10 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import { ActivityIndicator, Dimensions } from 'react-native'
+import { ActivityIndicator, Dimensions, Platform } from 'react-native'
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera'
+import { useRouter } from 'expo-router'
 import { useScanTicket } from '@/services/tickets/hook'
 import { ScanTicketResponse } from '@/services/tickets/schema'
-import { Tickets, CameraOff } from '@tamagui/lucide-icons'
+import { Tickets, CameraOff, ArrowLeft } from '@tamagui/lucide-icons'
 import { YStack, XStack, ScrollView, View, useMedia } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import StatusIndicator, { StatusIndicatorSkeleton } from '../components/StatusIndicator'
@@ -17,6 +18,7 @@ const { width, height } = Dimensions.get('window')
 
 export default function TicketScannerPage() {
   const media = useMedia()
+  const router = useRouter()
   const [permission, requestPermission] = useCameraPermissions()
   const [scanned, setScanned] = useState(false)
   const [ticketData, setTicketData] = useState<ScanTicketResponse | null>(null)
@@ -24,6 +26,22 @@ export default function TicketScannerPage() {
   const scanTicketMutation = useScanTicket()
   const toast = useToastController()
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleBack = useCallback(() => {
+    if (Platform.OS === 'web') {
+      if (router.canGoBack()) {
+        router.back()
+      } else {
+        router.replace('/')
+      }
+    } else {
+      if (router.canGoBack()) {
+        router.back()
+      } else {
+        router.replace('/')
+      }
+    }
+  }, [router])
 
   const handleScanTicket = useCallback((ticketUuid: string) => {
     // Vérifier si c'est le même ticket que le dernier scanné
@@ -154,6 +172,19 @@ export default function TicketScannerPage() {
           justifyContent="center"
           alignItems="center"
         >
+          <View
+            position="absolute"
+            top={16}
+            left={16}
+            zIndex={10}
+          >
+            <VoxButton
+              shrink
+              iconLeft={ArrowLeft}
+              onPress={handleBack}
+              variant="contained"
+            />
+          </View>
           <View width={150} height={150} marginTop={32} justifyContent="center" alignItems="center">
             <View width="100%" height="100%" borderWidth={8} borderColor={scanned ? '$gray7' : '#F5D900'} borderRadius={10} backgroundColor="transparent" justifyContent="center" alignItems="center">
               {scanTicketMutation.isPending && <ActivityIndicator size="large" color="#F5D900" />}

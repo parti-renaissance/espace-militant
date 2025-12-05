@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect } from 'react'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import ProgressBar from '@/screens/shared/ProgressBar'
 import { useUploadFile } from '@/services/files/hook'
 import { useForm } from 'react-hook-form'

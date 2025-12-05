@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react'
 import { stringifyCSSProperties } from 'react-style-stringify'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { RestAvailableSendersResponse } from '@/services/publications/schema'
 
 const renderSenderView = (sender: RestAvailableSendersResponse[number] | null | undefined, _datetime?: string) => {

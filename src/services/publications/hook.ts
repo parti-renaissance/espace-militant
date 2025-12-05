@@ -252,7 +252,7 @@ export const useDeleteMessage = (props: { messageId?: string; scope?: string }) 
   })
 }
 
-export { useAutoSave } from '@/features/publications/components/Editor/hooks/useAutoSave'
+export { useAutoSave } from '@/features_next/publications/components/Editor/hooks/useAutoSave'
 
 export const useGetFilterCollection = (props: { scope: string; enabled?: boolean }) => {
   return useQuery({

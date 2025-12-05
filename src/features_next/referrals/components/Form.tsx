@@ -21,7 +21,7 @@ import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomShe
 import Button, { VoxButton } from '@/components/Button'
 
 import { RestViolation } from '@/data/restObjects/RestUpdateProfileRequest'
-import { validateBirthdateFormSchema } from '@/features/profil/pages/account/form/schema'
+import { validateBirthdateFormSchema } from '@/features_next/profil/pages/account/form/schema'
 import { postAddressSchema } from '@/services/events/schema'
 import { ReferralFormError } from '@/services/referral/error'
 import { useReferralsInvite, useReferralsPreRegister } from '@/services/referral/hook'

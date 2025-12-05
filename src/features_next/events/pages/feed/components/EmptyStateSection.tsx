@@ -1,14 +1,14 @@
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import EmptyEvent from '@/features/events/components/EmptyEvent'
+import EmptyEvent from '@/features_next/events/components/EmptyEvent'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { Link } from 'expo-router'
 import { Image, isWeb, XStack, YStack } from 'tamagui'
 
 // eslint-disable-next-line
-const EventIllustration = require('@/features/events/assets/images/event_illustration.png')
+const EventIllustration = require('@/features_next/events/assets/images/event_illustration.png')
 
 const PowerUserEmptyState = () => {
   const { hasFeature } = useGetExecutiveScopes()

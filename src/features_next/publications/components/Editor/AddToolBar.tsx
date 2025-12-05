@@ -4,7 +4,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming, withDelay, Easi
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 import { Image, Text as TextIcon, MousePointerSquare, X, Plus, Paperclip } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { EditorMethods } from './types'
 
 export const TOOLBAR_ITEM_HEIGHT = 56

@@ -1,6 +1,6 @@
 import { forwardRef, RefObject, useCallback } from 'react'
 import { VoxButton } from '@/components/Button'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2, X } from '@tamagui/lucide-icons'
 import { styled, ThemeableStack } from 'tamagui'
 import { EditorMethods } from './types'

@@ -11,13 +11,13 @@ import * as metatags from '@/config/metatags';
 
 export default function PublicationsPage() {
   const { isAuth } = useSession()
-  const { hasFeature, isLoading } = useGetExecutiveScopes()
+  const { hasFeature } = useGetExecutiveScopes()
 
   if (!isAuth) {
-    return <Redirect href={'/(app)/(tabs)/evenements/'} />
+    return <Redirect href={'/evenements'} />
   }
 
-  if (!hasFeature('publications') && !isLoading) {
+  if (!hasFeature('publications')) {
     return <AccessDeny />
   }
 

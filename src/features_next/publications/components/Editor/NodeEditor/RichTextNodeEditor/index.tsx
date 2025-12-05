@@ -1,10 +1,15 @@
 import React from 'react'
-import { Payloads } from '@/features/events/pages/create-edit/DescriptionInput'
-import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+import { RichTextContent } from '@/components/VoxRichText'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { Controller, useForm } from 'react-hook-form'
 import EditorModal from './EditorModal'
 
-type NodeEditorProps = { value: S.RichTextNode; onChange: (node: S.RichTextNode) => void; onBlur: () => void; present: boolean }
+type NodeEditorProps = { 
+  value: S.RichTextNode
+  onChange: (node: S.RichTextNode) => void
+  onBlur: () => void
+  present: boolean 
+}
 
 export const RichTextNodeEditor = (props: NodeEditorProps) => {
   const { control, handleSubmit, setValue } = useForm({
@@ -23,7 +28,7 @@ export const RichTextNodeEditor = (props: NodeEditorProps) => {
     props.onBlur()
   })
 
-  const handleOnChange = (x: Payloads) => {
+  const handleOnChange = (x: RichTextContent) => {
     setValue('content', x)
     onSubmit()
   }
@@ -33,7 +38,15 @@ export const RichTextNodeEditor = (props: NodeEditorProps) => {
       control={control}
       name="content"
       render={({ field }) => {
-        return <EditorModal value={field.value} onChange={handleOnChange} onBlur={field.onBlur} present={props.present} onClose={props.onBlur} />
+        return (
+          <EditorModal 
+            value={field.value} 
+            onChange={handleOnChange} 
+            onBlur={field.onBlur} 
+            present={props.present} 
+            onClose={props.onBlur} 
+          />
+        )
       }}
     />
   )

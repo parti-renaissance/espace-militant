@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSession } from '@/ctx/SessionProvider'
-import { GreetingCreateModal } from '@/features/events/components/GreetingModals/GreetingCreateModal'
+import { GreetingCreateModal } from '@/features_next/events/components/GreetingModals/GreetingCreateModal'
 import * as eventTypes from '@/services/events/schema'
 import { router, useLocalSearchParams } from 'expo-router'
 import { EventContent } from './components/EventContent'
