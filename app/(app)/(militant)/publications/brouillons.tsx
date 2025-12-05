@@ -14,7 +14,7 @@ export default function PublicationsDraftPage() {
   if (!isAuth) {
     return <Redirect href={'/(app)/(tabs)/evenements/'} />
   }
-  
+
   if (!hasFeature('publications') && !isLoading) {
     return <AccessDeny />
   }
@@ -22,7 +22,7 @@ export default function PublicationsDraftPage() {
   return (
     <>
       <Header title="Publications" />
-    <Layout.Container alwaysShowScrollbar>
+      <Layout.Container alwaysShowScrollbar>
         <DraftPage />
       </Layout.Container>
     </>

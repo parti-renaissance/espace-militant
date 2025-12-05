@@ -24,7 +24,7 @@ function AppNewLayoutContent() {
     : {
       headerShown: false,
       tabBarStyle: { display: 'none' as const }, // custom tabbar and sidebar
-      lazy: true, // load pages only when they are opened
+      // lazy: true,
       contentStyle: { backgroundColor: '#fafafb' },
     }, [])
 
