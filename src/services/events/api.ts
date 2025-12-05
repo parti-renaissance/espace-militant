@@ -68,7 +68,7 @@ export const subscribePublicEvent = (eventId: string, payload: schemas.RestPostP
     type: 'public',
   })(payload)
 
-export const getEventParticipants = (props: { eventId: string; page: number;}) =>
+export const getEventParticipants = (props: { eventId: string; page: number }) =>
   api({
     method: 'get',
     path: `/api/v3/events/${props.eventId}/participants`,
@@ -77,8 +77,7 @@ export const getEventParticipants = (props: { eventId: string; page: number;}) =
     type: 'private',
   })({ page: props.page })
 
-export const getEventParticipantsFileEndpoint = (props: { eventId: string }) =>
-  `/api/v3/events/${props.eventId}/participants.xlsx`
+export const getEventParticipantsFileEndpoint = (props: { eventId: string }) => `/api/v3/events/${props.eventId}/participants.xlsx`
 
 export const getEventCategories = api({
   method: 'get',
@@ -98,10 +97,10 @@ export const createEvent = (props: { payload: schemas.RestPostEventRequest; scop
     type: 'private',
   })(props.payload)
 
-export const updateEvent = (props: { payload: schemas.RestPostEventRequest; eventId: string; scope: string }) =>
+export const updateEvent = (props: { payload: schemas.RestPostEventRequest; eventId: string }) =>
   api({
     method: 'put',
-    path: `/api/v3/events/${props.eventId}?scope=${props.scope}`,
+    path: `/api/v3/events/${props.eventId}`,
     requestSchema: schemas.RestPostEventRequestSchema,
     responseSchema: schemas.RestPostEventResponseSchema,
     errorThrowers: [eventPostFormErrorThrower],
@@ -148,11 +147,11 @@ export const deleteEventImage = (props: { eventId: string; scope: string }) =>
     type: 'private',
   })()
 
-  export const countInvitationsEvent = (props: { payload: schemas.RestPostCountInvitationsEventRequest; scope: string }) =>
-    api({
-      method: 'post',
-      path: '/api/v3/events/count-invitations?scope=' + props.scope,
-      requestSchema: schemas.RestPostCountInvitationsEventRequestSchema,
-      responseSchema: schemas.RestPostCountInvitationsEventResponseSchema,
-      type: 'private',
-    })(props.payload)
+export const countInvitationsEvent = (props: { payload: schemas.RestPostCountInvitationsEventRequest; scope: string }) =>
+  api({
+    method: 'post',
+    path: '/api/v3/events/count-invitations?scope=' + props.scope,
+    requestSchema: schemas.RestPostCountInvitationsEventRequestSchema,
+    responseSchema: schemas.RestPostCountInvitationsEventResponseSchema,
+    type: 'private',
+  })(props.payload)
