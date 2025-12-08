@@ -11,6 +11,7 @@ import LayoutScrollView, { type LayoutScrollViewRef } from '@/components/AppStru
 import type { RestProfilResponse } from '@/services/profile/schema'
 import type { ReferralScoreboardType, ReferralStatisticsType } from '@/services/referral/schema'
 import { ReferralScoreCard, ReferralsInviteCard, ReferralsLinkCard, ReferralsTrackingCard, ReferralsRankingCard } from '@/features_next/referrals/components/Cards'
+import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 
 type ReferralsContentProps = {
   user?: RestProfilResponse
@@ -19,7 +20,7 @@ type ReferralsContentProps = {
 }
 
 export function ReferralsDesktopContent({ user, scoreboard, statistics }: ReferralsContentProps) {
-
+  const spacingValues = useLayoutSpacing(true)
   const [activeSection, setActiveSection] = useState('cl')
 
   const scrollViewRef = useRef<LayoutScrollViewRef>(null)
@@ -66,7 +67,7 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
       onScroll={handleScroll}
       scrollEventThrottle={16}
     >
-      <View backgroundColor="$orange1" pt="$6" pb={52} borderRadius="$medium" mx="$medium">
+      <View backgroundColor="$orange1" pt="$6" pb={52} borderRadius="$medium" mx={spacingValues.paddingLeft}>
         <View maxWidth={480} width="100%" margin="auto">
           <ReferralScoreCard
             fullName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}

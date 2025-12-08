@@ -13,6 +13,7 @@ import { FieldSurvey } from '@/services/field-surveys/schema'
 import { getFormattedDate } from '@/utils/date'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 
 
 const Container = styled(YStack, {
@@ -259,6 +260,7 @@ export const LoadingState: React.FC = () => {
 const FieldSurveysListPage: React.FC = () => {
   const { data: surveys, isLoading, error, refresh, isRefetching } = useFieldSurveysWithRefresh()
   const media = useMedia()
+  const spacingValues = useLayoutSpacing(true)
 
   const handleRefresh = () => {
     refresh()
@@ -277,10 +279,10 @@ const FieldSurveysListPage: React.FC = () => {
       }
       contentContainerStyle={{ flexGrow: 1, paddingBottom: 40, backgroundColor: media.sm ? 'white' : '$textSurface' }}
       showsVerticalScrollIndicator={false}
-      disablePadding
+      // disablePadding
     >
       <Container>
-        <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} />
+        <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, marginHorizontal: spacingValues.paddingLeft, borderRadius: 16, overflow: 'hidden' }} />
         <ContentWrapper>
           <VoxCard borderRadius="$medium" bg="white" mx={media.sm ? '$medium' : 0}>
             <VoxCard.Content p={media.sm ? 12 : '$medium'}>

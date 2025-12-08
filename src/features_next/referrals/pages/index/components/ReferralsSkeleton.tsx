@@ -11,7 +11,7 @@ export function ReferralsDesktopSkeleton() {
   
   return (
     <View style={{ width: '100%', paddingTop: spacingValues.paddingTop, paddingBottom: 100, backgroundColor: '$textSurface' }}>
-      <View backgroundColor="$orange1" pt="$6" pb={52} borderRadius="$medium" mx="$medium">
+      <View backgroundColor="$orange1" pt="$6" pb={52} borderRadius="$medium" mx={spacingValues.paddingLeft}>
         <View maxWidth={480} width="100%" margin="auto">
           <SkeCard height={280}>
             <SkeCard.Content>
