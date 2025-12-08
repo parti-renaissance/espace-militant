@@ -12,7 +12,7 @@ export { NavItem, type NavItemProps } from './Navigation/NavItem'
 export { NavItemDropdown, type NavItemSubItem } from './Navigation/NavItemDropdown'
 export { default as NavSheet, type NavSheetRef } from './Navigation/NavSheet'
 export { ScopeSelector } from './Navigation/ScopeSelector'
-export { HelpMenuItems } from './Navigation/HelpMenuItems'
+export { FeaturebaseFooterItem } from './Navigation/FeaturebaseFooterItems'
 
 // Hooks
 export { default as useLayoutSpacing, type UseLayoutSpacingOptions } from './hooks/useLayoutSpacing'

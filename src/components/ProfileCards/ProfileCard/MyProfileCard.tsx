@@ -188,11 +188,17 @@ export function MyProfileCardNoLinks() {
         <VoxCard.Content>
           <BoundarySuspenseWrapper>
             <>
-              <ProfilBlock
-                editablePicture={false}
-                inside
-                bg="$textSurface"
-              />
+              <Link href="/profil" asChild={!isWeb}>
+                <ProfilBlock
+                  editablePicture={false}
+                  inside
+                  bg="$textSurface"
+                  animation="100ms"
+                  hoverStyle={{
+                    bg: '$gray1',
+                  }}
+                />
+              </Link>
 
               {!showEluCard && statusAdh ? <MembershipCard status={statusAdh} /> : null}
               {showEluCard ? <EluCard /> : null}

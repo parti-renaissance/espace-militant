@@ -3,16 +3,26 @@ import { StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet'
-import { YStack } from 'tamagui'
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetScrollView } from '@gorhom/bottom-sheet'
+import { styled, YStack } from 'tamagui'
 import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
 import { type NavItemConfig } from '@/config/navigationItems'
+
+const Line = styled(YStack, {
+  backgroundColor: '$purple3',
+  position: 'absolute',
+  left: 36,
+  top: 0,
+  bottom: 16,
+  width: 1,
+})
 
 interface NavSheetProps {
   onClose?: () => void
   items: NavItemConfig[]
   ListHeaderComponent?: React.ReactNode
   ListFooterComponent?: React.ReactNode
+  showLine?: boolean
 }
 
 export interface NavSheetRef {
@@ -20,7 +30,7 @@ export interface NavSheetRef {
   close: () => void
 }
 
-const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListHeaderComponent, ListFooterComponent }, ref) => {
+const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListHeaderComponent, ListFooterComponent, showLine = false }, ref) => {
   const insets = useSafeAreaInsets()
   const bsRef = useRef<BottomSheet>(null)
   const zIndex = useSharedValue(-10)
@@ -71,12 +81,13 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
           backdropComponent={renderBackdrop}
           onClose={handleClose}
           enablePanDownToClose
+          topInset={insets.top}
           handleIndicatorStyle={{
             backgroundColor: '#D2DCE5',
             width: 48,
           }}
         >
-          <BottomSheetView style={styles.contentContainer}>
+          <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
             <YStack paddingVertical={8}>
               {ListHeaderComponent && (
                 <YStack>
@@ -84,6 +95,7 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
                 </YStack>
               )}
               <YStack gap={4} paddingHorizontal={16}>
+                {showLine && <Line />}
                 {items.map((item) => (
                   <NavItem
                     key={item.id}
@@ -110,7 +122,7 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
                 </YStack>
               )}
             </YStack>
-          </BottomSheetView>
+          </BottomSheetScrollView>
         </BottomSheet>
       </GestureHandlerRootView>
     </Animated.View>

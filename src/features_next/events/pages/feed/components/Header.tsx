@@ -38,7 +38,6 @@ const EventsHeader = ({ mode, value, onChange }: { mode: 'compact' | 'aside'; va
   return (
     <YStack
       gap="$medium"
-      pb="$medium"
       px={media.sm ? '$medium' : 0}
     >
       {isAuth && (
