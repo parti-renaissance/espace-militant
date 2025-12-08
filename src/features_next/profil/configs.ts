@@ -1,6 +1,5 @@
 import { CircleUser, Sparkle, HelpingHand, LandPlot, Settings2, MessageCircle, TreeDeciduous, KeyRound } from "@tamagui/lucide-icons"
 import { RestProfilResponse } from "@/services/profile/schema"
-import type { Href } from "expo-router"
 import { UserTagEnum } from "@/core/entities/UserProfile"
 
 export type ProfilNavItemConfig = {
