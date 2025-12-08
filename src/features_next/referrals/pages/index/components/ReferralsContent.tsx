@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import type { LayoutRectangle, NativeScrollEvent, NativeSyntheticEvent, ScrollView as RNScrollView } from 'react-native'
+import type { LayoutRectangle, NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import { ScrollView, View, XStack, YStack, useMedia } from 'tamagui'
 import { ListTodo, Medal } from '@tamagui/lucide-icons'
 
@@ -7,9 +7,11 @@ import BreadCrumb from '@/components/BreadCrumb/BreadCrumb'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import Text from '@/components/base/Text'
 import StickyBox from '@/components/StickyBox/StickyBox'
+import LayoutScrollView, { type LayoutScrollViewRef } from '@/components/AppStructure/Layout/LayoutScrollView'
 import type { RestProfilResponse } from '@/services/profile/schema'
 import type { ReferralScoreboardType, ReferralStatisticsType } from '@/services/referral/schema'
 import { ReferralScoreCard, ReferralsInviteCard, ReferralsLinkCard, ReferralsTrackingCard, ReferralsRankingCard } from '@/features_next/referrals/components/Cards'
+import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 
 type ReferralsContentProps = {
   user?: RestProfilResponse
@@ -18,10 +20,10 @@ type ReferralsContentProps = {
 }
 
 export function ReferralsDesktopContent({ user, scoreboard, statistics }: ReferralsContentProps) {
-
+  const spacingValues = useLayoutSpacing(true)
   const [activeSection, setActiveSection] = useState('cl')
 
-  const scrollViewRef = useRef<RNScrollView>(null)
+  const scrollViewRef = useRef<LayoutScrollViewRef>(null)
   const rankingLayout = useRef<LayoutRectangle | null>(null)
   const trackingLayout = useRef<LayoutRectangle | null>(null)
 
@@ -59,13 +61,13 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
   const shouldShowAssemblyFirst = !isInTop5National && hasAssemblyRanking
 
   return (
-    <ScrollView
+    <LayoutScrollView
       contentContainerStyle={{ paddingBottom: 100, backgroundColor: '$textSurface' }}
       ref={scrollViewRef}
       onScroll={handleScroll}
       scrollEventThrottle={16}
     >
-      <View backgroundColor="$orange1" pt="$6" pb={52}>
+      <View backgroundColor="$orange1" pt="$6" pb={52} borderRadius="$medium" mx={spacingValues.paddingLeft}>
         <View maxWidth={480} width="100%" margin="auto">
           <ReferralScoreCard
             fullName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}
@@ -136,7 +138,7 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
           </YStack>
         </YStack>
       </XStack>
-    </ScrollView>
+    </LayoutScrollView>
   )
 }
 

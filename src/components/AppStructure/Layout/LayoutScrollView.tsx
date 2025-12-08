@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react'
 import { NativeScrollEvent, NativeSyntheticEvent, Platform, RefreshControl, ScrollView, ScrollViewProps } from 'react-native'
 import { isWeb } from 'tamagui'
 import { usePageLayoutScroll } from '@/components/AppStructure/hooks/usePageLayoutScroll'
@@ -16,7 +16,11 @@ type LayoutScrollViewProps = Omit<ScrollViewProps, 'onEndReached'> & {
   onRefresh?: () => void
 }
 
-export default function LayoutScrollView({
+export type LayoutScrollViewRef = {
+  scrollTo: (options: { x?: number; y?: number; animated?: boolean }) => void
+}
+
+const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(({
   onEndReached,
   onEndReachedThreshold = 0.4,
   hasMore = false,
@@ -27,9 +31,11 @@ export default function LayoutScrollView({
   refreshing,
   onRefresh,
   contentContainerStyle,
+  onScroll,
   ...rest
-}: LayoutScrollViewProps) {
+}, ref) => {
   const spacingValues = useLayoutSpacing(padding)
+  const scrollViewRef = useRef<ScrollView>(null)
 
   const loadMore = useCallback(() => {
     if (onEndReached && hasMore) {
@@ -38,13 +44,35 @@ export default function LayoutScrollView({
   }, [hasMore, onEndReached])
 
   // Web: écouteur sur le conteneur parent via le hook
-  usePageLayoutScroll({
+  const { layoutRef } = usePageLayoutScroll({
     onEndReached: onEndReached ? loadMore : undefined,
     onEndReachedThreshold,
+    onScroll,
+    scrollEventThrottle: rest.scrollEventThrottle,
   })
+
+  // Expose scrollTo method via ref
+  useImperativeHandle(ref, () => ({
+    scrollTo: (options: { x?: number; y?: number; animated?: boolean }) => {
+      if (isWeb && layoutRef?.current) {
+        // En web, on scroll sur le conteneur parent
+        layoutRef.current.scrollTo({
+          top: options.y ?? 0,
+          left: options.x ?? 0,
+          behavior: options.animated !== false ? 'smooth' : 'auto',
+        })
+      } else if (scrollViewRef.current) {
+        // En natif, on utilise la méthode native
+        scrollViewRef.current.scrollTo(options)
+      }
+    },
+  }), [layoutRef])
 
   // Natif: écouteur sur la ScrollView elle-même
   const handleNativeScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    console.log('handleNativeScroll', event.nativeEvent.contentOffset.y)
+    onScroll?.(event)
+    
     if (!onEndReached || isWeb || !hasMore) return
 
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent
@@ -53,7 +81,7 @@ export default function LayoutScrollView({
     if (layoutMeasurement.height + contentOffset.y >= contentSize.height - thresholdPixels) {
       loadMore()
     }
-  }, [onEndReached, hasMore, loadMore, onEndReachedThreshold])
+  }, [onEndReached, hasMore, loadMore, onEndReachedThreshold, onScroll])
 
   const refreshControlElement = refreshControl ?? (refreshing !== undefined && onRefresh ? (
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -61,6 +89,7 @@ export default function LayoutScrollView({
   
   return (
     <ScrollView
+      ref={scrollViewRef}
       scrollEnabled={!isWeb}
       onScroll={handleNativeScroll}
       scrollEventThrottle={16}
@@ -78,4 +107,8 @@ export default function LayoutScrollView({
       {children}
     </ScrollView>
   )
-}
+})
+
+LayoutScrollView.displayName = 'LayoutScrollView'
+
+export default LayoutScrollView

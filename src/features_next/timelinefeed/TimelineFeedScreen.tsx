@@ -24,8 +24,9 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import AppDownloadCTA from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
 import { MyProfileCardNoLinks } from '@/components/ProfileCards/ProfileCard/MyProfileCard'
-import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
+import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
+import VoxCard from '@/components/VoxCard/VoxCard'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 
@@ -178,16 +179,28 @@ const TimelineFeedScreen = () => {
       </Layout.Main>
 
       {media.gtMd ? (
-        <BoundarySuspenseWrapper fallback={<HomeFeedSidebarSkeleton />}>
-          <Layout.SideBar isSticky>
+        <Layout.SideBar isSticky>
+          <BoundarySuspenseWrapper
+            fallback={<HomeFeedSidebarSkeleton />}
+            errorChildren={(error) => (
+              <YStack justifyContent="center" alignItems="center" gap="$medium">
+                <VoxCard justifyContent="center" alignItems="center" flex={1} width="100%">
+                  <VoxCard.Content justifyContent="center" alignItems="center">
+                    <DefaultErrorFallback {...error} />
+                  </VoxCard.Content>
+                </VoxCard>
+                <AppDownloadCTA />
+              </YStack>
+            )}
+          >
             <ScrollView contentContainerStyle={{ height: '100dvh' }}>
               <YStack alignItems="center" justifyContent="center" gap="$medium">
                 <MyProfileCardNoLinks />
                 <AppDownloadCTA />
               </YStack>
             </ScrollView>
-          </Layout.SideBar>
-        </BoundarySuspenseWrapper>
+          </BoundarySuspenseWrapper>
+        </Layout.SideBar>
       ) : null}
     </>
   )

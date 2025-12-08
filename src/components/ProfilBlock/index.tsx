@@ -8,7 +8,6 @@ import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { UserTagEnum } from '@/core/entities/UserProfile'
-import ExecutiveRoleSelector from '@/features_next/profil/components/ExecutiveRoleSelector'
 import { useDeleteProfilPicture, useGetProfil, useGetTags, usePostProfilPicture } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { Delete, Plus, Repeat2, Settings2 } from '@tamagui/lucide-icons'
@@ -142,7 +141,6 @@ export default function ProfilBlock({ editablePicture = true, ...props }: Compon
         <Text.MD medium textAlign="center">
           {[profil.instances?.assembly?.name, profil.instances?.committee?.name].filter(Boolean).join(', ')}
         </Text.MD>
-        {editablePicture ? <ExecutiveRoleSelector /> : null}
       </VoxCard.Content>
     </VoxCard>
   ) : (

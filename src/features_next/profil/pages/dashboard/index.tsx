@@ -16,7 +16,7 @@ import MembershipCard from '../donations/components/MembershipCard'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
 
-const DashboardScreen = () => {
+const DashboardContent = () => {
   const media = useMedia()
   const { data: profile } = useGetDetailProfil()
   const { data: me } = useGetProfil()
@@ -35,7 +35,7 @@ const DashboardScreen = () => {
   }, [])
 
   return (
-    <ProfilLayout>
+    <>
       <LayoutScrollView>
         <YStack gap="$medium" flex={1} pt={media.sm ? 8 + insets.top : undefined}>
           <ProfilBlock />
@@ -88,6 +88,13 @@ const DashboardScreen = () => {
         </YStack>
       </LayoutScrollView>
       {showDeleteAccountModal && <DeleteAccountModal isOpen={showDeleteAccountModal} onClose={hideModal} isAdherent={isAdherent} />}
+    </>
+  )
+}
+const DashboardScreen = () => {
+  return (
+    <ProfilLayout>
+      <DashboardContent />
     </ProfilLayout>
   )
 }

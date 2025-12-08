@@ -87,7 +87,7 @@ const PhonePollDetailScreenLoaded: FunctionComponent<Props> = ({
       .execute(poll, session.id, provider.getResult())
       .then(() => {
         router.replace({
-          pathname: '/(tabs)/actions/phoning/session/[device]/poll/success',
+          pathname: '/old/actions/phoning/session/[device]/poll/success',
           params: { device }
         })
       })
