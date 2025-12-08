@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { usePathname } from 'expo-router'
-import { BellOff, ChevronRight, Sparkle, Ellipsis } from '@tamagui/lucide-icons'
+import { BellOff, ChevronRight, Sparkle, Ellipsis, CircleCheckBig } from '@tamagui/lucide-icons'
 import { styled, YStack, XStack } from 'tamagui'
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
 import Text from '@/components/base/Text'
@@ -395,6 +395,30 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
                 <Text.MD semibold textWrap="balance">
                   Adhérez pour débloquer <Text.MD semibold color="$yellow5">tous les contenus et fonctionnalités</Text.MD>
                 </Text.MD>
+                
+                <YStack gap={8}>
+                  <XStack gap={8} alignItems="center">
+                    <CircleCheckBig size={16} color="$green4" />
+                    <Text.SM medium>Carte adhérent</Text.SM>
+                  </XStack>
+                  <XStack gap={8} alignItems="center">
+                    <CircleCheckBig size={16} color="$green4" />
+                    <Text.SM medium>Comités locaux</Text.SM>
+                  </XStack>
+                  <XStack gap={8} alignItems="center">
+                    <CircleCheckBig size={16} color="$green4" />
+                    <Text.SM medium>Événements exclusifs</Text.SM>
+                  </XStack>
+                  <XStack gap={8} alignItems="center">
+                    <CircleCheckBig size={16} color="$green4" />
+                    <Text.SM medium>Consultations</Text.SM>
+                  </XStack>
+                  <XStack gap={8} alignItems="center">
+                    <CircleCheckBig size={16} color="$green4" />
+                    <Text.SM medium>Élections internes</Text.SM>
+                  </XStack>
+                </YStack>
+
                 <VoxButton
                   variant="contained"
                   size="lg"
