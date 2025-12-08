@@ -15,6 +15,7 @@ import { useMilitantNavItems, type NavItemConfig } from '@/config/navigationItem
 import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
 import useCheckNotificationsState from '@/hooks/notifications/useCheckNotificationsState'
 import { useSession } from '@/ctx/SessionProvider'
+import CadreIllustration from '@/assets/illustrations/CadreIllustration'
 
 export const WIDTH_MILITANT = 248;
 export const WIDTH_COLLAPSED = 58;
@@ -438,8 +439,8 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
         hasBoxShadow={state !== 'cadre'}
         display={displayNavCadre ? 'flex' : 'none'}
       >
-        <LogoContainer pb={0}>
-          <Text fontSize={20} medium>CADRE</Text>
+        <LogoContainer pb={0} pt={14}>
+          <CadreIllustration showIcon={false} />
         </LogoContainer>
         <YStack>
           <ScopeSelector />
