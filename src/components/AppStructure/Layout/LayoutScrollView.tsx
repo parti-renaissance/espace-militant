@@ -94,10 +94,10 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
       onScroll={handleNativeScroll}
       scrollEventThrottle={16}
       refreshControl={refreshControlElement}
-      contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
+      contentInsetAdjustmentBehavior={ !isWeb ? 'automatic' : undefined}
       contentContainerStyle={[
         !disablePadding && {
-          paddingTop: Platform.OS === 'ios' ? 0 : spacingValues.paddingTop, 
+          paddingTop: !isWeb ? 16 : spacingValues.paddingTop, 
           paddingBottom: spacingValues.paddingBottom,
         },
         contentContainerStyle,

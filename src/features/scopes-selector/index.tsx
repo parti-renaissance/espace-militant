@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
@@ -14,14 +14,23 @@ const tutoNavMobileImg = require('./assets/mobile-nav-tuto.png')
 const tutoNavDesktopImg = require('./assets/sidebar-tuto.png')
 
 export default function ScopesSelector() {
-  const { data: scopes } = useGetExecutiveScopes()
+  const { data: scopes, isLoading } = useGetExecutiveScopes()
   const { mutate: mutateScope } = useMutateExecutiveScope()
   const [selectedScope, setSelectedScope] = useState(scopes?.default?.code)
   const [hasSelectedScope, setHasSelectedScope] = useState(false)
   const scopesCodeList = useMemo(() => scopes?.list?.map((scope) => scope.code) ?? [], [scopes])
-  const [shouldOpen, setShouldOpen] = useState(
-    !scopes?.lastAvailableScopes || scopes.lastAvailableScopes.length === 0 || xor(scopesCodeList, scopes.lastAvailableScopes).length > 0,
-  )
+  const [shouldOpen, setShouldOpen] = useState(false)
+
+  // Mettre à jour shouldOpen seulement quand les données sont chargées
+  useEffect(() => {
+    if (!isLoading && scopes) {
+      const shouldOpenModal = 
+        !scopes.lastAvailableScopes || 
+        scopes.lastAvailableScopes.length === 0 || 
+        xor(scopesCodeList, scopes.lastAvailableScopes).length > 0
+      setShouldOpen(shouldOpenModal)
+    }
+  }, [isLoading, scopes, scopesCodeList])
 
   const media = useMedia()
 

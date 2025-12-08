@@ -8,7 +8,7 @@ import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, YStack 
 import Text from '@/components/base/Text'
 import NavSheet, { NavSheetRef } from '@/components/AppStructure/Navigation/NavSheet'
 import { ScopeSelector } from '@/components/AppStructure/Navigation/ScopeSelector'
-import { HelpMenuItems } from '@/components/AppStructure/Navigation/HelpMenuItems'
+import { FeaturebaseFooterItems } from '@/components/AppStructure/Navigation/FeaturebaseFooterItems'
 import { isNavItemActive } from '@/components/AppStructure/utils'
 import { useMilitantNavItems, cadreNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useGetUserScopes } from '@/services/profile/hook'
@@ -403,12 +403,13 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
         ref={cadreSheetRef}
         onClose={() => handleSheetClose('cadreSheet')}
         items={cadreItems}
+        showLine
         ListHeaderComponent={
           <YStack paddingHorizontal={16}>
             <ScopeSelector />
           </YStack>
         }
-        ListFooterComponent={<HelpMenuItems variant="button" />}
+        ListFooterComponent={<FeaturebaseFooterItems variant="button" />}
       />
     </>
   )

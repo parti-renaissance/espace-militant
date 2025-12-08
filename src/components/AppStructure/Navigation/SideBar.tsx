@@ -7,7 +7,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { NavItem } from './NavItem'
 import { ScopeSelector } from './ScopeSelector'
-import { HelpMenuItems } from './HelpMenuItems'
+import { FeaturebaseFooterItems } from './FeaturebaseFooterItems'
 import type { NavItemSubItem } from './NavItemDropdown'
 import { useVisibleNavItems } from '@/components/AppStructure/hooks/useVisibleNavItems'
 import { isNavItemActive } from '@/components/AppStructure/utils'
@@ -475,7 +475,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
 
         </MenuContainer>
         <MenuFooterContainer>
-          <HelpMenuItems variant="navItem" />
+          <FeaturebaseFooterItems variant="navItem" />
         </MenuFooterContainer>
       </SideBarContainer>
     </SideBarArea>

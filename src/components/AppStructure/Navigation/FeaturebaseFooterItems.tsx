@@ -5,27 +5,40 @@ import { YStack } from 'tamagui'
 import { VoxButton } from '@/components/Button'
 import { NavItem } from './NavItem'
 import type { IconComponent } from '@/models/common.model'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { useGetExecutiveScopes } from '@/services/profile/hook'
 
-type HelpMenuItem = {
+type FeaturebaseItem = {
   icon: IconComponent
   text: string
+  externalUrlSlug?: string
 }
 
-const HELP_MENU_ITEMS: HelpMenuItem[] = [
-  { icon: RefreshCcw, text: 'Dernières mises à jour' },
-  { icon: CircleHelp, text: 'Demande de retours' },
-  { icon: LifeBuoy, text: "Centre d'aide" },
+const FEATUREBASE_ITEMS: FeaturebaseItem[] = [
+  { icon: RefreshCcw, text: 'Dernières mises à jour', externalUrlSlug: '/', },
+  { icon: CircleHelp, text: 'Demande de retours', externalUrlSlug: '/demandes-et-retours', },
+  { icon: LifeBuoy, text: "Centre d'aide", externalUrlSlug: '/centre-d-aide', },
 ]
 
-type HelpMenuItemsProps = {
+type FeaturebaseFooterItemProps = {
   variant: 'button' | 'navItem'
-  onPress?: (item: HelpMenuItem) => void
+  onPress?: (item: FeaturebaseItem) => void
   collapsed?: boolean
 }
 
-export const HelpMenuItems = ({ variant, collapsed }: HelpMenuItemsProps) => {
-  const handleItemPress = (item: HelpMenuItem) => {
-    console.log('item', item)
+export const FeaturebaseFooterItems = ({ variant, collapsed }: FeaturebaseFooterItemProps) => {
+  const openExternalContentHook = useOpenExternalContent({ slug: 'cadre' })
+  const { data: executiveScopes } = useGetExecutiveScopes();
+
+  if (!executiveScopes?.default?.features?.includes('featurebase')) {
+    return null;
+  }
+  
+  const handleItemPress = (item: FeaturebaseItem) => {
+    if (item.externalUrlSlug) {
+      const stateUrl = `${item.externalUrlSlug}?scope=${executiveScopes?.default?.code}`;
+      openExternalContentHook.open({ state: stateUrl })()
+    }
   }
 
   if (variant === 'button') {
@@ -35,7 +48,7 @@ export const HelpMenuItems = ({ variant, collapsed }: HelpMenuItemsProps) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 8, paddingRight: 32, paddingLeft: 16, paddingTop: 16 }}
       >
-        {HELP_MENU_ITEMS.map((item) => (
+        {FEATUREBASE_ITEMS.map((item) => (
           <VoxButton
             key={item.text}
             variant="outlined"
@@ -53,7 +66,7 @@ export const HelpMenuItems = ({ variant, collapsed }: HelpMenuItemsProps) => {
   // variant === 'navItem'
   return (
     <YStack gap={4}>
-      {HELP_MENU_ITEMS.map((item) => (
+      {FEATUREBASE_ITEMS.map((item) => (
         <NavItem
           key={item.text}
           iconLeft={item.icon}
@@ -67,4 +80,3 @@ export const HelpMenuItems = ({ variant, collapsed }: HelpMenuItemsProps) => {
     </YStack>
   )
 }
-

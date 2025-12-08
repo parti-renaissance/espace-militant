@@ -141,7 +141,7 @@ const TimelineFeedMain = () => {
   return (
     <LayoutFlatList<RestTimelineFeedItem>
       ref={flatListRef}
-      padding="left"
+      padding={media.sm ? false : 'left'}
       data={feedData}
       renderItem={renderFeedItem}
       keyExtractor={(item) => item.objectID}

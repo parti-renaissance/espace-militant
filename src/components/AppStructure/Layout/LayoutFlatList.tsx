@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { FlatList, FlatListProps, RefreshControl, Platform } from 'react-native'
+import { FlatList, FlatListProps, RefreshControl } from 'react-native'
 import { isWeb } from 'tamagui'
 import { usePageLayoutScroll } from '@/components/AppStructure/hooks/usePageLayoutScroll'
 import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
@@ -60,10 +60,10 @@ function LayoutFlatListInner<T>(
       onEndReached={nativeOnEndReached}
       onEndReachedThreshold={onEndReachedThreshold}
       refreshControl={refreshControlElement}
-      contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
+      contentInsetAdjustmentBehavior={ !isWeb ? 'automatic' : undefined}
       contentContainerStyle={[
         {
-          paddingTop: Platform.OS === 'ios' ? 0 : spacingValues.paddingTop, 
+          paddingTop: !isWeb ? 16 : spacingValues.paddingTop, 
           paddingBottom: spacingValues.paddingBottom,
         },
         contentContainerStyle,

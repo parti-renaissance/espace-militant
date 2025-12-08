@@ -22,8 +22,6 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
   const { user: credentials } = useUserStore()
   const { data: profile } = useGetProfil({ enabled: true })
 
-  console.log('ProfilLayout', pathname)
-
   const visibleItems = Object.entries(pageConfigs)
     .filter(([key, config]) => {
       if (key === 'index' && !media.gtSm) return false
