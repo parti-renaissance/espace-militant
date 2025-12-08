@@ -24,6 +24,7 @@ const errorMonitor = (error: AxiosError) => {
 }
 
 const appVersionInterceptor = async (config: CustomAxiosRequestConfig) => {
+  config.headers = config.headers ?? {}
   config.headers['X-App-version'] = getFullVersion()
   if (!isWeb) {
     config.headers['User-Agent'] = await getUserAgent()
@@ -36,6 +37,7 @@ const authInterceptor = (config: CustomAxiosRequestConfig) => {
   const accessToken = useUserStore.getState().user?.accessToken
 
   if (accessToken) {
+    config.headers = config.headers ?? {}
     config.headers.Authorization = `Bearer ${accessToken}`
   }
 
@@ -46,47 +48,94 @@ publicInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
 authInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
 authInstance.interceptors.request.use(authInterceptor, errorMonitor)
 
+// Une seule promesse de refresh par runtime (onglet / app)
 let refreshing_token: Promise<Awaited<ReturnType<ReturnType<typeof getRefreshToken>>> | undefined> | null = null
 
-authInstance.interceptors.response.use(identity, async function (error: AxiosError) {
-  const originalRequest: CustomAxiosRequestConfig | undefined = error.config
+authInstance.interceptors.response.use(
+  identity,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as CustomAxiosRequestConfig | undefined
 
-  if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    // Si ce n'est pas une 401 ou qu'on n'a pas la requête d'origine → on laisse passer
+    if (error.response?.status !== 401 || !originalRequest) {
+      return Promise.reject(error)
+    }
+
+    // On évite la boucle infinie : une seule tentative de refresh par requête
+    if (originalRequest._retry) {
+      return Promise.reject(error)
+    }
     originalRequest._retry = true
-    try {
-      const refreshToken = useUserStore.getState().user?.refreshToken
-      if (!refreshToken) {
-        useUserStore.getState().removeCredentials()
-        return
-      }
 
-      refreshing_token =
-        refreshing_token ??
-        getRefreshToken({ authInstance, publicInstance })({
+    const user = useUserStore.getState().user
+    const refreshToken = user?.refreshToken
+
+    // Pas de refresh_token → session réellement expirée
+    if (!refreshToken) {
+      useUserStore.getState().removeCredentials()
+      return Promise.reject(error)
+    }
+
+    try {
+      // Si aucun refresh en cours dans CE runtime, on en lance un
+      if (!refreshing_token) {
+        refreshing_token = getRefreshToken({ authInstance, publicInstance })({
           client_id: clientEnv.OAUTH_CLIENT_ID,
           grant_type: 'refresh_token',
           refresh_token: refreshToken,
-        }).catch(() => {
-          useUserStore.getState().removeCredentials()
-          return undefined
         })
-      const response = await refreshing_token
-      refreshing_token = null
+          .then((response) => {
+            if (!response) return undefined
 
-      if (response) {
-        useUserStore.setState({ user: { accessToken: response.access_token, refreshToken: response.refresh_token } })
+            // On met à jour le user en conservant les autres champs
+            useUserStore.setState((state) => {
+              const prevUser = state.user
+              if (!prevUser) return state
 
-        originalRequest.headers.Authorization = `Bearer ${response.access_token}`
+              return {
+                user: {
+                  ...prevUser,
+                  accessToken: response.access_token,
+                  // si l'API ne renvoie pas de nouveau refresh_token, on garde l'ancien
+                  refreshToken: response.refresh_token ?? prevUser.refreshToken,
+                },
+              }
+            })
+
+            return response
+          })
+          .catch((refreshError) => {
+            // Échec du refresh → session expirée
+            console.warn('refresh token failed', refreshError)
+            useUserStore.getState().removeCredentials()
+            return undefined
+          })
+          .finally(() => {
+            refreshing_token = null
+          })
       }
+
+      // On attend le refresh, que ce soit celui qu'on vient de lancer
+      // ou un déjà en cours
+      const refreshResponse = await refreshing_token
+
+      // Si pas de réponse → on considère la session expirée
+      if (!refreshResponse) {
+        return Promise.reject(error)
+      }
+
+      // On rejoue la requête originale avec le nouvel access token
+      originalRequest.headers = originalRequest.headers ?? {}
+      originalRequest.headers.Authorization = `Bearer ${refreshResponse.access_token}`
 
       return authInstance(originalRequest)
-    } catch (error) {
-      if (error instanceof AxiosError && error.response?.status === 403) {
+    } catch (err) {
+      // Cas spécifique : 403 pendant le refresh
+      if (err instanceof AxiosError && err.response?.status === 403) {
         useUserStore.getState().removeCredentials()
-        return
       }
+
+      return Promise.reject(err)
     }
   }
-
-  return Promise.reject(error)
-})
+)
