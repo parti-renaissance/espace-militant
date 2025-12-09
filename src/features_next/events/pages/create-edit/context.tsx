@@ -158,25 +158,25 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   )
 
   const selectedScope = useWatch({
-      control,
-      name: 'scope',
-    })
-  
-    const isAgoraLeader = useMemo(() =>
-      selectedScope === UserScopesEnum.AgoraPresident ||
-      selectedScope === UserScopesEnum.AgoraGeneralSecretary,
-      [selectedScope])
-  
-    useEffect(() => {
-      if (isAgoraLeader) {
-        setValue('mode', 'online')
-        setValue('category', 'reunion-d-equipe')
-        setValue('visibility', 'invitation_agora')
-        setMode('online') 
-      } else if (edit?.visibility === "invitation_agora") {
-        setValue('visibility', 'public')
-      }
-    }, [isAgoraLeader])
+    control,
+    name: 'scope',
+  })
+
+  const isAgoraLeader = useMemo(
+    () => selectedScope === UserScopesEnum.AgoraPresident || selectedScope === UserScopesEnum.AgoraGeneralSecretary,
+    [selectedScope],
+  )
+
+  useEffect(() => {
+    if (isAgoraLeader) {
+      setValue('mode', 'online')
+      setValue('category', 'reunion-d-equipe')
+      setValue('visibility', 'invitation_agora')
+      setMode('online')
+    } else if (edit?.visibility === 'invitation_agora') {
+      setValue('visibility', 'public')
+    }
+  }, [isAgoraLeader])
 
   const currentScope = useWatch({ control, name: 'scope' })
   const visibilityOptions = useMemo(() => getVisibilityOptions(currentScope), [currentScope])
@@ -273,7 +273,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     title: 'Créer l’événement ?',
     onAccept: finalOnSubmit,
     control,
-    isAgoraLeader, 
+    isAgoraLeader,
     agoraUuid,
     scope: selectedScope,
   })

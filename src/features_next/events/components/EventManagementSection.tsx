@@ -4,20 +4,19 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { EventItemProps } from '@/features_next/events/types'
 import { useFileDownload } from '@/hooks/useFileDownload'
 import { getEventParticipantsFileEndpoint } from '@/services/events/api'
+import { UserScopesEnum } from '@/services/profile/schema'
+import { useEventStats } from '@/services/stats/hook'
 import { Download, Sparkle } from '@tamagui/lucide-icons'
 import { XStack, YStack } from 'tamagui'
 import { EventParticipantsTable } from '../components/EventParticipantsTable'
 import { isEventFull } from '../utils'
 import EventHandleActions from './EventHandleActions'
-import { UserScopesEnum } from '@/services/profile/schema'
 import EventStatsCard from './EventStatsCard'
-import { useEventStats } from '@/services/stats/hook'
 
 const EventManagementSection = ({ event }: EventItemProps) => {
   const { handleDownload, isPending } = useFileDownload()
   const { data: stats } = useEventStats({
     uuid: event.uuid,
-    scope: event?.organizer?.scope ?? UserScopesEnum.National,
     enabled: event.object_state === 'full' && event.editable,
   })
 
@@ -25,10 +24,6 @@ const EventManagementSection = ({ event }: EventItemProps) => {
     return null
   }
   const scope = event?.organizer?.scope ?? UserScopesEnum.National
-
-  if (!scope) {
-    return null
-  }
 
   const handlePress = () =>
     handleDownload({
@@ -64,9 +59,8 @@ const EventManagementSection = ({ event }: EventItemProps) => {
 
           <EventParticipantsTable eventId={event.uuid} displayInvitationStatus={event?.visibility?.startsWith('invitation')} />
 
-
           {stats && (
-            <YStack gap="$medium" mt={"$medium"}>
+            <YStack gap="$medium" mt={'$medium'}>
               <Text.MD color="$purple6" semibold>
                 Statistiques de l'événement
               </Text.MD>
@@ -98,4 +92,3 @@ const EventManagementSection = ({ event }: EventItemProps) => {
 }
 
 export default EventManagementSection
-

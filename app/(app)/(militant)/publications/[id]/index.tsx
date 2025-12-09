@@ -1,19 +1,18 @@
 import React from 'react'
 import Error404 from '@/components/404/Error404'
+import Layout from '@/components/AppStructure/Layout/Layout'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import * as metatags from '@/config/metatags'
 import { ForbiddenError, UnauthorizedError } from '@/core/errors'
 import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSkeleton } from '@/features_next/publications/pages/detail'
-import { useGetMessage, useGetMessageFilters } from '@/services/publications/hook'
-import { useUserStore } from '@/store/user-store'
-import { Stack as RouterStack, useLocalSearchParams, useGlobalSearchParams } from 'expo-router'
-import Head from 'expo-router/head'
 import { useHits } from '@/services/hits/hook'
-import { cleanupUrlParams } from '@/utils/urlCleanup'
-import { resolveSource } from '@/utils/sourceResolver'
+import { useGetMessage, useGetMessageFilters } from '@/services/publications/hook'
 import { usePublicationStats } from '@/services/stats/hook'
-import { isWeb, useMedia } from 'tamagui'
-import Layout from '@/components/AppStructure/Layout/Layout'
+import { useUserStore } from '@/store/user-store'
+import { resolveSource } from '@/utils/sourceResolver'
+import { cleanupUrlParams } from '@/utils/urlCleanup'
+import { Stack as RouterStack, useGlobalSearchParams, useLocalSearchParams } from 'expo-router'
+import Head from 'expo-router/head'
 
 const MessageDetailsPage: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
@@ -40,8 +39,11 @@ const MessageDetailsPage: React.FC = () => {
 
 function MessageDetailScreen(props: Readonly<{ id: string }>) {
   const { defaultScope } = useUserStore()
-  const media = useMedia()
-  const { data: messageData, isLoading: isMessageLoading, error: messageError } = useGetMessage({
+  const {
+    data: messageData,
+    isLoading: isMessageLoading,
+    error: messageError,
+  } = useGetMessage({
     messageId: props.id,
     scope: defaultScope!,
     enabled: true,
@@ -54,9 +56,12 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
     source?: string
   }>()
   const sentRef = React.useRef<string | null>(null)
-  const { data: publicationStats, refetch: refetchStats, isRefetching: isRefetchingStats } = usePublicationStats({
+  const {
+    data: publicationStats,
+    refetch: refetchStats,
+    isRefetching: isRefetchingStats,
+  } = usePublicationStats({
     uuid: props.id,
-    scope: defaultScope!,
     enabled: messageData?.editable === true,
   })
 
@@ -77,7 +82,7 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
           source: resolveSource(searchParams.source),
           utm_source: searchParams.utm_source,
           utm_campaign: searchParams.utm_campaign,
-          referrer_code: searchParams.ref
+          referrer_code: searchParams.ref,
         })
 
         cleanupUrlParams(['source'])
@@ -103,9 +108,9 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
       <Head>
         <title>{metatags.createTitle(messageData.subject || 'Détails du message')}</title>
       </Head>
-      <MessageDetailsScreen 
-        data={messageData} 
-        stats={publicationStats} 
+      <MessageDetailsScreen
+        data={messageData}
+        stats={publicationStats}
         filters={messageFilters}
         onRefreshStats={() => {
           refetchStats()
