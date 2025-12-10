@@ -50,26 +50,7 @@ const PostCard = ({ title, description, image, href, icon }: { title: string, de
     <Link href={href as any} asChild>
       <VoxCard
         borderRadius="$medium"
-        shadowColor="rgb(145, 158, 171)"
-        shadowOpacity={0.16}
-        shadowOffset={{ width: 0, height: 2 }}
-        shadowRadius={6}
-        elevation={Platform.OS === 'android' ? 3 : undefined}
         cursor="pointer"
-        hoverStyle={{
-          shadowColor: "rgb(145, 158, 171)",
-          shadowOpacity: 0.24,
-          shadowOffset: { width: 0, height: 5 },
-          shadowRadius: 18,
-          elevation: Platform.OS === 'android' ? 4 : undefined,
-        }}
-        pressStyle={{
-          shadowColor: "rgb(145, 158, 171)",
-          shadowOpacity: 0.36,
-          shadowOffset: { width: 0, height: 2 },
-          shadowRadius: 4,
-          elevation: Platform.OS === 'android' ? 2 : undefined,
-        }}
       >
         <VoxCard.Content>
           <XStack gap="$medium" alignItems="center">

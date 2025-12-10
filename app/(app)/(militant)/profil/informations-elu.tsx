@@ -8,7 +8,7 @@ export default function InformationsEluPage() {
   return (
     <>
       <Header title="Informations élu" icon={TreeDeciduous} />
-      <Layout.Container hideTabBar={true}>
+      <Layout.Container alwaysShowScrollbar hideTabBar={true}>
         <EluScreen />
       </Layout.Container>
     </>

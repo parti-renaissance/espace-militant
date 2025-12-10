@@ -9,7 +9,7 @@ export default function InformationsPersonnellesPage() {
   return (
     <>
       <Header title="Informations personnelles" icon={Settings2} />
-      <Layout.Container hideTabBar={true}>
+      <Layout.Container alwaysShowScrollbar hideTabBar={true}>
         <AccountScreen />
       </Layout.Container>
     </>

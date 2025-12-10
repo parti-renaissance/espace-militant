@@ -13,7 +13,7 @@ import { RestFullEvent } from '@/services/events/schema'
 const EditEventScreen: React.FC = () => {
   
   return (
-    <Layout.Container>
+    <Layout.Container hideSideBar hideTabBar>
       <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton editMode />}>
         <_EventFormScreen />
       </BoundarySuspenseWrapper>

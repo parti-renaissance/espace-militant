@@ -9,7 +9,7 @@ export default function MesInstancesPage() {
   return (
     <>
       <Header title="Mes instances" icon={LandPlot} />
-      <Layout.Container hideTabBar={true}>
+      <Layout.Container alwaysShowScrollbar hideTabBar={true}>
         <InstancesScreen />
       </Layout.Container>
     </>

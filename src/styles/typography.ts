@@ -15,11 +15,11 @@ const subheadFontSize = 15
 const caption1FontSize = 12
 const caption2FontSize = 11
 
-const robotoRegular = 'Value-Regular'
-const robotoMedium = 'Value-Medium'
-const maaxMedium = 'Value-Medium'
-const maaxMediumItalic = 'Value-MediumItalic'
-const maaxBold = 'Value-Bold'
+const robotoRegular = 'PublicSans-Regular'
+const robotoMedium = 'PublicSans-Medium'
+const maaxMedium = 'PublicSans-Bold'
+const maaxMediumItalic = 'PublicSans-BoldItalic'
+const maaxBold = 'PublicSans-Bold'
 
 export const footnote: TextStyle = {
   fontSize: footnoteFontSize,

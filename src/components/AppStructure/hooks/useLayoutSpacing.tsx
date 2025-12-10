@@ -1,7 +1,7 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia } from 'tamagui'
 
-const SAFE_AREA_PADDING = 24
+const EXTRA_VERTICAL_SPACING = 24
 const TABBAR_HEIGHT_SM = 64
 
 type SpacingConfig = {
@@ -64,15 +64,15 @@ type SpacingConfig = {
               safeAreaRight: options.safeAreaRight,
             }
           : { safeArea: true }
-  
+
       const enableTop = safeAreaOptions.safeAreaTop ?? safeAreaOptions.safeArea ?? false
       const enableBottom = safeAreaOptions.safeAreaBottom ?? safeAreaOptions.safeArea ?? false
       const enableLeft = safeAreaOptions.safeAreaLeft ?? safeAreaOptions.safeArea ?? false
       const enableRight = safeAreaOptions.safeAreaRight ?? safeAreaOptions.safeArea ?? false
-  
+
       return {
-        paddingTop: py + SAFE_AREA_PADDING + (enableTop ? insets.top : 0),
-        paddingBottom: py + SAFE_AREA_PADDING + (enableBottom ? insets.bottom : 0) + (media.sm ? TABBAR_HEIGHT_SM : 0),
+        paddingTop: py + EXTRA_VERTICAL_SPACING + (enableTop ? insets.top : 0),
+        paddingBottom: py + EXTRA_VERTICAL_SPACING + (enableBottom ? insets.bottom : 0) + (media.sm ? TABBAR_HEIGHT_SM : 0),
         paddingLeft: px + (enableLeft ? insets.left : 0),
         paddingRight: px + (enableRight ? insets.right : 0),
       }

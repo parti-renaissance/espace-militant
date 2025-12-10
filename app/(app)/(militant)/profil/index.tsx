@@ -9,7 +9,7 @@ export default function IndexPage() {
       <Head>
         <title>{metatags.createTitle('Profil')}</title>
       </Head>
-      <Layout.Container>
+      <Layout.Container alwaysShowScrollbar>
         <DashboardScreen />
       </Layout.Container>
     </>

@@ -8,7 +8,7 @@ export default function AccesCadrePage() {
   return (
     <>
       <Header title="Accès cadre" icon={Sparkle} />
-      <Layout.Container hideTabBar={true}>
+      <Layout.Container alwaysShowScrollbar hideTabBar={true}>
         <ExecutiveAccessesScreen />
       </Layout.Container>
     </>

@@ -1,7 +1,8 @@
-import { LogOut, PenLine, QrCode, DoorOpen, GraduationCap, Zap } from "@tamagui/lucide-icons"
+import { useState } from "react"
+import { LogOut, PenLine, QrCode, DoorOpen, GraduationCap, Zap, Wrench, Minus, Cross, DoorClosed, X } from "@tamagui/lucide-icons"
 import { isNavItemActive } from "@/components/AppStructure/utils"
 import { Href, usePathname } from "expo-router"
-import { useMedia } from "tamagui"
+import { Button, useMedia, XStack } from "tamagui"
 import Layout from "@/components/AppStructure/Layout/Layout"
 import VoxCard from "@/components/VoxCard/VoxCard"
 import { NavItem } from "@/components/AppStructure/Navigation/NavItem"
@@ -15,12 +16,14 @@ import { useGetProfil } from "@/services/profile/hook"
 import clientEnv from "@/config/clientEnv"
 import Text from "@/components/base/Text"
 
+
 function ProfilLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const media = useMedia()
   const { signOut } = useSession()
   const { user: credentials } = useUserStore()
   const { data: profile } = useGetProfil({ enabled: true })
+  const [devMode, setDevMode] = useState(false)
 
   const visibleItems = Object.entries(pageConfigs)
     .filter(([key, config]) => {
@@ -33,8 +36,8 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
     })
 
   const SkeletonCard = () => (
-    <LayoutScrollView>
-      <SkeCard>
+    <LayoutScrollView style={{ flexGrow: 1 }}>
+      <SkeCard flex={1}>
         <SkeCard.Content>
           <SkeCard.Title />
           <SkeCard.Image />
@@ -46,7 +49,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <Layout.Main>
+      <Layout.Main style={{ width: '100%' }}>
         <BoundarySuspenseWrapper fallback={<SkeletonCard />}>
           {children}
         </BoundarySuspenseWrapper>
@@ -70,10 +73,25 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
             </VoxCard.Content>
           </VoxCard>
 
-          {clientEnv.ENVIRONMENT === 'staging' && (
+          {clientEnv.ENVIRONMENT === 'staging' && !devMode && (
             <VoxCard borderRadius={16}>
               <VoxCard.Content padding="$small" gap={4}>
-                <Text.SM semibold secondary mx="$small" mt="$small">Outils de développement</Text.SM>
+                <NavItem
+                  text="Mode développeur"
+                  iconLeft={Wrench}
+                  onPress={() => setDevMode(true)}
+                />
+              </VoxCard.Content>
+            </VoxCard>
+          )}
+
+          {clientEnv.ENVIRONMENT === 'staging' && devMode && (
+            <VoxCard borderRadius={16}>
+              <VoxCard.Content padding="$small" gap={4}>
+                <XStack onPress={() => setDevMode(false)} alignItems="center" gap="$small" justifyContent="space-between" px="$small" pt="$small" cursor="pointer">
+                  <Text.SM semibold secondary >Outils de développement</Text.SM>
+                  <X size={16} color="$textDisabled" />
+                </XStack>
                 <NavItem
                   text="StoryBook"
                   iconLeft={PenLine}

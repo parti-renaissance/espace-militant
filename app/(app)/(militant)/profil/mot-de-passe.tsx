@@ -8,7 +8,7 @@ export default function MotDePassePage() {
   return (
     <>
       <Header title="Mot de passe" icon={KeyRound} />
-      <Layout.Container hideTabBar={true}>
+      <Layout.Container alwaysShowScrollbar hideTabBar={true}>
         <PasswordScreen />
       </Layout.Container>
     </>

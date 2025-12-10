@@ -27,7 +27,7 @@ export default function PublicationsPage() {
         <title>{metatags.createTitle('Publications')}</title>
       </Head>
       <Header title="Publications" />
-      <Layout.Container alwaysShowScrollbar>
+      <Layout.Container alwaysShowScrollbar hideSideBar hideTabBar>
         <MessagePageIndex />
       </Layout.Container>
     </>
