@@ -23,7 +23,7 @@ export default function PublicationsDraftPage() {
   return (
     <>
       <Header title="Publications" />
-      <Layout.Container alwaysShowScrollbar>
+      <Layout.Container alwaysShowScrollbar hideSideBar hideTabBar>
         <DraftPage />
       </Layout.Container>
     </>

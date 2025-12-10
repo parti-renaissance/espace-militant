@@ -10,7 +10,7 @@ export default function CotisationsEtDonsPage() {
   return (
     <>
       <Header title="Cotisations et dons" icon={HelpingHand} />
-      <Layout.Container hideTabBar={true}>
+      <Layout.Container alwaysShowScrollbar hideTabBar={true}>
         <DonationsScreen />
       </Layout.Container>
     </>

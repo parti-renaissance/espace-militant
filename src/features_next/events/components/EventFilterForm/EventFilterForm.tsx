@@ -1,9 +1,9 @@
-import React, { memo, RefObject, useCallback } from 'react'
+import React, { memo, RefObject, useCallback, useMemo } from 'react'
 import { TextInput } from 'react-native'
 import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
 import SearchBox from '@/components/Search/SearchBox'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
-import { useMedia, YStack } from 'tamagui'
+import { useMedia, View, YStack } from 'tamagui'
 
 type EventFiltersProps = {
   onSearchFocus?: () => void
@@ -45,8 +45,11 @@ const EventFilters = ({ onSearchFocus }: EventFiltersProps) => {
     setValue((y) => ({ ...y, search: x }))
   }, [])
 
+  const gap = useMemo(() => media.lg ? 8 : 16, [media])
+  const flexDirection = useMemo(() => media.md ? 'row' : 'column', [media])
+
   return (
-    <YStack gap={media.lg ? '$small' : '$medium'} flexDirection={media.md ? 'row' : 'column'}>
+    <View flexDirection={flexDirection} gap={gap}>
       <AssemblySelectWrapper zone={value.zone} onDetailChange={handleAssemblyChange} />
       <YStack flex={1}>
         <SearchBox
@@ -58,7 +61,7 @@ const EventFilters = ({ onSearchFocus }: EventFiltersProps) => {
           onFocus={onSearchFocus}
         />
       </YStack>
-    </YStack>
+    </View>
   )
 }
 const MemoizedEF = React.memo(EventFilters)

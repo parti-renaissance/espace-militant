@@ -8,7 +8,7 @@ export default function CommunicationsPage() {
   return (
     <>
       <Header title="Communications" icon={MessageCircle} />
-      <Layout.Container hideTabBar={true}>
+      <Layout.Container alwaysShowScrollbar hideTabBar={true}>
         <CommunicationsScreen />
       </Layout.Container>
     </>

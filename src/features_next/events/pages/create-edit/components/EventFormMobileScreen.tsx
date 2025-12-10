@@ -72,7 +72,7 @@ export default function EventFormMobileScreen() {
               <VoxHeader.Title>{`${editMode ? 'Modifier' : 'Créer'} l'événement`}</VoxHeader.Title>
             </XStack>
             <XStack>
-              <VoxButton onPress={() => onSubmit()} size="md" variant="soft" theme="purple" pop loading={isPending} iconLeft={editMode ? undefined : Sparkle}>
+              <VoxButton onPress={() => onSubmit()} size="md" theme="purple" loading={isPending} iconLeft={editMode ? undefined : Sparkle}>
                 {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? `${editMode ? 'Modifier' : 'Créer'}` : null}
                 {isUploadImagePending ? 'image...' : null}
                 {isUploadDeletePending ? 'image...' : null}

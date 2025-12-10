@@ -15,11 +15,4 @@ export default {
 'PublicSans-Regular': require('assets/fonts/PublicSans/PublicSans-Regular.ttf'),
 'PublicSans-SemiBold': require('assets/fonts/PublicSans/PublicSans-SemiBold.ttf'),
 'PublicSans-SemiBoldItalic': require('assets/fonts/PublicSans/PublicSans-SemiBoldItalic.ttf'),
-'PublicSans-Thin': require('assets/fonts/PublicSans/PublicSans-Thin.ttf'),
-'PublicSans-ThinItalic': require('assets/fonts/PublicSans/PublicSans-ThinItalic.ttf'),
-'SharpGrotesk-SemiBold25': require('assets/fonts/SharpGrotesk-SemiBold25.ttf'),
-'Value-Bold': require('assets/fonts/Value-Bold.ttf'),
-'Value-Medium': require('assets/fonts/Value-Medium.ttf'),
-'Value-MediumItalic': require('assets/fonts/Value-MediumItalic.ttf'),
-'Value-Regular': require('assets/fonts/Value-Regular.ttf'),
 } as const;

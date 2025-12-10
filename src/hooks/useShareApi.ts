@@ -1,12 +1,12 @@
 import { Share } from 'react-native'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { UnavailabilityError } from 'expo-modules-core'
 import * as Sharing from 'expo-sharing'
 
 type ShareContent = { url: string; title?: string; message?: string }
 
 export default function useShareApi() {
-  const { data } = useSuspenseQuery({
+  const { data } = useQuery({
     queryKey: ['shareApi'],
     queryFn: () => {
       return Sharing.isAvailableAsync()

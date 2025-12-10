@@ -57,7 +57,7 @@ const EventsHeader = ({ mode, value, onChange }: { mode: 'compact' | 'aside'; va
           )}
         </XStack>
       )}
-      <YStack height={50}>
+      <YStack>
         <EventFilterForm />
       </YStack>
     </YStack>

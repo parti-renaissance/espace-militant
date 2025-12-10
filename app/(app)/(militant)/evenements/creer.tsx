@@ -8,7 +8,7 @@ import EventFormScreen, { EventFormScreenSkeleton } from '@/features_next/events
 const CreateEventScreen: React.FC = () => {
 
   return (
-    <Layout.Container>
+    <Layout.Container hideSideBar hideTabBar>
       <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton />}>
         <_EventFormScreen />
       </BoundarySuspenseWrapper>
