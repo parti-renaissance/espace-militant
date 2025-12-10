@@ -22,7 +22,7 @@ export function ReferralsDesktopSkeleton() {
         </View>
       </View>
       <View mt={-48}>
-        <View maxWidth={780} width="100%" margin="auto">
+        <View maxWidth={892} width="100%" margin="auto">
           <VoxCard>
             <VoxCard.Content>
               <XStack gap="$medium">
@@ -41,7 +41,7 @@ export function ReferralsDesktopSkeleton() {
           </VoxCard>
         </View>
       </View>
-      <XStack maxWidth={780} py="$medium" width="100%" margin="auto" height="auto">
+      <XStack maxWidth={892} py="$medium" width="100%" margin="auto" height="auto">
         <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
           <View pr="$medium" width={200}>
             <SkeCard>

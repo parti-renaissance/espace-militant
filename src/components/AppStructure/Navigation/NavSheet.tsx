@@ -12,7 +12,7 @@ const Line = styled(YStack, {
   backgroundColor: '$purple3',
   position: 'absolute',
   left: 36,
-  top: 0,
+  top: -12,
   bottom: 16,
   width: 1,
 })

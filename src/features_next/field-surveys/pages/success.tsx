@@ -16,7 +16,7 @@ const Container = styled(YStack, {
 })
 
 const ContentWrapper = styled(YStack, {
-  maxWidth: 780,
+  maxWidth: 892,
   width: '100%',
   alignSelf: 'center',
   paddingHorizontal: '$medium',

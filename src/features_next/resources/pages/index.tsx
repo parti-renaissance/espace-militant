@@ -12,7 +12,7 @@ import Text from '@/components/base/Text'
 const ResourcesSkeleton = ({ media }: { media: ReturnType<typeof useMedia> }) => {
   return (
     <LayoutScrollView contentContainerStyle={{ alignItems: media.gtSm ? 'center' : undefined }}>
-      <Layout.Main maxWidth={992} width="100%">
+      <Layout.Main maxWidth={892} width="100%">
         <View
           flexDirection={media.gtSm ? 'row' : 'column'}
           flexWrap="wrap"
@@ -68,7 +68,7 @@ const ResourcesScreen = () => {
       contentContainerStyle={{ alignItems: media.gtSm ? 'center' : undefined }}
       refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}
     >
-      <Layout.Main maxWidth={992} width="100%">
+      <Layout.Main maxWidth={892} width="100%">
         <View
           flexDirection={media.gtSm ? 'row' : 'column'}
           flexWrap="wrap"

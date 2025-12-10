@@ -155,7 +155,7 @@ const EventFeed = () => {
       </Layout.Main>
       {media.gtMd ? (
         <Layout.SideBar isSticky padding="right">
-          <YStack pt="$medium">
+          <YStack>
             <EventsHeader mode="aside" value={activeTab} onChange={setActiveTab} />
           </YStack>
         </Layout.SideBar>

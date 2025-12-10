@@ -182,7 +182,7 @@ const MobileLayout = (props: EventItemProps) => {
 // Desktop Layout
 const DesktopLayout = (props: EventItemProps) => {
   return (
-    <Layout.Main maxWidth={992}>
+    <Layout.Main maxWidth={892}>
       <LayoutScrollView>
         <ContentBackButton fallbackPath="/(militant)/evenements" />
         <YStack gap="$medium">

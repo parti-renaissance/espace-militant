@@ -50,7 +50,7 @@ const EventsHeader = ({ mode, value, onChange }: { mode: 'compact' | 'aside'; va
           </XStack>
           {canCreate && (
             <Suspense>
-              <NewEventBtn paddingBottom={isAside ? '$medium' : undefined}>
+              <NewEventBtn paddingBottom={isAside ? '$small' : undefined}>
                 {isAside ? 'Organiser un événement' : (media.sm ? 'Créer' : 'Organiser un événement')}
               </NewEventBtn>
             </Suspense>

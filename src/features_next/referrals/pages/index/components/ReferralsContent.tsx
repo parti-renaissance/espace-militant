@@ -81,14 +81,14 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
         </View>
       </View>
       <View mt={-48}>
-        <View maxWidth={780} width="100%" margin="auto">
+        <View maxWidth={892} width="100%" margin="auto">
           <VoxCard>
             <VoxCard.Content>
               <XStack gap="$medium">
-                <YStack flex={1}>
+                <YStack flex={1} maxWidth={422}>
                   <ReferralsLinkCard />
                 </YStack>
-                <YStack>
+                <YStack flex={1} maxWidth={422}>
                   <ReferralsInviteCard />
                 </YStack>
               </XStack>
@@ -96,7 +96,7 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
           </VoxCard>
         </View>
       </View>
-      <XStack maxWidth={780} py="$medium" width="100%" margin="auto" height="auto">
+      <XStack maxWidth={892} py="$medium" width="100%" margin="auto" height="auto">
         <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
           <View pl="$medium" pt="$medium" width={200}>
             <BreadCrumb
