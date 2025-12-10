@@ -327,7 +327,7 @@ export const EventFormDesktopScreen = () => {
   return (
     <>
       {ConfirmAlert}
-      <Layout.Main maxWidth={992}>
+      <Layout.Main maxWidth={892}>
         <LayoutScrollView>
           <XStack paddingBottom="$medium" flex={1}>
             <BackButton />

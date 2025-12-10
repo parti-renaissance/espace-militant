@@ -13,7 +13,7 @@ export type Scope = {
 }
 
 const SelectorContainer = styled(XStack, {
-  p: 12,
+  padding: 12,
   gap: '$small',
   cursor: 'pointer',
   justifyContent: 'space-between',
@@ -21,6 +21,9 @@ const SelectorContainer = styled(XStack, {
   backgroundColor: '$purple1',
   hoverStyle: { backgroundColor: '$purple2' },
   pressStyle: { backgroundColor: '$purple3' },
+  $sm: {
+    padding: '$medium',
+  },
 })
 
 const ScopeItemFrame = styled(ThemeableStack, {

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import VoxCard from '@/components/VoxCard/VoxCard';
-import { Spinner, getToken, XStack, YStack } from 'tamagui';
+import { Spinner, getToken, XStack, YStack, useMedia } from 'tamagui';
 import Text from '@/components/base/Text';
 import { Clock, PenLine } from '@tamagui/lucide-icons';
 import { relativeDateFormatter } from '@/utils/DateFormatter';
@@ -62,6 +62,7 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
 };
 
 export function DraftContent({ data, fetchNextPage, hasNextPage, isFetchingNextPage, scopeFromParams }: DraftContentProps) {
+  const media = useMedia();
   const publications = data?.pages.flatMap((page: { items: RestMessageListItem[] }) => page.items) || [];
 
   const handleEndReached = useCallback(() => {
@@ -77,7 +78,7 @@ export function DraftContent({ data, fetchNextPage, hasNextPage, isFetchingNextP
   return (
     <Layout.Main>
       <LayoutFlatList<RestMessageListItem>
-        padding="left"
+        padding={media.sm ? false : "left"}
         data={publications}
         renderItem={renderItem}
         keyExtractor={(item) => item.uuid}

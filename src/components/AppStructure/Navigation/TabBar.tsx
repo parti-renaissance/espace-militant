@@ -127,8 +127,8 @@ type ConfigurableTabBarProps = {
   navCadreItems?: NavItemConfig[]
 }
 
-const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'parrainages', 'ressources', 'more']
-const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'ressources', 'more']
+const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'parrainages', 'formations', 'more']
+const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'formations', 'more']
 
 const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: ConfigurableTabBarProps = {} as ConfigurableTabBarProps) => {
   const router = useRouter()
@@ -405,7 +405,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
         items={cadreItems}
         showLine
         ListHeaderComponent={
-          <YStack paddingHorizontal={16}>
+          <YStack paddingHorizontal={16} mb={12}>
             <ScopeSelector />
           </YStack>
         }

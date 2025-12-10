@@ -37,7 +37,7 @@ const MobileSkeleton = () => {
 
 const DesktopSkeleton = () => {
   return (
-    <Layout.Main maxWidth={992}>
+    <Layout.Main maxWidth={892}>
       <LayoutScrollView>
         <XStack alignItems="flex-start" alignSelf="flex-start" pb="$medium">
           <SkeCard.Button />

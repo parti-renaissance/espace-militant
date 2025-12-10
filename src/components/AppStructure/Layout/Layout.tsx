@@ -158,12 +158,13 @@ interface SideBarProps extends Omit<ViewProps, 'padding'> {
   padding?: UseLayoutSpacingOptions
 }
 
-const SideBarComponent = ({ children, isSticky, maxWidth = 320, padding = 'right', ...props }: SideBarProps) => {
+const SideBarComponent = ({ children, isSticky, maxWidth = 320, minWidth = 280, padding = 'right', ...props }: SideBarProps) => {
   const spacingValues = useLayoutSpacing(padding)
   return (
     <LayoutSideBar
       isSticky={isSticky}
       maxWidth={maxWidth}
+      minWidth={minWidth}
       pt={spacingValues.paddingTop}
       pb={spacingValues.paddingBottom}
       {...props}
