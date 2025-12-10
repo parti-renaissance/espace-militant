@@ -1,6 +1,7 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { View, XStack, styled, withStaticProperties, ViewProps, useMedia, isWeb, YStack } from 'tamagui'
+import { useFocusEffect } from 'expo-router'
 import { SideBar, SideBarState } from '@/components/AppStructure/Navigation/SideBar'
 import ConfigurableTabBar from '@/components/AppStructure/Navigation/TabBar'
 import useLayoutSpacing, { UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
@@ -98,16 +99,13 @@ const Container = ({ children, hideSideBar, hideTabBar, sidebarState, safeHorizo
   const { setHideSideBar, setHideTabBar, setSidebarState } = useLayoutContext()
   const spacingValues = useLayoutSpacing({ left: true, right: true })
 
-  useEffect(() => {
-    setSidebarState(sidebarState ?? 'militant');
-    setHideSideBar(hideSideBar ?? false);
-    setHideTabBar(hideTabBar ?? false);
-
-    return () => {
-      setHideSideBar(false);
-      setHideTabBar(false);
-    };
-  }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, sidebarState]);
+  useFocusEffect(
+    useCallback(() => {
+      setSidebarState(sidebarState ?? 'militant');
+      setHideSideBar(hideSideBar ?? false);
+      setHideTabBar(hideTabBar ?? false);
+    }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, sidebarState])
+  );
 
   const scrollBehavior = alwaysShowScrollbar ? 'scroll' : 'auto'
 
