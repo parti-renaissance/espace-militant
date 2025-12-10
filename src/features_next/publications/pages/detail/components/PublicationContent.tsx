@@ -44,7 +44,7 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
   return (
     <Layout.Main>
       {(stats && media.sm) && (
-        <YStack gap="$medium" px="$medium" pt="$medium">
+        <YStack gap="$medium">
           <BreadCrumbV2 items={[{ id: "read", label: 'Lecture', icon: Eye }, { id: "stats", label: 'Statistiques', icon: PieChart, color: '$purple5' }]} value={activeSection} onChange={(v) => { setActiveSection(v) }} />
         </YStack>
       )}
