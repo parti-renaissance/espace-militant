@@ -74,9 +74,10 @@ type TabProps = {
   icon: IconComponent
   theme?: Theme
   onLayout: (e: LayoutChangeEvent) => void
+  externalLink?: boolean
 }
 
-const Tab = ({ isFocus, onPress, onLayout, label, icon: Icon, theme = 'blue' }: TabProps) => {
+const Tab = ({ isFocus, onPress, onLayout, label, icon: Icon, theme = 'blue', externalLink }: TabProps) => {
   const scale = useSharedValue(0)
   const themes = getThemes()
 
@@ -90,12 +91,22 @@ const Tab = ({ isFocus, onPress, onLayout, label, icon: Icon, theme = 'blue' }: 
   }, [isFocus])
 
   const animatedIconStyle = useAnimatedStyle(() => {
+    if (externalLink) {
+      return {
+        transform: [{ scale: 1 }, { translateY: 0 }],
+      }
+    }
     return {
       transform: [{ scale: interpolate(scale.value, [0, 1], [1, 1.334]) }, { translateY: interpolate(scale.value, [0, 1], [0, 6]) }],
     }
   })
 
   const animatedTextStyle = useAnimatedStyle(() => {
+    if (externalLink) {
+      return {
+        opacity: 1,
+      }
+    }
     return {
       opacity: interpolate(scale.value, [0, 1], [1, 0]),
     }
@@ -221,6 +232,8 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     if (visibleItemIds.includes('more')) return 'more'
     return visibleItemIds[0] || 'accueil'
   }, [currentRouteId, visibleItemIds, cadreItems, moreItems, activeSpecialTab, pathname])
+
+  console.log('activeTabKey', activeTabKey)
 
 
   const layoutsByKey = useRef(new Map<string, LayoutRectangle>())
@@ -388,6 +401,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
                 label={config.text}
                 icon={config.iconLeft}
                 theme={(config.theme ?? 'blue') as Theme}
+                externalLink={config.externalUrlSlug ? true : false}
               />
             )
           })}

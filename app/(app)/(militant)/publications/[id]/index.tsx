@@ -13,6 +13,7 @@ import { resolveSource } from '@/utils/sourceResolver'
 import { cleanupUrlParams } from '@/utils/urlCleanup'
 import { Stack as RouterStack, useGlobalSearchParams, useLocalSearchParams } from 'expo-router'
 import Head from 'expo-router/head'
+import { Header } from '@/components/AppStructure'
 
 const MessageDetailsPage: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
@@ -20,20 +21,23 @@ const MessageDetailsPage: React.FC = () => {
   if (!params.id) return <Error404 />
 
   return (
-    <Layout.Container>
-      <BoundarySuspenseWrapper
-        fallback={<MessageDetailsScreenSkeleton />}
-        errorChildren={(payload) => {
-          if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
-            return <MessageDetailsScreenDeny error={payload.error} />
-          } else {
-            return <DefaultErrorFallback {...payload} />
-          }
-        }}
-      >
-        <MessageDetailScreen id={params.id} />
-      </BoundarySuspenseWrapper>
-    </Layout.Container>
+    <>
+      <Header title="Publications" />
+      <Layout.Container hideTabBar>
+        <BoundarySuspenseWrapper
+          fallback={<MessageDetailsScreenSkeleton />}
+          errorChildren={(payload) => {
+            if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
+              return <MessageDetailsScreenDeny error={payload.error} />
+            } else {
+              return <DefaultErrorFallback {...payload} />
+            }
+          }}
+        >
+          <MessageDetailScreen id={params.id} />
+        </BoundarySuspenseWrapper>
+      </Layout.Container>
+    </>
   )
 }
 

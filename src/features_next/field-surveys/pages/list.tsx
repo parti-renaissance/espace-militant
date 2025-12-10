@@ -279,7 +279,7 @@ const FieldSurveysListPage: React.FC = () => {
       }
       contentContainerStyle={{ flexGrow: 1, paddingBottom: 40, backgroundColor: media.sm ? 'white' : '$textSurface' }}
       showsVerticalScrollIndicator={false}
-      // disablePadding
+      disablePadding={media.sm}
     >
       <Container>
         <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, marginHorizontal: spacingValues.paddingLeft, borderRadius: 16, overflow: 'hidden' }} />
