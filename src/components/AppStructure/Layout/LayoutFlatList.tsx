@@ -63,7 +63,7 @@ function LayoutFlatListInner<T>(
       contentInsetAdjustmentBehavior={ !isWeb ? 'automatic' : undefined}
       contentContainerStyle={[
         {
-          paddingTop: !isWeb || padding === false ? 16 : spacingValues.paddingTop, 
+          paddingTop: !isWeb && padding !== false ? 16 : spacingValues.paddingTop, 
           paddingBottom: spacingValues.paddingBottom,
         },
         contentContainerStyle,
