@@ -3,7 +3,7 @@ import { useSession } from '@/ctx/SessionProvider'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/events/api'
 import { eventPostFormError } from '@/services/events/error'
-import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
+import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook'
 import { useToastController } from '@tamagui/toast'
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -182,7 +182,6 @@ export const useMutationEventImage = () => {
   return useMutation({
     mutationFn: (x: {
       eventId: string
-      scope: string
       payload: string
       slug: string
       size: {
@@ -215,7 +214,7 @@ export const useDeleteEventImage = () => {
   const toast = useToastController()
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (x: { eventId: string; scope: string; slug: string }) => api.deleteEventImage(x),
+    mutationFn: (x: { eventId: string; slug: string }) => api.deleteEventImage(x),
     onSuccess: (_, { eventId, slug }) => {
       optimisticUpdate(
         { image: null },
