@@ -75,6 +75,13 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
     ])
     plugins.push(['expo-router', { origin: `https://${process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN}` }])
     plugins.push('expo-web-browser')
+    plugins.push([
+      'expo-navigation-bar',
+      {
+        backgroundColor: '#ffffff',
+        barStyle: 'dark',
+      },
+    ])
   }
   config.plugins = plugins
 
