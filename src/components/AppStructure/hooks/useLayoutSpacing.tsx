@@ -1,7 +1,6 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia } from 'tamagui'
 
-const EXTRA_VERTICAL_SPACING = 24
 const TABBAR_HEIGHT_SM = 64
 
 type SpacingConfig = {
@@ -33,10 +32,15 @@ type SpacingConfig = {
     const media = useMedia()
     const insets = useSafeAreaInsets()
   
+    // Espacement vertical de base (réduit sur mobile pour éviter un padding excessif)
     let py = 16
     if (media.xl) py = 12
     if (media.lg) py = 8
     if (media.sm) py = 8
+  
+    // Espacement vertical supplémentaire (plus petit sur mobile)
+    let extraVerticalSpacing = 24
+    if (media.sm) extraVerticalSpacing = 8
   
     let px = 32
     if (media.xl) px = 24
@@ -71,8 +75,8 @@ type SpacingConfig = {
       const enableRight = safeAreaOptions.safeAreaRight ?? safeAreaOptions.safeArea ?? false
 
       return {
-        paddingTop: py + EXTRA_VERTICAL_SPACING + (enableTop ? insets.top : 0),
-        paddingBottom: py + EXTRA_VERTICAL_SPACING + (enableBottom ? insets.bottom : 0) + (media.sm ? TABBAR_HEIGHT_SM : 0),
+        paddingTop: py + extraVerticalSpacing + (enableTop ? insets.top : 0),
+        paddingBottom: py + extraVerticalSpacing + (enableBottom ? insets.bottom : 0) + (media.sm ? TABBAR_HEIGHT_SM : 0),
         paddingLeft: px + (enableLeft ? insets.left : 0),
         paddingRight: px + (enableRight ? insets.right : 0),
       }
