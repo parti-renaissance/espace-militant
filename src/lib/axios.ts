@@ -6,6 +6,7 @@ import { getFullVersion } from '@/utils/version'
 import axios, { AxiosError, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios'
 import { identity } from 'fp-ts/lib/function'
 import { isWeb } from 'tamagui'
+import * as Sentry from '@sentry/react-native'
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
@@ -50,6 +51,29 @@ authInstance.interceptors.request.use(authInterceptor, errorMonitor)
 
 // Une seule promesse de refresh par runtime (onglet / app)
 let refreshing_token: Promise<Awaited<ReturnType<ReturnType<typeof getRefreshToken>>> | undefined> | null = null
+
+const logRefreshTokenError = (error: unknown, context: string) => {
+  if (__DEV__) {
+    console.warn(`[RefreshToken] ${context}`, error)
+    return
+  }
+
+  const details: Record<string, unknown> = { context }
+  if (error instanceof AxiosError) {
+    details.status = error.response?.status
+    details.responseData = error.response?.data
+  }
+  const user = useUserStore.getState().user
+  if (user) {
+    details.hasRefreshToken = !!user.refreshToken
+    details.hasSessionId = !!user.sessionId
+  }
+
+  Sentry.captureMessage(`Session expired: ${context}`, {
+    level: 'info',
+    extra: details,
+  })
+}
 
 authInstance.interceptors.response.use(
   identity,
@@ -105,8 +129,7 @@ authInstance.interceptors.response.use(
             return response
           })
           .catch((refreshError) => {
-            // Échec du refresh → session expirée
-            console.warn('refresh token failed', refreshError)
+            logRefreshTokenError(refreshError, 'refresh token failed')
             useUserStore.getState().removeCredentials()
             return undefined
           })
@@ -130,11 +153,12 @@ authInstance.interceptors.response.use(
 
       return authInstance(originalRequest)
     } catch (err) {
-      // Cas spécifique : 403 pendant le refresh
       if (err instanceof AxiosError && err.response?.status === 403) {
+        logRefreshTokenError(err, '403 during refresh')
         useUserStore.getState().removeCredentials()
+      } else {
+        logRefreshTokenError(err, 'unexpected error during refresh')
       }
-
       return Promise.reject(err)
     }
   }
