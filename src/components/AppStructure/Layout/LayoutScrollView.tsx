@@ -70,7 +70,6 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
 
   // Natif: écouteur sur la ScrollView elle-même
   const handleNativeScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    console.log('handleNativeScroll', event.nativeEvent.contentOffset.y)
     onScroll?.(event)
     
     if (!onEndReached || isWeb || !hasMore) return
@@ -94,10 +93,10 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
       onScroll={handleNativeScroll}
       scrollEventThrottle={16}
       refreshControl={refreshControlElement}
-      contentInsetAdjustmentBehavior={ !isWeb ? 'automatic' : undefined}
+      contentInsetAdjustmentBehavior={ Platform.OS === 'ios' ? 'automatic' : undefined}
       contentContainerStyle={[
         !disablePadding && {
-          paddingTop: !isWeb ? 16 : spacingValues.paddingTop, 
+          paddingTop: Platform.OS === 'ios' ? 0 : spacingValues.paddingTop, 
           paddingBottom: spacingValues.paddingBottom,
         },
         contentContainerStyle,
