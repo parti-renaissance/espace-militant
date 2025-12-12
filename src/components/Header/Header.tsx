@@ -8,7 +8,7 @@ import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
 import { NativeStackHeaderProps } from '@react-navigation/native-stack'
 import type { IconComponent } from '@/models/common.model'
-import { ArrowLeft, HeartHandshake } from '@tamagui/lucide-icons'
+import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Link, router, usePathname, useSegments } from 'expo-router'
 import { capitalize } from 'lodash'
 import { isWeb, Spinner, Stack, styled, ThemeableStack, useMedia, useStyle, View, withStaticProperties, XStack, XStackProps, YStackProps } from 'tamagui'
@@ -247,6 +247,7 @@ const VoxHeaderContainerStyled = styled(Container, {
 const VoxHeaderFrameRouter = ({
   safeAreaView = true,
   borderWidth,
+  display,
   ...props
 }: React.ComponentProps<typeof VoxHeaderFrameStyled> & { safeAreaView?: boolean }) => {
   const styles = useStyle(props)
@@ -262,6 +263,7 @@ const VoxHeaderFrameRouter = ({
       style={isWeb ? undefined : { paddingTop: safeAreaView ? insets.top : 0, zIndex: 5 }}
       backgroundColor={backgroundColor}
       borderWidth={borderWidth}
+      display={display}
     >
       <VoxHeaderFrameStyled {...props} />
     </VoxHeaderContainerStyled>

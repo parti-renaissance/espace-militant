@@ -198,6 +198,8 @@ export const ButtonText = styled(Text.MD, {
   color: '$color',
   userSelect: 'none',
   semibold: true,
+  textAlign: 'center',
+  textWrap: 'balance',
 
   '$group-hover': {
     color: '$colorHover',
@@ -273,7 +275,7 @@ export const VoxButton = forwardRef<TamaguiElement, VoxButtonProps>(
           />
         ) : null}
         {children ? (
-          <ButtonText {...customTextProps} pop={props.pop} size={props.size}>
+          <ButtonText {...customTextProps} pop={props.pop} size={props.size} numberOfLines={2}>
             {children}
           </ButtonText>
         ) : null}

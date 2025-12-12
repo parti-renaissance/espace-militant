@@ -30,10 +30,11 @@ export type ChipProps = {
   children: string
 } & ComponentProps<typeof ChipFrame>
 
-const Chip = ({ children, ...props }: ChipProps & { icon?: IconComponent }) => {
+const Chip = ({ children, icon, ...props }: ChipProps & { icon?: IconComponent }) => {
+  const Icon = icon
   return (
     <ChipFrame {...props} theme={props.theme ?? 'gray'}>
-      {props.icon && <props.icon color={props.alert ? 'white' : '$color5'} testID={`chip-icon`} size={12} />}
+      {Icon && <Icon color={props.alert ? 'white' : '$color5'} testID={`chip-icon`} size={12} />}
       <Text.SM semibold color={props.alert ? 'white' : '$color5'}>
         {children}
       </Text.SM>

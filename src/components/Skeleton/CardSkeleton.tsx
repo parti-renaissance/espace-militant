@@ -10,7 +10,7 @@ const SkeletonColor = '#F7F7F7'
 const CardFrame = styled(YStack, {
   backgroundColor: '$white1',
   $gtSm: {
-    borderRadius: '$8',
+    borderRadius: '$medium',
   },
 } as const)
 

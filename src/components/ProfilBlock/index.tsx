@@ -8,7 +8,6 @@ import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { UserTagEnum } from '@/core/entities/UserProfile'
-import ExecutiveRoleSelector from '@/features/profil/components/ExecutiveRoleSelector'
 import { useDeleteProfilPicture, useGetProfil, useGetTags, usePostProfilPicture } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { Delete, Plus, Repeat2, Settings2 } from '@tamagui/lucide-icons'
@@ -120,13 +119,13 @@ const UploadPP = (props: { profil: RestProfilResponse }) => {
   )
 }
 
-export default function ({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
+export default function ProfilBlock({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
   const { data: profil } = useGetProfil()
   const { tags } = useGetTags({ tags: [UserTagEnum.ELU, UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] })
   const media = useMedia()
   
   return profil ? (
-    <VoxCard bg={media.sm ? 'transparent' : undefined} {...props}>
+    <VoxCard bg={media.sm ? 'transparent' : undefined} borderWidth={media.sm ? 0 : undefined} {...props}>
       <VoxCard.Content>
         <YStack justifyContent="center" alignItems="center" gap="$medium">
           {editablePicture ? (
@@ -142,7 +141,6 @@ export default function ({ editablePicture = true, ...props }: ComponentPropsWit
         <Text.MD medium textAlign="center">
           {[profil.instances?.assembly?.name, profil.instances?.committee?.name].filter(Boolean).join(', ')}
         </Text.MD>
-        {editablePicture ? <ExecutiveRoleSelector /> : null}
       </VoxCard.Content>
     </VoxCard>
   ) : (

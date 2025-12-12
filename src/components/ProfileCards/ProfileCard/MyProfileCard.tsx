@@ -4,9 +4,9 @@ import InfoCard from '@/components/InfoCard/InfoCard'
 import Menu from '@/components/menu/Menu'
 import ProfilBlock from '@/components/ProfilBlock'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import RenewMembershipButton from '@/features/profil/pages/donations/components/RenewMembershipButton'
+import RenewMembershipButton from '@/features_next/profil/pages/donations/components/RenewMembershipButton'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
+import { useGetExecutiveScopes, useGetProfil, useGetSuspenseProfil } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
@@ -16,7 +16,8 @@ import { Link } from 'expo-router'
 import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 
 export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
-  const { data: { default: default_scope } = {} } = useGetExecutiveScopes()
+  const { data } = useGetExecutiveScopes()
+  const default_scope = data?.default
   const isCadre = profil?.cadre_auth_path && default_scope
   const { open: openCadre, isPending } = useOpenExternalContent({ slug: 'cadre' })
 
@@ -27,7 +28,7 @@ export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
     <VoxCard
       inside={true}
       bg="$purple1"
-      onPress={openCadre({ state: `/?scope=${default_scope.code}` })}
+      onPress={openCadre({ state: `/?scope=${default_scope?.code ?? ''}` })}
       cursor="pointer"
       animation="100ms"
       disabled={isPending}
@@ -161,6 +162,49 @@ export default function MyProfileCard() {
             Questionnaires
           </Menu.Item>
         </Link>
+      </YStack>
+    </VoxCard>
+  )
+}
+
+export function MyProfileCardNoLinks() {
+  const { user: session } = useUserStore()
+  const user = useGetSuspenseProfil({ enabled: !!session })
+  const profile = user?.data
+  const statusAdh = profile ? getMembershipCardStatus(profile.tags) : null
+  const showEluCard = (profile?.tags ?? []).map((tag) => tag.code).find((x) => ['elu:attente_declaration', 'elu:cotisation_nok'].includes(x))
+
+  if (!profile) {
+    return null
+  }
+
+  if (!session) {
+    return null
+  }
+
+  return (
+    <VoxCard bg="$white" overflow="hidden" width="100%">
+      <YStack>
+        <VoxCard.Content>
+          <BoundarySuspenseWrapper>
+            <>
+              <Link href="/profil" asChild={!isWeb}>
+                <ProfilBlock
+                  editablePicture={false}
+                  inside
+                  bg="$textSurface"
+                  animation="100ms"
+                  hoverStyle={{
+                    bg: '$gray1',
+                  }}
+                />
+              </Link>
+
+              {!showEluCard && statusAdh ? <MembershipCard status={statusAdh} /> : null}
+              {showEluCard ? <EluCard /> : null}
+            </>
+          </BoundarySuspenseWrapper>
+        </VoxCard.Content>
       </YStack>
     </VoxCard>
   )

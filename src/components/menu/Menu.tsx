@@ -6,7 +6,7 @@ const MenuFrame = styled(YStack, {
   width: '100%',
 })
 
-const MenuFrameWithMedia = ({ children, ...props }: any) => {
+const MenuFrameWithMedia = ({ children, ...props }) => {
   const media = useMedia()
   return (
     <MenuFrame

@@ -12,5 +12,8 @@ export const useGetPaginatedFeed = () => {
     getNextPageParam: (lastPage) => (lastPage ? (lastPage.nbPages > lastPage.page ? lastPage.page + 1 : null) : null),
     getPreviousPageParam: (firstPage) => (firstPage ? firstPage.page - 1 : null),
     initialPageParam: 0,
+    refetchOnMount: true,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   })
 }

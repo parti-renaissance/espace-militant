@@ -1,4 +1,3 @@
-import { ComponentPropsWithRef } from 'react'
 import { Platform } from 'react-native'
 import { GetThemeValueForKey } from '@tamagui/web'
 import { Image } from 'expo-image'
@@ -70,6 +69,4 @@ const ProfilePicture = (props: ProfilePictureProps) => {
   )
 }
 
-export default (props: ComponentPropsWithRef<typeof ProfilePicture>) => {
-  return <ProfilePicture key={props.src} {...props} />
-}
+export default ProfilePicture

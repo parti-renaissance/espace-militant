@@ -1,25 +1,24 @@
 import * as api from '@/services/stats/api'
 import { useQuery } from '@tanstack/react-query'
 
-export const usePublicationStats = (props: { uuid: string; scope: string; enabled?: boolean }) => {
+export const usePublicationStats = (props: { uuid: string; enabled?: boolean }) => {
   return useQuery({
-    queryKey: ['publication-stats', props.uuid, props.scope],
-    queryFn: () => api.getPublicationStats({ uuid: props.uuid, scope: props.scope }),
+    queryKey: ['publication-stats', props.uuid],
+    queryFn: () => api.getPublicationStats({ uuid: props.uuid }),
     enabled: props.enabled !== false,
-    staleTime: (query) => query.state.error ? 0 : 60 * 1000,
+    staleTime: (query) => (query.state.error ? 0 : 60 * 1000),
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   })
 }
 
-export const useEventStats = (props: { uuid: string; scope: string; enabled?: boolean }) => {
+export const useEventStats = (props: { uuid: string; enabled?: boolean }) => {
   return useQuery({
-    queryKey: ['event-stats', props.uuid, props.scope],
-    queryFn: () => api.getEventStats({ uuid: props.uuid, scope: props.scope }),
+    queryKey: ['event-stats', props.uuid],
+    queryFn: () => api.getEventStats({ uuid: props.uuid }),
     enabled: props.enabled !== false,
-    staleTime: (query) => query.state.error ? 0 : 60 * 1000,
+    staleTime: (query) => (query.state.error ? 0 : 60 * 1000),
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   })
 }
-

@@ -1,152 +1,69 @@
-import React from 'react'
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
-import { VoxButton } from '@/components/Button'
-import { NavBar, ProfileNav, VoxHeader } from '@/components/Header/Header'
-import { PortalLayout } from '@/components/layouts/PortalLayout'
-import { ArrowLeft, FileEdit, Speech } from '@tamagui/lucide-icons'
-import { Link, Stack, usePathname, useSegments } from 'expo-router'
-import { isWeb, useMedia, View, XStack } from 'tamagui'
-import ProfilHeader from '@/features/profil/components/PageHeader'
+import React, { useState, useMemo, useCallback } from 'react'
+import { Stack } from 'expo-router'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import { LayoutContext, useLayoutContext } from '@/components/AppStructure/Layout/LayoutContext'
+import { SideBarState } from '@/components/AppStructure/Navigation/SideBar'
+import ScopesSelector from '@/features/scopes-selector'
 
-export default function AppLayout() {
-  const media = useMedia()
-  const pathname = usePathname()
-  const segments = useSegments()
-  const hideHeaderRoutes = [
-    '/publications/creer',
-    '/publications/brouillons',
-    '/publications',
-    '/tools/test',
-  ]
+function AppNewLayoutContent() {
+  const { sidebarState, hideTabBar, hideSideBar } = useLayoutContext()
 
-  const isQuestionnairesRoute = segments[1] === 'questionnaires' && segments[2] === '[id]'
+  const effectiveSidebarState = useMemo(() =>
+    hideSideBar ? 'hide' : sidebarState,
+    [hideSideBar, sidebarState]
+  )
 
-  const shouldShowHeader = media.gtSm && !hideHeaderRoutes.includes(pathname) && !isQuestionnairesRoute
+  // Stack global pour gérer la navigation de détail (création, édition, détails, etc.)
+  // Les pages de premier niveau sont gérées par (tabs)
+  const screenOptions = useMemo(() => ({
+    headerShown: false,
+    animation: 'simple_push' as const,
+    fullScreenGestureEnabled: true,
+    contentStyle: {
+      backgroundColor: '#fafafb',
+    },
+
+  }), [])
+
+  const layoutContent = useMemo(() => (
+    <Layout sidebarState={effectiveSidebarState} hideTabBar={hideTabBar}>
+      <ScopesSelector />
+      <Stack screenOptions={screenOptions} />
+    </Layout>
+  ), [effectiveSidebarState, hideTabBar, screenOptions])
+
+  return layoutContent
+}
+
+export default function AppNewLayout() {
+  const [sidebarState, setSidebarState] = useState<SideBarState>('militant')
+  const [hideTabBar, setHideTabBar] = useState(false)
+  const [hideSideBar, setHideSideBar] = useState(false)
+
+  const setSidebarStateOptimized = useCallback((newState: SideBarState) => {
+    setSidebarState(prev => prev === newState ? prev : newState)
+  }, [])
+
+  const setHideTabBarOptimized = useCallback((newValue: boolean) => {
+    setHideTabBar(prev => prev === newValue ? prev : newValue)
+  }, [])
+
+  const setHideSideBarOptimized = useCallback((newValue: boolean) => {
+    setHideSideBar(prev => prev === newValue ? prev : newValue)
+  }, [])
+
+  const contextValue = useMemo(() => ({
+    sidebarState,
+    setSidebarState: setSidebarStateOptimized,
+    hideTabBar,
+    setHideTabBar: setHideTabBarOptimized,
+    hideSideBar,
+    setHideSideBar: setHideSideBarOptimized,
+  }), [sidebarState, hideTabBar, hideSideBar, setSidebarStateOptimized, setHideTabBarOptimized, setHideSideBarOptimized])
 
   return (
-    <PortalLayout>
-      {shouldShowHeader ? (
-        <VoxHeader justifyContent="space-between" display={media.sm ? 'none' : 'flex'} safeAreaView={true}>
-          <XStack flex={1} flexBasis={0}>
-            <Link href="/" replace>
-              <EuCampaignIllustration cursor="pointer" showText={media.gtLg} />
-            </Link>
-          </XStack>
-          <NavBar />
-          <ProfileNav flex={1} flexBasis={0} justifyContent="flex-end" />
-        </VoxHeader>
-      ) : null}
-
-      <View style={{ height: isWeb ? 'calc(100vh - 100px)' : '100%', flex: 1 }} backgroundColor="white">
-        <Stack screenOptions={{ animation: 'slide_from_right', fullScreenGestureEnabled: true }}>
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-              title: '',
-            }}
-          />
-
-          <Stack.Screen
-            name="profil"
-            options={{
-              headerShown: false,
-              animation: media.sm ? 'slide_from_right' : 'none',
-            }}
-          />
-
-          <Stack.Screen
-            name="evenements/[id]/index"
-            options={{
-              headerTransparent: true,
-              header: ({ navigation }) => {
-                return media.sm ? (
-                  <VoxHeader backgroundColor="transparent" borderWidth={0}>
-                    <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
-                      <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
-                    </Link>
-                  </VoxHeader>
-                ) : null
-              },
-            }}
-          />
-
-          <Stack.Screen
-            name="evenements/[id]/modifier"
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
-          />
-
-          <Stack.Screen
-            name="evenements/creer"
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
-          />
-
-          <Stack.Screen
-            name="publications/index"
-            options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : Speech} title={media.sm ? 'Publication' : 'Nouvelle publication'} hideOnMdUp={false} forcedBackPath={isWeb ? '/' : undefined} /> }
-            }}
-          />
-
-          <Stack.Screen
-            name="publications/creer"
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
-          />
-
-          <Stack.Screen
-            name="publications/[id]/index"
-            options={({ route }) => ({
-              headerShown: false,
-              animation: route.params && 'withoutAnimation' in route.params ? 'none' : 'slide_from_right',
-            })}
-          />
-
-          <Stack.Screen
-            name="publications/brouillons"
-            options={{
-              header: () => { return <ProfilHeader icon={media.sm ? undefined : FileEdit} title="Brouillons" hideOnMdUp={false} forcedBackPath={isWeb ? '/publications' : undefined} /> }
-            }}
-          />
-
-          <Stack.Screen name="porte-a-porte/building-detail" options={{ title: '' }} />
-          <Stack.Screen name="porte-a-porte/tunnel" options={{ presentation: 'fullScreenModal', headerShown: false }} />
-          <Stack.Screen
-            name="questionnaires/index"
-            options={{
-              headerShown: true,
-              header: () => { return <ProfilHeader title="Questionnaires terrain" hideOnMdUp={true} /> }
-            }}
-          />
-          <Stack.Screen name="questionnaires/[id]/index" options={{ headerShown: false }} />
-          <Stack.Screen name="questionnaires/[id]/success" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="scanner"
-            options={{
-              headerTransparent: true,
-              header: ({ navigation }) => {
-                return (
-                  <VoxHeader backgroundColor="transparent" borderWidth={0}>
-                    <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
-                      <VoxButton iconLeft={ArrowLeft} shrink size="lg" mt={24} />
-                    </Link>
-                  </VoxHeader>
-                )
-              },
-            }}
-          />
-
-          <Stack.Screen name="tools/test" options={{ headerShown: false }} />
-        </Stack>
-      </View>
-    </PortalLayout>
+    <LayoutContext.Provider value={contextValue}>
+      <AppNewLayoutContent />
+    </LayoutContext.Provider>
   )
 }

@@ -43,7 +43,7 @@ export const useRetaliationsScreen = (): {
 
   const onRetaliationSelected = (id: string) => {
     router.push({
-      pathname: '/(tabs)/actions/retaliation/[id]',
+      pathname: '/old/actions/retaliation/[id]',
       params: { id },
     })
   }

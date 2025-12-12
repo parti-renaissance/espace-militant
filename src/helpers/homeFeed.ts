@@ -84,13 +84,13 @@ export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardPr
         type,
         onShow: () => {
           router.push({
-            pathname: '/(tabs)/actions',
+            pathname: '/old/actions',
             params: { uuid: feed.objectID },
           })
         },
         onEdit: () => {
           router.push({
-            pathname: '/(tabs)/actions',
+            pathname: '/old/actions',
             params: { uuid: feed.objectID, action: 'edit' },
           })
         },

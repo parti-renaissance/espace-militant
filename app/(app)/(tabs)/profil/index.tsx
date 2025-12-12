@@ -1,13 +1,17 @@
-import React from 'react'
-import ProfilLayout from '@/features/profil/components/ProfilPage'
-import DashboardScreen from '@/features/profil/pages/dashboard'
+import Head from 'expo-router/head'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import DashboardScreen from '@/features_next/profil/pages/dashboard'
+import * as metatags from '@/config/metatags'
 
-function ProfilScreen() {
+export default function IndexPage() {
   return (
-    <ProfilLayout screenName="index" backArrow={false}>
-      <DashboardScreen />
-    </ProfilLayout>
+    <>
+      <Head>
+        <title>{metatags.createTitle('Profil')}</title>
+      </Head>
+      <Layout.Container alwaysShowScrollbar>
+        <DashboardScreen />
+      </Layout.Container>
+    </>
   )
 }
-
-export default ProfilScreen
