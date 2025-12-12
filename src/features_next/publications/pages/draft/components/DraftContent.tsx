@@ -86,7 +86,7 @@ export function DraftContent({ data, fetchNextPage, hasNextPage, isFetchingNextP
         onEndReachedThreshold={0.5}
         hasMore={hasNextPage ?? false}
         ListHeaderComponent={
-          <ContentBackButton fallbackPath="/(militant)/publications" />
+          <ContentBackButton fallbackPath="/publications" />
         }
         contentContainerStyle={{
           gap: getToken('$medium', 'space'),

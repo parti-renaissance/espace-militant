@@ -371,8 +371,8 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
                   fullName: user ? `${user.first_name} ${user.last_name}` : 'John Doe',
                 }}
                 collapsed={displayNavCadre}
-                href="/(militant)/profil"
-                active={isNavItemActive(pathname, '/(militant)/profil')}
+                href="/(tabs)/profil"
+                active={isNavItemActive(pathname, '/(tabs)/profil')}
               />
             </>
           ) : (

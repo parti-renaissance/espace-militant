@@ -31,7 +31,7 @@ const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 
 
 const GoToButton = ({ eventUuid, source }: { eventUuid: string, source?: string }) => {
   const router = useRouter()
-  const href = `/(militant)/evenements/${eventUuid}?source=${source || ''}` as Href
+  const href = `/evenements/${eventUuid}?source=${source || ''}` as Href
   
   // Sur mobile, utiliser router.push
   const handlePress = () => {

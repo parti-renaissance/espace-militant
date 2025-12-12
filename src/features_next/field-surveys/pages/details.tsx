@@ -116,11 +116,11 @@ const FieldSurveyDetailsPage: React.FC = () => {
   const handleQuit = () => {
     setDisplayQuitModal(false)
     if (isWeb) {
-      router.push('/(militant)/questionnaires')
+      router.push('/questionnaires')
     } else if (router.canGoBack?.()) {
       router.back()
     } else {
-      router.replace('/(militant)/questionnaires')
+      router.replace('/questionnaires')
     }
   }
 
@@ -218,7 +218,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
 
       // Navigation vers la page de succès
       router.replace({
-        pathname: '/(app)/(militant)/questionnaires/[id]/success',
+          pathname: '/questionnaires/[id]/success',
         params: { id: survey.uuid }
       })
     } catch (error) {

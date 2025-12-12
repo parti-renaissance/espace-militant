@@ -73,7 +73,7 @@ const MobileSkeleton = (props?: { editMode?: boolean }) => {
         <VoxHeader>
           <XStack alignItems="center" flex={1} width="100%">
             <XStack alignContent="flex-start">
-              <Link href={navigation.canGoBack() ? '../' : '/(militant)/evenements'} replace asChild={!isWeb}>
+              <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
                 <VoxButton size="lg" variant="soft" theme="orange">
                   Annuler
                 </VoxButton>

@@ -37,18 +37,18 @@ const FieldSurveySuccessPage: React.FC = () => {
   const handleRestart = () => {
     // Navigation vers le questionnaire avec réinitialisation
     router.replace({
-      pathname: '/(app)/(militant)/questionnaires/[id]',
+      pathname: '/questionnaires/[id]',
       params: { id }
     })
   }
 
   const handleBackToList = () => {
     if (isWeb) {
-      router.push('/(app)/(militant)/questionnaires')
+      router.push('/questionnaires')
     } else if (router.canGoBack?.()) {
       router.back()
     } else {
-      router.replace('/(app)/(militant)/questionnaires')
+      router.replace('/questionnaires')
     }
   }
 

@@ -18,7 +18,7 @@ const NewEventBtn = ({ children, ...props }: YStackProps & { children: string })
   if (!hasFeature('events')) return null
   return (
     <YStack {...props}>
-      <Link href="/(militant)/evenements/creer" asChild={!isWeb}>
+      <Link href="/evenements/creer" asChild={!isWeb}>
         <VoxButton variant="soft" size="xl" theme="purple" iconLeft={Sparkle}>
           {children}
         </VoxButton>

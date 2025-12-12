@@ -39,7 +39,7 @@ const AdhButton = () => {
 const BackButton = () => {
   const { canGoBack } = useNavigation()
   return (
-    <Link href={canGoBack() ? '../' : '/(militant)/evenements'} asChild={!isWeb}>
+    <Link href={canGoBack() ? '../' : '/evenements'} asChild={!isWeb}>
       <VoxButton variant="text" iconLeft={ArrowLeft} borderRadius={16}>
         Événements
       </VoxButton>

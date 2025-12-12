@@ -132,7 +132,7 @@ export const SurveyList: React.FC<{ surveys: FieldSurvey[] }> = ({ surveys }) =>
 
   const handleSurveyPress = (survey: FieldSurvey) => {
     router.push({
-      pathname: '/(app)/(militant)/questionnaires/[id]',
+      pathname: '/questionnaires/[id]',
       params: { id: survey.uuid }
     })
   }

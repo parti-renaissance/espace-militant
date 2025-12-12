@@ -184,7 +184,7 @@ const DesktopLayout = (props: EventItemProps) => {
   return (
     <Layout.Main maxWidth={892}>
       <LayoutScrollView>
-        <ContentBackButton fallbackPath="/(militant)/evenements" />
+        <ContentBackButton fallbackPath="/evenements" />
         <YStack gap="$medium">
           <EventLive event={props.event} userUuid={props.userUuid} />
           <VoxCard>

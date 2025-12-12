@@ -10,7 +10,7 @@ export function DraftSkeleton() {
     <Layout.Main>
       <LayoutScrollView padding="left">
         <YStack gap={getToken('$medium', 'space')}>
-          <ContentBackButton fallbackPath="/(militant)/publications" />
+          <ContentBackButton fallbackPath="/publications" />
           {Array.from({ length: 3 }).map((_, i) => (
             <SkeCard key={i} width="100%" height={195}>
               <SkeCard.Content>

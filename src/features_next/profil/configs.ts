@@ -15,7 +15,7 @@ export type ProfilNavItemConfig = {
 export const pageConfigs: Record<string, ProfilNavItemConfig> = {
   index: {
     id: 'index',
-    href: '/(militant)/profil',
+    href: '/profil',
     text: 'Mon profil',
     title: 'Mon profil',
     icon: CircleUser,
@@ -23,7 +23,7 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
   },
   'acces-cadre': {
     id: 'acces-cadre',
-    href: '/(militant)/profil/acces-cadre',
+    href: '/profil/acces-cadre',
     text: 'Accès cadre',
     title: 'Accès cadre',
     icon: Sparkle,
@@ -32,7 +32,7 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
   },
   'cotisations-et-dons': {
     id: 'cotisations-et-dons',
-    href: '/(militant)/profil/cotisations-et-dons',
+    href: '/profil/cotisations-et-dons',
     text: 'Cotisations et dons',
     title: 'Cotisations et dons',
     icon: HelpingHand,
@@ -40,7 +40,7 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
   },
   'mes-instances': {
     id: 'mes-instances',
-    href: '/(militant)/profil/mes-instances',
+    href: '/profil/mes-instances',
     text: 'Mes instances',
     title: 'Mes instances',
     icon: LandPlot,
@@ -48,7 +48,7 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
   },
   'informations-personnelles': {
     id: 'informations-personnelles',
-    href: '/(militant)/profil/informations-personnelles',
+    href: '/profil/informations-personnelles',
     text: 'Informations personnelles',
     title: 'Informations personnelles',
     icon: Settings2,
@@ -56,7 +56,7 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
   },
   communications: {
     id: 'communications',
-    href: '/(militant)/profil/communications',
+    href: '/profil/communications',
     text: 'Communications',
     title: 'Communications',
     icon: MessageCircle,
@@ -64,7 +64,7 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
   },
   'informations-elu': {
     id: 'informations-elu',
-    href: '/(militant)/profil/informations-elu',
+    href: '/profil/informations-elu',
     text: 'Informations élu',
     title: 'Informations élu',
     icon: TreeDeciduous,
@@ -73,7 +73,7 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
   },
   'mot-de-passe': {
     id: 'mot-de-passe',
-    href: '/(militant)/profil/mot-de-passe',
+    href: '/profil/mot-de-passe',
     text: 'Mot de passe',
     title: 'Mot de passe',
     icon: KeyRound,
