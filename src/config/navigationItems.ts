@@ -1,4 +1,4 @@
-import { ComponentProps, useMemo } from 'react'
+import { ComponentProps, useMemo, useCallback, useRef, useEffect } from 'react'
 import { Home, Calendar, Zap, HeartHandshake, GraduationCap, Link, ClipboardCheck, ScrollText, Group, DoorOpen, Network, Goal, Vote, CircleUser, Globe, Download, FileStack, Award, MessageSquareQuote, FileBadge, CopyCheck, Swords, ClipboardList, PhoneOutgoing, MapPin, PartyPopper, UsersRound, TabletSmartphone, Laptop, MessageSquareDot, Mail, Sparkle, Eye, Signature, Map } from '@tamagui/lucide-icons'
 import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
 import type { IconComponent } from '@/models/common.model'
@@ -13,7 +13,6 @@ export type NavItemConfig = {
   iconLeft: IconComponent
   text: string
   href?: ComponentProps<typeof NavItem>['href']
-  routeName?: string
   isNew?: boolean
   externalLink?: boolean
   externalUrlSlug?: string
@@ -28,20 +27,20 @@ export type NavItemConfig = {
 
 // Configuration des items du menu militant pour utilisateurs connectés
 const militantNavItemsAuthConfig: NavItemConfig[] = [
-  { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/(militant)', routeName: '(militant)/index' },
-  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/(militant)/evenements', routeName: '(militant)/evenements' },
+  { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/(tabs)' },
+  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/(tabs)/evenements' },
   // { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/(militant)/actions', routeName: '(militant)/actions', theme: 'blue' },
-  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/(militant)/parrainages', routeName: '(militant)/parrainages' },
+  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/(tabs)/parrainages' },
   { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalUrlSlug: '/formations', isNew: true },
-  { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/(militant)/ressources', routeName: '(militant)/ressources' },
-  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', href: '/(militant)/questionnaires', routeName: '(militant)/questionnaires' },
-  { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/(militant)/profil', routeName: '(militant)/profil', displayIn: 'tabbar' },
+  { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/(tabs)/ressources' },
+  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', href: '/(tabs)/questionnaires' },
+  { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/(tabs)/profil', displayIn: 'tabbar' },
 ] as const;
 
 // Configuration des items du menu militant pour utilisateurs non connectés
 const militantNavItemsPublicConfig: NavItemConfig[] = [
   { id: 'accueil', iconLeft: Globe, text: 'parti-renaissance.fr', externalUrlSlug: 'https://parti-renaissance.fr/' },
-  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/(militant)/evenements', routeName: '(militant)/evenements' },
+  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/(tabs)/evenements' },
   { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', disabled: true },
   { id: 'formations', iconLeft: GraduationCap, text: 'Formations', disabled: true },
   { id: 'ressources', iconLeft: Link, text: 'Ressources', disabled: true },
@@ -52,11 +51,14 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
   const { isAuth } = useSession();
   const openExternalContentHook = useOpenExternalContent({ slug: 'formation' });
 
+  const openRef = useRef(openExternalContentHook.open);
+  useEffect(() => {
+    openRef.current = openExternalContentHook.open;
+  }, [openExternalContentHook.open]);
+
   return useMemo(() => {
-    // Choisir la bonne configuration selon l'état d'authentification
     const baseConfig = isAuth ? militantNavItemsAuthConfig : militantNavItemsPublicConfig;
 
-    // Ajouter les onPress pour les liens externes
     return baseConfig.map((item) => {
       const config: NavItemConfig = {
         ...item,
@@ -65,7 +67,6 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
 
       if (item.externalUrlSlug) {
         const externalUrl = item.externalUrlSlug;
-        // Si c'est une URL complète (commence par http), on ouvre directement
         if (externalUrl.startsWith('http')) {
           config.onPress = () => {
             if (isWeb) {
@@ -75,24 +76,23 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
             }
           };
         } else {
-          // Sinon, on utilise le hook pour les slugs internes
           config.onPress = () => {
-            openExternalContentHook.open({ state: externalUrl })();
+            openRef.current({ state: externalUrl })();
           };
         }
       }
 
       return config;
     });
-  }, [openExternalContentHook, isAuth]);
+  }, [isAuth]);
 };
 
 export const militantNavItems: NavItemConfig[] = []
 
 const cadreNavItemsConfig: NavItemConfig[] = [
-  { id: 'dashboard', iconLeft: Eye, text: "Vue d’ensemble", theme: 'purple', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
+  { id: 'dashboard', iconLeft: Eye, text: "Vue d'ensemble", theme: 'purple', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
   { id: 'my_team', iconLeft: Sparkle, text: 'Mon équipe cadre', theme: 'purple', externalUrlSlug: '/mon-equipe', externalLink: true },
-  // { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/cadre/publications', routeName: 'cadre/publications' },
+  // { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/(tabs)/cadre/publications', routeName: '(tabs)/cadre/publications' },
   { id: 'messages', iconLeft: Mail, text: 'Messagerie', theme: 'purple', externalUrlSlug: '/messagerie', externalLink: true },
   { id: 'news', iconLeft: MessageSquareDot, text: 'Notifications', theme: 'purple', externalUrlSlug: '/notifications', externalLink: true },
   { id: 'department_site', iconLeft: Laptop, text: 'Site départemental', theme: 'purple', externalUrlSlug: '/site-departemental', externalLink: true },
@@ -132,6 +132,12 @@ export const useCadreNavItems = (): NavItemConfig[] => {
 
   const defaultScopeFeaturesKey = JSON.stringify([...defaultScopeFeatures].sort());
 
+  // Utiliser useRef pour stabiliser la référence de la fonction open
+  const openRef = useRef(openExternalContentHook.open);
+  useEffect(() => {
+    openRef.current = openExternalContentHook.open;
+  }, [openExternalContentHook.open]);
+
   return useMemo(() => {
     if (!isAuth) {
       return []
@@ -150,15 +156,15 @@ export const useCadreNavItems = (): NavItemConfig[] => {
 
         if (item.externalUrlSlug) {
           const stateUrl = `${item.externalUrlSlug}?scope=${defaultScopeCode}`;
-          
+
           config.onPress = () => {
-            openExternalContentHook.open({ state: stateUrl })();
+            openRef.current({ state: stateUrl })();
           };
         }
 
         return config;
       });
-  }, [isAuth, defaultScopeCode, defaultScopeFeaturesKey, openExternalContentHook]);
+  }, [isAuth, defaultScopeCode, defaultScopeFeaturesKey]);
 };
 
 export const cadreNavItems: NavItemConfig[] = []

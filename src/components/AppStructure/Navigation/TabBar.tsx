@@ -233,9 +233,6 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     return visibleItemIds[0] || 'accueil'
   }, [currentRouteId, visibleItemIds, cadreItems, moreItems, activeSpecialTab, pathname])
 
-  console.log('activeTabKey', activeTabKey)
-
-
   const layoutsByKey = useRef(new Map<string, LayoutRectangle>())
   const getPosition = (layout: LayoutRectangle) => {
     return layout.x + layout?.width / 2 - (isWeb ? 50 : 27)

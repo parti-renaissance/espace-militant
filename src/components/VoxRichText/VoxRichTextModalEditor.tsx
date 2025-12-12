@@ -1,8 +1,9 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
+import { Platform } from 'react-native'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import { Save } from '@tamagui/lucide-icons'
-import { XStack } from 'tamagui'
+import { isWeb, XStack } from 'tamagui'
 import { VoxRichTextEditor } from './VoxRichTextEditor'
 import { RichTextContent, EditorRef } from './types'
 import { normalizeHtmlLinks, normalizeJsonLinks } from '@/utils/normalizeUrl'
@@ -29,6 +30,12 @@ export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({
 }) => {
   const editorRef = useRef<EditorRef | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    if (editorRef.current?.focus && open) {
+      editorRef.current.focus()
+    }
+  }, [open])
 
   const handleSave = async () => {
     if (!editorRef.current) {

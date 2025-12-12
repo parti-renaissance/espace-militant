@@ -63,7 +63,7 @@ type VoxRichTextEditorProps = {
 export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
   ({ value, placeholder = 'Décrivez votre contenu...' }, ref) => {
     const editor = useEditorBridge({
-      autofocus: true,
+      autofocus: false,
       avoidIosKeyboard: false,
       initialContent: parseJsonEditorContent(value.json),
       bridgeExtensions: [
@@ -82,6 +82,9 @@ export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
           pure: await editor.getText(),
           json: await editor.getJSON(),
         }),
+        focus: () => {
+          editor.focus?.()
+        },
       }
     })
 

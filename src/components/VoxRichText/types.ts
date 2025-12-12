@@ -10,5 +10,6 @@ export type EditorRef = {
     pure: string
     json: object
   }>
+  focus?: () => void
 }
 

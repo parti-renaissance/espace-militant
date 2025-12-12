@@ -20,7 +20,7 @@ const EventDetailScreen: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
   if (!params.id) return <Error404 />
   return (
-    <Layout.Container>
+    <Layout.Container hideTabBar>
         <BoundarySuspenseWrapper
           fallback={<EventDetailsScreenSkeleton />}
           errorChildren={(payload) => {

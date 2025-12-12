@@ -2,7 +2,7 @@
   "expo": {
     "slug": "vox",
     "scheme": "vox",
-    "version": "5.19.1",
+    "version": "6.0.0",
     "owner": "parti-renaissance",
     "runtimeVersion": {
       "policy": "appVersion"

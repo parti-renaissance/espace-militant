@@ -14,7 +14,6 @@ export default function EventDetailsScreen({ data }: { data: eventTypes.RestEven
     router.setParams({ greet: undefined })
   }
   const { user } = useSession()
-
   
   return (
     <>

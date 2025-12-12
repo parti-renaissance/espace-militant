@@ -26,10 +26,14 @@ export default function DescriptionInput(props: DescriptionInputProps) {
     onBlur()
   }
 
+  const handleOnOpen = () => {
+    setOpen(true)
+  }
+
   return (
     <>
       <SF.Props>
-        <SF error={Boolean(error)} onPress={() => setOpen(true)} height="auto">
+        <SF error={Boolean(error)} onPress={handleOnOpen} height="auto">
           <YStack flex={1} height={height} gap="$medium" paddingVertical="$medium" overflow="hidden">
             <XStack gap="$small">
               <XStack flexShrink={1} flex={1} alignItems="center" gap="$small">
@@ -43,7 +47,7 @@ export default function DescriptionInput(props: DescriptionInputProps) {
               <VoxRichTextRenderer key={value.json} value={value.json} primary placeholder={placeholder} />
             </YStack>
           </YStack>
-          <YStack position="absolute" bottom={0} left={0} right={0} top={0} cursor="pointer" />
+          <YStack position="absolute" bottom={0} left={0} right={0} top={0} cursor="pointer" onPress={handleOnOpen} />
         </SF>
       </SF.Props>
       {error ? (
