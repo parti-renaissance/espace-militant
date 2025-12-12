@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react"
 import { XStack, YStack } from "tamagui"
 import Text from "@/components/base/Text"
 import ProfilePicture from "@/components/ProfilePicture"
-import { Clock, UserCog } from "@tamagui/lucide-icons"
+import { Clipboard, ClipboardCheck, ClipboardEdit, Clock, UserCog } from "@tamagui/lucide-icons"
 import { VoxButton } from "@/components/Button"
 import SendersSelectModal from "./SendersSelectModal"
 
@@ -58,13 +58,58 @@ export type SenderViewProps = {
   scope?: string | null
 }
 
-export const SenderView = ({ 
-  sender, 
-  datetime, 
+const StatusBadge = ({ status }: { status: 'published' | 'draft' | string }) => {
+  const { label, Icon, theme } = useMemo(() => {
+    switch (status) {
+      case 'published':
+        return {
+          label: 'Publiée',
+          Icon: ClipboardCheck,
+          theme: 'green' as const,
+        }
+      case 'draft':
+        return {
+          label: 'Brouillon',
+          Icon: ClipboardEdit,
+          theme: 'gray' as const,
+        }
+      default:
+        return {
+          label: status,
+          Icon: Clipboard,
+          theme: 'gray' as const,
+        }
+    }
+  }, [status])
+
+  return (
+    <XStack
+      theme={theme}
+      backgroundColor={'$color1'}
+      borderRadius={999}
+      paddingVertical={4}
+      paddingHorizontal={8}
+      alignItems="center"
+      flexShrink={1}
+      gap="$xsmall"
+    >
+      {Icon && <Icon size={12} color={'$color5'} />}
+      <Text.SM semibold color={'$color5'} ellipsizeMode="tail" numberOfLines={1}>
+        {label}
+      </Text.SM>
+    </XStack>
+  )
+}
+
+export const SenderView = ({
+  sender,
+  status,
+  datetime,
   availableSenders,
   onSenderSelect
-}: { 
+}: {
   sender: SenderViewProps | null
+  status?: 'published' | 'draft' | string
   datetime?: string
   availableSenders?: SenderViewProps[]
   onSenderSelect?: (sender: SenderViewProps) => void
@@ -113,6 +158,9 @@ export const SenderView = ({
               <Clock size={16} color="$textSecondary" />
               <Text.SM secondary>{datetime}</Text.SM>
             </XStack>
+          )}
+          {status && (
+            <StatusBadge status={status} />
           )}
         </XStack>
         <XStack gap="$small" alignItems="center" justifyContent="space-between">

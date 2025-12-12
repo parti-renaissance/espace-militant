@@ -1,5 +1,5 @@
 import React from 'react'
-import { YStack, XStack, Separator } from 'tamagui'
+import { YStack, XStack, Separator, ThemeName } from 'tamagui'
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { RestPublicationStatsResponse } from '@/services/stats/schema'
@@ -10,20 +10,22 @@ interface PublicationGlobalStatsCardsProps {
   stats: RestPublicationStatsResponse
 }
 
-const StatCard: React.FC<{ value: string | number; label: string, small?: boolean }> = ({ value, label, small = false }) => (
+export const StatCard: React.FC<{ value: string | number; label: string, small?: boolean; theme?: ThemeName }> = ({ value, label, small = false, theme = 'purple' }) => (
   <YStack
+    theme={theme}
     backgroundColor="$gray1"
     borderRadius="$4"
     padding="$medium"
     alignItems="center"
     justifyContent="center"
     flex={1}
+    width="100%"
     minHeight={80}
   >
-    <Text fontSize={small ? 16 : 24} textAlign="center" fontWeight="600" color="$purple5">
+    <Text fontSize={small ? 16 : 24} textAlign="center" fontWeight="600" color="$color5">
       {value}
     </Text>
-    <Text.SM color="$gray10" textAlign="center" fontWeight="500">
+    <Text.SM color="$gray10" textAlign="center" fontWeight="500" numberOfLines={2} ellipsizeMode="tail" width="100%">
       {label}
     </Text.SM>
   </YStack>
@@ -32,9 +34,9 @@ const StatCard: React.FC<{ value: string | number; label: string, small?: boolea
 const StatsSectionRow: React.FC<{
   category: string;
   total: { percentage?: string; count: number | string };
-  subcategories: Array<{ 
-    label: string; 
-    percentage?: string; 
+  subcategories: Array<{
+    label: string;
+    percentage?: string;
     count: number | string;
     subItems?: Array<{ label: string; count: number | string }>
   }>
@@ -43,7 +45,7 @@ const StatsSectionRow: React.FC<{
     <XStack justifyContent="space-between" alignItems="center">
       <Text.MD medium>{category}</Text.MD>
       <XStack gap="$small" alignItems="center">
-        { total.percentage && (
+        {total.percentage && (
           <Text.MD semibold secondary>{total.percentage}</Text.MD>
         )}
         <Text.MD semibold>{total.count}</Text.MD>
@@ -54,7 +56,7 @@ const StatsSectionRow: React.FC<{
         <XStack justifyContent="space-between" alignItems="center">
           <Text.SM>{sub.label}</Text.SM>
           <XStack gap="$small" alignItems="center">
-            { sub.percentage && (
+            {sub.percentage && (
               <Text.SM secondary>{sub.percentage}</Text.SM>
             )}
             <Text.SM>{sub.count}</Text.SM>

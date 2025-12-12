@@ -1,20 +1,20 @@
 import React from 'react'
-import { Text } from 'tamagui'
 import Layout from '@/components/AppStructure/Layout/Layout'
+import PublicationsScreen from '@/features_next/publications/pages/list'
+import Head from 'expo-router/head'
+import * as metatags from '@/config/metatags'
 
 export default function PublicationsPage() {
   return (
-    <Layout.Container sidebarState="cadre">
-      <PublicationsContent />
-    </Layout.Container>
-  )
-}
+    <>
+      <Head>
+        <title>{metatags.createTitle('Publications')}</title>
+      </Head>
+      <Layout.Container sidebarState="cadre">
+        <PublicationsScreen />
+      </Layout.Container>
+    </>
 
-function PublicationsContent() {
-  return (
-    <Layout.Main maxWidth={992}>
-      <Text>Publications</Text>
-    </Layout.Main>
   )
 }
 
