@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { SelectOption, SF } from '@/components/base/Select/SelectV3'
-import { createEventSchema, EventFormData } from './schema'
 import { getFormatedScope as getFormatedScopeData } from '@/features/scopes-selector/utils'
 import { isPathExist } from '@/services/common/errors/utils'
 import { eventPostFormError } from '@/services/events/error'
@@ -16,6 +15,7 @@ import { router, useNavigation } from 'expo-router'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 import { useConfirmAlert } from './components/ConfirmAlert'
+import { createEventSchema, EventFormData } from './schema'
 import getVisibilityOptions from './visibility-options'
 
 export type EventFormProps = {
@@ -95,7 +95,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const defaultValues = {
     isPastEvent,
-    scope: edit ? (edit.organizer?.scope ?? 'national') : scopes.data?.default?.code ?? 'national',
+    scope: edit ? (edit.organizer?.scope ?? 'national') : (scopes.data?.default?.code ?? 'national'),
     name: edit?.name ?? '',
     image: edit?.image,
     category: edit?.category?.slug ?? '',
@@ -208,10 +208,9 @@ const useEventFormData = ({ edit }: EventFormProps) => {
       try {
         if (newEvent) {
           if (edit && edit.image?.url && image === null) {
-            await deleteImage({ scope, eventId: newEvent.uuid, slug: newEvent.slug })
+            await deleteImage({ eventId: newEvent.uuid, slug: newEvent.slug })
           } else if (image && image.url && image.url.startsWith('data:') && image.width !== null && image.height !== null) {
             await uploadImage({
-              scope,
               eventId: newEvent.uuid,
               payload: image.url,
               slug: newEvent.slug,

@@ -125,10 +125,10 @@ export const cancelEvent = (props: { eventId: string; scope: string }) =>
     type: 'private',
   })()
 
-export const uploadEventImage = (props: { eventId: string; scope: string; payload: string }) =>
+export const uploadEventImage = (props: { eventId: string; payload: string }) =>
   api({
     method: 'post',
-    path: `/api/v3/events/${props.eventId}/image?scope=${props.scope}`,
+    path: `/api/v3/events/${props.eventId}/image`,
     requestSchema: z.object({
       content: z.string(),
     }),
@@ -138,10 +138,10 @@ export const uploadEventImage = (props: { eventId: string; scope: string; payloa
     content: props.payload,
   })
 
-export const deleteEventImage = (props: { eventId: string; scope: string }) =>
+export const deleteEventImage = (props: { eventId: string }) =>
   api({
     method: 'delete',
-    path: `/api/v3/events/${props.eventId}/image?scope=${props.scope}`,
+    path: `/api/v3/events/${props.eventId}/image`,
     requestSchema: z.void(),
     responseSchema: z.any(),
     type: 'private',
