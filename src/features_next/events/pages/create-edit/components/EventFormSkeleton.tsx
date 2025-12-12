@@ -17,7 +17,7 @@ const DesktopSkeleton = (props?: { editMode?: boolean }) => {
     <Layout.Main maxWidth={920}>
       <LayoutScrollView>
         <XStack paddingBottom="$medium" flex={1}>
-          <SkeCard.Button />
+          <SkeCard.Button size="md" />
         </XStack>
         <YStack gap="$medium">
           <SkeCard>
