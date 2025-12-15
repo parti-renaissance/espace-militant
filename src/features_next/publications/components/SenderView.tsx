@@ -42,9 +42,9 @@ const SenderProfile = ({ sender }: SenderProfileProps) => {
 SenderProfile.displayName = 'SenderProfile'
 
 export type SenderViewProps = {
-  uuid: string
-  first_name: string
-  last_name: string
+  uuid?: string | null
+  first_name: string | null
+  last_name: string | null
   role?: string | null
   image_url?: string | null
   theme: {
@@ -116,6 +116,9 @@ export const SenderView = ({
 }) => {
   const [showSenderModal, setShowSenderModal] = useState(false)
 
+  const isNoSignature = useMemo(() => sender && sender.uuid === null, [sender])
+  const isEditMode = useMemo(() => availableSenders && availableSenders.length > 0, [availableSenders])
+
   const senderProps = useMemo(() => {
     if (!sender) {
       return {
@@ -125,22 +128,43 @@ export const SenderView = ({
       }
     }
 
+    const name = (sender?.first_name && sender?.last_name) 
+      ? `${sender.first_name} ${sender.last_name}`
+      : sender?.first_name || sender?.last_name || 'Expéditeur inconnu'
+    
     return {
-      name: `${sender?.first_name} ${sender?.last_name}`,
+      name,
       role: sender?.role || undefined,
       pictureLink: sender?.image_url || undefined,
       textColor: sender?.theme?.primary ?? '$gray5'
     }
   }, [sender])
 
+
   const memoizedSender = useMemo(() => {
+    if (isNoSignature && isEditMode && sender?.first_name) {
+      return (
+        <XStack gap="$small" alignItems="center">
+            <Text.MD semibold secondary>{sender.first_name}</Text.MD>
+        </XStack>
+      )
+    }
+
+    if (isNoSignature) {
+      return null
+    }
+
+    if (!sender?.first_name || !sender?.last_name) {
+      return null
+    }
+
     return <SenderProfile sender={senderProps} />
-  }, [sender])
+  }, [sender, isNoSignature, senderProps, isEditMode])
 
   return (
     <>
-      <YStack gap="$medium">
-        <XStack justifyContent="space-between" gap="$small">
+      <YStack>
+        <XStack justifyContent="space-between" gap="$small" mb={isNoSignature && !isEditMode ? 0 : '$medium'}>
           <XStack
             backgroundColor={sender?.theme?.soft ?? '$gray1'}
             borderRadius={999}
@@ -165,18 +189,18 @@ export const SenderView = ({
         </XStack>
         <XStack gap="$small" alignItems="center" justifyContent="space-between">
           {memoizedSender}
-          {availableSenders && availableSenders.length > 0 && (
-            <YStack justifyContent="center" alignItems="center">
+          {isEditMode && (
+            <YStack justifyContent="center" alignItems="center" marginLeft="auto">
               <VoxButton size="md" variant="soft" textColor="$textSecondary" shrink iconLeft={UserCog} onPress={() => setShowSenderModal(true)} />
             </YStack>
           )}
         </XStack>
       </YStack>
-      {availableSenders && availableSenders.length > 0 && (
+      {isEditMode && (
         <SendersSelectModal
           open={showSenderModal}
           onClose={() => setShowSenderModal(false)}
-          availableSenders={availableSenders}
+          availableSenders={availableSenders ?? []}
           selectedSender={sender}
           onSenderSelect={onSenderSelect}
         />

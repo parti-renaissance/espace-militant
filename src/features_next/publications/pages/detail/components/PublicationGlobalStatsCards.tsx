@@ -74,9 +74,10 @@ const StatsSectionRow: React.FC<{
 )
 
 const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ stats }) => {
-  const sentDate = new Date(stats.sent_at)
-  const formattedDate = DateFormatter.format(sentDate, 'dd MMMM yyyy')
-  const formattedTime = DateFormatter.format(sentDate, 'HH:mm')
+  const sentDate = stats.sent_at ? new Date(stats.sent_at) : null
+  const isValidDate = sentDate && !isNaN(sentDate.getTime())
+  const formattedDate = isValidDate ? DateFormatter.format(sentDate, 'dd MMMM yyyy') : null
+  const formattedTime = isValidDate ? DateFormatter.format(sentDate, 'HH:mm') : null
 
   const openRate = stats.unique_opens.total_rate
   const clickRate = stats.unique_clicks.total_rate
@@ -88,12 +89,20 @@ const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ st
           {/* Header Section */}
           <YStack gap="$small">
             <Text.MD color="$gray10">
-              Envoyé à <Text.MD fontWeight="600">{stats.contacts}</Text.MD> contacts le{' '}
-              <Text.MD fontWeight="600">{formattedDate}</Text.MD> à{' '}
-              <Text.MD fontWeight="600">{formattedTime}</Text.MD>.
+              {formattedDate && formattedTime ? (
+                <>
+                  Envoyé à <Text.MD fontWeight="600">{stats.contacts}</Text.MD> contacts le{' '}
+                  <Text.MD fontWeight="600">{formattedDate}</Text.MD> à{' '}
+                  <Text.MD fontWeight="600">{formattedTime}</Text.MD>.
+                </>
+              ) : (
+                <>
+                  Envoyé à <Text.MD fontWeight="600">{stats.contacts}</Text.MD> contacts.
+                </>
+              )}
             </Text.MD>
             <Text.MD color="$gray10">
-              Au total, <Text.MD fontWeight="600">{stats.visible_count}</Text.MD> peuvent la voir sur leur espace militant.
+              Au total, <Text.MD fontWeight="600">{stats.visible_count ?? 0}</Text.MD> peuvent la voir sur leur espace militant.
             </Text.MD>
           </YStack>
 

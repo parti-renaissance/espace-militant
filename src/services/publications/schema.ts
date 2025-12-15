@@ -49,9 +49,9 @@ export const RestAvailableSenderThemeSchema = z.object({
 })
 
 export const RestSenderSchema = z.object({
-  uuid: z.string(),
-  first_name: z.string(),
-  last_name: z.string(),
+  uuid: z.string().nullable(),
+  first_name: z.string().nullable(),
+  last_name: z.string().nullable(),
   image_url: z.string().nullish(),
   scope: z.string().nullish(),
   instance: z.string().nullish(),

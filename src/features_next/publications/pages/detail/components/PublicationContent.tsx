@@ -81,7 +81,7 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
         }
       >
         <YStack gap="$medium" width="100%" marginHorizontal="auto" paddingBottom={100}>
-          <ContentBackButton fallbackPath="/publications/index" />
+          <ContentBackButton fallbackPath="/publications" />
           {
             (activeSection === 'read' || media.gtSm) && (
               <YStack gap="$medium" pt={media.sm ? '$medium' : 0}>

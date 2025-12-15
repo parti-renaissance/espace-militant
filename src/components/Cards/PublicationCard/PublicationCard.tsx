@@ -140,7 +140,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
     <VoxCard borderLeftWidth={media.sm ? 0 : 1} borderRightWidth={media.sm ? 0 : 1}>
       <VoxCard.Content padding={0} gap={0}>
         <YStack px="$medium" pt="$medium" pb="$small" gap="$medium">
-          {author && author.first_name && author.last_name && author.uuid && <SenderView sender={author as SenderViewProps} datetime={date ? relativeDateFormatter(date) : undefined} />}
+          {author && <SenderView sender={author as SenderViewProps} datetime={date ? relativeDateFormatter(date) : undefined} />}
           <Text.LG semibold>{title}</Text.LG>
         </YStack>
         {renderContent()}

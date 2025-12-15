@@ -57,8 +57,8 @@ export function PublicationCadreItem({ item, onDeletePress, scope }: Publication
         <YStack gap="$small">
           {item.sender && <SenderView sender={{
             uuid: item.sender.uuid,
-            first_name: item.sender?.first_name ?? 'Utilisateur',
-            last_name: item.sender?.last_name ?? 'Inconnu',
+            first_name: item.sender?.first_name,
+            last_name: item.sender?.last_name,
             image_url: item.sender?.image_url,
             role: item.sender?.role,
             instance: item.sender?.instance,
