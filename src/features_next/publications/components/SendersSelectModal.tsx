@@ -93,7 +93,7 @@ export const SendersSelectModal = ({
             <SenderItem
               key={availableSender.uuid || availableSender.first_name || 'unknown'}
               sender={availableSender}
-              isSelected={availableSender.uuid === selectedSender?.uuid || (availableSender.uuid === null && selectedSender?.uuid === null && availableSender.first_name === "Sans signataire" && selectedSender?.first_name === "Sans signataire")}
+              isSelected={availableSender.uuid === selectedSender?.uuid || (availableSender.uuid === null && selectedSender?.uuid === null)}
               onPress={handleSenderPress}
             />
           ))}
