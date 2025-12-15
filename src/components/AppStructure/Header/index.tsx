@@ -26,6 +26,7 @@ type HeaderProps = {
   navigation?: NavigationConfig
   style?: StyleConfig
   children?: React.ReactNode
+  rightComponent?: React.ReactNode
 }
 
 const DEFAULT_NAVIGATION: Required<NavigationConfig> = {
@@ -123,6 +124,7 @@ const Header = ({
   navigation: navigationConfig = {},
   style: styleConfig = {},
   children,
+  rightComponent,
 }: HeaderProps) => {
   const media = useMedia()
 
@@ -161,12 +163,22 @@ const Header = ({
                 )}
               </XStack>
 
-              <XStack flex={1} justifyContent="center" alignItems="center">
+              <XStack 
+                flex={1} 
+                justifyContent={rightComponent && !navigationSettings.showBackButton ? "flex-start" : "center"} 
+                alignItems="center"
+              >
                 <XStack alignItems="center" gap={10}>
                   {icon && React.createElement(icon, { size: 20, color: '$textPrimary' })}
                   <Text.LG semibold>{title}</Text.LG>
                 </XStack>
               </XStack>
+
+              {rightComponent && (
+                <YStack position="absolute" right={0} top={0} bottom={0} zIndex={1} alignItems="center" justifyContent="center" height="100%">
+                  {rightComponent}
+                </YStack>
+              )}
             </YStack>
           )}
         </HeaderFrame>

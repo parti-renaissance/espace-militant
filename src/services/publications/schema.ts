@@ -60,11 +60,56 @@ export const RestSenderSchema = z.object({
   theme: RestAvailableSenderThemeSchema.nullable(),
 })
 
+export const RestMessageStatisticsSchema = z.object({
+  contacts: z.number(),
+  notifications: z.object({
+    android: z.number(),
+    ios: z.number(),
+    web: z.number(),
+  }),
+  sent_at: z.string().nullable(),
+  unique_clicks: z.object({
+    app: z.number(),
+    app_rate: z.number(),
+    email: z.number(),
+    email_rate: z.number(),
+    total: z.number(),
+    total_rate: z.number(),
+  }),
+  unique_emails: z.number().nullable(),
+  unique_impressions: z.object({
+    list: z.number(),
+    timeline: z.number(),
+    total: z.number(),
+  }),
+  unique_notifications: z.number(),
+  unique_opens: z.object({
+    app: z.number(),
+    app_rate: z.number(),
+    direct_link: z.number(),
+    email: z.number(),
+    email_rate: z.number(),
+    list: z.number(),
+    notification: z.number(),
+    notification_rate: z.number(),
+    timeline: z.number(),
+    total: z.number(),
+    total_rate: z.number(),
+  }),
+  unsubscribed: z.object({
+    total: z.number(),
+    total_rate: z.number(),
+  }),
+  visible_count: z.number().nullable(),
+})
+
 export const RestMessageListItemSchema = z.object({
   author: z.object({
     uuid: z.string(),
     first_name: z.string(),
     last_name: z.string(),
+    image_url: z.string().url().nullable().optional(),
+    scope: z.string().optional(),
   }),
   sender: RestSenderSchema.nullable(),
   label: z.string(),
@@ -77,15 +122,8 @@ export const RestMessageListItemSchema = z.object({
   created_at: z.string(),
   synchronized: z.boolean(),
   from_name: z.string(),
-  statistics: z.object({
-    sent: z.number(),
-    opens: z.number(),
-    open_rate: z.number(),
-    clicks: z.number(),
-    click_rate: z.number(),
-    unsubscribe: z.number(),
-    unsubscribe_rate: z.number(),
-  }),
+  editable: z.boolean().optional(),
+  statistics: RestMessageStatisticsSchema,
   preview_link: z.string().nullable(),
 })
 
@@ -93,6 +131,7 @@ export const RestMessageListResponseSchema = createRestPaginationSchema(RestMess
 
 export type RestMessageListItem = z.infer<typeof RestMessageListItemSchema>
 export type RestMessageListResponse = z.infer<typeof RestMessageListResponseSchema>
+export type RestMessageStatistics = z.infer<typeof RestMessageStatisticsSchema>
 
 export const RestMessageCountRecipientsResponseSchema = z.object({
   push: z.number().optional(),

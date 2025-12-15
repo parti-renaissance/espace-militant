@@ -58,10 +58,10 @@ export type SenderViewProps = {
   scope?: string | null
 }
 
-const StatusBadge = ({ status }: { status: 'published' | 'draft' | string }) => {
+const StatusBadge = ({ status }: { status: 'sent' | 'draft' | string }) => {
   const { label, Icon, theme } = useMemo(() => {
     switch (status) {
-      case 'published':
+      case 'sent':
         return {
           label: 'Publiée',
           Icon: ClipboardCheck,
@@ -109,7 +109,7 @@ export const SenderView = ({
   onSenderSelect
 }: {
   sender: SenderViewProps | null
-  status?: 'published' | 'draft' | string
+  status?: 'sent' | 'draft' | string
   datetime?: string
   availableSenders?: SenderViewProps[]
   onSenderSelect?: (sender: SenderViewProps) => void

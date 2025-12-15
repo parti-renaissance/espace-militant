@@ -25,7 +25,7 @@ export const StatCard: React.FC<{ value: string | number; label: string, small?:
     <Text fontSize={small ? 16 : 24} textAlign="center" fontWeight="600" color="$color5">
       {value}
     </Text>
-    <Text.SM color="$gray10" textAlign="center" fontWeight="500" numberOfLines={2} ellipsizeMode="tail" width="100%">
+    <Text.SM color="$gray10" textAlign="center" fontWeight="500" numberOfLines={1} ellipsizeMode="tail" width="100%">
       {label}
     </Text.SM>
   </YStack>
