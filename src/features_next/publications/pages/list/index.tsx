@@ -36,8 +36,6 @@ export default function PublicationsScreen() {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  console.log('usePaginatedMessages', hasNextPage, isFetchingNextPage, isLoading);
-
   const handleDeletePress = useCallback((messageId: string) => {
     setDeleteMessageId(messageId);
   }, []);

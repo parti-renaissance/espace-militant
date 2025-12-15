@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Redirect } from "expo-router";
 import Head from 'expo-router/head';
 import { useSession } from "@/ctx/SessionProvider";
@@ -11,13 +11,16 @@ import * as metatags from '@/config/metatags';
 
 export default function PublicationsPage() {
   const { isAuth } = useSession()
-  const { hasFeature } = useGetExecutiveScopes()
+  const { hasFeature, isLoading } = useGetExecutiveScopes()
+  const isFeatureEnabled = useMemo(() => hasFeature('publications'), [hasFeature])
+
+  console.log('isFeatureEnabled', isFeatureEnabled)
 
   if (!isAuth) {
     return <Redirect href={'/evenements'} />
   }
 
-  if (!hasFeature('publications')) {
+  if (!isFeatureEnabled && !isLoading) {
     return <AccessDeny />
   }
 
