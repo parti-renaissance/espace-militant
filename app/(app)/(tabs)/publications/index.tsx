@@ -14,8 +14,6 @@ export default function PublicationsPage() {
   const { hasFeature, isLoading } = useGetExecutiveScopes()
   const isFeatureEnabled = useMemo(() => hasFeature('publications'), [hasFeature])
 
-  console.log('isFeatureEnabled', isFeatureEnabled)
-
   if (!isAuth) {
     return <Redirect href={'/evenements'} />
   }

@@ -107,7 +107,7 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
           {stats && (activeSection === 'stats' || media.gtSm) && (
             <YStack 
               id="publication-stats"
-              ref={statsSectionRef as React.RefObject<any>}
+              ref={statsSectionRef as React.RefObject<HTMLElement>}
               gap={media.sm ? 0 : "$medium"} 
               pt={media.sm ? 0 : '$large'}
             >
