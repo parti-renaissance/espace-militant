@@ -43,14 +43,14 @@ const RestPublicationStatsNotificationsSchema = z.object({
 export const RestPublicationStatsResponseSchema = z.object({
   contacts: z.number(),
   notifications: RestPublicationStatsNotificationsSchema,
-  sent_at: z.string(),
+  sent_at: z.string().nullable(),
   unique_clicks: RestPublicationStatsUniqueClicksSchema,
   unique_emails: z.number().nullable(),
   unique_impressions: RestPublicationStatsUniqueImpressionsSchema,
   unique_notifications: z.number(),
   unique_opens: RestPublicationStatsUniqueOpensSchema,
   unsubscribed: RestPublicationStatsUnsubscribedSchema,
-  visible_count: z.number(),
+  visible_count: z.number().nullable(),
 })
 
 export type RestPublicationStatsResponse = z.infer<typeof RestPublicationStatsResponseSchema>

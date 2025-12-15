@@ -21,7 +21,9 @@ type SenderItemProps = {
 }
 
 const SenderItem = ({ sender, isSelected, onPress }: SenderItemProps) => {
-  const fullName = `${sender.first_name} ${sender.last_name}`
+  const fullName = sender.first_name && sender.last_name 
+    ? `${sender.first_name} ${sender.last_name}` 
+    : sender.first_name || sender.last_name || 'Expéditeur inconnu'
 
   return (
     <XStack 
@@ -89,9 +91,9 @@ export const SendersSelectModal = ({
         <YStack>
           {availableSenders.map((availableSender) => (
             <SenderItem
-              key={availableSender.uuid}
+              key={availableSender.uuid || availableSender.first_name || 'unknown'}
               sender={availableSender}
-              isSelected={availableSender.uuid === selectedSender?.uuid}
+              isSelected={availableSender.uuid === selectedSender?.uuid || (availableSender.uuid === null && selectedSender?.uuid === null)}
               onPress={handleSenderPress}
             />
           ))}

@@ -147,7 +147,7 @@ export const useAutoSave = (props: {
           label: metaData.subject,
           json_content: JSON.stringify(message),
           content: htmlContent,
-          sender: sender?.uuid || undefined,
+          sender: sender?.uuid,
         },
       })
 

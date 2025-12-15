@@ -63,7 +63,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
     if (manuallySelectedSender) {
       return manuallySelectedSender
     }
-    if (messageData?.sender) {
+    if (messageData?.sender !== undefined) {
       return messageData.sender
     }
     if (availableSenders && availableSenders.length > 0) {

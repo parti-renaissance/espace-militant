@@ -120,7 +120,7 @@ const Container = ({ children, hideSideBar, hideTabBar, sidebarState, safeHorizo
       {...props}
     >
       <YStack width="100%" flexGrow={1}>
-        <ScrollContext.Provider value={{ layoutRef: layoutRef as React.RefObject<HTMLDivElement>, scrollActive: Boolean(isWeb && media.gtSm) }}>
+        <ScrollContext.Provider value={{ layoutRef: layoutRef as React.RefObject<HTMLDivElement>, scrollActive: Boolean(isWeb) }}>
           <ContentContainer style={safeHorizontalPadding ? {
             paddingLeft: spacingValues.paddingLeft,
             paddingRight: spacingValues.paddingRight,
