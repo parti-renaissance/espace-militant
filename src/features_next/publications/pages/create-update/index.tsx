@@ -98,8 +98,8 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const handleQuit = () => {
     setDisplayQuitModal(false)
     if (isWeb) {
-      if (props?.messageId) {
-        router.replace(`/publications/brouillons?scope=${props?.scope ?? messageData?.author?.scope ?? ''}`)
+      if (router.canGoBack()) {
+        router.back()
       } else {
         router.replace('/publications')
       }

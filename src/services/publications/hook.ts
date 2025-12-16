@@ -1,7 +1,7 @@
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/publications/api'
 import { useToastController } from '@tamagui/toast'
-import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 import { RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 
@@ -159,6 +159,21 @@ export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') =
     getPreviousPageParam: (firstPage) =>
       firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined,
     placeholderData: (prev) => prev,
+    refetchOnMount: true,
+  })
+}
+
+export const usePaginatedMessagesSuspense = (scope: string, status?: 'draft' | 'sent') => {
+  return useSuspenseInfiniteQuery({
+    queryKey: ['messages', scope, status],
+    queryFn: ({ pageParam = 1 }) => api.getMessages({ scope, page: pageParam, status, orderCreatedAt: 'desc' }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.metadata.current_page < lastPage.metadata.last_page
+        ? lastPage.metadata.current_page + 1
+        : undefined,
+    getPreviousPageParam: (firstPage) =>
+      firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined,
     refetchOnMount: true,
   })
 }

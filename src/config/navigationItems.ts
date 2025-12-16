@@ -92,7 +92,7 @@ export const militantNavItems: NavItemConfig[] = []
 const cadreNavItemsConfig: NavItemConfig[] = [
   { id: 'dashboard', iconLeft: Eye, text: "Vue d'ensemble", theme: 'purple', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
   { id: 'my_team', iconLeft: Sparkle, text: 'Mon équipe cadre', theme: 'purple', externalUrlSlug: '/mon-equipe', externalLink: true },
-  // { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/(tabs)/cadre/publications', routeName: '(tabs)/cadre/publications' },
+  { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/cadre/publications', },
   { id: 'messages', iconLeft: Mail, text: 'Messagerie', theme: 'purple', externalUrlSlug: '/messagerie', externalLink: true },
   { id: 'news', iconLeft: MessageSquareDot, text: 'Notifications', theme: 'purple', externalUrlSlug: '/notifications', externalLink: true },
   { id: 'department_site', iconLeft: Laptop, text: 'Site départemental', theme: 'purple', externalUrlSlug: '/site-departemental', externalLink: true },

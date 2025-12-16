@@ -4,7 +4,7 @@ import Text from "@/components/base/Text";
 import { VoxButton } from "@/components/Button";
 import VoxCard from "@/components/VoxCard/VoxCard";
 import { SenderView } from "@/features_next/publications/components/SenderView";
-import { ChartColumn, Copy, Eye, Pen, Trash } from "@tamagui/lucide-icons";
+import { ChartColumn, Copy, Eye, Pen, Trash2 } from "@tamagui/lucide-icons";
 import { useMedia, XStack, YStack } from "tamagui";
 import { StatCard } from "../../detail/components/PublicationGlobalStatsCards";
 import { RestMessageListItem } from "@/services/publications/schema";
@@ -66,7 +66,7 @@ export function PublicationCadreItem({ item, onDeletePress, scope }: Publication
             theme: item.sender?.theme,
           }} status={item.status} />}
 
-          <Text fontSize={media.md ? '20' : '14'} semibold>
+          <Text fontSize={media.md ? 18 : 14} semibold>
             {item.subject}
           </Text>
           <XStack gap={media.md ? '$small' : '$large'} flexWrap="wrap" >
@@ -102,7 +102,7 @@ export function PublicationCadreItem({ item, onDeletePress, scope }: Publication
               <VoxButton variant="outlined" theme="gray" iconLeft={Pen} size="md" onPress={handleEdit}>Modifier</VoxButton>
             </XStack>
             <XStack gap="$small">
-              <VoxButton variant="text" theme="orange" iconLeft={Trash} size="md" onPress={handleDeletePress} shrink={media.md}>Supprimer</VoxButton>
+              <VoxButton variant="text" theme="orange" iconLeft={Trash2} size="md" onPress={handleDeletePress} shrink={media.md}>Supprimer</VoxButton>
             </XStack>
           </XStack>
         ) : (
