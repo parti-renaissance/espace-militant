@@ -52,7 +52,7 @@ export function ListSkeleton() {
 
   return (
     <Layout.Main maxWidth={892}>
-      <LayoutScrollView contentContainerStyle={{ paddingTop: media.md ? 0 : undefined }}>
+      <LayoutScrollView contentContainerStyle={{ paddingTop: media.sm ? 0 : undefined }}>
         <YStack gap="$medium" paddingHorizontal={media.sm ? 0 : undefined}>
           {!media.sm && <PublicationsListHeader />}
           <PublicationItemSkeleton />

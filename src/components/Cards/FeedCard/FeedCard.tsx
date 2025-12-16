@@ -4,6 +4,7 @@ import { NewsCard, NewsVoxCardProps } from '@/components/Cards/NewsCard'
 import EventListItem from '@/features_next/events/components/EventListItem'
 import PublicationCard, { PublicationCardProps } from '@/components/Cards/PublicationCard/PublicationCard'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
+import TransactionalCard, { TransactionalCardProps } from '../TransactionalCard'
 
 export type FeedCardProps =
   | ({
@@ -18,6 +19,9 @@ export type FeedCardProps =
   | ({
       type: 'publication'
     } & PublicationCardProps)
+  | ({
+      type: 'transactional_message'
+    } & TransactionalCardProps)
 
 const FeedCard = (props: FeedCardProps) => {
   const { data } = useGetSuspenseProfil()
@@ -30,6 +34,8 @@ const FeedCard = (props: FeedCardProps) => {
       return <NewsCard {...props} />
     case 'publication':
       return <PublicationCard {...props} />
+    case 'transactional_message':
+      return <TransactionalCard {...props} />
     default:
       return null
   }
