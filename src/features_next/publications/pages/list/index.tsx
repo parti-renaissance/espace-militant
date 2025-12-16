@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "expo-router";
 import { Layout, LayoutFlatList } from "@/components/AppStructure";
 import Text from "@/components/base/Text";
-import { getToken, Spinner, useMedia, XStack, YStack } from "tamagui";
+import { getToken, Spinner, useMedia, YStack } from "tamagui";
 import { RestMessageListItem } from "@/services/publications/schema";
 import { PublicationCadreItem } from "./components/ListItem";
 import { PublicationsListHeader } from "./components/Header";
@@ -140,7 +140,6 @@ export default function PublicationsScreen() {
       key={defaultScope}
       fallback={<ListSkeleton />} 
       errorChildren={(payload) => {
-        console.log('payload', payload);
         if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
           return <AccessDeny 
             message="Votre rôle cadre actif ne vous permet pas d'accéder à cette fonctionnalité." 
