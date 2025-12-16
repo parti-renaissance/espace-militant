@@ -1,30 +1,26 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "expo-router";
 import { Layout, LayoutFlatList } from "@/components/AppStructure";
 import Text from "@/components/base/Text";
-import { getToken, Spinner, useMedia, XStack, YStack } from "tamagui";
+import { getToken, Spinner, useMedia, YStack } from "tamagui";
 import { RestMessageListItem } from "@/services/publications/schema";
-import { PublicationCadreItem } from "./components/item";
-import { VoxButton } from "@/components/Button";
-import { Sparkle } from "@tamagui/lucide-icons";
-import { usePaginatedMessages } from "@/services/publications/hook";
-import { useGetExecutiveScopes } from "@/services/profile/hook";
+import { PublicationCadreItem } from "./components/ListItem";
+import { PublicationsListHeader } from "./components/Header";
+import { usePaginatedMessagesSuspense } from "@/services/publications/hook";
+import { useGetExecutiveScopes, useMutateExecutiveScope } from "@/services/profile/hook";
 import DeleteModal from "@/features_next/publications/components/DeleteModal";
+import BoundarySuspenseWrapper, { DefaultErrorFallback } from "@/components/BoundarySuspenseWrapper";
+import { ForbiddenError, UnauthorizedError } from "@/core/errors";
+import { AccessDeny } from "@/components/AccessDeny";
+import ListSkeleton from "./components/ListSkeleton";
+import { VoxButton } from "@/components/Button";
+import { ArrowLeft } from "@tamagui/lucide-icons";
 
-export default function PublicationsScreen() {
+function PublicationsContent({ scope }: { scope: string }) {
   const router = useRouter();
   const media = useMedia();
-  const { data: scopes } = useGetExecutiveScopes();
-  const defaultScope = useMemo(() => scopes?.default?.code || '', [scopes?.default?.code]);
   const [deleteMessageId, setDeleteMessageId] = useState<string | null>(null);
-
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading
-  } = usePaginatedMessages(defaultScope);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = usePaginatedMessagesSuspense(scope);
 
   const publications = useMemo(() => {
     return data?.pages.flatMap((page: { items: RestMessageListItem[] }) => page.items) || [];
@@ -49,20 +45,12 @@ export default function PublicationsScreen() {
   }, [router]);
 
   const headerComponent = useCallback(() => {
-    return (
-      <XStack justifyContent="space-between" alignItems="flex-start" marginBottom="$medium">
-        <YStack flex={1} gap="$small">
-          <Text.LG semibold>Mes publications</Text.LG>
-          <Text.SM secondary>Gérez et analyser vos publications depuis votre tableau de bord</Text.SM>
-        </YStack>
-        <VoxButton variant="soft" theme="purple" iconLeft={Sparkle} size="lg" onPress={handleCreatePublication}>Nouvelle publication</VoxButton>
-      </XStack>
-    )
+    return <PublicationsListHeader />;
   }, [handleCreatePublication]);
 
   const renderItem = useCallback(({ item }: { item: RestMessageListItem }) => {
-    return <PublicationCadreItem item={item} onDeletePress={handleDeletePress} scope={defaultScope} />;
-  }, [handleDeletePress, defaultScope]);
+    return <PublicationCadreItem item={item} onDeletePress={handleDeletePress} scope={scope} />;
+  }, [handleDeletePress, scope]);
 
   const contentContainerStyle = useMemo(() => {
     const baseStyle: { gap: number; paddingTop?: number; marginTop?: number } = {
@@ -109,8 +97,60 @@ export default function PublicationsScreen() {
         isOpen={deleteMessageId !== null}
         onClose={handleCloseDeleteModal}
         messageId={deleteMessageId}
-        scope={defaultScope}
+        scope={scope}
       />
     </>
+  )
+}
+
+export default function PublicationsScreen() {
+  const { data: scopes } = useGetExecutiveScopes();
+  const { mutate: mutateScope } = useMutateExecutiveScope();
+  const defaultScope = useMemo(() => scopes?.default?.code || '', [scopes?.default?.code]);
+  const previousScopeRef = useRef<string | null>(null);
+  const [previousScope, setPreviousScope] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (previousScopeRef.current !== null && previousScopeRef.current !== defaultScope) {
+      setPreviousScope(previousScopeRef.current);
+    } else if (previousScopeRef.current === defaultScope) {
+      setPreviousScope(null);
+    }
+    previousScopeRef.current = defaultScope;
+  }, [defaultScope]);
+
+  const handleReturnToPreviousScope = useCallback(() => {
+    if (previousScope && scopes?.list) {
+      mutateScope({
+        scope: previousScope,
+        lastAvailableScopes: scopes.list.map((s) => s.code),
+      });
+      setPreviousScope(null);
+    }
+  }, [mutateScope, scopes?.list, previousScope]);
+
+  const accessDenyButton = previousScope ? (
+    <VoxButton theme="purple" iconLeft={ArrowLeft} onPress={handleReturnToPreviousScope}>
+      Revenir au scope précédent
+    </VoxButton>
+  ) : undefined;
+
+  return (
+    <BoundarySuspenseWrapper 
+      key={defaultScope}
+      fallback={<ListSkeleton />} 
+      errorChildren={(payload) => {
+        if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
+          return <AccessDeny 
+            message="Votre rôle cadre actif ne vous permet pas d'accéder à cette fonctionnalité." 
+            Button={accessDenyButton}
+          />
+        } else {
+          return <DefaultErrorFallback {...payload} />
+        }
+      }}
+    >
+      <PublicationsContent scope={defaultScope} />
+    </BoundarySuspenseWrapper>
   )
 }
