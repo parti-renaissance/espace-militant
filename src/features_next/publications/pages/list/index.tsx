@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "expo-router";
-import { Layout, LayoutFlatList } from "@/components/AppStructure";
-import Text from "@/components/base/Text";
 import { getToken, Spinner, useMedia, YStack } from "tamagui";
+import { ArrowLeft } from "@tamagui/lucide-icons";
+import { Layout, LayoutFlatList } from "@/components/AppStructure";
 import { RestMessageListItem } from "@/services/publications/schema";
 import { PublicationCadreItem } from "./components/ListItem";
 import { PublicationsListHeader } from "./components/Header";
@@ -12,9 +12,9 @@ import DeleteModal from "@/features_next/publications/components/DeleteModal";
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from "@/components/BoundarySuspenseWrapper";
 import { ForbiddenError, UnauthorizedError } from "@/core/errors";
 import { AccessDeny } from "@/components/AccessDeny";
-import ListSkeleton from "./components/ListSkeleton";
 import { VoxButton } from "@/components/Button";
-import { ArrowLeft } from "@tamagui/lucide-icons";
+import ListSkeleton from "./components/ListSkeleton";
+import EmptyState from "./components/EmptyState";
 
 function PublicationsContent({ scope }: { scope: string }) {
   const router = useRouter();
@@ -78,9 +78,7 @@ function PublicationsContent({ scope }: { scope: string }) {
           hasMore={hasNextPage ?? false}
           ListEmptyComponent={
             isLoading ? null : (
-              <YStack alignItems="center" margin={16}>
-                <Text.MD color="$gray6">Aucune publication trouvée</Text.MD>
-              </YStack>
+              <EmptyState />
             )
           }
           ListFooterComponent={
