@@ -19,6 +19,8 @@ const transformFeedItemType = (type: RestTimelineFeedItem['type']): FeedCardProp
       return 'action'
     case 'publication':
       return 'publication'
+    case 'transactional_message':
+      return 'transactional_message'
   }
 }
 
@@ -38,6 +40,8 @@ const transformFeedItemTypeToTag = (type: RestTimelineFeedItem['type']) => {
       return 'Enquête'
     case 'publication':
       return 'Publication'
+    case 'transactional_message':
+      return 'Message'
   }
 }
 
@@ -119,6 +123,14 @@ export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardPr
         author: feed.author || undefined,
         date: feed.date,
         uuid: feed.objectID,
+      }
+    case 'transactional_message':
+      return {
+        type,
+        title: feed.title!,
+        description: feed.description!,
+        ctaLink: feed.cta_link ?? '',
+        ctaLabel: feed.cta_label ?? null,
       }
   }
 }

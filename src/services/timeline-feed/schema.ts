@@ -33,7 +33,7 @@ export type RestTimelineFeedItem = z.infer<typeof RestTimelineFeedItemSchema>
 export const RestTimelineFeedItemSchema = z.object({
   objectID: z.string(),
   identifier: z.string().nullable(),
-  type: z.enum(['news', 'event', 'phoning-campaign', 'pap-campaign', 'survey', 'riposte', 'action', 'publication']),
+  type: z.enum(['news', 'event', 'phoning-campaign', 'pap-campaign', 'survey', 'riposte', 'action', 'publication', 'transactional_message']),
   title: z.string().nullable(),
   description: z.string().nullable(),
   author: RestTimelineFeedAuthorSchema.nullable().optional(),
