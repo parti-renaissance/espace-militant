@@ -125,7 +125,7 @@
       "@react-native-firebase/messaging"
     ],
     "extra": {
-      "eas_update_version": "2",
+      "eas_update_version": "3",
       "router": {
         "origin": false
       },

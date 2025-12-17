@@ -209,7 +209,9 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
   )
 
   React.useEffect(() => {
-    if (displayNavCadre && state !== 'cadre') {
+    if (state === 'cadre') {
+      setDisplayNavCadre(true)
+    } else {
       setDisplayNavCadre(false)
     }
   }, [state, pathname])

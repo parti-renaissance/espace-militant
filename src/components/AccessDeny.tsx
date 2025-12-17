@@ -7,9 +7,10 @@ import { ArrowLeft } from "@tamagui/lucide-icons"
 
 interface AccessDenyProps {
   message?: string
+  Button?: React.ReactNode
 }
 
-export const AccessDeny = ({ message }: AccessDenyProps) => {
+export const AccessDeny = ({ message, Button }: AccessDenyProps) => {
     const defaultMessage = "Vous n'avez pas les droits d'accès à cette page."
     
     return (
@@ -18,11 +19,13 @@ export const AccessDeny = ({ message }: AccessDenyProps) => {
           <Image src={require('@/assets/illustrations/VisuCadnas.png')} />
           <Text.LG>{message || defaultMessage}</Text.LG>
           <YStack>
-            <Link href="/" asChild>
-              <VoxButton iconLeft={ArrowLeft}>
-                Retour à l'accueil
-              </VoxButton>
-            </Link>
+            {Button ? Button : (
+              <Link href="/" asChild>
+                <VoxButton iconLeft={ArrowLeft}>
+                  Retour à l'accueil
+                </VoxButton>
+              </Link>
+            )}
           </YStack>
         </YStack>
       </VoxCard.Content>

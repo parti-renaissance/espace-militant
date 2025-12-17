@@ -7,8 +7,17 @@ export const DateFormatter = {
   },
 }
 
-export function relativeDateFormatter(dateString: string) {
+export function relativeDateFormatter(dateString: string | null | undefined): string {
+  if (!dateString) {
+    return 'Date inconnue';
+  }
+  
   const date = new Date(dateString);
+  
+  if (isNaN(date.getTime())) {
+    return 'Date invalide';
+  }
+  
   const now = new Date();
   const daysDiff = differenceInDays(now, date);
 

@@ -155,10 +155,10 @@ export const useCreateEvent = ({ editSlug, editUuid }: { editSlug?: string; edit
           queryClient,
         )
       } else {
-        queryClient.invalidateQueries({
+        queryClient.refetchQueries({
           queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS],
         })
-        queryClient.invalidateQueries({
+        queryClient.refetchQueries({
           queryKey: [PAGINATED_QUERY_FEED],
         })
       }

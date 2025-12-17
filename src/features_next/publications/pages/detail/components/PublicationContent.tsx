@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { RefreshControl } from 'react-native'
-import { YStack, XStack, useMedia } from 'tamagui'
+import { YStack, XStack, useMedia, isWeb } from 'tamagui'
 import Text from '@/components/base/Text'
 import { RestGetMessageContentResponse, RestGetMessageResponse, RestGetMessageFiltersResponse } from '@/services/publications/schema'
 import PublicationCard from '@/components/Cards/PublicationCard/PublicationCard'
@@ -26,16 +26,41 @@ interface PublicationContentProps {
 }
 
 export function PublicationContent({ data, stats, filters, onRefreshStats, isRefreshingStats }: PublicationContentProps) {
-  const params = useLocalSearchParams()
+  const params = useLocalSearchParams<{ congratulations?: string; section?: string }>()
   const media = useMedia()
   const [showCongratulations, setShowCongratulations] = useState(false)
-  const [activeSection, setActiveSection] = useState('read')
+  const [activeSection, setActiveSection] = useState<'read' | 'stats'>('read')
+  const statsSectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (params.congratulations) {
       setShowCongratulations(true)
     }
   }, [params.congratulations])
+
+  useEffect(() => {
+    if (params.section === 'stats' && stats) {
+      setActiveSection('stats')
+      
+      // Scroll vers la section stats sur le web
+      if (isWeb) {
+        // Mettre à jour l'URL avec le hash
+        if (typeof window !== 'undefined' && !window.location.hash.includes('publication-stats')) {
+          window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#publication-stats`)
+        }
+        
+        setTimeout(() => {
+          const element = document.getElementById('publication-stats')
+          if (element) {
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            })
+          }
+        }, 100)
+      }
+    }
+  }, [params.section, stats])
 
   const handleCloseCongratulations = () => {
     setShowCongratulations(false)
@@ -45,7 +70,7 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
     <Layout.Main>
       {(stats && media.sm) && (
         <YStack gap="$medium">
-          <BreadCrumbV2 items={[{ id: "read", label: 'Lecture', icon: Eye }, { id: "stats", label: 'Statistiques', icon: PieChart, color: '$purple5' }]} value={activeSection} onChange={(v) => { setActiveSection(v) }} />
+          <BreadCrumbV2 items={[{ id: "read", label: 'Lecture', icon: Eye }, { id: "stats", label: 'Statistiques', icon: PieChart, color: '$purple5' }]} value={activeSection} onChange={(v) => { setActiveSection(v as 'read' | 'stats') }} />
         </YStack>
       )}
       <LayoutScrollView 
@@ -56,7 +81,7 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
         }
       >
         <YStack gap="$medium" width="100%" marginHorizontal="auto" paddingBottom={100}>
-          <ContentBackButton fallbackPath="/publications/index" />
+          <ContentBackButton fallbackPath="/publications" />
           {
             (activeSection === 'read' || media.gtSm) && (
               <YStack gap="$medium" pt={media.sm ? '$medium' : 0}>
@@ -80,7 +105,12 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
           }
 
           {stats && (activeSection === 'stats' || media.gtSm) && (
-            <YStack gap={media.sm ? 0 : "$medium"} pt={media.sm ? 0 : '$large'}>
+            <YStack 
+              id="publication-stats"
+              ref={statsSectionRef as React.RefObject<HTMLElement>}
+              gap={media.sm ? 0 : "$medium"} 
+              pt={media.sm ? 0 : '$large'}
+            >
               <XStack gap="$small" px="$medium" display={media.sm ? 'none' : 'flex'}>
                 <PieChart size={20} />
                 <Text.LG semibold>Statistiques de publication</Text.LG>
