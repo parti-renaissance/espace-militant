@@ -1,6 +1,5 @@
 import { forwardRef, PropsWithChildren, useImperativeHandle, useState } from 'react'
 import { Modal, StyleSheet } from 'react-native'
-import VoxCard from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { View } from 'tamagui'
 
@@ -23,7 +22,7 @@ const VoxSimpleModal = forwardRef<ModalRef, PropsWithChildren>((props, ref) => {
     <Modal animationType={'fade'} transparent visible={!!open}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <VoxCard>{props.children}</VoxCard>
+          {props.children}
         </View>
       </View>
     </Modal>

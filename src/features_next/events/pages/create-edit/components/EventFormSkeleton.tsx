@@ -68,51 +68,55 @@ const MobileSkeleton = (props?: { editMode?: boolean }) => {
   const navigation = useNavigation()
 
   return (
-    <LayoutScrollView padding={false}>
-      <YStack>
-        <VoxHeader>
-          <XStack alignItems="center" flex={1} width="100%">
-            <XStack alignContent="flex-start">
-              <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
-                <VoxButton size="lg" variant="soft" theme="orange">
-                  Annuler
-                </VoxButton>
-              </Link>
-            </XStack>
-            <XStack flexGrow={1} justifyContent="center">
-              <VoxHeader.Title>{props?.editMode ? "Modifier l'événement" : 'Créer un événement'}</VoxHeader.Title>
-            </XStack>
-            <XStack>
-              <VoxButton size="lg" variant="text" theme="blue" disabled>
-                Créer
+    <YStack flex={1}>
+      <VoxHeader>
+        <XStack alignItems="center" flex={1} width="100%">
+          <XStack alignContent="flex-start">
+            <Link href={navigation.canGoBack() ? '../' : '/evenements'} replace asChild={!isWeb}>
+              <VoxButton size="lg" variant="soft" theme="orange">
+                Annuler
               </VoxButton>
-            </XStack>
+            </Link>
           </XStack>
-        </VoxHeader>
+          <XStack flexGrow={1} justifyContent="center">
+            <VoxHeader.Title>{props?.editMode ? "Modifier l'événement" : 'Créer un événement'}</VoxHeader.Title>
+          </XStack>
+          <XStack>
+            <VoxButton size="lg" variant="text" theme="blue" disabled>
+              Créer
+            </VoxButton>
+          </XStack>
+        </XStack>
+      </VoxHeader>
 
-        <SkeCard>
-          <SkeCard.Content>
-            <SF theme="purple" />
-            <SkeCard.Separator />
-            <SF />
-            <SF />
-            <SF />
-            <SkeCard.Separator />
-            <SF height={200} />
-            <SkeCard.Separator />
-            <XStack gap="$small">
-              <SkeCard.Button />
-              <SkeCard.Button />
-            </XStack>
-            <SF />
-            <SF height={200} />
-            <SkeCard.Separator />
-            <SF />
-            <SF />
-          </SkeCard.Content>
-        </SkeCard>
-      </YStack>
-    </LayoutScrollView>
+      <LayoutScrollView padding={false}>
+        <YStack>
+
+
+          <SkeCard>
+            <SkeCard.Content>
+              <SF theme="purple" />
+              <SkeCard.Separator />
+              <SF />
+              <SF />
+              <SF />
+              <SkeCard.Separator />
+              <SF height={200} />
+              <SkeCard.Separator />
+              <XStack gap="$small">
+                <SkeCard.Button />
+                <SkeCard.Button />
+              </XStack>
+              <SF />
+              <SF height={200} />
+              <SkeCard.Separator />
+              <SF />
+              <SF />
+            </SkeCard.Content>
+          </SkeCard>
+        </YStack>
+      </LayoutScrollView>
+    </YStack>
   )
 }
 
