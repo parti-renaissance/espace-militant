@@ -53,8 +53,7 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
   const { isAuth } = useSession();
   const openExternalContentHook = useOpenExternalContent({ slug: 'formation' });
   const { tags } = useGetTags({ tags: [UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] });
-  const membershipStatus = tags ? getMembershipStatus(tags) : null;
-
+  
   const openRef = useRef(openExternalContentHook.open);
   useEffect(() => {
     openRef.current = openExternalContentHook.open;
@@ -62,6 +61,8 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
 
   return useMemo(() => {
     const baseConfig = isAuth ? militantNavItemsAuthConfig : militantNavItemsPublicConfig;
+ 
+    const membershipStatus = tags ? getMembershipStatus(tags) : null;
 
     return baseConfig.map((item) => {
       // Pour l'item "formations", si le statut n'est pas "valid", utiliser la route locale
@@ -98,7 +99,7 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
 
       return config;
     });
-  }, [isAuth, membershipStatus]);
+  }, [isAuth, tags]);
 };
 
 export const militantNavItems: NavItemConfig[] = []
