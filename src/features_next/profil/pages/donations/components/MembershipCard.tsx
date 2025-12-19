@@ -24,6 +24,7 @@ type CardStatus = keyof typeof cardsByStatus
 
 const getCardByStatus = (status: CardStatus) => cardsByStatus[status]
 
+// TODO: Move to utils/membershipStatus.ts
 const getMembershipCardStatus = (tags: RestProfilResponse['tags']): CardStatus | null => {
   const codes = tags.map((tag) => tag.code)
 
