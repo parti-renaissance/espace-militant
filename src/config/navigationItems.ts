@@ -2,9 +2,11 @@ import { ComponentProps, useMemo, useCallback, useRef, useEffect } from 'react'
 import { Home, Calendar, Zap, HeartHandshake, GraduationCap, Link, ClipboardCheck, ScrollText, Group, DoorOpen, Network, Goal, Vote, CircleUser, Globe, Download, FileStack, Award, MessageSquareQuote, FileBadge, CopyCheck, Swords, ClipboardList, PhoneOutgoing, MapPin, PartyPopper, UsersRound, TabletSmartphone, Laptop, MessageSquareDot, Mail, Sparkle, Eye, Signature, Map } from '@tamagui/lucide-icons'
 import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
 import type { IconComponent } from '@/models/common.model'
-import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { UserTagEnum } from '@/core/entities/UserProfile'
+import { useGetExecutiveScopes, useGetTags } from '@/services/profile/hook'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { useSession } from '@/ctx/SessionProvider'
+import { getMembershipStatus } from '@/utils/membershipStatus'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 
@@ -50,7 +52,8 @@ const militantNavItemsPublicConfig: NavItemConfig[] = [
 export const useMilitantNavItems = (): NavItemConfig[] => {
   const { isAuth } = useSession();
   const openExternalContentHook = useOpenExternalContent({ slug: 'formation' });
-
+  const { tags } = useGetTags({ tags: [UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] });
+  
   const openRef = useRef(openExternalContentHook.open);
   useEffect(() => {
     openRef.current = openExternalContentHook.open;
@@ -58,8 +61,20 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
 
   return useMemo(() => {
     const baseConfig = isAuth ? militantNavItemsAuthConfig : militantNavItemsPublicConfig;
+ 
+    const membershipStatus = tags ? getMembershipStatus(tags) : null;
 
     return baseConfig.map((item) => {
+      // Pour l'item "formations", si le statut n'est pas "valid", utiliser la route locale
+      if (item.id === 'formations' && membershipStatus !== 'valid') {
+        return {
+          ...item,
+          href: '/(tabs)/formations',
+          externalUrlSlug: undefined,
+          externalLink: false,
+        };
+      }
+
       const config: NavItemConfig = {
         ...item,
         externalLink: item.externalUrlSlug ? true : false,
@@ -84,7 +99,7 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
 
       return config;
     });
-  }, [isAuth]);
+  }, [isAuth, tags]);
 };
 
 export const militantNavItems: NavItemConfig[] = []

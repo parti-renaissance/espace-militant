@@ -10,6 +10,7 @@ import { useGetExecutiveScopes, useGetProfil, useGetSuspenseProfil } from '@/ser
 import { RestProfilResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { getMembershipStatus } from '@/utils/membershipStatus'
 import { ChevronRight, ClipboardCheck, GraduationCap, History, Link as LinkIcon, SquareUser, UserPlus } from '@tamagui/lucide-icons'
 import { getYear } from 'date-fns'
 import { Link } from 'expo-router'
@@ -171,7 +172,8 @@ export function MyProfileCardNoLinks() {
   const { user: session } = useUserStore()
   const user = useGetSuspenseProfil({ enabled: !!session })
   const profile = user?.data
-  const statusAdh = profile ? getMembershipCardStatus(profile.tags) : null
+  const status = profile ? getMembershipStatus(profile.tags) : null
+  const statusAdh = status === 'renew' || status === 'tofinish' ? status : null
   const showEluCard = (profile?.tags ?? []).map((tag) => tag.code).find((x) => ['elu:attente_declaration', 'elu:cotisation_nok'].includes(x))
 
   if (!profile) {
