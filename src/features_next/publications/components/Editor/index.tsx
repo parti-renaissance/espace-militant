@@ -36,6 +36,7 @@ export type MessageEditorProps = {
 
 export type MessageEditorRef = {
   submit: () => void
+  save: () => Promise<void>
   unSelect: () => void
 }
 
@@ -191,6 +192,11 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
         console.error('Validation errors:', errors);
       }
     ),
+    save: async () => {
+      const currentValues = getValues()
+      const fields = renderFieldsRef.current?.getFields() ?? []
+      await onImmediateSave(currentValues.formValues, fields, currentValues.metaData, props.sender, zipMessage, getHTML, defaultTheme)
+    },
     unSelect: () => {
       setValue('selectedField', null)
       setValue('addBarOpenForFieldId', null)

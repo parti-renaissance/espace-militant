@@ -118,14 +118,13 @@ export default function PublicationsScreen() {
   }, [defaultScope]);
 
   const handleReturnToPreviousScope = useCallback(() => {
-    if (previousScope && scopes?.list) {
+    if (previousScope) {
       mutateScope({
         scope: previousScope,
-        lastAvailableScopes: scopes.list.map((s) => s.code),
       });
       setPreviousScope(null);
     }
-  }, [mutateScope, scopes?.list, previousScope]);
+  }, [mutateScope, previousScope]);
 
   const accessDenyButton = previousScope ? (
     <VoxButton theme="purple" iconLeft={ArrowLeft} onPress={handleReturnToPreviousScope}>

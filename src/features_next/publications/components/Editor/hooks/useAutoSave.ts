@@ -65,6 +65,7 @@ export const useAutoSave = (props: {
         queryClient.invalidateQueries({ queryKey: ['message', data.uuid] })
         queryClient.invalidateQueries({ queryKey: ['message-content', data.uuid] })
       }
+      queryClient.invalidateQueries({ queryKey: ['messages'],  exact: false })
     },
     onError: (error) => {
       if (error instanceof GenericResponseError) {
