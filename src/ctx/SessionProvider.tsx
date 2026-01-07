@@ -82,8 +82,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
         if (!session) {
           return
         }
-        const { accessToken, refreshToken, idToken: sessionId } = session
-        setSession({ accessToken, refreshToken, sessionId, isAdmin: props?.isAdmin })
+        const { accessToken, refreshToken, idToken: sessionId, expiresIn } = session
+        setSession({ accessToken, refreshToken, sessionId, isAdmin: props?.isAdmin, accessTokenExpiresIn: expiresIn })
       } catch (e) {
         ErrorMonitor.log(e.message, { e })
         toast.show('Erreur lors de la connexion', { type: 'error' })
@@ -118,8 +118,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
       if (!session) {
         return
       }
-      const { accessToken, refreshToken, idToken: sessionId } = session
-      setSession({ accessToken, refreshToken, sessionId })
+      const { accessToken, refreshToken, idToken: sessionId, expiresIn } = session
+      setSession({ accessToken, refreshToken, sessionId, accessTokenExpiresIn: expiresIn })
     } catch (e) {
       ErrorMonitor.log(e.message, { e })
       toast.show('Erreur lors de la connexion', { type: 'error' })
