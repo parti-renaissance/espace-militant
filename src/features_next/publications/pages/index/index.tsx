@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useGetExecutiveScopes } from "@/services/profile/hook";
+import React, { useMemo, useCallback } from "react";
+import { useGetExecutiveScopes, useMutateExecutiveScope } from "@/services/profile/hook";
 import { useGetAvailableSenders } from "@/services/publications/hook";
 import { IndexContent } from './components/IndexContent'
 import { IndexSkeleton } from './components/IndexSkeleton'
 
 export default function MessagePageIndex() {
   const { data: scopes, isLoading } = useGetExecutiveScopes();
-  const [selectedScope, setSelectedScope] = useState<string | undefined>(undefined);
+  const { mutate: mutateScope } = useMutateExecutiveScope();
 
   const availableScopes = useMemo(
     () => (scopes?.list || []).filter((scope) => scope.features.includes("publications")),
@@ -15,21 +15,24 @@ export default function MessagePageIndex() {
 
   const scopeCodes = useMemo(() => availableScopes.map((scope) => scope.code), [availableScopes]);
 
-  useEffect(() => {
-    if (scopeCodes.length === 0 || (selectedScope && scopeCodes.includes(selectedScope))) return;
+  const handleScopeChange = useCallback((scope: string) => {
+    mutateScope({ scope });
+  }, [mutateScope]);
 
+  const selectedScope = useMemo(() => {
+    if (scopeCodes.length === 0) return undefined;
     const defaultCode = scopes?.default?.code;
-    setSelectedScope(defaultCode && scopeCodes.includes(defaultCode) ? defaultCode : scopeCodes[0]);
-  }, [scopes?.default?.code, scopeCodes, selectedScope]);
-
-  useGetAvailableSenders({
-    scope: selectedScope || '',
-  });
+    return defaultCode && scopeCodes.includes(defaultCode) ? defaultCode : scopeCodes[0];
+  }, [scopes?.default?.code, scopeCodes]);
 
   const scopeOptions = useMemo(
     () => availableScopes.map((scope) => ({ value: scope.code, label: scope.name })),
     [availableScopes]
   );
+
+  useGetAvailableSenders({
+    scope: selectedScope || '',
+  });
 
   if (isLoading) {
     return <IndexSkeleton />
@@ -39,7 +42,7 @@ export default function MessagePageIndex() {
     <IndexContent 
       scopeOptions={scopeOptions}
       selectedScope={selectedScope}
-      onScopeChange={setSelectedScope}
+      onScopeChange={handleScopeChange}
     />
   );
 }

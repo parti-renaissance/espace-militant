@@ -1,8 +1,9 @@
-import { Text, TextStyle, Linking } from 'react-native'
+import { Text, TextStyle } from 'react-native'
 import { useThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { View, YStack } from 'tamagui'
 import { useHits } from '@/services/hits/hook'
+import { handleLinkPress } from '@/utils/linkHandler'
 
 export const ButtonRenderer = ({
   data,
@@ -22,18 +23,21 @@ export const ButtonRenderer = ({
   
   if (!data.content) return null
 
-  const handlePress = () => {
+  const handlePress = async () => {
     if (data.content?.link) {
-      if (allowHits) {
-        trackClick({
-          object_type: 'publication',
-          object_id: publicationUuid,
-          target_url: data.content.link,
-          button_name: data.content.text,
-        })
-      }
+      const url = data.content.link
+      const onLinkClick = allowHits
+        ? (target_url: string, button_name: string) => {
+            trackClick({
+              object_type: 'publication',
+              object_id: publicationUuid,
+              target_url,
+              button_name,
+            })
+          }
+        : undefined
       
-      Linking.openURL(data.content.link)
+      await handleLinkPress(url, onLinkClick, data.content.text)
     }
   }
 

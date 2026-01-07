@@ -83,7 +83,11 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
   }, [onEndReached, hasMore, loadMore, onEndReachedThreshold, onScroll])
 
   const refreshControlElement = refreshControl ?? (refreshing !== undefined && onRefresh ? (
-    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+    <RefreshControl 
+      refreshing={refreshing} 
+      onRefresh={onRefresh}
+      progressViewOffset={Platform.OS === 'android' && padding !== false ? 8 : undefined}
+    />
   ) : undefined)
   
   return (
