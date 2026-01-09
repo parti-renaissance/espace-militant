@@ -1,6 +1,5 @@
-import { useGetTags } from '@/services/profile/hook'
-import { UserTagEnum } from '@/core/entities/UserProfile'
-import { getMembershipStatus } from '@/utils/membershipStatus'
+import { useHasRecentMembership } from '@/services/profile/hook'
+import { MembershipStatus } from '@/utils/membershipStatus'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { useMedia, YStack } from 'tamagui'
 import { JoinMembershipCard, RenewMembershipCard, AccessFormationsCard } from '../components/MembershipCards'
@@ -25,7 +24,7 @@ function FormationsSkeleton() {
   )
 }
 
-function FormationsContent({ status }: { status: ReturnType<typeof getMembershipStatus> }) {
+function FormationsContent({ hasAccess, status }: { hasAccess: boolean; status: MembershipStatus | null }) {
   const media = useMedia()
 
   return (
@@ -36,9 +35,14 @@ function FormationsContent({ status }: { status: ReturnType<typeof getMembership
       >
         <YStack gap="$medium">
           <ContentBackButton fallbackPath="/evenements" />
-          {(status === 'join' || status === 'tofinish') && <JoinMembershipCard />}
-          {status === 'renew' && <RenewMembershipCard />}
-          {status === 'valid' && <AccessFormationsCard />}
+          {hasAccess ? (
+            <AccessFormationsCard />
+          ) : (
+            <>
+              {status === 'renew' && <RenewMembershipCard />}
+              {(status === 'join' || status === 'tofinish') && <JoinMembershipCard />}
+            </>
+          )}
         </YStack>
       </LayoutScrollView>
     </Layout.Main>
@@ -46,14 +50,12 @@ function FormationsContent({ status }: { status: ReturnType<typeof getMembership
 }
 
 export default function FormationsScreen() {
-  const { tags, isPending } = useGetTags({ tags: [UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] })
+  const { hasAccess, isPending, status } = useHasRecentMembership()
 
-  if (isPending || !tags) {
+  if (isPending) {
     return <FormationsSkeleton />
   }
 
-  const status = getMembershipStatus(tags ?? [])
-
-  return <FormationsContent status={status} />
+  return <FormationsContent hasAccess={hasAccess} status={status} />
 }
 

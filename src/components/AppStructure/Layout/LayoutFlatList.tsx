@@ -48,7 +48,11 @@ function LayoutFlatListInner<T>(
   const nativeOnEndReached = !isWeb && onEndReached ? loadMore : undefined
 
   const refreshControlElement = refreshControl ?? (refreshing !== undefined && onRefresh ? (
-    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      progressViewOffset={Platform.OS === 'android' && padding !== false ? 8 : undefined}
+    />
   ) : undefined)
 
   return (
@@ -60,7 +64,7 @@ function LayoutFlatListInner<T>(
       onEndReached={nativeOnEndReached}
       onEndReachedThreshold={onEndReachedThreshold}
       refreshControl={refreshControlElement}
-      contentInsetAdjustmentBehavior={ Platform.OS === 'ios' ? 'automatic' : undefined}
+      contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
       contentContainerStyle={[
         {
           paddingTop: Platform.OS === 'ios' ? 8 : spacingValues.paddingTop,

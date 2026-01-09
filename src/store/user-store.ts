@@ -8,6 +8,8 @@ export interface User {
   refreshToken?: string
   sessionId?: string
   isAdmin?: boolean
+  accessTokenExpiresIn?: number
+  accessTokenExpiresAt?: number
 }
 
 interface UserState {
@@ -22,6 +24,7 @@ interface UserState {
   lastAvailableScopes: string[] | null
   _hasHydrated: boolean
   _setHasHydrated: (hasHydrated: boolean) => void
+  rehydrateFromStorage: () => Promise<void>
 }
 
 const userStoreSlice: StateCreator<UserState> = (set) => ({
@@ -32,10 +35,33 @@ const userStoreSlice: StateCreator<UserState> = (set) => ({
   lastAvailableScopes: null,
   setDefaultScope: (scope) => set({ defaultScope: scope }),
   setLastAvailableScopes: (scopes) => set({ lastAvailableScopes: scopes }),
-  setCredentials: (user) => set({ user }),
+  setCredentials: (user) => {
+    const userWithExpiration: User = {
+      ...user,
+      // Calcule accessTokenExpiresAt depuis accessTokenExpiresIn si disponible
+      accessTokenExpiresAt: user.accessTokenExpiresIn
+        ? Date.now() + user.accessTokenExpiresIn * 1000
+        : user.accessTokenExpiresAt,
+    }
+    set({ user: userWithExpiration })
+  },
   removeCredentials: () => set({ user: null }),
   _setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   setHideReSubscribeAlert: (hideResubscribeAlert) => set({ hideResubscribeAlert }),
+  rehydrateFromStorage: async () => {
+    // Force la réhydratation depuis le storage pour éviter les désynchronisations entre onglets
+    try {
+      const stored = await AsyncStorage.getItem('user')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (parsed.state?.user) {
+          set({ user: parsed.state.user })
+        }
+      }
+    } catch (error) {
+      ErrorMonitor.log('Failed to rehydrate from storage', { error })
+    }
+  },
 })
 
 const persistedUserStore = persist<UserState>(userStoreSlice, {

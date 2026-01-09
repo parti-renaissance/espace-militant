@@ -3,11 +3,13 @@ import { useGetTags } from '@/services/profile/hook'
 import type { RestDetailedProfileResponse } from '@/services/profile/schema'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { getMembershipStatus } from '@/utils/membershipStatus'
 import { FullWrapper } from './FullWrapper'
 import ImpossibleMembershipCard from './ImpossibleMembershipCard'
 import JoinMembershipCard from './JoinMembershipCard'
 import RenewMembershipCard from './RenewMembershipCard'
 import ValidMembershipCard from './ValidMembershipCard'
+import { UserTagEnum } from '@/core/entities/UserProfile'
 
 type MembershipCardProps = Pick<RestDetailedProfileResponse, 'last_membership_donation' | 'other_party_membership'> & {
   full?: boolean
@@ -24,29 +26,23 @@ type CardStatus = keyof typeof cardsByStatus
 
 const getCardByStatus = (status: CardStatus) => cardsByStatus[status]
 
-// TODO: Move to utils/membershipStatus.ts
 const getMembershipCardStatus = (tags: RestProfilResponse['tags']): CardStatus | null => {
   const codes = tags.map((tag) => tag.code)
 
   if (codes.includes('sympathisant:autre_parti')) {
     return 'impossible'
   }
-  const AtDate = codes.find((code) => code.startsWith('adherent:a_jour_'))
-  if (AtDate) {
-    const todayYear = new Date().getFullYear()
-    const codeYear = parseInt(AtDate.split('_')[2])
-    if (!codeYear || Number.isNaN(codeYear)) {
-      ErrorMonitor.log(`Invalid tag code date parsing: ${AtDate}`)
-      return null
-    }
-    return codeYear >= todayYear ? 'valid' : 'renew'
+  const status = getMembershipStatus(tags)
+
+  if (status === 'tofinish') {
+    return 'join'
   }
 
-  return 'join'
+  return status as CardStatus
 }
 
 const MembershipCard = (props: MembershipCardProps) => {
-  const { tags, isPending } = useGetTags({ tags: ['sympathisant', 'adherent'] })
+  const { tags, isPending } = useGetTags({ tags: [UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] })
   if (isPending || !tags)
     return (
       <SkeCard>

@@ -9,6 +9,7 @@ import * as U from './utils'
 import { Svg, LinearGradient, Rect, Defs, Stop } from 'react-native-svg'
 import { useHits } from '@/services/hits/hook'
 import { ObjectType } from '@/services/hits/schema'
+import { isInternalLink, handleLinkPress } from '@/utils/linkHandler'
 
 type RenderFn<A, P extends object = Record<string, unknown>> = (props: { data: A } & P) => React.ReactNode
 
@@ -62,26 +63,48 @@ const RenderText: RenderFn<S.TipText, HitsContext> = ({ data, onLinkClick }) => 
   const marks = data.marks?.map(({ type }) => type)
   const link = data.marks?.find(U.isTipLinkMark)
 
-  const handlePress = () => {
-    if (link && onLinkClick) {
-      onLinkClick(link.attrs.href, data.text)
-    }
+  const handlePress = async (e?: any) => {
+    if (!link) return
+    await handleLinkPress(link.attrs.href, onLinkClick, data.text, e)
   }
 
   if (link) {
-    return (
-      <Link href={link.attrs.href as Href} target="_blank" onPress={handlePress}>
+    const url = link.attrs.href
+    const internal = isInternalLink(url)
+    
+    if (isWeb) {
+      return (
+        <Link 
+          href={link.attrs.href as Href} 
+          target={internal ? undefined : "_blank"} 
+          onPress={handlePress}
+        >
+          <Text.MD
+            color="$blue5"
+            textDecorationLine="underline"
+            multiline
+            semibold={marks?.includes('bold')}
+            fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}
+          >
+            {data.text}
+          </Text.MD>
+        </Link>
+      )
+    } else {
+      return (
         <Text.MD
           color="$blue5"
           textDecorationLine="underline"
           multiline
           semibold={marks?.includes('bold')}
           fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}
+          onPress={handlePress}
+          cursor="pointer"
         >
           {data.text}
         </Text.MD>
-      </Link>
-    )
+      )
+    }
   }
   return (
     <Text.MD multiline color="$gray8" semibold={marks?.includes('bold')} fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}>
@@ -126,26 +149,50 @@ const RenderHeading: RenderFn<S.TipHeading, HitsContext> = ({ data, onLinkClick 
       }
       const fontSize = fontSizeMap[level as keyof typeof fontSizeMap] || 16
 
-      const handlePress = () => {
-        if (link && onLinkClick) {
-          onLinkClick(link.attrs.href, x.text)
-        }
+      const handlePress = async (e?: any) => {
+        if (!link) return
+        await handleLinkPress(link.attrs.href, onLinkClick, x.text, e)
       }
 
       if (link) {
-        return (
-          <Link key={x.type + i} href={link.attrs.href as Href} target="_blank" onPress={handlePress}>
+        const url = link.attrs.href
+        const internal = isInternalLink(url)
+        
+        if (isWeb) {
+          return (
+            <Link 
+              key={x.type + i} 
+              href={link.attrs.href as Href} 
+              target={internal ? undefined : "_blank"} 
+              onPress={handlePress}
+            >
+              <Text
+                fontSize={fontSize}
+                color="$blue5"
+                textDecorationLine="underline"
+                fontWeight={marks?.includes('bold') ? '700' : '600'}
+                fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}
+              >
+                {x.text}
+              </Text>
+            </Link>
+          )
+        } else {
+          return (
             <Text
+              key={x.type + i}
               fontSize={fontSize}
               color="$blue5"
               textDecorationLine="underline"
               fontWeight={marks?.includes('bold') ? '700' : '600'}
               fontStyle={marks?.includes('italic') ? 'italic' : 'normal'}
+              onPress={handlePress}
+              cursor="pointer"
             >
               {x.text}
             </Text>
-          </Link>
-        )
+          )
+        }
       }
 
       return (

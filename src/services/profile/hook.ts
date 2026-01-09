@@ -1,7 +1,7 @@
 import clientEnv from '@/config/clientEnv'
 import { UserTagEnum } from '@/core/entities/UserProfile'
 import * as api from '@/services/profile/api'
-import { RestProfilResponse, RestProfilResponseTagTypes, RestUpdateProfileRequest, RestRemoveProfileRequest } from '@/services/profile/schema'
+import { RestProfilResponse, RestProfilResponseTagTypes, RestUpdateProfileRequest, RestRemoveProfileRequest, RestDonationsResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { getFullVersion } from '@/utils/version'
@@ -12,6 +12,7 @@ import { isWeb } from 'tamagui'
 import { GenericResponseError } from '../common/errors/generic-errors'
 import { ProfilChangePasswordFormError } from './error'
 import { useSession } from '@/ctx/SessionProvider'
+import { getMembershipStatus } from '@/utils/membershipStatus'
 
 export const PROFIL_QUERY_KEY = 'profil'
 
@@ -220,11 +221,52 @@ export const useDeleteProfil = () => {
   })
 }
 
-export const useGetDonations = () => {
+export const useGetDonations = ({ enabled }: { enabled?: boolean } = {}) => {
   return useQuery({
     queryKey: ['donations'],
     queryFn: () => api.getDonations(),
+    enabled: enabled !== false,
   })
+}
+
+const hasRecentMembership = (donations: RestDonationsResponse | undefined): boolean => {
+  if (!donations?.length) return false
+
+  const sixMonthsAgo = new Date()
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
+  return donations.some((donation) => {
+    const donationDate = new Date(donation.date)
+    if (Number.isNaN(donationDate.getTime())) return false
+
+    return donation.membership === true && donation.status === 'finished' && donationDate >= sixMonthsAgo
+  })
+}
+
+type UseHasRecentMembershipResult = {
+  hasAccess: boolean
+  isPending: boolean
+  status: ReturnType<typeof getMembershipStatus> | null
+}
+
+export const useHasRecentMembership = (): UseHasRecentMembershipResult => {
+  const { tags, isPending: isTagsPending } = useGetTags({
+    tags: [UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT],
+  })
+
+  const status = tags ? getMembershipStatus(tags) : null
+  const isRenew = status === 'renew'
+  const isValid = status === 'valid'
+
+  const { data: donations, isPending: isDonationsPending } = useGetDonations({
+    enabled: isRenew,
+  })
+
+  const hasAccess = isValid ? true : isRenew ? hasRecentMembership(donations) : false
+
+  const isPending = isTagsPending || (isRenew ? isDonationsPending : false)
+
+  return { hasAccess, isPending, status }
 }
 
 export const useCancelDonation = () => {

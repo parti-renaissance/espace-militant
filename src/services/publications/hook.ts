@@ -22,6 +22,7 @@ export const useCreateMessage = (props: { uuid?: string }) => {
         queryClient.invalidateQueries({ queryKey: ['message', data.uuid] })
         queryClient.invalidateQueries({ queryKey: ['message-content', data.uuid] })
       }
+      queryClient.invalidateQueries({ queryKey: ['messages'], exact: false, })
     },
     onError: (error) => {
       if (error instanceof GenericResponseError) {
@@ -175,6 +176,7 @@ export const usePaginatedMessagesSuspense = (scope: string, status?: 'draft' | '
     getPreviousPageParam: (firstPage) =>
       firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined,
     refetchOnMount: true,
+    refetchOnWindowFocus: true,
   })
 }
 
