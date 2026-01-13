@@ -17,6 +17,7 @@ type VoxRichTextModalEditorProps = {
   title?: string
   placeholder?: string
   maxWidth?: number
+  enableVariables?: boolean
 }
 
 export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({ 
@@ -26,7 +27,8 @@ export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({
   onClose,
   title = 'Éditeur',
   placeholder,
-  maxWidth
+  maxWidth,
+  enableVariables,
 }) => {
   const editorRef = useRef<EditorRef | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -88,7 +90,12 @@ export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({
         </VoxHeader>
       }
     >
-      <VoxRichTextEditor ref={editorRef} value={value} placeholder={placeholder} />
+      <VoxRichTextEditor 
+        ref={editorRef} 
+        value={value} 
+        placeholder={placeholder}
+        enableVariables={enableVariables}
+      />
     </ModalOrPageBase>
   )
 }

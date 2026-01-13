@@ -309,3 +309,15 @@ export type RestFilterOptionSelect = z.infer<typeof RestFilterOptionSelectSchema
 export type RestFilter = z.infer<typeof RestFilterSchema>
 export type RestFilterCategory = z.infer<typeof RestFilterCategorySchema>
 export type RestFilterCollectionResponse = z.infer<typeof RestFilterCollectionResponseSchema>
+
+// Available variables schemas
+export const RestAvailableVariableSchema = z.object({
+  label: z.string(),
+  code: z.string(),
+  description: z.string().nullable(),
+})
+
+export const RestAvailableVariablesResponseSchema = z.array(RestAvailableVariableSchema)
+
+export type RestAvailableVariable = z.infer<typeof RestAvailableVariableSchema>
+export type RestAvailableVariablesResponse = z.infer<typeof RestAvailableVariablesResponseSchema>

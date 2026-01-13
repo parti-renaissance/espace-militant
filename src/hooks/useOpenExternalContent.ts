@@ -17,12 +17,19 @@ function useOpenExternalContent(props: { slug: types.Slugs; utm_source?: string;
       }
 
       queryLink.mutateAsync(params).then(({ url }) => {
-        trackClick({
-          target_url: url,
-          button_name: props.slug,
-          utm_source: props.utm_source,
-          utm_campaign: props.utm_campaign,
-        })
+        try {
+          trackClick({
+            target_url: url,
+            button_name: props.slug,
+            utm_source: props.utm_source,
+            utm_campaign: props.utm_campaign,
+          })
+        } catch (error) {
+          // Silently ignore tracking errors - they should not impact user experience
+          if (__DEV__) {
+            console.warn('[useOpenExternalContent] trackClick error:', error)
+          }
+        }
         if (isWeb) {
           if (newWindow) {
             newWindow.location.href = url

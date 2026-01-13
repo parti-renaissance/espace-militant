@@ -279,3 +279,12 @@ export const useGetFilterCollection = (props: { scope: string; enabled?: boolean
     staleTime: (query) => query.state.error ? 0 : 60 * 1000,
   })
 }
+
+export const useGetAvailableVariables = (props: { scope?: string; enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['available-variables'],
+    queryFn: () => api.getAvailableVariables({ scope: props?.scope }),
+      enabled: props.enabled !== false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}

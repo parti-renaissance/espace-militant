@@ -59,13 +59,50 @@ const RenderHardBreak: RenderFn<S.TipHardBreak> = () =>
     <Text.BR />
   )
 
-const RenderText: RenderFn<S.TipText, HitsContext> = ({ data, onLinkClick }) => {
+const RenderText: RenderFn<S.TipText, { editMode?: boolean } & HitsContext> = ({ data, onLinkClick, editMode = false }) => {
   const marks = data.marks?.map(({ type }) => type)
   const link = data.marks?.find(U.isTipLinkMark)
+  const variable = data.marks?.find(U.isTipVariableMark)
 
   const handlePress = async (e?: any) => {
     if (!link) return
     await handleLinkPress(link.attrs.href, onLinkClick, data.text, e)
+  }
+
+  // Render variable with badge styling
+  if (variable) {
+    const fontStyle = marks?.includes('italic') ? ('italic' as const) : ('normal' as const)
+
+
+    if (editMode) {
+      return (
+        <Text.MD
+          multiline
+          semibold={marks?.includes('bold')}
+          fontStyle={fontStyle}
+          color="$gray8"
+          backgroundColor="$gray3"
+          paddingHorizontal="$xsmall"
+          paddingVertical={2}
+          borderRadius={4}
+        >
+          {data.text ?? ' variable inconnue'}
+        </Text.MD>
+      )
+    } else {
+      return (
+        <Text.MD
+          multiline
+          semibold={marks?.includes('bold')}
+          fontStyle={fontStyle}
+          color="$gray8"
+        >
+          {
+            variable?.attrs?.value ?? data.text ?? ''
+          }
+        </Text.MD>
+      )
+    }
   }
 
   if (link) {
@@ -113,12 +150,12 @@ const RenderText: RenderFn<S.TipText, HitsContext> = ({ data, onLinkClick }) => 
   )
 }
 
-const RenderParagraph: RenderFn<S.TipParagraph, HitsContext> = ({ data, onLinkClick }) => {
+const RenderParagraph: RenderFn<S.TipParagraph, { editMode?: boolean } & HitsContext> = ({ data, onLinkClick, editMode = false }) => {
   return data.content ? (
     <Text.MD tag="p" marginVertical={0} color="$gray8">
       {data.content.map((x, i) => {
         if (U.isTipNonSupported(x)) return <RenderNonSupported key={x.type + i} data={x} />
-        if (U.isTipText(x)) return <RenderText key={x.type + i} data={x} onLinkClick={onLinkClick} />
+        if (U.isTipText(x)) return <RenderText key={x.type + i} data={x} onLinkClick={onLinkClick} editMode={editMode} />
         if (U.isTipHardBreak(x)) return <RenderHardBreak key={x.type + i} data={x} />
         return null
       })}
@@ -259,7 +296,7 @@ const RenderOrderedList: RenderFn<S.TipOrderedList, HitsContext> = ({ data: { co
   )
 }
 
-export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLines?: number } & HitsContext> = ({ data, numberOfLines, onLinkClick, ...props }) => {
+export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLines?: number; editMode?: boolean } & HitsContext> = ({ data, numberOfLines, onLinkClick, editMode = false, ...props }) => {
   const id = props.id ?? 'no-id'
 
   const content = data.map((x, i) => {
@@ -268,7 +305,7 @@ export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLine
     }
 
     if (U.isTipParagraph(x)) {
-      return <RenderParagraph key={id + i + x.type} data={x} onLinkClick={onLinkClick} />
+      return <RenderParagraph key={id + i + x.type} data={x} onLinkClick={onLinkClick} editMode={editMode} />
     }
 
     if (U.isTipHeading(x)) {
@@ -295,6 +332,7 @@ export const TipTapRenderer = (props: {
   numberOfLines?: number
   object_id?: string
   object_type?: ObjectType
+  editMode?: boolean
 }) => {
   const { trackClick } = useHits()
   const { content, type } = U.parseJsonEditorContent(props.content)
@@ -303,12 +341,19 @@ export const TipTapRenderer = (props: {
     if (!props.object_id || !props.object_type) return undefined
 
     return (target_url: string, button_name: string) => {
-      trackClick({
-        object_id: props.object_id,
-        object_type: props.object_type,
-        target_url,
-        button_name,
-      })
+      try {
+        trackClick({
+          object_id: props.object_id,
+          object_type: props.object_type,
+          target_url,
+          button_name,
+        })
+      } catch (error) {
+        // Silently ignore tracking errors - they should not impact user experience
+        if (__DEV__) {
+          console.warn('[TipTapRenderer] trackClick error:', error)
+        }
+      }
     }
   }, [props.object_id, props.object_type, trackClick])
 
@@ -328,6 +373,7 @@ export const TipTapRenderer = (props: {
           object_id={props.object_id}
           object_type={props.object_type}
           onLinkClick={onLinkClick}
+          editMode={props.editMode}
         />
       </YStack>
     )

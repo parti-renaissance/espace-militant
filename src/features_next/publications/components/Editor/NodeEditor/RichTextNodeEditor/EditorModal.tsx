@@ -25,6 +25,7 @@ const EditorModal = ({ value, onChange, onBlur, present, onClose }: EditorModalP
       title={value.pure.length > 0 ? 'Modifier le texte' : 'Nouveau texte'}
       placeholder="Votre contenu..."
       maxWidth={520}
+      enableVariables={true}
     />
   )
 }

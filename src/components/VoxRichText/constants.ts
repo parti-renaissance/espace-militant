@@ -9,80 +9,95 @@ export enum ToolbarContext {
   Heading,
 }
 
-export const TOOLBAR_ITEMS: ToolbarItem[] = [
-  {
-    onPress:
-      ({ editor }) =>
-        () =>
-          editor.undo(),
-    active: () => false,
-    disabled: ({ editorState }) => !editorState.canUndo,
-    image: () => Images.undo,
-  },
-  {
-    onPress:
-      ({ editor }) =>
-        () =>
-          editor.redo(),
-    active: () => false,
-    disabled: ({ editorState }) => !editorState.canRedo,
-    image: () => Images.redo,
-  },
-  {
-    onPress:
-      ({ editor }) =>
-        () =>
-          editor.toggleBold(),
-    active: ({ editorState }) => editorState.isBoldActive,
-    disabled: ({ editorState }) => !editorState.canToggleBold,
-    image: () => Images.bold,
-  },
-  {
-    onPress:
-      ({ editor }) =>
-        () =>
-          editor.toggleItalic(),
-    active: ({ editorState }) => editorState.isItalicActive,
-    disabled: ({ editorState }) => !editorState.canToggleItalic,
-    image: () => Images.italic,
-  },
-  {
-    onPress:
-      ({ editor }) =>
-        () =>
-          editor.toggleBulletList(),
-    active: ({ editorState }) => editorState.isBulletListActive,
-    disabled: ({ editorState }) => !editorState.canToggleBulletList,
-    image: () => Images.bulletList,
-  },
-  {
-    onPress:
-      ({ editor }) =>
-        () =>
-          editor.toggleOrderedList(),
-    active: ({ editorState }) => editorState.isOrderedListActive,
-    disabled: ({ editorState }) => !editorState.canToggleOrderedList,
-    image: () => Images.orderedList,
-  },
-  {
-    onPress:
-      ({ setToolbarContext, editorState, editor }) =>
-        () => {
-          if (Platform.OS === 'android') {
-            setTimeout(() => {
-              editor.setSelection(
-                editorState.selection.from,
-                editorState.selection.to
-              )
-            })
-          }
-          setToolbarContext(ToolbarContext.Link)
-        },
-    active: ({ editorState }) => editorState.isLinkActive,
-    disabled: ({ editorState }) => !editorState.isLinkActive && !editorState.canSetLink,
-    image: () => Images.link,
-  },
-]
+export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] => {
+  const baseItems: ToolbarItem[] = [
+    {
+      onPress:
+        ({ editor }) =>
+          () =>
+            editor.undo(),
+      active: () => false,
+      disabled: ({ editorState }) => !editorState.canUndo,
+      image: () => Images.undo,
+    },
+    {
+      onPress:
+        ({ editor }) =>
+          () =>
+            editor.redo(),
+      active: () => false,
+      disabled: ({ editorState }) => !editorState.canRedo,
+      image: () => Images.redo,
+    },
+    {
+      onPress:
+        ({ editor }) =>
+          () =>
+            editor.toggleBold(),
+      active: ({ editorState }) => editorState.isBoldActive,
+      disabled: ({ editorState }) => !editorState.canToggleBold,
+      image: () => Images.bold,
+    },
+    {
+      onPress:
+        ({ editor }) =>
+          () =>
+            editor.toggleItalic(),
+      active: ({ editorState }) => editorState.isItalicActive,
+      disabled: ({ editorState }) => !editorState.canToggleItalic,
+      image: () => Images.italic,
+    },
+    {
+      onPress:
+        ({ editor }) =>
+          () =>
+            editor.toggleBulletList(),
+      active: ({ editorState }) => editorState.isBulletListActive,
+      disabled: ({ editorState }) => !editorState.canToggleBulletList,
+      image: () => Images.bulletList,
+    },
+    {
+      onPress:
+        ({ editor }) =>
+          () =>
+            editor.toggleOrderedList(),
+      active: ({ editorState }) => editorState.isOrderedListActive,
+      disabled: ({ editorState }) => !editorState.canToggleOrderedList,
+      image: () => Images.orderedList,
+    },
+    {
+      onPress:
+        ({ setToolbarContext, editorState, editor }) =>
+          () => {
+            if (Platform.OS === 'android') {
+              setTimeout(() => {
+                editor.setSelection(
+                  editorState.selection.from,
+                  editorState.selection.to
+                )
+              })
+            }
+            setToolbarContext(ToolbarContext.Link)
+          },
+      active: ({ editorState }) => editorState.isLinkActive,
+      disabled: ({ editorState }) => !editorState.isLinkActive && !editorState.canSetLink,
+      image: () => Images.link,
+    },
+  ]
+
+  if (onVariablesPress) {
+    baseItems.push({
+      onPress: () => onVariablesPress,
+      active: () => false,
+      disabled: () => false,
+      image: () => Images.variables,
+    })
+  }
+
+  return baseItems
+}
+
+export const TOOLBAR_ITEMS: ToolbarItem[] = getToolbarItems()
 
 const customFontBase = (primary?: boolean) => `
 ${PublicSans}

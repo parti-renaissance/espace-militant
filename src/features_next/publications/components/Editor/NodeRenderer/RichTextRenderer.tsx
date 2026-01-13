@@ -23,6 +23,7 @@ export const RichTextRenderer = (props: {
           numberOfLines={props.numberOfLines}
           object_id={props.object_id}
           object_type="publication"
+          editMode={props.displayToolbar}
         />
       </View>
     </YStack>
