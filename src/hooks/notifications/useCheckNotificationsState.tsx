@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, Linking } from 'react-native'
+import { useSession } from '@/ctx/SessionProvider'
 import FB from '@/config/firebaseConfig'
 import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
@@ -10,6 +11,7 @@ export default function useCheckNotificationsState() {
   const [notificationGrantState, setNotificationGrantState] = useState<string | null>(null)
   const hasBeenGrantedOnce = useRef<null | string>(null)
   const isCheckingPermissions = useRef(false)
+  const { isAuth } = useSession()
 
   const { mutate: postPushToken } = useAddPushToken()
   const { mutate: removePushToken } = useRemovePushToken()
@@ -25,8 +27,10 @@ export default function useCheckNotificationsState() {
     if (granted && hasBeenGrantedOnce.current === null) {
       try {
         const token = await FB?.messaging.getToken()
-        hasBeenGrantedOnce.current = token
-        postPushToken({ token })
+        if (token) {
+          hasBeenGrantedOnce.current = token
+          postPushToken({ token })
+        }
       } catch (e) {
         //
       }
@@ -61,18 +65,8 @@ export default function useCheckNotificationsState() {
   }, [postPushToken, checkPermissions])
 
   useEffect(() => {
-    checkPermissions()
-    const interval = setInterval(checkPermissions, 10e3)
-
-    return () => {
-      if (interval) {
-        clearInterval(interval)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    checkPermissions()
+    if (isAuth) {
+      checkPermissions()
       const interval = setInterval(() => {
         if (!isCheckingPermissions.current) {
           checkPermissions()
@@ -82,7 +76,8 @@ export default function useCheckNotificationsState() {
       return () => {
         clearInterval(interval)
       }
-  }, [checkPermissions])
+    }
+  }, [checkPermissions, isAuth])
 
   return {
     notificationGranted,

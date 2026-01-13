@@ -85,7 +85,7 @@ class TokenRefreshManager {
       return response
     } catch (refreshError) {
       const isInvalidToken = this.isInvalidTokenError(refreshError)
-      
+
       if (isInvalidToken) {
         this.logError(refreshError, context)
         useUserStore.getState().removeCredentials()
@@ -95,14 +95,15 @@ class TokenRefreshManager {
       // Backoff uniquement pour les refresh prédictifs, pas pour les 401
       if (applyBackoff) {
         this.refreshFailureCount++
-        const backoffDelay = REFRESH_BACKOFF_DELAYS[Math.min(this.refreshFailureCount - 1, REFRESH_BACKOFF_DELAYS.length - 1)]
+        const backoffDelay =
+          REFRESH_BACKOFF_DELAYS[Math.min(this.refreshFailureCount - 1, REFRESH_BACKOFF_DELAYS.length - 1)]
         this.refreshDisabledUntil = Date.now() + backoffDelay
       }
 
       // Log prédictif uniquement en dev ou après 3 échecs consécutifs
-      const shouldLogPredictive = context === 'predictive refresh token failed' && 
-                                   (__DEV__ || this.refreshFailureCount >= 3)
-      
+      const shouldLogPredictive =
+        context === 'predictive refresh token failed' && (__DEV__ || this.refreshFailureCount >= 3)
+
       if (shouldLogPredictive) {
         if (__DEV__) {
           console.warn('[RefreshToken] Predictive refresh failed (network error)', refreshError)
@@ -112,29 +113,29 @@ class TokenRefreshManager {
       } else if (context !== 'predictive refresh token failed') {
         this.logError(refreshError, context)
       }
-      
+
       return undefined
     }
   }
 
+  // ✅ PATCH: détection OAuth2 plus stricte (invalid_grant)
   private isInvalidTokenError(error: unknown): boolean {
-    if (error instanceof AxiosError) {
-      const status = error.response?.status
-      const data = error.response?.data
-
-      if (status === 401 || status === 403) {
+    // 1. Si c'est déjà une erreur transformée (GenericResponseError ou autre Error standard JS)
+    // On analyse simplement le message
+    if (error instanceof Error) {
+      const msg = error.message.toLowerCase()
+      // Détection des mots clés OAuth2 ou de l'erreur "The refresh token is invalid"
+      if (msg.includes('invalid_grant') || (msg.includes('refresh token') && msg.includes('invalid')) || msg.includes('revoked')) {
         return true
       }
-
-      if (status === 400) {
-        const errorMessage = typeof data === 'string' ? data : data?.error || data?.error_description || ''
-        const errorStr = String(errorMessage).toLowerCase()
-        return errorStr.includes('invalid_grant') || 
-               errorStr.includes('invalid_token') || 
-               errorStr.includes('expired') ||
-               errorStr.includes('revoked')
-      }
     }
+
+    // 2. Si par hasard une AxiosError "survit" jusqu'ici (ex: erreur réseau brute non catchée par constructApi)
+    // On considère toute 401 comme une session morte
+    if (error instanceof AxiosError && error.response?.status === 401) {
+      return true
+    }
+
     return false
   }
 
@@ -143,7 +144,8 @@ class TokenRefreshManager {
       return await this.rehydratePromise
     }
 
-    this.rehydratePromise = useUserStore.getState()
+    this.rehydratePromise = useUserStore
+      .getState()
       .rehydrateFromStorage()
       .finally(() => {
         this.rehydratePromise = null
@@ -156,9 +158,11 @@ class TokenRefreshManager {
    * Réhydrate et vérifie si le token a été rafraîchi ailleurs.
    * Cooldown uniquement sur mobile. Sur web, réhydrate toujours pour détecter les refresh dans d'autres onglets.
    */
-  private async rehydrateAndCheckToken(failedAccessToken?: string): Promise<RestRefreshTokenResponse | undefined> {
+  private async rehydrateAndCheckToken(
+    failedAccessToken?: string
+  ): Promise<RestRefreshTokenResponse | undefined> {
     const now = Date.now()
-    
+
     if (!isWeb && now - this.lastRehydrateAt < REHYDRATE_COOLDOWN) {
       return this.checkTokenFromMemory(failedAccessToken)
     }
@@ -191,9 +195,7 @@ class TokenRefreshManager {
     const token = freshUser?.accessToken
 
     const isValidByTime =
-      token &&
-      freshUser.accessTokenExpiresAt &&
-      freshUser.accessTokenExpiresAt > Date.now() + TOKEN_EXPIRATION_LEEWAY
+      token && freshUser.accessTokenExpiresAt && freshUser.accessTokenExpiresAt > Date.now() + TOKEN_EXPIRATION_LEEWAY
 
     if (!isValidByTime) {
       return undefined
@@ -261,7 +263,11 @@ class TokenRefreshManager {
     return await this.refreshPromise
   }
 
-  private async executeRefresh(context: string, applyBackoff: boolean = true, failedAccessToken?: string): Promise<RestRefreshTokenResponse | undefined> {
+  private async executeRefresh(
+    context: string,
+    applyBackoff: boolean = true,
+    failedAccessToken?: string
+  ): Promise<RestRefreshTokenResponse | undefined> {
     try {
       const alreadyRefreshed = await this.rehydrateAndCheckToken(failedAccessToken)
       if (alreadyRefreshed) {
@@ -293,8 +299,22 @@ class TokenRefreshManager {
     const details: Record<string, unknown> = { context }
     if (error instanceof AxiosError) {
       details.status = error.response?.status
-      details.responseData = error.response?.data
+
+      // Sentry-safe : extraire seulement les champs OAuth2
+      const data = error.response?.data
+      if (data && typeof data === 'object') {
+        const d = data as Record<string, unknown>
+        details.oauth_error = typeof d.error === 'string' ? d.error : undefined
+        details.oauth_error_description =
+          typeof d.error_description === 'string' ? d.error_description : undefined
+      } else if (typeof data === 'string') {
+        details.oauth_error_description = data
+      }
+
+      details.url = error.config?.url
+      details.method = error.config?.method
     }
+
     const user = useUserStore.getState().user
     if (user) {
       details.hasRefreshToken = !!user.refreshToken
@@ -302,15 +322,18 @@ class TokenRefreshManager {
     }
     details.refreshFailureCount = this.refreshFailureCount
 
+    // Titre clair (séparation par contexte)
+    const message = `TokenRefresh: ${context}`
+
     if (error instanceof Error) {
       Sentry.captureException(error, {
-        tags: { context, component: 'TokenRefresh' },
+        tags: { refresh_context: context, component: 'TokenRefresh' },
         extra: details,
       })
     } else {
-      Sentry.captureMessage(`Session expired: ${context}`, {
+      Sentry.captureMessage(message, {
         level: 'error',
-        tags: { context, component: 'TokenRefresh' },
+        tags: { refresh_context: context, component: 'TokenRefresh' },
         extra: details,
       })
     }
@@ -380,15 +403,15 @@ authInstance.interceptors.response.use(
     try {
       const authHeader = (originalRequest.headers?.Authorization ?? '') as string
       const failedToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : undefined
-      
+
       const refreshResponse = await tokenRefreshManager.refreshOn401(failedToken)
 
       if (!refreshResponse) {
         const user = useUserStore.getState().user
         if (user?.accessToken) {
-          const isTokenValid = user.accessTokenExpiresAt && 
-                               user.accessTokenExpiresAt > Date.now() + TOKEN_EXPIRATION_LEEWAY
-          
+          const isTokenValid =
+            user.accessTokenExpiresAt && user.accessTokenExpiresAt > Date.now() + TOKEN_EXPIRATION_LEEWAY
+
           if (isTokenValid) {
             return authInstance.request({
               ...originalRequest,
@@ -408,10 +431,12 @@ authInstance.interceptors.response.use(
           ...originalRequest.headers,
           Authorization: `Bearer ${refreshResponse.access_token}`,
         },
-      })
+      } as CustomAxiosRequestConfig)
     } catch (err) {
       if (err instanceof AxiosError && err.response?.status === 403) {
         tokenRefreshManager.logError(err, '403 during refresh')
+      } else if (tokenRefreshManager['isInvalidTokenError'](err)) {
+        tokenRefreshManager.logError(err, 'invalid refresh during refresh')
         useUserStore.getState().removeCredentials()
       } else {
         tokenRefreshManager.logError(err, 'unexpected error during refresh')
