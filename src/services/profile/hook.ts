@@ -242,7 +242,7 @@ const hasRecentMembership = (donations: RestDonationsResponse | undefined): bool
   if (!donations?.length) return false
 
   const sixMonthsAgo = new Date()
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 12) // 12 mois glissant
 
   return donations.some((donation) => {
     const donationDate = new Date(donation.date)
