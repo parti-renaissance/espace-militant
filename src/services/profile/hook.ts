@@ -17,17 +17,23 @@ import { getMembershipStatus } from '@/utils/membershipStatus'
 export const PROFIL_QUERY_KEY = 'profil'
 
 export const useGetProfil = (props?: { enabled?: boolean; placeholderData?: RestProfilResponse | PlaceholderDataFunction<RestProfilResponse> }) => {
+  const isAuth = useUserStore((state) => !!state.user?.accessToken)
+  const isEnabled = props?.enabled !== undefined ? props.enabled && isAuth : isAuth
+
   return useQuery({
     queryKey: [PROFIL_QUERY_KEY],
     queryFn: () => api.getProfile(),
-    enabled: props?.enabled,
+    enabled: isEnabled,
     staleTime: 1000 * 60 * 5,
     placeholderData: props?.placeholderData,
   })
 }
 
 function useGetSuspenseProfil(props?: { enabled?: boolean }) {
-  if (props?.enabled === false) {
+  const isAuth = useUserStore((state) => !!state.user?.accessToken)
+  const isEnabled = props?.enabled !== undefined ? props.enabled && isAuth : isAuth
+
+  if (isEnabled === false) {
     return { data: null }
   }
   return useSuspenseQuery({
@@ -40,11 +46,14 @@ function useGetSuspenseProfil(props?: { enabled?: boolean }) {
 export { useGetSuspenseProfil }
 
 export const useGetUserScopes = ({ enabled }: { enabled?: boolean } = {}) => {
+  const isAuth = useUserStore((state) => !!state.user?.accessToken)
+  const isEnabled = enabled !== undefined ? enabled && isAuth : isAuth
+
   return useQuery({
     queryKey: ['userScopes'],
     staleTime: 1000 * 60 * 5,
     queryFn: () => api.getUserScopes(),
-    enabled,
+    enabled: isEnabled,
   })
 }
 

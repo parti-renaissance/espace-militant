@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useSession } from '@/ctx/SessionProvider'
 import FB from '@/config/firebaseConfig'
 import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
 import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
@@ -11,6 +12,8 @@ export default function useCheckNotificationsState() {
   const [notificationGrantState, setNotificationGrantState] = useState<string | null>(null)
   const hasBeenGrantedOnce = useRef<null | string>(null)
   const isCheckingPermissions = useRef(false)
+
+  const { isAuth } = useSession()
 
   const { mutate: postPushToken } = useAddPushToken()
   const { mutate: removePushToken } = useRemovePushToken()
@@ -30,8 +33,10 @@ export default function useCheckNotificationsState() {
     if (permission === 'granted' && hasBeenGrantedOnce.current === null) {
       try {
         const token = await FB?.messaging.getToken()
-        hasBeenGrantedOnce.current = token
-        postPushToken({ token })
+        if (token) {
+          hasBeenGrantedOnce.current = token
+          postPushToken({ token })
+        }
       } catch (e) {
         // Trigger an error if safari but not requested permission
       }
@@ -59,7 +64,7 @@ export default function useCheckNotificationsState() {
   }, [])
 
   useEffect(() => {
-    if (notificationsSupported) {
+    if (notificationsSupported && isAuth) {
       checkPermissions()
       const interval = setInterval(() => {
         if (!isCheckingPermissions.current) {
@@ -71,7 +76,7 @@ export default function useCheckNotificationsState() {
         clearInterval(interval)
       }
     }
-  }, [notificationsSupported, checkPermissions])
+  }, [notificationsSupported, checkPermissions, isAuth])
 
   return {
     notificationGranted,
