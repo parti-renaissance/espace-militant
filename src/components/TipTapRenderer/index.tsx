@@ -80,13 +80,9 @@ const RenderText: RenderFn<S.TipText, { editMode?: boolean } & HitsContext> = ({
           multiline
           semibold={marks?.includes('bold')}
           fontStyle={fontStyle}
-          color="$gray8"
-          backgroundColor="$gray3"
-          paddingHorizontal="$xsmall"
-          paddingVertical={2}
-          borderRadius={4}
+          color="$purple5"
         >
-          {data.text ?? ' variable inconnue'}
+          {data.text ? `{{${data.text}}}`: ' variable inconnue'}
         </Text.MD>
       )
     } else {

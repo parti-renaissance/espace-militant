@@ -11,12 +11,16 @@ type TipTapNode = {
   attrs?: Record<string, unknown>
 }
 
+// Module-level regex for variable tokens
+const VARIABLE_TOKEN_REGEX = /\{\{([^}]+)\}\}/g
+
 /**
- * Removes all variable marks from content and replaces text with the code value
- * (used when variables are not enabled or not loaded)
+ * Converts storage JSON (with variable marks) to editor JSON (with text tokens)
+ * Storage format: text = "Prénom" + mark variable.attrs.code = "{{Prénom}}"
+ * Editor format: plain text with tokens {{Prénom}} (no variable marks)
  */
-export function removeVariableMarks(json: unknown): unknown {
-  if (!json || typeof json !== 'object') {
+export function storageToEditor(json: unknown): unknown {
+  if (!json || typeof json !== 'object' || json === null) {
     return json
   }
 
@@ -28,7 +32,7 @@ export function removeVariableMarks(json: unknown): unknown {
     if (variableMark && variableMark.attrs) {
       const code = variableMark.attrs.code as string
       if (code) {
-        // Replace the text with the code and remove the variable mark
+        // Replace the text with the code (token) and remove the variable mark
         const otherMarks = node.marks.filter((mark) => mark.type !== 'variable')
         return {
           ...node,
@@ -38,6 +42,8 @@ export function removeVariableMarks(json: unknown): unknown {
       }
     }
     // If no code found, just remove the variable marks
+    // If code absent but text present → keep text
+    // If code absent and text empty → keep empty (coherent behavior)
     const filteredMarks = node.marks.filter((mark) => mark.type !== 'variable')
     return {
       ...node,
@@ -49,7 +55,7 @@ export function removeVariableMarks(json: unknown): unknown {
   if (node.content && Array.isArray(node.content)) {
     return {
       ...node,
-      content: node.content.map((child) => removeVariableMarks(child)),
+      content: node.content.map((child) => storageToEditor(child)),
     }
   }
 
@@ -57,74 +63,50 @@ export function removeVariableMarks(json: unknown): unknown {
 }
 
 /**
- * Converts storage JSON (with variable marks) to editor JSON (with text tokens)
+ * Helper function to get variable label from token using a Map for O(1) lookup
+ * Extracts label from availableVariables if token matches variable.code
+ * Otherwise returns token without braces (trimmed)
  */
-export function convertStorageToEditor(
-  json: unknown,
-  availableVariables: RestAvailableVariable[]
-): unknown {
-  if (!json || typeof json !== 'object') {
-    return json
+function getVariableLabel(
+  token: string,
+  variablesMap: Map<string, RestAvailableVariable>
+): string {
+  // token is like "{{Prénom}}", find variable where code === "{{Prénom}}"
+  const variable = variablesMap.get(token)
+  
+  if (variable) {
+    return variable.label
   }
-
-  const node = json as TipTapNode
-
-  // If it's a text node with a variable mark, convert it to plain text token
-  if (node.type === 'text' && node.marks) {
-    const variableMark = node.marks.find((mark) => mark.type === 'variable')
-    if (variableMark && variableMark.attrs) {
-      const code = variableMark.attrs.code as string
-      if (code) {
-        // Replace the text with the token and remove the variable mark
-        const otherMarks = node.marks.filter((mark) => mark.type !== 'variable')
-        return {
-          ...node,
-          text: code,
-          marks: otherMarks.length > 0 ? otherMarks : undefined,
-        }
-      }
-    }
-  }
-
-  // Recursively process content
-  if (node.content && Array.isArray(node.content)) {
-    return {
-      ...node,
-      content: node.content.map((child) => convertStorageToEditor(child, availableVariables)),
-    }
-  }
-
-  return node
+  
+  // Extract content between braces as fallback label (trimmed for robustness)
+  const innerMatch = token.match(/\{\{([^}]+)\}\}/)
+  return innerMatch ? innerMatch[1].trim() : token
 }
 
 /**
  * Helper function to split a text node containing variable tokens into multiple text nodes
+ * Converts editor format (tokens {{...}}) to storage format (marks with labels)
  */
 function splitTextNodeWithVariables(
   node: TipTapNode,
-  availableVariables: RestAvailableVariable[]
+  variablesMap: Map<string, RestAvailableVariable>
 ): TipTapNode[] {
   if (!node.text) return [node]
 
   const text = node.text
-  const variableTokenRegex = /\{\{([^}]+)\}\}/g
-  const matches = Array.from(text.matchAll(variableTokenRegex))
+  // Create a new regex instance to avoid state issues with global regex
+  const regex = new RegExp(VARIABLE_TOKEN_REGEX.source, VARIABLE_TOKEN_REGEX.flags)
+  const matches = Array.from(text.matchAll(regex))
 
   if (matches.length === 0) {
     return [node]
   }
 
-  // Build a map of available variables by code
-  const variablesMap = new Map<string, RestAvailableVariable>()
-  availableVariables.forEach((variable) => {
-    variablesMap.set(variable.code, variable)
-  })
-
   // Process matches and build new content
   const newContent: TipTapNode[] = []
   let lastIndex = 0
 
-  matches.forEach((match) => {
+  for (const match of matches) {
     const fullMatch = match[0] // e.g., "{{Prénom}}"
     const matchIndex = match.index ?? 0
 
@@ -140,34 +122,28 @@ function splitTextNodeWithVariables(
       }
     }
 
-    // Check if this token matches an available variable
-    const variable = variablesMap.get(fullMatch)
-    if (variable) {
-      // Create a text node with variable mark
-      newContent.push({
-        type: 'text',
-        text: variable.label,
-        marks: [
-          ...(node.marks || []),
-          {
-            type: 'variable',
-            attrs: {
-              code: variable.code,
-            },
+    // Get variable label using Map (O(1) lookup)
+    const label = getVariableLabel(fullMatch, variablesMap)
+    
+    // Create a text node with variable mark
+    // Storage format: text = label, mark.variable.attrs.code = token
+    // Note: we don't write attrs.value (backend handles it)
+    newContent.push({
+      type: 'text',
+      text: label,
+      marks: [
+        ...(node.marks || []),
+        {
+          type: 'variable',
+          attrs: {
+            code: fullMatch,
           },
-        ],
-      })
-    } else {
-      // Unknown token, keep as plain text
-      newContent.push({
-        type: 'text',
-        text: fullMatch,
-        marks: node.marks,
-      })
-    }
+        },
+      ],
+    })
 
     lastIndex = matchIndex + fullMatch.length
-  })
+  }
 
   // Add remaining text after last match
   if (lastIndex < text.length) {
@@ -186,29 +162,36 @@ function splitTextNodeWithVariables(
 
 /**
  * Converts editor JSON (with text tokens) to storage JSON (with variable marks)
+ * Editor format: plain text with tokens {{Prénom}}
+ * Storage format: text = "Prénom" + mark variable.attrs.code = "{{Prénom}}"
  */
-export function convertEditorToStorage(
+export function editorToStorage(
   json: unknown,
   availableVariables: RestAvailableVariable[]
 ): unknown {
-  if (!json || typeof json !== 'object') {
+  if (!json || typeof json !== 'object' || json === null) {
     return json
   }
 
+  // Build Map once for O(1) lookups (avoids O(n²) with find() in loop)
+  const variablesMap = new Map(
+    availableVariables.map((v) => [v.code, v])
+  )
+
   const node = json as TipTapNode
 
-  // Recursively process content first (bottom-up approach)
+  // Recursively process content (single pass traversal)
   if (node.content && Array.isArray(node.content)) {
     const processedContent: TipTapNode[] = []
     
     for (const child of node.content) {
       // If it's a text node, split it if it contains variables
       if (child.type === 'text' && child.text) {
-        const splitNodes = splitTextNodeWithVariables(child, availableVariables)
+        const splitNodes = splitTextNodeWithVariables(child, variablesMap)
         processedContent.push(...splitNodes)
       } else {
         // Recursively process non-text nodes
-        const processed = convertEditorToStorage(child, availableVariables) as TipTapNode
+        const processed = editorToStorage(child, availableVariables) as TipTapNode
         processedContent.push(processed)
       }
     }
@@ -220,11 +203,18 @@ export function convertEditorToStorage(
   }
 
   // If it's a text node at the root level (shouldn't happen in normal TipTap structure)
+  // But if it does and splits into multiple nodes, wrap in doc to avoid returning array
   if (node.type === 'text' && node.text) {
-    const splitNodes = splitTextNodeWithVariables(node, availableVariables)
-    return splitNodes.length === 1 ? splitNodes[0] : splitNodes
+    const splitNodes = splitTextNodeWithVariables(node, variablesMap)
+    if (splitNodes.length === 1) {
+      return splitNodes[0]
+    }
+    // Multiple nodes: wrap in doc to maintain valid TipTap structure
+    return {
+      type: 'doc',
+      content: splitNodes,
+    }
   }
 
   return node
 }
-
