@@ -70,7 +70,7 @@ export function storageToEditor(json: unknown): unknown {
 function getVariableLabel(
   token: string,
   variablesMap: Map<string, RestAvailableVariable>
-): string {
+): string | null {
   // token is like "{{Prénom}}", find variable where code === "{{Prénom}}"
   const variable = variablesMap.get(token)
   
@@ -78,9 +78,7 @@ function getVariableLabel(
     return variable.label
   }
   
-  // Extract content between braces as fallback label (trimmed for robustness)
-  const innerMatch = token.match(/\{\{([^}]+)\}\}/)
-  return innerMatch ? innerMatch[1].trim() : token
+  return null
 }
 
 /**
@@ -124,23 +122,30 @@ function splitTextNodeWithVariables(
 
     // Get variable label using Map (O(1) lookup)
     const label = getVariableLabel(fullMatch, variablesMap)
-    
-    // Create a text node with variable mark
-    // Storage format: text = label, mark.variable.attrs.code = token
-    // Note: we don't write attrs.value (backend handles it)
-    newContent.push({
-      type: 'text',
-      text: label,
-      marks: [
-        ...(node.marks || []),
-        {
-          type: 'variable',
-          attrs: {
-            code: fullMatch,
+
+    if (label) {
+      // Variable exists: create a text node with variable mark
+      newContent.push({
+        type: 'text',
+        text: label,
+        marks: [
+          ...(node.marks || []),
+          {
+            type: 'variable',
+            attrs: {
+              code: fullMatch,
+            },
           },
-        },
-      ],
-    })
+        ],
+      })
+    } else {
+      // Variable doesn't exist: keep as plain text (no variable mark)
+      newContent.push({
+        type: 'text',
+        text: fullMatch,
+        marks: node.marks,
+      })
+    }
 
     lastIndex = matchIndex + fullMatch.length
   }
