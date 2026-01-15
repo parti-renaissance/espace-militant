@@ -1,5 +1,5 @@
 import React from 'react'
-import { FlatList, Modal, Pressable, StyleSheet } from 'react-native'
+import { FlatList, Modal, StyleSheet, TouchableOpacity } from 'react-native'
 import { VoxHeader } from '@/components/Header/Header'
 import { useGetAvailableVariables } from '@/services/publications/hook'
 import { RestAvailableVariable } from '@/services/publications/schema'
@@ -7,6 +7,7 @@ import Text from '@/components/base/Text'
 import { Spinner, XStack, YStack, View } from 'tamagui'
 import { Spacing } from '@/styles'
 import { VoxCard } from '@/components/VoxCard/VoxCard'
+import { X } from '@tamagui/lucide-icons'
 
 type VariablesModalProps = {
   open: boolean
@@ -25,19 +26,22 @@ export const VariablesModal: React.FC<VariablesModalProps> = ({ open, onClose, o
   }
 
   const renderItem = ({ item }: { item: RestAvailableVariable }) => (
-    <Pressable onPress={() => handleSelect(item)}>
+    <TouchableOpacity activeOpacity={0.9} onPress={() => handleSelect(item)}>
       <YStack
         padding="$medium"
         borderBottomColor="$textOutline"
         borderBottomWidth={1}
         gap="$xsmall"
       >
-        <Text.MD semibold>{item.label}</Text.MD>
+        <XStack alignItems="center" gap="$xsmall">
+          <Text.MD>{item.label} :</Text.MD>
+          <Text.SM secondary>{item.code}</Text.SM>
+        </XStack>
         {item.description && (
           <Text.SM secondary>{item.description}</Text.SM>
         )}
       </YStack>
-    </Pressable>
+    </TouchableOpacity>
   )
 
   return (
@@ -47,7 +51,8 @@ export const VariablesModal: React.FC<VariablesModalProps> = ({ open, onClose, o
       visible={open}
       onRequestClose={onClose}
     >
-      <Pressable
+      <TouchableOpacity
+        activeOpacity={1}
         style={styles.centeredView}
         onPress={(event) => {
           if (event.target === event.currentTarget) {
@@ -56,12 +61,11 @@ export const VariablesModal: React.FC<VariablesModalProps> = ({ open, onClose, o
         }}
       >
         <View style={styles.modalView}>
-          <VoxCard.Content maxWidth={520} width="100%">
-            <VoxHeader>
-              <XStack alignItems="center" flex={1} width="100%">
-                <VoxHeader.Title>Variables disponibles</VoxHeader.Title>
-              </XStack>
-            </VoxHeader>
+          <VoxCard.Content maxWidth={520} width="100%" padding={0} gap={0}>
+            <XStack alignItems="center" justifyContent="space-between" width="100%" padding="$medium" borderBottomColor="$textOutline" borderBottomWidth={1}>
+              <VoxHeader.Title>Variables disponibles</VoxHeader.Title>
+              <X size={20} color="$textPrimary" onPress={onClose} />
+            </XStack>
             <YStack maxHeight={400}>
               {isLoading && (
                 <YStack flex={1} justifyContent="center" alignItems="center" padding="$large">
@@ -88,7 +92,7 @@ export const VariablesModal: React.FC<VariablesModalProps> = ({ open, onClose, o
             </YStack>
           </VoxCard.Content>
         </View>
-      </Pressable>
+      </TouchableOpacity>
     </Modal>
   )
 }
@@ -101,6 +105,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalView: {
+    overflow: 'hidden',
     backgroundColor: 'white',
     borderRadius: 16,
     margin: Spacing.largeMargin,

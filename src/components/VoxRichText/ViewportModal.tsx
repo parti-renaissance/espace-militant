@@ -1,8 +1,8 @@
 import React, { PropsWithChildren } from 'react'
-import { Modal, ScrollView, StyleSheet } from 'react-native'
+import { Modal, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
-import { isWeb, Sheet, useMedia, useWindowDimensions, View } from 'tamagui'
+import { isWeb, useMedia, useWindowDimensions, View } from 'tamagui'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
@@ -12,8 +12,7 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
 }
 
 export const useModalOrPageScrollView = () => {
-  const viewport = useMedia()
-  return viewport.gtSm ? ScrollView : Sheet.ScrollView
+  return ScrollView
 }
 
 /**
@@ -43,26 +42,17 @@ export default function ViewportModal({ children, onClose, open, header, maxWidt
   }
 
   return (
-    <Sheet
-      modal
-      open={!!open}
-      snapPoints={[100]}
-      snapPointsMode="percent"
-      disableDrag
-      dismissOnSnapToBottom={false}
-      dismissOnOverlayPress={false}
-      onOpenChange={(x) => {
-        if (!x) {
-          onClose?.()
-        }
-      }}
+    <Modal
+      animationType="none"
+      transparent={false}
+      visible={!!open}
+      onRequestClose={onClose}
     >
-      <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-      <Sheet.Frame>
+      <View style={styles.fullScreenView}>
         {header ? header : null}
         {children}
-      </Sheet.Frame>
-    </Sheet>
+      </View>
+    </Modal>
   )
 }
 
@@ -89,5 +79,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  fullScreenView: {
+    flex: 1,
+    backgroundColor: 'white',
   },
 })

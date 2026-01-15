@@ -1,6 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useState, useMemo, useCallback } from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
-import { 
+import {
   BoldBridge,
   CodeBridge,
   ItalicBridge,
@@ -21,7 +21,7 @@ import {
   HardBreakBridge,
   RichText,
   Toolbar,
-  useEditorBridge 
+  useEditorBridge
 } from '@10play/tentap-editor'
 import { isWeb, YStack, XStack } from 'tamagui'
 import Text from '@/components/base/Text'
@@ -74,7 +74,7 @@ type InjectJSEditor = {
  */
 function insertTextAtCursor(editor: InjectJSEditor, text: string): void {
   const escapedText = JSON.stringify(text)
-  
+
   editor.injectJS(`
     (function() {
       try {
@@ -122,7 +122,7 @@ type VoxRichTextEditorProps = {
 export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
   ({ value, placeholder = 'Décrivez votre contenu...', enableVariables = false }, ref) => {
     const [variablesModalOpen, setVariablesModalOpen] = useState(false)
-    
+
     const { data: availableVariables = [] } = useGetAvailableVariables({
       enabled: enableVariables,
     })
@@ -170,7 +170,7 @@ export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
       return {
         getData: async () => {
           const rawJson = await editor.getJSON()
-          
+
           // Convert editor format to storage format on export
           const finalJson = enableVariables
             ? (editorToStorage(rawJson, availableVariables) as object)
