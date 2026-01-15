@@ -27,11 +27,18 @@ const NewsCard = ({ payload, ...props }: NewsVoxCardProps) => {
     if (payload.ctaLink) {
       const url = payload.ctaLink
       
-      trackClick({
-        object_type: 'news',
-        target_url: url,
-        button_name: payload.ctaLabel || undefined,
-      })
+      try {
+        trackClick({
+          object_type: 'news',
+          target_url: url,
+          button_name: payload.ctaLabel || undefined,
+        })
+      } catch (error) {
+        // Silently ignore tracking errors - they should not impact user experience
+        if (__DEV__) {
+          console.warn('[NewsCard] trackClick error:', error)
+        }
+      }
       
       try {
         if (isWeb) {

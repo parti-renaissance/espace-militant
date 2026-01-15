@@ -63,3 +63,7 @@ export function isTipNonSupported(obj: unknown): obj is schemas.TipNonSupported 
 export function isTipLinkMark(obj: unknown): obj is schemas.TipLinkMark {
   return schemas.linkMarkSchema.safeParse(obj).success
 }
+
+export function isTipVariableMark(obj: unknown): obj is schemas.TipVariableMark {
+  return schemas.variableMarkSchema.safeParse(obj).success
+}

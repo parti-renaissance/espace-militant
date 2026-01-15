@@ -25,19 +25,23 @@ export const ButtonRenderer = ({
 
   const handlePress = async () => {
     if (data.content?.link) {
-      const url = data.content.link
-      const onLinkClick = allowHits
-        ? (target_url: string, button_name: string) => {
-            trackClick({
-              object_type: 'publication',
-              object_id: publicationUuid,
-              target_url,
-              button_name,
-            })
+      if (allowHits) {
+        try {
+          trackClick({
+            object_type: 'publication',
+            object_id: publicationUuid,
+            target_url: data.content.link,
+            button_name: data.content.text,
+          })
+        } catch (error) {
+          // Silently ignore tracking errors - they should not impact user experience
+          if (__DEV__) {
+            console.warn('[ButtonRenderer] trackClick error:', error)
           }
-        : undefined
+        }
+      }
       
-      await handleLinkPress(url, onLinkClick, data.content.text)
+      await handleLinkPress(data.content.link, undefined, data.content.text)
     }
   }
 

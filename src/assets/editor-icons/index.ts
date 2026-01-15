@@ -23,4 +23,5 @@ export const Images = {
   Aa: require('./Aa.png'),
   a: require('./a.png'),
   close: require('./close.png'),
+  variables: require('./variables.png'),
 };

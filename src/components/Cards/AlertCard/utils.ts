@@ -9,11 +9,18 @@ export const createOnShow = (url: string | null, buttonLabel?: string | null) =>
   
   return () => {
     if (url) {
-      trackClick({
-        object_type: 'alert',
-        target_url: url || undefined,
-        button_name: buttonLabel || undefined,
-      })
+      try {
+        trackClick({
+          object_type: 'alert',
+          target_url: url || undefined,
+          button_name: buttonLabel || undefined,
+        })
+      } catch (error) {
+        // Silently ignore tracking errors - they should not impact user experience
+        if (__DEV__) {
+          console.warn('[AlertCard] trackClick error:', error)
+        }
+      }
       
       try {
         if (url.startsWith('/')) {

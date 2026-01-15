@@ -80,14 +80,21 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
       if (sentRef.current !== props.id) {
         sentRef.current = props.id
 
-        trackOpen({
-          object_type: 'publication',
-          object_id: props.id,
-          source: resolveSource(searchParams.source),
-          utm_source: searchParams.utm_source,
-          utm_campaign: searchParams.utm_campaign,
-          referrer_code: searchParams.ref,
-        })
+        try {
+          trackOpen({
+            object_type: 'publication',
+            object_id: props.id,
+            source: resolveSource(searchParams.source),
+            utm_source: searchParams.utm_source,
+            utm_campaign: searchParams.utm_campaign,
+            referrer_code: searchParams.ref
+          })
+        } catch (error) {
+          // Silently ignore tracking errors - they should not impact user experience
+          if (__DEV__) {
+            console.warn('[PublicationPage] trackOpen error:', error)
+          }
+        }
 
         cleanupUrlParams(['source'])
       }
