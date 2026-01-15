@@ -296,6 +296,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
         externalLink={item.externalLink}
         disabled={item.disabled}
         active={item.active}
+        onPress={item.onPress}
         inner={true}
       />
     )
