@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react'
-import { Modal, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
+import { Modal, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { isWeb, useMedia, useWindowDimensions, View } from 'tamagui'
