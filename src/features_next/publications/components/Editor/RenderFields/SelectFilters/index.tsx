@@ -122,7 +122,7 @@ export default function SelectFilters({
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
       const item = quickFilters.find(d => d.value === selectedQuickFilterId)
-      let baseLabel = item ? item.label : 'Sélectionné'
+      const baseLabel = item ? item.label : 'Sélectionné'
 
       // EXEMPLE - Check if static_tags contains rentree-2025 to add rentrée information
       // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
