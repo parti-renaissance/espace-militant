@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import WaitingScreen from '@/components/WaitingScreen'
 import { SessionProvider, useSession } from '@/ctx/SessionProvider'
@@ -120,24 +121,26 @@ function Root() {
   useRegisterRoutingInstrumentation()
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: 'white' }}>
-      <StatusBar animated style="dark" />
-      <ToastProvider swipeDirection="up">
-        <QueryClientProvider client={queryClient}>
-          <TamaguiProvider config={config} defaultTheme="light">
-            <ThemeProvider value={DefaultTheme}>
-              <BottomSheetModalProvider>
-                <SessionProvider>
-                  <WaitingRoomHoc isLoading={!isFontsLoaded}>
-                    <Slot />
-                  </WaitingRoomHoc>
-                </SessionProvider>
-              </BottomSheetModalProvider>
-            </ThemeProvider>
-          </TamaguiProvider>
-        </QueryClientProvider>
-      </ToastProvider>
-    </GestureHandlerRootView>
+    <View style={isWeb ? { maxHeight: '100dvh' as any, backgroundColor: 'white' } : { flex: 1, backgroundColor: 'white' }}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar animated style="dark" />
+        <ToastProvider swipeDirection="up">
+          <QueryClientProvider client={queryClient}>
+            <TamaguiProvider config={config} defaultTheme="light">
+              <ThemeProvider value={DefaultTheme}>
+                <BottomSheetModalProvider>
+                  <SessionProvider>
+                    <WaitingRoomHoc isLoading={!isFontsLoaded}>
+                      <Slot />
+                    </WaitingRoomHoc>
+                  </SessionProvider>
+                </BottomSheetModalProvider>
+              </ThemeProvider>
+            </TamaguiProvider>
+          </QueryClientProvider>
+        </ToastProvider>
+      </GestureHandlerRootView>
+    </View>
   )
 }
 

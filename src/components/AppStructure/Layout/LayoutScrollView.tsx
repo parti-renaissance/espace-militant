@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react'
 import { NativeScrollEvent, NativeSyntheticEvent, Platform, RefreshControl, ScrollView, ScrollViewProps } from 'react-native'
-import { isWeb } from 'tamagui'
+import { isWeb, YStack } from 'tamagui'
 import { usePageLayoutScroll } from '@/components/AppStructure/hooks/usePageLayoutScroll'
 import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
 
@@ -90,10 +90,25 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
     />
   ) : undefined)
   
+  if (isWeb) {
+    return (
+      <YStack
+        style={[
+          !disablePadding && {
+            paddingTop: Platform.OS === 'ios' ? 0 : spacingValues.paddingTop,
+            paddingBottom: spacingValues.paddingBottom,
+          },
+          contentContainerStyle,
+        ]}
+      >
+        {children}
+      </YStack>
+    )
+  }
+  
   return (
     <ScrollView
       ref={scrollViewRef}
-      scrollEnabled={!isWeb}
       onScroll={handleNativeScroll}
       scrollEventThrottle={16}
       refreshControl={refreshControlElement}
