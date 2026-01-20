@@ -5,6 +5,7 @@ import { api } from '@/utils/api'
 import { getFullVersion } from '@/utils/version'
 import { createUploadTask, FileSystemUploadType } from 'expo-file-system'
 import { z } from 'zod'
+import * as schemas from '@/services/files/schema'
 import { parseError } from '../common/errors/utils'
 
 const API_URL = `${clientEnv.API_BASE_URL}/api/v3/upload-file`
@@ -67,6 +68,21 @@ export const uploadFile = async (
         'Content-Type': 'multipart/form-data',
       },
     },
+  })()
+}
+
+export const getUploadedFiles = (props: { scope: string; page?: number }) => {
+  const searchParams = new URLSearchParams({ scope: props.scope })
+  if (props.page) {
+    searchParams.set('page', props.page.toString())
+  }
+
+  return api({
+    method: 'get',
+    path: `/api/v3/upload?${searchParams.toString()}`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestUploadedFileListResponseSchema,
+    type: 'private',
   })()
 }
 
