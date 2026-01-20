@@ -1,10 +1,15 @@
 import React, { useCallback } from 'react'
-import { FlatList, FlatListProps, Platform, RefreshControl } from 'react-native'
-import { isWeb } from 'tamagui'
+import { FlatList, type FlatListProps, Platform, RefreshControl } from 'react-native'
+import { isWeb, YStack } from 'tamagui'
 import { usePageLayoutScroll } from '@/components/AppStructure/hooks/usePageLayoutScroll'
-import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
+import useLayoutSpacing, {
+  type UseLayoutSpacingOptions,
+} from '@/components/AppStructure/hooks/useLayoutSpacing'
 
-type LayoutFlatListProps<T> = Omit<FlatListProps<T>, 'onEndReached' | 'data' | 'renderItem' | 'refreshControl'> & {
+type LayoutFlatListProps<T> = Omit<
+  FlatListProps<T>,
+  'onEndReached' | 'data' | 'renderItem' | 'refreshControl'
+> & {
   data: FlatListProps<T>['data']
   renderItem: FlatListProps<T>['renderItem']
   onEndReached?: () => void
@@ -16,8 +21,24 @@ type LayoutFlatListProps<T> = Omit<FlatListProps<T>, 'onEndReached' | 'data' | '
   refreshControl?: React.ReactElement
 }
 
+const noop = () => undefined
+
+function renderListComponent(
+  component: FlatListProps<unknown>['ListHeaderComponent'] |
+    FlatListProps<unknown>['ListFooterComponent'] |
+    FlatListProps<unknown>['ListEmptyComponent']
+): React.ReactNode {
+  if (!component) return null
+  if (React.isValidElement(component)) return component
+  if (typeof component === 'function') return React.createElement(component)
+  return null
+}
+
 function LayoutFlatListInner<T>(
-  {
+  props: LayoutFlatListProps<T>,
+  ref: React.Ref<FlatList<T>>
+) {
+  const {
     onEndReached,
     onEndReachedThreshold = 0.4,
     hasMore = false,
@@ -28,10 +49,13 @@ function LayoutFlatListInner<T>(
     refreshing,
     onRefresh,
     refreshControl,
+    ListHeaderComponent,
+    ListFooterComponent,
+    ListEmptyComponent,
+    keyExtractor,
     ...rest
-  }: LayoutFlatListProps<T>,
-  ref: React.Ref<FlatList<T>>
-) {
+  } = props
+
   const spacingValues = useLayoutSpacing(padding)
 
   const loadMore = useCallback(() => {
@@ -40,12 +64,51 @@ function LayoutFlatListInner<T>(
     }
   }, [hasMore, onEndReached])
 
-  usePageLayoutScroll({
-    onEndReached: onEndReached ? loadMore : undefined,
-    onEndReachedThreshold,
-  })
+  if (isWeb) {
+    usePageLayoutScroll({
+      onEndReached: onEndReached ? loadMore : undefined,
+      onEndReachedThreshold,
+    })
+  }
 
-  const nativeOnEndReached = !isWeb && onEndReached ? loadMore : undefined
+  const baseContainerStyle = [
+    { paddingTop: Platform.OS === 'ios' ? 8 : spacingValues.paddingTop, paddingBottom: spacingValues.paddingBottom },
+    contentContainerStyle,
+  ]
+
+  if (isWeb && Array.isArray(data)) {
+    const headerNode = renderListComponent(ListHeaderComponent)
+    const footerNode = renderListComponent(ListFooterComponent)
+
+    if (data.length === 0) {
+      const emptyNode = renderListComponent(ListEmptyComponent)
+      return <YStack style={baseContainerStyle}>{emptyNode}</YStack>
+    }
+
+    return (
+      <YStack style={baseContainerStyle}>
+        {headerNode}
+        {renderItem &&
+          data.map((item, index) => {
+            const key = keyExtractor ? keyExtractor(item, index) : String(index)
+            return (
+              <React.Fragment key={key}>
+                {renderItem({
+                  item,
+                  index,
+                  separators: {
+                    highlight: noop,
+                    unhighlight: noop,
+                    updateProps: noop,
+                  },
+                })}
+              </React.Fragment>
+            )
+          })}
+        {footerNode}
+      </YStack>
+    )
+  }
 
   const refreshControlElement = refreshControl ?? (refreshing !== undefined && onRefresh ? (
     <RefreshControl
@@ -61,17 +124,15 @@ function LayoutFlatListInner<T>(
       data={data}
       renderItem={renderItem}
       scrollEnabled={!isWeb}
-      onEndReached={nativeOnEndReached}
+      onEndReached={!isWeb && onEndReached ? loadMore : undefined}
       onEndReachedThreshold={onEndReachedThreshold}
       refreshControl={refreshControlElement}
       contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
-      contentContainerStyle={[
-        {
-          paddingTop: Platform.OS === 'ios' ? 8 : spacingValues.paddingTop,
-          paddingBottom: spacingValues.paddingBottom,
-        },
-        contentContainerStyle,
-      ]}
+      contentContainerStyle={baseContainerStyle}
+      ListHeaderComponent={ListHeaderComponent}
+      ListFooterComponent={ListFooterComponent}
+      ListEmptyComponent={ListEmptyComponent}
+      keyExtractor={keyExtractor}
       {...rest}
     />
   )
