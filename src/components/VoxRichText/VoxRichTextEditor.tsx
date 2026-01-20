@@ -103,8 +103,13 @@ function insertTextAtCursor(editor: InjectJSEditor, text: string): void {
           const tr = state.tr.insertText(${escapedText}, selection.from, selection.to);
           view.dispatch(tr);
           
-          // Focus the editor after insertion
-          view.focus();
+          // Focus the editor
+          requestAnimationFrame(() => {
+            view.focus();
+            if (editorElement) {
+              editorElement.focus();
+            }
+          });
         }
       } catch (error) {
         console.warn('Error inserting variable:', error);
@@ -156,9 +161,51 @@ export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
     }, [])
 
     const handleVariableSelect = (code: string) => {
-      // code is already in format "{{Prénom}}" from VariablesModal
-      insertTextAtCursor(editor, code)
       setVariablesModalOpen(false)
+      
+      if (!isWeb || typeof document === 'undefined') {
+        setTimeout(() => {
+          insertTextAtCursor(editor, code)
+          editor.focus?.()
+        }, 100)
+        return
+      }
+
+      // Find the editor element in the iframe
+      const iframe = document.querySelector('iframe[srcdoc]') as HTMLIFrameElement | null
+      const editorElement = iframe?.contentDocument?.querySelector('.ProseMirror')
+      
+      // Prevent focus from returning to toolbar buttons
+      const preventFocusListener = (e: FocusEvent) => {
+        const target = e.target as HTMLElement | null
+        if (!target) return
+        
+        const isToolbarElement = 
+          target.tagName === 'BUTTON' || 
+          (target.tagName === 'DIV' && target.hasAttribute('tabindex') && target.getAttribute('tabindex') === '0')
+        
+        if (isToolbarElement && target !== editorElement && !editorElement?.contains(target)) {
+          e.preventDefault()
+          e.stopPropagation()
+          editor.focus?.()
+          if (editorElement && editorElement instanceof HTMLElement) {
+            editorElement.focus()
+          }
+        }
+      }
+      
+      document.addEventListener('focusin', preventFocusListener, true)
+      
+      // Wait for modal to close, then insert and focus
+      setTimeout(() => {
+        insertTextAtCursor(editor, code)
+        editor.focus?.()
+        
+        // Remove listener after focus is stable
+        setTimeout(() => {
+          document.removeEventListener('focusin', preventFocusListener, true)
+        }, 1000)
+      }, 100)
     }
 
     const toolbarItems = useMemo(
