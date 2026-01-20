@@ -46,7 +46,6 @@ export default function ViewportModal({ children, onClose, open, header, maxWidt
       animationType="none"
       transparent={false}
       visible={!!open}
-      onRequestClose={onClose}
     >
       <View style={styles.fullScreenView}>
         {header ? header : null}
