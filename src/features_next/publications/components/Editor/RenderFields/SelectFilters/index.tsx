@@ -14,7 +14,6 @@ import { SelectedFiltersType, HierarchicalQuickFilterType, FilterValue } from '.
 import { useQueryClient } from '@tanstack/react-query'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
 import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
-import SelectQuickFiltersItem from './QuickFilter/SelectQuickFiltersItem'
 import { FiltersChips, calculateDefaultValues } from '../../../FiltersChips'
 
 interface SelectFiltersProps {
@@ -64,10 +63,11 @@ export default function SelectFilters({
       // En mode filtres rapides : on réinitialise les filtres avancés non protégés
       const protectedFilters = ['zone', 'zones', 'committee']
 
-      // Protéger static_tags si sa valeur est liée à la rentrée
-      if (currentFilters.static_tags === 'national_event:rentree-2025' || currentFilters.static_tags === '!national_event:rentree-2025') {
-        protectedFilters.push('static_tags')
-      }
+      // EXEMPLE - Protéger static_tags si sa valeur est liée à la rentrée
+      // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
+      // if (currentFilters.static_tags === 'national_event:rentree-2025' || currentFilters.static_tags === '!national_event:rentree-2025') {
+      //   protectedFilters.push('static_tags')
+      // }
 
       protectedFilters.forEach(filterKey => {
         if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
@@ -124,25 +124,27 @@ export default function SelectFilters({
       const item = quickFilters.find(d => d.value === selectedQuickFilterId)
       let baseLabel = item ? item.label : 'Sélectionné'
 
-      // Check if static_tags contains rentree-2025 to add rentrée information
-      if (selectedFilters.static_tags) {
-        const staticTagsValue = selectedFilters.static_tags
-        if (staticTagsValue === 'national_event:rentree-2025') {
-          baseLabel += ' - Inscrits à la rentrée'
-        } else if (staticTagsValue === '!national_event:rentree-2025') {
-          baseLabel += ' - Non-inscrits à la rentrée'
-        }
-      }
+      // EXEMPLE - Check if static_tags contains rentree-2025 to add rentrée information
+      // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
+      // if (selectedFilters.static_tags) {
+      //   const staticTagsValue = selectedFilters.static_tags
+      //   if (staticTagsValue === 'national_event:rentree-2025') {
+      //     baseLabel += ' - Inscrits à la rentrée'
+      //   } else if (staticTagsValue === '!national_event:rentree-2025') {
+      //     baseLabel += ' - Non-inscrits à la rentrée'
+      //   }
+      // }
       
       return baseLabel
     }
 
     const excludedFilters = ['zone', 'zones', 'committee']
     
-    // Exclure static_tags s'il est protégé (lié à la rentrée)
-    if (selectedFilters.static_tags === 'national_event:rentree-2025' || selectedFilters.static_tags === '!national_event:rentree-2025') {
-      excludedFilters.push('static_tags')
-    }
+    // EXEMPLE - Exclure static_tags s'il est protégé (lié à la rentrée)
+    // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
+    // if (selectedFilters.static_tags === 'national_event:rentree-2025' || selectedFilters.static_tags === '!national_event:rentree-2025') {
+    //   excludedFilters.push('static_tags')
+    // }
     
     const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) =>
       value !== null && value !== undefined && !excludedFilters.includes(key)
@@ -345,36 +347,41 @@ export default function SelectFilters({
                   selectedQuickFilterId={selectedQuickFilterId}
                   onItemSelection={handleQuickFilterSelection}
                 />
-                <XStack alignItems="center" gap="$small">
-                  <Text.MD secondary>Filtres circonstanciels</Text.MD>
-                  <YStack h={1} flexGrow={1} mt={2} bg="$textOutline" />
-                </XStack>
-                <YStack gap="$small">
-                  <SelectQuickFiltersItem
-                    label="Inscrits à la rentrée"
-                    state={selectedFilters.static_tags === "national_event:rentree-2025" ? "selected" : "default"}
-                    onPress={() => {
-                      if (selectedFilters.static_tags === "national_event:rentree-2025") {
-                        handleAdvancedFilterChange("static_tags", null)
-                      } else {
-                        handleAdvancedFilterChange("static_tags", "national_event:rentree-2025")
-                      }
-                    }}
-                    type="radio"
-                  />
-                  <SelectQuickFiltersItem
-                    label="Non-inscrits à la rentrée"
-                    state={selectedFilters.static_tags === "!national_event:rentree-2025" ? "selected" : "default"}
-                    onPress={() => {
-                      if (selectedFilters.static_tags === "!national_event:rentree-2025") {
-                        handleAdvancedFilterChange("static_tags", null)
-                      } else {
-                        handleAdvancedFilterChange("static_tags", "!national_event:rentree-2025")
-                      }
-                    }}
-                    type="radio"
-                  />
-                </YStack>
+                {/* 
+                  EXEMPLE - Filtres circonstanciels
+                  Pour réactiver cette section, décommenter le code ci-dessous :
+                  
+                  <XStack alignItems="center" gap="$small">
+                    <Text.MD secondary>Filtres circonstanciels</Text.MD>
+                    <YStack h={1} flexGrow={1} mt={2} bg="$textOutline" />
+                  </XStack>
+                  <YStack gap="$small">
+                    <SelectQuickFiltersItem
+                      label="Inscrits à la rentrée"
+                      state={selectedFilters.static_tags === "national_event:rentree-2025" ? "selected" : "default"}
+                      onPress={() => {
+                        if (selectedFilters.static_tags === "national_event:rentree-2025") {
+                          handleAdvancedFilterChange("static_tags", null)
+                        } else {
+                          handleAdvancedFilterChange("static_tags", "national_event:rentree-2025")
+                        }
+                      }}
+                      type="radio"
+                    />
+                    <SelectQuickFiltersItem
+                      label="Non-inscrits à la rentrée"
+                      state={selectedFilters.static_tags === "!national_event:rentree-2025" ? "selected" : "default"}
+                      onPress={() => {
+                        if (selectedFilters.static_tags === "!national_event:rentree-2025") {
+                          handleAdvancedFilterChange("static_tags", null)
+                        } else {
+                          handleAdvancedFilterChange("static_tags", "!national_event:rentree-2025")
+                        }
+                      }}
+                      type="radio"
+                    />
+                  </YStack>
+                */}
               </>
 
             )}
