@@ -59,7 +59,7 @@ const RenderHardBreak: RenderFn<S.TipHardBreak> = () =>
     <Text.BR />
   )
 
-const RenderText: RenderFn<S.TipText, { editMode?: boolean } & HitsContext> = ({ data, onLinkClick, editMode = false }) => {
+const RenderText: RenderFn<S.TipText, { editMode?: boolean, previewMode?: boolean } & HitsContext> = ({ data, onLinkClick, editMode = false, previewMode = false }) => {
   const marks = data.marks?.map(({ type }) => type)
   const link = data.marks?.find(U.isTipLinkMark)
   const variable = data.marks?.find(U.isTipVariableMark)
@@ -85,6 +85,15 @@ const RenderText: RenderFn<S.TipText, { editMode?: boolean } & HitsContext> = ({
           {data.text ? `{{${data.text}}}`: ' variable inconnue'}
         </Text.MD>
       )
+    } else if (previewMode) {
+      return (
+        <Text.MD
+          multiline
+          semibold={marks?.includes('bold')}
+          fontStyle={fontStyle}
+          color="$gray8"
+        > {data.text ? `<<${data.text}>>`: ' variable inconnue'} </Text.MD>
+      )
     } else {
       return (
         <Text.MD
@@ -104,12 +113,12 @@ const RenderText: RenderFn<S.TipText, { editMode?: boolean } & HitsContext> = ({
   if (link) {
     const url = link.attrs.href
     const internal = isInternalLink(url)
-    
+
     if (isWeb) {
       return (
-        <Link 
-          href={link.attrs.href as Href} 
-          target={internal ? undefined : "_blank"} 
+        <Link
+          href={link.attrs.href as Href}
+          target={internal ? undefined : "_blank"}
           onPress={handlePress}
         >
           <Text.MD
@@ -146,12 +155,12 @@ const RenderText: RenderFn<S.TipText, { editMode?: boolean } & HitsContext> = ({
   )
 }
 
-const RenderParagraph: RenderFn<S.TipParagraph, { editMode?: boolean } & HitsContext> = ({ data, onLinkClick, editMode = false }) => {
+const RenderParagraph: RenderFn<S.TipParagraph, { editMode?: boolean, previewMode?: boolean } & HitsContext> = ({ data, onLinkClick, editMode = false, previewMode = false }) => {
   return data.content ? (
     <Text.MD tag="p" marginVertical={0} color="$gray8">
       {data.content.map((x, i) => {
         if (U.isTipNonSupported(x)) return <RenderNonSupported key={x.type + i} data={x} />
-        if (U.isTipText(x)) return <RenderText key={x.type + i} data={x} onLinkClick={onLinkClick} editMode={editMode} />
+        if (U.isTipText(x)) return <RenderText key={x.type + i} data={x} onLinkClick={onLinkClick} editMode={editMode} previewMode={previewMode} />
         if (U.isTipHardBreak(x)) return <RenderHardBreak key={x.type + i} data={x} />
         return null
       })}
@@ -190,13 +199,13 @@ const RenderHeading: RenderFn<S.TipHeading, HitsContext> = ({ data, onLinkClick 
       if (link) {
         const url = link.attrs.href
         const internal = isInternalLink(url)
-        
+
         if (isWeb) {
           return (
-            <Link 
-              key={x.type + i} 
-              href={link.attrs.href as Href} 
-              target={internal ? undefined : "_blank"} 
+            <Link
+              key={x.type + i}
+              href={link.attrs.href as Href}
+              target={internal ? undefined : "_blank"}
               onPress={handlePress}
             >
               <Text
@@ -292,7 +301,7 @@ const RenderOrderedList: RenderFn<S.TipOrderedList, HitsContext> = ({ data: { co
   )
 }
 
-export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLines?: number; editMode?: boolean } & HitsContext> = ({ data, numberOfLines, onLinkClick, editMode = false, ...props }) => {
+export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLines?: number; editMode?: boolean; previewMode?: boolean } & HitsContext> = ({ data, numberOfLines, onLinkClick, editMode = false, previewMode = false, ...props }) => {
   const id = props.id ?? 'no-id'
 
   const content = data.map((x, i) => {
@@ -301,7 +310,7 @@ export const RenderContent: RenderFn<S.TipContent[], { id?: string; numberOfLine
     }
 
     if (U.isTipParagraph(x)) {
-      return <RenderParagraph key={id + i + x.type} data={x} onLinkClick={onLinkClick} editMode={editMode} />
+      return <RenderParagraph key={id + i + x.type} data={x} onLinkClick={onLinkClick} editMode={editMode} previewMode={previewMode} />
     }
 
     if (U.isTipHeading(x)) {
@@ -329,6 +338,7 @@ export const TipTapRenderer = (props: {
   object_id?: string
   object_type?: ObjectType
   editMode?: boolean
+  previewMode?: boolean
 }) => {
   const { trackClick } = useHits()
   const { content, type } = U.parseJsonEditorContent(props.content)
@@ -370,6 +380,7 @@ export const TipTapRenderer = (props: {
           object_type={props.object_type}
           onLinkClick={onLinkClick}
           editMode={props.editMode}
+          previewMode={props.previewMode}
         />
       </YStack>
     )

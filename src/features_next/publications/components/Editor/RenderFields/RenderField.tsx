@@ -225,7 +225,7 @@ export const RenderField = memo((props: {
                 displayToolbar={props.displayToolbar ?? true}
               >
                 {field.value.content && field.value.content.pure.length > 0 ? (
-                  <RichTextRenderer id={props.field.id} data={field.value} edgePosition={props.edgePosition} displayToolbar={props.displayToolbar} />
+                  <RichTextRenderer id={props.field.id} data={field.value} edgePosition={props.edgePosition} displayToolbar={props.displayToolbar} previewMode={!props.displayToolbar} />
                 ) : (
                   <EmptyRichTextRender data={field.value} edgePosition={props.edgePosition} />
                 )}
