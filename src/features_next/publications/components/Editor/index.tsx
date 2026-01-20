@@ -198,6 +198,10 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       await onImmediateSave(currentValues.formValues, fields, currentValues.metaData, props.sender, zipMessage, getHTML, defaultTheme)
     },
     unSelect: () => {
+      const currentSelectedField = getValues('selectedField')
+      if (currentSelectedField?.edit === true) {
+        return
+      }
       setValue('selectedField', null)
       setValue('addBarOpenForFieldId', null)
     },
