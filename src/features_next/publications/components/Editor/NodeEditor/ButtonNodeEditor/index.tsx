@@ -60,7 +60,7 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
       onClose={() => props.onBlur()}
       open={props.present}
       header={
-        <VoxHeader.NoSafeFrame height={56} backgroundColor="white">
+        <VoxHeader>
           <XStack alignItems="center" flex={1} width="100%">
             <XStack flexGrow={1}>
               <VoxHeader.Title icon={Link}>{props.value.content ? 'Modifier le bouton' : 'Nouveau bouton'}</VoxHeader.Title>
@@ -71,7 +71,7 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
               </VoxButton>
             </XStack>
           </XStack>
-        </VoxHeader.NoSafeFrame>
+        </VoxHeader>
       }
     >
       <VoxCard.Content paddingBottom={insets.bottom + getTokenValue('$medium')}>
