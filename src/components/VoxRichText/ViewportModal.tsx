@@ -2,6 +2,7 @@ import React, { PropsWithChildren } from 'react'
 import { Modal, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { isWeb, useMedia, useWindowDimensions, View } from 'tamagui'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
@@ -9,6 +10,7 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   open?: boolean
   header?: React.ReactNode
   maxWidth?: number
+  height?: 'auto' | undefined
 }
 
 export const useModalOrPageScrollView = () => {
@@ -19,21 +21,23 @@ export const useModalOrPageScrollView = () => {
  * This component create a centered modal in sm and more viewport, or a page in small ones
  * @constructor
  */
-export default function ViewportModal({ children, onClose, open, header, maxWidth = 1048 }: ModalOrPageBaseProps) {
+export default function ViewportModal({ children, onClose, open, header, maxWidth = 1048, height }: ModalOrPageBaseProps) {
   const viewport = useMedia()
   const size = useWindowDimensions()
 
   const width = Math.min((size.width * 80) / 100, maxWidth)
-  const height = (size.height * 60) / 100
+  const modalHeight = height === 'auto' ? 'auto' : (size.height * 60) / 100
 
   if (viewport.gtSm && isWeb) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <CardFrame width={width} height={height}>
-              {header ? header : null}
-              {children}
+            <CardFrame width={width} height={modalHeight}>
+              <BottomSheetModalProvider>
+                {header ? header : null}
+                {children}
+              </BottomSheetModalProvider>
             </CardFrame>
           </View>
         </View>
@@ -43,13 +47,15 @@ export default function ViewportModal({ children, onClose, open, header, maxWidt
 
   return (
     <Modal
-      animationType="none"
+      animationType="slide"
       transparent={false}
       visible={!!open}
     >
       <View style={styles.fullScreenView}>
-        {header ? header : null}
-        {children}
+        <BottomSheetModalProvider>
+          {header ? header : null}
+          {children}
+        </BottomSheetModalProvider>
       </View>
     </Modal>
   )

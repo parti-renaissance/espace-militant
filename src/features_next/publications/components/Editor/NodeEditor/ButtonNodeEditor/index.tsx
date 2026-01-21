@@ -11,7 +11,7 @@ import { Link, Save } from '@tamagui/lucide-icons'
 import { Controller, useForm } from 'react-hook-form'
 import { getTokenValue, useMedia, XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
-import ViewportModal from './ViewportModal'
+import ViewportModal from '@/components/VoxRichText/ViewportModal'
 import { useRef } from 'react'
 
 type NodeEditorProps = { 
@@ -55,6 +55,8 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
 
   return (
     <ViewportModal
+      maxWidth={480}
+      height="auto"
       onClose={() => props.onBlur()}
       open={props.present}
       header={
