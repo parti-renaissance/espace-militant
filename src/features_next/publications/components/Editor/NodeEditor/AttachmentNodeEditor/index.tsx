@@ -11,7 +11,7 @@ import { Save, Upload, UploadCloud, FileCheck2, AlertTriangle, Paperclip } from 
 import { Controller, useForm } from 'react-hook-form'
 import { getTokenValue, useMedia, XStack, YStack, Spinner } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
-import ViewportModal from '../ButtonNodeEditor/ViewportModal'
+import ViewportModal from '@/components/VoxRichText/ViewportModal'
 import Text from '@/components/base/Text'
 import { useDocumentSelector } from './useDocumentSelector'
 import { useUploadPublicationFile } from '@/services/files/hook'
@@ -116,7 +116,7 @@ const ImportFileCard = memo((props: ImportFileCardProps) => {
   return (
     <YStack backgroundColor="$textSurface" borderWidth={1} borderColor="$textOutline32" borderStyle="dashed" borderRadius="$medium" padding="$medium" gap="$medium" alignItems="center" justifyContent="center" height={258}>
       <UploadCloud size={40} color="$gray4" />
-      <YStack alignItems="center" gap="$xsmall">
+      <YStack alignItems="center" gap="$small">
         <VoxButton
           iconLeft={Upload}
           variant="outlined"
@@ -141,9 +141,6 @@ type NodeEditorProps = {
 
 export const AttachmentNodeEditor = (props: NodeEditorProps) => {
 
-  if (!props.present) {
-    return null
-  }
 
   return <AttachmentNodeEditorContent {...props} />
 }
@@ -228,6 +225,8 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
 
   return (
     <ViewportModal
+      maxWidth={480}
+      height="auto"
       onClose={() => props.onBlur()}
       open={props.present}
       header={
