@@ -122,3 +122,12 @@ export const deleteMessage = (props: { messageId: string; scope: string }) =>
     responseSchema: z.void(),
     type: 'private',
   })()
+
+export const getAvailableVariables = (props: { scope?: string }) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherent_messages/available-variables?scope=${props?.scope ?? ''}`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestAvailableVariablesResponseSchema,
+    type: 'private',
+  })()

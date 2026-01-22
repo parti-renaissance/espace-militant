@@ -10,6 +10,7 @@ export const RichTextRenderer = (props: {
   displayToolbar?: boolean
   numberOfLines?: number
   object_id?: string
+  previewMode?: boolean
 }) => {
   const { containerStyle, wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
   if (!props.data.content) return null
@@ -23,6 +24,8 @@ export const RichTextRenderer = (props: {
           numberOfLines={props.numberOfLines}
           object_id={props.object_id}
           object_type="publication"
+          editMode={props.displayToolbar}
+          previewMode={props.previewMode ?? false}
         />
       </View>
     </YStack>

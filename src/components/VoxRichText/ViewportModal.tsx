@@ -1,40 +1,43 @@
 import React, { PropsWithChildren } from 'react'
-import { Modal, ScrollView, StyleSheet } from 'react-native'
+import { Dimensions, Modal, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
-import { isWeb, Sheet, useMedia, useWindowDimensions, View } from 'tamagui'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { isWeb, useMedia, useWindowDimensions, View } from 'tamagui'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
   open?: boolean
   header?: React.ReactNode
   maxWidth?: number
+  height?: 'auto' | undefined
 }
 
 export const useModalOrPageScrollView = () => {
-  const viewport = useMedia()
-  return viewport.gtSm ? ScrollView : Sheet.ScrollView
+  return ScrollView
 }
 
 /**
  * This component create a centered modal in sm and more viewport, or a page in small ones
  * @constructor
  */
-export default function ViewportModal({ children, onClose, open, header, maxWidth = 1048 }: ModalOrPageBaseProps) {
+export default function ViewportModal({ children, onClose, open, header, maxWidth = 1048, height }: ModalOrPageBaseProps) {
   const viewport = useMedia()
   const size = useWindowDimensions()
 
   const width = Math.min((size.width * 80) / 100, maxWidth)
-  const height = (size.height * 60) / 100
+  const modalHeight = height === 'auto' ? 'auto' : (size.height * 60) / 100
 
   if (viewport.gtSm && isWeb) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <CardFrame width={width} height={height}>
-              {header ? header : null}
-              {children}
+            <CardFrame width={width} height={modalHeight}>
+              <BottomSheetModalProvider>
+                {header ? header : null}
+                {children}
+              </BottomSheetModalProvider>
             </CardFrame>
           </View>
         </View>
@@ -43,26 +46,18 @@ export default function ViewportModal({ children, onClose, open, header, maxWidt
   }
 
   return (
-    <Sheet
-      modal
-      open={!!open}
-      snapPoints={[100]}
-      snapPointsMode="percent"
-      disableDrag
-      dismissOnSnapToBottom={false}
-      dismissOnOverlayPress={false}
-      onOpenChange={(x) => {
-        if (!x) {
-          onClose?.()
-        }
-      }}
+    <Modal
+      animationType="slide"
+      transparent={false}
+      visible={!!open}
     >
-      <Sheet.Overlay animation="lazy" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
-      <Sheet.Frame>
-        {header ? header : null}
-        {children}
-      </Sheet.Frame>
-    </Sheet>
+      <View style={styles.fullScreenView}>
+        <BottomSheetModalProvider>
+          {header ? header : null}
+          {children}
+        </BottomSheetModalProvider>
+      </View>
+    </Modal>
   )
 }
 
@@ -89,5 +84,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  fullScreenView: {
+    
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    backgroundColor: 'white',
   },
 })

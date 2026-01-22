@@ -39,14 +39,21 @@ const TrackImpressionWeb: React.FC<TrackImpressionWebProps> = ({
           timeoutRef.current = setTimeout(() => {
             if (!hasTrackedRef.current) {
               hasTrackedRef.current = true
-              trackImpression({
-                object_type: objectType,
-                object_id: objectId,
-                source,
-                utm_source: utmSource,
-                utm_campaign: utmCampaign,
-                referrer_code: referrerCode,
-              })
+              try {
+                trackImpression({
+                  object_type: objectType,
+                  object_id: objectId,
+                  source,
+                  utm_source: utmSource,
+                  utm_campaign: utmCampaign,
+                  referrer_code: referrerCode,
+                })
+              } catch (error) {
+                // Silently ignore tracking errors - they should not impact user experience
+                if (__DEV__) {
+                  console.warn('[TrackImpressionWeb] trackImpression error:', error)
+                }
+              }
             }
           }, 400)
         }

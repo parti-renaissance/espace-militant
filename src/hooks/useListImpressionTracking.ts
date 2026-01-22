@@ -25,14 +25,21 @@ export const useListImpressionTracking = () => {
               // Trouver l'item correspondant dans notre liste
               const item = items.find((item) => item.objectId === viewToken.item?.objectID)
               if (item) {
-                trackImpression({
-                  object_type: item.objectType,
-                  object_id: item.objectId,
-                  source: item.source,
-                  utm_source: item.utmSource,
-                  utm_campaign: item.utmCampaign,
-                  referrer_code: item.referrerCode,
-                })
+                try {
+                  trackImpression({
+                    object_type: item.objectType,
+                    object_id: item.objectId,
+                    source: item.source,
+                    utm_source: item.utmSource,
+                    utm_campaign: item.utmCampaign,
+                    referrer_code: item.referrerCode,
+                  })
+                } catch (error) {
+                  // Silently ignore tracking errors - they should not impact user experience
+                  if (__DEV__) {
+                    console.warn('[useListImpressionTracking] trackImpression error:', error)
+                  }
+                }
               }
             }
           })

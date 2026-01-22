@@ -9,11 +9,22 @@ export const linkMarkSchema = z.object({
 
 export type TipLinkMark = z.infer<typeof linkMarkSchema>
 
+export const variableMarkSchema = z.object({
+  type: z.literal('variable'),
+  attrs: z.object({
+    code: z.string(),
+    value: z.string().optional(),
+  }),
+})
+
+export type TipVariableMark = z.infer<typeof variableMarkSchema>
+
 export const markSchema = z
   .object({
     type: z.union([z.literal('bold'), z.literal('italic')]),
   })
   .or(linkMarkSchema)
+  .or(variableMarkSchema)
   .or(z.object({ type: z.string().transform(() => 'non_supported' as const) }))
 
 export type TipMark = z.infer<typeof markSchema>

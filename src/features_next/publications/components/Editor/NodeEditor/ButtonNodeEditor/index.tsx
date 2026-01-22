@@ -11,7 +11,7 @@ import { Link, Save } from '@tamagui/lucide-icons'
 import { Controller, useForm } from 'react-hook-form'
 import { getTokenValue, useMedia, XStack, YStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
-import ViewportModal from './ViewportModal'
+import ViewportModal from '@/components/VoxRichText/ViewportModal'
 import { useRef } from 'react'
 
 type NodeEditorProps = { 
@@ -55,10 +55,12 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
 
   return (
     <ViewportModal
+      maxWidth={480}
+      height="auto"
       onClose={() => props.onBlur()}
       open={props.present}
       header={
-        <VoxHeader.NoSafeFrame height={56} backgroundColor="white">
+        <VoxHeader>
           <XStack alignItems="center" flex={1} width="100%">
             <XStack flexGrow={1}>
               <VoxHeader.Title icon={Link}>{props.value.content ? 'Modifier le bouton' : 'Nouveau bouton'}</VoxHeader.Title>
@@ -69,7 +71,7 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
               </VoxButton>
             </XStack>
           </XStack>
-        </VoxHeader.NoSafeFrame>
+        </VoxHeader>
       }
     >
       <VoxCard.Content paddingBottom={insets.bottom + getTokenValue('$medium')}>

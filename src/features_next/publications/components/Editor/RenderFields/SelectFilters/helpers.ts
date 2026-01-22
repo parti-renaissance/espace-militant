@@ -36,7 +36,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       level: 2,
       parentId: 'adherents',
       filters: {
-        'adherent_tags': 'adherent:a_jour_2025',
+        'adherent_tags': 'adherent:a_jour_2026',
         'first_membership_since': null,
       }
     },
@@ -47,7 +47,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       level: 3,
       parentId: 'a-jour',
       filters: {
-        'adherent_tags': 'adherent:a_jour_2025:primo',
+        'adherent_tags': 'adherent:a_jour_2026:primo',
         'first_membership_since': null,
       }
     },
@@ -58,7 +58,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       level: 4,
       parentId: 'primos',
       filters: {
-        'adherent_tags': 'adherent:a_jour_2025:primo',
+        'adherent_tags': 'adherent:a_jour_2026:primo',
         'first_membership_since': formatDate(oneMonthAgo),
       }
     },
@@ -99,18 +99,18 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
     },
     {
       value: 'a-jour',
-      filters: { 'adherent_tags': 'adherent:a_jour_2025' }
+      filters: { 'adherent_tags': 'adherent:a_jour_2026' }
     },
     {
       value: 'primos-recents',
       filters: {
-        'adherent_tags': 'adherent:a_jour_2025:primo',
+        'adherent_tags': 'adherent:a_jour_2026:primo',
         'first_membership_since': 'today - 30 days'
       }
     },
     {
       value: 'primos',
-      filters: { 'adherent_tags': 'adherent:a_jour_2025:primo' }
+      filters: { 'adherent_tags': 'adherent:a_jour_2026:primo' }
     },
     {
       value: 'non-a-jour',
@@ -149,12 +149,13 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
 
     const nonQuickFilterFields = allFields.filter(field => !quickFilterFields.includes(field))
     const hasNullNonQuickFilterFields = nonQuickFilterFields.every(field => {
-      if (field === 'static_tags') {
-        const staticTagsValue = filters[field]
-        if (staticTagsValue === 'national_event:rentree-2025' || staticTagsValue === '!national_event:rentree-2025') {
-          return true
-        }
-      }
+      // EXEMPLE - Vérification de static_tags pour les filtres circonstanciels (décommenter si réactivation)
+      // if (field === 'static_tags') {
+      //   const staticTagsValue = filters[field]
+      //   if (staticTagsValue === 'national_event:rentree-2025' || staticTagsValue === '!national_event:rentree-2025') {
+      //     return true
+      //   }
+      // }
       
       return filters[field] === null || filters[field] === undefined
     })

@@ -1,9 +1,21 @@
-import { ComponentProps, ComponentRef, forwardRef, useEffect, useMemo, useState } from 'react'
+import { ComponentProps, ComponentRef, forwardRef, useEffect, useMemo, useState, createContext, useContext } from 'react'
 import { GestureResponderEvent, LayoutChangeEvent, NativeSyntheticEvent, Platform, TextInput, TextInputFocusEventData, TextInputProps } from 'react-native'
 import Text from '@/components/base/Text'
 import { useForwardRef } from '@/hooks/useForwardRef'
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
 import { AnimatePresence, isWeb, Spinner, styled, TamaguiElement, useTheme, XStack, YStack } from 'tamagui'
+
+// Contexte pour indiquer si on est dans un vrai BottomSheet
+const BottomSheetContext = createContext<boolean>(false)
+
+export const BottomSheetProvider = ({ children }: { children: React.ReactNode }) => {
+  return <BottomSheetContext.Provider value={true}>{children}</BottomSheetContext.Provider>
+}
+
+// Hook pour vérifier si on est dans un vrai BottomSheet
+function useIsInBottomSheet(): boolean {
+  return useContext(BottomSheetContext)
+}
 
 export type InputProps = {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
@@ -217,7 +229,9 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
   }
 
   const FakeTextComponent = fakeProps?.customTextComponent ?? Text.MD
-  const DynInput = useMemo(() => (bottomSheetInput ? BottomSheetTextInput : TextInput), [])
+  const isInBottomSheet = useIsInBottomSheet()
+  // Utiliser BottomSheetTextInput seulement si bottomSheetInput est true ET qu'on est dans un vrai BottomSheet
+  const DynInput = useMemo(() => (bottomSheetInput && isInBottomSheet ? BottomSheetTextInput : TextInput), [bottomSheetInput, isInBottomSheet])
 
   return (
     <YStack gap="$xsmall" ref={frameRef}>

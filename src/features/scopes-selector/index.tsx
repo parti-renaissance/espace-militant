@@ -61,7 +61,7 @@ export default function ScopesSelector() {
             <ScopeList scopes={scopes.list} onChange={handleChange} value={selectedScope} />
           </YStack>
         </YStack>
-        <YStack p="$medium" pt={0} alignItems="center" gap="$medium">
+        <YStack p="$medium" pt={0} mb="$xlarge" alignItems="center" gap="$medium">
           <Text.SM>Vos fonctonnalités de cadre sont indiquées en violet dans votre espace Militant.</Text.SM>
           <XStack>
             <VoxButton theme="purple" iconRight={ArrowRight} onPress={handleSubmit}>

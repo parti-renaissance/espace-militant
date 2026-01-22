@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetFlatList, BottomSheetModal } from '@gorhom/bottom-sheet'
 import { YStack } from 'tamagui'
 import { DropdownItem, DropdownItemFrame } from '../Dropdown'
-import Input from '../Input/Input'
+import Input, { BottomSheetProvider } from '../Input/Input'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
 import { reactTextNodeChildrenToString } from './utils'
@@ -67,7 +67,8 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
           width: 48,
         }}
       >
-        <BottomSheetFlatList
+        <BottomSheetProvider>
+          <BottomSheetFlatList
           stickyHeaderHiddenOnScroll={props.searchable}
           stickyHeaderIndices={props.searchable ? [0] : undefined}
           keyboardShouldPersistTaps="always"
@@ -123,10 +124,11 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(({
           }
           data={filteredItems}
           keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => (
-            <MemoItem {...item} onPress={handleSelect(item)} size={props.size} selected={item.id === props.value} last={filteredItems.length - 1 === index} />
-          )}
-        />
+            renderItem={({ item, index }) => (
+              <MemoItem {...item} onPress={handleSelect(item)} size={props.size} selected={item.id === props.value} last={filteredItems.length - 1 === index} />
+            )}
+          />
+        </BottomSheetProvider>
       </BottomSheetModal>
     </>
   )
