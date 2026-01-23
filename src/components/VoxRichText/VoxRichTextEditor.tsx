@@ -237,7 +237,7 @@ export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
 
     return (
       <>
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <YStack flex={1}>
             {isWeb ? (
               <XStack paddingVertical="$small" borderBottomColor="$textOutline" borderBottomWidth={1}>
