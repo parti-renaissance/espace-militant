@@ -13,6 +13,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ActivistTags from '@/components/ActivistTags'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const { width, height } = Dimensions.get('window')
 
@@ -26,8 +27,10 @@ export default function TicketScannerPage() {
   const scanTicketMutation = useScanTicket()
   const toast = useToastController()
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
+  const safeAreaInsets = useSafeAreaInsets()
+  
   const handleBack = useCallback(() => {
+    console.log('handleBack')
     if (Platform.OS === 'web') {
       if (router.canGoBack()) {
         router.back()
@@ -164,7 +167,7 @@ export default function TicketScannerPage() {
         />
         <View
           position="absolute"
-          top={0}
+          top={safeAreaInsets.top}
           left={0}
           right={0}
           bottom={0}
