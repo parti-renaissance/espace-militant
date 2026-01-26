@@ -3,8 +3,8 @@ import { LayoutChangeEvent, LayoutRectangle, Platform, SafeAreaView as RNSafeAre
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, usePathname } from 'expo-router'
-import { MoreHorizontal, Sparkle } from '@tamagui/lucide-icons'
-import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, YStack } from 'tamagui'
+import { MoreHorizontal, QrCode, Sparkle } from '@tamagui/lucide-icons'
+import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, XStack, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import NavSheet, { NavSheetRef } from '@/components/AppStructure/Navigation/NavSheet'
 import { ScopeSelector } from '@/components/AppStructure/Navigation/ScopeSelector'
@@ -13,6 +13,7 @@ import { isNavItemActive } from '@/components/AppStructure/utils'
 import { useMilitantNavItems, cadreNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useGetUserScopes } from '@/services/profile/hook'
 import type { IconComponent } from '@/models/common.model'
+import FutureButton from '@/components/Buttons/FutureButton'
 
 type Theme = 'blue' | 'purple' | 'green' | 'orange'
 
@@ -152,6 +153,8 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     return userScopes?.some((s) => s.apps.includes('data_corner')) ?? false
   }, [userScopes])
 
+  const hasScannerScope = useMemo(() => userScopes?.some((s) => s.code === 'meeting_scanner') ?? false, [userScopes])
+
   const visibleItemIds = useMemo(() => {
     return hasExecutiveScope ? CADRE_TAB_ORDER : DEFAULT_TAB_ORDER
   }, [hasExecutiveScope])
@@ -254,7 +257,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
         const config = getAllItems.find((item) => item.id === activeTabKey)
         theme = (config?.theme ?? 'blue') as Theme
       }
-      
+
       // Wait a bit for animation to complete
       setTimeout(() => {
         activeColor.value = themes.light[`${theme}1`]?.val ?? themes.light.gray1.val
@@ -344,6 +347,17 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
           ...(isWeb && hide ? { display: 'none' } : {}),
         }}
       >
+        {hasScannerScope && (
+          <XStack justifyContent="center" alignItems="center" flex={1} pb={16}>
+            <FutureButton onPress={() => router.push('/scanner')}>
+              <XStack alignItems="center" gap={8}>
+                <QrCode size={20} color="white" />
+                <Text.LG regular color="white">Scanner un billet</Text.LG>
+              </XStack>
+            </FutureButton>
+          </XStack>
+        )}
+
         <TabBarComponent>
           <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
           {visibleItemIds.map((id) => {

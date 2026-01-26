@@ -1,5 +1,6 @@
 import { forwardRef, PropsWithChildren, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { Modal, StyleSheet } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
@@ -58,6 +59,7 @@ const ViewportModal = forwardRef<ViewportModalRef, ViewportModalSheet>(({ childr
 
 const ViewportSheet = forwardRef<ViewportModalRef, ViewportModalSheet>(({ children, onClose, header }, ref) => {
   const sheetModalRef = useRef<BottomSheetModal>(null)
+  const insets = useSafeAreaInsets()
 
   const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={1} />, [])
 
@@ -71,8 +73,15 @@ const ViewportSheet = forwardRef<ViewportModalRef, ViewportModalSheet>(({ childr
   }))
 
   return (
-    <BottomSheetModal ref={sheetModalRef} backdropComponent={renderBackdrop} onDismiss={onClose} enableDismissOnClose>
-      <BottomSheetScrollView stickyHeaderIndices={[0]} style={{ flex: 1 }}>
+    <BottomSheetModal 
+      ref={sheetModalRef} 
+      backdropComponent={renderBackdrop} 
+      onDismiss={onClose} 
+      enableDismissOnClose
+      topInset={insets.top}
+      snapPoints={['100%']}
+    >
+      <BottomSheetScrollView>
         {header}
         {children}
       </BottomSheetScrollView>

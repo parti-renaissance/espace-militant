@@ -121,7 +121,7 @@ function Root() {
   useRegisterRoutingInstrumentation()
 
   return (
-    <View style={isWeb ? { maxHeight: '100dvh' as any, backgroundColor: 'white' } : { flex: 1, backgroundColor: 'white' }}>
+    <View style={isWeb ? { maxHeight: '100dvh' as any, flex: 1, backgroundColor: 'white' } : { flex: 1, backgroundColor: 'white' }}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar animated style="dark" />
         <ToastProvider swipeDirection="up">
