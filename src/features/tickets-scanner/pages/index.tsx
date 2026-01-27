@@ -264,7 +264,7 @@ export default function TicketScannerPage() {
 
                         <YStack>
                           {ticketData.visit_day && (
-                            <Text.MD regular>{ticketData.visit_day}</Text.MD>
+                            <Text fontSize={20} semibold >{ticketData.visit_day}</Text>
                           )}
                           {ticketData.transport && (
                             <Text.MD regular>{ticketData.transport}</Text.MD>
