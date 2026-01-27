@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
-import { isWeb, useMedia, useWindowDimensions, View } from 'tamagui'
+import { isWeb, useMedia, useWindowDimensions, View, ScrollView } from 'tamagui'
 
 export interface ViewportModalSheet extends PropsWithChildren {
   onClose?: () => void
@@ -36,22 +36,24 @@ const ViewportModal = forwardRef<ViewportModalRef, ViewportModalSheet>(({ childr
   if (viewport.gtSm && isWeb) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
-        <View
-          style={styles.centeredView}
-          onPress={(e) => {
-            e.stopPropagation()
-            if (e.target === e.currentTarget) {
-              onClose?.()
-            }
-          }}
-        >
-          <View style={styles.modalView}>
-            <CardFrame width={width}>
-              {header ? header : null}
-              {children}
-            </CardFrame>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} bounces={false} showsVerticalScrollIndicator={false}>
+          <View
+            style={styles.centeredView}
+            onPress={(e) => {
+              e.stopPropagation()
+              if (e.target === e.currentTarget) {
+                onClose?.()
+              }
+            }}
+          >
+            <View style={styles.modalView}>
+              <CardFrame width={width}>
+                {header ? header : null}
+                {children}
+              </CardFrame>
+            </View>
           </View>
-        </View>
+        </ScrollView>
       </Modal>
     )
   }
@@ -73,10 +75,10 @@ const ViewportSheet = forwardRef<ViewportModalRef, ViewportModalSheet>(({ childr
   }))
 
   return (
-    <BottomSheetModal 
-      ref={sheetModalRef} 
-      backdropComponent={renderBackdrop} 
-      onDismiss={onClose} 
+    <BottomSheetModal
+      ref={sheetModalRef}
+      backdropComponent={renderBackdrop}
+      onDismiss={onClose}
       enableDismissOnClose
       topInset={insets.top}
       snapPoints={['100%']}
