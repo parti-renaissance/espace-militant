@@ -4,7 +4,7 @@ import { isWeb } from 'tamagui'
 
 export default function TabsLayout() {
   if (isWeb) {
-    return <Slot />
+    return <Slot  />
   }
 
   const screenOptions = useMemo(() => ({

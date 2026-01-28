@@ -230,7 +230,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
       onClose={() => props.onBlur()}
       open={props.present}
       header={
-        <VoxHeader>
+        <VoxHeader safeAreaView={false}>
           <XStack alignItems="center" flex={1} width="100%">
             <XStack flexGrow={1}>
               <VoxHeader.Title icon={Paperclip}>Pièce jointe</VoxHeader.Title>

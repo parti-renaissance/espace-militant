@@ -4,7 +4,7 @@
  * - The pathname exactly matches the item's href, OR
  * - The pathname starts with the item's href followed by a slash (for sub-routes)
  * 
- * Route groups (text in parentheses like /(app)/ or /(militant)/) are removed before comparison
+ * Route groups (text in parentheses like /(app)/) are removed before comparison
  * because they don't appear in the actual browser URL.
  * 
  * @param pathname - The current pathname
@@ -20,7 +20,7 @@ export function isNavItemActive(pathname: string, href?: string): boolean {
   
   // Remove all route groups (text in parentheses) from both pathname and href
   // because route groups don't appear in the actual URL
-  // e.g., /(app)/(militant)/evenements -> /evenements
+  // e.g., /(app)/evenements -> /evenements
   normalizedPathname = normalizedPathname.replace(/\/\([^)]+\)/g, '')
   normalizedHref = normalizedHref.replace(/\/\([^)]+\)/g, '')
   

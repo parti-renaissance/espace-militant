@@ -67,7 +67,7 @@ export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({
       onClose={onClose}
       maxWidth={maxWidth}
       header={
-        <VoxHeader>
+        <VoxHeader safeAreaView={false}>
           <XStack alignItems="center" flex={1} width="100%">
             <XStack flexGrow={1}>
               <VoxHeader.Title>{title}</VoxHeader.Title>
