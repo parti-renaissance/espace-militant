@@ -29,7 +29,7 @@ export type NavItemConfig = {
 const militantNavItemsAuthConfig: NavItemConfig[] = [
   { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/(tabs)' },
   { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/(tabs)/evenements' },
-  // { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/(militant)/actions', routeName: '(militant)/actions', theme: 'blue' },
+  // { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/actions', routeName: '/actions', theme: 'blue' },
   { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/(tabs)/parrainages' },
   { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalUrlSlug: '/formations', isNew: true },
   { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/(tabs)/ressources' },

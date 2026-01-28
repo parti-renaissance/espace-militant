@@ -5,6 +5,10 @@ import { LayoutContext, useLayoutContext } from '@/components/AppStructure/Layou
 import { SideBarState } from '@/components/AppStructure/Navigation/SideBar'
 import ScopesSelector from '@/features/scopes-selector'
 
+export const unstable_settings = {
+  initialRouteName: '(tabs)',
+}
+
 function AppNewLayoutContent() {
   const { sidebarState, hideTabBar, hideSideBar } = useLayoutContext()
 
@@ -28,7 +32,9 @@ function AppNewLayoutContent() {
   const layoutContent = useMemo(() => (
     <Layout sidebarState={effectiveSidebarState} hideTabBar={hideTabBar}>
       <ScopesSelector />
-      <Stack screenOptions={screenOptions} />
+      <Stack screenOptions={screenOptions} initialRouteName="(tabs)">
+        <Stack.Screen name="(tabs)" />
+      </Stack>
     </Layout>
   ), [effectiveSidebarState, hideTabBar, screenOptions])
 

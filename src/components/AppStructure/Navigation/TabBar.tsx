@@ -196,7 +196,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
   // Map pathname to route ID
   const currentRouteId = useMemo(() => {
     // Find matching nav item using isNavItemActive helper
-    // This handles route groups (like /(militant)/) which don't appear in the URL
+    // This handles route groups (like /(app)/) which don't appear in the URL
     const matchingItem = getAllItems.find(item => isNavItemActive(pathname, item.href))
     return matchingItem?.id || null
   }, [pathname, getAllItems])
