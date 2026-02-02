@@ -3,7 +3,7 @@ import clientEnv from '@/config/clientEnv'
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
 import { useUserStore } from '@/store/user-store'
-import { LogOut, PenLine } from '@tamagui/lucide-icons'
+import { LogOut, PenLine, Bot } from '@tamagui/lucide-icons'
 import { Href, Link, usePathname } from 'expo-router'
 import { isWeb, useMedia, YStack } from 'tamagui'
 import { pageConfigs } from '../configs'
@@ -51,6 +51,11 @@ const ProfilMenu = () => {
 
       {clientEnv.ENVIRONMENT === 'staging' && (
         <Menu>
+          <Link href="/chatbot" asChild={!isWeb}>
+            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Bot}>
+              Chatbot
+            </Menu.Item>
+          </Link>
           <Link href="/tools/storybook" asChild={!isWeb}>
             <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={PenLine} last>
               StoryBook
