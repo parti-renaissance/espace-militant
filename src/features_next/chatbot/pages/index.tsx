@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ScrollView, NativeSyntheticEvent, TextInputKeyPressEventData } from "react-native";
-import { YStack, XStack, View, Spinner, isWeb, Input } from "tamagui";
+import { YStack, XStack, View, Spinner, isWeb, Input, useMedia } from "tamagui";
 import Text from "@/components/base/Text";
 import Layout from "@/components/AppStructure/Layout/Layout";
 import { VoxButton } from "@/components/Button/Button";
@@ -12,6 +12,7 @@ import LayoutScrollView from "@/components/AppStructure/Layout/LayoutScrollView"
 type Message = { role: "user" | "assistant"; content: string; };
 
 export default function ChatbotPage() {
+  const media = useMedia();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [params, setParams] = useState<RestChatbotStartRequest>({ messages: [] });
@@ -118,13 +119,16 @@ export default function ChatbotPage() {
           right={0}
           zIndex={100}
           bg="$textSurface"
-          pb="$medium"
+          pb={media.gtMd ? "$medium" : 0}
         >
           <YStack
             backgroundColor="$white1"
             borderColor="$textOutline"
             borderWidth={1}
-            borderRadius={24}
+            borderTopLeftRadius={24}
+            borderTopRightRadius={24}
+            borderBottomLeftRadius={media.gtMd ? 24 : 0}
+            borderBottomRightRadius={media.gtMd ? 24 : 0}
             overflow="hidden"
           >
             <View paddingTop={8}>

@@ -3,6 +3,7 @@ import Head from 'expo-router/head'
 import * as metatags from '@/config/metatags'
 import ChatbotPage from '@/features_next/chatbot/pages/index'
 import Layout from '@/components/AppStructure/Layout/Layout'
+import { Header } from '@/components/AppStructure'
 
 function ChatbotScreen() {
   return (
@@ -10,6 +11,7 @@ function ChatbotScreen() {
       <Head>
         <title>{metatags.createTitle('Chatbot')}</title>
       </Head>
+      <Header title="Chatbot" />
       <Layout.Container hideTabBar>
         <ChatbotPage /> 
       </Layout.Container>
