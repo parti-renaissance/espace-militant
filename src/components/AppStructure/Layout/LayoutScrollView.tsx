@@ -18,6 +18,7 @@ type LayoutScrollViewProps = Omit<ScrollViewProps, 'onEndReached'> & {
 
 export type LayoutScrollViewRef = {
   scrollTo: (options: { x?: number; y?: number; animated?: boolean }) => void
+  scrollToEnd: (options?: { animated?: boolean }) => void
 }
 
 const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(({
@@ -66,6 +67,16 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
         scrollViewRef.current.scrollTo(options)
       }
     },
+    scrollToEnd: (options?: { animated?: boolean }) => {
+      if (isWeb && layoutRef?.current) {
+        layoutRef.current.scrollTo({
+          top: layoutRef.current.scrollHeight,
+          behavior: options?.animated !== false ? 'smooth' : 'auto',
+        })
+      } else if (scrollViewRef.current) {
+        scrollViewRef.current.scrollToEnd(options)
+      }
+    }
   }), [layoutRef])
 
   // Natif: écouteur sur la ScrollView elle-même

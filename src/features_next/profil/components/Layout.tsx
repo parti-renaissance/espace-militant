@@ -1,8 +1,8 @@
 import { useState } from "react"
-import { LogOut, PenLine, QrCode, DoorOpen, GraduationCap, Zap, Wrench, Minus, Cross, DoorClosed, X } from "@tamagui/lucide-icons"
+import { LogOut, PenLine, QrCode, DoorOpen, GraduationCap, Zap, Wrench, X, Bot } from "@tamagui/lucide-icons"
 import { isNavItemActive } from "@/components/AppStructure/utils"
-import { Href, usePathname } from "expo-router"
-import { Button, useMedia, XStack } from "tamagui"
+import { usePathname } from "expo-router"
+import { useMedia, XStack } from "tamagui"
 import Layout from "@/components/AppStructure/Layout/Layout"
 import VoxCard from "@/components/VoxCard/VoxCard"
 import { NavItem } from "@/components/AppStructure/Navigation/NavItem"
@@ -92,6 +92,11 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                   <Text.SM semibold secondary >Outils de développement</Text.SM>
                   <X size={16} color="$textDisabled" />
                 </XStack>
+                <NavItem
+                  text="Chatbot"
+                  iconLeft={Bot}
+                  href="/chatbot"
+                />
                 <NavItem
                   text="StoryBook"
                   iconLeft={PenLine}
