@@ -1,15 +1,21 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, ComponentRef } from "react";
 import { ScrollView, NativeSyntheticEvent, TextInputKeyPressEventData } from "react-native";
-import { YStack, XStack, View, Spinner, isWeb, Input, useMedia } from "tamagui";
+import { YStack, View, Spinner, isWeb, Input, useMedia } from "tamagui";
 import Text from "@/components/base/Text";
 import Layout from "@/components/AppStructure/Layout/Layout";
 import { VoxButton } from "@/components/Button/Button";
 import { useChatbotStream } from "@/services/chatbot/hook";
-import { ArrowUpRight, Send } from "@tamagui/lucide-icons";
+import { ArrowUpRight } from "@tamagui/lucide-icons";
 import { RestChatbotStartRequest } from "@/services/chatbot/schema";
 import LayoutScrollView from "@/components/AppStructure/Layout/LayoutScrollView";
+import useKeyboardHeight from "@/hooks/useKeyboardHeight";
+import InternAlert from "@/components/InternAlert/InternAlert";
 
 type Message = { role: "user" | "assistant"; content: string; };
+
+type TamaguiInputRef = ComponentRef<typeof Input> & {
+  getNativeRef?: () => ComponentRef<typeof Input> | null;
+};
 
 export default function ChatbotPage() {
   const media = useMedia();
@@ -18,7 +24,8 @@ export default function ChatbotPage() {
   const [params, setParams] = useState<RestChatbotStartRequest>({ messages: [] });
   const [enabled, setEnabled] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
-  const inputRef = useRef<any>(null);
+  const inputRef = useRef<TamaguiInputRef>(null);
+  const keyboardHeight = useKeyboardHeight();
 
   const { data: chunks, isFetching } = useChatbotStream(params, enabled);
   const streamText = Array.isArray(chunks) ? chunks.join('') : (chunks || '');
@@ -52,11 +59,12 @@ export default function ChatbotPage() {
       // Si Maj+Entrée, laisser le comportement par défaut (saut de ligne)
     };
 
-    const element = inputRef.current as any;
+    const element = inputRef.current;
     const textarea = element?.getNativeRef?.() || element;
-    const domElement = textarea?._nativeNode || textarea;
+    const nativeNode = (textarea as { _nativeNode?: HTMLElement })?._nativeNode;
+    const domElement = nativeNode || (textarea as unknown as HTMLElement | null);
 
-    if (domElement) {
+    if (domElement && domElement instanceof HTMLElement) {
       domElement.addEventListener('keydown', handleKeyDown);
       return () => {
         domElement.removeEventListener('keydown', handleKeyDown);
@@ -68,7 +76,7 @@ export default function ChatbotPage() {
     // Sur le web : Entrée seule = envoi, Maj+Entrée = saut de ligne
     if (isWeb) {
       const key = e.nativeEvent.key;
-      const shiftKey = (e.nativeEvent as any).shiftKey;
+      const shiftKey = (e.nativeEvent as TextInputKeyPressEventData & { shiftKey?: boolean }).shiftKey;
 
       if (key === 'Enter' && !shiftKey) {
         // Empêcher le comportement par défaut et envoyer le message
@@ -87,10 +95,19 @@ export default function ChatbotPage() {
         <LayoutScrollView
           ref={scrollViewRef}
           style={{ flex: 1 }}
-          contentContainerStyle={{ gap: 10, paddingBottom: 32, minHeight: '100%', ...(isWeb ? { flex: 1 } : {}) }}
+          contentContainerStyle={{
+            gap: 10,
+            paddingBottom: isWeb ? 32 : 32 + keyboardHeight,
+            minHeight: '100%',
+            ...(isWeb ? { flex: 1 } : {})
+          }}
           onContentSizeChange={scrollToBottom}
-          padding={{ top: true, safeAreaBottom: true }}
         >
+          {!isWeb && (
+            <InternAlert type="warning" marginHorizontal="$medium" marginTop="$medium">
+              Ce POC n'est pas encore disponible sur mobile. Veuillez utiliser la version web.
+            </InternAlert>
+          )}
           {messages.map((m, i) => (
             <View
               key={i}
@@ -114,7 +131,7 @@ export default function ChatbotPage() {
         </LayoutScrollView>
         <YStack
           position={isWeb ? 'sticky' : 'absolute'}
-          bottom={0}
+          bottom={isWeb ? 0 : keyboardHeight}
           left={0}
           right={0}
           zIndex={100}
@@ -143,12 +160,15 @@ export default function ChatbotPage() {
                 focusStyle={{
                   outlineWidth: 0,
                 }}
+                maxHeight={160}
                 textAlignVertical="top"
-                placeholder="Formulez votre demande"
+                placeholder={isWeb ? "Formulez votre demande" : "Non disponible sur mobile"}
+                editable={isWeb}
+                opacity={isWeb ? 1 : 0.5}
               />
             </View>
             <View flex={1} pb="$medium" pt={4} paddingHorizontal={16}>
-              <VoxButton theme="blue" onPress={send} iconLeft={ArrowUpRight} shrink loading={isFetching} disabled={!input.trim() || isFetching} alignSelf="flex-end" />
+              <VoxButton theme="blue" onPress={send} iconLeft={ArrowUpRight} shrink loading={isFetching} disabled={!input.trim() || isFetching || !isWeb} alignSelf="flex-end" />
             </View>
           </YStack>
         </YStack>
