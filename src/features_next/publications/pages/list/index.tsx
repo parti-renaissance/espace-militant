@@ -1,30 +1,45 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "expo-router";
 import { getToken, Spinner, useMedia, YStack } from "tamagui";
 import { ArrowLeft } from "@tamagui/lucide-icons";
 import { Layout, LayoutFlatList } from "@/components/AppStructure";
 import { RestMessageListItem } from "@/services/publications/schema";
 import { PublicationCadreItem } from "./components/ListItem";
 import { PublicationsListHeader } from "./components/Header";
-import { usePaginatedMessagesSuspense } from "@/services/publications/hook";
+import { usePaginatedMessages } from "@/services/publications/hook";
 import { useGetExecutiveScopes, useMutateExecutiveScope } from "@/services/profile/hook";
 import DeleteModal from "@/features_next/publications/components/DeleteModal";
-import BoundarySuspenseWrapper, { DefaultErrorFallback } from "@/components/BoundarySuspenseWrapper";
 import { ForbiddenError, UnauthorizedError } from "@/core/errors";
 import { AccessDeny } from "@/components/AccessDeny";
 import { VoxButton } from "@/components/Button";
-import ListSkeleton from "./components/ListSkeleton";
+import { ListSkeleton } from "./components/ListSkeleton";
 import EmptyState from "./components/EmptyState";
+import EmptyStateWithFilters from "./components/EmptyStateWithFilters";
 
-function PublicationsContent({ scope }: { scope: string }) {
-  const router = useRouter();
+export type PublicationsFilters = {
+  status?: 'draft' | 'sent';
+};
+
+function PublicationsContent({ scope, accessDenyButton }: { scope: string; accessDenyButton?: React.ReactNode }) {
   const media = useMedia();
   const [deleteMessageId, setDeleteMessageId] = useState<string | null>(null);
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = usePaginatedMessagesSuspense(scope);
+  const [filters, setFilters] = useState<PublicationsFilters>({});
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error, refetch, isRefetching } = usePaginatedMessages(scope, filters.status);
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
 
   const publications = useMemo(() => {
     return data?.pages.flatMap((page: { items: RestMessageListItem[] }) => page.items) || [];
   }, [data]);
+
+  useEffect(() => {
+    if (!isRefetching) {
+      setIsManualRefreshing(false);
+    }
+  }, [isRefetching]);
+
+  const handleManualRefresh = useCallback(() => {
+    setIsManualRefreshing(true);
+    refetch();
+  }, [refetch]);
 
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -40,13 +55,17 @@ function PublicationsContent({ scope }: { scope: string }) {
     setDeleteMessageId(null);
   }, []);
 
-  const handleCreatePublication = useCallback(() => {
-    router.push('/publications');
-  }, [router]);
+  const handleFilterChange = useCallback((newFilters: PublicationsFilters) => {
+    setFilters(newFilters);
+  }, []);
 
-  const headerComponent = useCallback(() => {
-    return <PublicationsListHeader />;
-  }, [handleCreatePublication]);
+  const handleResetFilters = useCallback(() => {
+    setFilters({});
+  }, []);
+
+  const headerComponent = useMemo(() => {
+    return <PublicationsListHeader onFilterChange={handleFilterChange} filters={filters} />;
+  }, [handleFilterChange, filters]);
 
   const renderItem = useCallback(({ item }: { item: RestMessageListItem }) => {
     return <PublicationCadreItem item={item} onDeletePress={handleDeletePress} scope={scope} />;
@@ -65,22 +84,55 @@ function PublicationsContent({ scope }: { scope: string }) {
     return baseStyle;
   }, [media.sm]);
 
+  // Vérifier s'il y a des filtres actifs
+  const hasActiveFilters = useMemo(() => {
+    return filters.status !== undefined;
+  }, [filters]);
+
+  // Afficher le header seulement s'il y a des éléments OU des filtres actifs
+  const shouldShowHeader = useMemo(() => {
+    return publications.length > 0 || hasActiveFilters;
+  }, [publications.length, hasActiveFilters]);
+
+  // Gérer l'affichage selon l'état de chargement et les erreurs
+  const listEmptyComponent = useMemo(() => {
+    if (isLoading) {
+      return <ListSkeleton />;
+    }
+    
+    if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {
+      return (
+        <AccessDeny 
+          message="Votre rôle cadre actif ne vous permet pas d'accéder à cette fonctionnalité." 
+          Button={accessDenyButton}
+        />
+      );
+    }
+    
+    // Si aucun résultat et filtres actifs, afficher le composant avec bouton de réinitialisation
+    if (hasActiveFilters) {
+      return <EmptyStateWithFilters filters={filters} onResetFilters={handleResetFilters} />;
+    }
+    
+    // Si aucun résultat et aucun filtre, afficher l'état vide normal
+    return <EmptyState />;
+  }, [isLoading, error, accessDenyButton, hasActiveFilters, filters, handleResetFilters]);
+
   return (
     <>
       <Layout.Main maxWidth={892}>
         <LayoutFlatList<RestMessageListItem>
+          padding={media.sm ? false : undefined}
           data={publications}
           renderItem={renderItem}
           keyExtractor={(item) => item.uuid}
-          ListHeaderComponent={media.sm ? undefined : headerComponent}
+          ListHeaderComponent={shouldShowHeader ? headerComponent : undefined}
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.5}
           hasMore={hasNextPage ?? false}
-          ListEmptyComponent={
-            isLoading ? null : (
-              <EmptyState />
-            )
-          }
+          ListEmptyComponent={listEmptyComponent}
+          refreshing={isManualRefreshing}
+          onRefresh={handleManualRefresh}
           ListFooterComponent={
             hasNextPage ? (
               <YStack p="$medium" pb="$large">
@@ -133,21 +185,6 @@ export default function PublicationsScreen() {
   ) : undefined;
 
   return (
-    <BoundarySuspenseWrapper 
-      key={defaultScope}
-      fallback={<ListSkeleton />} 
-      errorChildren={(payload) => {
-        if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
-          return <AccessDeny 
-            message="Votre rôle cadre actif ne vous permet pas d'accéder à cette fonctionnalité." 
-            Button={accessDenyButton}
-          />
-        } else {
-          return <DefaultErrorFallback {...payload} />
-        }
-      }}
-    >
-      <PublicationsContent scope={defaultScope} />
-    </BoundarySuspenseWrapper>
+    <PublicationsContent scope={defaultScope} accessDenyButton={accessDenyButton} />
   )
 }

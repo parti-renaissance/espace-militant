@@ -161,6 +161,7 @@ export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') =
       firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined,
     placeholderData: (prev) => prev,
     refetchOnMount: true,
+    staleTime: 60 * 1000,
   })
 }
 

@@ -66,8 +66,8 @@ export function PublicationCadreItem({ item, onDeletePress, scope }: Publication
             theme: item.sender?.theme,
           }} status={item.status} />}
 
-          <Text fontSize={media.md ? 18 : 14} semibold>
-            {item.subject}
+          <Text fontSize={media.md ? 18 : 14} secondary={!item.subject} semibold>
+            {item.subject || 'Sans titre'}
           </Text>
           <XStack gap={media.md ? '$small' : '$large'} flexWrap="wrap" >
             { item.status === 'sent' && item.sent_at ? (

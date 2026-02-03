@@ -4,7 +4,7 @@ import { useMedia, XStack, YStack } from 'tamagui'
 import { Layout, LayoutScrollView } from '@/components/AppStructure'
 import { PublicationsListHeader } from './Header'
 
-const PublicationItemSkeleton = ({ withStats = false }: { withStats?: boolean }) => {
+export const PublicationItemSkeleton = ({ withStats = false }: { withStats?: boolean }) => {
   const media = useMedia()
 
   return (
@@ -51,17 +51,13 @@ export function ListSkeleton() {
   const media = useMedia()
 
   return (
-    <Layout.Main maxWidth={892}>
-      <LayoutScrollView contentContainerStyle={{ paddingTop: media.sm ? 0 : undefined }}>
-        <YStack gap="$medium" paddingHorizontal={media.sm ? 0 : undefined}>
-          {!media.sm && <PublicationsListHeader />}
-          <PublicationItemSkeleton />
-          <PublicationItemSkeleton withStats={true} />
-          <PublicationItemSkeleton />
-          <PublicationItemSkeleton withStats={true} />
-        </YStack>
-      </LayoutScrollView>
-    </Layout.Main>
+    <YStack gap="$medium" paddingHorizontal={media.sm ? 0 : undefined}>
+      <PublicationsListHeader />
+      <PublicationItemSkeleton />
+      <PublicationItemSkeleton withStats={true} />
+      <PublicationItemSkeleton />
+      <PublicationItemSkeleton withStats={true} />
+    </YStack>
   )
 }
 
