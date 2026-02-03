@@ -3,13 +3,17 @@ import { LayoutChangeEvent } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { XStack, Text } from 'tamagui'
 
-type Option = { label: string; value: string }
-export type OptionsTuple = [Option, Option]
+type Option = { label: string; value: string | undefined }
+export type OptionsArray = 
+  | [Option, Option]
+  | [Option, Option, Option]
+  | [Option, Option, Option, Option]
+  | [Option, Option, Option, Option, Option]
 
 type Props = {
-  options: OptionsTuple
-  value: string
-  onChange: (x: string) => void
+  options: OptionsArray
+  value: string | undefined
+  onChange: (x: string | undefined) => void
 }
 
 const HEIGHT = 44
@@ -20,14 +24,14 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
   const prevW = useRef<number>(0)
   const isInitialMount = useRef(true)
 
-  const isFirst = value === options[0].value
+  const selectedIndex = options.findIndex((opt) => opt.value === value)
   const innerW = Math.max(0, containerW - PADDING * 2)
-  const halfW = innerW / 2
+  const segmentWidth = innerW / options.length
 
   const translateX = useSharedValue(0)
 
   useEffect(() => {
-    const targetX = isFirst ? 0 : halfW
+    const targetX = selectedIndex >= 0 ? selectedIndex * segmentWidth : 0
     if (isInitialMount.current) {
       translateX.value = targetX
       isInitialMount.current = false
@@ -36,7 +40,7 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
         duration: 300,
       })
     }
-  }, [isFirst, halfW, translateX])
+  }, [selectedIndex, segmentWidth, translateX])
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -55,9 +59,6 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
       setContainerW(w)
     }
   }, [])
-
-  const handleLeft = useCallback(() => onChange(options[0].value), [onChange, options])
-  const handleRight = useCallback(() => onChange(options[1].value), [onChange, options])
 
   return (
     <XStack
@@ -79,7 +80,7 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
             top: PADDING,
             bottom: PADDING,
             left: PADDING,
-            width: halfW,
+            width: segmentWidth,
             borderRadius: 999,
             backgroundColor: 'white',
           },
@@ -87,35 +88,23 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
         ]}
       />
 
-      <XStack
-        width="50%"
-        alignItems="center"
-        justifyContent="center"
-        zIndex={1}
-        cursor="pointer"
-        onPress={handleLeft}
-        accessibilityRole="tab"
-        aria-selected={isFirst}
-      >
-        <Text fontWeight="600" fontSize={14} color="$textPrimary">
-          {options[0].label}
-        </Text>
-      </XStack>
-
-      <XStack
-        width="50%"
-        alignItems="center"
-        justifyContent="center"
-        zIndex={1}
-        cursor="pointer"
-        onPress={handleRight}
-        accessibilityRole="tab"
-        aria-selected={!isFirst}
-      >
-        <Text fontWeight="600" fontSize={14} color="$textPrimary">
-          {options[1].label}
-        </Text>
-      </XStack>
+      {options.map((option, index) => (
+        <XStack
+          key={option.value ?? '__undefined__'}
+          width={segmentWidth}
+          alignItems="center"
+          justifyContent="center"
+          zIndex={1}
+          cursor="pointer"
+          onPress={() => onChange(option.value)}
+          accessibilityRole="tab"
+          aria-selected={selectedIndex === index}
+        >
+          <Text fontWeight="600" fontSize={14} color="$textPrimary">
+            {option.label}
+          </Text>
+        </XStack>
+      ))}
     </XStack>
   )
 }

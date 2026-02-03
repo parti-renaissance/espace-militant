@@ -82,6 +82,15 @@ function LayoutFlatListInner<T>(
 
     if (data.length === 0) {
       const emptyNode = renderListComponent(ListEmptyComponent)
+      // Afficher le header si présent, même quand la liste est vide
+      if (headerNode) {
+        return (
+          <YStack style={baseContainerStyle}>
+            {headerNode}
+            {emptyNode}
+          </YStack>
+        )
+      }
       return <YStack style={baseContainerStyle}>{emptyNode}</YStack>
     }
 
@@ -127,7 +136,7 @@ function LayoutFlatListInner<T>(
       onEndReached={!isWeb && onEndReached ? loadMore : undefined}
       onEndReachedThreshold={onEndReachedThreshold}
       refreshControl={refreshControlElement}
-      contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
+      contentInsetAdjustmentBehavior={Platform.OS === 'ios' && padding !== false ? 'automatic' : undefined}
       contentContainerStyle={baseContainerStyle}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
