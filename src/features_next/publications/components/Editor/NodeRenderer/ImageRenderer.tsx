@@ -62,7 +62,7 @@ export const ImageRenderer = ({
   return (
     <YStack style={wrapperStyle}>
       <View
-        style={containerStyle}
+        style={[containerStyle, link_url && { cursor: 'pointer' }]}
         paddingBottom={displayToolbar && edgePosition === 'leading' ? 0 : paddingBottom}
         onPress={link_url ? handlePress : undefined}
         tag={link_url ? 'button' : undefined}

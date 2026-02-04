@@ -116,7 +116,6 @@ const ImportImageCard = memo((props: ImportImageCardProps) => {
                 Remplacer cette image
               </VoxButton>
             </YStack>
-            ﬂ
           </YStack>
         )}
       </>
