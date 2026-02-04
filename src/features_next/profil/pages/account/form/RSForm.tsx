@@ -1,8 +1,11 @@
 import { Fragment } from 'react'
+import { Controller } from 'react-hook-form'
+
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
+
 import { RestDetailedProfileResponse } from '@/services/profile/schema'
-import { Controller } from 'react-hook-form'
+
 import AbstractForm from './AbstractProfilForm'
 import { validateRSFormSchema } from './schema'
 

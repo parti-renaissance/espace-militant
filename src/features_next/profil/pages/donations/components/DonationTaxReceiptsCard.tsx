@@ -1,13 +1,15 @@
 import { Fragment } from 'react'
+import { XStack } from 'tamagui'
+import { Download } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useFileDownload } from '@/hooks/useFileDownload'
 import { useGetTaxReceipts } from '@/services/profile/hook'
 import { RestTaxReceiptsResponse } from '@/services/profile/schema'
-import { Download } from '@tamagui/lucide-icons'
-import { XStack } from 'tamagui'
 
 const DownloadBtn = ({ receipt }: { receipt: RestTaxReceiptsResponse[number] }) => {
   const { handleDownload, isPending } = useFileDownload()

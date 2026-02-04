@@ -1,8 +1,10 @@
+import { isWeb, styled, XStack, YStack } from 'tamagui'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard, { VoxCardFrame } from '@/components/VoxCard/VoxCard'
+
 import type { RestGetComitteesResponse } from '@/services/committee/schema'
-import { isWeb, styled, XStack, YStack } from 'tamagui'
 
 const CommitteeCardFrame = styled(VoxCardFrame, {
   tag: 'button',

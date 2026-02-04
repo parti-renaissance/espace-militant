@@ -1,8 +1,9 @@
-import Text from "@/components/base/Text"
-import { VoxButton } from "@/components/Button"
-import ProfilePicture from "@/components/ProfilePicture"
-import VoxCard, { VoxCardFrame } from "@/components/VoxCard/VoxCard"
-import { styled, XStack, YStack } from "tamagui"
+import { styled, XStack, YStack } from 'tamagui'
+
+import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
+import ProfilePicture from '@/components/ProfilePicture'
+import VoxCard, { VoxCardFrame } from '@/components/VoxCard/VoxCard'
 
 const MembershipCardFrame = styled(VoxCardFrame, {
   tag: 'button',
@@ -77,16 +78,7 @@ type MembershipCardProps = {
   }
 }
 
-export function MembershipCard({
-  title,
-  subtitle,
-  loading,
-  onPress,
-  showJoinButton = true,
-  isMember = false,
-  disabled = false,
-  manager
-}: MembershipCardProps) {
+export function MembershipCard({ title, subtitle, loading, onPress, showJoinButton = true, isMember = false, disabled = false, manager }: MembershipCardProps) {
   const isTrulyDisabled = disabled && !isMember
 
   const color = isTrulyDisabled ? '$gray6' : '$blue6'
@@ -96,34 +88,28 @@ export function MembershipCard({
   const cardPressable = !isMember && !isTrulyDisabled && !showJoinButton && onPress ? onPress : undefined
 
   return (
-    <MembershipCardFrame
-      inside
-      selected={isMember}
-      disabled={isTrulyDisabled}
-      onPress={cardPressable}
-      focusable={!isTrulyDisabled}
-    >
+    <MembershipCardFrame inside selected={isMember} disabled={isTrulyDisabled} onPress={cardPressable} focusable={!isTrulyDisabled}>
       <VoxCard.Content px={0} pb={0} flexShrink={1} height={148} overflow="hidden">
         <XStack justifyContent="space-between" alignItems="center" gap="$medium" px="$medium" flexGrow={1}>
           <YStack flexShrink={1} gap={8}>
-            <Text.MD semibold color={color}>{title}</Text.MD>
+            <Text.MD semibold color={color}>
+              {title}
+            </Text.MD>
             <Text.SM color={subColor}>{subtitle}</Text.SM>
           </YStack>
 
           {showJoinButton && (
             <YStack>
               {isMember ? (
-                <VoxButton variant="text" theme={buttonTheme}>Membre</VoxButton>
+                <VoxButton variant="text" theme={buttonTheme}>
+                  Membre
+                </VoxButton>
               ) : isTrulyDisabled ? (
-                <Text.MD color="$gray5" semibold px="$medium">Complète</Text.MD>
+                <Text.MD color="$gray5" semibold px="$medium">
+                  Complète
+                </Text.MD>
               ) : (
-                <VoxButton
-                  variant="outlined"
-                  bg="white"
-                  theme="blue"
-                  onPress={onPress}
-                  loading={loading}
-                >
+                <VoxButton variant="outlined" bg="white" theme="blue" onPress={onPress} loading={loading}>
                   Rejoindre
                 </VoxButton>
               )}
@@ -141,11 +127,9 @@ export function MembershipCard({
             </XStack>
           </YStack>
         ) : (
-          <YStack/>
+          <YStack />
         )}
-
       </VoxCard.Content>
     </MembershipCardFrame>
   )
 }
-

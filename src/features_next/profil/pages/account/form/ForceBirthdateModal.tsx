@@ -1,14 +1,17 @@
 import { Fragment, useMemo } from 'react'
+import { YStack } from 'tamagui'
+import { Info } from '@tamagui/lucide-icons'
+import { Controller } from 'react-hook-form'
+import * as z from 'zod'
+
 import DatePickerField from '@/components/DatePicker'
 import { VoxHeader } from '@/components/Header/Header'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import NationalitySelect from '@/components/NationalitySelect/NationalitySelect'
+
 import { useGetDetailProfil } from '@/services/profile/hook'
-import { Info } from '@tamagui/lucide-icons'
-import { Controller } from 'react-hook-form'
-import { YStack } from 'tamagui'
-import * as z from 'zod'
+
 import AbstractProfilForm from './AbstractProfilForm'
 import { validateBirthdateFormSchema, validateNationalityFormSchema } from './schema'
 

@@ -1,7 +1,9 @@
 import React from 'react'
-import { YStack, XStack, Separator } from 'tamagui'
+import { Separator, XStack, YStack } from 'tamagui'
+
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { RestEventStatsResponse } from '@/services/stats/schema'
 
 interface EventStatsCardProps {
@@ -95,4 +97,3 @@ const EventStatsCard: React.FC<EventStatsCardProps> = ({ stats }) => {
 }
 
 export default EventStatsCard
-

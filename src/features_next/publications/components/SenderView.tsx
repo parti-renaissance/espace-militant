@@ -1,10 +1,12 @@
-import React, { useMemo, useState } from "react"
-import { XStack, YStack } from "tamagui"
-import Text from "@/components/base/Text"
-import ProfilePicture from "@/components/ProfilePicture"
-import { Clipboard, ClipboardCheck, ClipboardEdit, Clock, UserCog } from "@tamagui/lucide-icons"
-import { VoxButton } from "@/components/Button"
-import SendersSelectModal from "./SendersSelectModal"
+import React, { useMemo, useState } from 'react'
+import { XStack, YStack } from 'tamagui'
+import { Clipboard, ClipboardCheck, ClipboardEdit, Clock, UserCog } from '@tamagui/lucide-icons'
+
+import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
+import ProfilePicture from '@/components/ProfilePicture'
+
+import SendersSelectModal from './SendersSelectModal'
 
 export type SenderProfileProps = {
   sender: {
@@ -16,14 +18,16 @@ export type SenderProfileProps = {
 }
 
 const SenderProfile = ({ sender }: SenderProfileProps) => {
-  const profilePictureProps = useMemo(() => ({
-    size: 40,
-    rounded: true,
-    src: sender.pictureLink,
-    alt: "Profile picture",
-    fullName: sender.name ?? 'U'
-  }), [sender.pictureLink, sender.name])
-
+  const profilePictureProps = useMemo(
+    () => ({
+      size: 40,
+      rounded: true,
+      src: sender.pictureLink,
+      alt: 'Profile picture',
+      fullName: sender.name ?? 'U',
+    }),
+    [sender.pictureLink, sender.name],
+  )
 
   return (
     <XStack gap="$small" alignItems="center">
@@ -106,7 +110,7 @@ export const SenderView = ({
   status,
   datetime,
   availableSenders,
-  onSenderSelect
+  onSenderSelect,
 }: {
   sender: SenderViewProps | null
   status?: 'sent' | 'draft' | string
@@ -124,28 +128,28 @@ export const SenderView = ({
       return {
         name: null,
         role: undefined,
-        pictureLink: undefined
+        pictureLink: undefined,
       }
     }
 
-    const name = (sender?.first_name && sender?.last_name) 
-      ? `${sender.first_name} ${sender.last_name}`
-      : sender?.first_name || sender?.last_name || 'Expéditeur inconnu'
-    
+    const name =
+      sender?.first_name && sender?.last_name ? `${sender.first_name} ${sender.last_name}` : sender?.first_name || sender?.last_name || 'Expéditeur inconnu'
+
     return {
       name,
       role: sender?.role || undefined,
       pictureLink: sender?.image_url || undefined,
-      textColor: sender?.theme?.primary ?? '$gray5'
+      textColor: sender?.theme?.primary ?? '$gray5',
     }
   }, [sender])
-
 
   const memoizedSender = useMemo(() => {
     if (isNoSignature && isEditMode && sender?.first_name) {
       return (
         <XStack gap="$small" alignItems="center">
-            <Text.MD semibold secondary>{sender.first_name}</Text.MD>
+          <Text.MD semibold secondary>
+            {sender.first_name}
+          </Text.MD>
         </XStack>
       )
     }
@@ -183,9 +187,7 @@ export const SenderView = ({
               <Text.SM secondary>{datetime}</Text.SM>
             </XStack>
           )}
-          {status && (
-            <StatusBadge status={status} />
-          )}
+          {status && <StatusBadge status={status} />}
         </XStack>
         <XStack gap="$small" alignItems="center" justifyContent="space-between">
           {memoizedSender}

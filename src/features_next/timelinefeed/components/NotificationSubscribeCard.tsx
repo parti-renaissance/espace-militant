@@ -1,11 +1,13 @@
+import { Link } from 'expo-router'
+import { Image, isWeb, useMedia, XStack, YStack } from 'tamagui'
+import { X } from '@tamagui/lucide-icons'
+import { addMonths } from 'date-fns'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { VoxCard } from '@/components/VoxCard/VoxCard'
+
 import { useUserStore } from '@/store/user-store'
-import { X } from '@tamagui/lucide-icons'
-import { addMonths } from 'date-fns'
-import { Link } from 'expo-router'
-import { Image, isWeb, useMedia, XStack, YStack } from 'tamagui'
 
 export default function NotificationSubscribeCard() {
   const userStore = useUserStore()

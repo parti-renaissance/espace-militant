@@ -1,20 +1,23 @@
 import { Fragment } from 'react'
+import { useMedia, View } from 'tamagui'
+import { Info } from '@tamagui/lucide-icons'
+import { Controller } from 'react-hook-form'
+
 import Input from '@/components/base/Input/Input'
 import Select from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import DatePickerField from '@/components/DatePicker'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import NationalitySelect from '@/components/NationalitySelect/NationalitySelect'
+
 import { RestDetailedProfileResponse } from '@/services/profile/schema'
-import { Info } from '@tamagui/lucide-icons'
-import { Controller } from 'react-hook-form'
-import { View, useMedia } from 'tamagui'
+
 import AbstractProfilForm from './AbstractProfilForm'
 import { validateInformationsFormSchema } from './schema'
 
 const InformationsForm = ({ profile }: { profile: RestDetailedProfileResponse }) => {
   const media = useMedia()
-  
+
   return (
     <AbstractProfilForm
       uuid={profile.uuid}

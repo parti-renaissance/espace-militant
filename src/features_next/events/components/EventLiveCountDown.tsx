@@ -1,6 +1,7 @@
 import { ComponentProps, useEffect, useState } from 'react'
-import Text from '@/components/base/Text'
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns'
+
+import Text from '@/components/base/Text'
 
 const calculateTimeLeft = (date: Date) => {
   const now = new Date()

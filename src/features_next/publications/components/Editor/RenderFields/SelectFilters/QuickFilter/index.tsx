@@ -1,9 +1,11 @@
 import React from 'react'
 import { XStack, YStack } from 'tamagui'
+
 import Text from '@/components/base/Text'
-import SelectQuickFiltersItem from './SelectQuickFiltersItem'
-import { HierarchicalQuickFilterType } from '../type'
+
 import { getItemState } from '../helpers'
+import { HierarchicalQuickFilterType } from '../type'
+import SelectQuickFiltersItem from './SelectQuickFiltersItem'
 
 interface QuickFilterProps {
   quickFilters: HierarchicalQuickFilterType[]
@@ -11,11 +13,7 @@ interface QuickFilterProps {
   onItemSelection: (value: string, hasSelectedQuickFilter: boolean) => void
 }
 
-export default function QuickFilter({
-  quickFilters,
-  selectedQuickFilterId,
-  onItemSelection,
-}: QuickFilterProps) {
+export default function QuickFilter({ quickFilters, selectedQuickFilterId, onItemSelection }: QuickFilterProps) {
   return (
     <YStack gap="$medium">
       <XStack alignItems="center" gap="$small">

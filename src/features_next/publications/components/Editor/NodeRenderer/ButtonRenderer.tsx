@@ -1,7 +1,9 @@
 import { Text, TextStyle } from 'react-native'
+import { View, YStack } from 'tamagui'
+
 import { useThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { View, YStack } from 'tamagui'
+
 import { useHits } from '@/services/hits/hook'
 import { handleLinkPress } from '@/utils/linkHandler'
 
@@ -11,16 +13,20 @@ export const ButtonRenderer = ({
   displayToolbar = true,
   allowHits = false,
   publicationUuid,
-}: { 
-  data: S.ButtonNode; 
-  edgePosition?: 'leading' | 'trailing' | 'alone'; 
-  displayToolbar?: boolean;
-  allowHits?: boolean;
-  publicationUuid?: string;
+}: {
+  data: S.ButtonNode
+  edgePosition?: 'leading' | 'trailing' | 'alone'
+  displayToolbar?: boolean
+  allowHits?: boolean
+  publicationUuid?: string
 }) => {
-  const { containerStyle, baseStyle, wrapperStyle: { paddingTop, paddingBottom, paddingLeft, paddingRight, ...wrapperStyle } } = useThemeStyle(data, edgePosition)
+  const {
+    containerStyle,
+    baseStyle,
+    wrapperStyle: { paddingTop, paddingBottom, paddingLeft, paddingRight, ...wrapperStyle },
+  } = useThemeStyle(data, edgePosition)
   const { trackClick } = useHits()
-  
+
   if (!data.content) return null
 
   const handlePress = async () => {
@@ -40,7 +46,7 @@ export const ButtonRenderer = ({
           }
         }
       }
-      
+
       await handleLinkPress(data.content.link, undefined, data.content.text)
     }
   }

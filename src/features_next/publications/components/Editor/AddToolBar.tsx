@@ -1,10 +1,12 @@
 import { forwardRef, RefObject, useCallback, useEffect } from 'react'
-import { Control } from 'react-hook-form'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming, withDelay, Easing } from 'react-native-reanimated'
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
-import { Image, Text as TextIcon, MousePointerSquare, X, Plus, Paperclip } from '@tamagui/lucide-icons'
+import { Image, MousePointerSquare, Paperclip, Plus, Text as TextIcon, X } from '@tamagui/lucide-icons'
+import { Control } from 'react-hook-form'
+
 import Text from '@/components/base/Text'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+
 import { EditorMethods } from './types'
 
 export const TOOLBAR_ITEM_HEIGHT = 56
@@ -15,7 +17,7 @@ const ANIMATION_CONFIG = {
   frame: { duration: 400, easing: Easing.inOut(Easing.quad) },
   plus: { duration: 200, easing: Easing.inOut(Easing.quad) },
   item: { duration: 300, easing: Easing.inOut(Easing.quad) },
-  delays: { frame: 200, plus: 400, container: 160, wrapper: 400 }
+  delays: { frame: 200, plus: 400, container: 160, wrapper: 400 },
 }
 
 type UseAnimatedStateOptions = {
@@ -27,14 +29,7 @@ type UseAnimatedStateOptions = {
   config?: any
 }
 
-const useAnimatedState = ({
-  openValue,
-  closedValue,
-  isOpen,
-  openDelay = 0,
-  closedDelay = 0,
-  config = ANIMATION_CONFIG.container,
-}: UseAnimatedStateOptions) => {
+const useAnimatedState = ({ openValue, closedValue, isOpen, openDelay = 0, closedDelay = 0, config = ANIMATION_CONFIG.container }: UseAnimatedStateOptions) => {
   const animatedValue = useSharedValue(isOpen ? openValue : closedValue)
 
   useEffect(() => {
@@ -122,13 +117,13 @@ const ToolBarItem = ({ title, icon: Icon, onPress, visible = true }: ToolBarItem
     openValue: TOOLBAR_ITEM_HEIGHT,
     closedValue: 0,
     isOpen: visible,
-    config: ANIMATION_CONFIG.item
+    config: ANIMATION_CONFIG.item,
   })
   const animatedOpacity = useAnimatedState({
     openValue: 1,
     closedValue: 0,
     isOpen: visible,
-    config: ANIMATION_CONFIG.item
+    config: ANIMATION_CONFIG.item,
   })
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -177,42 +172,42 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
     closedValue: 36,
     isOpen: props.showAddBar || false,
     openDelay: ANIMATION_CONFIG.delays.frame,
-    config: ANIMATION_CONFIG.frame
+    config: ANIMATION_CONFIG.frame,
   })
   const animatedFrameOpacity = useAnimatedState({
     openValue: 1,
     closedValue: 0,
     isOpen: props.showAddBar || false,
     openDelay: ANIMATION_CONFIG.delays.frame + 20,
-    config: ANIMATION_CONFIG.frame
+    config: ANIMATION_CONFIG.frame,
   })
   const animatedContainerWidth = useAnimatedState({
     openValue: 1,
     closedValue: 0,
     isOpen: props.showAddBar || false,
     closedDelay: ANIMATION_CONFIG.delays.container,
-    config: ANIMATION_CONFIG.container
+    config: ANIMATION_CONFIG.container,
   })
   const animatedContainerBorderRadius = useAnimatedState({
     openValue: 24,
     closedValue: TOOLBAR_ITEM_HEIGHT,
     isOpen: props.showAddBar || false,
     closedDelay: ANIMATION_CONFIG.delays.container,
-    config: ANIMATION_CONFIG.plus
+    config: ANIMATION_CONFIG.plus,
   })
   const animatedPlusOpacity = useAnimatedState({
     openValue: 0,
     closedValue: 1,
     isOpen: props.showAddBar || false,
     closedDelay: ANIMATION_CONFIG.delays.plus,
-    config: ANIMATION_CONFIG.plus
+    config: ANIMATION_CONFIG.plus,
   })
   const animatedPlusSize = useAnimatedState({
     openValue: 0,
     closedValue: 36,
     isOpen: props.showAddBar || false,
     closedDelay: ANIMATION_CONFIG.delays.plus,
-    config: ANIMATION_CONFIG.plus
+    config: ANIMATION_CONFIG.plus,
   })
 
   const containerAnimatedStyle = useAnimatedStyle(() => {
@@ -250,21 +245,27 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
       wrapperOpacity.value = withTiming(1, ANIMATION_CONFIG.wrapper)
     } else {
       wrapperIsAuto.value = withDelay(ANIMATION_CONFIG.delays.wrapper, withTiming(0, { duration: 0 }))
-      
-      wrapperHeight.value = withDelay(ANIMATION_CONFIG.delays.wrapper, withTiming(28, { 
-        duration: 200,
-        easing: Easing.inOut(Easing.quad)
-      }))
-      wrapperMargin.value = withDelay(ANIMATION_CONFIG.delays.wrapper, withTiming(0, { 
-        duration: 200,
-        easing: Easing.inOut(Easing.quad)
-      }))
+
+      wrapperHeight.value = withDelay(
+        ANIMATION_CONFIG.delays.wrapper,
+        withTiming(28, {
+          duration: 200,
+          easing: Easing.inOut(Easing.quad),
+        }),
+      )
+      wrapperMargin.value = withDelay(
+        ANIMATION_CONFIG.delays.wrapper,
+        withTiming(0, {
+          duration: 200,
+          easing: Easing.inOut(Easing.quad),
+        }),
+      )
     }
   }, [props.showAddBar])
 
   const wrapperAnimatedStyle = useAnimatedStyle(() => {
     if (wrapperIsAuto.value > 0) {
-      return { 
+      return {
         height: 'auto',
         marginTop: wrapperMargin.value,
         marginBottom: wrapperMargin.value,
@@ -277,7 +278,6 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
     }
   })
 
-
   const handleAddField = useCallback(
     (node: S.NodeType) => {
       if (props.editorMethods.current) {
@@ -285,7 +285,7 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
           props.editorMethods.current.addField(node, undefined)
         } else {
           const fields = props.editorMethods.current.getFields()
-          const currentIndex = fields.findIndex(f => f.id === props.field?.id)
+          const currentIndex = fields.findIndex((f) => f.id === props.field?.id)
           const previousField = currentIndex > 0 ? fields[currentIndex - 1] : undefined
           props.editorMethods.current.addField(node, previousField, currentIndex === 0)
         }
@@ -295,50 +295,41 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
     [props.editorMethods, props.field, props.onClose],
   )
 
- 
-
   return (
     <AnimatedToolBarWrapper style={wrapperAnimatedStyle}>
-        <AnimatedToolBarContainer style={containerAnimatedStyle} onPress={(e) => e.stopPropagation()}>
+      <AnimatedToolBarContainer style={containerAnimatedStyle} onPress={(e) => e.stopPropagation()}>
         <Animated.View style={[plusAnimatedStyle, { justifyContent: 'center', alignItems: 'center', alignSelf: 'center', position: 'absolute', zIndex: 100 }]}>
-          <YStack justifyContent="center" alignItems="center" width="100%" height="100%" borderRadius={36} backgroundColor="white" cursor='pointer' pressStyle={{ backgroundColor: '$gray2' }} hoverStyle={{ backgroundColor: '$gray1' }} onPress={props.onShowAddBar}>
+          <YStack
+            justifyContent="center"
+            alignItems="center"
+            width="100%"
+            height="100%"
+            borderRadius={36}
+            backgroundColor="white"
+            cursor="pointer"
+            pressStyle={{ backgroundColor: '$gray2' }}
+            hoverStyle={{ backgroundColor: '$gray1' }}
+            onPress={props.onShowAddBar}
+          >
             <Plus color="black" size={16} />
           </YStack>
         </Animated.View>
         <AnimatedToolBarFrame style={frameAnimatedStyle}>
           <XStack height={TOOLBAR_ITEM_HEIGHT} justifyContent="space-between" gap="$medium" alignItems="center" bg="white">
-            <Text.LG padding="$medium" numberOfLines={1}>Ajouter un élément</Text.LG>
+            <Text.LG padding="$medium" numberOfLines={1}>
+              Ajouter un élément
+            </Text.LG>
             <YStack padding="$medium" cursor="pointer">
               <X color="$textPrimary" onPress={props.onClose} size={24} />
             </YStack>
           </XStack>
-          <ToolBarItem
-            title="Texte"
-            icon={TextIcon}
-            onPress={() => handleAddField('richtext')}
-            visible={props.showAddBar}
-          />
+          <ToolBarItem title="Texte" icon={TextIcon} onPress={() => handleAddField('richtext')} visible={props.showAddBar} />
 
-          <ToolBarItem
-            title="Image"
-            icon={Image}
-            onPress={() => handleAddField('image')}
-            visible={props.showAddBar}
-          />
+          <ToolBarItem title="Image" icon={Image} onPress={() => handleAddField('image')} visible={props.showAddBar} />
 
-          <ToolBarItem
-            title="Bouton"
-            icon={MousePointerSquare}
-            onPress={() => handleAddField('button')}
-            visible={props.showAddBar}
-          />
+          <ToolBarItem title="Bouton" icon={MousePointerSquare} onPress={() => handleAddField('button')} visible={props.showAddBar} />
 
-          <ToolBarItem
-            title="Pièce jointe"
-            icon={Paperclip}
-            onPress={() => handleAddField('attachment')}
-            visible={props.showAddBar}
-          />
+          <ToolBarItem title="Pièce jointe" icon={Paperclip} onPress={() => handleAddField('attachment')} visible={props.showAddBar} />
         </AnimatedToolBarFrame>
       </AnimatedToolBarContainer>
     </AnimatedToolBarWrapper>

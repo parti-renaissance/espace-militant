@@ -1,9 +1,11 @@
+import { Image } from 'expo-image'
+import { useMedia, useWindowDimensions, YStack } from 'tamagui'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import { Image } from 'expo-image'
-import { useMedia, useWindowDimensions, YStack } from 'tamagui'
 
 const illuFormations = require('../assets/illu-formations.png')
 
@@ -12,7 +14,7 @@ export function JoinMembershipCard() {
   const windowDimensions = useWindowDimensions()
   const { isPending, open: openAdhesion } = useOpenExternalContent({
     slug: 'adhesion',
-    utm_campaign: 'formations'
+    utm_campaign: 'formations',
   })
 
   return (
@@ -23,9 +25,9 @@ export function JoinMembershipCard() {
         alignItems="center"
         gap={0}
         p={0}
-        pb={media.sm ? "$large" : 0}
+        pb={media.sm ? '$large' : 0}
       >
-        <YStack height={media.sm ? undefined : 420} width={media.sm ? '100%' : undefined} flexGrow={1} >
+        <YStack height={media.sm ? undefined : 420} width={media.sm ? '100%' : undefined} flexGrow={1}>
           <Image
             source={illuFormations}
             contentFit="cover"
@@ -44,13 +46,7 @@ export function JoinMembershipCard() {
             Rejoignez-nous pour y accéder.
           </Text.SM>
           <YStack>
-            <VoxButton
-              theme="yellow"
-              size="lg"
-              variant="outlined"
-              disabled={isPending}
-              onPress={openAdhesion()}
-            >
+            <VoxButton theme="yellow" size="lg" variant="outlined" disabled={isPending} onPress={openAdhesion()}>
               Adhérer pour accéder
             </VoxButton>
           </YStack>
@@ -65,7 +61,7 @@ export function RenewMembershipCard() {
   const windowDimensions = useWindowDimensions()
   const { isPending, open: openAdhesion } = useOpenExternalContent({
     slug: 'adhesion',
-    utm_campaign: 'formations'
+    utm_campaign: 'formations',
   })
 
   return (
@@ -76,9 +72,9 @@ export function RenewMembershipCard() {
         alignItems="center"
         gap={0}
         p={0}
-        pb={media.sm ? "$large" : 0}
+        pb={media.sm ? '$large' : 0}
       >
-        <YStack height={media.sm ? undefined : 420} width={media.sm ? '100%' : undefined} flexGrow={1} >
+        <YStack height={media.sm ? undefined : 420} width={media.sm ? '100%' : undefined} flexGrow={1}>
           <Image
             source={illuFormations}
             contentFit="cover"
@@ -97,13 +93,7 @@ export function RenewMembershipCard() {
             Renouvelez votre adhésion pour y accéder.
           </Text.SM>
           <YStack>
-            <VoxButton
-              theme="yellow"
-              size="lg"
-              variant="outlined"
-              disabled={isPending}
-              onPress={openAdhesion()}
-            >
+            <VoxButton theme="yellow" size="lg" variant="outlined" disabled={isPending} onPress={openAdhesion()}>
               Me mettre à jour pour accéder
             </VoxButton>
           </YStack>
@@ -118,7 +108,7 @@ export function AccessFormationsCard() {
   const windowDimensions = useWindowDimensions()
   const { isPending, open: openFormations } = useOpenExternalContent({
     slug: 'formation',
-    utm_campaign: 'formations'
+    utm_campaign: 'formations',
   })
 
   return (
@@ -129,9 +119,9 @@ export function AccessFormationsCard() {
         alignItems="center"
         gap={0}
         p={0}
-        pb={media.sm ? "$large" : 0}
+        pb={media.sm ? '$large' : 0}
       >
-        <YStack height={media.sm ? undefined : 420} width={media.sm ? '100%' : undefined} flexGrow={1} >
+        <YStack height={media.sm ? undefined : 420} width={media.sm ? '100%' : undefined} flexGrow={1}>
           <Image
             source={illuFormations}
             contentFit="cover"
@@ -150,13 +140,7 @@ export function AccessFormationsCard() {
             Vous êtes adhérent à jour.
           </Text.SM>
           <YStack>
-            <VoxButton
-              theme="blue"
-              size="lg"
-              variant="outlined"
-              disabled={isPending}
-              onPress={openFormations({ state: '/formations' })}
-            >
+            <VoxButton theme="blue" size="lg" variant="outlined" disabled={isPending} onPress={openFormations({ state: '/formations' })}>
               Accéder aux formations
             </VoxButton>
           </YStack>

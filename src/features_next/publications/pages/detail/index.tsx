@@ -1,10 +1,12 @@
 import React from 'react'
-import { RestGetMessageContentResponse, RestGetMessageResponse, RestGetMessageFiltersResponse } from '@/services/publications/schema'
-import { RestPublicationStatsResponse } from '@/services/stats/schema'
-import { PublicationContent } from './components/PublicationContent'
-import { PublicationSkeleton } from './components/PublicationSkeleton'
-import { PublicationDenyScreen } from './components/PublicationDenyScreen'
+
 import { DetailedAPIErrorPayload } from '@/core/errors'
+import { RestGetMessageContentResponse, RestGetMessageFiltersResponse, RestGetMessageResponse } from '@/services/publications/schema'
+import { RestPublicationStatsResponse } from '@/services/stats/schema'
+
+import { PublicationContent } from './components/PublicationContent'
+import { PublicationDenyScreen } from './components/PublicationDenyScreen'
+import { PublicationSkeleton } from './components/PublicationSkeleton'
 
 interface MessageDetailsScreenProps {
   data: RestGetMessageResponse

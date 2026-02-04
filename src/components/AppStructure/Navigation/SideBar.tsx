@@ -1,30 +1,32 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { usePathname } from 'expo-router'
-import { BellOff, ChevronRight, Sparkle, Ellipsis, CircleCheckBig } from '@tamagui/lucide-icons'
-import { styled, YStack, XStack } from 'tamagui'
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
-import Text from '@/components/base/Text'
-import { VoxButton } from '@/components/Button'
-import { NavItem } from './NavItem'
-import { ScopeSelector } from './ScopeSelector'
-import { FeaturebaseFooterItems } from './FeaturebaseFooterItems'
-import type { NavItemSubItem } from './NavItemDropdown'
+import { styled, XStack, YStack } from 'tamagui'
+import { BellOff, ChevronRight, CircleCheckBig, Ellipsis, Sparkle } from '@tamagui/lucide-icons'
+
 import { useVisibleNavItems } from '@/components/AppStructure/hooks/useVisibleNavItems'
 import { isNavItemActive } from '@/components/AppStructure/utils'
-import { useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
-import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
-import useCheckNotificationsState from '@/hooks/notifications/useCheckNotificationsState'
-import { useSession } from '@/ctx/SessionProvider'
-import CadreIllustration from '@/assets/illustrations/CadreIllustration'
+import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
 
-export const WIDTH_MILITANT = 248;
-export const WIDTH_COLLAPSED = 58;
+import CadreIllustration from '@/assets/illustrations/CadreIllustration'
+import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import { useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
+import { useSession } from '@/ctx/SessionProvider'
+import useCheckNotificationsState from '@/hooks/notifications/useCheckNotificationsState'
+import { useGetExecutiveScopes, useGetProfil } from '@/services/profile/hook'
+
+import { FeaturebaseFooterItems } from './FeaturebaseFooterItems'
+import { NavItem } from './NavItem'
+import type { NavItemSubItem } from './NavItemDropdown'
+import { ScopeSelector } from './ScopeSelector'
+
+export const WIDTH_MILITANT = 248
+export const WIDTH_COLLAPSED = 58
 export const MARGINS = {
   small: 8,
   medium: 12,
   large: 16,
-};
-
+}
 
 export type SideBarState = 'floating' | 'militant' | 'collapsed' | 'cadre' | 'hide'
 
@@ -203,10 +205,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
   const militantNavItems = useMilitantNavItems()
   const [displayNavCadre, setDisplayNavCadre] = useState(state === 'cadre')
   const { notificationGranted, triggerNotificationRequest } = useCheckNotificationsState()
-  const hasExecutiveScopes = useMemo(
-    () => executiveScopes?.list && executiveScopes.list.length > 0,
-    [executiveScopes],
-  )
+  const hasExecutiveScopes = useMemo(() => executiveScopes?.list && executiveScopes.list.length > 0, [executiveScopes])
 
   React.useEffect(() => {
     if (state === 'cadre') {
@@ -219,11 +218,11 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
   // Ajouter la propriété active aux items militant et filtrer selon displayIn
   const militantNavItemsWithActive = useMemo(() => {
     return militantNavItems
-      .filter(item => {
+      .filter((item) => {
         const displayIn = item.displayIn ?? 'all'
         return displayIn === 'all' || displayIn === 'sidebar'
       })
-      .map(item => ({
+      .map((item) => ({
         ...item,
         active: isNavItemActive(pathname, item.href),
       }))
@@ -232,11 +231,11 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
   // Ajouter la propriété active aux items cadre et filtrer selon displayIn
   const cadreNavItemsWithActive = useMemo(() => {
     return navCadreItems
-      .filter(item => {
+      .filter((item) => {
         const displayIn = item.displayIn ?? 'all'
         return displayIn === 'all' || displayIn === 'sidebar'
       })
-      .map(item => ({
+      .map((item) => ({
         ...item,
         active: isNavItemActive(pathname, item.href),
       }))
@@ -280,7 +279,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
         onPress={item.onPress}
         inner={true}
       />
-    )
+    ),
   }))
 
   const cadrePlusSubItems: NavItemSubItem[] = hiddenCadreNavItems.map((item) => ({
@@ -299,7 +298,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
         onPress={item.onPress}
         inner={true}
       />
-    )
+    ),
   }))
 
   return (
@@ -330,7 +329,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
               collapsed={displayNavCadre}
               dropdownVerticalPosition="top"
               subItems={militantPlusSubItems}
-              active={hiddenMilitantNavItems.some(item => item.active)}
+              active={hiddenMilitantNavItems.some((item) => item.active)}
             />
           )}
           {hasExecutiveScopes && (
@@ -358,13 +357,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
               <NavItem iconLeft={BellOff} text="Abonnement emails" dangerAccent collapsed={displayNavCadre} />
               */}
               {notificationGranted === false && (
-                <NavItem
-                  iconLeft={BellOff}
-                  text="Notifications"
-                  dangerAccent
-                  collapsed={displayNavCadre}
-                  onPress={triggerNotificationRequest}
-                />
+                <NavItem iconLeft={BellOff} text="Notifications" dangerAccent collapsed={displayNavCadre} onPress={triggerNotificationRequest} />
               )}
               <NavItem
                 text="Mon profil"
@@ -379,27 +372,27 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
               />
             </>
           ) : (
-            <YStack gap={24} p={12} >
+            <YStack gap={24} p={12}>
               <YStack gap={16}>
                 <Text.MD semibold textWrap="balance">
-                  Je me connecte à <Text.MD semibold color="$blue5">mon espace</Text.MD>
+                  Je me connecte à{' '}
+                  <Text.MD semibold color="$blue5">
+                    mon espace
+                  </Text.MD>
                 </Text.MD>
-                <VoxButton
-                  variant="outlined"
-                  size="lg"
-                  width="100%"
-                  theme="blue"
-                  onPress={() => signIn()}
-                >
+                <VoxButton variant="outlined" size="lg" width="100%" theme="blue" onPress={() => signIn()}>
                   Me connecter
                 </VoxButton>
               </YStack>
 
               <YStack gap={16}>
                 <Text.MD semibold textWrap="balance">
-                  Adhérez pour débloquer <Text.MD semibold color="$yellow5">tous les contenus et fonctionnalités</Text.MD>
+                  Adhérez pour débloquer{' '}
+                  <Text.MD semibold color="$yellow5">
+                    tous les contenus et fonctionnalités
+                  </Text.MD>
                 </Text.MD>
-                
+
                 <YStack gap={8}>
                   <XStack gap={8} alignItems="center">
                     <CircleCheckBig size={16} color="$green4" />
@@ -423,13 +416,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
                   </XStack>
                 </YStack>
 
-                <VoxButton
-                  variant="contained"
-                  size="lg"
-                  width="100%"
-                  theme="yellow"
-                  onPress={() => signUp()}
-                >
+                <VoxButton variant="contained" size="lg" width="100%" theme="yellow" onPress={() => signUp()}>
                   J'adhère
                 </VoxButton>
               </YStack>
@@ -437,11 +424,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
           )}
         </MenuFooterContainer>
       </SideBarContainer>
-      <SideBarContainer
-        isCadre
-        hasBoxShadow={state !== 'cadre'}
-        display={displayNavCadre ? 'flex' : 'none'}
-      >
+      <SideBarContainer isCadre hasBoxShadow={state !== 'cadre'} display={displayNavCadre ? 'flex' : 'none'}>
         <LogoContainer pb={0} pt={14}>
           <CadreIllustration showIcon={false} />
         </LogoContainer>
@@ -472,11 +455,10 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
                 theme="purple"
                 dropdownVerticalPosition="top"
                 subItems={cadrePlusSubItems}
-                active={hiddenCadreNavItems.some(item => item.active)}
+                active={hiddenCadreNavItems.some((item) => item.active)}
               />
             )}
           </YStack>
-
         </MenuContainer>
         <MenuFooterContainer>
           <FeaturebaseFooterItems variant="navItem" />

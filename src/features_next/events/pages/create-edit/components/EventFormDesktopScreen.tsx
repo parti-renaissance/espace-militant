@@ -1,5 +1,12 @@
 import React from 'react'
+import { Link, useNavigation } from 'expo-router'
+import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { ArrowLeft, Calendar, Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
+import { Controller } from 'react-hook-form'
+
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
 import { FormFileImage } from '@/components/base/FormFileUpload/FormFileImage'
 import Input from '@/components/base/Input/Input'
@@ -9,16 +16,11 @@ import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import DescriptionInput from './DescriptionInput'
-import { EventFormData } from '../schema'
-import { ArrowLeft, Calendar, Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
-import { Link, useNavigation } from 'expo-router'
-import { Controller } from 'react-hook-form'
-import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
+
 import EventHandleActions from '../../../components/EventHandleActions'
-import Layout from '@/components/AppStructure/Layout/Layout'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import { useEventFormContext } from '../context'
+import { EventFormData } from '../schema'
+import DescriptionInput from './DescriptionInput'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
 
@@ -79,12 +81,7 @@ const EventFormAside = () => {
         control={control}
         name="category"
       />
-      <EventDatesField
-        disabled={isPastEvent}
-        control={control}
-        handleOnChangeBeginAt={handleOnChangeBeginAt}
-        handleOnChangeFinishAt={handleOnChangeFinishAt}
-      />
+      <EventDatesField disabled={isPastEvent} control={control} handleOnChangeBeginAt={handleOnChangeBeginAt} handleOnChangeFinishAt={handleOnChangeFinishAt} />
       <Controller
         render={({ field }) => {
           return (
@@ -292,13 +289,7 @@ const EventFormMain = () => {
         render={({ field, fieldState }) => {
           return (
             <YStack minHeight={100} maxHeight={400}>
-              <DescriptionInput
-                error={fieldState.error?.message}
-                label="Description"
-                value={field.value!}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-              />
+              <DescriptionInput error={fieldState.error?.message} label="Description" value={field.value!} onChange={field.onChange} onBlur={field.onBlur} />
             </YStack>
           )
         }}
@@ -333,11 +324,7 @@ export const EventFormDesktopScreen = () => {
             <BackButton />
           </XStack>
           <YStack gap="$medium">
-            <VoxCard
-              opacity={globalPending ? 0.5 : 1}
-              style={{ pointerEvents: globalPending ? 'none' : 'auto' }}
-              cursor={globalPending ? 'progress' : 'auto'}
-            >
+            <VoxCard opacity={globalPending ? 0.5 : 1} style={{ pointerEvents: globalPending ? 'none' : 'auto' }} cursor={globalPending ? 'progress' : 'auto'}>
               <VoxCard.Content paddingBottom={0} justifyContent="center" alignItems="center">
                 <VoxHeader.Title icon={Calendar}>{`${editMode ? 'Modifier' : 'Créer'} l'événement`}</VoxHeader.Title>
               </VoxCard.Content>
@@ -371,5 +358,3 @@ export const EventFormDesktopScreen = () => {
     </>
   )
 }
-
-

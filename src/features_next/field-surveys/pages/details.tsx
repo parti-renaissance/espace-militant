@@ -1,26 +1,28 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native'
-import { ImageBackground, Image } from 'expo-image'
-import { router, useLocalSearchParams } from 'expo-router'
-import { XStack, YStack, isWeb, styled, useMedia } from 'tamagui'
-import { ArrowLeft, ArrowRight, ClipboardCheck, SendHorizontal } from '@tamagui/lucide-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Image, ImageBackground } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
-import redirectToStore from '@/helpers/redirectToStore'
+import { router, useLocalSearchParams } from 'expo-router'
+import { isWeb, styled, useMedia, XStack, YStack } from 'tamagui'
+import { ArrowLeft, ArrowRight, ClipboardCheck, SendHorizontal } from '@tamagui/lucide-icons'
 
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import VoxCard from '@/components/VoxCard/VoxCard'
-import { useFieldSurvey, useSubmitFieldSurveyAnswers } from '@/services/field-surveys/hook'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { VoxHeader } from '@/components/Header/Header'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
+import VoxCard from '@/components/VoxCard/VoxCard'
+
+import redirectToStore from '@/helpers/redirectToStore'
+import { useFieldSurvey, useSubmitFieldSurveyAnswers } from '@/services/field-surveys/hook'
+
+import ContactPreferences, { ContactPreferencesData } from '../components/ContactPreferences'
 import { MultipleChoiceQuestion, SimpleFieldQuestion, UniqueChoiceQuestion } from '../components/FieldQuestion'
 import QuestionProgressBar from '../components/QuestionProgressBar'
-import RespondentProfile, { RespondentProfileData } from '../components/RespondentProfile'
-import ContactPreferences, { ContactPreferencesData } from '../components/ContactPreferences'
 import QuitConfirmModal from '../components/QuitConfirmModal'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import Layout from '@/components/AppStructure/Layout/Layout'
+import RespondentProfile, { RespondentProfileData } from '../components/RespondentProfile'
 
 // Types pour les réponses
 interface Answer {
@@ -33,7 +35,6 @@ interface QuestionAnswer {
   questionId: number
   answer: Answer
 }
-
 
 const Container = styled(YStack, {
   flex: 1,
@@ -48,7 +49,7 @@ const ContentWrapper = styled(XStack, {
   $sm: {
     gap: 0,
     paddingHorizontal: 0,
-    transform: 'translateY(0)'
+    transform: 'translateY(0)',
   },
 })
 
@@ -86,7 +87,6 @@ const FieldSurveyDetailsPage: React.FC = () => {
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-
 
   const redirectToAndroid = () => {
     redirectToStore('android')
@@ -131,7 +131,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
 
   const currentAnswer = useMemo(() => {
     if (!currentQuestion) return null
-    return answers.find(a => a.questionId === currentQuestion.id)
+    return answers.find((a) => a.questionId === currentQuestion.id)
   }, [answers, currentQuestion])
 
   const totalSteps = useMemo(() => {
@@ -157,8 +157,8 @@ const FieldSurveyDetailsPage: React.FC = () => {
   const isFirstQuestion = currentQuestionIndex === 0
 
   const handleAnswerChange = (questionId: number, answer: Answer) => {
-    setAnswers(prev => {
-      const existingIndex = prev.findIndex(a => a.questionId === questionId)
+    setAnswers((prev) => {
+      const existingIndex = prev.findIndex((a) => a.questionId === questionId)
       if (existingIndex >= 0) {
         const newAnswers = [...prev]
         newAnswers[existingIndex] = { questionId, answer }
@@ -175,28 +175,29 @@ const FieldSurveyDetailsPage: React.FC = () => {
       // Soumettre les réponses
       handleSubmit()
     } else {
-      setCurrentQuestionIndex(prev => prev + 1)
+      setCurrentQuestionIndex((prev) => prev + 1)
     }
   }
 
   const handlePrevious = () => {
     if (!isFirstQuestion) {
-      setCurrentQuestionIndex(prev => prev - 1)
+      setCurrentQuestionIndex((prev) => prev - 1)
     }
   }
 
   const handleSubmit = async () => {
     if (!survey) return
 
-    const formattedAnswers = answers.map(a => a.answer).filter(answer =>
-      answer.textField !== undefined || (answer.selectedChoices && answer.selectedChoices.length > 0)
-    ).map(answer => {
-      if (answer.textField !== undefined) {
-        return { surveyQuestion: answer.surveyQuestion, textField: answer.textField }
-      } else {
-        return { surveyQuestion: answer.surveyQuestion, selectedChoices: answer.selectedChoices! }
-      }
-    })
+    const formattedAnswers = answers
+      .map((a) => a.answer)
+      .filter((answer) => answer.textField !== undefined || (answer.selectedChoices && answer.selectedChoices.length > 0))
+      .map((answer) => {
+        if (answer.textField !== undefined) {
+          return { surveyQuestion: answer.surveyQuestion, textField: answer.textField }
+        } else {
+          return { surveyQuestion: answer.surveyQuestion, selectedChoices: answer.selectedChoices! }
+        }
+      })
 
     try {
       setSubmitLoading(true)
@@ -218,8 +219,8 @@ const FieldSurveyDetailsPage: React.FC = () => {
 
       // Navigation vers la page de succès
       router.replace({
-          pathname: '/questionnaires/[id]/success',
-        params: { id: survey.uuid }
+        pathname: '/questionnaires/[id]/success',
+        params: { id: survey.uuid },
       })
     } catch (error) {
       console.error('Erreur lors de la soumission:', error)
@@ -231,21 +232,11 @@ const FieldSurveyDetailsPage: React.FC = () => {
   const renderQuestion = () => {
     // Étapes supplémentaires
     if (isRespondentProfileStep) {
-      return (
-        <RespondentProfile
-          data={respondentProfile}
-          onChange={setRespondentProfile}
-        />
-      )
+      return <RespondentProfile data={respondentProfile} onChange={setRespondentProfile} />
     }
 
     if (isContactPreferencesStep) {
-      return (
-        <ContactPreferences
-          data={contactPreferences}
-          onChange={setContactPreferences}
-        />
-      )
+      return <ContactPreferences data={contactPreferences} onChange={setContactPreferences} />
     }
 
     // Questions normales du questionnaire
@@ -257,10 +248,12 @@ const FieldSurveyDetailsPage: React.FC = () => {
           <SimpleFieldQuestion
             question={currentQuestion}
             value={currentAnswer?.answer.textField || ''}
-            onChange={(value) => handleAnswerChange(currentQuestion.id, {
-              surveyQuestion: currentQuestion.id,
-              textField: value
-            })}
+            onChange={(value) =>
+              handleAnswerChange(currentQuestion.id, {
+                surveyQuestion: currentQuestion.id,
+                textField: value,
+              })
+            }
           />
         )
 
@@ -272,11 +265,11 @@ const FieldSurveyDetailsPage: React.FC = () => {
             onChange={(value) => {
               if (value === null) {
                 // Supprimer la réponse si elle est désélectionnée
-                setAnswers(prev => prev.filter(a => a.questionId !== currentQuestion.id))
+                setAnswers((prev) => prev.filter((a) => a.questionId !== currentQuestion.id))
               } else {
                 handleAnswerChange(currentQuestion.id, {
                   surveyQuestion: currentQuestion.id,
-                  selectedChoices: [value]
+                  selectedChoices: [value],
                 })
               }
             }}
@@ -288,10 +281,12 @@ const FieldSurveyDetailsPage: React.FC = () => {
           <MultipleChoiceQuestion
             question={currentQuestion}
             value={currentAnswer?.answer.selectedChoices || []}
-            onChange={(value) => handleAnswerChange(currentQuestion.id, {
-              surveyQuestion: currentQuestion.id,
-              selectedChoices: value
-            })}
+            onChange={(value) =>
+              handleAnswerChange(currentQuestion.id, {
+                surveyQuestion: currentQuestion.id,
+                selectedChoices: value,
+              })
+            }
           />
         )
 
@@ -373,7 +368,11 @@ const FieldSurveyDetailsPage: React.FC = () => {
   return (
     <>
       <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} />
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? -65 : 0}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -65 : 0}
+      >
         <YStack flex={1} backgroundColor={media.sm ? 'white' : '$textSurface'}>
           <VoxHeader alignItems="center" justifyContent="center">
             <XStack flex={1} alignItems="center" justifyContent="center" width="100%">
@@ -399,33 +398,31 @@ const FieldSurveyDetailsPage: React.FC = () => {
               <XStack flex={1} justifyContent="flex-end" w={100}></XStack>
             </XStack>
           </VoxHeader>
-          <LayoutScrollView
-            contentContainerStyle={{ flexGrow: 1, paddingBottom: 16 }}
-            showsVerticalScrollIndicator={false}
-            disablePadding
-          >
+          <LayoutScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 16 }} showsVerticalScrollIndicator={false} disablePadding>
             <Container flex={1}>
               {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
               <ContentWrapper flex={1}>
-                <SideLeft>
-                </SideLeft>
+                <SideLeft></SideLeft>
                 <Main>
                   {isLoading && <LoadingState />}
                   {error && <ErrorState />}
                   {!survey && !isLoading && !error && <ErrorState />}
                   {survey && !error && !isLoading && (
-                    <VoxCard inside={media.sm ? true : false} flex={media.sm ? 1 : undefined} borderWidth={media.sm ? 0 : 1} shadowColor={media.sm ? 'transparent' : undefined} elevation={media.sm ? 0 : undefined} bg={media.sm ? 'transparent' : 'white'}>
+                    <VoxCard
+                      inside={media.sm ? true : false}
+                      flex={media.sm ? 1 : undefined}
+                      borderWidth={media.sm ? 0 : 1}
+                      shadowColor={media.sm ? 'transparent' : undefined}
+                      elevation={media.sm ? 0 : undefined}
+                      bg={media.sm ? 'transparent' : 'white'}
+                    >
                       <VoxCard.Content gap="$large" flex={1}>
-                        <Text.MD secondary mb="$small">{survey.name}</Text.MD>
-                        <QuestionProgressBar
-                          questions={survey.questions}
-                          currentIndex={currentQuestionIndex}
-                          totalSteps={totalSteps}
-                        />
+                        <Text.MD secondary mb="$small">
+                          {survey.name}
+                        </Text.MD>
+                        <QuestionProgressBar questions={survey.questions} currentIndex={currentQuestionIndex} totalSteps={totalSteps} />
                         {renderQuestion()}
-                        {media.gtSm && (
-                          <NavigationButtons />
-                        )}
+                        {media.gtSm && <NavigationButtons />}
                       </VoxCard.Content>
                     </VoxCard>
                   )}
@@ -460,9 +457,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
             </Container>
           </LayoutScrollView>
 
-          {media.sm && survey && !error && !isLoading && (
-            <NavigationButtons />
-          )}
+          {media.sm && survey && !error && !isLoading && <NavigationButtons />}
         </YStack>
       </KeyboardAvoidingView>
     </>

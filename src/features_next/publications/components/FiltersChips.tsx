@@ -1,6 +1,8 @@
-import { VoxButton } from '@/components/Button'
-import { Undo2, CircleX, EqualNot } from '@tamagui/lucide-icons'
 import { XStack, YStack } from 'tamagui'
+import { CircleX, EqualNot, Undo2 } from '@tamagui/lucide-icons'
+
+import { VoxButton } from '@/components/Button'
+
 import { AVAILABLE_FILTERS } from './Editor/RenderFields/SelectFilters/AdvancedFilters'
 
 export type FilterValue =
@@ -56,7 +58,7 @@ const getFilterLabel = (key: string, value: FilterValue): string => {
 
   // Rechercher le filtre dans AVAILABLE_FILTERS
   for (const category of AVAILABLE_FILTERS) {
-    const filter = category.filters.find(f => f.code === key)
+    const filter = category.filters.find((f) => f.code === key)
 
     if (filter) {
       // Si c'est un select avec des choix, récupérer le label de la valeur
@@ -84,9 +86,15 @@ const isValueDefault = (key: string, value: FilterValue, defaultValue: FilterVal
   if (defaultValue === null || defaultValue === undefined) return false
 
   // Comparaison pour les objets zone avec uuid
-  if (key === 'zone' && typeof value === 'object' && typeof defaultValue === 'object' &&
-    value !== null && defaultValue !== null &&
-    'uuid' in value && 'uuid' in defaultValue) {
+  if (
+    key === 'zone' &&
+    typeof value === 'object' &&
+    typeof defaultValue === 'object' &&
+    value !== null &&
+    defaultValue !== null &&
+    'uuid' in value &&
+    'uuid' in defaultValue
+  ) {
     return value.uuid === defaultValue.uuid
   }
 
@@ -184,14 +192,15 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
                 key={key}
                 size="xxs"
                 theme={theme}
-                variant={isDefault ? "outlined" : "contained"}
+                variant={isDefault ? 'outlined' : 'contained'}
                 iconLeft={iconLeft}
                 iconRight={!isDefault && !isStatic ? Undo2 : undefined}
                 onPress={() => handleChipPress(key)}
                 testID={`filter-chip-${key}`}
                 asChip={isStatic}
               >
-                {label}{isDefault && !isStatic ? " - par défaut" : ""}
+                {label}
+                {isDefault && !isStatic ? ' - par défaut' : ''}
               </VoxButton>
             )
           }
@@ -217,4 +226,3 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
     </YStack>
   )
 }
-

@@ -3,6 +3,7 @@ import { Image, XStack, YStack } from 'tamagui'
 import { capitalize } from 'lodash'
 
 import Text from '@/components/base/Text'
+
 import { ReferralStatusEnum, ReferralType, TypeReferralEnum } from '@/services/referral/schema'
 import { getHumanFormattedDateShort } from '@/utils/date'
 
@@ -106,4 +107,3 @@ export function ReferralListEmptyState() {
     </YStack>
   )
 }
-

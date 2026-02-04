@@ -1,26 +1,29 @@
 import React, { useMemo, useState } from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
+import { Link } from 'expo-router'
+import { isWeb, Separator, useMedia, View, XStack, YStack } from 'tamagui'
+import { Info, UserPlus } from '@tamagui/lucide-icons'
+
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import InfoCard from '@/components/InfoCard/InfoCard'
 import InstanceCard from '@/components/InstanceCard/InstanceCard'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import ProfilLayout from '@/features_next/profil/components/Layout'
+
+import { UserTagEnum } from '@/core/entities/UserProfile'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { useLeaveMyAgora } from '@/services/agoras/hook'
 import { useGetDetailProfil, useGetInstances, useGetTags, useIsAdherentDues } from '@/services/profile/hook'
 import { RestInstancesResponse } from '@/services/profile/schema'
-import { Info, UserPlus } from '@tamagui/lucide-icons'
-import { Link } from 'expo-router'
-import { isWeb, Separator, useMedia, View, XStack, YStack } from 'tamagui'
-import ChangeCommitteeModal from './components/ChangeCommittee'
-import { DoubleCircle, DoubleDiamond, DoubleTriangle, DoubleSquare } from './components/icons'
-import { UserTagEnum } from '@/core/entities/UserProfile'
+
 import ChangeAgoraModal from './components/ChangeAgoraModal'
-import { CommitteeCreationButton } from './components/CommitteeCreationButton'
+import ChangeCommitteeModal from './components/ChangeCommittee'
 import { CommitteeCandidateButton } from './components/CommitteeCandidateButton'
-import { useLeaveMyAgora } from '@/services/agoras/hook'
-import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import ProfilLayout from '@/features_next/profil/components/Layout'
+import { CommitteeCreationButton } from './components/CommitteeCreationButton'
+import { DoubleCircle, DoubleDiamond, DoubleSquare, DoubleTriangle } from './components/icons'
 
 type Instance = RestInstancesResponse[number]
 
@@ -59,7 +62,9 @@ const InstancesContent = () => {
     if (isSympathisant) {
       return {
         content: (
-          <InfoCard theme="yellow" icon={UserPlus}
+          <InfoCard
+            theme="yellow"
+            icon={UserPlus}
             button={
               <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingCommitee} onPress={openAdhCommitee()}>
                 J’adhère
@@ -75,33 +80,35 @@ const InstancesContent = () => {
     }
     if (committee && committee.name) {
       return {
-        content: <InstanceCard.Content
-          title={committee.name}
-          description={`${committee.members_count ?? 0} Adhérents`}
-          author={
-            committee?.manager
-              ? {
-                name: `${committee?.manager.first_name ?? ''} ${committee?.manager.last_name ?? ''}`,
-                avatar: committee?.manager.image_url ?? undefined,
-                role: committee?.manager.role ?? undefined,
-              }
-              : undefined
-          }
-        >
-          {committee?.manager === null && (
-            <>
-              <Separator borderColor={'$textOutline'} borderRadius={1} />
-              <XStack gap="$medium" alignItems="center">
-                <Text.SM flex={1} color="$textSecondary" >
-                  Ce comité n’a pas de Responsable. Vous pouvez informer votre Assemblée que vous souhaitez rejoindre la future équipe d’animation.
-                </Text.SM>
-                <View>
-                  <CommitteeCandidateButton profile={profile} assemblyName={assembly.name} committeeName={committee.name} />
-                </View>
-              </XStack>
-            </>
-          )}
-        </InstanceCard.Content>,
+        content: (
+          <InstanceCard.Content
+            title={committee.name}
+            description={`${committee.members_count ?? 0} Adhérents`}
+            author={
+              committee?.manager
+                ? {
+                    name: `${committee?.manager.first_name ?? ''} ${committee?.manager.last_name ?? ''}`,
+                    avatar: committee?.manager.image_url ?? undefined,
+                    role: committee?.manager.role ?? undefined,
+                  }
+                : undefined
+            }
+          >
+            {committee?.manager === null && (
+              <>
+                <Separator borderColor={'$textOutline'} borderRadius={1} />
+                <XStack gap="$medium" alignItems="center">
+                  <Text.SM flex={1} color="$textSecondary">
+                    Ce comité n’a pas de Responsable. Vous pouvez informer votre Assemblée que vous souhaitez rejoindre la future équipe d’animation.
+                  </Text.SM>
+                  <View>
+                    <CommitteeCandidateButton profile={profile} assemblyName={assembly.name} committeeName={committee.name} />
+                  </View>
+                </XStack>
+              </>
+            )}
+          </InstanceCard.Content>
+        ),
         footerText: <Text.P>Vous êtes rattaché à ce comité par défaut. Vous pouvez en changer pour un autre comité de votre département.</Text.P>,
         button: (
           <>
@@ -120,10 +127,7 @@ const InstancesContent = () => {
             <VoxButton variant="outlined" onPress={() => setOpenChange(true)} disabled={!committee?.can_change_committee}>
               Choisir parmi {committee?.assembly_committees_count} comités
             </VoxButton>
-            <CommitteeCreationButton
-              profile={profile}
-              assemblyName={assembly?.name}
-            />
+            <CommitteeCreationButton profile={profile} assemblyName={assembly?.name} />
           </XStack>
         ),
       }
@@ -131,12 +135,7 @@ const InstancesContent = () => {
       return {
         content: <InstanceCard.EmptyState message={'Malheureusement, votre Assemblée ne dispose d’aucun comité.'} />,
         footerText: null,
-        button: (
-          <CommitteeCreationButton
-            profile={profile}
-            assemblyName={assembly?.name}
-          />
-        ),
+        button: <CommitteeCreationButton profile={profile} assemblyName={assembly?.name} />,
       }
     }
   }, [committee])
@@ -145,7 +144,9 @@ const InstancesContent = () => {
     if (isSympathisant) {
       return {
         content: (
-          <InfoCard theme="yellow" icon={UserPlus}
+          <InfoCard
+            theme="yellow"
+            icon={UserPlus}
             button={
               <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
                 J’adhère
@@ -171,14 +172,20 @@ const InstancesContent = () => {
                   key={agora.uuid ?? agora.name}
                   title={agora?.name ?? 'Agora sans nom'}
                   description={`${agora?.members_count ?? '-'} membres`}
-                  onLeave={agora?.uuid ? () => { handleLeave(agora.uuid!) } : undefined}
+                  onLeave={
+                    agora?.uuid
+                      ? () => {
+                          handleLeave(agora.uuid!)
+                        }
+                      : undefined
+                  }
                   author={
                     manager
                       ? {
-                        name: `${manager.first_name ?? ''} ${manager.last_name ?? ''}`,
-                        avatar: manager.image_url ?? undefined,
-                        role: manager.role ?? undefined,
-                      }
+                          name: `${manager.first_name ?? ''} ${manager.last_name ?? ''}`,
+                          avatar: manager.image_url ?? undefined,
+                          role: manager.role ?? undefined,
+                        }
                       : undefined
                   }
                 />
@@ -198,7 +205,9 @@ const InstancesContent = () => {
     if (!isAdherentDues) {
       return {
         content: (
-          <InfoCard theme="yellow" icon={UserPlus}
+          <InfoCard
+            theme="yellow"
+            icon={UserPlus}
             button={
               <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
                 Je cotise
@@ -222,7 +231,6 @@ const InstancesContent = () => {
       ),
     }
   }, [isSympathisant, agoras])
-
 
   return (
     <>
@@ -255,10 +263,10 @@ const InstancesContent = () => {
                   author={
                     assembly?.manager
                       ? {
-                        name: `${assembly?.manager.first_name ?? ''} ${assembly?.manager.last_name ?? ''}`,
-                        avatar: assembly?.manager.image_url ?? undefined,
-                        role: assembly?.manager.role ?? undefined,
-                      }
+                          name: `${assembly?.manager.first_name ?? ''} ${assembly?.manager.last_name ?? ''}`,
+                          avatar: assembly?.manager.image_url ?? undefined,
+                          role: assembly?.manager.role ?? undefined,
+                        }
                       : undefined
                   }
                 />
@@ -288,10 +296,10 @@ const InstancesContent = () => {
                   author={
                     circonscription?.manager
                       ? {
-                        name: `${circonscription?.manager.first_name ?? ''} ${circonscription?.manager.last_name ?? ''}`,
-                        avatar: circonscription?.manager.image_url ?? undefined,
-                        role: circonscription?.manager.role ?? undefined,
-                      }
+                          name: `${circonscription?.manager.first_name ?? ''} ${circonscription?.manager.last_name ?? ''}`,
+                          avatar: circonscription?.manager.image_url ?? undefined,
+                          role: circonscription?.manager.role ?? undefined,
+                        }
                       : undefined
                   }
                 />
@@ -323,7 +331,7 @@ const InstancesContent = () => {
             </InstanceCard>
 
             <InstanceCard
-              title={agoras?.length > 1 ? "Mes agoras thématiques" : "Mon agora thématique"}
+              title={agoras?.length > 1 ? 'Mes agoras thématiques' : 'Mon agora thématique'}
               icon={DoubleSquare}
               description="Les agoras thématiques sont un espace d’échange et de travail réservé aux adhérents Renaissance."
               headerLeft={isSympathisant || !isAdherentDues ? <VoxCard.AdhLock due={!isAdherentDues} /> : null}
@@ -340,7 +348,6 @@ const InstancesContent = () => {
             </InstanceCard>
           </YStack>
         </LayoutScrollView>
-
       </KeyboardAvoidingView>
     </>
   )

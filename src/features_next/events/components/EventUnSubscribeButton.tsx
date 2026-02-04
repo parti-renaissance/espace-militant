@@ -1,8 +1,10 @@
 import { ComponentPropsWithoutRef } from 'react'
+import { CalendarOff } from '@tamagui/lucide-icons'
+
 import { VoxButton } from '@/components/Button'
+
 import { useUnsubscribeEvent } from '@/services/events/hook'
 import { RestItemEvent } from '@/services/events/schema'
-import { CalendarOff } from '@tamagui/lucide-icons'
 
 type ButtonProps = ComponentPropsWithoutRef<typeof VoxButton> &
   Pick<RestItemEvent, 'uuid' | 'slug'> & {

@@ -2,11 +2,13 @@ import React from 'react'
 import { Redirect } from 'expo-router'
 import Head from 'expo-router/head'
 import { HeartHandshake } from '@tamagui/lucide-icons'
-import Layout from '@/components/AppStructure/Layout/Layout'
+
 import Header from '@/components/AppStructure/Header'
+import Layout from '@/components/AppStructure/Layout/Layout'
 import ReferralsScreen from '@/features_next/referrals/pages/index/index'
-import { useSession } from '@/ctx/SessionProvider'
+
 import * as metatags from '@/config/metatags'
+import { useSession } from '@/ctx/SessionProvider'
 
 export default function ParrainagesPage() {
   const { isAuth } = useSession()

@@ -1,8 +1,9 @@
 import React from 'react'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
-import { XStack, YStack, useMedia } from 'tamagui'
+import { useMedia, XStack, YStack } from 'tamagui'
+
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 const MobileSkeleton = () => {
   return (
@@ -75,4 +76,3 @@ export function EventSkeleton() {
   const media = useMedia()
   return media.sm ? <MobileSkeleton /> : <DesktopSkeleton />
 }
-

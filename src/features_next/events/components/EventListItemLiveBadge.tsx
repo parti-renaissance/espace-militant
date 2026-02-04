@@ -1,9 +1,12 @@
-import VoxCard from '@/components/VoxCard/VoxCard'
-import { RestItemEvent } from '@/services/events/schema'
-import { getHumanFormattedTime } from '@/utils/date'
+import { XStack } from 'tamagui'
 import { Radio } from '@tamagui/lucide-icons'
 import { isToday } from 'date-fns'
-import { XStack } from 'tamagui'
+
+import VoxCard from '@/components/VoxCard/VoxCard'
+
+import { RestItemEvent } from '@/services/events/schema'
+import { getHumanFormattedTime } from '@/utils/date'
+
 import { isEventHasNationalLive, isEventStarted } from '../utils'
 
 export const EventListItemLiveBadge = ({ event }: { event: Partial<RestItemEvent> }) => {

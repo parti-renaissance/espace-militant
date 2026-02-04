@@ -1,8 +1,11 @@
+import { XStack, YStack } from 'tamagui'
+import { CheckCircle } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { getHumanFormattedDate } from '@/utils/date'
-import { CheckCircle } from '@tamagui/lucide-icons'
-import { XStack, YStack } from 'tamagui'
+
 import type { CommonMembershipCardProps } from './types'
 
 export default function (props: CommonMembershipCardProps) {

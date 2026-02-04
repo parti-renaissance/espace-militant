@@ -1,17 +1,19 @@
 import React, { useEffect, useRef } from 'react'
 import { WebView } from 'react-native-webview'
+import { router, useLocalSearchParams } from 'expo-router'
+import { isWeb, Separator, XStack, YStack } from 'tamagui'
+import { AlertTriangle, Info } from '@tamagui/lucide-icons'
+import { Controller, useForm } from 'react-hook-form'
+
 import SwitchGroup from '@/components/base/SwitchGroup/SwitchGroup'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useGetNotificationList, useGetReSubscribeConfig, useUnsubscribe } from '@/services/notifications/hook'
 import { useGetResubscribeLoop, useGetSuspenseProfil, useMutationUpdateProfil } from '@/services/profile/hook'
 import { RestDetailedProfileResponse } from '@/services/profile/schema'
-import { AlertTriangle, Info } from '@tamagui/lucide-icons'
-import { router, useLocalSearchParams } from 'expo-router'
-import { Controller, useForm } from 'react-hook-form'
-import { isWeb, Separator, XStack, YStack } from 'tamagui'
 
 const UnSubscribeCase = () => {
   const [execWebView, setExecWebView] = React.useState(false)

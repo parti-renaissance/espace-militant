@@ -1,7 +1,9 @@
 import React from 'react'
 import { YStack } from 'tamagui'
-import { UniqueChoiceQuestion } from './FieldQuestion'
+
 import { AgeRange } from '@/core/entities/UserProfile'
+
+import { UniqueChoiceQuestion } from './FieldQuestion'
 
 interface RespondentProfileData {
   gender: string | null
@@ -70,7 +72,7 @@ const RespondentProfile: React.FC<RespondentProfileProps> = ({ data, onChange })
         question={{
           id: 1002,
           type: 'unique_choice',
-          content: 'Sa tranche d\'âge ?',
+          content: "Sa tranche d'âge ?",
           choices: ageRangeChoices,
         }}
         value={data.ageRange}

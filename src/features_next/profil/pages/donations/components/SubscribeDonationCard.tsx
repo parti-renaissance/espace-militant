@@ -1,13 +1,15 @@
+import { XStack, YStack } from 'tamagui'
+import { Crown } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { AlertUtils } from '@/screens/shared/AlertUtils'
 import { useCancelDonation } from '@/services/profile/hook'
 import type { RestDonationsResponse } from '@/services/profile/schema'
 import { getHumanFormattedDate } from '@/utils/date'
-import { Crown } from '@tamagui/lucide-icons'
-import { XStack, YStack } from 'tamagui'
 
 export default function (props: { subscription: RestDonationsResponse[number]; full?: boolean }) {
   const { isPending, open: handlePress } = useOpenExternalContent({ slug: 'donation' })

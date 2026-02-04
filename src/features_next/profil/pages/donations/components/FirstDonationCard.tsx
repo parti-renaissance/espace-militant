@@ -1,9 +1,11 @@
+import { Image } from 'expo-image'
+import { styled, XStack, YStack } from 'tamagui'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import { Image } from 'expo-image'
-import { styled, XStack, YStack } from 'tamagui'
 
 const HeaderFrame = styled(XStack, {
   padding: '$medium',

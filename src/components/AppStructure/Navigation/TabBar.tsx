@@ -2,18 +2,20 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, LayoutRectangle, Platform, SafeAreaView as RNSafeAreaView, StyleSheet } from 'react-native'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, usePathname } from 'expo-router'
-import { MoreHorizontal, QrCode, Sparkle } from '@tamagui/lucide-icons'
+import { usePathname, useRouter } from 'expo-router'
 import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, XStack, YStack } from 'tamagui'
-import Text from '@/components/base/Text'
+import { MoreHorizontal, QrCode, Sparkle } from '@tamagui/lucide-icons'
+
+import { FeaturebaseFooterItems } from '@/components/AppStructure/Navigation/FeaturebaseFooterItems'
 import NavSheet, { NavSheetRef } from '@/components/AppStructure/Navigation/NavSheet'
 import { ScopeSelector } from '@/components/AppStructure/Navigation/ScopeSelector'
-import { FeaturebaseFooterItems } from '@/components/AppStructure/Navigation/FeaturebaseFooterItems'
 import { isNavItemActive } from '@/components/AppStructure/utils'
-import { useMilitantNavItems, cadreNavItems, type NavItemConfig } from '@/config/navigationItems'
-import { useGetUserScopes } from '@/services/profile/hook'
-import type { IconComponent } from '@/models/common.model'
+import Text from '@/components/base/Text'
 import FutureButton from '@/components/Buttons/FutureButton'
+
+import { cadreNavItems, useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
+import type { IconComponent } from '@/models/common.model'
+import { useGetUserScopes } from '@/services/profile/hook'
 
 type Theme = 'blue' | 'purple' | 'green' | 'orange'
 
@@ -161,7 +163,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
 
   // Filter items based on displayIn property (default to 'all')
   const navItems = useMemo(() => {
-    return militantNavItems.filter(item => {
+    return militantNavItems.filter((item) => {
       const displayIn = item.displayIn ?? 'all'
       return displayIn === 'all' || displayIn === 'tabbar'
     })
@@ -173,12 +175,12 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
 
   // Identify items for sheets
   const cadreItems = useMemo(() => {
-    const filtered = navCadreItems.filter(item => {
+    const filtered = navCadreItems.filter((item) => {
       const displayIn = item.displayIn ?? 'all'
       return displayIn === 'all' || displayIn === 'tabbar'
     })
     // Add active state based on current pathname (including sub-routes)
-    return filtered.map(item => ({
+    return filtered.map((item) => ({
       ...item,
       active: isNavItemActive(pathname, item.href),
     }))
@@ -187,7 +189,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
   const moreItems = useMemo(() => {
     const filtered = navItems.filter((item) => !visibleItemIds.includes(item.id))
     // Add active state based on current pathname (including sub-routes)
-    return filtered.map(item => ({
+    return filtered.map((item) => ({
       ...item,
       active: isNavItemActive(pathname, item.href),
     }))
@@ -197,7 +199,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
   const currentRouteId = useMemo(() => {
     // Find matching nav item using isNavItemActive helper
     // This handles route groups (like /(app)/) which don't appear in the URL
-    const matchingItem = getAllItems.find(item => isNavItemActive(pathname, item.href))
+    const matchingItem = getAllItems.find((item) => isNavItemActive(pathname, item.href))
     return matchingItem?.id || null
   }, [pathname, getAllItems])
 
@@ -216,12 +218,12 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     if (visibleItemIds.includes(currentRouteId)) return currentRouteId
 
     // Check if route is a cadre item
-    if (cadreItems.some(item => item.id === currentRouteId)) {
+    if (cadreItems.some((item) => item.id === currentRouteId)) {
       if (visibleItemIds.includes('cadreSheet')) return 'cadreSheet'
     }
 
     // Check if route is in more items
-    if (moreItems.some(item => item.id === currentRouteId)) {
+    if (moreItems.some((item) => item.id === currentRouteId)) {
       if (visibleItemIds.includes('more')) return 'more'
     }
 
@@ -352,7 +354,9 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
             <FutureButton onPress={() => router.push('/scanner')}>
               <XStack alignItems="center" gap={8}>
                 <QrCode size={20} color="white" />
-                <Text.LG regular color="white">Scanner un billet</Text.LG>
+                <Text.LG regular color="white">
+                  Scanner un billet
+                </Text.LG>
               </XStack>
             </FutureButton>
           </XStack>
@@ -413,11 +417,7 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
         </TabBarComponent>
       </SAV>
 
-      <NavSheet
-        ref={moreSheetRef}
-        onClose={() => handleSheetClose('more')}
-        items={moreItems}
-      />
+      <NavSheet ref={moreSheetRef} onClose={() => handleSheetClose('more')} items={moreItems} />
       <NavSheet
         ref={cadreSheetRef}
         onClose={() => handleSheetClose('cadreSheet')}

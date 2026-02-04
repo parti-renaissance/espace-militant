@@ -1,34 +1,35 @@
 import React from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Link, useNavigation, usePathname } from 'expo-router'
+import { getTokenValue, Image, isWeb, useMedia, XStack, YStack } from 'tamagui'
+import { ArrowLeft, LandPlot } from '@tamagui/lucide-icons'
+
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { SignInButton } from '@/components/Buttons/AuthButton'
-import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import { Link, usePathname, useNavigation } from 'expo-router'
-import { XStack, YStack, Image, useMedia, getTokenValue } from 'tamagui'
-import { LandPlot, ArrowLeft } from '@tamagui/lucide-icons'
-import { DetailedAPIErrorPayload, ForbiddenError, UnauthorizedError } from '@/core/errors'
-import { useSession } from '@/ctx/SessionProvider'
-import { isWeb } from 'tamagui'
-import Layout from '@/components/AppStructure/Layout/Layout'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
+import { DetailedAPIErrorPayload, ForbiddenError, UnauthorizedError } from '@/core/errors'
+import { useSession } from '@/ctx/SessionProvider'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+
 const AdhButton = () => {
-  const { isPending, open: handleClick } = useOpenExternalContent({ 
-    slug: 'adhesion', 
-    utm_source: "app", 
-    utm_campaign: "event" 
+  const { isPending, open: handleClick } = useOpenExternalContent({
+    slug: 'adhesion',
+    utm_source: 'app',
+    utm_campaign: 'event',
   })
   const { signUp, isAuth } = useSession()
 
   return (
-    <VoxButton 
-      variant="outlined" 
-      size="lg" 
+    <VoxButton
+      variant="outlined"
+      size="lg"
       flex={1}
-      theme="yellow" 
-      onPress={isAuth ? handleClick() : () => signUp({ utm_campaign: "event" })} 
+      theme="yellow"
+      onPress={isAuth ? handleClick() : () => signUp({ utm_campaign: 'event' })}
       loading={isPending}
     >
       Adhérer
@@ -49,8 +50,8 @@ const BackButton = () => {
 
 function DenyContent({ error }: { error: DetailedAPIErrorPayload }) {
   const path = usePathname()
-  
-  if (error instanceof ForbiddenError && error?.key === "event.agora.access_denied") {
+
+  if (error instanceof ForbiddenError && error?.key === 'event.agora.access_denied') {
     return (
       <YStack justifyContent="center" gap="$medium">
         <YStack gap="$medium" alignItems="center">
@@ -71,7 +72,7 @@ function DenyContent({ error }: { error: DetailedAPIErrorPayload }) {
       </YStack>
     )
   }
-  
+
   if (error instanceof ForbiddenError) {
     return (
       <YStack justifyContent="center" gap="$medium">
@@ -86,7 +87,7 @@ function DenyContent({ error }: { error: DetailedAPIErrorPayload }) {
       </YStack>
     )
   }
-  
+
   if (error instanceof UnauthorizedError) {
     return (
       <YStack justifyContent="center" gap="$medium">
@@ -102,26 +103,20 @@ function DenyContent({ error }: { error: DetailedAPIErrorPayload }) {
       </YStack>
     )
   }
-  
+
   return null
 }
 
 // Mobile Layout
 const MobileDeny = ({ error }: { error: DetailedAPIErrorPayload }) => {
   const insets = useSafeAreaInsets()
-  
+
   return (
     <>
       <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="#ECF1F5">
         <Image src={require('@/assets/illustrations/VisuCadnas.png')} />
       </YStack>
-      <YStack 
-        padding="$xlarge" 
-        pb={getTokenValue('$xlarge') + insets.bottom} 
-        bg="white" 
-        justifyContent="center" 
-        alignItems="center"
-      >
+      <YStack padding="$xlarge" pb={getTokenValue('$xlarge') + insets.bottom} bg="white" justifyContent="center" alignItems="center">
         <DenyContent error={error} />
       </YStack>
     </>
@@ -161,4 +156,3 @@ export function EventDenyScreen({ error }: { error: DetailedAPIErrorPayload }) {
   const media = useMedia()
   return media.sm ? <MobileDeny error={error} /> : <DesktopDeny error={error} />
 }
-

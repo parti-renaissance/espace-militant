@@ -1,10 +1,12 @@
-import React from "react"
-import { useMedia, XStack, YStack } from "tamagui"
-import Text from "@/components/base/Text"
-import ProfilePicture from "@/components/ProfilePicture"
-import { Check, PenLine } from "@tamagui/lucide-icons"
-import ModalOrBottomSheet from "@/components/ModalOrBottomSheet/ModalOrBottomSheet"
-import { SenderViewProps } from "./SenderView"
+import React from 'react'
+import { useMedia, XStack, YStack } from 'tamagui'
+import { Check, PenLine } from '@tamagui/lucide-icons'
+
+import Text from '@/components/base/Text'
+import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
+import ProfilePicture from '@/components/ProfilePicture'
+
+import { SenderViewProps } from './SenderView'
 
 type SendersSelectModalProps = {
   open: boolean
@@ -21,36 +23,33 @@ type SenderItemProps = {
 }
 
 const SenderItem = ({ sender, isSelected, onPress }: SenderItemProps) => {
-  const fullName = sender.first_name && sender.last_name 
-    ? `${sender.first_name} ${sender.last_name}` 
-    : sender.first_name || sender.last_name || 'Expéditeur inconnu'
+  const fullName =
+    sender.first_name && sender.last_name ? `${sender.first_name} ${sender.last_name}` : sender.first_name || sender.last_name || 'Expéditeur inconnu'
 
   return (
-    <XStack 
-      alignItems="center" 
-      gap="$medium" 
-      py="$small" 
-      px={20} 
+    <XStack
+      alignItems="center"
+      gap="$medium"
+      py="$small"
+      px={20}
       bg={isSelected ? '$textOutline' : 'white'}
-      hoverStyle={{ 
+      hoverStyle={{
         backgroundColor: '$textOutline20',
-        cursor: 'pointer' 
+        cursor: 'pointer',
       }}
-      pressStyle={{ 
-        backgroundColor: '$textOutline32' 
+      pressStyle={{
+        backgroundColor: '$textOutline32',
       }}
       onPress={() => onPress(sender)}
     >
-      <ProfilePicture
-        size={40}
-        rounded
-        fullName={fullName}
-        src={sender.image_url ?? undefined}
-        alt={fullName}
-      />
+      <ProfilePicture size={40} rounded fullName={fullName} src={sender.image_url ?? undefined} alt={fullName} />
       <YStack flex={1} flexShrink={1}>
-        <Text.SM medium numberOfLines={1}>{fullName}</Text.SM>
-        <Text.SM medium color={sender.theme?.primary ?? '$textSecondary'} numberOfLines={1}>{sender.role}</Text.SM>
+        <Text.SM medium numberOfLines={1}>
+          {fullName}
+        </Text.SM>
+        <Text.SM medium color={sender.theme?.primary ?? '$textSecondary'} numberOfLines={1}>
+          {sender.role}
+        </Text.SM>
       </YStack>
       <YStack opacity={isSelected ? 1 : 0}>
         <Check size={20} color="$textPrimary" />
@@ -61,13 +60,7 @@ const SenderItem = ({ sender, isSelected, onPress }: SenderItemProps) => {
 
 SenderItem.displayName = 'SenderItem'
 
-export const SendersSelectModal = ({
-  open,
-  onClose,
-  availableSenders,
-  selectedSender,
-  onSenderSelect
-}: SendersSelectModalProps) => {
+export const SendersSelectModal = ({ open, onClose, availableSenders, selectedSender, onSenderSelect }: SendersSelectModalProps) => {
   const media = useMedia()
 
   const handleSenderPress = (sender: SenderViewProps) => {
@@ -84,7 +77,9 @@ export const SendersSelectModal = ({
         </XStack>
         <YStack p="$medium" bg="$textSurface" borderBottomColor="$textOutline" borderBottomWidth={1}>
           <Text.SM lineHeight={20}>
-            <Text.SM semibold lineHeight={20}>Seuls les membres de l'équipe peuvent être signataires d'une publication. </Text.SM>
+            <Text.SM semibold lineHeight={20}>
+              Seuls les membres de l'équipe peuvent être signataires d'une publication.{' '}
+            </Text.SM>
             Le signataire par défaut est le rôle principal de l'instance.
           </Text.SM>
         </YStack>
@@ -106,4 +101,3 @@ export const SendersSelectModal = ({
 SendersSelectModal.displayName = 'SendersSelectModal'
 
 export default SendersSelectModal
-

@@ -1,7 +1,8 @@
 import { CSSProperties } from 'react'
+import { stringifyCSSProperties } from 'react-style-stringify'
+
 import { getThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { stringifyCSSProperties } from 'react-style-stringify'
 
 // <Row style={wrapperStyle as CSSProperties}>
 //   <Column style={containerStyle as CSSProperties}>

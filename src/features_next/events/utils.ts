@@ -1,5 +1,6 @@
-import { RestFullEvent, RestItemEvent, RestPartialEvent } from '@/services/events/schema'
 import { isAfter, isBefore, subHours } from 'date-fns'
+
+import { RestFullEvent, RestItemEvent, RestPartialEvent } from '@/services/events/schema'
 
 export const isEventPast = (event: Partial<RestItemEvent>) => {
   const date = event.finish_at || event.begin_at

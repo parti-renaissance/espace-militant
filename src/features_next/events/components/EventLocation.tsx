@@ -1,6 +1,8 @@
-import VoxCard from '@/components/VoxCard/VoxCard'
-import { RestItemEvent } from '@/services/events/schema'
 import { YStack } from 'tamagui'
+
+import VoxCard from '@/components/VoxCard/VoxCard'
+
+import { RestItemEvent } from '@/services/events/schema'
 
 export const EventLocation = ({ event }: { event: Partial<RestItemEvent> }) => {
   if (event.mode === 'online') {

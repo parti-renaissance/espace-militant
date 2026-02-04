@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react'
-import { styled, ThemeableStack, YStack } from "tamagui"
-import { EditorMethods } from "./types"
-import { memo, RefObject } from "react"
+import React, { memo, RefObject, useEffect } from 'react'
+import { Platform } from 'react-native'
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
+import { styled, ThemeableStack, YStack } from 'tamagui'
+import { Control } from 'react-hook-form'
+
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { Control } from "react-hook-form"
-import MessageEditorAddToolbar from "./AddToolBar"
-import { Platform } from "react-native"
-import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming, Easing } from 'react-native-reanimated'
+
+import MessageEditorAddToolbar from './AddToolBar'
+import { EditorMethods } from './types'
 
 const EditorInsertionToolbarContainer = styled(ThemeableStack, {
   position: 'relative',
@@ -30,13 +31,7 @@ const EditorInsertionToolbarSeparator = ({ bottom }: { bottom?: boolean }) => {
       style={{ pointerEvents: 'none' }}
     >
       {Array.from({ length: Platform.OS === 'web' ? 90 : 60 }).map((_, i) => (
-        <ThemeableStack
-          key={i}
-          width={6}
-          height={2}
-          backgroundColor={i % 2 === 0 ? '$gray3' : 'transparent'}
-          borderRadius={1}
-        />
+        <ThemeableStack key={i} width={6} height={2} backgroundColor={i % 2 === 0 ? '$gray3' : 'transparent'} borderRadius={1} />
       ))}
     </ThemeableStack>
   )
@@ -54,7 +49,6 @@ type EditorInsertionToolbarProps = {
 }
 
 export const EditorInsertionToolbar = memo((props: EditorInsertionToolbarProps) => {
-
   const wrapperHeight = useSharedValue(28)
   const wrapperIsAuto = useSharedValue(0)
   const wrapperOpacity = useSharedValue(0)
@@ -108,4 +102,4 @@ export const EditorInsertionToolbar = memo((props: EditorInsertionToolbarProps) 
   )
 })
 
-EditorInsertionToolbar.displayName = 'EditorInsertionToolbar' 
+EditorInsertionToolbar.displayName = 'EditorInsertionToolbar'

@@ -1,25 +1,21 @@
 import React, { ComponentRef, useRef } from 'react'
 import { RefreshControl } from 'react-native'
-import CardTool from '@/features_next/resources/components/CardTool'
 import { useScrollToTop } from '@react-navigation/native'
 import { isWeb, ScrollView, useMedia, View } from 'tamagui'
-import { useGetRessources } from '@/services/ressources/hook'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+
 import { Layout } from '@/components/AppStructure'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
+import CardTool from '@/features_next/resources/components/CardTool'
+
+import { useGetRessources } from '@/services/ressources/hook'
 
 const ResourcesSkeleton = ({ media }: { media: ReturnType<typeof useMedia> }) => {
   return (
     <LayoutScrollView contentContainerStyle={{ alignItems: media.gtSm ? 'center' : undefined }}>
       <Layout.Main maxWidth={892} width="100%">
-        <View
-          flexDirection={media.gtSm ? 'row' : 'column'}
-          flexWrap="wrap"
-          gap="$medium"
-          px="$medium"
-          width="100%"
-        >
+        <View flexDirection={media.gtSm ? 'row' : 'column'} flexWrap="wrap" gap="$medium" px="$medium" width="100%">
           {Array.from({ length: 4 }).map((_, index) => (
             <SkeCard key={index} height="$13" width={media.gtSm ? (isWeb ? 'calc(50% - 9px)' : '48.8%') : '100%'}>
               <SkeCard.Content justifyContent="flex-end" gap="$medium">
@@ -58,9 +54,7 @@ const ResourcesScreen = () => {
       })) ?? []
 
   if (isLoading) {
-    return (
-      <ResourcesSkeleton media={media} />
-    )
+    return <ResourcesSkeleton media={media} />
   }
 
   return (
@@ -69,21 +63,14 @@ const ResourcesScreen = () => {
       refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}
     >
       <Layout.Main maxWidth={892} width="100%">
-        <View
-          flexDirection={media.gtSm ? 'row' : 'column'}
-          flexWrap="wrap"
-          gap="$medium"
-          px="$medium"
-          width="100%"
-        >
-          {tools.length > 0 ? tools?.map((item) => (
-            <View
-              key={item.url + item.name}
-              width={media.gtSm ? (isWeb ? 'calc(50% - 9px)' : '48.8%') : '100%'}
-            >
-              <CardTool {...item} />
-            </View>
-          )) : (
+        <View flexDirection={media.gtSm ? 'row' : 'column'} flexWrap="wrap" gap="$medium" px="$medium" width="100%">
+          {tools.length > 0 ? (
+            tools?.map((item) => (
+              <View key={item.url + item.name} width={media.gtSm ? (isWeb ? 'calc(50% - 9px)' : '48.8%') : '100%'}>
+                <CardTool {...item} />
+              </View>
+            ))
+          ) : (
             <View width="100%" alignItems="center" justifyContent="center">
               <Text.LG secondary>Aucune ressource trouvée</Text.LG>
             </View>

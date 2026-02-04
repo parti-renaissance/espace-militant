@@ -1,10 +1,12 @@
+import { isWeb, styled, XStack, YStack } from 'tamagui'
+import { Check, X } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard, { VoxCardFrame } from '@/components/VoxCard/VoxCard'
+
 import type { RestUserScopesResponse } from '@/services/profile/schema'
 import { FEATURES_STRUCT, FEATURES_TRANSLATION, GROUPS_TRANSLATION, HIDDEN_FEATURES } from '@/utils/Scopes'
-import { Check, X } from '@tamagui/lucide-icons'
-import { isWeb, styled, XStack, YStack } from 'tamagui'
 
 export const listAvailableFeatureByGroup = (scope: RestUserScopesResponse[number]) => {
   const flattenGroups = Object.values(FEATURES_STRUCT).flat()

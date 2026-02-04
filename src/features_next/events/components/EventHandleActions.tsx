@@ -1,13 +1,16 @@
 import { ComponentProps } from 'react'
+import { router } from 'expo-router'
+import { XStack, YStack } from 'tamagui'
+import { StopCircle, Trash2 } from '@tamagui/lucide-icons'
+import { useDebouncedCallback } from 'use-debounce'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { useDestructiveAlert } from '@/components/DestructiveAlert'
+
 import { useCancelEvent, useDeleteEvent } from '@/services/events/hook'
 import { RestFullEvent } from '@/services/events/schema'
-import { StopCircle, Trash2 } from '@tamagui/lucide-icons'
-import { router } from 'expo-router'
-import { XStack, YStack } from 'tamagui'
-import { useDebouncedCallback } from 'use-debounce'
+
 import { isEventCancelled } from '../utils'
 
 type EventHandleButtonProps = {
@@ -77,7 +80,11 @@ export const DeleteButton = (props: EventHandleButtonProps) => {
 export default function (props: Omit<EventHandleButtonProps, 'eventId'> & { event: RestFullEvent }) {
   return isEventCancelled(props.event) ? null : (
     <XStack gap="$small">
-      {props?.event?.participants_count && props.event.participants_count < 2 ? <DeleteButton {...props} eventId={props.event.uuid} /> : <CancelButton {...props} eventId={props.event.uuid} />}
+      {props?.event?.participants_count && props.event.participants_count < 2 ? (
+        <DeleteButton {...props} eventId={props.event.uuid} />
+      ) : (
+        <CancelButton {...props} eventId={props.event.uuid} />
+      )}
     </XStack>
   )
 }

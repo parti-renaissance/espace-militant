@@ -1,22 +1,24 @@
-import { useEffect, useState, memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
+import { getTokenValue, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { AlertTriangle, CloudUpload, Image as ImageIcon, Save } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
-import { Save, Image as ImageIcon, AlertTriangle, CloudUpload } from '@tamagui/lucide-icons'
-import { getTokenValue, useMedia, XStack, YStack, Spinner } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
 
+import Input from '@/components/base/Input/Input'
+import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import Input from '@/components/base/Input/Input'
-import Text from '@/components/base/Text'
 import ViewportModal from '@/components/VoxRichText/ViewportModal'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { useUploadFile } from '@/services/files/hook'
+
 import ProgressBar from '@/screens/shared/ProgressBar'
+import { useUploadFile } from '@/services/files/hook'
+
 import { useImageSelector } from './useImageSelector'
 
 type ImportImageCardProps = {
@@ -36,12 +38,23 @@ type ImportImageCardProps = {
 const ImportImageCard = memo((props: ImportImageCardProps) => {
   if (props.isLoading) {
     return (
-      <YStack backgroundColor="$textSurface" borderWidth={1} borderColor="$textOutline32" borderStyle="dashed" borderRadius="$medium" padding="$medium" gap="$medium" alignItems="center" justifyContent="center" height={258}>
+      <YStack
+        backgroundColor="$textSurface"
+        borderWidth={1}
+        borderColor="$textOutline32"
+        borderStyle="dashed"
+        borderRadius="$medium"
+        padding="$medium"
+        gap="$medium"
+        alignItems="center"
+        justifyContent="center"
+        height={258}
+      >
         <Spinner />
         {props.isUploading && <ProgressBar progress={props.uploadProgress} color="$blue5" />}
         <YStack alignItems="center" gap="$xsmall">
           <Text.SM semibold textAlign="center">
-            {!props.isUploading ? 'Chargement de l\'image...' : 'Importation en cours...'}
+            {!props.isUploading ? "Chargement de l'image..." : 'Importation en cours...'}
           </Text.SM>
         </YStack>
       </YStack>
@@ -61,13 +74,7 @@ const ImportImageCard = memo((props: ImportImageCardProps) => {
         </YStack>
         <YStack alignItems="center">
           <YStack>
-            <VoxButton
-              iconLeft={CloudUpload}
-              variant="outlined"
-              theme="gray"
-              onPress={props.onImport}
-              disabled={props.disabled}
-            >
+            <VoxButton iconLeft={CloudUpload} variant="outlined" theme="gray" onPress={props.onImport} disabled={props.disabled}>
               Réessayer
             </VoxButton>
           </YStack>
@@ -80,15 +87,21 @@ const ImportImageCard = memo((props: ImportImageCardProps) => {
     const previewUrl = props.imageUrl || props.localImageUri
     return (
       <>
-        <YStack backgroundColor="$textSurface" borderWidth={1} borderColor="$textOutline32" borderStyle="dashed" borderRadius="$medium" gap="$medium" alignItems="center" justifyContent="center" height={258} overflow="hidden" position="relative">
+        <YStack
+          backgroundColor="$textSurface"
+          borderWidth={1}
+          borderColor="$textOutline32"
+          borderStyle="dashed"
+          borderRadius="$medium"
+          gap="$medium"
+          alignItems="center"
+          justifyContent="center"
+          height={258}
+          overflow="hidden"
+          position="relative"
+        >
           <YStack width="100%" height="100%" alignItems="center" justifyContent="center">
-            {previewUrl && (
-              <Image
-                source={previewUrl}
-                contentFit="contain"
-                style={{ width: '100%', height: '100%' }}
-              />
-            )}
+            {previewUrl && <Image source={previewUrl} contentFit="contain" style={{ width: '100%', height: '100%' }} />}
           </YStack>
           {props.isUploading && (
             <YStack position="absolute" bottom={0} left={0} right={0} padding="$medium">
@@ -99,16 +112,11 @@ const ImportImageCard = memo((props: ImportImageCardProps) => {
         {!props.isUploading && (
           <YStack alignItems="center">
             <YStack>
-              <VoxButton
-                iconLeft={CloudUpload}
-                variant="outlined"
-                theme="gray"
-                onPress={props.onImport}
-                disabled={props.disabled}
-              >
+              <VoxButton iconLeft={CloudUpload} variant="outlined" theme="gray" onPress={props.onImport} disabled={props.disabled}>
                 Remplacer cette image
               </VoxButton>
-            </YStack>ﬂ
+            </YStack>
+            ﬂ
           </YStack>
         )}
       </>
@@ -116,15 +124,21 @@ const ImportImageCard = memo((props: ImportImageCardProps) => {
   }
 
   return (
-    <YStack backgroundColor="$textSurface" borderWidth={1} borderColor="$textOutline32" borderStyle="dashed" borderRadius="$medium" padding="$medium" gap="$medium" alignItems="center" justifyContent="center" height={258}>
+    <YStack
+      backgroundColor="$textSurface"
+      borderWidth={1}
+      borderColor="$textOutline32"
+      borderStyle="dashed"
+      borderRadius="$medium"
+      padding="$medium"
+      gap="$medium"
+      alignItems="center"
+      justifyContent="center"
+      height={258}
+    >
       <CloudUpload size={40} color="$gray4" />
       <YStack alignItems="center" gap="$small">
-        <VoxButton
-          variant="outlined"
-          theme="gray"
-          onPress={props.onImport}
-          disabled={props.disabled}
-        >
+        <VoxButton variant="outlined" theme="gray" onPress={props.onImport} disabled={props.disabled}>
           Importer une image
         </VoxButton>
       </YStack>
@@ -188,7 +202,7 @@ const ImageNodeEditorContent = (props: NodeEditorProps) => {
         setValue('content.url', '')
         setValue('content.width', 0)
         setValue('content.height', 0)
-        setUploadError('Une erreur est survenue lors de l\'importation de l\'image. Veuillez réessayer.')
+        setUploadError("Une erreur est survenue lors de l'importation de l'image. Veuillez réessayer.")
       })
   }, [imageSelector.data, uploadFile, setValue])
 
@@ -226,15 +240,7 @@ const ImageNodeEditorContent = (props: NodeEditorProps) => {
               <VoxHeader.Title icon={ImageIcon}>Image</VoxHeader.Title>
             </XStack>
             <XStack flex={1} justifyContent="flex-end">
-              <VoxButton
-                size="sm"
-                iconLeft={Save}
-                theme="blue"
-                alignSelf="flex-end"
-                variant="text"
-                onPress={onSubmit}
-                disabled={isLoading}
-              >
+              <VoxButton size="sm" iconLeft={Save} theme="blue" alignSelf="flex-end" variant="text" onPress={onSubmit} disabled={isLoading}>
                 Terminé
               </VoxButton>
             </XStack>
@@ -243,9 +249,7 @@ const ImageNodeEditorContent = (props: NodeEditorProps) => {
       }
     >
       <XStack bg="$textSurface" padding="$medium">
-        <Text.SM semibold>
-          Importez une image. Vous pouvez y ajouter un lien pour la rendre cliquable.
-        </Text.SM>
+        <Text.SM semibold>Importez une image. Vous pouvez y ajouter un lien pour la rendre cliquable.</Text.SM>
       </XStack>
       <VoxCard.Content paddingBottom={insets.bottom + getTokenValue('$medium')}>
         <YStack gap="$medium">

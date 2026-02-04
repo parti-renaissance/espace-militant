@@ -1,8 +1,11 @@
 import { ComponentPropsWithoutRef } from 'react'
-import HandleButton from '@/components/Buttons/HandleButton'
-import { RestEvent } from '@/services/events/schema'
 import { Link } from 'expo-router'
 import { isWeb } from 'tamagui'
+
+import HandleButton from '@/components/Buttons/HandleButton'
+
+import { RestEvent } from '@/services/events/schema'
+
 import { isEventEditable, isEventToggleRegisterHided } from '../utils'
 
 type EventItemHandleButtonProps = {

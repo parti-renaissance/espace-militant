@@ -1,9 +1,10 @@
 import React, { memo, RefObject, useCallback, useMemo } from 'react'
 import { TextInput } from 'react-native'
+import { useMedia, View, YStack } from 'tamagui'
+
 import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
 import SearchBox from '@/components/Search/SearchBox'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
-import { useMedia, View, YStack } from 'tamagui'
 
 type EventFiltersProps = {
   onSearchFocus?: () => void
@@ -45,8 +46,8 @@ const EventFilters = ({ onSearchFocus }: EventFiltersProps) => {
     setValue((y) => ({ ...y, search: x }))
   }, [])
 
-  const gap = useMemo(() => media.lg ? 8 : 16, [media])
-  const flexDirection = useMemo(() => media.md ? 'row' : 'column', [media])
+  const gap = useMemo(() => (media.lg ? 8 : 16), [media])
+  const flexDirection = useMemo(() => (media.md ? 'row' : 'column'), [media])
 
   return (
     <View flexDirection={flexDirection} gap={gap}>

@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
+import { useMedia } from 'tamagui'
+
 import VimeoPlayer from '@/components/VimeoPlayer'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import { EventItemProps } from '@/features_next/events/types'
+
 import clientEnv from '@/config/clientEnv'
 import { useSession } from '@/ctx/SessionProvider'
-import { EventItemProps } from '@/features_next/events/types'
+
 import { isEventHasNationalLive, isEventStarted } from '../utils'
 import EventLiveCountDown from './EventLiveCountDown'
-import { useMedia } from 'tamagui'
 
 export const EventLive = ({ event }: EventItemProps) => {
   const [started, setStarted] = useState(isEventStarted(event))
@@ -28,10 +31,7 @@ export const EventLive = ({ event }: EventItemProps) => {
   if (!started && isEventHasNationalLive(event)) {
     return (
       <VoxCard backgroundColor="black" borderWidth={0}>
-        <VoxCard.Content
-          height={media.sm ? 110 : 50}
-          justifyContent="center"
-        >
+        <VoxCard.Content height={media.sm ? 110 : 50} justifyContent="center">
           <EventLiveCountDown
             startDate={new Date(event.begin_at!)}
             textProps={{

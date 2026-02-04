@@ -125,10 +125,9 @@ export const AttachmentNodeValidationSchema = z.object({
   type: z.literal('attachment'),
   marks: z.array(z.string()).optional(),
   content: z.object({
-    name: z
-      .string({
-        required_error: 'Le fichier est requis',
-      }),
+    name: z.string({
+      required_error: 'Le fichier est requis',
+    }),
     title: z
       .string({
         required_error: 'Veuillez saisir le nom du fichier',
@@ -172,12 +171,9 @@ export const MessageFormValuesValidatorSchema = z.object({
       }),
   }),
   filters: z.object({
-    hasRecipients: z.boolean().refine(
-      (value) => value === true,
-      {
-        message: "Ce filtre ne correspond à aucun contact",
-      }
-    ),
+    hasRecipients: z.boolean().refine((value) => value === true, {
+      message: 'Ce filtre ne correspond à aucun contact',
+    }),
   }),
   formValues: z.record(
     z.enum(nodeTypesArray),

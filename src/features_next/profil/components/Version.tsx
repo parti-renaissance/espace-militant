@@ -1,12 +1,14 @@
 import React from 'react'
 import { TouchableOpacity } from 'react-native'
-import Text from '@/components/base/Text'
-import clientEnv from '@/config/clientEnv'
-import { getFullVersion } from '@/utils/version'
-import { format } from 'date-fns'
 import { nativeBuildVersion } from 'expo-application'
 import * as Update from 'expo-updates'
 import { isWeb, YStack } from 'tamagui'
+import { format } from 'date-fns'
+
+import Text from '@/components/base/Text'
+
+import clientEnv from '@/config/clientEnv'
+import { getFullVersion } from '@/utils/version'
 
 export default function Version() {
   const [showEasDate, setShowEasDate] = React.useState(false)

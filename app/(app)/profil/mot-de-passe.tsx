@@ -1,10 +1,10 @@
 import { KeyRound } from '@tamagui/lucide-icons'
+
+import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import PasswordScreen from '@/features_next/profil/pages/password'
-import { Header } from '@/components/AppStructure'
 
 export default function MotDePassePage() {
-
   return (
     <>
       <Header title="Mot de passe" icon={KeyRound} />
@@ -13,4 +13,4 @@ export default function MotDePassePage() {
       </Layout.Container>
     </>
   )
-} 
+}

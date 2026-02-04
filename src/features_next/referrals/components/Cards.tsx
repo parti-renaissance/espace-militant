@@ -1,29 +1,28 @@
-import { Share2, HeartHandshake } from '@tamagui/lucide-icons'
+import { useCallback, useState } from 'react'
 import { Platform } from 'react-native'
-import { Circle, View, XStack, YStack, useMedia } from 'tamagui'
-import { useState, useCallback } from 'react'
 import { Image } from 'expo-image'
+import { Circle, useMedia, View, XStack, YStack } from 'tamagui'
+import { HeartHandshake, Share2 } from '@tamagui/lucide-icons'
 
+import Text from '@/components/base/Text'
+import Button, { VoxButton } from '@/components/Button'
+import ShareButton from '@/components/Buttons/ShareButton'
+import InstanceCard from '@/components/InstanceCard/InstanceCard'
+import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import StatsCard from '@/components/StatsCard/StatsCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import Text from '@/components/base/Text'
-import ProfilePicture from '@/components/ProfilePicture'
-import { VoxButton } from '@/components/Button'
-import Button from '@/components/Button'
-import ShareButton from '@/components/Buttons/ShareButton'
-import InstanceCard from '@/components/InstanceCard/InstanceCard'
 
-import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import { useReferralStatistics, useReferrals } from '@/services/referral/hook'
+import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { useGetProfil } from '@/services/profile/hook'
+import { useReferrals, useReferralStatistics } from '@/services/referral/hook'
 import i18n from '@/utils/i18n'
 
-import ReferralScoreboardTable, { ReferralScoreboardTableEmptyState } from './Scoreboard'
-import { ReferralListEmptyState } from './List'
 import ReferralFormModal from './Form'
+import { ReferralListEmptyState } from './List'
+import ReferralScoreboardTable, { ReferralScoreboardTableEmptyState } from './Scoreboard'
 
 // ============================================================================
 // RANKING CARD
@@ -87,7 +86,9 @@ export const ReferralsTrackingCard = () => {
           <ReferralListEmptyState />
         ) : (
           <>
-            <Text.MD semibold display={media.sm ? 'none' : undefined}>Suivi des parrainages</Text.MD>
+            <Text.MD semibold display={media.sm ? 'none' : undefined}>
+              Suivi des parrainages
+            </Text.MD>
             <XStack alignItems="center" gap="$medium">
               <XStack flex={1}>
                 <StatsCard
@@ -122,13 +123,9 @@ export const ReferralsTrackingCard = () => {
               {referrals?.items.map((item, index) => {
                 const referralType = item.type === 'invitation' ? 'Invitation' : item.type === 'preregistration' ? 'Préinscription' : 'Lien'
                 const color = item.status === 'adhesion_finished' ? '$green6' : item.status === 'account_created' ? '$orange9' : '$gray6'
-                
+
                 return (
-                  <View
-                    key={item.uuid}
-                    backgroundColor={index % 2 ? '$white1' : '$textSurface'}
-                    p="$medium"
-                  >
+                  <View key={item.uuid} backgroundColor={index % 2 ? '$white1' : '$textSurface'} p="$medium">
                     <XStack justifyContent="space-between" alignItems="center" gap="$4">
                       <YStack flex={1} minWidth={0}>
                         <Text fontWeight="500" lineHeight={20}>
@@ -243,17 +240,9 @@ function ReferralScoreCardBadge({ globalRank, assemblyRank, assemblyName }: Refe
   const isGlobalRanked = typeof globalRank === 'number'
   const isAssemblyRanked = typeof assemblyRank === 'number'
 
-  const label = isGlobalRanked
-    ? formatRankLabel(globalRank)
-    : isAssemblyRanked
-    ? formatRankLabel(assemblyRank)
-    : 'Non classé'
+  const label = isGlobalRanked ? formatRankLabel(globalRank) : isAssemblyRanked ? formatRankLabel(assemblyRank) : 'Non classé'
 
-  const subLabel = isGlobalRanked
-    ? 'National'
-    : isAssemblyRanked && assemblyName
-    ? assemblyName
-    : 'Local'
+  const subLabel = isGlobalRanked ? 'National' : isAssemblyRanked && assemblyName ? assemblyName : 'Local'
 
   return (
     <View backgroundColor="$orange3" py="$small" px="$medium" borderRadius="$large">
@@ -287,14 +276,7 @@ function ReferralScoreCardProgress({ current, goal, label }: ReferralScoreCardPr
         <Text.MD>{progressDisplay}</Text.MD>
       </XStack>
       <View backgroundColor="$orange3" borderRadius="$large" height={8}>
-        <View
-          backgroundColor="$orange9"
-          height="100%"
-          borderRadius="$large"
-          px="$small"
-          width={`${progress}%`}
-          animation="quick"
-        />
+        <View backgroundColor="$orange9" height="100%" borderRadius="$large" px="$small" width={`${progress}%`} animation="quick" />
       </View>
     </>
   )
@@ -327,9 +309,7 @@ export const ReferralScoreCard = ({
   assemblyName,
 }: ReferralScoreCardProps) => {
   const isInvitationGoalReached = nbReferralSent >= nbReferralSentdGoal
-  const label = isInvitationGoalReached
-    ? `Objectif : faire adhérer ${nbReferralFinishedGoal} personnes`
-    : `Objectif : inviter ${nbReferralSentdGoal} personnes`
+  const label = isInvitationGoalReached ? `Objectif : faire adhérer ${nbReferralFinishedGoal} personnes` : `Objectif : inviter ${nbReferralSentdGoal} personnes`
 
   const current = isInvitationGoalReached ? nbReferralFinished : nbReferralSent
   const goal = isInvitationGoalReached ? nbReferralFinishedGoal : nbReferralSentdGoal
@@ -397,4 +377,3 @@ export const ReferralDenyCard = () => (
     <Text>Vous n'avez pas accès aux parrainages.</Text>
   </YStack>
 )
-

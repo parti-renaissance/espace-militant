@@ -1,8 +1,9 @@
 import React from 'react'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
-import { useMedia, YStack, ScrollView } from 'tamagui'
+import { ScrollView, useMedia, YStack } from 'tamagui'
+
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 const ItemFeedSkeleton = () => (
   <SkeCard>
@@ -58,4 +59,3 @@ export const HomeFeedSidebarSkeleton: React.FC = () => {
     </ScrollView>
   )
 }
-

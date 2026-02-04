@@ -1,10 +1,12 @@
 import React from 'react'
-import Head from 'expo-router/head'
 import { Redirect } from 'expo-router'
-import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
+import Head from 'expo-router/head'
+
 import Layout from '@/components/AppStructure/Layout/Layout'
-import * as metatags from '@/config/metatags'
+import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import EventFormScreen, { EventFormScreenSkeleton } from '@/features_next/events/pages/create-edit'
+
+import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
 
 const CreateEventScreen: React.FC = () => {

@@ -21,4 +21,3 @@ export { useVisibleNavItems } from './hooks/useVisibleNavItems'
 
 // Utils
 export { isNavItemActive } from './utils'
-

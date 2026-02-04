@@ -1,9 +1,11 @@
 import React from 'react'
-import { YStack } from 'tamagui'
-import { UniqueChoiceQuestion } from './FieldQuestion'
-import Text from '@/components/base/Text'
-import VoxInput from '@/components/base/Input/Input'
 import { Link } from 'expo-router'
+import { YStack } from 'tamagui'
+
+import VoxInput from '@/components/base/Input/Input'
+import Text from '@/components/base/Text'
+
+import { UniqueChoiceQuestion } from './FieldQuestion'
 
 interface ContactPreferencesData {
   wantsToStayInformed: string | null
@@ -50,10 +52,17 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({ data, onChange 
         <YStack gap="$small">
           <Text.LG semibold>Souhaite-t-il être tenu au courant des résultats de ce questionnaire par e-mail ?</Text.LG>
           <Text.MD color="$gray6">
-            En cochant OUI, vous consentez à ce que vos données personnelles soient traitées par Renaissance dans le cadre de cette consultation et conformément à la politique de protection des données que vous pouvez consulter.
+            En cochant OUI, vous consentez à ce que vos données personnelles soient traitées par Renaissance dans le cadre de cette consultation et conformément
+            à la politique de protection des données que vous pouvez consulter.
           </Text.MD>
           <Text.MD color="$blue4" textDecorationLine="underline">
-            <Link href="https://app.parti-renaissance.fr/politique-de-protection-des-donnees" target="_blank" style={{ textDecorationLine: 'underline', color: '#4D85BE' }}>La politique de données de Renaissance.</Link>
+            <Link
+              href="https://app.parti-renaissance.fr/politique-de-protection-des-donnees"
+              target="_blank"
+              style={{ textDecorationLine: 'underline', color: '#4D85BE' }}
+            >
+              La politique de données de Renaissance.
+            </Link>
           </Text.MD>
         </YStack>
 
@@ -69,23 +78,13 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({ data, onChange 
         />
       </YStack>
 
-      {data.wantsToStayInformed === "1" && (
+      {data.wantsToStayInformed === '1' && (
         <YStack gap="$medium">
           <Text.LG semibold>Informations personnelles</Text.LG>
 
-          <VoxInput
-            placeholder="Prénom"
-            value={data.firstName}
-            onChangeText={handleFirstNameChange}
-            color="gray"
-          />
+          <VoxInput placeholder="Prénom" value={data.firstName} onChangeText={handleFirstNameChange} color="gray" />
 
-          <VoxInput
-            placeholder="Nom"
-            value={data.lastName}
-            onChangeText={handleLastNameChange}
-            color="gray"
-          />
+          <VoxInput placeholder="Nom" value={data.lastName} onChangeText={handleLastNameChange} color="gray" />
 
           <VoxInput
             placeholder="Adresse email"
@@ -96,13 +95,7 @@ const ContactPreferences: React.FC<ContactPreferencesProps> = ({ data, onChange 
             color="gray"
           />
 
-          <VoxInput
-            placeholder="Code postal"
-            value={data.postalCode}
-            onChangeText={handlePostalCodeChange}
-            keyboardType="numeric"
-            color="gray"
-          />
+          <VoxInput placeholder="Code postal" value={data.postalCode} onChangeText={handlePostalCodeChange} keyboardType="numeric" color="gray" />
         </YStack>
       )}
     </YStack>

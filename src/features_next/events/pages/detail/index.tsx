@@ -1,12 +1,15 @@
 import React from 'react'
-import { useSession } from '@/ctx/SessionProvider'
-import { GreetingCreateModal } from '@/features_next/events/components/GreetingModals/GreetingCreateModal'
-import * as eventTypes from '@/services/events/schema'
 import { router, useLocalSearchParams } from 'expo-router'
-import { EventContent } from './components/EventContent'
-import { EventSkeleton } from './components/EventSkeleton'
-import { EventDenyScreen } from './components/EventDenyScreen'
+
+import { GreetingCreateModal } from '@/features_next/events/components/GreetingModals/GreetingCreateModal'
+
 import { DetailedAPIErrorPayload } from '@/core/errors'
+import { useSession } from '@/ctx/SessionProvider'
+import * as eventTypes from '@/services/events/schema'
+
+import { EventContent } from './components/EventContent'
+import { EventDenyScreen } from './components/EventDenyScreen'
+import { EventSkeleton } from './components/EventSkeleton'
 
 export default function EventDetailsScreen({ data }: { data: eventTypes.RestEvent }) {
   const { greet } = useLocalSearchParams<{ greet: string }>()
@@ -14,7 +17,7 @@ export default function EventDetailsScreen({ data }: { data: eventTypes.RestEven
     router.setParams({ greet: undefined })
   }
   const { user } = useSession()
-  
+
   return (
     <>
       <GreetingCreateModal event={data} modalProps={{ open: greet === 'new', onClose: setIsGreet }} />

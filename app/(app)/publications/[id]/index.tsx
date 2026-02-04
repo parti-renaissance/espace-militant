@@ -1,19 +1,21 @@
 import React from 'react'
+import { Stack as RouterStack, useGlobalSearchParams, useLocalSearchParams } from 'expo-router'
+import Head from 'expo-router/head'
+
 import Error404 from '@/components/404/Error404'
+import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
+import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSkeleton } from '@/features_next/publications/pages/detail'
+
 import * as metatags from '@/config/metatags'
 import { ForbiddenError, UnauthorizedError } from '@/core/errors'
-import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSkeleton } from '@/features_next/publications/pages/detail'
 import { useHits } from '@/services/hits/hook'
 import { useGetMessage, useGetMessageFilters } from '@/services/publications/hook'
 import { usePublicationStats } from '@/services/stats/hook'
 import { useUserStore } from '@/store/user-store'
 import { resolveSource } from '@/utils/sourceResolver'
 import { cleanupUrlParams } from '@/utils/urlCleanup'
-import { Stack as RouterStack, useGlobalSearchParams, useLocalSearchParams } from 'expo-router'
-import Head from 'expo-router/head'
-import { Header } from '@/components/AppStructure'
 
 const MessageDetailsPage: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()
@@ -87,7 +89,7 @@ function MessageDetailScreen(props: Readonly<{ id: string }>) {
             source: resolveSource(searchParams.source),
             utm_source: searchParams.utm_source,
             utm_campaign: searchParams.utm_campaign,
-            referrer_code: searchParams.ref
+            referrer_code: searchParams.ref,
           })
         } catch (error) {
           // Silently ignore tracking errors - they should not impact user experience

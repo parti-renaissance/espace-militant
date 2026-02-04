@@ -1,12 +1,15 @@
 import { Fragment, useCallback, useState } from 'react'
+import { View, YStack } from 'tamagui'
+import { Controller } from 'react-hook-form'
+
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import CountrySelect from '@/components/CountrySelect/CountrySelect'
+
 import { RestDetailedProfileResponse } from '@/services/profile/schema'
-import { Controller } from 'react-hook-form'
-import { View, YStack } from 'tamagui'
+
 import AbstractProfilForm from './AbstractProfilForm'
 import { validateLocationFormSchema } from './schema'
 

@@ -1,22 +1,25 @@
-import { useEffect, useState, memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useLocalSearchParams } from 'expo-router'
+import { getTokenValue, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { AlertTriangle, FileCheck2, Paperclip, Save, Upload, UploadCloud } from '@tamagui/lucide-icons'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
+import { useDebouncedCallback } from 'use-debounce'
+
 import Input from '@/components/base/Input/Input'
+import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Save, Upload, UploadCloud, FileCheck2, AlertTriangle, Paperclip } from '@tamagui/lucide-icons'
-import { Controller, useForm } from 'react-hook-form'
-import { getTokenValue, useMedia, XStack, YStack, Spinner } from 'tamagui'
-import { useDebouncedCallback } from 'use-debounce'
 import ViewportModal from '@/components/VoxRichText/ViewportModal'
-import Text from '@/components/base/Text'
-import { useDocumentSelector } from './useDocumentSelector'
-import { useUploadPublicationFile } from '@/services/files/hook'
-import { useLocalSearchParams } from 'expo-router'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+
 import ProgressBar from '@/screens/shared/ProgressBar'
+import { useUploadPublicationFile } from '@/services/files/hook'
+
+import { useDocumentSelector } from './useDocumentSelector'
 
 const formatFileSize = (sizeInBytes: number | undefined): string => {
   if (!sizeInBytes) return '0 Ko'
@@ -46,7 +49,18 @@ type ImportFileCardProps = {
 const ImportFileCard = memo((props: ImportFileCardProps) => {
   if (props.isLoading) {
     return (
-      <YStack backgroundColor="$textSurface" borderWidth={1} borderColor="$textOutline32" borderStyle="dashed" borderRadius="$medium" padding="$medium" gap="$medium" alignItems="center" justifyContent="center" height={258}>
+      <YStack
+        backgroundColor="$textSurface"
+        borderWidth={1}
+        borderColor="$textOutline32"
+        borderStyle="dashed"
+        borderRadius="$medium"
+        padding="$medium"
+        gap="$medium"
+        alignItems="center"
+        justifyContent="center"
+        height={258}
+      >
         <Spinner />
         {props.isUploading && <ProgressBar progress={props.uploadProgress} color="$blue5" />}
         <YStack alignItems="center" gap="$xsmall">
@@ -71,13 +85,7 @@ const ImportFileCard = memo((props: ImportFileCardProps) => {
         </YStack>
         <YStack alignItems="center">
           <YStack>
-            <VoxButton
-              iconLeft={Upload}
-              variant="outlined"
-              theme="gray"
-              onPress={props.onImport}
-              disabled={props.disabled}
-            >
+            <VoxButton iconLeft={Upload} variant="outlined" theme="gray" onPress={props.onImport} disabled={props.disabled}>
               Réessayer
             </VoxButton>
           </YStack>
@@ -89,22 +97,31 @@ const ImportFileCard = memo((props: ImportFileCardProps) => {
   if (props.hasFile) {
     return (
       <>
-        <YStack backgroundColor="$textSurface" borderWidth={1} borderColor="$textOutline32" borderStyle="dashed" borderRadius="$medium" padding="$medium" gap="$medium" alignItems="center" justifyContent="center" height={258}>
+        <YStack
+          backgroundColor="$textSurface"
+          borderWidth={1}
+          borderColor="$textOutline32"
+          borderStyle="dashed"
+          borderRadius="$medium"
+          padding="$medium"
+          gap="$medium"
+          alignItems="center"
+          justifyContent="center"
+          height={258}
+        >
           <FileCheck2 size={40} color="$green5" />
           <YStack alignItems="center" gap="$xsmall">
-            <Text.SM semibold textAlign="center">{props.fileName}</Text.SM>
-            <Text.SM semibold secondary textAlign="center">{formatFileSize(props.fileSize)}</Text.SM>
+            <Text.SM semibold textAlign="center">
+              {props.fileName}
+            </Text.SM>
+            <Text.SM semibold secondary textAlign="center">
+              {formatFileSize(props.fileSize)}
+            </Text.SM>
           </YStack>
         </YStack>
         <YStack alignItems="center">
           <YStack>
-            <VoxButton
-              iconLeft={Upload}
-              variant="outlined"
-              theme="gray"
-              onPress={props.onImport}
-              disabled={props.disabled}
-            >
+            <VoxButton iconLeft={Upload} variant="outlined" theme="gray" onPress={props.onImport} disabled={props.disabled}>
               Remplacer par un nouvel import
             </VoxButton>
           </YStack>
@@ -114,19 +131,26 @@ const ImportFileCard = memo((props: ImportFileCardProps) => {
   }
 
   return (
-    <YStack backgroundColor="$textSurface" borderWidth={1} borderColor="$textOutline32" borderStyle="dashed" borderRadius="$medium" padding="$medium" gap="$medium" alignItems="center" justifyContent="center" height={258}>
+    <YStack
+      backgroundColor="$textSurface"
+      borderWidth={1}
+      borderColor="$textOutline32"
+      borderStyle="dashed"
+      borderRadius="$medium"
+      padding="$medium"
+      gap="$medium"
+      alignItems="center"
+      justifyContent="center"
+      height={258}
+    >
       <UploadCloud size={40} color="$gray4" />
       <YStack alignItems="center" gap="$small">
-        <VoxButton
-          iconLeft={Upload}
-          variant="outlined"
-          theme="gray"
-          onPress={props.onImport}
-          disabled={props.disabled}
-        >
+        <VoxButton iconLeft={Upload} variant="outlined" theme="gray" onPress={props.onImport} disabled={props.disabled}>
           Importer un fichier
         </VoxButton>
-        <Text.SM semibold secondary textAlign="center">Maximum 100 Mo</Text.SM>
+        <Text.SM semibold secondary textAlign="center">
+          Maximum 100 Mo
+        </Text.SM>
       </YStack>
     </YStack>
   )
@@ -140,8 +164,6 @@ type NodeEditorProps = {
 }
 
 export const AttachmentNodeEditor = (props: NodeEditorProps) => {
-
-
   return <AttachmentNodeEditorContent {...props} />
 }
 
@@ -180,7 +202,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
       setUploadError(payload.error)
       return
     }
-    
+
     setValue('content.name', payload.filename)
 
     const currentTitle = getValues('content.title')
@@ -198,7 +220,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
         console.error('Upload error:', error)
         setValue('content.url', '')
         setValue('content.size', undefined)
-        setUploadError('Une erreur est survenue lors de l\'importation du fichier. Veuillez réessayer.')
+        setUploadError("Une erreur est survenue lors de l'importation du fichier. Veuillez réessayer.")
       })
   }, [documentSelector.data, scope, uploadFile, setValue, getValues])
 
@@ -236,15 +258,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
               <VoxHeader.Title icon={Paperclip}>Pièce jointe</VoxHeader.Title>
             </XStack>
             <XStack flex={1} justifyContent="flex-end">
-              <VoxButton
-                size="sm"
-                iconLeft={Save}
-                theme="blue"
-                alignSelf="flex-end"
-                variant="text"
-                onPress={onSubmit}
-                disabled={isLoading}
-              >
+              <VoxButton size="sm" iconLeft={Save} theme="blue" alignSelf="flex-end" variant="text" onPress={onSubmit} disabled={isLoading}>
                 Terminé
               </VoxButton>
             </XStack>
@@ -253,9 +267,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
       }
     >
       <XStack bg="$textSurface" padding="$medium">
-        <Text.SM semibold>
-          Importez n'importe quel fichier jusqu'à 100 Mo. Votre fichier deviendra téléchargeable directement depuis la publication.
-        </Text.SM>
+        <Text.SM semibold>Importez n'importe quel fichier jusqu'à 100 Mo. Votre fichier deviendra téléchargeable directement depuis la publication.</Text.SM>
       </XStack>
       <VoxCard.Content paddingBottom={insets.bottom + getTokenValue('$medium')}>
         <YStack gap="$medium">
@@ -294,4 +306,3 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
     </ViewportModal>
   )
 }
-

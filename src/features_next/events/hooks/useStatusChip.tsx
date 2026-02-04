@@ -1,7 +1,10 @@
 import { ComponentPropsWithoutRef } from 'react'
-import { VoxButton } from '@/components/Button'
-import { RestItemEvent } from '@/services/events/schema'
 import { Clock9, Users, XCircle } from '@tamagui/lucide-icons'
+
+import { VoxButton } from '@/components/Button'
+
+import { RestItemEvent } from '@/services/events/schema'
+
 import { isEventCancelled, isEventCapacityReached, isEventPast } from '../utils'
 
 export const useStatusChip = ({ event, buttonProps }: { event: Partial<RestItemEvent>; buttonProps?: ComponentPropsWithoutRef<typeof VoxButton> }) => {

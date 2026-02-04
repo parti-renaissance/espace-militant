@@ -1,8 +1,10 @@
 import React from 'react'
 import { ScrollView, useMedia, YStack } from 'tamagui'
+
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { DetailedAPIErrorPayload, NotFoundError, DepartmentNotFoundError } from '@/core/errors'
+
+import { DepartmentNotFoundError, DetailedAPIErrorPayload, NotFoundError } from '@/core/errors'
 
 export function PublicationDenyScreen({ error }: { error: DetailedAPIErrorPayload }) {
   const media = useMedia()
@@ -27,4 +29,3 @@ export function PublicationDenyScreen({ error }: { error: DetailedAPIErrorPayloa
     </ScrollView>
   )
 }
-
