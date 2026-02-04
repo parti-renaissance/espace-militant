@@ -12,10 +12,23 @@ import { stringifyCSSProperties } from 'react-style-stringify'
 export const imageRenderer = (props: { theme: S.MessageStyle; data: S.ImageNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
   const { containerStyle, baseStyle, wrapperStyle } = getThemeStyle(props.theme, props.data, props.edgePosition)
   if (!props.data.content) return ''
-  const { width, height, url } = props.data.content
+  const { width, height, url, link_url } = props.data.content
   const dynStyle = {
     aspectRatio: width / height,
   }
+
+  const imageTag = `<img
+      src="${url}"
+      style="${stringifyCSSProperties({ ...dynStyle, ...baseStyle } as CSSProperties)}; margin: 0 !important;"
+  />`
+
+  const imageContent = link_url
+    ? `<a
+        href="${link_url}"
+        style="text-decoration: none; display: block;"
+        target="_blank"
+    >${imageTag}</a>`
+    : imageTag
 
   return `<table
       align="center"
@@ -29,10 +42,7 @@ export const imageRenderer = (props: { theme: S.MessageStyle; data: S.ImageNode;
       <tbody style="width: 100%">
           <tr style="width: 100%">
               <td data-id="__react-email-column" ${props.edgePosition === 'leading' ? '' : 'class="padding-responsive"'} style="${stringifyCSSProperties(containerStyle as CSSProperties)}">
-                  <img
-                      src="${url}"
-                      style="${stringifyCSSProperties({ ...dynStyle, ...baseStyle } as CSSProperties)}; margin: 0 !important;"
-                  />
+                  ${imageContent}
               </td>
           </tr>
       </tbody>
