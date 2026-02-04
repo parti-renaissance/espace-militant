@@ -1,10 +1,13 @@
-import { useHasRecentMembership } from '@/services/profile/hook'
-import { MembershipStatus } from '@/utils/membershipStatus'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { useMedia, YStack } from 'tamagui'
-import { JoinMembershipCard, RenewMembershipCard, AccessFormationsCard } from '../components/MembershipCards'
+
 import { Layout, LayoutScrollView } from '@/components/AppStructure'
 import { ContentBackButton } from '@/components/ContentBackButton'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
+
+import { useHasRecentMembership } from '@/services/profile/hook'
+import { MembershipStatus } from '@/utils/membershipStatus'
+
+import { AccessFormationsCard, JoinMembershipCard, RenewMembershipCard } from '../components/MembershipCards'
 
 function FormationsSkeleton() {
   return (
@@ -29,10 +32,7 @@ function FormationsContent({ hasAccess, status }: { hasAccess: boolean; status: 
 
   return (
     <Layout.Main maxWidth={892}>
-      <LayoutScrollView
-        padding={media.sm ? false : { safeAreaTop: false }}
-        contentInsetAdjustmentBehavior="never"
-      >
+      <LayoutScrollView padding={media.sm ? false : { safeAreaTop: false }} contentInsetAdjustmentBehavior="never">
         <YStack gap="$medium">
           <ContentBackButton fallbackPath="/evenements" />
           {hasAccess ? (
@@ -58,4 +58,3 @@ export default function FormationsScreen() {
 
   return <FormationsContent hasAccess={hasAccess} status={status} />
 }
-

@@ -1,11 +1,12 @@
-import { forwardRef, RefObject, useCallback } from 'react'
+import React, { forwardRef, RefObject, useCallback } from 'react'
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
+import { styled, ThemeableStack } from 'tamagui'
+import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2, X } from '@tamagui/lucide-icons'
+
 import { VoxButton } from '@/components/Button'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2, X } from '@tamagui/lucide-icons'
-import { styled, ThemeableStack } from 'tamagui'
+
 import { EditorMethods } from './types'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming, withDelay, Easing } from 'react-native-reanimated'
-import React from 'react'
 
 // Animation constants
 const ANIMATION_DURATION = 300
@@ -64,14 +65,20 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
   }))
 
   const animatedToolBarStyle = useAnimatedStyle(() => ({
-    opacity: withDelay(ANIMATION_DELAY, withTiming(animatedToolBarOpacity.value, {
-      duration: ANIMATION_DURATION,
-      easing: Easing.out(Easing.quad),
-    })),
-    width: withDelay(ANIMATION_DELAY, withTiming(animatedToolBarWidth.value, {
-      duration: ANIMATION_DURATION,
-      easing: Easing.out(Easing.quad),
-    })),
+    opacity: withDelay(
+      ANIMATION_DELAY,
+      withTiming(animatedToolBarOpacity.value, {
+        duration: ANIMATION_DURATION,
+        easing: Easing.out(Easing.quad),
+      }),
+    ),
+    width: withDelay(
+      ANIMATION_DELAY,
+      withTiming(animatedToolBarWidth.value, {
+        duration: ANIMATION_DURATION,
+        easing: Easing.out(Easing.quad),
+      }),
+    ),
   }))
 
   const animatedButtonStyle = useAnimatedStyle(() => {
@@ -82,12 +89,14 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
         easing: Easing.out(Easing.quad),
       }),
       marginRight: 4,
-      transform: [{
-        translateX: withTiming(isCollapsed ? 24 : 0, {
-          duration: ANIMATION_DURATION,
-          easing: Easing.out(Easing.quad),
-        }),
-      }],
+      transform: [
+        {
+          translateX: withTiming(isCollapsed ? 24 : 0, {
+            duration: ANIMATION_DURATION,
+            easing: Easing.out(Easing.quad),
+          }),
+        },
+      ],
     }
   })
 
@@ -138,10 +147,7 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
   }, [props.selected, currentField, animatedToolBarOpacity, animatedToolBarWidth, animatedOpacity])
 
   return (
-    <AnimatedToolBarPositioner
-      onPress={(e) => e.stopPropagation()}
-      style={[animatedStyle, { pointerEvents: props.selected ? 'auto' : 'none' }]}
-    >
+    <AnimatedToolBarPositioner onPress={(e) => e.stopPropagation()} style={[animatedStyle, { pointerEvents: props.selected ? 'auto' : 'none' }]}>
       {currentField && (
         <AnimatedToolBarFrame style={animatedToolBarStyle}>
           <Animated.View style={animatedButtonStyle}>
@@ -157,7 +163,16 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
             <VoxButton size="lg" variant="soft" backgroundColor="$white1" shrink iconLeft={ArrowDownToLine} onPress={handleMoveDown} />
           </Animated.View>
           <Animated.View style={animatedButtonStyle}>
-            <VoxButton size="lg" variant="soft" backgroundColor="$gray3" hoverStyle={{ backgroundColor: '$gray4' }} pressStyle={{ backgroundColor: '$gray5' }} shrink iconLeft={X} onPress={handleUnSelect} />
+            <VoxButton
+              size="lg"
+              variant="soft"
+              backgroundColor="$gray3"
+              hoverStyle={{ backgroundColor: '$gray4' }}
+              pressStyle={{ backgroundColor: '$gray5' }}
+              shrink
+              iconLeft={X}
+              onPress={handleUnSelect}
+            />
           </Animated.View>
         </AnimatedToolBarFrame>
       )}

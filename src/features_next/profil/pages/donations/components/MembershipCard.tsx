@@ -1,15 +1,17 @@
 import SkeCard from '@/components/Skeleton/CardSkeleton'
+
+import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useGetTags } from '@/services/profile/hook'
 import type { RestDetailedProfileResponse } from '@/services/profile/schema'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { getMembershipStatus } from '@/utils/membershipStatus'
+
 import { FullWrapper } from './FullWrapper'
 import ImpossibleMembershipCard from './ImpossibleMembershipCard'
 import JoinMembershipCard from './JoinMembershipCard'
 import RenewMembershipCard from './RenewMembershipCard'
 import ValidMembershipCard from './ValidMembershipCard'
-import { UserTagEnum } from '@/core/entities/UserProfile'
 
 type MembershipCardProps = Pick<RestDetailedProfileResponse, 'last_membership_donation' | 'other_party_membership'> & {
   full?: boolean

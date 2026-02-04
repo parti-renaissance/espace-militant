@@ -1,5 +1,7 @@
-import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { uniqueId } from 'lodash'
+
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+
 import { normalizeUrl } from '@/utils/normalizeUrl'
 
 type NodeCreator<I extends S.Node> = () => I

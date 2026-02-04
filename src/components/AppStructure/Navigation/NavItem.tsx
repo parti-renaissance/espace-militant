@@ -1,11 +1,14 @@
 import { ComponentProps, ComponentPropsWithoutRef, createContext, forwardRef, useContext, useMemo, useRef, useState } from 'react'
 import type { PressableProps } from 'react-native'
 import { Link, useRouter, type Href } from 'expo-router'
+import { isWeb, styled, TamaguiElement, useMedia, XStack, YStack } from 'tamagui'
 import { ExternalLink } from '@tamagui/lucide-icons'
-import { styled, TamaguiElement, XStack, YStack, isWeb, useMedia } from 'tamagui'
+
 import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture/ProfilePicture'
+
 import type { IconComponent } from '@/models/common.model'
+
 import { NavItemDropdown, type NavItemSubItem } from './NavItemDropdown'
 
 const NavItemFrame = styled(XStack, {
@@ -221,14 +224,7 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
     const leftContent = (() => {
       if (profilePicture) {
         const { size, rounded, ...profilePictureRest } = profilePicture
-        return (
-          <ProfilePicture
-            size={size ?? 28}
-            rounded={rounded ?? true}
-            marginRight={resolvedCollapsed ? 0 : 6}
-            {...profilePictureRest}
-          />
-        )
+        return <ProfilePicture size={size ?? 28} rounded={rounded ?? true} marginRight={resolvedCollapsed ? 0 : 6} {...profilePictureRest} />
       }
 
       if (IconLeft) {
@@ -236,8 +232,8 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
           <IconContainer
             tone={iconTone}
             marginRight={resolvedCollapsed ? 0 : 2}
-            $group-hover={{ backgroundColor: (active && frame === 'cadre') ? '$purple2' : frame === 'cadre' ? '$purple1' : disabled ? 'white' : '$gray1' }}
-            $group-press={{ backgroundColor: (active && frame === 'cadre') ? '$purple3' : frame === 'cadre' ? '$purple2' : disabled ? 'white' : '$gray2' }}
+            $group-hover={{ backgroundColor: active && frame === 'cadre' ? '$purple2' : frame === 'cadre' ? '$purple1' : disabled ? 'white' : '$gray1' }}
+            $group-press={{ backgroundColor: active && frame === 'cadre' ? '$purple3' : frame === 'cadre' ? '$purple2' : disabled ? 'white' : '$gray2' }}
           >
             <IconLeft size={16} color={iconColor} />
           </IconContainer>
@@ -248,8 +244,12 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
     })()
 
     const shape: ComponentProps<typeof NavItemFrame>['shape'] = resolvedCollapsed
-      ? (profilePicture) ? 'pillBoth' : 'default'
-      : (profilePicture) ? 'pillLeft' : 'default'
+      ? profilePicture
+        ? 'pillBoth'
+        : 'default'
+      : profilePicture
+        ? 'pillLeft'
+        : 'default'
 
     const shouldRenderAsWebLink = Boolean(href && isWeb)
 
@@ -261,23 +261,23 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
         }
         return
       }
-      
+
       // Si le NavItem a des subItems, ouvrir le dropdown au lieu de naviguer
       if (subItems && subItems.length > 0) {
         setDropdownOpen(!dropdownOpen)
         return
       }
-      
+
       onPress?.(event)
       if (href && !isWeb && !active) {
         router.navigate(href)
       }
     }
 
-    const resolvedTabIndex = shouldRenderAsWebLink ? undefined : tabIndex ?? (disabled ? -1 : 0)
-    const resolvedRole = shouldRenderAsWebLink ? role : role ?? 'button'
+    const resolvedTabIndex = shouldRenderAsWebLink ? undefined : (tabIndex ?? (disabled ? -1 : 0))
+    const resolvedRole = shouldRenderAsWebLink ? role : (role ?? 'button')
     // Attacher onPress au Frame si on a subItems, onPress, href, ou si ce n'est pas un lien web
-    const shouldAttachPressToFrame = (Boolean(subItems && subItems.length > 0)) || (!shouldRenderAsWebLink && (Boolean(onPress) || Boolean(href)))
+    const shouldAttachPressToFrame = Boolean(subItems && subItems.length > 0) || (!shouldRenderAsWebLink && (Boolean(onPress) || Boolean(href)))
     const shouldUseButtonTag = shouldAttachPressToFrame && !disabled && isWeb
 
     const FrameComponent = frame === 'cadre' ? NavCadreItemFrame : NavItemFrame
@@ -327,16 +327,11 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
 
     // Si on a des subItems, on ne doit pas utiliser Link même si href est défini
     const shouldUseLink = shouldRenderAsWebLink && href && !(subItems && subItems.length > 0)
-    
+
     const navItemWithDropdown = (
       <>
         {shouldUseLink ? (
-          <Link
-            href={href}
-            onPress={handlePress}
-            style={{ textDecorationLine: 'none' }}
-            aria-disabled={disabled || undefined}
-          >
+          <Link href={href} onPress={handlePress} style={{ textDecorationLine: 'none' }} aria-disabled={disabled || undefined}>
             {navItemContent}
           </Link>
         ) : (

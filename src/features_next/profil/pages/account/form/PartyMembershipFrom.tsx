@@ -1,9 +1,12 @@
 import { Fragment } from 'react'
-import RadioGroup from '@/components/base/RadioGroup/RadioGroup'
-import Text from '@/components/base/Text'
-import { RestDetailedProfileResponse } from '@/services/profile/schema'
 import { Controller } from 'react-hook-form'
 import * as z from 'zod'
+
+import RadioGroup from '@/components/base/RadioGroup/RadioGroup'
+import Text from '@/components/base/Text'
+
+import { RestDetailedProfileResponse } from '@/services/profile/schema'
+
 import AbstractProfilForm from './AbstractProfilForm'
 
 const PartyMembershipForm = ({ profile }: { profile: RestDetailedProfileResponse }) => {

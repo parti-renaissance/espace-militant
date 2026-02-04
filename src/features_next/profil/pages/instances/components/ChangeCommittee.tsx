@@ -1,5 +1,8 @@
 import { ComponentPropsWithoutRef, memo, useMemo, useRef, useState } from 'react'
 import { Dimensions, FlatList, SafeAreaView, View } from 'react-native'
+import { useMedia, YStack } from 'tamagui'
+import { Diamond, X } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
@@ -7,9 +10,9 @@ import { VoxHeader } from '@/components/Header/Header'
 import { InstanceCardHeader } from '@/components/InstanceCard/InstanceCard'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useGetCommittees, useSetMyCommittee } from '@/services/committee/hook'
-import { Diamond, X } from '@tamagui/lucide-icons'
-import { useMedia, YStack } from 'tamagui'
+
 import { DoubleDiamond } from './icons'
 import { MembershipCard } from './MembershipCard'
 
@@ -59,11 +62,15 @@ const ChangeCommitteeList = ({ currentUuid, ...props }: { currentUuid: string | 
           onPress={handlePress(committee.uuid)}
           loading={pendingSelected === committee.uuid && isPending}
           isMember={selected === committee.uuid}
-          manager={committee.animator ? {
-            role: committee.animator?.role ?? "Responsable comité local",
-            name: `${committee.animator?.first_name} ${committee.animator?.last_name}`,
-            avatar: committee.animator?.image_url
-          } : undefined }
+          manager={
+            committee.animator
+              ? {
+                  role: committee.animator?.role ?? 'Responsable comité local',
+                  name: `${committee.animator?.first_name} ${committee.animator?.last_name}`,
+                  avatar: committee.animator?.image_url,
+                }
+              : undefined
+          }
         />
       )}
       keyExtractor={(item) => item.uuid}

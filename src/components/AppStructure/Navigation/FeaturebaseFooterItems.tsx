@@ -1,12 +1,15 @@
 import React from 'react'
 import { ScrollView } from 'react-native'
-import { RefreshCcw, CircleHelp, LifeBuoy } from '@tamagui/lucide-icons'
 import { YStack } from 'tamagui'
+import { CircleHelp, LifeBuoy, RefreshCcw } from '@tamagui/lucide-icons'
+
 import { VoxButton } from '@/components/Button'
-import { NavItem } from './NavItem'
-import type { IconComponent } from '@/models/common.model'
+
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import type { IconComponent } from '@/models/common.model'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
+
+import { NavItem } from './NavItem'
 
 type FeaturebaseItem = {
   icon: IconComponent
@@ -15,9 +18,9 @@ type FeaturebaseItem = {
 }
 
 const FEATUREBASE_ITEMS: FeaturebaseItem[] = [
-  { icon: RefreshCcw, text: 'Dernières mises à jour', externalUrlSlug: '/', },
-  { icon: CircleHelp, text: 'Demande de retours', externalUrlSlug: '/demandes-et-retours', },
-  { icon: LifeBuoy, text: "Centre d'aide", externalUrlSlug: '/centre-d-aide', },
+  { icon: RefreshCcw, text: 'Dernières mises à jour', externalUrlSlug: '/' },
+  { icon: CircleHelp, text: 'Demande de retours', externalUrlSlug: '/demandes-et-retours' },
+  { icon: LifeBuoy, text: "Centre d'aide", externalUrlSlug: '/centre-d-aide' },
 ]
 
 type FeaturebaseFooterItemProps = {
@@ -28,34 +31,24 @@ type FeaturebaseFooterItemProps = {
 
 export const FeaturebaseFooterItems = ({ variant, collapsed }: FeaturebaseFooterItemProps) => {
   const openExternalContentHook = useOpenExternalContent({ slug: 'cadre' })
-  const { data: executiveScopes } = useGetExecutiveScopes();
+  const { data: executiveScopes } = useGetExecutiveScopes()
 
   if (!executiveScopes?.default?.features?.includes('featurebase')) {
-    return null;
+    return null
   }
-  
+
   const handleItemPress = (item: FeaturebaseItem) => {
     if (item.externalUrlSlug) {
-      const stateUrl = `${item.externalUrlSlug}?scope=${executiveScopes?.default?.code}`;
+      const stateUrl = `${item.externalUrlSlug}?scope=${executiveScopes?.default?.code}`
       openExternalContentHook.open({ state: stateUrl })()
     }
   }
 
   if (variant === 'button') {
     return (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 8, paddingRight: 32, paddingLeft: 16, paddingTop: 16 }}
-      >
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 32, paddingLeft: 16, paddingTop: 16 }}>
         {FEATUREBASE_ITEMS.map((item) => (
-          <VoxButton
-            key={item.text}
-            variant="outlined"
-            theme="gray"
-            iconLeft={item.icon}
-            onPress={() => handleItemPress(item)}
-          >
+          <VoxButton key={item.text} variant="outlined" theme="gray" iconLeft={item.icon} onPress={() => handleItemPress(item)}>
             {item.text}
           </VoxButton>
         ))}

@@ -1,16 +1,18 @@
+import { useMedia, View, XStack } from 'tamagui'
+import { Euro, X } from '@tamagui/lucide-icons'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
+import * as z from 'zod'
+
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { profileElectDeclarationFormError } from '@/services/profile/error'
 import { usePostElectDeclaration } from '@/services/profile/hook'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Euro, X } from '@tamagui/lucide-icons'
-import { Controller, useForm } from 'react-hook-form'
-import { useMedia, View, XStack } from 'tamagui'
-import * as z from 'zod'
 
 type Props = {
   open: boolean

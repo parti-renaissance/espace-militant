@@ -1,38 +1,39 @@
 import React from 'react'
-import { Stack as RouterStack, useLocalSearchParams, useGlobalSearchParams } from 'expo-router'
+import { Stack as RouterStack, useGlobalSearchParams, useLocalSearchParams } from 'expo-router'
 import Head from 'expo-router/head'
+
 import Error404 from '@/components/404/Error404'
-import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import * as metatags from '@/config/metatags'
-import clientEnv from '@/config/clientEnv'
-import { ForbiddenError, UnauthorizedError } from '@/core/errors'
+import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import EventDetailsScreen, { EventDetailsScreenDeny, EventDetailsScreenSkeleton } from '@/features_next/events/pages/detail'
+
+import clientEnv from '@/config/clientEnv'
+import * as metatags from '@/config/metatags'
+import { ForbiddenError, UnauthorizedError } from '@/core/errors'
 import { useGetEvent } from '@/services/events/hook'
 import { useHits } from '@/services/hits/hook'
-import { cleanupUrlParams } from '@/utils/urlCleanup'
 import { resolveSource } from '@/utils/sourceResolver'
+import { cleanupUrlParams } from '@/utils/urlCleanup'
 
 const BASE_URL = `https://${clientEnv.ASSOCIATED_DOMAIN}`
 
 const EventDetailScreen: React.FC = () => {
-  
   const params = useLocalSearchParams<{ id: string }>()
   if (!params.id) return <Error404 />
   return (
     <Layout.Container hideTabBar>
-        <BoundarySuspenseWrapper
-          fallback={<EventDetailsScreenSkeleton />}
-          errorChildren={(payload) => {
-            if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
-              return <EventDetailsScreenDeny error={payload.error} />
-            } else {
-              return <DefaultErrorFallback {...payload} />
-            }
-          }}
-        >
-          <_EventDetailScreen id={params.id} />
-        </BoundarySuspenseWrapper>
+      <BoundarySuspenseWrapper
+        fallback={<EventDetailsScreenSkeleton />}
+        errorChildren={(payload) => {
+          if (payload.error instanceof UnauthorizedError || payload.error instanceof ForbiddenError) {
+            return <EventDetailsScreenDeny error={payload.error} />
+          } else {
+            return <DefaultErrorFallback {...payload} />
+          }
+        }}
+      >
+        <_EventDetailScreen id={params.id} />
+      </BoundarySuspenseWrapper>
     </Layout.Container>
   )
 }
@@ -53,15 +54,15 @@ function _EventDetailScreen(props: Readonly<{ id: string }>) {
     if (!isEventLoading && !eventError && data) {
       if (sentRef.current !== props.id) {
         sentRef.current = props.id
-        
+
         try {
-          trackOpen({ 
-            object_type: 'event', 
-            object_id: props.id, 
+          trackOpen({
+            object_type: 'event',
+            object_id: props.id,
             source: resolveSource(searchParams.source),
             utm_source: searchParams.utm_source,
             utm_campaign: searchParams.utm_campaign,
-            referrer_code: searchParams.ref
+            referrer_code: searchParams.ref,
           })
         } catch (error) {
           // Silently ignore tracking errors - they should not impact user experience
@@ -69,7 +70,7 @@ function _EventDetailScreen(props: Readonly<{ id: string }>) {
             console.warn('[EventPage] trackOpen error:', error)
           }
         }
-        
+
         cleanupUrlParams(['source'])
       }
     }
@@ -79,7 +80,7 @@ function _EventDetailScreen(props: Readonly<{ id: string }>) {
     <>
       <RouterStack.Screen
         options={{
-          title: data?.name || 'Détails de l\'événement',
+          title: data?.name || "Détails de l'événement",
         }}
       />
       <Head>

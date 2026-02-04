@@ -1,7 +1,9 @@
+import { Image, View, XStack } from 'tamagui'
+import { RotateCw } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import { RotateCw } from '@tamagui/lucide-icons'
-import { Image, View, XStack } from 'tamagui'
+
 import useResetFilters from '../hooks/useResetFilters'
 
 export default function EmptyState() {

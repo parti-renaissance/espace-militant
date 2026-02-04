@@ -3,9 +3,11 @@ import { StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { styled, YStack } from 'tamagui'
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetScrollView } from '@gorhom/bottom-sheet'
+
 import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
+
 import { type NavItemConfig } from '@/config/navigationItems'
 
 const Line = styled(YStack, {
@@ -67,9 +69,7 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
     }
   })
 
-  const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => (
-    <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={1} />
-  ), [])
+  const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={1} />, [])
 
   return (
     <Animated.View style={[styles.container, { bottom: 54 + insets.bottom + 10 }, styleContainer]}>
@@ -89,11 +89,7 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
         >
           <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
             <YStack paddingVertical={8}>
-              {ListHeaderComponent && (
-                <YStack>
-                  {ListHeaderComponent}
-                </YStack>
-              )}
+              {ListHeaderComponent && <YStack>{ListHeaderComponent}</YStack>}
               <YStack gap={4} paddingHorizontal={16}>
                 {showLine && <Line />}
                 {items.map((item) => (
@@ -116,11 +112,7 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
                 ))}
               </YStack>
 
-              {ListFooterComponent && (
-                <YStack>
-                  {ListFooterComponent}
-                </YStack>
-              )}
+              {ListFooterComponent && <YStack>{ListFooterComponent}</YStack>}
             </YStack>
           </BottomSheetScrollView>
         </BottomSheet>
@@ -146,4 +138,3 @@ const styles = StyleSheet.create({
 })
 
 export default memo(NavSheet)
-

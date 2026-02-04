@@ -1,13 +1,16 @@
+import { XStack, YStack } from 'tamagui'
+import { Download, Sparkle } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { EventItemProps } from '@/features_next/events/types'
+
 import { useFileDownload } from '@/hooks/useFileDownload'
 import { getEventParticipantsFileEndpoint } from '@/services/events/api'
 import { UserScopesEnum } from '@/services/profile/schema'
 import { useEventStats } from '@/services/stats/hook'
-import { Download, Sparkle } from '@tamagui/lucide-icons'
-import { XStack, YStack } from 'tamagui'
+
 import { EventParticipantsTable } from '../components/EventParticipantsTable'
 import { isEventFull } from '../utils'
 import EventHandleActions from './EventHandleActions'

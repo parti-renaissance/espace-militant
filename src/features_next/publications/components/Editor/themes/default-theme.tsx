@@ -90,7 +90,7 @@ export default {
     },
     alone: {
       container: { paddingTop: 8, paddingBottom: 40, paddingLeft: 16, paddingRight: 16 },
-    }
+    },
   },
   button: {
     global: {

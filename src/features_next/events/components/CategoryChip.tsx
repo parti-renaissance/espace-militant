@@ -1,5 +1,6 @@
-import VoxCard from '@/components/VoxCard/VoxCard'
 import { Calendar } from '@tamagui/lucide-icons'
+
+import VoxCard from '@/components/VoxCard/VoxCard'
 
 export const CategoryChip = ({ children }: { children?: string }) => {
   return (

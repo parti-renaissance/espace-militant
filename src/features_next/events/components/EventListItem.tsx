@@ -1,9 +1,12 @@
+import { Href, useRouter } from 'expo-router'
+import { XStack } from 'tamagui'
+import { Eye } from '@tamagui/lucide-icons'
+
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { RestItemEvent } from '@/services/events/schema'
-import { Eye } from '@tamagui/lucide-icons'
-import { useRouter, Href } from 'expo-router'
-import { XStack } from 'tamagui'
+
 import { EventItemProps } from '../types'
 import { getEventItemImageFallback, isEventFull, isEventPrivate } from '../utils'
 import { CategoryChip } from './CategoryChip'
@@ -29,28 +32,21 @@ const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 
   )
 }
 
-const GoToButton = ({ eventUuid, source }: { eventUuid: string, source?: string }) => {
+const GoToButton = ({ eventUuid, source }: { eventUuid: string; source?: string }) => {
   const router = useRouter()
   const href = `/evenements/${eventUuid}?source=${source || ''}` as Href
-  
+
   // Sur mobile, utiliser router.push
   const handlePress = () => {
     router.push(href)
   }
 
   return (
-    <VoxButton 
-      variant="outlined" 
-      theme="gray" 
-      iconLeft={Eye} 
-      testID="event-show-button"
-      onPress={handlePress}
-    >
+    <VoxButton variant="outlined" theme="gray" iconLeft={Eye} testID="event-show-button" onPress={handlePress}>
       Voir
     </VoxButton>
   )
 }
-
 
 export const BaseEventListItem = ({ event, userUuid, source }: EventItemProps) => {
   const fallbackImage = getEventItemImageFallback(event)
@@ -71,9 +67,7 @@ export const BaseEventListItem = ({ event, userUuid, source }: EventItemProps) =
         {fallbackImage ? <VoxCard.Image image={fallbackImage} imageData={event.image} /> : null}
         <DateItem showTime={isFull} begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} />
         <EventLocation event={event} />
-        {participantsCount != null && participantsCount >= 10 && (
-          <VoxCard.Attendees attendees={{ count: participantsCount }} />
-        )}
+        {participantsCount != null && participantsCount >= 10 && <VoxCard.Attendees attendees={{ count: participantsCount }} />}
         <VoxCard.Author
           author={{
             role: event.organizer?.role,

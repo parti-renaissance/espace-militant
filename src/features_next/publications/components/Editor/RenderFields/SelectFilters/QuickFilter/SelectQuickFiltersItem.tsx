@@ -1,7 +1,8 @@
 import React from 'react'
 import { createStyledContext, styled, withStaticProperties, XStack, YStack } from 'tamagui'
-import Text from '@/components/base/Text'
 import { Check } from '@tamagui/lucide-icons'
+
+import Text from '@/components/base/Text'
 
 // Types pour les états
 type SelectItemState = 'default' | 'selected' | 'parentSelected'
@@ -151,14 +152,7 @@ interface SelectItemProps {
 }
 
 // Composant principal
-const SelectItemComponent = ({
-  label,
-  count,
-  state = 'default',
-  onPress,
-  disabled = false,
-  type = 'radio'
-}: SelectItemProps) => {
+const SelectItemComponent = ({ label, count, state = 'default', onPress, disabled = false, type = 'radio' }: SelectItemProps) => {
   const currentState = disabled ? 'default' : state
 
   const renderButton = () => {
@@ -173,13 +167,7 @@ const SelectItemComponent = ({
       return currentState === 'selected' ? (
         <Check size={16} color="$blue9" />
       ) : (
-        <XStack
-          width={16}
-          height={16}
-          borderWidth={2}
-          borderColor="$gray6"
-          borderRadius={4}
-        />
+        <XStack width={16} height={16} borderWidth={2} borderColor="$gray6" borderRadius={4} />
       )
     }
   }
@@ -188,18 +176,10 @@ const SelectItemComponent = ({
     <SelectItemContext.Provider state={currentState}>
       <SelectItemContainer state={currentState} onPress={disabled ? undefined : onPress}>
         <XStack flex={1} gap={4}>
-          <SelectItemLabel state={currentState}>
-            {label}
-          </SelectItemLabel>
-          {count !== undefined && (
-            <SelectItemCount state={currentState}>
-              {count}
-            </SelectItemCount>
-          )}
+          <SelectItemLabel state={currentState}>{label}</SelectItemLabel>
+          {count !== undefined && <SelectItemCount state={currentState}>{count}</SelectItemCount>}
         </XStack>
-        <SelectItemButton state={currentState}>
-          {renderButton()}
-        </SelectItemButton>
+        <SelectItemButton state={currentState}>{renderButton()}</SelectItemButton>
       </SelectItemContainer>
     </SelectItemContext.Provider>
   )
@@ -213,4 +193,4 @@ export const SelectQuickFiltersItem = withStaticProperties(SelectItemComponent, 
   Button: SelectItemButton,
 })
 
-export default SelectQuickFiltersItem 
+export default SelectQuickFiltersItem

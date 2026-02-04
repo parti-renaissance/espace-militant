@@ -1,12 +1,14 @@
 import React, { Suspense } from 'react'
+import { Link } from 'expo-router'
+import { isWeb, useMedia, XStack, YStack, YStackProps } from 'tamagui'
+import { Sparkle } from '@tamagui/lucide-icons'
+
 import BigSwitch, { OptionsTuple } from '@/components/base/BigSwitch'
 import { VoxButton } from '@/components/Button'
-import { useSession } from '@/ctx/SessionProvider'
 import EventFilterForm from '@/features_next/events/components/EventFilterForm/EventFilterForm'
+
+import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
-import { Sparkle } from '@tamagui/lucide-icons'
-import { Link } from 'expo-router'
-import { isWeb, XStack, YStack, YStackProps, useMedia } from 'tamagui'
 
 const options = [
   { label: 'Tous', value: 'events' },
@@ -36,22 +38,16 @@ const EventsHeader = ({ mode, value, onChange }: { mode: 'compact' | 'aside'; va
   const isAside = mode === 'aside'
 
   return (
-    <YStack
-      gap="$medium"
-      px={media.sm ? '$medium' : 0}
-    >
+    <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
       {isAuth && (
-        <XStack
-          gap={isAside ? '$medium' : '$small'}
-          flexDirection={isAside ? 'column-reverse' : 'row'}
-        >
+        <XStack gap={isAside ? '$medium' : '$small'} flexDirection={isAside ? 'column-reverse' : 'row'}>
           <XStack flex={isAside ? undefined : 2}>
             <BigSwitch options={options} value={value} onChange={onChange} />
           </XStack>
           {canCreate && (
             <Suspense>
               <NewEventBtn paddingBottom={isAside ? '$small' : undefined}>
-                {isAside ? 'Organiser un événement' : (media.sm ? 'Créer' : 'Organiser un événement')}
+                {isAside ? 'Organiser un événement' : media.sm ? 'Créer' : 'Organiser un événement'}
               </NewEventBtn>
             </Suspense>
           )}

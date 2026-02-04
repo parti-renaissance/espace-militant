@@ -1,28 +1,31 @@
-import React, { useRef, useState, useMemo, useEffect } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Keyboard } from 'react-native'
+import { router } from 'expo-router'
+import { isWeb, useMedia, XStack, YStack } from 'tamagui'
+import { Speech } from '@tamagui/lucide-icons'
+
+import Error404 from '@/components/404/Error404'
+import { Header } from '@/components/AppStructure'
+import BigSwitch from '@/components/base/BigSwitch'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import PageLayout from '@/components/layouts/PageLayout/PageLayout'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 import StickyBox from '@/components/StickyBox/StickyBox'
 import { EventFormScreenSkeleton } from '@/features_next/events/pages/create-edit/index'
+
 import { useCreateMessage, useGetAvailableSenders, useGetMessage, useGetMessageContent, useGetMessageFilters } from '@/services/publications/hook'
-import { Speech } from '@tamagui/lucide-icons'
-import { router } from 'expo-router'
-import { isWeb, useMedia, XStack, YStack } from 'tamagui'
-import MessageEditor, { defaultTheme, MessageEditorRef } from '../../components/Editor'
+import { RestAvailableSender } from '@/services/publications/schema'
+
 import ConfirmationModal from '../../components/ConfirmationModal'
 import { ViewportModalRef } from '../../components/ConfirmationModal/ViewportModalSheet'
-import BigSwitch from '@/components/base/BigSwitch'
-import { RestAvailableSender } from '@/services/publications/schema'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
-import QuitConfirmModal from '../../components/QuitConfirmModal'
-import { useAutoSave } from '../../components/Editor/hooks/useAutoSave'
+import MessageEditor, { defaultTheme, MessageEditorRef } from '../../components/Editor'
 import { AutoSaveErrorIndicator } from '../../components/Editor/AutoSaveErrorIndicator'
-import Error404 from '@/components/404/Error404'
-import { Header } from '@/components/AppStructure'
+import { useAutoSave } from '../../components/Editor/hooks/useAutoSave'
+import QuitConfirmModal from '../../components/QuitConfirmModal'
 
-const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
+const MessageEditorPage = (props?: { scope?: string; messageId?: string }) => {
   const editorRef = useRef<MessageEditorRef>(null)
   const modalSendRef = useRef<ViewportModalRef>(null)
   const media = useMedia()
@@ -43,7 +46,7 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
     return {
       messageId: props?.messageId ?? '',
       scope: props?.scope ?? '',
-      enabled: !!props?.messageId
+      enabled: !!props?.messageId,
     }
   }, [props?.messageId, props?.scope])
 
@@ -51,9 +54,12 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
   const { data: messageData, isLoading: isMessageLoading, error: messageError } = useGetMessage(messageQueryParams)
   const { data: messageContent, isLoading: isMessageContentLoading, error: messageContentError } = useGetMessageContent(messageQueryParams)
 
-  const availableSendersQueryParams = useMemo(() => ({
-    scope: props?.scope ?? messageData?.author?.scope ?? ''
-  }), [messageData?.author?.scope, props?.scope])
+  const availableSendersQueryParams = useMemo(
+    () => ({
+      scope: props?.scope ?? messageData?.author?.scope ?? '',
+    }),
+    [messageData?.author?.scope, props?.scope],
+  )
 
   const { data: availableSenders, isLoading: isSendersLoading } = useGetAvailableSenders(availableSendersQueryParams)
 
@@ -133,29 +139,20 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
                 <VoxButton
                   size="lg"
                   variant="text"
-                  theme={isAutoSaving ? 'blue' : (!props?.messageId ? 'orange' : undefined)}
+                  theme={isAutoSaving ? 'blue' : !props?.messageId ? 'orange' : undefined}
                   onPress={props?.messageId && !displayQuitModal ? () => setDisplayQuitModal(true) : handleQuit}
                   disabled={isInitialLoading || isAutoSaving}
                   loading={isAutoSaving}
                 >
-                  {isAutoSaving ? 'Sauvegarde' : (props?.messageId ? 'Quitter' : 'Annuler')}
+                  {isAutoSaving ? 'Sauvegarde' : props?.messageId ? 'Quitter' : 'Annuler'}
                 </VoxButton>
-                <AutoSaveErrorIndicator
-                  hasError={hasError}
-                />
-
+                <AutoSaveErrorIndicator hasError={hasError} />
               </XStack>
               <XStack maxWidth={520} justifyContent="center">
                 <VoxHeader.Title icon={media.gtSm ? Speech : undefined}>{media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
               </XStack>
               <XStack flex={1} justifyContent="flex-end" w={100}>
-                <VoxButton
-                  size="lg"
-                  loading={messageQuery.isPending}
-                  disabled={isInitialLoading}
-                  theme="purple"
-                  onPress={() => editorRef.current?.submit()}
-                >
+                <VoxButton size="lg" loading={messageQuery.isPending} disabled={isInitialLoading} theme="purple" onPress={() => editorRef.current?.submit()}>
                   Suivant
                 </VoxButton>
               </XStack>
@@ -163,27 +160,29 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
           </Header>
         </YStack>
         <YStack backgroundColor="$textSurface" paddingTop={media.gtSm ? '$large' : undefined}>
-          <YStack maxWidth={520} marginHorizontal='auto' width="100%" height={media.sm ? 60 : 76} px={media.sm ? '$medium' : undefined} py={media.sm ? '$small' : '$medium'} justifyContent='center'>
+          <YStack
+            maxWidth={520}
+            marginHorizontal="auto"
+            width="100%"
+            height={media.sm ? 60 : 76}
+            px={media.sm ? '$medium' : undefined}
+            py={media.sm ? '$small' : '$medium'}
+            justifyContent="center"
+          >
             <BigSwitch
               options={[
                 { label: 'Édition', value: 'edit' },
                 { label: 'Aperçu', value: 'preview' },
               ]}
               value={mode}
-              onChange={x => setMode(x as 'edit' | 'preview')}
+              onChange={(x) => setMode(x as 'edit' | 'preview')}
             />
           </YStack>
         </YStack>
       </StickyBox>
       {isInitialLoading ? (
         <PageLayout>
-          <PageLayout.MainSingleColumn
-            maxWidth={520}
-            marginHorizontal='auto'
-            width="100%"
-            flexGrow={1}
-            paddingTop={isWeb && media.gtSm ? '$large' : undefined}
-          >
+          <PageLayout.MainSingleColumn maxWidth={520} marginHorizontal="auto" width="100%" flexGrow={1} paddingTop={isWeb && media.gtSm ? '$large' : undefined}>
             <SkeCard>
               <SkeCard.Content>
                 <SkeCard.Chip />
@@ -236,9 +235,6 @@ const MessageEditorPage = (props?: { scope?: string, messageId?: string }) => {
         </PageLayout>
       )}
     </YStack>
-
   )
-
 }
 export default MessageEditorPage
-

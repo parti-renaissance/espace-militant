@@ -1,3 +1,10 @@
+import { Link } from 'expo-router'
+import { isWeb, useMedia, XStack, YStack } from 'tamagui'
+import { Pen, X } from '@tamagui/lucide-icons'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
+import * as z from 'zod'
+
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
@@ -7,14 +14,10 @@ import { VoxHeader } from '@/components/Header/Header'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { profileElectPaymentFormError } from '@/services/profile/error'
 import { useGetDetailProfil, usePostElectPayment } from '@/services/profile/hook'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Pen, X } from '@tamagui/lucide-icons'
-import { Link } from 'expo-router'
-import { Controller, useForm } from 'react-hook-form'
-import { isWeb, useMedia, XStack, YStack } from 'tamagui'
-import * as z from 'zod'
+
 import { smellsLikeIbanRegex } from './utils'
 
 type Props = {

@@ -1,10 +1,12 @@
 import { forwardRef, PropsWithChildren, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { Modal, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { CardFrame } from '@/components/VoxCard/VoxCard'
-import { Spacing } from '@/styles'
+import { isWeb, ScrollView, useMedia, useWindowDimensions, View } from 'tamagui'
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
-import { isWeb, useMedia, useWindowDimensions, View, ScrollView } from 'tamagui'
+
+import { CardFrame } from '@/components/VoxCard/VoxCard'
+
+import { Spacing } from '@/styles'
 
 export interface ViewportModalSheet extends PropsWithChildren {
   onClose?: () => void

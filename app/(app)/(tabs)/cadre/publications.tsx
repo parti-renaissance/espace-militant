@@ -1,12 +1,14 @@
 import React, { useCallback } from 'react'
 import { useRouter } from 'expo-router'
-import Layout from '@/components/AppStructure/Layout/Layout'
-import PublicationsScreen from '@/features_next/publications/pages/list'
 import Head from 'expo-router/head'
-import * as metatags from '@/config/metatags'
-import { Header } from '@/components/AppStructure'
-import { VoxButton } from '@/components/Button'
 import { Sparkle } from '@tamagui/lucide-icons'
+
+import { Header } from '@/components/AppStructure'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import { VoxButton } from '@/components/Button'
+import PublicationsScreen from '@/features_next/publications/pages/list'
+
+import * as metatags from '@/config/metatags'
 
 export default function PublicationsPage() {
   const router = useRouter()
@@ -20,8 +22,8 @@ export default function PublicationsPage() {
       <Head>
         <title>{metatags.createTitle('Mes Publications')}</title>
       </Head>
-      <Header 
-        title="Mes Publications" 
+      <Header
+        title="Mes Publications"
         navigation={{ showBackButton: false }}
         rightComponent={
           <VoxButton variant="soft" theme="purple" iconLeft={Sparkle} size="lg" onPress={handleCreatePublication}>
@@ -33,7 +35,5 @@ export default function PublicationsPage() {
         <PublicationsScreen />
       </Layout.Container>
     </>
-
   )
 }
-

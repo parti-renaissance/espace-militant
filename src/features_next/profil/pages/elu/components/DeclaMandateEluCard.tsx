@@ -1,11 +1,13 @@
+import { XStack, YStack } from 'tamagui'
+import { Controller, useForm } from 'react-hook-form'
+
 import CheckboxGroup from '@/components/base/CheckboxGroup/CheckboxGroup'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useMutationUpdateProfil } from '@/services/profile/hook'
 import { RestElectedProfileResponse } from '@/services/profile/schema'
-import { Controller, useForm } from 'react-hook-form'
-import { XStack, YStack } from 'tamagui'
 
 export default function (props: { profil: RestElectedProfileResponse }) {
   const declarationsValues = [

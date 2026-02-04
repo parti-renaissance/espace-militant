@@ -1,4 +1,5 @@
 import { VoxButton, VoxButtonProps } from '@/components/Button'
+
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
 type RenewMembershipButtonProps = {

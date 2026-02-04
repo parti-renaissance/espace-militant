@@ -1,10 +1,13 @@
-import { useState, useRef, useMemo } from 'react'
-import { ChevronsUpDown } from '@tamagui/lucide-icons'
+import { useMemo, useRef, useState } from 'react'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
+import { ChevronsUpDown } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
-import { NavItemDropdown, type NavItemSubItem } from './NavItemDropdown'
 import { getFormatedScope } from '@/features/scopes-selector/utils'
+
 import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
+
+import { NavItemDropdown, type NavItemSubItem } from './NavItemDropdown'
 
 export type Scope = {
   id: string
@@ -87,11 +90,7 @@ type ScopeItemProps = {
 
 const ScopeItem = ({ scope, selected, onPress, last }: ScopeItemProps) => {
   return (
-    <ScopeItemFrame
-      selected={selected}
-      onPress={onPress}
-      last={last}
-    >
+    <ScopeItemFrame selected={selected} onPress={onPress} last={last}>
       <XStack flex={1} alignItems="center" gap={8} justifyContent="space-between">
         <YStack flex={1} gap={4}>
           <Text fontSize={12} semibold numberOfLines={2}>
@@ -169,9 +168,7 @@ export const ScopeSelector = () => {
     },
   }))
 
-  const displayScope = !isEmpty
-    ? selectedScope || scopes[0]
-    : { id: 'empty', name: 'Responsabilité cadre', role: 'Aucun rôle disponible' }
+  const displayScope = !isEmpty ? selectedScope || scopes[0] : { id: 'empty', name: 'Responsabilité cadre', role: 'Aucun rôle disponible' }
 
   return (
     <>
@@ -185,11 +182,7 @@ export const ScopeSelector = () => {
         pressStyle={!canSelect ? { backgroundColor: 'transparent' } : undefined}
       >
         <YStack flexShrink={1} gap={4}>
-          <Text.MD
-            semibold
-            color={'$purple6'}
-            numberOfLines={1}
-          >
+          <Text.MD semibold color={'$purple6'} numberOfLines={1}>
             {displayScope.name}
           </Text.MD>
           {displayScope.role && (
@@ -217,4 +210,3 @@ export const ScopeSelector = () => {
     </>
   )
 }
-

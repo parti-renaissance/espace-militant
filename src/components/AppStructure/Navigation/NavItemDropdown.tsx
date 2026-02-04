@@ -1,9 +1,11 @@
-import React, { useCallback, useEffect, useState, cloneElement, isValidElement } from 'react'
+import React, { cloneElement, isValidElement, useCallback, useEffect, useState } from 'react'
 import { FlatList, GestureResponderEvent, Modal } from 'react-native'
+import { styled, useMedia, XStack, YStack } from 'tamagui'
 import { Info } from '@tamagui/lucide-icons'
-import { styled, XStack, YStack, useMedia } from 'tamagui'
+
 import { DropdownFrame, DropdownItem } from '@/components/base/Dropdown'
 import Text from '@/components/base/Text'
+
 import type { IconComponent } from '@/models/common.model'
 
 export type NavItemSubItem = {
@@ -60,14 +62,7 @@ const DropdownContainer = styled(YStack, {
 
 const MemoItem = React.memo(DropdownItem)
 
-export const NavItemDropdown = ({
-  open,
-  onClose,
-  subItems,
-  triggerRef,
-  verticalPosition = 'bottom',
-  helpText,
-}: NavItemDropdownProps) => {
+export const NavItemDropdown = ({ open, onClose, subItems, triggerRef, verticalPosition = 'bottom', helpText }: NavItemDropdownProps) => {
   const media = useMedia()
   const isMobile = media.sm
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
@@ -129,10 +124,7 @@ export const NavItemDropdown = ({
 
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
-      <OverlayContainer
-        justifyContent={isMobile ? 'center' : undefined}
-        alignItems={isMobile ? 'center' : undefined}
-      >
+      <OverlayContainer justifyContent={isMobile ? 'center' : undefined} alignItems={isMobile ? 'center' : undefined}>
         <Overlay onPress={handleBackdropPress} />
 
         <DropdownContainer
@@ -147,7 +139,9 @@ export const NavItemDropdown = ({
             {helpText && (
               <XStack p={8} mb={0} mt={4} mx={4} borderRadius={8} bg="$textSurface" justifyContent="space-between" alignItems="center">
                 <YStack flexShrink={1} textWrap="balance">
-                  <Text.SM primary semibold lineHeight={20}>{helpText}</Text.SM>
+                  <Text.SM primary semibold lineHeight={20}>
+                    {helpText}
+                  </Text.SM>
                 </YStack>
                 <YStack p={6} alignSelf="flex-start">
                   <Info size={24} color="$blue5" />
@@ -175,7 +169,7 @@ export const NavItemDropdown = ({
                     })
                     return <>{enhancedContent}</>
                   }
-                  
+
                   return <>{item.customContent}</>
                 }
 
@@ -200,4 +194,3 @@ export const NavItemDropdown = ({
     </Modal>
   )
 }
-

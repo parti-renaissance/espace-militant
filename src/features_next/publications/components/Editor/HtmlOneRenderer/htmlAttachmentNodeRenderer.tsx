@@ -1,11 +1,21 @@
 import { CSSProperties } from 'react'
-import { getThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
-import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { RestAvailableSendersResponse } from '@/services/publications/schema'
 import { stringifyCSSProperties } from 'react-style-stringify'
 
-export const attachmentRenderer = (props: { theme: S.MessageStyle; data: S.AttachmentNode; edgePosition?: 'leading' | 'trailing' | 'alone'; sender?: RestAvailableSendersResponse[number] | null }) => {
-  const { containerStyle, wrapperStyle: { paddingTop, paddingBottom, paddingLeft, paddingRight, ...wrapperStyle } } = getThemeStyle(props.theme, props.data, props.edgePosition)
+import { getThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+
+import { RestAvailableSendersResponse } from '@/services/publications/schema'
+
+export const attachmentRenderer = (props: {
+  theme: S.MessageStyle
+  data: S.AttachmentNode
+  edgePosition?: 'leading' | 'trailing' | 'alone'
+  sender?: RestAvailableSendersResponse[number] | null
+}) => {
+  const {
+    containerStyle,
+    wrapperStyle: { paddingTop, paddingBottom, paddingLeft, paddingRight, ...wrapperStyle },
+  } = getThemeStyle(props.theme, props.data, props.edgePosition)
   if (!props.data.content) return ''
 
   const containerStyles: CSSProperties = {
@@ -50,4 +60,3 @@ export const attachmentRenderer = (props: { theme: S.MessageStyle; data: S.Attac
       </tbody>
   </table>`
 }
-

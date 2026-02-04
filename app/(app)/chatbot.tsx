@@ -1,9 +1,11 @@
 import React from 'react'
 import Head from 'expo-router/head'
-import * as metatags from '@/config/metatags'
-import ChatbotPage from '@/features_next/chatbot/pages/index'
-import Layout from '@/components/AppStructure/Layout/Layout'
+
 import { Header } from '@/components/AppStructure'
+import Layout from '@/components/AppStructure/Layout/Layout'
+import ChatbotPage from '@/features_next/chatbot/pages/index'
+
+import * as metatags from '@/config/metatags'
 
 function ChatbotScreen() {
   return (
@@ -13,7 +15,7 @@ function ChatbotScreen() {
       </Head>
       <Header title="Chatbot" />
       <Layout.Container hideTabBar>
-        <ChatbotPage /> 
+        <ChatbotPage />
       </Layout.Container>
     </>
   )

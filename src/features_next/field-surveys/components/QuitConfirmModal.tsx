@@ -2,8 +2,8 @@ import { Modal, Pressable, type GestureResponderEvent } from 'react-native'
 import { Circle, XStack, YStack } from 'tamagui'
 import { Trash2 } from '@tamagui/lucide-icons'
 
-import { VoxButton } from '@/components/Button'
 import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
 
 interface QuitConfirmModalProps {
   isOpen: boolean
@@ -19,13 +19,8 @@ export default function QuitConfirmModal({ isOpen, onClose, onConfirm }: QuitCon
   }
 
   return (
-    <Modal 
-      animationType="fade" 
-      transparent 
-      visible={isOpen}
-      accessibilityLabel="Confirmation de sortie"
-    >
-      <Pressable 
+    <Modal animationType="fade" transparent visible={isOpen} accessibilityLabel="Confirmation de sortie">
+      <Pressable
         style={{
           flex: 1,
           justifyContent: 'center',
@@ -54,17 +49,14 @@ export default function QuitConfirmModal({ isOpen, onClose, onConfirm }: QuitCon
           minHeight={300}
           onPress={(e) => e.stopPropagation()}
         >
-          <Circle 
-            size={88} 
-            backgroundColor="$orange1"
-          >
+          <Circle size={88} backgroundColor="$orange1">
             <Trash2 size={40} color="$orange5" />
           </Circle>
-          
+
           <Text.LG semibold textAlign="center">
             Quitter le questionnaire
           </Text.LG>
-          
+
           <YStack alignItems="center" marginBottom="$medium">
             <Text.MD secondary textAlign="center" textWrap="balance">
               Êtes-vous sûr de vouloir quitter le questionnaire ?
@@ -73,7 +65,7 @@ export default function QuitConfirmModal({ isOpen, onClose, onConfirm }: QuitCon
               Toutes vos réponses seront perdues.
             </Text.MD>
           </YStack>
-          
+
           <XStack gap="$3" alignItems="center" justifyContent="center">
             <VoxButton variant="outlined" onPress={onClose}>
               Annuler

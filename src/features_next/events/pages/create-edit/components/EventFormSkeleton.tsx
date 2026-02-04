@@ -1,16 +1,17 @@
 import React from 'react'
-import { VoxHeader } from '@/components/Header/Header'
-import { MessageCard } from '@/components/MessageCard/MessageCard'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
+import { Link, useNavigation } from 'expo-router'
+import { isWeb, XStack, YStack } from 'tamagui'
+import { Calendar, Info } from '@tamagui/lucide-icons'
+
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import { SF } from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import { VoxHeader } from '@/components/Header/Header'
+import { MessageCard } from '@/components/MessageCard/MessageCard'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { Calendar, Info } from '@tamagui/lucide-icons'
-import { Link, useNavigation } from 'expo-router'
-import { isWeb, XStack, YStack } from 'tamagui'
-import Layout from '@/components/AppStructure/Layout/Layout'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 const DesktopSkeleton = (props?: { editMode?: boolean }) => {
   return (
@@ -91,8 +92,6 @@ const MobileSkeleton = (props?: { editMode?: boolean }) => {
 
       <LayoutScrollView padding={false}>
         <YStack>
-
-
           <SkeCard>
             <SkeCard.Content>
               <SF theme="purple" />
@@ -127,4 +126,3 @@ export const EventFormDesktopScreenSkeleton = (props?: { editMode?: boolean }) =
 export const EventFormMobileScreenSkeleton = (props?: { editMode?: boolean }) => {
   return <MobileSkeleton editMode={props?.editMode} />
 }
-

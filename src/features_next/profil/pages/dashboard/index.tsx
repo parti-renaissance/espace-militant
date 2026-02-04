@@ -1,20 +1,23 @@
 import React, { useCallback, useState } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Link } from 'expo-router'
+import { isWeb, useMedia, XStack, YStack } from 'tamagui'
+import { HelpingHand } from '@tamagui/lucide-icons'
+
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import DeleteAccountModal from '@/components/DeleteAccountModal/DeleteAccountModal'
 import ProfilBlock from '@/components/ProfilBlock'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useGetDetailProfil, useGetProfil } from '@/services/profile/hook'
-import { HelpingHand } from '@tamagui/lucide-icons'
-import { Link } from 'expo-router'
-import { isWeb, useMedia, XStack, YStack } from 'tamagui'
+import ProfilLayout from '@/features_next/profil/components/Layout'
 import ProfilMenu from '@/features_next/profil/components/Menu'
+
+import { useGetDetailProfil, useGetProfil } from '@/services/profile/hook'
+
 import Version from '../../components/Version'
 import DonationCard from '../donations/components/DonationCard'
 import MembershipCard from '../donations/components/MembershipCard'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import ProfilLayout from '@/features_next/profil/components/Layout'
 
 const DashboardContent = () => {
   const media = useMedia()

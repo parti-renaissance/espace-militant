@@ -1,12 +1,14 @@
 import React, { memo } from 'react'
+import { XStack, YStack } from 'tamagui'
+import { getTimezoneOffset } from 'date-fns-tz'
+import { Controller } from 'react-hook-form'
+import timezonesList from 'timezones-list'
+
 import { FormFrame } from '@/components/base/FormFrames'
 import Select from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import DatePickerField from '@/components/DatePickerV2'
-import { getTimezoneOffset } from 'date-fns-tz'
-import { Controller } from 'react-hook-form'
-import { XStack, YStack } from 'tamagui'
-import timezonesList from 'timezones-list'
+
 import { EventFormContext } from '../context'
 
 function getTimezoneOffsetLabel(timeZone: string) {

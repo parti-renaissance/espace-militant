@@ -1,11 +1,13 @@
 import { Fragment } from 'react'
+import { XStack, YStack } from 'tamagui'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
+
 import Text from '@/components/base/Text'
 import _EmptyState from '@/components/EmptyStates/EmptyState'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { RestElectedProfileResponse } from '@/services/profile/schema'
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
-import { XStack, YStack } from 'tamagui'
 
 const EmptyState = () => {
   return (

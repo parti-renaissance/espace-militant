@@ -1,14 +1,17 @@
 import React from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
-import { useGetDetailProfil } from '@/services/profile/hook'
 import { useMedia, YStack } from 'tamagui'
+
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import ProfilLayout from '@/features_next/profil/components/Layout'
+
+import { useGetDetailProfil } from '@/services/profile/hook'
+
 import ForceBirthdateModal from '../account/form/ForceBirthdateModal'
 import DonationCard from './components/DonationCard'
 import DonationHistoryCard from './components/DonationHistoryCard'
 import DonationTaxReceiptCard from './components/DonationTaxReceiptsCard'
 import MembershipCard from './components/MembershipCard'
-import ProfilLayout from '@/features_next/profil/components/Layout'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 const DonationsContent = () => {
   const { data: profile } = useGetDetailProfil()

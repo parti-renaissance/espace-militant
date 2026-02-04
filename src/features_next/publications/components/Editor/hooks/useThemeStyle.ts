@@ -1,6 +1,8 @@
 import { useContext } from 'react'
 import { TextStyle, ViewStyle } from 'react-native'
+
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+
 import { styleRendererContext } from '../context/styleRenderContext'
 
 export const nodeHasMarks = <T extends S.Node>(node: T): node is T & { marks: S.HasMarks<T>[] } => {
@@ -46,18 +48,18 @@ export function getThemeStyle(theme: S.MessageStyle, _node?: S.Node, edgePositio
   if (node.type === 'button' && node.content?.color) {
     const customColor = node.content.color
     const defaultColor = '#4291E1'
-    
+
     if ((containerStyle as ViewStyle)?.backgroundColor === defaultColor) {
-      (containerStyle as ViewStyle).backgroundColor = customColor
+      ;(containerStyle as ViewStyle).backgroundColor = customColor
     }
     if ((containerStyle as ViewStyle)?.borderColor === defaultColor) {
-      (containerStyle as ViewStyle).borderColor = customColor
+      ;(containerStyle as ViewStyle).borderColor = customColor
     }
     if ((baseStyle as TextStyle)?.color === defaultColor) {
-      (baseStyle as TextStyle).color = customColor
+      ;(baseStyle as TextStyle).color = customColor
     }
   }
-  
+
   return { containerStyle, baseStyle, wrapperStyle: nodeWrapperStyle }
 }
 

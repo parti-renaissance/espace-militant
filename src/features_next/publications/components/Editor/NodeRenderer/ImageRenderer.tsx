@@ -1,8 +1,10 @@
 import { useMemo } from 'react'
+import { Image, ImageStyle } from 'expo-image'
+import { View, YStack } from 'tamagui'
+
 import { useThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { Image, ImageStyle } from 'expo-image'
-import { YStack, View } from 'tamagui'
+
 import { useHits } from '@/services/hits/hook'
 import { handleLinkPress } from '@/utils/linkHandler'
 
@@ -19,9 +21,13 @@ export const ImageRenderer = ({
   allowHits?: boolean
   publicationUuid?: string
 }) => {
-  const { containerStyle: {paddingBottom, ...containerStyle}, baseStyle, wrapperStyle } = useThemeStyle(data, edgePosition)
+  const {
+    containerStyle: { paddingBottom, ...containerStyle },
+    baseStyle,
+    wrapperStyle,
+  } = useThemeStyle(data, edgePosition)
   const { trackClick } = useHits()
-  
+
   if (!data.content) return null
   const { width, height, url, link_url } = data.content
   const dynStyle = useMemo(
@@ -48,15 +54,15 @@ export const ImageRenderer = ({
           }
         }
       }
-      
+
       await handleLinkPress(link_url, undefined, 'Image')
     }
   }
 
   return (
     <YStack style={wrapperStyle}>
-      <View 
-        style={containerStyle} 
+      <View
+        style={containerStyle}
         paddingBottom={displayToolbar && edgePosition === 'leading' ? 0 : paddingBottom}
         onPress={link_url ? handlePress : undefined}
         tag={link_url ? 'button' : undefined}

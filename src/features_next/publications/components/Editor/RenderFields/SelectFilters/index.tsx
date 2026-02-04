@@ -1,20 +1,23 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { XStack, YStack, useMedia } from 'tamagui'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Platform, SafeAreaView } from 'react-native'
+import { useMedia, XStack, YStack } from 'tamagui'
 import { Save } from '@tamagui/lucide-icons'
-import { VoxButton } from '@/components/Button'
-import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
-import Text from '@/components/base/Text'
-import { SelectFrames as SF } from '@/components/base/Select/Frames'
-import QuickFilter from './QuickFilter'
-import AdvancedFilters from './AdvancedFilters'
-import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook';
-import { getHierarchicalQuickFilters, getItemState } from './helpers';
-import { SelectedFiltersType, HierarchicalQuickFilterType, FilterValue } from './type';
 import { useQueryClient } from '@tanstack/react-query'
-import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
+
+import { SelectFrames as SF } from '@/components/base/Select/Frames'
 import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
-import { FiltersChips, calculateDefaultValues } from '../../../FiltersChips'
+import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
+import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
+import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
+
+import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook'
+
+import { calculateDefaultValues, FiltersChips } from '../../../FiltersChips'
+import AdvancedFilters from './AdvancedFilters'
+import { getHierarchicalQuickFilters, getItemState } from './helpers'
+import QuickFilter from './QuickFilter'
+import { FilterValue, HierarchicalQuickFilterType, SelectedFiltersType } from './type'
 
 interface SelectFiltersProps {
   updateFilter: (updatedFilter: { [code: string]: FilterValue }) => void
@@ -33,14 +36,14 @@ export default function SelectFilters({
   messageId,
   scope,
   isLoading = false,
-  hasError = false
+  hasError = false,
 }: SelectFiltersProps) {
   const media = useMedia()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isAdvancedFilters, setIsAdvancedFilters] = useState(false)
   const [zoneResetKey, setZoneResetKey] = useState(0)
   const quickFilters: HierarchicalQuickFilterType[] = useMemo(() => getHierarchicalQuickFilters(), [])
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     setIsAdvancedFilters(selectedQuickFilterId ? false : true)
@@ -49,50 +52,51 @@ export default function SelectFilters({
   const zoneProvider = useMemo(() => new ZoneProvider(), [])
 
   // Fonction pour fusionner les filtres du filtre rapide avec les filtres avancés
-  const mergeQuickFilterWithAdvancedFilters = useCallback((quickFilter: HierarchicalQuickFilterType, currentFilters: SelectedFiltersType, isAdvancedMode: boolean = false) => {
-    const mergedFilters = { ...quickFilter.filters }
-    if (isAdvancedMode) {
-      // En mode avancé avec filtre rapide : on fusionne les deux, on ne réinitialise rien
-      // Les filtres avancés ont la priorité sur les filtres du filtre rapide
-      Object.keys(currentFilters).forEach(filterKey => {
-        if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
-          mergedFilters[filterKey] = currentFilters[filterKey]
-        }
-      })
-    } else {
-      // En mode filtres rapides : on réinitialise les filtres avancés non protégés
-      const protectedFilters = ['zone', 'zones', 'committee']
+  const mergeQuickFilterWithAdvancedFilters = useCallback(
+    (quickFilter: HierarchicalQuickFilterType, currentFilters: SelectedFiltersType, isAdvancedMode: boolean = false) => {
+      const mergedFilters = { ...quickFilter.filters }
+      if (isAdvancedMode) {
+        // En mode avancé avec filtre rapide : on fusionne les deux, on ne réinitialise rien
+        // Les filtres avancés ont la priorité sur les filtres du filtre rapide
+        Object.keys(currentFilters).forEach((filterKey) => {
+          if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
+            mergedFilters[filterKey] = currentFilters[filterKey]
+          }
+        })
+      } else {
+        // En mode filtres rapides : on réinitialise les filtres avancés non protégés
+        const protectedFilters = ['zone', 'zones', 'committee']
 
-      // EXEMPLE - Protéger static_tags si sa valeur est liée à la rentrée
-      // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
-      // if (currentFilters.static_tags === 'national_event:rentree-2025' || currentFilters.static_tags === '!national_event:rentree-2025') {
-      //   protectedFilters.push('static_tags')
-      // }
+        // EXEMPLE - Protéger static_tags si sa valeur est liée à la rentrée
+        // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
+        // if (currentFilters.static_tags === 'national_event:rentree-2025' || currentFilters.static_tags === '!national_event:rentree-2025') {
+        //   protectedFilters.push('static_tags')
+        // }
 
-      protectedFilters.forEach(filterKey => {
-        if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
-          mergedFilters[filterKey] = currentFilters[filterKey]
-        }
-      })
+        protectedFilters.forEach((filterKey) => {
+          if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
+            mergedFilters[filterKey] = currentFilters[filterKey]
+          }
+        })
 
-      // On réinitialise les autres filtres avancés
-      Object.keys(currentFilters).forEach(filterKey => {
-        if (!(filterKey in quickFilter.filters) &&
-          !protectedFilters.includes(filterKey) &&
-          currentFilters[filterKey] !== null) {
-          mergedFilters[filterKey] = null
-        }
-      })
-    }
+        // On réinitialise les autres filtres avancés
+        Object.keys(currentFilters).forEach((filterKey) => {
+          if (!(filterKey in quickFilter.filters) && !protectedFilters.includes(filterKey) && currentFilters[filterKey] !== null) {
+            mergedFilters[filterKey] = null
+          }
+        })
+      }
 
-    return mergedFilters
-  }, [])
+      return mergedFilters
+    },
+    [],
+  )
 
   const zoneDefaultValue = useMemo(() => {
     if (selectedFilters.zone && typeof selectedFilters.zone === 'object' && 'name' in selectedFilters.zone && 'code' in selectedFilters.zone) {
       return {
         label: `${selectedFilters.zone.name} (${selectedFilters.zone.code})`,
-        value: selectedFilters.zone.uuid
+        value: selectedFilters.zone.uuid,
       }
     }
 
@@ -101,7 +105,7 @@ export default function SelectFilters({
       if (firstZone && typeof firstZone === 'object' && 'name' in firstZone && 'code' in firstZone) {
         return {
           label: `${firstZone.name} (${firstZone.code})`,
-          value: firstZone.uuid
+          value: firstZone.uuid,
         }
       }
     }
@@ -109,7 +113,7 @@ export default function SelectFilters({
     if (selectedFilters.committee && typeof selectedFilters.committee === 'object' && 'name' in selectedFilters.committee) {
       return {
         label: selectedFilters.committee.name,
-        value: null
+        value: null,
       }
     }
 
@@ -121,7 +125,7 @@ export default function SelectFilters({
 
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
-      const item = quickFilters.find(d => d.value === selectedQuickFilterId)
+      const item = quickFilters.find((d) => d.value === selectedQuickFilterId)
       const baseLabel = item ? item.label : 'Sélectionné'
 
       // EXEMPLE - Check if static_tags contains rentree-2025 to add rentrée information
@@ -134,27 +138,28 @@ export default function SelectFilters({
       //     baseLabel += ' - Non-inscrits à la rentrée'
       //   }
       // }
-      
+
       return baseLabel
     }
 
     const excludedFilters = ['zone', 'zones', 'committee']
-    
+
     // EXEMPLE - Exclure static_tags s'il est protégé (lié à la rentrée)
     // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
     // if (selectedFilters.static_tags === 'national_event:rentree-2025' || selectedFilters.static_tags === '!national_event:rentree-2025') {
     //   excludedFilters.push('static_tags')
     // }
-    
-    const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) =>
-      value !== null && value !== undefined && !excludedFilters.includes(key)
-    )
+
+    const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) => value !== null && value !== undefined && !excludedFilters.includes(key))
     return nonNullFilters.length > 0
       ? `${nonNullFilters.length} filtre${nonNullFilters.length > 1 ? 's' : ''} avancé${nonNullFilters.length > 1 ? 's' : ''}`
       : 'Sélectionner'
   }, [selectedQuickFilterId, quickFilters, selectedFilters, isAdvancedFilters])
 
-  const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({ messageId: messageId, scope: scope })
+  const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({
+    messageId: messageId,
+    scope: scope,
+  })
 
   const handleOpenModal = useCallback(() => {
     setIsModalOpen(true)
@@ -168,34 +173,43 @@ export default function SelectFilters({
     })
   }, [messageId, queryClient])
 
-  const handleQuickFilterSelection = useCallback((itemId: string) => {
-    const item = quickFilters.find(d => d.value === itemId)
-    if (!item) return
+  const handleQuickFilterSelection = useCallback(
+    (itemId: string) => {
+      const item = quickFilters.find((d) => d.value === itemId)
+      if (!item) return
 
-    const mergedFilters = mergeQuickFilterWithAdvancedFilters(item, selectedFilters, isAdvancedFilters)
+      const mergedFilters = mergeQuickFilterWithAdvancedFilters(item, selectedFilters, isAdvancedFilters)
 
-    // Appliquer tous les filtres fusionnés en une seule fois
-    updateFilter(mergedFilters)
-  }, [quickFilters, selectedFilters, mergeQuickFilterWithAdvancedFilters, updateFilter, isAdvancedFilters])
+      // Appliquer tous les filtres fusionnés en une seule fois
+      updateFilter(mergedFilters)
+    },
+    [quickFilters, selectedFilters, mergeQuickFilterWithAdvancedFilters, updateFilter, isAdvancedFilters],
+  )
 
-  const handleAdvancedFilterChange = useCallback((filterCode: string, value: any) => {
-    updateFilter({ [filterCode]: value })
-  }, [updateFilter])
+  const handleAdvancedFilterChange = useCallback(
+    (filterCode: string, value: any) => {
+      updateFilter({ [filterCode]: value })
+    },
+    [updateFilter],
+  )
 
-  const handleZoneSelect = useCallback((result: any) => {
-    if (!result) {
-      updateFilter({ zone: null })
-    } else if (result.id) {
-      updateFilter({
-        zone: {
-          uuid: result.id,
-          name: result.metadata?.zone?.name || '',
-          code: result.metadata?.zoneCode || '',
-          type: result.metadata?.zoneType || 'custom'
-        }
-      })
-    }
-  }, [updateFilter])
+  const handleZoneSelect = useCallback(
+    (result: any) => {
+      if (!result) {
+        updateFilter({ zone: null })
+      } else if (result.id) {
+        updateFilter({
+          zone: {
+            uuid: result.id,
+            name: result.metadata?.zone?.name || '',
+            code: result.metadata?.zoneCode || '',
+            type: result.metadata?.zoneType || 'custom',
+          },
+        })
+      }
+    },
+    [updateFilter],
+  )
 
   const handleZoneAndCommitteeReset = useCallback(() => {
     updateFilter({ zone: null, committee: null })
@@ -205,18 +219,27 @@ export default function SelectFilters({
     setIsAdvancedFilters(!isAdvancedFilters)
   }, [isAdvancedFilters])
 
-  const handleFilterChange = useCallback((filterKey: string, value: FilterValue) => {
-    // Si on remet la zone à sa valeur par défaut, incrémenter le compteur pour forcer le rechargement de GlobalSearch
-    if (filterKey === 'zone' && defaultFiltersValues.zone && 
-        typeof value === 'object' && value !== null && 'uuid' in value && 
-        typeof defaultFiltersValues.zone === 'object' && 'uuid' in defaultFiltersValues.zone) {
-      if (value.uuid === defaultFiltersValues.zone.uuid) {
-        setZoneResetKey(prev => prev + 1)
+  const handleFilterChange = useCallback(
+    (filterKey: string, value: FilterValue) => {
+      // Si on remet la zone à sa valeur par défaut, incrémenter le compteur pour forcer le rechargement de GlobalSearch
+      if (
+        filterKey === 'zone' &&
+        defaultFiltersValues.zone &&
+        typeof value === 'object' &&
+        value !== null &&
+        'uuid' in value &&
+        typeof defaultFiltersValues.zone === 'object' &&
+        'uuid' in defaultFiltersValues.zone
+      ) {
+        if (value.uuid === defaultFiltersValues.zone.uuid) {
+          setZoneResetKey((prev) => prev + 1)
+        }
       }
-    }
-    
-    updateFilter({ [filterKey]: value })
-  }, [updateFilter, defaultFiltersValues, setZoneResetKey, messageId])
+
+      updateFilter({ [filterKey]: value })
+    },
+    [updateFilter, defaultFiltersValues, setZoneResetKey, messageId],
+  )
 
   const Header = useCallback(() => {
     return (
@@ -234,25 +257,19 @@ export default function SelectFilters({
   return (
     <>
       <SF.Props themedText={false}>
-        <SF
-          theme="gray"
-          size="lg"
-          onPress={handleOpenModal}
-          error={hasError}
-          disabled={!messageId || !scope}
-        >
+        <SF theme="gray" size="lg" onPress={handleOpenModal} error={hasError} disabled={!messageId || !scope}>
           <SF.Container>
             <SF.Label>Destinataires</SF.Label>
             <SF.ValueContainer alignItems="flex-end">
-              <SF.Text>
-                {displayText}
-              </SF.Text>
+              <SF.Text>{displayText}</SF.Text>
               {isFetchingMessageCountRecipients ? (
                 <YStack marginBottom={2} marginHorizontal={2}>
                   <ActivityIndicator size={12} color="#6B7280" />
                 </YStack>
               ) : (
-                <SF.Text secondary fontSize={12}>{messageCountRecipients?.contacts}</SF.Text>
+                <SF.Text secondary fontSize={12}>
+                  {messageCountRecipients?.contacts}
+                </SF.Text>
               )}
             </SF.ValueContainer>
           </SF.Container>
@@ -271,26 +288,34 @@ export default function SelectFilters({
         withKeyboard={false}
       >
         <YStack width={media.gtMd ? 500 : undefined}>
-          {media.gtMd ? (
-            <Header />
-          ) : null}
+          {media.gtMd ? <Header /> : null}
           <YStack gap="$medium" padding="$medium">
             {/* Affichage des filtres actifs sous forme de chips */}
-            <FiltersChips
-              selectedFilters={selectedFilters}
-              onFilterChange={handleFilterChange}
-            />
+            <FiltersChips selectedFilters={selectedFilters} onFilterChange={handleFilterChange} />
             <YStack gap="$medium">
               <YStack gap="$small">
                 <XStack alignItems="center" flexWrap="wrap">
                   <Text.MD secondary>Votre publication sera notifiée à</Text.MD>
                   <XStack alignItems="center" justifyContent="center" position="relative" minWidth={18}>
                     {isFetchingMessageCountRecipients || isLoading ? (
-                      <YStack position="absolute" left={0} top={0} right={0} bottom={0} justifyContent="center" alignItems="center" backgroundColor="white" zIndex={10}>
+                      <YStack
+                        position="absolute"
+                        left={0}
+                        top={0}
+                        right={0}
+                        bottom={0}
+                        justifyContent="center"
+                        alignItems="center"
+                        backgroundColor="white"
+                        zIndex={10}
+                      >
                         <ActivityIndicator size={14} color="#6B7280" />
                       </YStack>
                     ) : null}
-                    <Text.MD primary semibold> {messageCountRecipients?.contacts} </Text.MD>
+                    <Text.MD primary semibold>
+                      {' '}
+                      {messageCountRecipients?.contacts}{' '}
+                    </Text.MD>
                   </XStack>
                   <Text.MD secondary>contacts.</Text.MD>
                 </XStack>
@@ -298,11 +323,24 @@ export default function SelectFilters({
                   <Text.MD secondary>Elle sera visible à</Text.MD>
                   <XStack alignItems="center" justifyContent="center" position="relative" minWidth={18}>
                     {isFetchingMessageCountRecipients || isLoading ? (
-                      <YStack position="absolute" left={0} top={0} right={0} bottom={0} justifyContent="center" alignItems="center" backgroundColor="white" zIndex={10}>
+                      <YStack
+                        position="absolute"
+                        left={0}
+                        top={0}
+                        right={0}
+                        bottom={0}
+                        justifyContent="center"
+                        alignItems="center"
+                        backgroundColor="white"
+                        zIndex={10}
+                      >
                         <ActivityIndicator size={14} color="#6B7280" />
                       </YStack>
                     ) : null}
-                    <Text.MD primary semibold> {messageCountRecipients?.total} </Text.MD>
+                    <Text.MD primary semibold>
+                      {' '}
+                      {messageCountRecipients?.total}{' '}
+                    </Text.MD>
                   </XStack>
                   <Text.MD secondary>personnes.</Text.MD>
                 </XStack>
@@ -319,34 +357,30 @@ export default function SelectFilters({
                 scope={scope}
                 defaultValue={zoneDefaultValue}
                 nullable={!!selectedFilters.committee && !!selectedFilters.zone}
-                helpText={<Text.SM><Text.SM semibold>Toutes les zones inclues dans votre zone de gestion sont filtrables. </Text.SM> Exemple :  Circonscriptions, Cantons, Communauté de communes, Communes et Bureaux de vote.</Text.SM>}
+                helpText={
+                  <Text.SM>
+                    <Text.SM semibold>Toutes les zones inclues dans votre zone de gestion sont filtrables. </Text.SM> Exemple : Circonscriptions, Cantons,
+                    Communauté de communes, Communes et Bureaux de vote.
+                  </Text.SM>
+                }
               />
               <Text.SM secondary>Ciblez votre publication géographiquement (Circonscriptions, communes, etc.)</Text.SM>
             </YStack>
             <YStack gap="$small" marginVertical="$small">
               <XStack alignItems="center" gap="$xsmall" justifyContent="flex-end">
-                <Text.MD color="$blue6" semibold onPress={handleAdvancedFiltersToggle}>Filtres avancés</Text.MD>
+                <Text.MD color="$blue6" semibold onPress={handleAdvancedFiltersToggle}>
+                  Filtres avancés
+                </Text.MD>
                 <XStack alignItems="center" gap="$small">
-                  <SwitchV2
-                    checked={isAdvancedFilters}
-                    onPress={handleAdvancedFiltersToggle}
-                  />
+                  <SwitchV2 checked={isAdvancedFilters} onPress={handleAdvancedFiltersToggle} />
                 </XStack>
               </XStack>
             </YStack>
             {isAdvancedFilters ? (
-              <AdvancedFilters
-                scope={scope}
-                selectedFilters={selectedFilters}
-                onFilterChange={handleAdvancedFilterChange}
-              />
+              <AdvancedFilters scope={scope} selectedFilters={selectedFilters} onFilterChange={handleAdvancedFilterChange} />
             ) : (
               <>
-                <QuickFilter
-                  quickFilters={quickFilters}
-                  selectedQuickFilterId={selectedQuickFilterId}
-                  onItemSelection={handleQuickFilterSelection}
-                />
+                <QuickFilter quickFilters={quickFilters} selectedQuickFilterId={selectedQuickFilterId} onItemSelection={handleQuickFilterSelection} />
                 {/* 
                   EXEMPLE - Filtres circonstanciels
                   Pour réactiver cette section, décommenter le code ci-dessous :
@@ -383,11 +417,9 @@ export default function SelectFilters({
                   </YStack>
                 */}
               </>
-
             )}
           </YStack>
         </YStack>
-
       </ModalOrPageBase>
     </>
   )

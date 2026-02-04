@@ -1,9 +1,10 @@
 import React from 'react'
-import { YStack, getToken } from "tamagui";
+import { getToken, YStack } from 'tamagui'
+
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import { ContentBackButton } from '@/components/ContentBackButton'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
-import { ContentBackButton } from '@/components/ContentBackButton';
-import Layout from '@/components/AppStructure/Layout/Layout';
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView';
 
 export function DraftSkeleton() {
   return (
@@ -26,4 +27,3 @@ export function DraftSkeleton() {
     </Layout.Main>
   )
 }
-

@@ -1,5 +1,11 @@
 import React from 'react'
+import { Link } from 'expo-router'
+import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
+import { Controller } from 'react-hook-form'
+
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ButtonGroup from '@/components/base/ButtonGroup/ButtonGroup'
 import { FormFileImage } from '@/components/base/FormFileUpload/FormFileImage'
 import Input from '@/components/base/Input/Input'
@@ -9,17 +15,13 @@ import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import DescriptionInput from './DescriptionInput'
-import { EventFormData } from '../schema'
-import { Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
-import { Link } from 'expo-router'
-import { Controller } from 'react-hook-form'
-import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
+
 import EventHandleActions from '../../../components/EventHandleActions'
 import { useEventFormContext } from '../context'
+import { EventFormData } from '../schema'
+import DescriptionInput from './DescriptionInput'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 
 export default function EventFormMobileScreen() {
   const media = useMedia()
@@ -324,7 +326,6 @@ export default function EventFormMobileScreen() {
                     </YStack>
                   </>
                 ) : null}
-
               </VoxCard.Content>
               {editMode && event ? (
                 <VoxCard.Content>

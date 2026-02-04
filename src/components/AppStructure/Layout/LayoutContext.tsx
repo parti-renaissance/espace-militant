@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react'
+
 import { SideBarState } from '@/components/AppStructure/Navigation/SideBar'
 
 // Layout Context - gestion de l'état du layout (sidebar, tabbar)
@@ -29,4 +30,3 @@ export const ScrollContext = createContext<{
   layoutRef: null,
   scrollActive: false,
 })
-

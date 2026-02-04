@@ -1,7 +1,9 @@
 import React from 'react'
-import { YStack, XStack, Separator, ThemeName } from 'tamagui'
+import { Separator, ThemeName, XStack, YStack } from 'tamagui'
+
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { RestPublicationStatsResponse } from '@/services/stats/schema'
 import { DateFormatter } from '@/utils/DateFormatter'
 import { NumberFormatter } from '@/utils/NumberFormatter'
@@ -10,7 +12,12 @@ interface PublicationGlobalStatsCardsProps {
   stats: RestPublicationStatsResponse
 }
 
-export const StatCard: React.FC<{ value: string | number; label: string, small?: boolean; theme?: ThemeName }> = ({ value, label, small = false, theme = 'purple' }) => (
+export const StatCard: React.FC<{ value: string | number; label: string; small?: boolean; theme?: ThemeName }> = ({
+  value,
+  label,
+  small = false,
+  theme = 'purple',
+}) => (
   <YStack
     theme={theme}
     backgroundColor="$gray1"
@@ -32,12 +39,12 @@ export const StatCard: React.FC<{ value: string | number; label: string, small?:
 )
 
 const StatsSectionRow: React.FC<{
-  category: string;
-  total: { percentage?: string; count: number | string };
+  category: string
+  total: { percentage?: string; count: number | string }
   subcategories: Array<{
-    label: string;
-    percentage?: string;
-    count: number | string;
+    label: string
+    percentage?: string
+    count: number | string
     subItems?: Array<{ label: string; count: number | string }>
   }>
 }> = ({ category, total, subcategories }) => (
@@ -46,7 +53,9 @@ const StatsSectionRow: React.FC<{
       <Text.MD medium>{category}</Text.MD>
       <XStack gap="$small" alignItems="center">
         {total.percentage && (
-          <Text.MD semibold secondary>{total.percentage}</Text.MD>
+          <Text.MD semibold secondary>
+            {total.percentage}
+          </Text.MD>
         )}
         <Text.MD semibold>{total.count}</Text.MD>
       </XStack>
@@ -56,18 +65,17 @@ const StatsSectionRow: React.FC<{
         <XStack justifyContent="space-between" alignItems="center">
           <Text.SM>{sub.label}</Text.SM>
           <XStack gap="$small" alignItems="center">
-            {sub.percentage && (
-              <Text.SM secondary>{sub.percentage}</Text.SM>
-            )}
+            {sub.percentage && <Text.SM secondary>{sub.percentage}</Text.SM>}
             <Text.SM>{sub.count}</Text.SM>
           </XStack>
         </XStack>
-        {sub.subItems && sub.subItems.map((subItem, subIndex) => (
-          <XStack key={subIndex} justifyContent="space-between" alignItems="center">
-            <Text fontSize={10}>{subItem.label}</Text>
-            <Text fontSize={10}>{subItem.count}</Text>
-          </XStack>
-        ))}
+        {sub.subItems &&
+          sub.subItems.map((subItem, subIndex) => (
+            <XStack key={subIndex} justifyContent="space-between" alignItems="center">
+              <Text fontSize={10}>{subItem.label}</Text>
+              <Text fontSize={10}>{subItem.count}</Text>
+            </XStack>
+          ))}
       </YStack>
     ))}
   </YStack>
@@ -91,8 +99,7 @@ const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ st
             <Text.MD color="$gray10">
               {formattedDate && formattedTime ? (
                 <>
-                  Envoyé à <Text.MD fontWeight="600">{stats.contacts}</Text.MD> contacts le{' '}
-                  <Text.MD fontWeight="600">{formattedDate}</Text.MD> à{' '}
+                  Envoyé à <Text.MD fontWeight="600">{stats.contacts}</Text.MD> contacts le <Text.MD fontWeight="600">{formattedDate}</Text.MD> à{' '}
                   <Text.MD fontWeight="600">{formattedTime}</Text.MD>.
                 </>
               ) : (
@@ -128,41 +135,42 @@ const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ st
 }
 
 const DiffusionDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ stats }) => {
-
   return (
     <VoxCard>
       <VoxCard.Content>
         <YStack gap="$medium">
-          <Text.LG semibold secondary>Détails de diffusion</Text.LG>
+          <Text.LG semibold secondary>
+            Détails de diffusion
+          </Text.LG>
 
           <YStack gap={12}>
             <StatsSectionRow
               category="Contacts notifiés"
               total={{
-                count: stats.contacts
+                count: stats.contacts,
               }}
               subcategories={[
                 {
-                  label: "Par notification mobile",
+                  label: 'Par notification mobile',
                   count: stats.unique_notifications,
                   subItems: [
                     {
-                      label: "Web",
-                      count: stats.notifications.web
+                      label: 'Web',
+                      count: stats.notifications.web,
                     },
                     {
-                      label: "iOS",
-                      count: stats.notifications.ios
+                      label: 'iOS',
+                      count: stats.notifications.ios,
                     },
                     {
-                      label: "Android",
-                      count: stats.notifications.android
+                      label: 'Android',
+                      count: stats.notifications.android,
                     },
-                  ]
+                  ],
                 },
                 {
-                  label: "Par email",
-                  count: stats.unique_emails === null ? 'En cours d‘envoi' : stats.unique_emails
+                  label: 'Par email',
+                  count: stats.unique_emails === null ? 'En cours d‘envoi' : stats.unique_emails,
                 },
               ]}
             />
@@ -172,11 +180,10 @@ const DiffusionDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = 
             <StatsSectionRow
               category="Impressions uniques sur l’espace militant"
               total={{
-                count: stats.unique_impressions.total
+                count: stats.unique_impressions.total,
               }}
               subcategories={[]}
             />
-
           </YStack>
         </YStack>
       </VoxCard.Content>
@@ -185,36 +192,37 @@ const DiffusionDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = 
 }
 
 const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ stats }) => {
-
   return (
     <VoxCard>
       <VoxCard.Content>
         <YStack gap="$medium">
-          <Text.LG semibold secondary>Détails de performance</Text.LG>
+          <Text.LG semibold secondary>
+            Détails de performance
+          </Text.LG>
 
           <YStack gap={12}>
             <StatsSectionRow
               category="Ouvertures uniques"
               total={{
                 percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.total_rate)}%`,
-                count: stats.unique_opens.total
+                count: stats.unique_opens.total,
               }}
               subcategories={[
                 {
-                  label: "Depuis la notification",
+                  label: 'Depuis la notification',
                   percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.notification_rate)}%`,
-                  count: stats.unique_opens.notification
+                  count: stats.unique_opens.notification,
                 },
                 {
                   label: "Depuis l'espace militant",
                   percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.app_rate)}%`,
-                  count: stats.unique_opens.app
+                  count: stats.unique_opens.app,
                 },
                 {
                   label: "Depuis l'email",
                   percentage: `${NumberFormatter.formatStatsPercent(stats.unique_opens.email_rate)}%`,
-                  count: stats.unique_opens.email
-                }
+                  count: stats.unique_opens.email,
+                },
               ]}
             />
 
@@ -224,19 +232,19 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
               category="Clics uniques"
               total={{
                 percentage: `${NumberFormatter.formatStatsPercent(stats.unique_clicks.total_rate)}%`,
-                count: stats.unique_clicks.total
+                count: stats.unique_clicks.total,
               }}
               subcategories={[
                 {
                   label: "Depuis l'espace militant",
                   percentage: `${NumberFormatter.formatStatsPercent(stats.unique_clicks.app_rate)}%`,
-                  count: stats.unique_clicks.app
+                  count: stats.unique_clicks.app,
                 },
                 {
                   label: "Depuis l'email",
                   percentage: `${NumberFormatter.formatStatsPercent(stats.unique_clicks.email_rate)}%`,
-                  count: stats.unique_clicks.email
-                }
+                  count: stats.unique_clicks.email,
+                },
               ]}
             />
 
@@ -247,7 +255,7 @@ const PerformanceDetailsCard: React.FC<{ stats: RestPublicationStatsResponse }> 
               category="Désabonnements aux emails"
               total={{
                 percentage: `${NumberFormatter.formatStatsPercent(stats.unsubscribed.total_rate)}%`,
-                count: stats.unsubscribed.total
+                count: stats.unsubscribed.total,
               }}
               subcategories={[]}
             />
@@ -264,8 +272,8 @@ const DefinitionsCard: React.FC<{ stats: RestPublicationStatsResponse }> = () =>
       <VoxCard.Content>
         <YStack gap="$small">
           <Text.SM lineHeight={20}>
-            <Text.SM semibold>Uniques :</Text.SM> Tous les chiffres sont dédoublonnés au niveau du contact.
-            Par exemple, si un militant ouvre la même publication 5 fois, cela compte pour une seule ouverture.
+            <Text.SM semibold>Uniques :</Text.SM> Tous les chiffres sont dédoublonnés au niveau du contact. Par exemple, si un militant ouvre la même
+            publication 5 fois, cela compte pour une seule ouverture.
           </Text.SM>
 
           <Text.SM lineHeight={20}>
@@ -273,13 +281,12 @@ const DefinitionsCard: React.FC<{ stats: RestPublicationStatsResponse }> = () =>
           </Text.SM>
 
           <Text.SM lineHeight={20}>
-            <Text.SM semibold>Ouvertures :</Text.SM> Votre publication est ouverte en entier.
-            Le taux d'ouverture se calcule : Ouvertures / (contacts notifiés + impressions).
+            <Text.SM semibold>Ouvertures :</Text.SM> Votre publication est ouverte en entier. Le taux d'ouverture se calcule : Ouvertures / (contacts notifiés +
+            impressions).
           </Text.SM>
 
           <Text.SM lineHeight={20}>
-            <Text.SM semibold>Clics :</Text.SM> Un des liens contenu dans votre publication est cliqué.
-            Le taux de clic se calcule : Clics / Ouvertures.
+            <Text.SM semibold>Clics :</Text.SM> Un des liens contenu dans votre publication est cliqué. Le taux de clic se calcule : Clics / Ouvertures.
           </Text.SM>
 
           <Text.SM lineHeight={20}>

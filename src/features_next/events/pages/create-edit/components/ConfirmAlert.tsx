@@ -1,17 +1,20 @@
 import React, { ComponentRef, forwardRef, memo, useImperativeHandle, useRef } from 'react'
+import { Theme, useMedia, XStack, YStack } from 'tamagui'
+import { BellDot, Mail } from '@tamagui/lucide-icons'
+import { Control, Controller, useWatch } from 'react-hook-form'
+
 import { FormFrame } from '@/components/base/FormFrames'
 import SwitchGroup from '@/components/base/SwitchGroup/SwitchGroup'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import VoxSimpleModal from '@/components/VoxSimpleModal'
-import { EventFormData } from '../schema'
-import { BellDot, Mail } from '@tamagui/lucide-icons'
-import { Control, Controller, useWatch } from 'react-hook-form'
-import { Theme, useMedia, XStack, YStack } from 'tamagui'
-import getVisibilityOptions from '../visibility-options'
-import { useCountInvitationsEvent } from '@/services/events/hook'
+
 import LoaderView from '@/screens/shared/LoaderView'
+import { useCountInvitationsEvent } from '@/services/events/hook'
+
+import { EventFormData } from '../schema'
+import getVisibilityOptions from '../visibility-options'
 
 type ConfirmAlertProps = {
   onAccept: () => void | Promise<unknown>
@@ -26,9 +29,7 @@ type ConfirmAlertProps = {
 
 type ModalRef = ComponentRef<typeof VoxSimpleModal>
 
-const VisibilityReview = (props: {
-  visibility: string
-}) => {
+const VisibilityReview = (props: { visibility: string }) => {
   const visibilityOptions = getVisibilityOptions()
   const visuOption = visibilityOptions.find((x) => x.value === props.visibility)
 
@@ -42,7 +43,10 @@ const VisibilityReview = (props: {
         ) : null}
         <YStack flexShrink={1}>
           <Text.MD color={visuOption.theme ? '$color5' : '$textPrimary'}>
-            <Text.MD bold color={visuOption.theme ? '$color5' : '$textPrimary'}>{visuOption.label}. </Text.MD>{visuOption.subLabel}
+            <Text.MD bold color={visuOption.theme ? '$color5' : '$textPrimary'}>
+              {visuOption.label}.{' '}
+            </Text.MD>
+            {visuOption.subLabel}
           </Text.MD>
         </YStack>
       </Theme>
@@ -50,11 +54,7 @@ const VisibilityReview = (props: {
   ) : null
 }
 
-const CountInvitation = (props: {
-  visibility: string
-  agoraUuid?: string | null
-  scope?: string | null
-}) => {
+const CountInvitation = (props: { visibility: string; agoraUuid?: string | null; scope?: string | null }) => {
   const shouldCount = props.visibility === 'invitation_agora' && !!props.agoraUuid && !!props.scope
 
   const { data, isLoading } = useCountInvitationsEvent({
@@ -68,13 +68,16 @@ const CountInvitation = (props: {
   return (
     shouldCount && (
       <YStack gap="$medium" alignItems="center" p="$medium" backgroundColor="$textSurface" borderRadius="$5">
-        {isLoading
-          ? <YStack height={47} justifyContent="center"><LoaderView /></YStack>
-          : <Text color="$blue9" fontSize={40} semibold>{count ?? 1}</Text>
-        }
-        <Text.MD semibold>
-          Invités
-        </Text.MD>
+        {isLoading ? (
+          <YStack height={47} justifyContent="center">
+            <LoaderView />
+          </YStack>
+        ) : (
+          <Text color="$blue9" fontSize={40} semibold>
+            {count ?? 1}
+          </Text>
+        )}
+        <Text.MD semibold>Invités</Text.MD>
       </YStack>
     )
   )
@@ -117,52 +120,56 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
               <Text.MD color="$textPrimary">Vos militants possédant l’app mobile recevront une notification automatique.</Text.MD>
             </YStack>
           </XStack>
-          {visibility === "invitation_agora"
-            ? (
-              <XStack gap="$small" alignItems="center">
-                <XStack paddingHorizontal="$medium">
-                  <Mail size={20} color="$textPrimary" />
-                </XStack>
-                <YStack flexShrink={1}>
-                  <Text.MD color="$textPrimary">Tous les invités recevront un email automatique.</Text.MD>
-                </YStack>
+          {visibility === 'invitation_agora' ? (
+            <XStack gap="$small" alignItems="center">
+              <XStack paddingHorizontal="$medium">
+                <Mail size={20} color="$textPrimary" />
               </XStack>
-            ) : (
-              <Controller
-                name="send_invitation_email"
-                control={props.control}
-                render={({ field }) => (
-                  <FormFrame paddingHorizontal={0}>
-                    <XStack gap="$small" alignItems="center" flex={1}>
-                      <XStack paddingHorizontal="$medium">
-                        <Mail size={20} color="$textPrimary" />
-                      </XStack>
-                      <YStack flex={1}>
-                        <SwitchGroup
-                          textProps={{
-                            multiline: false,
-                          }}
-                          onChange={(x) => field.onChange(Boolean(x[0]))}
-                          value={field.value ? ['notif'] : []}
-                          options={[
-                            {
-                              value: 'notif',
-                              label: 'Inviter également mes adhérents par email.',
-                            },
-                          ]}
-                        />
-                      </YStack>
+              <YStack flexShrink={1}>
+                <Text.MD color="$textPrimary">Tous les invités recevront un email automatique.</Text.MD>
+              </YStack>
+            </XStack>
+          ) : (
+            <Controller
+              name="send_invitation_email"
+              control={props.control}
+              render={({ field }) => (
+                <FormFrame paddingHorizontal={0}>
+                  <XStack gap="$small" alignItems="center" flex={1}>
+                    <XStack paddingHorizontal="$medium">
+                      <Mail size={20} color="$textPrimary" />
                     </XStack>
-                  </FormFrame>
-                )}
-              />
-            )
-          }
-          { visibility === 'invitation_agora' ? <CountInvitation visibility={visibility} agoraUuid={props.agoraUuid} scope={props.scope} /> : null}
+                    <YStack flex={1}>
+                      <SwitchGroup
+                        textProps={{
+                          multiline: false,
+                        }}
+                        onChange={(x) => field.onChange(Boolean(x[0]))}
+                        value={field.value ? ['notif'] : []}
+                        options={[
+                          {
+                            value: 'notif',
+                            label: 'Inviter également mes adhérents par email.',
+                          },
+                        ]}
+                      />
+                    </YStack>
+                  </XStack>
+                </FormFrame>
+              )}
+            />
+          )}
+          {visibility === 'invitation_agora' ? <CountInvitation visibility={visibility} agoraUuid={props.agoraUuid} scope={props.scope} /> : null}
         </YStack>
         <XStack gap="$medium">
           <VoxButton variant="outlined" flex={3} children="Annuler" onPress={handleCancel} theme="gray" />
-          <VoxButton children={visibility === 'invitation_agora' ? 'Envoyer les invitations' : 'Créer'} loading={props.isPending} flex={1} onPress={handleAccept} theme="purple" />
+          <VoxButton
+            children={visibility === 'invitation_agora' ? 'Envoyer les invitations' : 'Créer'}
+            loading={props.isPending}
+            flex={1}
+            onPress={handleAccept}
+            theme="purple"
+          />
         </XStack>
       </VoxCard.Content>
     </VoxSimpleModal>
