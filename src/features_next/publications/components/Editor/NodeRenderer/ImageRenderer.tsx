@@ -3,11 +3,27 @@ import { useThemeStyle } from '@/features_next/publications/components/Editor/ho
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { Image, ImageStyle } from 'expo-image'
 import { YStack, View } from 'tamagui'
+import { useHits } from '@/services/hits/hook'
+import { handleLinkPress } from '@/utils/linkHandler'
 
-export const ImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leading' | 'trailing' | 'alone'; displayToolbar?: boolean }) => {
-  const { containerStyle: {paddingBottom, ...containerStyle}, baseStyle, wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
-  if (!props.data.content) return null
-  const { width, height, url } = props.data.content
+export const ImageRenderer = ({
+  data,
+  edgePosition,
+  displayToolbar = true,
+  allowHits = false,
+  publicationUuid,
+}: {
+  data: S.ImageNode
+  edgePosition?: 'leading' | 'trailing' | 'alone'
+  displayToolbar?: boolean
+  allowHits?: boolean
+  publicationUuid?: string
+}) => {
+  const { containerStyle: {paddingBottom, ...containerStyle}, baseStyle, wrapperStyle } = useThemeStyle(data, edgePosition)
+  const { trackClick } = useHits()
+  
+  if (!data.content) return null
+  const { width, height, url, link_url } = data.content
   const dynStyle = useMemo(
     () => ({
       aspectRatio: width / height,
@@ -15,9 +31,36 @@ export const ImageRenderer = (props: { data: S.ImageNode; edgePosition?: 'leadin
     [width, height],
   )
 
+  const handlePress = async () => {
+    if (link_url) {
+      if (allowHits) {
+        try {
+          trackClick({
+            object_type: 'publication',
+            object_id: publicationUuid,
+            target_url: link_url,
+            button_name: 'Image',
+          })
+        } catch (error) {
+          // Silently ignore tracking errors - they should not impact user experience
+          if (__DEV__) {
+            console.warn('[ImageRenderer] trackClick error:', error)
+          }
+        }
+      }
+      
+      await handleLinkPress(link_url, undefined, 'Image')
+    }
+  }
+
   return (
     <YStack style={wrapperStyle}>
-      <View style={containerStyle} paddingBottom={props.displayToolbar && props.edgePosition === 'leading' ? 0 : paddingBottom}>
+      <View 
+        style={containerStyle} 
+        paddingBottom={displayToolbar && edgePosition === 'leading' ? 0 : paddingBottom}
+        onPress={link_url ? handlePress : undefined}
+        tag={link_url ? 'button' : undefined}
+      >
         <Image contentFit={'cover'} source={url} style={[dynStyle, baseStyle as ImageStyle]} />
       </View>
     </YStack>
