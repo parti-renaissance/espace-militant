@@ -14,6 +14,7 @@ import { VoxHeader } from '@/components/Header/Header'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import ViewportModal from '@/components/VoxRichText/ViewportModal'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+import { normalizeUrl } from '@/utils/normalizeUrl'
 
 type NodeEditorProps = {
   value: S.ButtonNode
@@ -46,7 +47,11 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
 
     if (hasContent) {
       handleSubmit((data) => {
-        props.onChange(data)
+        const normalized = { ...data }
+        if (normalized.content?.link?.trim()) {
+          normalized.content = { ...normalized.content, link: normalizeUrl(normalized.content.link) }
+        }
+        props.onChange(normalized)
         props.onBlur()
       })()
     } else {
