@@ -342,7 +342,6 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
                 collapsed={displayNavCadre}
                 iconRight={ChevronRight}
                 theme="purple"
-                isNew
                 onPress={() => {
                   setDisplayNavCadre(!displayNavCadre)
                 }}
