@@ -69,7 +69,7 @@ const militantNavItemsAuthConfig: NavItemConfig[] = [
   { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/(tabs)/evenements' },
   // { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/actions', routeName: '/actions', theme: 'blue' },
   { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/(tabs)/parrainages' },
-  { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalUrlSlug: '/formations', isNew: true },
+  { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalUrlSlug: '/formations' },
   { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/(tabs)/ressources' },
   { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', href: '/(tabs)/questionnaires' },
   { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/(tabs)/profil', displayIn: 'tabbar' },
