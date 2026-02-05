@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { LayoutChangeEvent } from 'react-native'
 
 // Valeurs par défaut (peuvent être surchargées via les props)
@@ -13,23 +13,15 @@ interface UseVisibleNavItemsOptions<T> {
   itemHeight?: number
 }
 
-export const useVisibleNavItems = <T,>({
-  items,
-  hasCadreButton = false,
-  isVisible = true,
-  itemHeight = DEFAULT_ITEM_HEIGHT,
-}: UseVisibleNavItemsOptions<T>) => {
+export const useVisibleNavItems = <T>({ items, hasCadreButton = false, isVisible = true, itemHeight = DEFAULT_ITEM_HEIGHT }: UseVisibleNavItemsOptions<T>) => {
   const [containerHeight, setContainerHeight] = useState<number>(0)
 
   // Fonction magique qui marche sur Web et Mobile
-  const onLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      const { height } = event.nativeEvent.layout
-      // On arrondit pour éviter les flottants bizarres sur certains écrans
-      setContainerHeight(Math.floor(height))
-    },
-    []
-  )
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout
+    // On arrondit pour éviter les flottants bizarres sur certains écrans
+    setContainerHeight(Math.floor(height))
+  }, [])
 
   const visibleItemsCount = useMemo(() => {
     // Si le conteneur n'est pas encore mesuré ou invisible, on renvoie tout ou rien
@@ -62,14 +54,8 @@ export const useVisibleNavItems = <T,>({
   }, [containerHeight, items.length, hasCadreButton, isVisible, itemHeight])
 
   // Découpage des listes
-  const visibleItems = useMemo(
-    () => items.slice(0, visibleItemsCount),
-    [items, visibleItemsCount]
-  )
-  const hiddenItems = useMemo(
-    () => items.slice(visibleItemsCount),
-    [items, visibleItemsCount]
-  )
+  const visibleItems = useMemo(() => items.slice(0, visibleItemsCount), [items, visibleItemsCount])
+  const hiddenItems = useMemo(() => items.slice(visibleItemsCount), [items, visibleItemsCount])
 
   return {
     visibleItems,
@@ -78,4 +64,3 @@ export const useVisibleNavItems = <T,>({
     containerHeight, // Utile pour le debug
   }
 }
-

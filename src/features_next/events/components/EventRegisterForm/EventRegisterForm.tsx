@@ -1,20 +1,23 @@
 import React, { ComponentProps, useId, useRef } from 'react'
 import { Linking, LogBox } from 'react-native'
+import { router } from 'expo-router'
+import { Checkbox, CheckboxProps, Dialog, H2, isWeb, Label, Paragraph, ScrollView, useMedia, XStack, YStack } from 'tamagui'
+import { CheckedState } from '@tamagui/checkbox-headless/src/useCheckbox'
+import { CalendarCheck2, Check as CheckIcon } from '@tamagui/lucide-icons'
+import { Formik, FormikHelpers } from 'formik'
+import { toFormikValidationSchema } from 'zod-formik-adapter'
+
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import Button, { VoxButton } from '@/components/Button/Button'
 import FormikController from '@/components/FormikController'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useSession } from '@/ctx/SessionProvider'
 import { PublicEventSubscriptionFormError } from '@/services/events/error'
 import { useSubscribePublicEvent } from '@/services/events/hook'
 import type { RestPostPublicEventSubsciptionRequest } from '@/services/events/schema'
-import { CheckedState } from '@tamagui/checkbox-headless/src/useCheckbox'
-import { CalendarCheck2, Check as CheckIcon } from '@tamagui/lucide-icons'
-import { router } from 'expo-router'
-import { Formik, FormikHelpers } from 'formik'
-import { Checkbox, CheckboxProps, Dialog, H2, isWeb, Label, Paragraph, ScrollView, useMedia, XStack, YStack } from 'tamagui'
-import { toFormikValidationSchema } from 'zod-formik-adapter'
+
 import { PublicSubscribtionFormDataSchema } from './schema'
 
 type PublicSubscribtionFormData = RestPostPublicEventSubsciptionRequest
@@ -63,25 +66,25 @@ const initialValues = {
   join_newsletter: false,
 } satisfies PublicSubscribtionFormData
 
-const EventRegisterForm = (props: { 
-  onScrollTo?: (x: { x: number; y: number }) => void; 
-  eventId: string; 
-  eventSlug?: string;
-  urlParams: { ref?: string; utm_source?: string; utm_campaign?: string };
+const EventRegisterForm = (props: {
+  onScrollTo?: (x: { x: number; y: number }) => void
+  eventId: string
+  eventSlug?: string
+  urlParams: { ref?: string; utm_source?: string; utm_campaign?: string }
 }) => {
   const { signIn } = useSession()
   const { mutateAsync } = useSubscribePublicEvent({ id: props.eventId, slug: props.eventSlug })
 
   const onSubmit = (values: PublicSubscribtionFormData, action: FormikHelpers<PublicSubscribtionFormData>) => {
     action.setSubmitting(true)
-    
+
     const payloadWithTracking: RestPostPublicEventSubsciptionRequest = {
       ...values,
       referrer_code: props.urlParams.ref,
       utm_source: props.urlParams.utm_source,
       utm_campaign: props.urlParams.utm_campaign,
     }
-    
+
     mutateAsync(payloadWithTracking)
       .then(() => {
         action.resetForm()

@@ -1,6 +1,7 @@
 import React from 'react'
-import { VoxRichTextModalEditor, RichTextContent } from '@/components/VoxRichText'
 import { Text as TextIcon } from '@tamagui/lucide-icons'
+
+import { RichTextContent, VoxRichTextModalEditor } from '@/components/VoxRichText'
 
 type EditorModalProps = {
   value: RichTextContent

@@ -1,6 +1,8 @@
 import { Linking } from 'react-native'
-import { VoxButton } from '@/components/Button'
 import { z } from 'zod'
+
+import { VoxButton } from '@/components/Button'
+
 import { RestDetailedProfileResponseSchema } from '@/services/profile/schema'
 
 type Props = {
@@ -8,8 +10,23 @@ type Props = {
   assemblyName: string
 }
 
-const buildCreateCommitteeUrl = ({ public_id, first_name, last_name, postal_address, assembly, phone, email }:
-    { public_id: string; first_name: string; last_name: string; postal_address: string; assembly: string; phone: string; email: string }) => {
+const buildCreateCommitteeUrl = ({
+  public_id,
+  first_name,
+  last_name,
+  postal_address,
+  assembly,
+  phone,
+  email,
+}: {
+  public_id: string
+  first_name: string
+  last_name: string
+  postal_address: string
+  assembly: string
+  phone: string
+  email: string
+}) => {
   const baseUrl = 'https://form.parti.re/r/mVAvra'
   const params = new URLSearchParams({
     public_id,
@@ -40,8 +57,8 @@ export const CommitteeCreationButton = ({ profile, assemblyName }: Props) => {
       first_name: profile.first_name,
       last_name: profile.last_name,
       postal_address,
-      assembly: assemblyName ?? "Inconnu",
-      phone: profile?.phone?.number ?? "",
+      assembly: assemblyName ?? 'Inconnu',
+      phone: profile?.phone?.number ?? '',
       email: profile.email_address,
     })
 

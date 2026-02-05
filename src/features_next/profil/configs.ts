@@ -1,6 +1,7 @@
-import { CircleUser, Sparkle, HelpingHand, LandPlot, Settings2, MessageCircle, TreeDeciduous, KeyRound } from "@tamagui/lucide-icons"
-import { RestProfilResponse } from "@/services/profile/schema"
-import { UserTagEnum } from "@/core/entities/UserProfile"
+import { CircleUser, HelpingHand, KeyRound, LandPlot, MessageCircle, Settings2, Sparkle, TreeDeciduous } from '@tamagui/lucide-icons'
+
+import { UserTagEnum } from '@/core/entities/UserProfile'
+import { RestProfilResponse } from '@/services/profile/schema'
 
 export type ProfilNavItemConfig = {
   id: string

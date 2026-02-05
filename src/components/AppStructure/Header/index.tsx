@@ -1,11 +1,13 @@
 import React from 'react'
-import { Href, useNavigation, useRouter } from 'expo-router'
-import { ArrowLeft } from '@tamagui/lucide-icons'
-import { Media, styled, ThemeableStack, useMedia, XStack, YStack } from 'tamagui'
 import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import type { IconComponent } from '@/models/common.model'
+import { Href, useNavigation, useRouter } from 'expo-router'
+import { Media, styled, ThemeableStack, useMedia, XStack, YStack } from 'tamagui'
+import { ArrowLeft } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
+
+import type { IconComponent } from '@/models/common.model'
 
 type NavigationConfig = {
   showBackButton?: boolean
@@ -118,14 +120,7 @@ const useBackButtonLabel = (customLabel?: string, isDesktop?: boolean): string |
   return undefined
 }
 
-const Header = ({
-  title,
-  icon,
-  navigation: navigationConfig = {},
-  style: styleConfig = {},
-  children,
-  rightComponent,
-}: HeaderProps) => {
+const Header = ({ title, icon, navigation: navigationConfig = {}, style: styleConfig = {}, children, rightComponent }: HeaderProps) => {
   const media = useMedia()
 
   const navigationSettings = { ...DEFAULT_NAVIGATION, ...navigationConfig }
@@ -134,7 +129,7 @@ const Header = ({
   const { handleBack } = useBackNavigation(navigationSettings)
   const backButtonLabel = useBackButtonLabel(navigationSettings.backButtonLabel, media.gtSm)
 
-  const headerDisplay = styleSettings.showOn === 'always' ? undefined : (media[styleSettings.showOn] ? undefined : 'none')
+  const headerDisplay = styleSettings.showOn === 'always' ? undefined : media[styleSettings.showOn] ? undefined : 'none'
   const borderWidth = styleSettings.withoutBorder ? 0 : undefined
 
   const insets = useSafeAreaInsets()
@@ -163,11 +158,7 @@ const Header = ({
                 )}
               </XStack>
 
-              <XStack 
-                flex={1} 
-                justifyContent={rightComponent && !navigationSettings.showBackButton ? "flex-start" : "center"} 
-                alignItems="center"
-              >
+              <XStack flex={1} justifyContent={rightComponent && !navigationSettings.showBackButton ? 'flex-start' : 'center'} alignItems="center">
                 <XStack alignItems="center" gap={10}>
                   {icon && React.createElement(icon, { size: 20, color: '$textPrimary' })}
                   <Text.LG semibold>{title}</Text.LG>

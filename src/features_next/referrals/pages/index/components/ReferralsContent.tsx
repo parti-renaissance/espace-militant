@@ -1,17 +1,24 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { LayoutRectangle, NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
-import { ScrollView, View, XStack, YStack, useMedia } from 'tamagui'
+import { ScrollView, useMedia, View, XStack, YStack } from 'tamagui'
 import { ListTodo, Medal } from '@tamagui/lucide-icons'
 
-import BreadCrumb from '@/components/BreadCrumb/BreadCrumb'
-import VoxCard from '@/components/VoxCard/VoxCard'
-import Text from '@/components/base/Text'
-import StickyBox from '@/components/StickyBox/StickyBox'
+import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 import LayoutScrollView, { type LayoutScrollViewRef } from '@/components/AppStructure/Layout/LayoutScrollView'
+import Text from '@/components/base/Text'
+import BreadCrumb from '@/components/BreadCrumb/BreadCrumb'
+import StickyBox from '@/components/StickyBox/StickyBox'
+import VoxCard from '@/components/VoxCard/VoxCard'
+import {
+  ReferralScoreCard,
+  ReferralsInviteCard,
+  ReferralsLinkCard,
+  ReferralsRankingCard,
+  ReferralsTrackingCard,
+} from '@/features_next/referrals/components/Cards'
+
 import type { RestProfilResponse } from '@/services/profile/schema'
 import type { ReferralScoreboardType, ReferralStatisticsType } from '@/services/referral/schema'
-import { ReferralScoreCard, ReferralsInviteCard, ReferralsLinkCard, ReferralsTrackingCard, ReferralsRankingCard } from '@/features_next/referrals/components/Cards'
-import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 
 type ReferralsContentProps = {
   user?: RestProfilResponse
@@ -51,9 +58,7 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
 
   const assemblyTitle = useMemo(() => {
     const assembly = scoreboard?.assembly?.[0]
-    return assembly?.assembly_name && assembly?.assembly_code
-      ? `${assembly.assembly_name} (${assembly.assembly_code})`
-      : 'Assemblée'
+    return assembly?.assembly_name && assembly?.assembly_code ? `${assembly.assembly_name} (${assembly.assembly_code})` : 'Assemblée'
   }, [scoreboard?.assembly])
 
   const isInTop5National = (scoreboard?.global_rank ?? Infinity) <= 5
@@ -115,7 +120,12 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
         </StickyBox>
         <YStack gap="$medium" flex={1}>
           {/* Section Classement */}
-          <YStack onLayout={(e) => { rankingLayout.current = e.nativeEvent.layout }} gap="$medium">
+          <YStack
+            onLayout={(e) => {
+              rankingLayout.current = e.nativeEvent.layout
+            }}
+            gap="$medium"
+          >
             <YStack gap="$medium">
               {shouldShowAssemblyFirst ? (
                 <>
@@ -125,15 +135,18 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
               ) : (
                 <>
                   <ReferralsRankingCard title="National" data={scoreboard?.global} />
-                  {hasAssemblyRanking && (
-                    <ReferralsRankingCard title={assemblyTitle} data={scoreboard?.assembly} />
-                  )}
+                  {hasAssemblyRanking && <ReferralsRankingCard title={assemblyTitle} data={scoreboard?.assembly} />}
                 </>
               )}
             </YStack>
           </YStack>
           {/* Section Suivi */}
-          <YStack flex={1} onLayout={(e) => { trackingLayout.current = e.nativeEvent.layout }}>
+          <YStack
+            flex={1}
+            onLayout={(e) => {
+              trackingLayout.current = e.nativeEvent.layout
+            }}
+          >
             <ReferralsTrackingCard />
           </YStack>
         </YStack>
@@ -143,14 +156,11 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
 }
 
 export function ReferralsMobileContent({ user, scoreboard, statistics }: ReferralsContentProps) {
-
   const [activeSection, setActiveSection] = useState<'cl' | 'suivi'>('cl')
 
   const assemblyTitle = useMemo(() => {
     const assembly = scoreboard?.assembly?.[0]
-    return assembly?.assembly_name && assembly?.assembly_code
-      ? `${assembly.assembly_name} (${assembly.assembly_code})`
-      : 'Assemblée'
+    return assembly?.assembly_name && assembly?.assembly_code ? `${assembly.assembly_name} (${assembly.assembly_code})` : 'Assemblée'
   }, [scoreboard?.assembly])
 
   const isInTop5National = (scoreboard?.global_rank ?? Infinity) <= 5
@@ -183,7 +193,9 @@ export function ReferralsMobileContent({ user, scoreboard, statistics }: Referra
               { id: 'suivi', label: 'Suivi', icon: <ListTodo size={16} /> },
             ]}
             value={activeSection}
-            onChange={(v) => { setActiveSection(v) }}
+            onChange={(v) => {
+              setActiveSection(v)
+            }}
           />
         </View>
         <View gap="$medium">
@@ -197,9 +209,7 @@ export function ReferralsMobileContent({ user, scoreboard, statistics }: Referra
               ) : (
                 <>
                   <ReferralsRankingCard title="National" data={scoreboard?.global} />
-                  {hasAssemblyRanking && (
-                    <ReferralsRankingCard title={assemblyTitle} data={scoreboard?.assembly} />
-                  )}
+                  {hasAssemblyRanking && <ReferralsRankingCard title={assemblyTitle} data={scoreboard?.assembly} />}
                 </>
               )}
             </View>
@@ -223,4 +233,3 @@ export function ReferralsContent({ user, scoreboard, statistics }: ReferralsCont
     <ReferralsMobileContent user={user} scoreboard={scoreboard} statistics={statistics} />
   )
 }
-

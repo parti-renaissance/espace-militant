@@ -1,6 +1,7 @@
-import { RefObject, useContext, useEffect, useRef, useCallback } from 'react'
+import { RefObject, useCallback, useContext, useEffect, useRef } from 'react'
 import { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import { isWeb } from 'tamagui'
+
 import { ScrollContext } from '@/components/AppStructure/Layout/LayoutContext'
 
 type Props = {
@@ -13,13 +14,14 @@ type Props = {
 }
 
 // Fonction utilitaire pour créer l'objet NativeSyntheticEvent pour le web
-const createWebScrollEvent = (scrollView: HTMLDivElement): NativeSyntheticEvent<NativeScrollEvent> => ({
-  nativeEvent: {
-    contentOffset: { y: scrollView.scrollTop },
-    contentSize: { height: scrollView.scrollHeight, width: scrollView.scrollWidth },
-    layoutMeasurement: { height: scrollView.clientHeight, width: scrollView.clientWidth },
-  },
-}) as NativeSyntheticEvent<NativeScrollEvent>
+const createWebScrollEvent = (scrollView: HTMLDivElement): NativeSyntheticEvent<NativeScrollEvent> =>
+  ({
+    nativeEvent: {
+      contentOffset: { y: scrollView.scrollTop },
+      contentSize: { height: scrollView.scrollHeight, width: scrollView.scrollWidth },
+      layoutMeasurement: { height: scrollView.clientHeight, width: scrollView.clientWidth },
+    },
+  }) as NativeSyntheticEvent<NativeScrollEvent>
 
 export const usePageLayoutScroll = (props?: Props) => {
   const { scrollActive, layoutRef } = useContext(ScrollContext)
@@ -33,7 +35,7 @@ export const usePageLayoutScroll = (props?: Props) => {
   const handleScroll = useCallback(() => {
     const currentProps = propsRef.current
     const scrollView = layoutRef?.current
-    
+
     // Condition de sortie rapide
     if (!isWeb || !scrollActive || !scrollView) return
 
@@ -76,14 +78,13 @@ export const usePageLayoutScroll = (props?: Props) => {
         currentProps.onMomentumScrollEnd?.(nativeEvent)
       }, 150) // Temps pour considérer la fin du défilement
     }
-
   }, [scrollActive, layoutRef])
 
   useEffect(() => {
     if (!isWeb || !scrollActive || !layoutRef?.current) return
 
     const scrollView = layoutRef?.current
-    
+
     // Un seul écouteur pour gérer toutes les logiques
     scrollView.addEventListener('scroll', handleScroll)
 

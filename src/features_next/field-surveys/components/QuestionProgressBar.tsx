@@ -1,6 +1,8 @@
-import Text from "@/components/base/Text"
-import { FieldSurveyQuestion } from "@/services/field-surveys/schema"
-import { styled, YStack } from "tamagui"
+import { styled, YStack } from 'tamagui'
+
+import Text from '@/components/base/Text'
+
+import { FieldSurveyQuestion } from '@/services/field-surveys/schema'
 
 const ProgressBar = styled(YStack, {
   height: 8,
@@ -23,15 +25,14 @@ const QuestionProgressBar: React.FC<{
 }> = ({ questions, currentIndex, totalSteps }) => {
   const total = totalSteps || questions.length
   const progressPercentage = ((currentIndex + 1) / total) * 100
-  
-  const stepTitle = 
-    currentIndex === total - 1 ? ' : Données personnelles' :
-    currentIndex === total - 2 ? ' : Profil du répondant' : ''
+
+  const stepTitle = currentIndex === total - 1 ? ' : Données personnelles' : currentIndex === total - 2 ? ' : Profil du répondant' : ''
 
   return (
     <YStack gap="$small">
       <Text.MD>
-        Étape {currentIndex + 1}/{total}{stepTitle}
+        Étape {currentIndex + 1}/{total}
+        {stepTitle}
       </Text.MD>
       <ProgressBar>
         <ProgressFill width={`${progressPercentage}%`} />

@@ -237,7 +237,11 @@ export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
 
     return (
       <>
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior="padding"
+          keyboardVerticalOffset={Platform.OS === 'android' ? 32 : 0}
+        >
           <YStack flex={1}>
             {isWeb ? (
               <XStack paddingVertical="$small" borderBottomColor="$textOutline" borderBottomWidth={1}>
@@ -255,7 +259,11 @@ export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
             </YStack>
             {isWeb ? null : (
               <YStack height={46}>
-                <Toolbar editor={editor} items={toolbarItems} />
+                <Toolbar
+                  editor={editor}
+                  items={toolbarItems}
+                  hidden={false}
+                />
               </YStack>
             )}
           </YStack>

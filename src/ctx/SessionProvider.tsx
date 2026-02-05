@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react'
+import { parse, useURL } from 'expo-linking'
+import { Href, router, useGlobalSearchParams } from 'expo-router'
+import { isWeb } from 'tamagui'
+import { useToastController } from '@tamagui/toast'
+
 import useLogin, { useRegister } from '@/hooks/useLogin'
 import { useLogOut } from '@/services/logout/api'
 import { useGetProfil, useGetUserScopes } from '@/services/profile/hook'
 import { User, useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
-import { useToastController } from '@tamagui/toast'
-import { parse, useURL } from 'expo-linking'
-import { Href, router, useGlobalSearchParams } from 'expo-router'
-import { isWeb } from 'tamagui'
 
 type AuthContext = {
   signIn: (props?: { code?: string; isAdmin?: boolean; state?: string }) => Promise<void>
@@ -95,11 +96,16 @@ export function SessionProvider(props: React.PropsWithChildren) {
   )
 
   React.useEffect(() => {
-    const { code, _switch_user } = onShotParams
+    const { code, state: stateParam, _switch_user } = onShotParams
     if (code || url) {
       if (isWeb && code) {
         setOneShotParams({})
-        handleSignIn({ code, isAdmin: _switch_user === 'true' })
+        const hadState = Boolean(stateParam?.startsWith('/'))
+        handleSignIn({ code, isAdmin: _switch_user === 'true' }).then(() => {
+          if (isWeb && !hadState) {
+            router.replace('/' as Href)
+          }
+        })
       }
       if (url && !isWeb) {
         const { queryParams } = parse(url)
@@ -112,19 +118,22 @@ export function SessionProvider(props: React.PropsWithChildren) {
     }
   }, [])
 
-  const handleRegister = React.useCallback(async (props?: { utm_campaign?: string }) => {
-    try {
-      const session = await register(props)
-      if (!session) {
-        return
+  const handleRegister = React.useCallback(
+    async (props?: { utm_campaign?: string }) => {
+      try {
+        const session = await register(props)
+        if (!session) {
+          return
+        }
+        const { accessToken, refreshToken, idToken: sessionId, expiresIn } = session
+        setSession({ accessToken, refreshToken, sessionId, accessTokenExpiresIn: expiresIn })
+      } catch (e) {
+        ErrorMonitor.log(e.message, { e })
+        toast.show('Erreur lors de la connexion', { type: 'error' })
       }
-      const { accessToken, refreshToken, idToken: sessionId, expiresIn } = session
-      setSession({ accessToken, refreshToken, sessionId, accessTokenExpiresIn: expiresIn })
-    } catch (e) {
-      ErrorMonitor.log(e.message, { e })
-      toast.show('Erreur lors de la connexion', { type: 'error' })
-    }
-  }, [isLoginInProgress])
+    },
+    [isLoginInProgress],
+  )
 
   const handleSignOut = React.useCallback(async () => {
     await logout()

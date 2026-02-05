@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
+import { XStack, YStack } from 'tamagui'
+import { Pen } from '@tamagui/lucide-icons'
+
 import { SelectFrames as SF } from '@/components/base/Select/Frames'
 import Text from '@/components/base/Text'
-import { Pen } from '@tamagui/lucide-icons'
-import { XStack, YStack } from 'tamagui'
-import { VoxRichTextRenderer, VoxRichTextModalEditor } from '@/components/VoxRichText/index'
+import { VoxRichTextModalEditor, VoxRichTextRenderer } from '@/components/VoxRichText/index'
 import { RichTextContent } from '@/components/VoxRichText/types'
 
 type DescriptionInputProps = {
@@ -57,15 +58,7 @@ export default function DescriptionInput(props: DescriptionInputProps) {
           </Text.XSM>
         </XStack>
       ) : null}
-      <VoxRichTextModalEditor 
-        open={open} 
-        value={value} 
-        onChange={onChange} 
-        onClose={handleOnClose}
-        title={modalTitle}
-        placeholder={placeholder}
-      />
+      <VoxRichTextModalEditor open={open} value={value} onChange={onChange} onClose={handleOnClose} title={modalTitle} placeholder={placeholder} />
     </>
   )
 }
-

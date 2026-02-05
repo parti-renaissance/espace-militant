@@ -1,12 +1,50 @@
-import { ComponentProps, useMemo, useCallback, useRef, useEffect } from 'react'
-import { Home, Calendar, Zap, HeartHandshake, GraduationCap, Link, ClipboardCheck, ScrollText, Group, DoorOpen, Network, Goal, Vote, CircleUser, Globe, Download, FileStack, Award, MessageSquareQuote, FileBadge, CopyCheck, Swords, ClipboardList, PhoneOutgoing, MapPin, PartyPopper, UsersRound, TabletSmartphone, Laptop, MessageSquareDot, Mail, Sparkle, Eye, Signature, Map } from '@tamagui/lucide-icons'
-import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
-import type { IconComponent } from '@/models/common.model'
-import { useGetExecutiveScopes, useHasRecentMembership } from '@/services/profile/hook'
-import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import { useSession } from '@/ctx/SessionProvider'
+import { ComponentProps, useCallback, useEffect, useMemo, useRef } from 'react'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
+import {
+  Award,
+  Calendar,
+  CircleUser,
+  ClipboardCheck,
+  ClipboardList,
+  CopyCheck,
+  DoorOpen,
+  Download,
+  Eye,
+  FileBadge,
+  FileStack,
+  Globe,
+  Goal,
+  GraduationCap,
+  Group,
+  HeartHandshake,
+  Home,
+  Laptop,
+  Link,
+  Mail,
+  Map,
+  MapPin,
+  MessageSquareDot,
+  MessageSquareQuote,
+  Network,
+  PartyPopper,
+  PhoneOutgoing,
+  ScrollText,
+  Signature,
+  Sparkle,
+  Swords,
+  TabletSmartphone,
+  UsersRound,
+  Vote,
+  Zap,
+} from '@tamagui/lucide-icons'
+
+import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
+
+import { useSession } from '@/ctx/SessionProvider'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import type { IconComponent } from '@/models/common.model'
+import { useGetExecutiveScopes, useHasRecentMembership } from '@/services/profile/hook'
 
 export type NavItemConfig = {
   id: string
@@ -27,15 +65,15 @@ export type NavItemConfig = {
 
 // Configuration des items du menu militant pour utilisateurs connectés
 const militantNavItemsAuthConfig: NavItemConfig[] = [
-  { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/(tabs)' },
+  { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/' },
   { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/(tabs)/evenements' },
-  // { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/(militant)/actions', routeName: '(militant)/actions', theme: 'blue' },
+  // { id: 'actions', iconLeft: Zap, text: 'Actions', href: '/actions', routeName: '/actions', theme: 'blue' },
   { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/(tabs)/parrainages' },
-  { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalUrlSlug: '/formations', isNew: true },
+  { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalUrlSlug: '/formations' },
   { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/(tabs)/ressources' },
   { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', href: '/(tabs)/questionnaires' },
   { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/(tabs)/profil', displayIn: 'tabbar' },
-] as const;
+] as const
 
 // Configuration des items du menu militant pour utilisateurs non connectés
 const militantNavItemsPublicConfig: NavItemConfig[] = [
@@ -45,20 +83,20 @@ const militantNavItemsPublicConfig: NavItemConfig[] = [
   { id: 'formations', iconLeft: GraduationCap, text: 'Formations', disabled: true },
   { id: 'ressources', iconLeft: Link, text: 'Ressources', disabled: true },
   { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', disabled: true },
-] as const;
+] as const
 
 export const useMilitantNavItems = (): NavItemConfig[] => {
-  const { isAuth } = useSession();
-  const openExternalContentHook = useOpenExternalContent({ slug: 'formation' });
-  const { hasAccess: hasFormationsAccess } = useHasRecentMembership();
-  
-  const openRef = useRef(openExternalContentHook.open);
+  const { isAuth } = useSession()
+  const openExternalContentHook = useOpenExternalContent({ slug: 'formation' })
+  const { hasAccess: hasFormationsAccess } = useHasRecentMembership()
+
+  const openRef = useRef(openExternalContentHook.open)
   useEffect(() => {
-    openRef.current = openExternalContentHook.open;
-  }, [openExternalContentHook.open]);
+    openRef.current = openExternalContentHook.open
+  }, [openExternalContentHook.open])
 
   return useMemo(() => {
-    const baseConfig = isAuth ? militantNavItemsAuthConfig : militantNavItemsPublicConfig;
+    const baseConfig = isAuth ? militantNavItemsAuthConfig : militantNavItemsPublicConfig
 
     return baseConfig.map((item) => {
       // Pour l'item "formations", si le statut n'est pas "valid", utiliser la route locale
@@ -68,42 +106,42 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
           href: '/(tabs)/formations',
           externalUrlSlug: undefined,
           externalLink: false,
-        };
+        }
       }
 
       const config: NavItemConfig = {
         ...item,
         externalLink: item.externalUrlSlug ? true : false,
-      };
+      }
 
       if (item.externalUrlSlug) {
-        const externalUrl = item.externalUrlSlug;
+        const externalUrl = item.externalUrlSlug
         if (externalUrl.startsWith('http')) {
           config.onPress = () => {
             if (isWeb) {
-              window.open(externalUrl, '_blank');
+              window.open(externalUrl, '_blank')
             } else {
-              WebBrowser.openBrowserAsync(externalUrl);
+              WebBrowser.openBrowserAsync(externalUrl)
             }
-          };
+          }
         } else {
           config.onPress = () => {
-            openRef.current({ state: externalUrl })();
-          };
+            openRef.current({ state: externalUrl })()
+          }
         }
       }
 
-      return config;
-    });
-  }, [isAuth, hasFormationsAccess]);
-};
+      return config
+    })
+  }, [isAuth, hasFormationsAccess])
+}
 
 export const militantNavItems: NavItemConfig[] = []
 
 const cadreNavItemsConfig: NavItemConfig[] = [
   { id: 'dashboard', iconLeft: Eye, text: "Vue d'ensemble", theme: 'purple', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
   { id: 'my_team', iconLeft: Sparkle, text: 'Mon équipe cadre', theme: 'purple', externalUrlSlug: '/mon-equipe', externalLink: true },
-  { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/cadre/publications', },
+  { id: 'publications', iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/cadre/publications' },
   { id: 'messages', iconLeft: Mail, text: 'Messagerie', theme: 'purple', externalUrlSlug: '/messagerie', externalLink: true },
   { id: 'news', iconLeft: MessageSquareDot, text: 'Notifications', theme: 'purple', externalUrlSlug: '/notifications', externalLink: true },
   { id: 'department_site', iconLeft: Laptop, text: 'Site départemental', theme: 'purple', externalUrlSlug: '/site-departemental', externalLink: true },
@@ -124,37 +162,44 @@ const cadreNavItemsConfig: NavItemConfig[] = [
   { id: 'circonscriptions', iconLeft: Goal, text: 'Circonscriptions', theme: 'purple', externalUrlSlug: '/circonscriptions', externalLink: true },
   { id: 'designation', iconLeft: CopyCheck, text: 'Désignations', theme: 'purple', externalUrlSlug: '/votes-et-consultations', externalLink: true },
   { id: 'elections', iconLeft: Vote, text: 'Votes et consultations', theme: 'purple', externalUrlSlug: '/votes-et-consultations', externalLink: true },
-  { id: 'statutory_message', iconLeft: MessageSquareQuote, text: 'Message statutaire', theme: 'purple', externalUrlSlug: '/mails-statutaires', externalLink: true },
+  {
+    id: 'statutory_message',
+    iconLeft: MessageSquareQuote,
+    text: 'Message statutaire',
+    theme: 'purple',
+    externalUrlSlug: '/mails-statutaires',
+    externalLink: true,
+  },
   { id: 'general_meeting_reports', iconLeft: FileBadge, text: 'Procès-verbaux d’AG', theme: 'purple', externalUrlSlug: '/proces-verbal', externalLink: true },
   { id: 'documents', iconLeft: FileStack, text: 'Documents', theme: 'purple', externalUrlSlug: '/documents', externalLink: true },
   { id: 'elected_representative', iconLeft: Award, text: 'Élus', theme: 'purple', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
   { id: 'actions', iconLeft: Zap, text: 'Actions', theme: 'purple', externalUrlSlug: '/actions', externalLink: true, displayIn: 'never' },
   { id: 'contacts_export', iconLeft: Download, text: 'Export contacts', theme: 'purple', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
-] as const;
+] as const
 
 export const useCadreNavItems = (): NavItemConfig[] => {
   const { isAuth } = useSession()
-  const { data } = useGetExecutiveScopes();
-  const openExternalContentHook = useOpenExternalContent({ slug: 'cadre' });
+  const { data } = useGetExecutiveScopes()
+  const openExternalContentHook = useOpenExternalContent({ slug: 'cadre' })
 
-  const defaultScope = data?.default;
-  const defaultScopeCode = defaultScope?.code ?? '';
-  const defaultScopeFeatures = defaultScope?.features ?? [];
+  const defaultScope = data?.default
+  const defaultScopeCode = defaultScope?.code ?? ''
+  const defaultScopeFeatures = defaultScope?.features ?? []
 
-  const defaultScopeFeaturesKey = JSON.stringify([...defaultScopeFeatures].sort());
+  const defaultScopeFeaturesKey = JSON.stringify([...defaultScopeFeatures].sort())
 
   // Utiliser useRef pour stabiliser la référence de la fonction open
-  const openRef = useRef(openExternalContentHook.open);
+  const openRef = useRef(openExternalContentHook.open)
   useEffect(() => {
-    openRef.current = openExternalContentHook.open;
-  }, [openExternalContentHook.open]);
+    openRef.current = openExternalContentHook.open
+  }, [openExternalContentHook.open])
 
   return useMemo(() => {
     if (!isAuth) {
       return []
     }
 
-    const hasFeatureInDefaultScope = (featureId: string) => defaultScopeFeatures.includes(featureId);
+    const hasFeatureInDefaultScope = (featureId: string) => defaultScopeFeatures.includes(featureId)
 
     return cadreNavItemsConfig
       .filter((item) => hasFeatureInDefaultScope(item.id))
@@ -163,19 +208,19 @@ export const useCadreNavItems = (): NavItemConfig[] => {
           ...item,
           hasAccess: true,
           externalLink: item.externalUrlSlug ? true : false,
-        } as NavItemConfig;
+        } as NavItemConfig
 
         if (item.externalUrlSlug) {
-          const stateUrl = `${item.externalUrlSlug}?scope=${defaultScopeCode}`;
+          const stateUrl = `${item.externalUrlSlug}?scope=${defaultScopeCode}`
 
           config.onPress = () => {
-            openRef.current({ state: stateUrl })();
-          };
+            openRef.current({ state: stateUrl })()
+          }
         }
 
-        return config;
-      });
-  }, [isAuth, defaultScopeCode, defaultScopeFeaturesKey]);
-};
+        return config
+      })
+  }, [isAuth, defaultScopeCode, defaultScopeFeaturesKey])
+}
 
 export const cadreNavItems: NavItemConfig[] = []

@@ -1,7 +1,8 @@
 import { CSSProperties } from 'react'
+import { stringifyCSSProperties } from 'react-style-stringify'
+
 import { getThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { stringifyCSSProperties } from 'react-style-stringify'
 
 export const richTextRenderer = (props: { theme: S.MessageStyle; data: S.RichTextNode; edgePosition?: 'leading' | 'trailing' | 'alone' }) => {
   const { wrapperStyle, containerStyle } = getThemeStyle(props.theme, props.data, props.edgePosition)
@@ -9,8 +10,8 @@ export const richTextRenderer = (props: { theme: S.MessageStyle; data: S.RichTex
   const { html } = props.data.content
 
   // Ajout du style inline min-height:20px à chaque <p>
-  const minHeightStyle = 'min-height:20px;';
-  const htmlWithMinHeight = html.replace(/<p(.*?)>/g, `<p$1 style="${minHeightStyle}">`);
+  const minHeightStyle = 'min-height:20px;'
+  const htmlWithMinHeight = html.replace(/<p(.*?)>/g, `<p$1 style="${minHeightStyle}">`)
 
   const content = `<table
       align="center"
@@ -30,5 +31,5 @@ export const richTextRenderer = (props: { theme: S.MessageStyle; data: S.RichTex
     </tbody>
   </table>`
 
-  return content;
+  return content
 }

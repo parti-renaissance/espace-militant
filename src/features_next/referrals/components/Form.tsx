@@ -1,27 +1,27 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { Platform, Pressable, StyleSheet } from 'react-native'
+import { Redirect } from 'expo-router'
 import { Image, isWeb, useMedia, View, XStack, YStack } from 'tamagui'
+import { gray } from '@tamagui/colors'
 import { AlertTriangle, Info } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { gray } from '@tamagui/colors'
-import { Redirect } from 'expo-router'
 
 import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocomplete'
 import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
 import SelectV3 from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
+import Button, { VoxButton } from '@/components/Button'
 import DatePickerField from '@/components/DatePicker'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
+import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import NationalitySelect from '@/components/NationalitySelect/NationalitySelect'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
-import Button, { VoxButton } from '@/components/Button'
+import { validateBirthdateFormSchema } from '@/features_next/profil/pages/account/form/schema'
 
 import { RestViolation } from '@/data/restObjects/RestUpdateProfileRequest'
-import { validateBirthdateFormSchema } from '@/features_next/profil/pages/account/form/schema'
 import { postAddressSchema } from '@/services/events/schema'
 import { ReferralFormError } from '@/services/referral/error'
 import { useReferralsInvite, useReferralsPreRegister } from '@/services/referral/hook'
@@ -502,4 +502,3 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
 })
-

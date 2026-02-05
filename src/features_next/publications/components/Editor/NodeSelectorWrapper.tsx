@@ -1,13 +1,15 @@
-import React, { memo, ReactNode, RefObject, useMemo, useCallback } from 'react'
+import React, { memo, ReactNode, RefObject, useCallback, useMemo } from 'react'
 import { GestureResponderEvent } from 'react-native'
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
+import { Control, useFormContext, useWatch } from 'react-hook-form'
+
 import Text from '@/components/base/Text'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { Control, useFormContext, useWatch } from 'react-hook-form'
-import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
-import { EditorMethods } from './types'
-import MessageEditorEditToolbar from './EditToolBar'
+
 import { EditorInsertionToolbar } from './EditorInsertionToolbar'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming, Easing } from 'react-native-reanimated'
+import MessageEditorEditToolbar from './EditToolBar'
+import { EditorMethods } from './types'
 
 const wrapperContext = createStyledContext<{ selected: boolean; edgePosition?: 'trailing' | 'leading' | 'alone'; error?: boolean; editMode?: boolean }>({
   selected: false,
@@ -191,11 +193,7 @@ const MemoWrapper = memo(
           onShowAddBar={props.onShowAddBarTop}
           onCloseAddBar={props.onCloseAddBar}
         />
-        <AnimatedWrapperFrame
-          id={props.htmlId}
-          onPress={handlePress}
-          style={animatedStyle}
-        >
+        <AnimatedWrapperFrame id={props.htmlId} onPress={handlePress} style={animatedStyle}>
           {props.displayToolbar && (
             <MessageEditorEditToolbar selected={props.selected} selectedField={props.selectedField} editorMethods={props.editorMethods} />
           )}

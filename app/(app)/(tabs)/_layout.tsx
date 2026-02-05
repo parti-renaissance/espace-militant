@@ -7,14 +7,14 @@ export default function TabsLayout() {
     return <Slot />
   }
 
-  const screenOptions = useMemo(() => ({
-    headerShown: false,
-    tabBarStyle: { display: 'none' as const }, // custom tabbar and sidebar
-    contentStyle: { backgroundColor: '#fafafb' },
-  }), [])
-
-  return (
-    <Tabs screenOptions={screenOptions} />
+  const screenOptions = useMemo(
+    () => ({
+      headerShown: false,
+      tabBarStyle: { display: 'none' as const }, // custom tabbar and sidebar
+      contentStyle: { backgroundColor: '#fafafb' },
+    }),
+    [],
   )
-}
 
+  return <Tabs screenOptions={screenOptions} />
+}

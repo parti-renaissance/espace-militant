@@ -1,4 +1,5 @@
 import { View, YStack } from 'tamagui'
+
 import { EluBlock } from './DeclaEluCard'
 
 const codeCased = [

@@ -1,6 +1,8 @@
-import { styled, TextArea, YStack } from "tamagui"
-import Text from "@/components/base/Text"
-import { FieldSurveyQuestion } from "@/services/field-surveys/schema"
+import { styled, TextArea, YStack } from 'tamagui'
+
+import Text from '@/components/base/Text'
+
+import { FieldSurveyQuestion } from '@/services/field-surveys/schema'
 
 const ChoiceItem = styled(YStack, {
   width: '100%',
@@ -30,8 +32,8 @@ const ChoiceItem = styled(YStack, {
           backgroundColor: '$gray2',
           borderColor: '$gray2',
         },
-      }
-    }
+      },
+    },
   },
 })
 
@@ -42,7 +44,9 @@ const SimpleFieldQuestion: React.FC<{
 }> = ({ question, value, onChange }) => {
   return (
     <YStack flex={1}>
-      <Text.LG semibold mb="$medium">{question.content}</Text.LG>
+      <Text.LG semibold mb="$medium">
+        {question.content}
+      </Text.LG>
       <TextArea
         placeholder="Votre réponse"
         value={value}
@@ -64,13 +68,13 @@ const SimpleFieldQuestion: React.FC<{
 }
 
 type Question = {
-  id: number;
-  content?: string;
-  type: "simple_field" | "unique_choice" | "multiple_choice";
+  id: number
+  content?: string
+  type: 'simple_field' | 'unique_choice' | 'multiple_choice'
   choices: {
-    id: number | string;
-    content: string;
-  }[];
+    id: number | string
+    content: string
+  }[]
 }
 
 const UniqueChoiceQuestion: React.FC<{
@@ -92,12 +96,10 @@ const UniqueChoiceQuestion: React.FC<{
       <Text.LG semibold>{question.content}</Text.LG>
       <YStack gap="$small">
         {question.choices.map((choice) => (
-          <ChoiceItem
-            key={choice.id}
-            selected={value === String(choice.id)}
-            onPress={() => handleChoicePress(String(choice.id))}
-          >
-            <Text.MD semibold textAlign="center" textWrap="balance">{choice.content}</Text.MD>
+          <ChoiceItem key={choice.id} selected={value === String(choice.id)} onPress={() => handleChoicePress(String(choice.id))}>
+            <Text.MD semibold textAlign="center" textWrap="balance">
+              {choice.content}
+            </Text.MD>
           </ChoiceItem>
         ))}
       </YStack>
@@ -112,9 +114,7 @@ const MultipleChoiceQuestion: React.FC<{
   onChange: (value: string[]) => void
 }> = ({ question, value, onChange }) => {
   const handleChoiceToggle = (choice: string) => {
-    const newValue = value.includes(choice)
-      ? value.filter(v => v !== choice)
-      : [...value, choice]
+    const newValue = value.includes(choice) ? value.filter((v) => v !== choice) : [...value, choice]
     onChange(newValue)
   }
 
@@ -124,12 +124,10 @@ const MultipleChoiceQuestion: React.FC<{
       <Text.SM secondary>Vous pouvez sélectionner plusieurs réponses</Text.SM>
       <YStack gap="$small">
         {question.choices.map((choice) => (
-          <ChoiceItem
-            key={choice.id}
-            selected={value.includes(String(choice.id))}
-            onPress={() => handleChoiceToggle(String(choice.id))}
-          >
-            <Text.MD semibold textAlign="center" textWrap="balance">{choice.content}</Text.MD>
+          <ChoiceItem key={choice.id} selected={value.includes(String(choice.id))} onPress={() => handleChoiceToggle(String(choice.id))}>
+            <Text.MD semibold textAlign="center" textWrap="balance">
+              {choice.content}
+            </Text.MD>
           </ChoiceItem>
         ))}
       </YStack>

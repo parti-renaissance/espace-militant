@@ -1,13 +1,15 @@
 import React from 'react'
 import { Link, Redirect } from 'expo-router'
 import Head from 'expo-router/head'
-import Layout from '@/components/AppStructure/Layout/Layout'
-import TimelineFeedScreen from '@/features_next/timelinefeed/TimelineFeedScreen'
-import { useSession } from '@/ctx/SessionProvider'
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
-import { ProfileNav, VoxHeader } from '@/components/Header/Header'
-import * as metatags from '@/config/metatags'
 import { useMedia, XStack } from 'tamagui'
+
+import Layout from '@/components/AppStructure/Layout/Layout'
+import { ProfileNav, VoxHeader } from '@/components/Header/Header'
+import TimelineFeedScreen from '@/features_next/timelinefeed/TimelineFeedScreen'
+
+import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import * as metatags from '@/config/metatags'
+import { useSession } from '@/ctx/SessionProvider'
 
 const HomeHeader = () => {
   const media = useMedia()
@@ -45,6 +47,5 @@ export default function AccueilPage() {
         <TimelineFeedScreen />
       </Layout.Container>
     </>
-
   )
 }

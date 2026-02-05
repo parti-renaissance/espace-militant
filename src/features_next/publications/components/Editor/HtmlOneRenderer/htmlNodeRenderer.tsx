@@ -3,10 +3,17 @@ import { buttonRenderer } from '@/features_next/publications/components/Editor/H
 import { imageRenderer } from '@/features_next/publications/components/Editor/HtmlOneRenderer/htmlImageNodeRenderer'
 import { richTextRenderer } from '@/features_next/publications/components/Editor/HtmlOneRenderer/htmlRichTextNodeRender'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+
 import { RestAvailableSendersResponse } from '@/services/publications/schema'
+
 import { containerRenderer } from './htmlContainerRenderer'
 
-const renderNode = (props: { theme: S.MessageStyle; data: S.Node; edgePosition?: 'leading' | 'trailing' | 'alone'; sender?: RestAvailableSendersResponse[number] | null }) => {
+const renderNode = (props: {
+  theme: S.MessageStyle
+  data: S.Node
+  edgePosition?: 'leading' | 'trailing' | 'alone'
+  sender?: RestAvailableSendersResponse[number] | null
+}) => {
   switch (props.data.type) {
     case 'image':
       return imageRenderer({ theme: props.theme, data: props.data, edgePosition: props.edgePosition })
@@ -22,11 +29,7 @@ const renderNode = (props: { theme: S.MessageStyle; data: S.Node; edgePosition?:
   }
 }
 
-const htmlNodeRenderer = (props: { 
-  data: S.Message; 
-  theme: S.MessageStyle;
-  sender?: RestAvailableSendersResponse[number] | null;
-}) => {
+const htmlNodeRenderer = (props: { data: S.Message; theme: S.MessageStyle; sender?: RestAvailableSendersResponse[number] | null }) => {
   const getFieldEdge = (index: number) => {
     if (index === 0 && props.data?.content.length === 1) {
       return 'alone'

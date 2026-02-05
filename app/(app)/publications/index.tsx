@@ -1,13 +1,15 @@
 import React, { useMemo } from 'react'
-import { Redirect } from "expo-router";
-import Head from 'expo-router/head';
-import { useSession } from "@/ctx/SessionProvider";
-import { useGetExecutiveScopes } from "@/services/profile/hook";
-import { AccessDeny } from "@/components/AccessDeny";
+import { Redirect } from 'expo-router'
+import Head from 'expo-router/head'
+
+import { AccessDeny } from '@/components/AccessDeny'
+import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import MessagePageIndex from '@/features_next/publications/pages/index'
-import { Header } from '@/components/AppStructure';
-import * as metatags from '@/config/metatags';
+
+import * as metatags from '@/config/metatags'
+import { useSession } from '@/ctx/SessionProvider'
+import { useGetExecutiveScopes } from '@/services/profile/hook'
 
 export default function PublicationsPage() {
   const { isAuth } = useSession()
@@ -34,4 +36,3 @@ export default function PublicationsPage() {
     </>
   )
 }
-

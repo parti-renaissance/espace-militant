@@ -1,14 +1,16 @@
 import React from 'react'
+import { Controller, useForm } from 'react-hook-form'
+
 import { RichTextContent } from '@/components/VoxRichText'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { Controller, useForm } from 'react-hook-form'
+
 import EditorModal from './EditorModal'
 
-type NodeEditorProps = { 
+type NodeEditorProps = {
   value: S.RichTextNode
   onChange: (node: S.RichTextNode) => void
   onBlur: () => void
-  present: boolean 
+  present: boolean
 }
 
 export const RichTextNodeEditor = (props: NodeEditorProps) => {
@@ -38,15 +40,7 @@ export const RichTextNodeEditor = (props: NodeEditorProps) => {
       control={control}
       name="content"
       render={({ field }) => {
-        return (
-          <EditorModal 
-            value={field.value} 
-            onChange={handleOnChange} 
-            onBlur={field.onBlur} 
-            present={props.present} 
-            onClose={props.onBlur} 
-          />
-        )
+        return <EditorModal value={field.value} onChange={handleOnChange} onBlur={field.onBlur} present={props.present} onClose={props.onBlur} />
       }}
     />
   )

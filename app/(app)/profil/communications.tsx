@@ -1,10 +1,10 @@
 import { MessageCircle } from '@tamagui/lucide-icons'
+
+import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import CommunicationsScreen from '@/features_next/profil/pages/communications'
-import { Header } from '@/components/AppStructure'
 
 export default function CommunicationsPage() {
-
   return (
     <>
       <Header title="Communications" icon={MessageCircle} />

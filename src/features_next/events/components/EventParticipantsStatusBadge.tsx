@@ -1,6 +1,7 @@
 import React, { memo, useMemo } from 'react'
-import { Check, Send, HelpCircle } from '@tamagui/lucide-icons'
 import { XStack } from 'tamagui'
+import { Check, HelpCircle, Send } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 
 type Status = 'confirmed' | 'invited' | string | null | undefined

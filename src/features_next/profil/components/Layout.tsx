@@ -1,21 +1,23 @@
-import { useState } from "react"
-import { LogOut, PenLine, QrCode, DoorOpen, GraduationCap, Zap, Wrench, Minus, Cross, DoorClosed, X } from "@tamagui/lucide-icons"
-import { isNavItemActive } from "@/components/AppStructure/utils"
-import { Href, usePathname } from "expo-router"
-import { Button, useMedia, XStack } from "tamagui"
-import Layout from "@/components/AppStructure/Layout/Layout"
-import VoxCard from "@/components/VoxCard/VoxCard"
-import { NavItem } from "@/components/AppStructure/Navigation/NavItem"
-import { useSession } from "@/ctx/SessionProvider"
-import { pageConfigs } from "../configs"
-import { useUserStore } from "@/store/user-store"
-import BoundarySuspenseWrapper from "@/components/BoundarySuspenseWrapper"
-import { SkeCard } from "@/components/Skeleton/CardSkeleton"
-import LayoutScrollView from "@/components/AppStructure/Layout/LayoutScrollView"
-import { useGetProfil } from "@/services/profile/hook"
-import clientEnv from "@/config/clientEnv"
-import Text from "@/components/base/Text"
+import { useState } from 'react'
+import { usePathname } from 'expo-router'
+import { useMedia, XStack } from 'tamagui'
+import { Bot, DoorOpen, GraduationCap, LogOut, PenLine, QrCode, Wrench, X, Zap } from '@tamagui/lucide-icons'
 
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
+import { isNavItemActive } from '@/components/AppStructure/utils'
+import Text from '@/components/base/Text'
+import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
+import { SkeCard } from '@/components/Skeleton/CardSkeleton'
+import VoxCard from '@/components/VoxCard/VoxCard'
+
+import clientEnv from '@/config/clientEnv'
+import { useSession } from '@/ctx/SessionProvider'
+import { useGetProfil } from '@/services/profile/hook'
+import { useUserStore } from '@/store/user-store'
+
+import { pageConfigs } from '../configs'
 
 function ProfilLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -25,15 +27,14 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
   const { data: profile } = useGetProfil({ enabled: true })
   const [devMode, setDevMode] = useState(false)
 
-  const visibleItems = Object.entries(pageConfigs)
-    .filter(([key, config]) => {
-      if (key === 'index' && !media.gtSm) return false
-      const hiddenInMenu = 'hiddenInMenu' in config ? config.hiddenInMenu : false
-      if (typeof hiddenInMenu === 'function') {
-        return !hiddenInMenu(profile)
-      }
-      return !hiddenInMenu
-    })
+  const visibleItems = Object.entries(pageConfigs).filter(([key, config]) => {
+    if (key === 'index' && !media.gtSm) return false
+    const hiddenInMenu = 'hiddenInMenu' in config ? config.hiddenInMenu : false
+    if (typeof hiddenInMenu === 'function') {
+      return !hiddenInMenu(profile)
+    }
+    return !hiddenInMenu
+  })
 
   const SkeletonCard = () => (
     <LayoutScrollView style={{ flexGrow: 1 }}>
@@ -50,9 +51,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Layout.Main style={{ width: '100%' }}>
-        <BoundarySuspenseWrapper fallback={<SkeletonCard />}>
-          {children}
-        </BoundarySuspenseWrapper>
+        <BoundarySuspenseWrapper fallback={<SkeletonCard />}>{children}</BoundarySuspenseWrapper>
       </Layout.Main>
       {media.gtMd ? (
         <Layout.SideBar isSticky gap="$medium">
@@ -65,9 +64,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                   iconLeft={config.iconLeft}
                   // @ts-expect-error - href type mismatch due to config type definition
                   href={config.href}
-                  active={config.id === 'index'
-                    ? pathname === '/profil'
-                    : isNavItemActive(pathname, config.href as string)}
+                  active={config.id === 'index' ? pathname === '/profil' : isNavItemActive(pathname, config.href as string)}
                 />
               ))}
             </VoxCard.Content>
@@ -76,11 +73,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
           {clientEnv.ENVIRONMENT === 'staging' && !devMode && (
             <VoxCard borderRadius={16}>
               <VoxCard.Content padding="$small" gap={4}>
-                <NavItem
-                  text="Mode développeur"
-                  iconLeft={Wrench}
-                  onPress={() => setDevMode(true)}
-                />
+                <NavItem text="Mode développeur" iconLeft={Wrench} onPress={() => setDevMode(true)} />
               </VoxCard.Content>
             </VoxCard>
           )}
@@ -88,36 +81,29 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
           {clientEnv.ENVIRONMENT === 'staging' && devMode && (
             <VoxCard borderRadius={16}>
               <VoxCard.Content padding="$small" gap={4}>
-                <XStack onPress={() => setDevMode(false)} alignItems="center" gap="$small" justifyContent="space-between" px="$small" pt="$small" cursor="pointer">
-                  <Text.SM semibold secondary >Outils de développement</Text.SM>
+                <XStack
+                  onPress={() => setDevMode(false)}
+                  alignItems="center"
+                  gap="$small"
+                  justifyContent="space-between"
+                  px="$small"
+                  pt="$small"
+                  cursor="pointer"
+                >
+                  <Text.SM semibold secondary>
+                    Outils de développement
+                  </Text.SM>
                   <X size={16} color="$textDisabled" />
                 </XStack>
-                <NavItem
-                  text="StoryBook"
-                  iconLeft={PenLine}
-                  href="/tools/storybook"
-                />
-                <Text.SM semibold secondary mx="$small" mt="$medium">Anciens outils</Text.SM>
-                <NavItem
-                  text="Actions"
-                  iconLeft={Zap}
-                  href="/old/actions"
-                />
-                <NavItem
-                  text="Scanner"
-                  iconLeft={QrCode}
-                  href="/old/scanner"
-                />
-                <NavItem
-                  text="Porte à porte"
-                  iconLeft={DoorOpen}
-                  href="/old/porte-a-porte"
-                />
-                <NavItem
-                  text="Formations"
-                  iconLeft={GraduationCap}
-                  href="/old/formations"
-                />
+                <NavItem text="Chatbot" iconLeft={Bot} href="/chatbot" />
+                <NavItem text="StoryBook" iconLeft={PenLine} href="/tools/storybook" />
+                <Text.SM semibold secondary mx="$small" mt="$medium">
+                  Anciens outils
+                </Text.SM>
+                <NavItem text="Actions" iconLeft={Zap} href="/old/actions" />
+                <NavItem text="Scanner" iconLeft={QrCode} href="/old/scanner" />
+                <NavItem text="Porte à porte" iconLeft={DoorOpen} href="/old/porte-a-porte" />
+                <NavItem text="Formations" iconLeft={GraduationCap} href="/old/formations" />
               </VoxCard.Content>
             </VoxCard>
           )}
@@ -135,7 +121,6 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
           </VoxCard>
         </Layout.SideBar>
       ) : null}
-
     </>
   )
 }

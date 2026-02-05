@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { XStack } from 'tamagui'
-import Chip from '@/components/Chip/Chip'
 import { AlertCircle } from '@tamagui/lucide-icons'
+
+import Chip from '@/components/Chip/Chip'
 
 type AutoSaveErrorIndicatorProps = {
   hasError: boolean
 }
 
-export const AutoSaveErrorIndicator = ({ 
-  hasError
-}: AutoSaveErrorIndicatorProps) => {
+export const AutoSaveErrorIndicator = ({ hasError }: AutoSaveErrorIndicatorProps) => {
   const [showError, setShowError] = useState(false)
   const [hasInitialized, setHasInitialized] = useState(false)
 
@@ -35,11 +34,7 @@ export const AutoSaveErrorIndicator = ({
 
   return (
     <XStack alignItems="center" gap="$small">
-      <Chip
-        children="Erreur de sauvegarde"
-        icon={AlertCircle}
-        alert={true}
-      />
+      <Chip children="Erreur de sauvegarde" icon={AlertCircle} alert={true} />
     </XStack>
   )
-} 
+}

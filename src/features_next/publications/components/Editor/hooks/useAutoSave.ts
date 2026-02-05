@@ -1,34 +1,28 @@
 import { useCallback, useRef, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToastController } from '@tamagui/toast'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useDebouncedCallback } from 'use-debounce'
+
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/publications/api'
 import { RestAvailableSender, RestPostMessageRequest } from '@/services/publications/schema'
-import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
-export type ZipMessageFunction = (
-    formValues: S.MessageFormValues, 
-    fields: S.FieldsArray, 
-    metaData: S.MessageMetaData
-  ) => S.Message
-  
-  export type GetHTMLFunction = (
-    theme: S.MessageStyle, 
-    message: S.Message, 
-    sender: RestAvailableSender | null
-  ) => string
-  
-  export type DebouncedSaveFunction = (
-    formValues: S.MessageFormValues,
-    fields: S.FieldsArray,
-    metaData: S.MessageMetaData,
-    sender: RestAvailableSender | null,
-    zipMessageFn: ZipMessageFunction,
-    getHTMLFn: GetHTMLFunction,
-    theme: S.MessageStyle
-  ) => void
-  
+export type ZipMessageFunction = (formValues: S.MessageFormValues, fields: S.FieldsArray, metaData: S.MessageMetaData) => S.Message
+
+export type GetHTMLFunction = (theme: S.MessageStyle, message: S.Message, sender: RestAvailableSender | null) => string
+
+export type DebouncedSaveFunction = (
+  formValues: S.MessageFormValues,
+  fields: S.FieldsArray,
+  metaData: S.MessageMetaData,
+  sender: RestAvailableSender | null,
+  zipMessageFn: ZipMessageFunction,
+  getHTMLFn: GetHTMLFunction,
+  theme: S.MessageStyle,
+) => void
+
 export type ImmediateSaveFunction = (
   formValues: S.MessageFormValues,
   fields: S.FieldsArray,
@@ -37,13 +31,10 @@ export type ImmediateSaveFunction = (
   zipMessageFn: ZipMessageFunction,
   getHTMLFn: GetHTMLFunction,
   theme: S.MessageStyle,
-  throwOnError?: boolean
+  throwOnError?: boolean,
 ) => Promise<void>
 
-export const useAutoSave = (props: {
-  messageId?: string
-  scope: string
-}) => {
+export const useAutoSave = (props: { messageId?: string; scope: string }) => {
   const lastSavedContent = useRef<string>('')
   const pendingSaves = useRef<Set<string>>(new Set())
   const createdMessageId = useRef<string | null>(null)
@@ -53,10 +44,10 @@ export const useAutoSave = (props: {
   const queryClient = useQueryClient()
 
   const { mutateAsync: saveMessage, isPending } = useMutation({
-    mutationFn: props.messageId !== undefined
-      ? ({ payload, scope }: { payload: RestPostMessageRequest; scope: string }) => 
-          api.updateMessage({ payload, messageId: props.messageId!, scope })
-      : api.createMessage,
+    mutationFn:
+      props.messageId !== undefined
+        ? ({ payload, scope }: { payload: RestPostMessageRequest; scope: string }) => api.updateMessage({ payload, messageId: props.messageId!, scope })
+        : api.createMessage,
     onSuccess: (data) => {
       if (props.messageId) {
         queryClient.invalidateQueries({ queryKey: ['message', props.messageId] })
@@ -65,7 +56,7 @@ export const useAutoSave = (props: {
         queryClient.invalidateQueries({ queryKey: ['message', data.uuid] })
         queryClient.invalidateQueries({ queryKey: ['message-content', data.uuid] })
       }
-      queryClient.invalidateQueries({ queryKey: ['messages'],  exact: false })
+      queryClient.invalidateQueries({ queryKey: ['messages'], exact: false })
     },
     onError: (error) => {
       if (error instanceof GenericResponseError) {
@@ -86,8 +77,7 @@ export const useAutoSave = (props: {
       case 'richtext':
         return Boolean(node.content.pure && node.content.pure.length > 0)
       case 'button':
-        return Boolean(node.content.text && node.content.text.length > 0 &&
-          node.content.link && node.content.link.length > 0)
+        return Boolean(node.content.text && node.content.text.length > 0 && node.content.link && node.content.link.length > 0)
       case 'image':
         return Boolean(node.content.url && node.content.url.length > 0)
       default:
@@ -96,83 +86,97 @@ export const useAutoSave = (props: {
   }, [])
 
   // Fonction pour vérifier si un message a du contenu valide
-  const hasValidContent = useCallback((formValues: S.MessageFormValues, fields: S.FieldsArray): boolean => {
-    return fields.some(field => {
-      const node = formValues[field.type]?.[field.id]
-      return node && hasContent(node)
-    })
-  }, [hasContent])
+  const hasValidContent = useCallback(
+    (formValues: S.MessageFormValues, fields: S.FieldsArray): boolean => {
+      return fields.some((field) => {
+        const node = formValues[field.type]?.[field.id]
+        return node && hasContent(node)
+      })
+    },
+    [hasContent],
+  )
 
   // Fonction de sauvegarde avec vérification de changement et de contenu
-  const performSave = useCallback(async (
-    formValues: S.MessageFormValues,
-    fields: S.FieldsArray,
-    metaData: S.MessageMetaData,
-    sender: RestAvailableSender | null,
-    zipMessageFn: ZipMessageFunction,
-    getHTMLFn: GetHTMLFunction,
-    theme: S.MessageStyle,
-    forceSave = false,
-    throwOnError = false
-  ) => {
-    const currentContent = JSON.stringify({ formValues, fields, metaData })
-    const contentHash = `${currentContent}_${Date.now()}`
+  const performSave = useCallback(
+    async (
+      formValues: S.MessageFormValues,
+      fields: S.FieldsArray,
+      metaData: S.MessageMetaData,
+      sender: RestAvailableSender | null,
+      zipMessageFn: ZipMessageFunction,
+      getHTMLFn: GetHTMLFunction,
+      theme: S.MessageStyle,
+      forceSave = false,
+      throwOnError = false,
+    ) => {
+      const currentContent = JSON.stringify({ formValues, fields, metaData })
+      const contentHash = `${currentContent}_${Date.now()}`
 
-    // Éviter les sauvegardes en double
-    if (pendingSaves.current.has(contentHash)) {
-      return
-    }
-
-    // Éviter les sauvegardes inutiles sauf si forcée
-    if (!forceSave && currentContent === lastSavedContent.current) {
-      return
-    }
-
-    // Vérifier qu'il y a du contenu valide avant de sauvegarder
-    if (!forceSave && !hasValidContent(formValues, fields)) {
-      return
-    }
-
-    const message = zipMessageFn(formValues, fields, metaData)
-    const htmlContent = getHTMLFn(theme, message, sender)
-
-    try {
-      pendingSaves.current.add(contentHash)
-      setHasError(false)
-
-      const result = await saveMessage({
-        scope: props.scope,
-        payload: {
-          type: metaData.scope,
-          subject: metaData.subject,
-          label: metaData.subject,
-          json_content: JSON.stringify(message),
-          content: htmlContent,
-          sender: sender?.uuid,
-        },
-      })
-
-      // Si c'est la première sauvegarde et qu'on n'avait pas d'ID, stocker le nouvel ID
-      if (!props.messageId && result?.uuid && !createdMessageId.current) {
-        createdMessageId.current = result.uuid
+      // Éviter les sauvegardes en double
+      if (pendingSaves.current.has(contentHash)) {
+        return
       }
 
-      lastSavedContent.current = currentContent
-      setLastSaved(new Date())
-    } catch (error) {
-      console.error('Error saving message:', error)
-      setHasError(true)
-      if (throwOnError) {
-        throw error // Re-throw uniquement si demandé
+      // Éviter les sauvegardes inutiles sauf si forcée
+      if (!forceSave && currentContent === lastSavedContent.current) {
+        return
       }
-    } finally {
-      pendingSaves.current.delete(contentHash)
-    }
-  }, [saveMessage, props.scope, hasValidContent, props.messageId])
+
+      // Vérifier qu'il y a du contenu valide avant de sauvegarder
+      if (!forceSave && !hasValidContent(formValues, fields)) {
+        return
+      }
+
+      const message = zipMessageFn(formValues, fields, metaData)
+      const htmlContent = getHTMLFn(theme, message, sender)
+
+      try {
+        pendingSaves.current.add(contentHash)
+        setHasError(false)
+
+        const result = await saveMessage({
+          scope: props.scope,
+          payload: {
+            type: metaData.scope,
+            subject: metaData.subject,
+            label: metaData.subject,
+            json_content: JSON.stringify(message),
+            content: htmlContent,
+            sender: sender?.uuid,
+          },
+        })
+
+        // Si c'est la première sauvegarde et qu'on n'avait pas d'ID, stocker le nouvel ID
+        if (!props.messageId && result?.uuid && !createdMessageId.current) {
+          createdMessageId.current = result.uuid
+        }
+
+        lastSavedContent.current = currentContent
+        setLastSaved(new Date())
+      } catch (error) {
+        console.error('Error saving message:', error)
+        setHasError(true)
+        if (throwOnError) {
+          throw error // Re-throw uniquement si demandé
+        }
+      } finally {
+        pendingSaves.current.delete(contentHash)
+      }
+    },
+    [saveMessage, props.scope, hasValidContent, props.messageId],
+  )
 
   // Sauvegarde debounced pour les modifications continues (seulement si contenu valide)
   const debouncedSave = useDebouncedCallback(
-    (formValues: S.MessageFormValues, fields: S.FieldsArray, metaData: S.MessageMetaData, sender: RestAvailableSender | null, zipMessageFn: ZipMessageFunction, getHTMLFn: GetHTMLFunction, theme: S.MessageStyle) => {
+    (
+      formValues: S.MessageFormValues,
+      fields: S.FieldsArray,
+      metaData: S.MessageMetaData,
+      sender: RestAvailableSender | null,
+      zipMessageFn: ZipMessageFunction,
+      getHTMLFn: GetHTMLFunction,
+      theme: S.MessageStyle,
+    ) => {
       performSave(formValues, fields, metaData, sender, zipMessageFn, getHTMLFn, theme, false)
     },
     3000, // 3 secondes de délai
@@ -180,23 +184,26 @@ export const useAutoSave = (props: {
       leading: false,
       trailing: true,
       maxWait: 15000, // Maximum 15 secondes d'attente
-    }
+    },
   )
 
   // Sauvegarde immédiate pour les actions critiques
-  const immediateSave = useCallback((
-    formValues: S.MessageFormValues,
-    fields: S.FieldsArray,
-    metaData: S.MessageMetaData,
-    sender: RestAvailableSender | null,
-    zipMessageFn: ZipMessageFunction,
-    getHTMLFn: GetHTMLFunction,
-    theme: S.MessageStyle,
-    throwOnError = false
-  ) => {
-    debouncedSave.cancel() // Annuler les sauvegardes en attente
-    return performSave(formValues, fields, metaData, sender, zipMessageFn, getHTMLFn, theme, true, throwOnError)
-  }, [performSave, debouncedSave])
+  const immediateSave = useCallback(
+    (
+      formValues: S.MessageFormValues,
+      fields: S.FieldsArray,
+      metaData: S.MessageMetaData,
+      sender: RestAvailableSender | null,
+      zipMessageFn: ZipMessageFunction,
+      getHTMLFn: GetHTMLFunction,
+      theme: S.MessageStyle,
+      throwOnError = false,
+    ) => {
+      debouncedSave.cancel() // Annuler les sauvegardes en attente
+      return performSave(formValues, fields, metaData, sender, zipMessageFn, getHTMLFn, theme, true, throwOnError)
+    },
+    [performSave, debouncedSave],
+  )
 
   return {
     debouncedSave,
@@ -206,4 +213,4 @@ export const useAutoSave = (props: {
     hasError,
     createdMessageId: createdMessageId.current,
   }
-} 
+}

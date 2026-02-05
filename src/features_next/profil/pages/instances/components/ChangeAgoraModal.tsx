@@ -1,5 +1,9 @@
 import { ComponentPropsWithoutRef, memo, useMemo, useRef, useState } from 'react'
 import { Dimensions, FlatList, SafeAreaView, View } from 'react-native'
+import { Spinner, useMedia, YStack } from 'tamagui'
+import { Diamond, X } from '@tamagui/lucide-icons'
+import { sortBy } from 'lodash'
+
 import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
@@ -7,12 +11,11 @@ import { VoxHeader } from '@/components/Header/Header'
 import { InstanceCardHeader } from '@/components/InstanceCard/InstanceCard'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { usePaginatedAgoras, useSetMyAgora } from '@/services/agoras/hook'
-import { Diamond, X } from '@tamagui/lucide-icons'
-import { Spinner, useMedia, YStack } from 'tamagui'
-import { MembershipCard } from './MembershipCard'
+
 import { DoubleSquare } from './icons'
-import { sortBy } from 'lodash'
+import { MembershipCard } from './MembershipCard'
 
 const MemorizedMembershipCard = memo(MembershipCard)
 
@@ -22,7 +25,7 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
 
   const agoras = useMemo(() => {
     const all = data?.pages.flatMap((page) => page.items) ?? []
-  
+
     return sortBy(all, (a) => (currentUuids.includes(a.uuid) ? 0 : 1))
   }, [data, currentUuids])
 
@@ -59,11 +62,7 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
       numColumns={media.gtSm ? 2 : undefined}
       onEndReached={() => hasNextPage && fetchNextPage()}
       onEndReachedThreshold={0.5}
-      ListHeaderComponent={
-        <Text.P pb={media.gtSm ? 16 : undefined}>
-          Vous ne pouvez être membre que d'une seule agora.
-        </Text.P>
-      }
+      ListHeaderComponent={<Text.P pb={media.gtSm ? 16 : undefined}>Vous ne pouvez être membre que d'une seule agora.</Text.P>}
       renderItem={({ item: agora }) => (
         <MemorizedMembershipCard
           title={agora.name}
@@ -72,11 +71,15 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
           loading={pendingSelected === agora.uuid && isPending}
           isMember={currentUuids.includes(agora.uuid)}
           disabled={agora?.members_count >= agora?.max_members_count}
-          manager={agora?.president ? {
-            role: agora?.president?.role ?? "Président",
-            name: `${agora?.president?.first_name} ${agora?.president?.last_name}`,
-            avatar: agora?.president?.image_url
-          } : undefined }
+          manager={
+            agora?.president
+              ? {
+                  role: agora?.president?.role ?? 'Président',
+                  name: `${agora?.president?.first_name} ${agora?.president?.last_name}`,
+                  avatar: agora?.president?.image_url,
+                }
+              : undefined
+          }
         />
       )}
       keyExtractor={(item) => item.uuid}
@@ -85,7 +88,6 @@ const ChangeAgoraList = ({ currentUuids, onClose }: { currentUuids: string[]; on
     />
   )
 }
-
 
 const windowSize = Dimensions.get('window')
 

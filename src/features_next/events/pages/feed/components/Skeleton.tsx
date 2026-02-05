@@ -1,10 +1,11 @@
 import React from 'react'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { useMedia, YStack } from 'tamagui'
+
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 const EventsListSkeleton: React.FC = () => {
   const media = useMedia()
-  
+
   return (
     <YStack gap="$medium" paddingHorizontal={media.sm ? 0 : undefined}>
       <SkeCard>

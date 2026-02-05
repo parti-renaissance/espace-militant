@@ -1,16 +1,19 @@
 import { ComponentPropsWithoutRef, forwardRef, Fragment, useRef, useState } from 'react'
 import { Dimensions } from 'react-native'
+import { useLocalSearchParams } from 'expo-router'
+import { ScrollView, ScrollViewProps, useMedia, XStack } from 'tamagui'
+import { Calendar, X } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useSubscribeEvent } from '@/services/events/hook'
 import { RestItemEvent } from '@/services/events/schema'
-import { Calendar, X } from '@tamagui/lucide-icons'
-import { ScrollView, ScrollViewProps, useMedia, XStack } from 'tamagui'
+
 import EventRegisterForm from './EventRegisterForm/EventRegisterForm'
-import { useLocalSearchParams } from 'expo-router'
 
 type ButtonProps = ComponentPropsWithoutRef<typeof VoxButton> &
   Pick<RestItemEvent, 'uuid' | 'slug'> & {
@@ -31,10 +34,10 @@ export const EventSubscribeButton = ({ uuid, slug, isPremium, userUuid, ...butto
   const sheetScrollRef = useRef<ScrollView | null>(null)
 
   // Récupérer les paramètres URL
-  const urlParams = useLocalSearchParams<{ 
-    ref?: string; 
-    utm_source?: string; 
-    utm_campaign?: string;
+  const urlParams = useLocalSearchParams<{
+    ref?: string
+    utm_source?: string
+    utm_campaign?: string
   }>()
 
   const height = Dimensions.get('window').height * 0.8

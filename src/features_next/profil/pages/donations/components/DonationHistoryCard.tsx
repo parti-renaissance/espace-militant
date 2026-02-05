@@ -1,15 +1,17 @@
 import { Fragment } from 'react'
+import { XStack, YStack } from 'tamagui'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import _EmptyState from '@/components/EmptyStates/EmptyState'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { useGetDonations } from '@/services/profile/hook'
 import { RestDonationsResponse } from '@/services/profile/schema'
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
-import { XStack, YStack } from 'tamagui'
 
 const isRecuDonation = (x: RestDonationsResponse[number]) => x.status === 'subscription_in_progress'
 const getType = (x: RestDonationsResponse[number]) => {

@@ -1,5 +1,6 @@
+import { Circle, Diamond, Square, Triangle } from '@tamagui/lucide-icons'
+
 import { createDoubleIcon } from '@/components/utils'
-import { Circle, Diamond, Triangle, Square } from '@tamagui/lucide-icons'
 
 export const DoubleCircle = createDoubleIcon({ icon: Circle })
 export const DoubleDiamond = createDoubleIcon({ icon: Diamond })

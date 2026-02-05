@@ -1,17 +1,18 @@
 import React from 'react'
 import { useLocalSearchParams } from 'expo-router'
 import Head from 'expo-router/head'
+
 import Error404 from '@/components/404/Error404'
-import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import * as metatags from '@/config/metatags'
-import { isEventEditable } from '@/features_next/events/utils'
+import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import EventFormScreen, { EventFormScreenSkeleton } from '@/features_next/events/pages/create-edit'
+import { isEventEditable } from '@/features_next/events/utils'
+
+import * as metatags from '@/config/metatags'
 import { useGetEvent } from '@/services/events/hook'
 import { RestFullEvent } from '@/services/events/schema'
 
 const EditEventScreen: React.FC = () => {
-  
   return (
     <Layout.Container hideSideBar hideTabBar>
       <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton editMode />}>

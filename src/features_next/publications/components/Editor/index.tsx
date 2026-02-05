@@ -1,19 +1,21 @@
-import { forwardRef, useImperativeHandle, useRef, useMemo, useEffect, useCallback } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react'
+import { router, useLocalSearchParams } from 'expo-router'
+import { getTokenValue, isWeb, useMedia, YStack } from 'tamagui'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uniqueId } from 'lodash'
-import { useForm, FormProvider } from 'react-hook-form'
-import { getTokenValue, isWeb, YStack, useMedia } from 'tamagui'
-import { useLocalSearchParams, router } from 'expo-router'
+import { FormProvider, useForm } from 'react-hook-form'
+
+import { useGetMessage } from '@/services/publications/hook'
+import { RestAvailableSender, RestAvailableSendersResponse, RestGetMessageFiltersResponse } from '@/services/publications/schema'
+
 import { StyleRendererContextProvider } from './context/styleRenderContext'
+import { DebouncedSaveFunction, ImmediateSaveFunction } from './hooks/useAutoSave'
 import { getHTML } from './HtmlOneRenderer'
 import { RenderFields } from './RenderFields'
+import * as S from './schemas/messageBuilderSchema'
 import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
-import { useGetMessage } from '@/services/publications/hook'
-import * as S from './schemas/messageBuilderSchema'
-import { RestAvailableSender, RestGetMessageFiltersResponse, RestAvailableSendersResponse } from '@/services/publications/schema'
-import { DebouncedSaveFunction, ImmediateSaveFunction } from './hooks/useAutoSave'
 
 export { getHTML, defaultTheme }
 
@@ -46,12 +48,15 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   const templateFromQuery = searchParams?.template
   const media = useMedia()
 
-  const messageQueryParams = useMemo(() => ({
-    messageId: props.messageId ?? '', 
-    scope: scopeFromQuery ?? '', 
-    enabled: !!props.messageId
-  }), [props.messageId, scopeFromQuery])
-  
+  const messageQueryParams = useMemo(
+    () => ({
+      messageId: props.messageId ?? '',
+      scope: scopeFromQuery ?? '',
+      enabled: !!props.messageId,
+    }),
+    [props.messageId, scopeFromQuery],
+  )
+
   const { data: message } = useGetMessage(messageQueryParams)
 
   const defaultData = useMemo(() => {
@@ -88,32 +93,28 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
   }, [props.defaultValue, templateFromQuery, scopeFromQuery])
 
   const formMethods = useForm<S.GlobalForm>({
-    defaultValues: { 
-      formValues: defaultData.states, 
-      metaData: defaultData.metaData, 
-      selectedField: null, 
+    defaultValues: {
+      formValues: defaultData.states,
+      metaData: defaultData.metaData,
+      selectedField: null,
       addBarOpenForFieldId: null,
       filters: {
-        hasRecipients: true
-      }
+        hasRecipients: true,
+      },
     },
     resolver: zodResolver(S.MessageFormValuesValidatorSchema),
   })
 
   const { control, handleSubmit, setValue, unregister, getValues } = formMethods
 
-  const {
-    onDebouncedSave,
-    onImmediateSave,
-    createdMessageId,
-  } = props
+  const { onDebouncedSave, onImmediateSave, createdMessageId } = props
 
   useEffect(() => {
     if (createdMessageId) {
       props.onMessageIdCreated?.(createdMessageId)
-      router.setParams({ 
+      router.setParams({
         id: createdMessageId,
-        scope: scopeFromQuery 
+        scope: scopeFromQuery,
       })
     }
   }, [createdMessageId, scopeFromQuery, props.onMessageIdCreated])
@@ -160,37 +161,41 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
     editField: (field: S.FieldsArray[number]) => setValue('selectedField', { edit: true, field }),
     setEditorMode: (mode: 'edit' | 'preview') => {
       props.onDisplayToolbarChange?.(mode === 'edit')
-    }
+    },
   } satisfies EditorMethods)
 
   const handleNodeChange = useCallback(() => {
     onDebouncedSave(getValues().formValues, renderFieldsRef.current?.getFields() ?? [], getValues().metaData, props.sender, zipMessage, getHTML, defaultTheme)
   }, [onDebouncedSave, getValues, props.sender])
 
-  const handleSenderChange = useCallback((newSender: RestAvailableSender) => {
-    props.onSenderChange?.(newSender)
-    // Sauvegarder immédiatement avec le nouveau sender
-    const currentValues = getValues()
-    const fields = renderFieldsRef.current?.getFields() ?? []
-    onImmediateSave(currentValues.formValues, fields, currentValues.metaData, newSender, zipMessage, getHTML, defaultTheme, true)
-      .catch(() => {
+  const handleSenderChange = useCallback(
+    (newSender: RestAvailableSender) => {
+      props.onSenderChange?.(newSender)
+      // Sauvegarder immédiatement avec le nouveau sender
+      const currentValues = getValues()
+      const fields = renderFieldsRef.current?.getFields() ?? []
+      onImmediateSave(currentValues.formValues, fields, currentValues.metaData, newSender, zipMessage, getHTML, defaultTheme, true).catch(() => {
         props.onSenderChange?.(null)
       })
-  }, [props.onSenderChange, getValues, onImmediateSave])
+    },
+    [props.onSenderChange, getValues, onImmediateSave],
+  )
 
   useImperativeHandle(ref, () => ({
     submit: handleSubmit(
       (x) => {
         const fields = renderFieldsRef.current!.getFields()
-        onImmediateSave(x.formValues, fields, x.metaData, props.sender, zipMessage, getHTML, defaultTheme).then(() => {
-          props.onSubmit()
-        }).catch((error) => {
-          console.error('Submit error:', error)
-        })
+        onImmediateSave(x.formValues, fields, x.metaData, props.sender, zipMessage, getHTML, defaultTheme)
+          .then(() => {
+            props.onSubmit()
+          })
+          .catch((error) => {
+            console.error('Submit error:', error)
+          })
       },
       (errors) => {
-        console.error('Validation errors:', errors);
-      }
+        console.error('Validation errors:', errors)
+      },
     ),
     save: async () => {
       const currentValues = getValues()
@@ -213,8 +218,8 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
         maxWidth={520}
         width="100%"
         flexGrow={1}
-        paddingTop={(media.gtSm && isWeb) ? '$large' : undefined}
-        paddingBottom={(media.gtSm && isWeb) ? 170 + getTokenValue('$medium') : undefined}
+        paddingTop={media.gtSm && isWeb ? '$large' : undefined}
+        paddingBottom={media.gtSm && isWeb ? 170 + getTokenValue('$medium') : undefined}
       >
         <YStack flex={1} gap="$medium" position="relative">
           <StyleRendererContextProvider value={props.theme}>

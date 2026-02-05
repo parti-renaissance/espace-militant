@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react'
-import { Dimensions, Modal, ScrollView, StyleSheet } from 'react-native'
+import { Dimensions, Modal, Platform, ScrollView, StyleSheet } from 'react-native'
 import { CardFrame } from '@/components/VoxCard/VoxCard'
 import { Spacing } from '@/styles'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
@@ -86,9 +86,9 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   fullScreenView: {
-    
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    flex: Platform.OS === 'android' ? undefined : 1,
+    width: Platform.OS === 'android' ? Dimensions.get('window').width : undefined,
+    height: Platform.OS === 'android' ? Dimensions.get('window').height : undefined,
     backgroundColor: 'white',
   },
 })

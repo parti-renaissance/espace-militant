@@ -1,15 +1,11 @@
 import React, { useCallback } from 'react'
-import { FlatList, type FlatListProps, Platform, RefreshControl } from 'react-native'
+import { FlatList, Platform, RefreshControl, type FlatListProps } from 'react-native'
 import { isWeb, YStack } from 'tamagui'
-import { usePageLayoutScroll } from '@/components/AppStructure/hooks/usePageLayoutScroll'
-import useLayoutSpacing, {
-  type UseLayoutSpacingOptions,
-} from '@/components/AppStructure/hooks/useLayoutSpacing'
 
-type LayoutFlatListProps<T> = Omit<
-  FlatListProps<T>,
-  'onEndReached' | 'data' | 'renderItem' | 'refreshControl'
-> & {
+import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
+import { usePageLayoutScroll } from '@/components/AppStructure/hooks/usePageLayoutScroll'
+
+type LayoutFlatListProps<T> = Omit<FlatListProps<T>, 'onEndReached' | 'data' | 'renderItem' | 'refreshControl'> & {
   data: FlatListProps<T>['data']
   renderItem: FlatListProps<T>['renderItem']
   onEndReached?: () => void
@@ -24,9 +20,7 @@ type LayoutFlatListProps<T> = Omit<
 const noop = () => undefined
 
 function renderListComponent(
-  component: FlatListProps<unknown>['ListHeaderComponent'] |
-    FlatListProps<unknown>['ListFooterComponent'] |
-    FlatListProps<unknown>['ListEmptyComponent']
+  component: FlatListProps<unknown>['ListHeaderComponent'] | FlatListProps<unknown>['ListFooterComponent'] | FlatListProps<unknown>['ListEmptyComponent'],
 ): React.ReactNode {
   if (!component) return null
   if (React.isValidElement(component)) return component
@@ -34,10 +28,7 @@ function renderListComponent(
   return null
 }
 
-function LayoutFlatListInner<T>(
-  props: LayoutFlatListProps<T>,
-  ref: React.Ref<FlatList<T>>
-) {
+function LayoutFlatListInner<T>(props: LayoutFlatListProps<T>, ref: React.Ref<FlatList<T>>) {
   const {
     onEndReached,
     onEndReachedThreshold = 0.4,
@@ -82,6 +73,15 @@ function LayoutFlatListInner<T>(
 
     if (data.length === 0) {
       const emptyNode = renderListComponent(ListEmptyComponent)
+      // Afficher le header si présent, même quand la liste est vide
+      if (headerNode) {
+        return (
+          <YStack style={baseContainerStyle}>
+            {headerNode}
+            {emptyNode}
+          </YStack>
+        )
+      }
       return <YStack style={baseContainerStyle}>{emptyNode}</YStack>
     }
 
@@ -110,13 +110,11 @@ function LayoutFlatListInner<T>(
     )
   }
 
-  const refreshControlElement = refreshControl ?? (refreshing !== undefined && onRefresh ? (
-    <RefreshControl
-      refreshing={refreshing}
-      onRefresh={onRefresh}
-      progressViewOffset={Platform.OS === 'android' && padding !== false ? 8 : undefined}
-    />
-  ) : undefined)
+  const refreshControlElement =
+    refreshControl ??
+    (refreshing !== undefined && onRefresh ? (
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={Platform.OS === 'android' && padding !== false ? 8 : undefined} />
+    ) : undefined)
 
   return (
     <FlatList<T>
@@ -127,7 +125,7 @@ function LayoutFlatListInner<T>(
       onEndReached={!isWeb && onEndReached ? loadMore : undefined}
       onEndReachedThreshold={onEndReachedThreshold}
       refreshControl={refreshControlElement}
-      contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
+      contentInsetAdjustmentBehavior={Platform.OS === 'ios' && padding !== false ? 'automatic' : undefined}
       contentContainerStyle={baseContainerStyle}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
@@ -141,8 +139,6 @@ function LayoutFlatListInner<T>(
 const LayoutFlatListForwarded = React.forwardRef(LayoutFlatListInner)
 LayoutFlatListForwarded.displayName = 'LayoutFlatList'
 
-const LayoutFlatList = LayoutFlatListForwarded as <T>(
-  props: LayoutFlatListProps<T> & { ref?: React.Ref<FlatList<T>> }
-) => React.ReactElement
+const LayoutFlatList = LayoutFlatListForwarded as <T>(props: LayoutFlatListProps<T> & { ref?: React.Ref<FlatList<T>> }) => React.ReactElement
 
 export default LayoutFlatList

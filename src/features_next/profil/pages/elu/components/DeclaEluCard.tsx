@@ -1,12 +1,15 @@
 import { ComponentProps, useState } from 'react'
+import { ThemeName, useMedia, View, XStack, YStack } from 'tamagui'
+import { Coins } from '@tamagui/lucide-icons'
+
 import Badge from '@/components/Badge'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { useGetTags } from '@/services/profile/hook'
-import { Coins } from '@tamagui/lucide-icons'
-import { ThemeName, useMedia, View, XStack, YStack } from 'tamagui'
+
 import DeclaForm from './DeclaForm'
 import IbanForm from './IbanForm'
 
@@ -138,7 +141,7 @@ export const EluBlock = ({
   if (code.includes('elu:cotisation_ok:exempte')) {
     return <EluOkExempte />
   } else if (code.includes('elu:cotisation_ok:soumis')) {
-    return <EluOkSoumis declaration={declaration ?? 0} cotisation={cotisation ?? 0}onPressIbanForm={onPressIbanForm} onPressDeclaForm={onPressDeclaForm} />
+    return <EluOkSoumis declaration={declaration ?? 0} cotisation={cotisation ?? 0} onPressIbanForm={onPressIbanForm} onPressDeclaForm={onPressDeclaForm} />
   } else if (code.includes('elu:cotisation_ok:non_soumis')) {
     return <EluOkNonSoumis declaration={declaration ?? 0} onPressDeclaForm={onPressDeclaForm} />
   } else if (code.includes('elu:attente_declaration')) {

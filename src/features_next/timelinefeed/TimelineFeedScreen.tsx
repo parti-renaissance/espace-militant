@@ -1,32 +1,33 @@
-import { memo, useCallback, useRef, useMemo, useState, useEffect } from 'react'
-import { ViewToken, FlatList } from 'react-native'
-import { FeedCard } from '@/components/Cards'
-import { transformFeedItemToProps } from '@/helpers/homeFeed'
-import { useAlerts } from '@/services/alerts/hook'
-import { useGetPaginatedFeed } from '@/services/timeline-feed/hook'
-import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
-import { useGetSuspenseExecutiveScopes } from '@/services/profile/hook'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
-import { useFocusEffect } from 'expo-router'
-import { getToken, Spinner, useMedia, YStack, XStack, ScrollView } from 'tamagui'
-import { useDebouncedCallback } from 'use-debounce'
-import { Sparkle } from '@tamagui/lucide-icons'
-import { VoxButton } from '@/components/Button'
 import { Link } from 'expo-router'
-import NotificationSubscribeCard from './components/NotificationSubscribeCard'
-import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
-import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
-import Text from '@/components/base/Text'
-import { useHits } from '@/services/hits/hook'
-import TrackImpressionWeb from '@/components/TrackImpressionWeb'
-import { Platform } from 'react-native'
+import { getToken, ScrollView, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { Sparkle } from '@tamagui/lucide-icons'
+import { useDebouncedCallback } from 'use-debounce'
+
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
+import Text from '@/components/base/Text'
+import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
+import { VoxButton } from '@/components/Button'
+import { FeedCard } from '@/components/Cards'
+import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
 import AppDownloadCTA from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
 import { MyProfileCardNoLinks } from '@/components/ProfileCards/ProfileCard/MyProfileCard'
-import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
-import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
+import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
+import { transformFeedItemToProps } from '@/helpers/homeFeed'
+import { useAlerts } from '@/services/alerts/hook'
+import { useHits } from '@/services/hits/hook'
+import { useGetSuspenseExecutiveScopes } from '@/services/profile/hook'
+import { useGetPaginatedFeed } from '@/services/timeline-feed/hook'
+import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
+
+import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
+import NotificationSubscribeCard from './components/NotificationSubscribeCard'
+import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 
@@ -35,11 +36,7 @@ const TimelineFeedCard = memo((item: RestTimelineFeedItem) => {
 
   if (Platform.OS === 'web' && props) {
     return (
-      <TrackImpressionWeb
-        objectType={item.type}
-        objectId={item.objectID}
-        source="page_timeline"
-      >
+      <TrackImpressionWeb objectType={item.type} objectId={item.objectID} source="page_timeline">
         <FeedCardMemoized {...props} />
       </TrackImpressionWeb>
     )
@@ -89,19 +86,16 @@ const TimelineFeedMain = () => {
 
   const hasAlerts = useMemo(() => alerts.length > 0, [alerts.length])
   const hasPublications = useMemo(() => hasFeature('publications'), [hasFeature])
-  const shouldShowHeader = useMemo(
-    () => hasAlerts || shouldShowNotificationCard || hasPublications,
-    [hasAlerts, shouldShowNotificationCard, hasPublications]
-  )
+  const shouldShowHeader = useMemo(() => hasAlerts || shouldShowNotificationCard || hasPublications, [hasAlerts, shouldShowNotificationCard, hasPublications])
 
-  const header = useMemo(() => (
-    shouldShowHeader
-      ? (
+  const header = useMemo(
+    () =>
+      shouldShowHeader ? (
         <YStack gap={media.sm ? 8 : 16}>
           {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
           {hasAlerts ? <AlertStack alerts={alerts} /> : null}
           {hasAlerts || hasPublications ? (
-            <XStack justifyContent="space-between" alignItems="center" px={media.sm ? "$medium" : "$0"}>
+            <XStack justifyContent="space-between" alignItems="center" px={media.sm ? '$medium' : '$0'}>
               <Text.MD color="$gray4" semibold>
                 Dernières actualités
               </Text.MD>
@@ -115,9 +109,9 @@ const TimelineFeedMain = () => {
             </XStack>
           ) : null}
         </YStack>
-      )
-      : null
-  ), [shouldShowHeader, shouldShowNotificationCard, hasAlerts, hasPublications, alerts, media.sm])
+      ) : null,
+    [shouldShowHeader, shouldShowNotificationCard, hasAlerts, hasPublications, alerts, media.sm],
+  )
 
   const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     if (Platform.OS !== 'web') {
@@ -133,10 +127,13 @@ const TimelineFeedMain = () => {
     }
   }, [])
 
-  const viewabilityConfig = useMemo(() => ({
-    itemVisiblePercentThreshold: 50,
-    minimumViewTime: 400,
-  }), [])
+  const viewabilityConfig = useMemo(
+    () => ({
+      itemVisiblePercentThreshold: 50,
+      minimumViewTime: 400,
+    }),
+    [],
+  )
 
   return (
     <LayoutFlatList<RestTimelineFeedItem>

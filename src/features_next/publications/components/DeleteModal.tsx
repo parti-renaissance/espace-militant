@@ -1,9 +1,11 @@
 import React from 'react'
-import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
-import { VoxButton } from '@/components/Button'
-import { Trash2 } from '@tamagui/lucide-icons'
 import { useMedia, XStack, YStack } from 'tamagui'
+import { Trash2 } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
+import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
+
 import { useDeleteMessage } from '@/services/publications/hook'
 
 interface DeleteModalProps {
@@ -19,11 +21,11 @@ export default function DeleteModal({ isOpen, onClose, messageId, scope }: Delet
 
   const handleConfirm = () => {
     if (!messageId) return
-    
+
     deleteMessage.mutate(undefined, {
       onSuccess: () => {
         onClose()
-      }
+      },
     })
   }
 
@@ -31,41 +33,24 @@ export default function DeleteModal({ isOpen, onClose, messageId, scope }: Delet
     <ModalOrBottomSheet open={isOpen} onClose={onClose} allowDrag>
       <YStack
         paddingHorizontal="$medium"
-        marginVertical={media.gtSm ? "$xxlarge" : "$xxxlarge"}
+        marginVertical={media.gtSm ? '$xxlarge' : '$xxxlarge'}
         gap="$large"
         alignItems="center"
         width={media.gtSm ? 480 : undefined}
       >
         <YStack gap="$medium" alignItems="center">
           <Trash2 size={32} color="$orange5" />
-          <Text.LG
-            textAlign="center"
-            semibold
-          >
+          <Text.LG textAlign="center" semibold>
             Confirmer la suppression
           </Text.LG>
-          <Text.MD
-            textAlign="center"
-          >
-            Êtes-vous sûr de vouloir supprimer définitivement cette publication ? Cette action est irréversible.
-          </Text.MD>
+          <Text.MD textAlign="center">Êtes-vous sûr de vouloir supprimer définitivement cette publication ? Cette action est irréversible.</Text.MD>
         </YStack>
 
         <XStack gap="$medium" alignItems="center" justifyContent="center">
-          <VoxButton
-            theme="gray"
-            variant='outlined'
-            onPress={onClose}
-            alignSelf="center"
-          >
+          <VoxButton theme="gray" variant="outlined" onPress={onClose} alignSelf="center">
             Annuler
           </VoxButton>
-          <VoxButton
-            theme="orange"
-            onPress={handleConfirm}
-            disabled={deleteMessage.isPending}
-            alignSelf="center"
-          >
+          <VoxButton theme="orange" onPress={handleConfirm} disabled={deleteMessage.isPending} alignSelf="center">
             {deleteMessage.isPending ? 'Suppression...' : 'Supprimer'}
           </VoxButton>
         </XStack>
@@ -73,4 +58,3 @@ export default function DeleteModal({ isOpen, onClose, messageId, scope }: Delet
     </ModalOrBottomSheet>
   )
 }
-

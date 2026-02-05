@@ -1,6 +1,8 @@
 import { useCallback } from 'react'
-import { useSession } from '@/ctx/SessionProvider'
+
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
+
+import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
 
 export default function useResetFilters() {

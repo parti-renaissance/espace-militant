@@ -1,14 +1,14 @@
-import { View, XStack, YStack, useMedia } from 'tamagui'
+import { useMedia, View, XStack, YStack } from 'tamagui'
 
-import SkeCard from '@/components/Skeleton/CardSkeleton'
-import VoxCard from '@/components/VoxCard/VoxCard'
-import StickyBox from '@/components/StickyBox/StickyBox'
-import { ReferralsRankingCardLoading } from '@/features_next/referrals/components/Cards'
 import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
+import StickyBox from '@/components/StickyBox/StickyBox'
+import VoxCard from '@/components/VoxCard/VoxCard'
+import { ReferralsRankingCardLoading } from '@/features_next/referrals/components/Cards'
 
 export function ReferralsDesktopSkeleton() {
   const spacingValues = useLayoutSpacing(true)
-  
+
   return (
     <View style={{ width: '100%', paddingTop: spacingValues.paddingTop, paddingBottom: 100, backgroundColor: '$textSurface' }}>
       <View backgroundColor="$orange1" pt="$6" pb={52} borderRadius="$medium" mx={spacingValues.paddingLeft}>
@@ -101,4 +101,3 @@ export function ReferralsSkeleton() {
   const media = useMedia()
   return media.gtSm ? <ReferralsDesktopSkeleton /> : <ReferralsMobileSkeleton />
 }
-

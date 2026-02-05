@@ -1,16 +1,19 @@
-import React, { useRef, useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { View, XStack, styled, withStaticProperties, ViewProps, useMedia, isWeb, YStack } from 'tamagui'
 import { useFocusEffect } from 'expo-router'
+import { isWeb, styled, useMedia, View, ViewProps, withStaticProperties, XStack, YStack } from 'tamagui'
+
+import useLayoutSpacing, { UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
 import { SideBar, SideBarState } from '@/components/AppStructure/Navigation/SideBar'
 import ConfigurableTabBar from '@/components/AppStructure/Navigation/TabBar'
-import useLayoutSpacing, { UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
-import { useCadreNavItems } from '@/config/navigationItems'
-import { useLayoutContext, ScrollContext } from './LayoutContext'
-import Header from '../Header'
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
 import { SignInButton, SignUpButton } from '@/components/Buttons/AuthButton'
+
+import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import { useCadreNavItems } from '@/config/navigationItems'
 import { useSession } from '@/ctx/SessionProvider'
+
+import Header from '../Header'
+import { ScrollContext, useLayoutContext } from './LayoutContext'
 
 const LayoutRoot = styled(View, {
   height: '100dvh',
@@ -65,15 +68,15 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
         {sidebarState && media.gtSm && <SideBar state={sidebarState} navCadreItems={cadreNavItems} />}
         {children}
       </LayoutWrapper>
-      {(!media.gtSm && isAuth) && <ConfigurableTabBar hide={hideTabBar} navCadreItems={cadreNavItems} />}
+      {!media.gtSm && isAuth && <ConfigurableTabBar hide={hideTabBar} navCadreItems={cadreNavItems} />}
     </LayoutRoot>
   )
 }
 
 const ContentContainer = styled(XStack, {
   flex: 1,
-  justifyContent: "center",
-  alignItems: "flex-start",
+  justifyContent: 'center',
+  alignItems: 'flex-start',
   $lg: {
     gap: 16,
   },
@@ -92,7 +95,15 @@ interface ContainerProps extends ViewProps {
   alwaysShowScrollbar?: boolean
 }
 
-const Container = ({ children, hideSideBar, hideTabBar, sidebarState, safeHorizontalPadding = true, alwaysShowScrollbar = false, ...props }: ContainerProps) => {
+const Container = ({
+  children,
+  hideSideBar,
+  hideTabBar,
+  sidebarState,
+  safeHorizontalPadding = true,
+  alwaysShowScrollbar = false,
+  ...props
+}: ContainerProps) => {
   const insets = useSafeAreaInsets()
   const layoutRef = useRef<HTMLDivElement>(null)
   const media = useMedia()
@@ -101,30 +112,37 @@ const Container = ({ children, hideSideBar, hideTabBar, sidebarState, safeHorizo
 
   useFocusEffect(
     useCallback(() => {
-      setSidebarState(sidebarState ?? 'militant');
-      setHideSideBar(hideSideBar ?? false);
-      setHideTabBar(hideTabBar ?? false);
-    }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, sidebarState])
-  );
+      setSidebarState(sidebarState ?? 'militant')
+      setHideSideBar(hideSideBar ?? false)
+      setHideTabBar(hideTabBar ?? false)
+    }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, sidebarState]),
+  )
 
   const scrollBehavior = alwaysShowScrollbar ? 'scroll' : 'auto'
 
   return (
-    <YStack alignItems="center"
+    <YStack
+      alignItems="center"
       ref={layoutRef}
       flex={1}
       bg="$textSurface"
-      pl={media.gtLg ? insets.left : (media.gtMd ? (insets.left) : insets.left)}
+      pl={media.gtLg ? insets.left : media.gtMd ? insets.left : insets.left}
       pr={insets.right}
       overflowY={isWeb ? scrollBehavior : undefined}
       {...props}
     >
       <YStack width="100%" flexGrow={1}>
         <ScrollContext.Provider value={{ layoutRef: layoutRef as React.RefObject<HTMLDivElement>, scrollActive: Boolean(isWeb) }}>
-          <ContentContainer style={safeHorizontalPadding ? {
-            paddingLeft: spacingValues.paddingLeft,
-            paddingRight: spacingValues.paddingRight,
-          } : undefined}>
+          <ContentContainer
+            style={
+              safeHorizontalPadding
+                ? {
+                    paddingLeft: spacingValues.paddingLeft,
+                    paddingRight: spacingValues.paddingRight,
+                  }
+                : undefined
+            }
+          >
             {children}
           </ContentContainer>
         </ScrollContext.Provider>
@@ -141,7 +159,7 @@ const MainContainer = styled(View, {
   },
 })
 
-const Main = ({ children, maxWidth = 520, ...props }: ViewProps & { children: React.ReactNode, maxWidth?: number | string }) => {
+const Main = ({ children, maxWidth = 520, ...props }: ViewProps & { children: React.ReactNode; maxWidth?: number | string }) => {
   return (
     <MainContainer maxWidth={maxWidth} {...props}>
       {children}
@@ -159,14 +177,7 @@ interface SideBarProps extends Omit<ViewProps, 'padding'> {
 const SideBarComponent = ({ children, isSticky, maxWidth = 320, minWidth = 280, padding = 'right', ...props }: SideBarProps) => {
   const spacingValues = useLayoutSpacing(padding)
   return (
-    <LayoutSideBar
-      isSticky={isSticky}
-      maxWidth={maxWidth}
-      minWidth={minWidth}
-      pt={spacingValues.paddingTop}
-      pb={spacingValues.paddingBottom}
-      {...props}
-    >
+    <LayoutSideBar isSticky={isSticky} maxWidth={maxWidth} minWidth={minWidth} pt={spacingValues.paddingTop} pb={spacingValues.paddingBottom} {...props}>
       {children}
     </LayoutSideBar>
   )

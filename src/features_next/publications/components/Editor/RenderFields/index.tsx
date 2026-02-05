@@ -1,15 +1,18 @@
-import React, { forwardRef, RefObject, useCallback, useImperativeHandle, useRef, useState, useMemo } from 'react'
+import React, { forwardRef, RefObject, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { isWeb, YStack } from 'tamagui'
+import { Control } from 'react-hook-form'
+
 import { usePageLayoutScroll } from '@/components/layouts/PageLayout/usePageLayoutScroll'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { RenderFieldRef, EditorMethods } from '@/features_next/publications/components/Editor/types'
-import { Control } from 'react-hook-form'
-import { isWeb, YStack } from 'tamagui'
+import { EditorMethods, RenderFieldRef } from '@/features_next/publications/components/Editor/types'
+
+import { RestAvailableSender, RestAvailableSendersResponse, RestGetMessageFiltersResponse, RestGetMessageResponse } from '@/services/publications/schema'
+
+import { EditorInsertionToolbar } from '../EditorInsertionToolbar'
 import { MetaDataForm } from './MetaDataForm'
 import { RenderField } from './RenderField'
-import { EditorInsertionToolbar } from '../EditorInsertionToolbar'
-import { RestAvailableSendersResponse, RestGetMessageResponse, RestGetMessageFiltersResponse, RestAvailableSender } from '@/services/publications/schema'
 
 type RenderFieldsProps = {
   defaultStruct: S.FieldsArray
@@ -121,20 +124,34 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
 
   const { isWebPageLayoutScrollActive } = usePageLayoutScroll()
 
-  const memoizedHeaderComponent = useMemo(() => (
-    <MetaDataForm
-      control={props.control}
-      availableSenders={memoizedAvailableSenders}
-      message={memoizedMessage}
-      displayToolbar={props.displayToolbar}
-      onMetaDataChange={props.onNodeChange}
-      messageFilters={props.messageFilters}
-      messageId={props.messageId}
-      scope={props.scope}
-      onSenderChange={props.onSenderChange}
-      selectedSender={props.selectedSender}
-    />
-  ), [props.control, memoizedAvailableSenders, memoizedMessage, props.displayToolbar, props.onNodeChange, props.messageFilters, props.messageId, props.scope, props.onSenderChange, props.selectedSender])
+  const memoizedHeaderComponent = useMemo(
+    () => (
+      <MetaDataForm
+        control={props.control}
+        availableSenders={memoizedAvailableSenders}
+        message={memoizedMessage}
+        displayToolbar={props.displayToolbar}
+        onMetaDataChange={props.onNodeChange}
+        messageFilters={props.messageFilters}
+        messageId={props.messageId}
+        scope={props.scope}
+        onSenderChange={props.onSenderChange}
+        selectedSender={props.selectedSender}
+      />
+    ),
+    [
+      props.control,
+      memoizedAvailableSenders,
+      memoizedMessage,
+      props.displayToolbar,
+      props.onNodeChange,
+      props.messageFilters,
+      props.messageId,
+      props.scope,
+      props.onSenderChange,
+      props.selectedSender,
+    ],
+  )
 
   return (
     <YStack flex={1} overflow="hidden">
@@ -153,7 +170,7 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
             field={undefined}
             display={true}
             showAddBar={true}
-            onShowAddBar={() => { }}
+            onShowAddBar={() => {}}
             onCloseAddBar={undefined}
           />
         ) : (

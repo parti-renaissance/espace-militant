@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react'
 import { Redirect, useLocalSearchParams } from 'expo-router'
-import { useSession } from '@/ctx/SessionProvider'
-import { useGetExecutiveScopes } from '@/services/profile/hook'
+
 import { AccessDeny } from '@/components/AccessDeny'
 import { Layout } from '@/components/AppStructure'
-import { useUserStore } from '@/store/user-store'
 import MessageEditorPage from '@/features_next/publications/pages/create-update'
+
+import { useSession } from '@/ctx/SessionProvider'
+import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { useUserStore } from '@/store/user-store'
 
 export default function PublicationsCreatePage() {
   const params = useLocalSearchParams<{ id?: string; scope?: string }>()
@@ -24,12 +26,7 @@ export default function PublicationsCreatePage() {
 
   return (
     <Layout.Container alwaysShowScrollbar hideSideBar hideTabBar safeHorizontalPadding={false}>
-      <MessageEditorPage
-        scope={params.scope ?? defaultScope ?? ''}
-        messageId={params.id}
-      />
+      <MessageEditorPage scope={params.scope ?? defaultScope ?? ''} messageId={params.id} />
     </Layout.Container>
-
   )
 }
-

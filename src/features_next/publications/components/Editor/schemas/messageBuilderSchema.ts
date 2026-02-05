@@ -11,8 +11,35 @@ export const ImageNodeSchema = z.object({
       url: z.string(),
       width: z.number(),
       height: z.number(),
+      link_url: z.string().optional(),
     })
     .nullish(),
+})
+
+export const ImageNodeValidationSchema = z.object({
+  type: z.literal('image'),
+  marks: z.array(z.string()).optional(),
+  content: z.object({
+    url: z.string(),
+    width: z.number(),
+    height: z.number(),
+    link_url: z
+      .string()
+      .optional()
+      .refine(
+        (value) => {
+          if (!value || !value.trim()) return true // Optionnel, donc vide est valide
+          if (value.startsWith('mailto:') || value.startsWith('tel:') || value.startsWith('sms:')) {
+            return true
+          }
+          const webRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)*([a-zA-Z0-9-]+\.)[a-zA-Z]{2,}(:\d+)?(\/[^\s]*)?$/
+          return webRegex.test(value)
+        },
+        {
+          message: 'Veuillez saisir un lien valide',
+        },
+      ),
+  }),
 })
 
 export type ImageNode = z.infer<typeof ImageNodeSchema>
@@ -98,10 +125,9 @@ export const AttachmentNodeValidationSchema = z.object({
   type: z.literal('attachment'),
   marks: z.array(z.string()).optional(),
   content: z.object({
-    name: z
-      .string({
-        required_error: 'Le fichier est requis',
-      }),
+    name: z.string({
+      required_error: 'Le fichier est requis',
+    }),
     title: z
       .string({
         required_error: 'Veuillez saisir le nom du fichier',
@@ -145,12 +171,9 @@ export const MessageFormValuesValidatorSchema = z.object({
       }),
   }),
   filters: z.object({
-    hasRecipients: z.boolean().refine(
-      (value) => value === true,
-      {
-        message: "Ce filtre ne correspond à aucun contact",
-      }
-    ),
+    hasRecipients: z.boolean().refine((value) => value === true, {
+      message: 'Ce filtre ne correspond à aucun contact',
+    }),
   }),
   formValues: z.record(
     z.enum(nodeTypesArray),

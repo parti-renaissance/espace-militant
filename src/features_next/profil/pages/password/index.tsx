@@ -1,16 +1,18 @@
 import { KeyboardAvoidingView, Platform } from 'react-native'
+import { XStack, YStack } from 'tamagui'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import ProfilLayout from '@/features_next/profil/components/Layout'
+
 import { ProfilChangePasswordFormError } from '@/services/profile/error'
 import { usePostChangePassword } from '@/services/profile/hook'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm } from 'react-hook-form'
-import { XStack, YStack } from 'tamagui'
-import * as z from 'zod'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import ProfilLayout from '@/features_next/profil/components/Layout'
 
 const ChangePasswordSchema = z
   .object({

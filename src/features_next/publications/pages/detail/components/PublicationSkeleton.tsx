@@ -1,8 +1,9 @@
 import React from 'react'
-import SkeCard from '@/components/Skeleton/CardSkeleton'
 import { useMedia, YStack } from 'tamagui'
+
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 export function PublicationSkeleton() {
   return (
@@ -25,4 +26,3 @@ export function PublicationSkeleton() {
     </Layout.Main>
   )
 }
-

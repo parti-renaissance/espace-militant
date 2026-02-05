@@ -1,9 +1,12 @@
 import React from 'react'
 import { Platform } from 'react-native'
+import { CalendarPlus, Share2 } from '@tamagui/lucide-icons'
+
 import { VoxButton } from '@/components/Button'
 import ShareButton from '@/components/Buttons/ShareButton'
 import { getFormatedVoxCardDate } from '@/components/utils'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import clientEnv from '@/config/clientEnv'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 import useShareApi from '@/hooks/useShareApi'
@@ -11,7 +14,7 @@ import useCreateEvent from '@/modules/Calendar/Calendar'
 import * as eventTypes from '@/services/events/schema'
 import { RestEvent } from '@/services/events/schema'
 import { useGetProfil } from '@/services/profile/hook'
-import { CalendarPlus, Share2 } from '@tamagui/lucide-icons'
+
 import { isEventFull } from '../utils'
 
 type Props = {

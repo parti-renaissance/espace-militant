@@ -1,25 +1,27 @@
+import { useRef } from 'react'
 import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { getTokenValue, useMedia, XStack, YStack } from 'tamagui'
+import { Link, Save } from '@tamagui/lucide-icons'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
+import { useDebouncedCallback } from 'use-debounce'
+
 import Input from '@/components/base/Input/Input'
 import Select from '@/components/base/Select/SelectV3'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, Save } from '@tamagui/lucide-icons'
-import { Controller, useForm } from 'react-hook-form'
-import { getTokenValue, useMedia, XStack, YStack } from 'tamagui'
-import { useDebouncedCallback } from 'use-debounce'
 import ViewportModal from '@/components/VoxRichText/ViewportModal'
-import { useRef } from 'react'
+import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+import { normalizeUrl } from '@/utils/normalizeUrl'
 
-type NodeEditorProps = { 
-  value: S.ButtonNode; 
-  onChange: (node: S.ButtonNode) => void; 
-  onBlur: () => void; 
-  present: boolean;
-  senderThemeColor?: string; // Ajout de cette prop
+type NodeEditorProps = {
+  value: S.ButtonNode
+  onChange: (node: S.ButtonNode) => void
+  onBlur: () => void
+  present: boolean
+  senderThemeColor?: string // Ajout de cette prop
 }
 
 export const ButtonNodeEditor = (props: NodeEditorProps) => {
@@ -42,10 +44,14 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
   const onSubmit = useDebouncedCallback(() => {
     const values = control._formValues
     const hasContent = values.content?.text?.length > 0 || values.content?.link?.length > 0
-    
+
     if (hasContent) {
       handleSubmit((data) => {
-        props.onChange(data)
+        const normalized = { ...data }
+        if (normalized.content?.link?.trim()) {
+          normalized.content = { ...normalized.content, link: normalizeUrl(normalized.content.link) }
+        }
+        props.onChange(normalized)
         props.onBlur()
       })()
     } else {
@@ -60,7 +66,7 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
       onClose={() => props.onBlur()}
       open={props.present}
       header={
-        <VoxHeader>
+        <VoxHeader safeAreaView={Platform.OS === 'android' ? false : true}>
           <XStack alignItems="center" flex={1} width="100%">
             <XStack flexGrow={1}>
               <VoxHeader.Title icon={Link}>{props.value.content ? 'Modifier le bouton' : 'Nouveau bouton'}</VoxHeader.Title>
@@ -162,7 +168,6 @@ export const ButtonNodeEditor = (props: NodeEditorProps) => {
             }}
           />
         </YStack>
-
       </VoxCard.Content>
     </ViewportModal>
   )

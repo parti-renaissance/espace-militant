@@ -1,26 +1,29 @@
 import React, { Children, isValidElement } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { useMedia, XStack, YStack } from 'tamagui'
+import { ArrowLeft } from '@tamagui/lucide-icons'
+
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import { VoxButton } from '@/components/Button'
 import { ContentBackButton } from '@/components/ContentBackButton'
+import { TipTapRenderer } from '@/components/TipTapRenderer'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { CategoryChip } from '@/features_next/events/components/CategoryChip'
 import { EventAuthComponent } from '@/features_next/events/components/EventAuthComponent'
 import { EventItemHandleButton } from '@/features_next/events/components/EventItemHandleButton'
+import { EventLive } from '@/features_next/events/components/EventLive'
 import { EventLocation } from '@/features_next/events/components/EventLocation'
+import EventManagementSection from '@/features_next/events/components/EventManagementSection'
 import { EventPremiumChip } from '@/features_next/events/components/EventPremiumChip'
 import { EventShareGroup } from '@/features_next/events/components/EventShareGroup'
 import { EventToggleSubscribeButton } from '@/features_next/events/components/EventToggleSubscribeButton'
 import { EventItemProps } from '@/features_next/events/types'
+
 import { RestItemEvent } from '@/services/events/schema'
-import { XStack, YStack, useMedia } from 'tamagui'
-import { ArrowLeft } from '@tamagui/lucide-icons'
-import { useRouter } from 'expo-router'
-import { EventLive } from '@/features_next/events/components/EventLive'
-import EventManagementSection from '@/features_next/events/components/EventManagementSection'
+
 import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../../utils'
-import Layout from '@/components/AppStructure/Layout/Layout'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import { TipTapRenderer } from '@/components/TipTapRenderer'
 
 const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 'time_zone'>> & { showTime?: boolean }) => {
   if (!props.begin_at) return null
@@ -49,14 +52,7 @@ const FloatingBackButton = () => {
 
   return (
     <YStack position="absolute" top={insets.top + 16} left={16} zIndex={100}>
-      <VoxButton 
-        variant="contained"
-        theme="gray"
-        iconLeft={ArrowLeft}
-        size="md"
-        shrink
-        onPress={handleBack}
-      />
+      <VoxButton variant="contained" theme="gray" iconLeft={ArrowLeft} size="md" shrink onPress={handleBack} />
     </YStack>
   )
 }
@@ -118,13 +114,13 @@ const EventInfo = ({ event }: EventItemProps) => {
   return (
     <>
       {fallbackImage ? <VoxCard.Image large={media.sm} image={fallbackImage} imageData={event.image} /> : null}
-      <YStack gap="$medium" px={media.sm ? "$medium" : 0}>
-      <XStack justifyContent="space-between" alignItems="flex-start" gap={8} flexWrap="wrap"> 
-        <CategoryChip>{event.category?.name}</CategoryChip>
-        <EventPremiumChip event={event} />
-      </XStack>
-      {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
-      {isFull && event.description ? <TipTapRenderer content={event.json_description ?? ''} /> : null}
+      <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
+        <XStack justifyContent="space-between" alignItems="flex-start" gap={8} flexWrap="wrap">
+          <CategoryChip>{event.category?.name}</CategoryChip>
+          <EventPremiumChip event={event} />
+        </XStack>
+        {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
+        {isFull && event.description ? <TipTapRenderer content={event.json_description ?? ''} /> : null}
       </YStack>
     </>
   )
@@ -135,7 +131,7 @@ const EventMeta = ({ event, userUuid }: EventItemProps) => {
   const media = useMedia()
 
   return (
-    <YStack gap="$medium" px={media.sm ? "$medium" : 0}>
+    <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
       <DateItem begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} showTime={isFull} />
       <EventLocation event={event} />
       {isFull && !!event.capacity ? <VoxCard.Capacity>Limité à {event.capacity} inscrits</VoxCard.Capacity> : null}
@@ -202,7 +198,7 @@ const DesktopLayout = (props: EventItemProps) => {
           <EventManagementSection event={props.event} userUuid={props.userUuid} />
         </YStack>
       </LayoutScrollView>
-    </Layout.Main >
+    </Layout.Main>
   )
 }
 
@@ -210,4 +206,3 @@ export function EventContent(props: EventItemProps) {
   const media = useMedia()
   return media.sm ? <MobileLayout {...props} /> : <DesktopLayout {...props} />
 }
-

@@ -1,7 +1,8 @@
-import { errorMessages } from '@/utils/errorMessages'
 import { getCountryCodeForRegionCode, parsePhoneNumber } from 'awesome-phonenumber'
 import { isBefore, subYears } from 'date-fns'
 import { z } from 'zod'
+
+import { errorMessages } from '@/utils/errorMessages'
 
 const buildReqError = (start: string) => ({
   required_error: `${start} est obligatoire.`,

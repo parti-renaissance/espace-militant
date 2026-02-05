@@ -1,7 +1,10 @@
-import VoxCard from '@/components/VoxCard/VoxCard'
-import { RestItemEvent } from '@/services/events/schema'
 import { XStack } from 'tamagui'
-import { isEventAdherentDuesReserved, isEventAdherentReserved, isEventPartial, isEventPrivate, isEventInvitationAgora } from '../utils'
+
+import VoxCard from '@/components/VoxCard/VoxCard'
+
+import { RestItemEvent } from '@/services/events/schema'
+
+import { isEventAdherentDuesReserved, isEventAdherentReserved, isEventInvitationAgora, isEventPartial, isEventPrivate } from '../utils'
 
 export const EventPremiumChip = ({ event }: { event: Partial<RestItemEvent> }) => {
   const isAdh = isEventAdherentReserved(event)

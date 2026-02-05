@@ -1,8 +1,10 @@
 import { ComponentPropsWithoutRef } from 'react'
+import { HelpingHand } from '@tamagui/lucide-icons'
+
 import { VoxButton } from '@/components/Button'
 import RenewMembershipButton from '@/features_next/profil/pages/donations/components/RenewMembershipButton'
+
 import { RestItemEvent } from '@/services/events/schema'
-import { HelpingHand } from '@tamagui/lucide-icons'
 
 export type PremiumLockButtonProps = ComponentPropsWithoutRef<typeof VoxButton> &
   Pick<RestItemEvent, 'uuid'> & {

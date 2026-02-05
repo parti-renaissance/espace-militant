@@ -1,12 +1,15 @@
 import React from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
-import { useGetDetailProfil } from '@/services/profile/hook'
 import { useMedia, YStack } from 'tamagui'
+
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import ProfilLayout from '@/features_next/profil/components/Layout'
+
+import { useGetDetailProfil } from '@/services/profile/hook'
+
 import ContactForm from '../account/form/ContactForm'
 import ForceBirthdateModal from '../account/form/ForceBirthdateModal'
 import NotificationForm from './components/NotificationForm'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import ProfilLayout from '@/features_next/profil/components/Layout'
 
 const CommunicationsContent = () => {
   const { data: profile } = useGetDetailProfil()

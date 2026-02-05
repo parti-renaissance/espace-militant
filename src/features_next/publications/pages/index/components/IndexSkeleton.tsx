@@ -1,8 +1,9 @@
 import React from 'react'
-import { useMedia, YStack } from "tamagui";
+import { useMedia, YStack } from 'tamagui'
+
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
-import Layout from '@/components/AppStructure/Layout/Layout';
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView';
 
 export function IndexSkeleton() {
   return (
@@ -31,4 +32,3 @@ export function IndexSkeleton() {
     </Layout.Main>
   )
 }
-

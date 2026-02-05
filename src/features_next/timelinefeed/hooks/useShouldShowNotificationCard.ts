@@ -1,7 +1,8 @@
-import { useGetSuspenseProfil } from '@/services/profile/hook'
-import { useUserStore } from '@/store/user-store'
 import { isAfter } from 'date-fns'
 import zod from 'zod'
+
+import { useGetSuspenseProfil } from '@/services/profile/hook'
+import { useUserStore } from '@/store/user-store'
 
 const isUserHidedNotificationCard = (x: string | null) => {
   if (!x) return false

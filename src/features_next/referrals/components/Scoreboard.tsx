@@ -3,6 +3,7 @@ import { Image, View, XStack, YStack } from 'tamagui'
 
 import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture'
+
 import { ReferralScoreboardItemType } from '@/services/referral/schema'
 
 // ============================================================================
@@ -58,9 +59,7 @@ export default function ReferralScoreboardTable({ data, national }: ReferralScor
               />
               <Text color="$textPrimaire" numberOfLines={1} ellipsizeMode="tail">
                 {`${entry.first_name} ${entry.last_name}`}
-                {entry?.assembly_code ? (
-                  <Text.SM color="$textSecondary">{` ${national ? `(${entry.assembly_code})` : ''}`}</Text.SM>
-                ) : null}
+                {entry?.assembly_code ? <Text.SM color="$textSecondary">{` ${national ? `(${entry.assembly_code})` : ''}`}</Text.SM> : null}
               </Text>
             </XStack>
 
@@ -97,4 +96,3 @@ export function ReferralScoreboardTableEmptyState() {
     </View>
   )
 }
-

@@ -1,11 +1,13 @@
+import { XStack, YStack } from 'tamagui'
+import { isAfter } from 'date-fns'
+
 import Badge from '@/components/Badge'
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useGetTags } from '@/services/profile/hook'
 import { RestElectedProfileResponse, RestProfilResponse } from '@/services/profile/schema'
-import { isAfter } from 'date-fns'
-import { XStack, YStack } from 'tamagui'
 
 const tagsMapping = (tag: RestProfilResponse['tags'][number]) => {
   switch (tag.type) {
@@ -26,9 +28,7 @@ const Tags = (props: { tags: RestProfilResponse['tags'] }) => {
     <XStack gap="$small">
       {mappedTags.map(({ theme, label }, index) => (
         <XStack key={`${label}-${index}`}>
-          <Badge theme={theme}>
-            {label}
-          </Badge>
+          <Badge theme={theme}>{label}</Badge>
         </XStack>
       ))}
     </XStack>
@@ -46,9 +46,7 @@ const Elu = (props: { mandates: RestElectedProfileResponse['elect_mandates']; ta
       <XStack gap={8} flexWrap="wrap">
         {activeMandates.map((x, index) => (
           <XStack key={`${x.mandate_type}-${index}`}>
-            <Badge theme="green">
-              {x.mandate_type_label}
-            </Badge>
+            <Badge theme="green">{x.mandate_type_label}</Badge>
           </XStack>
         ))}
       </XStack>
