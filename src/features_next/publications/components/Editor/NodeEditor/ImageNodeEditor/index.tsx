@@ -18,6 +18,7 @@ import * as S from '@/features_next/publications/components/Editor/schemas/messa
 
 import ProgressBar from '@/screens/shared/ProgressBar'
 import { useUploadFile } from '@/services/files/hook'
+import { normalizeUrl } from '@/utils/normalizeUrl'
 
 import { useImageSelector } from './useImageSelector'
 
@@ -211,7 +212,11 @@ const ImageNodeEditorContent = (props: NodeEditorProps) => {
 
     if (hasContent) {
       handleSubmit((data) => {
-        props.onChange(data)
+        const normalized = { ...data }
+        if (normalized.content?.link_url?.trim()) {
+          normalized.content = { ...normalized.content, link_url: normalizeUrl(normalized.content.link_url) }
+        }
+        props.onChange(normalized)
         props.onBlur()
       })()
     } else {
