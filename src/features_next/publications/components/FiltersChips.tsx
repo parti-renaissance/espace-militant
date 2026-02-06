@@ -3,31 +3,26 @@ import { CircleX, EqualNot, Undo2 } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
 
+import type { RestFilterCollectionResponse } from '@/services/publications/schema'
+
 import { AVAILABLE_FILTERS } from './Editor/RenderFields/SelectFilters/AdvancedFilters'
+import type { FilterValue, SelectedFiltersType } from './Editor/RenderFields/SelectFilters/type'
 
-export type FilterValue =
-  | string
-  | number
-  | boolean
-  | string[]
-  | { min: number; max: number }
-  | { start: string; end: string }
-  | Record<string, string>
-  | Record<string, string>[]
-  | { uuid: string; type: string; code: string; name: string }
-  | { uuid: string; type: string; code: string; name: string }[]
-  | undefined
-  | null
-
-export type SelectedFiltersType = Record<string, FilterValue>
+export type { FilterValue, SelectedFiltersType }
 
 export type FiltersChipsProps = {
   selectedFilters: Record<string, FilterValue>
   onFilterChange?: (filterKey: string, value: FilterValue) => void
   isStatic?: boolean
+  /** Collection de filtres depuis l’API (si fournie, utilisée pour les libellés ; sinon fallback sur AVAILABLE_FILTERS) */
+  filterCollection?: RestFilterCollectionResponse | null
 }
 
-const getFilterLabel = (key: string, value: FilterValue): string => {
+const getFilterLabel = (
+  key: string,
+  value: FilterValue,
+  filterCollection: RestFilterCollectionResponse | null | undefined,
+): string => {
   // Exception pour le filtre zone : afficher zone.name (zone.code)
   if (key === 'zone' && typeof value === 'object' && value !== null && 'name' in value && 'code' in value) {
     return `${value.name} (${value.code})`
@@ -56,8 +51,9 @@ const getFilterLabel = (key: string, value: FilterValue): string => {
     return 'Tous mes contacts'
   }
 
-  // Rechercher le filtre dans AVAILABLE_FILTERS
-  for (const category of AVAILABLE_FILTERS) {
+  const collection = filterCollection && filterCollection.length > 0 ? filterCollection : AVAILABLE_FILTERS
+
+  for (const category of collection) {
     const filter = category.filters.find((f) => f.code === key)
 
     if (filter) {
@@ -125,7 +121,12 @@ export const calculateDefaultValues = (selectedFilters: Record<string, FilterVal
   return defaults
 }
 
-export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false }: FiltersChipsProps) => {
+export const FiltersChips = ({
+  selectedFilters,
+  onFilterChange,
+  isStatic = false,
+  filterCollection,
+}: FiltersChipsProps) => {
   // Calculer automatiquement les valeurs par défaut
   const defaultValues = calculateDefaultValues(selectedFilters)
 
@@ -176,7 +177,7 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
     <YStack gap="$small">
       <XStack flexWrap="wrap" gap="$small">
         {activeFilters.map(([key, value]) => {
-          const label = getFilterLabel(key, value)
+          const label = getFilterLabel(key, value, filterCollection)
 
           // Détecter si la valeur commence par "!" (négation)
           const isNegation = typeof value === 'string' && value.startsWith('!')

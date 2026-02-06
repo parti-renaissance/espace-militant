@@ -9,9 +9,11 @@ import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
+import type { ZoneProviderOptions } from '@/components/GlobalSearch/providers/ZoneProvider'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 
-import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook'
+import { useGetFilterCollection, useGetMessageCountRecipientsPartial } from '@/services/publications/hook'
+import type { RestFilterOptionZoneAutocomplete } from '@/services/publications/schema'
 
 import { calculateDefaultValues, FiltersChips } from '../../../FiltersChips'
 import AdvancedFilters from './AdvancedFilters'
@@ -45,11 +47,27 @@ export default function SelectFilters({
   const quickFilters: HierarchicalQuickFilterType[] = useMemo(() => getHierarchicalQuickFilters(), [])
   const queryClient = useQueryClient()
 
+  const { data: filterCollection } = useGetFilterCollection({ scope: scope ?? '', enabled: !!scope })
+
   useEffect(() => {
     setIsAdvancedFilters(selectedQuickFilterId ? false : true)
   }, [])
 
-  const zoneProvider = useMemo(() => new ZoneProvider(), [])
+  const zoneAutocompleteOptions = useMemo((): ZoneProviderOptions | undefined => {
+    if (!filterCollection?.length) return undefined
+    for (const category of filterCollection) {
+      const zoneFilter = category.filters.find((f) => f.type === 'zone_autocomplete' && f.options != null)
+      if (zoneFilter?.options && 'url' in zoneFilter.options) {
+        return zoneFilter.options as RestFilterOptionZoneAutocomplete
+      }
+    }
+    return undefined
+  }, [filterCollection])
+
+  const zoneProvider = useMemo(
+    () => new ZoneProvider(zoneAutocompleteOptions),
+    [zoneAutocompleteOptions],
+  )
 
   // Fonction pour fusionner les filtres du filtre rapide avec les filtres avancés
   const mergeQuickFilterWithAdvancedFilters = useCallback(
@@ -291,7 +309,11 @@ export default function SelectFilters({
           {media.gtMd ? <Header /> : null}
           <YStack gap="$medium" padding="$medium">
             {/* Affichage des filtres actifs sous forme de chips */}
-            <FiltersChips selectedFilters={selectedFilters} onFilterChange={handleFilterChange} />
+            <FiltersChips
+              selectedFilters={selectedFilters}
+              onFilterChange={handleFilterChange}
+              filterCollection={filterCollection ?? undefined}
+            />
             <YStack gap="$medium">
               <YStack gap="$small">
                 <XStack alignItems="center" flexWrap="wrap">

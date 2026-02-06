@@ -3,10 +3,12 @@ export type FilterValue =
   | number
   | boolean
   | string[]
-  | { min: number; max: number }
-  | { start: string; end: string }
+  | { min: number | null; max: number | null }
+  | { start: string | null; end: string | null }
   | Record<string, string>
   | Record<string, string>[]
+  | { uuid: string; type: string; code: string; name: string }
+  | { uuid: string; type: string; code: string; name: string }[]
   | undefined
   | null
 

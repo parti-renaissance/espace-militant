@@ -8,7 +8,7 @@ import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
-import { useGetMessageCountRecipientsPartial, usePutMessageFilters } from '@/services/publications/hook'
+import { useGetFilterCollection, useGetMessageCountRecipientsPartial, usePutMessageFilters } from '@/services/publications/hook'
 import { RestAvailableSender, RestAvailableSendersResponse, RestGetMessageFiltersResponse, RestGetMessageResponse } from '@/services/publications/schema'
 
 import SenderView from '../../SenderView'
@@ -59,6 +59,8 @@ export const MetaDataForm = memo(
     })
 
     const { mutate: putMessageFilters, isPending: isPuttingMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
+    // Prefetch filter collection
+    useGetFilterCollection({ scope: props.scope, enabled: !!props.scope })
     const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({
       messageId: props.messageId,
       scope: props.scope,
