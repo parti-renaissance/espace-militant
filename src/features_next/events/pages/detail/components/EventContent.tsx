@@ -158,17 +158,19 @@ const EventMeta = ({ event, userUuid }: EventItemProps) => {
 const MobileLayout = (props: EventItemProps) => {
   return (
     <>
-      <LayoutScrollView padding={false}>
-        <YStack paddingBottom={100}>
-          <EventLive event={props.event} userUuid={props.userUuid} />
-          <VoxCard overflow="hidden" pb={66} borderWidth={0}>
-            <EventInfo {...props} />
-            <VoxCard.Separator />
-            <EventMeta {...props} />
-            <EventManagementSection event={props.event} userUuid={props.userUuid} />
-          </VoxCard>
-        </YStack>
-      </LayoutScrollView>
+      <Layout.Main maxWidth={892}>
+        <LayoutScrollView padding={false}>
+          <YStack paddingBottom={100}>
+            <EventLive event={props.event} userUuid={props.userUuid} />
+            <VoxCard overflow="hidden" pb={66} borderWidth={0}>
+              <EventInfo {...props} />
+              <VoxCard.Separator />
+              <EventMeta {...props} />
+              <EventManagementSection event={props.event} userUuid={props.userUuid} />
+            </VoxCard>
+          </YStack>
+        </LayoutScrollView>
+      </Layout.Main>
       <FloatingBackButton />
       <MobileBottomCTA {...props} />
     </>
