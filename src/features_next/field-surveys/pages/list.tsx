@@ -5,6 +5,7 @@ import { router } from 'expo-router'
 import { Circle, Image, ScrollView, styled, useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft, Calendar, ClipboardCheck, FileQuestion, Flag, MapPin, Pen, RotateCw } from '@tamagui/lucide-icons'
 
+import { Layout } from '@/components/AppStructure'
 import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
@@ -267,57 +268,60 @@ const FieldSurveysListPage: React.FC = () => {
   const surveysCount = useMemo(() => surveys?.length || 0, [surveys])
 
   return (
-    <LayoutScrollView
-      refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} colors={['#007AFF']} />}
-      contentContainerStyle={{ flexGrow: 1, paddingBottom: 40, backgroundColor: media.sm ? 'white' : '$textSurface' }}
-      showsVerticalScrollIndicator={false}
-      disablePadding={media.sm}
-    >
-      <Container>
-        <ImageBackground
-          source={require('../assets/bg-surveys.png')}
-          style={{ height: media.sm ? 250 : 350, marginHorizontal: spacingValues.paddingLeft, borderRadius: 16, overflow: 'hidden' }}
-        />
-        <ContentWrapper>
-          <VoxCard borderRadius="$medium" bg="white" mx={media.sm ? '$medium' : 0}>
-            <VoxCard.Content p={media.sm ? 12 : '$medium'}>
-              <VoxCard bg="$blue1" inside>
-                <VoxCard.Content p={media.sm ? 12 : '$medium'}>
-                  <XStack gap="$large">
-                    <YStack gap="$medium" flexShrink={1}>
-                      <YStack gap="$small">
-                        <Text semibold fontSize={media.sm ? 14 : 16}>
-                          Questionnaires de terrain
+    <Layout.Main maxWidth="100%">
+      <LayoutScrollView
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} colors={['#007AFF']} />}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40, backgroundColor: media.sm ? 'white' : '$textSurface' }}
+        showsVerticalScrollIndicator={false}
+        disablePadding={media.sm}
+      >
+        <Container>
+          <ImageBackground
+            source={require('../assets/bg-surveys.png')}
+            style={{ height: media.sm ? 250 : 350, marginHorizontal: spacingValues.paddingLeft, borderRadius: 16, overflow: 'hidden' }}
+          />
+          <ContentWrapper>
+            <VoxCard borderRadius="$medium" bg="white" mx={media.sm ? '$medium' : 0}>
+              <VoxCard.Content p={media.sm ? 12 : '$medium'}>
+                <VoxCard bg="$blue1" inside>
+                  <VoxCard.Content p={media.sm ? 12 : '$medium'}>
+                    <XStack gap="$large">
+                      <YStack gap="$medium" flexShrink={1}>
+                        <YStack gap="$small">
+                          <Text semibold fontSize={media.sm ? 14 : 16}>
+                            Questionnaires de terrain
+                          </Text>
+                          <VoxCard.Chip theme="blue" backgroundColor="white">
+                            {`${surveysCount} questionnaire${surveysCount > 1 ? 's' : ''} disponible${surveysCount > 1 ? 's' : ''}`}
+                          </VoxCard.Chip>
+                        </YStack>
+                        <Text fontSize={media.sm ? 12 : 14} color="$textSecondary">
+                          Les questionnaires de terrains sont faits pour aller à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à
+                          porte.
                         </Text>
-                        <VoxCard.Chip theme="blue" backgroundColor="white">
-                          {`${surveysCount} questionnaire${surveysCount > 1 ? 's' : ''} disponible${surveysCount > 1 ? 's' : ''}`}
-                        </VoxCard.Chip>
                       </YStack>
-                      <Text fontSize={media.sm ? 12 : 14} color="$textSecondary">
-                        Les questionnaires de terrains sont faits pour aller à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à porte.
-                      </Text>
-                    </YStack>
-                    <Image
-                      source={require('../assets/notepad-survey.png')}
-                      objectFit="contain"
-                      display={media.sm ? 'none' : 'block'}
-                      width={129}
-                      height={126}
-                      mr="$medium"
-                    />
-                  </XStack>
-                </VoxCard.Content>
-              </VoxCard>
-            </VoxCard.Content>
-          </VoxCard>
+                      <Image
+                        source={require('../assets/notepad-survey.png')}
+                        objectFit="contain"
+                        display={media.sm ? 'none' : 'block'}
+                        width={129}
+                        height={126}
+                        mr="$medium"
+                      />
+                    </XStack>
+                  </VoxCard.Content>
+                </VoxCard>
+              </VoxCard.Content>
+            </VoxCard>
 
-          {isLoading && <LoadingState />}
-          {error && <ErrorState onRetry={handleRefresh} />}
-          {!surveys || (surveys.length === 0 && <EmptyState />)}
-          {surveys && surveys.length > 0 && !error && !isLoading && <SurveyList surveys={surveys} />}
-        </ContentWrapper>
-      </Container>
-    </LayoutScrollView>
+            {isLoading && <LoadingState />}
+            {error && <ErrorState onRetry={handleRefresh} />}
+            {!surveys || (surveys.length === 0 && <EmptyState />)}
+            {surveys && surveys.length > 0 && !error && !isLoading && <SurveyList surveys={surveys} />}
+          </ContentWrapper>
+        </Container>
+      </LayoutScrollView>
+    </Layout.Main>
   )
 }
 

@@ -5,6 +5,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { Circle, isWeb, styled, useMedia, XStack, YStack } from 'tamagui'
 import { RotateCcw, ThumbsUp } from '@tamagui/lucide-icons'
 
+import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
@@ -81,42 +82,44 @@ const FieldSurveySuccessPage: React.FC = () => {
           <VoxHeader.Title>Questionnaire terminé</VoxHeader.Title>
         </VoxHeader>
       ) : null}
-      <LayoutScrollView showsVerticalScrollIndicator={false} disablePadding>
-        <Container flex={1}>
-          {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
-          <ContentWrapper flex={1}>
-            <VoxCard
-              inside={media.sm ? true : false}
-              flex={media.sm ? 1 : undefined}
-              borderWidth={media.sm ? 0 : 1}
-              shadowColor={media.sm ? 'transparent' : undefined}
-              elevation={media.sm ? 0 : undefined}
-              bg={media.sm ? 'transparent' : 'white'}
-            >
-              <VoxCard.Content gap="$large" flex={1} alignItems="center" justifyContent="center" pt="$xxlarge">
-                <Circle size={88} backgroundColor="$green1">
-                  <ThumbsUp size={40} color="$green6" />
-                </Circle>
-                <YStack alignItems="center" gap="$medium" pb="$xxlarge">
-                  <Text.LG semibold textAlign="center">
-                    Bravo
-                  </Text.LG>
-                  <YStack alignItems="center">
-                    <Text.MD textAlign="center" color="$textSecondary" maxWidth={400}>
-                      Un questionnaire de plus réalisé.
-                    </Text.MD>
-                    <Text.MD textAlign="center" color="$textSecondary" maxWidth={400}>
-                      Merci de votre engagement !
-                    </Text.MD>
+      <Layout.Main maxWidth="100%">
+        <LayoutScrollView showsVerticalScrollIndicator={false} disablePadding>
+          <Container flex={1}>
+            {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
+            <ContentWrapper flex={1}>
+              <VoxCard
+                inside={media.sm ? true : false}
+                flex={media.sm ? 1 : undefined}
+                borderWidth={media.sm ? 0 : 1}
+                shadowColor={media.sm ? 'transparent' : undefined}
+                elevation={media.sm ? 0 : undefined}
+                bg={media.sm ? 'transparent' : 'white'}
+              >
+                <VoxCard.Content gap="$large" flex={1} alignItems="center" justifyContent="center" pt="$xxlarge">
+                  <Circle size={88} backgroundColor="$green1">
+                    <ThumbsUp size={40} color="$green6" />
+                  </Circle>
+                  <YStack alignItems="center" gap="$medium" pb="$xxlarge">
+                    <Text.LG semibold textAlign="center">
+                      Bravo
+                    </Text.LG>
+                    <YStack alignItems="center">
+                      <Text.MD textAlign="center" color="$textSecondary" maxWidth={400}>
+                        Un questionnaire de plus réalisé.
+                      </Text.MD>
+                      <Text.MD textAlign="center" color="$textSecondary" maxWidth={400}>
+                        Merci de votre engagement !
+                      </Text.MD>
+                    </YStack>
                   </YStack>
-                </YStack>
 
-                {media.gtSm && <FixedButtons />}
-              </VoxCard.Content>
-            </VoxCard>
-          </ContentWrapper>
-        </Container>
-      </LayoutScrollView>
+                  {media.gtSm && <FixedButtons />}
+                </VoxCard.Content>
+              </VoxCard>
+            </ContentWrapper>
+          </Container>
+        </LayoutScrollView>
+      </Layout.Main>
 
       {media.sm && <FixedButtons />}
     </YStack>
