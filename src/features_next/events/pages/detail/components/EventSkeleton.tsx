@@ -7,32 +7,34 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 const MobileSkeleton = () => {
   return (
-    <LayoutScrollView padding={false}>
-      <YStack>
-        <SkeCard.Image />
-        <SkeCard>
-          <SkeCard.Content>
-            <XStack justifyContent="space-between" alignItems="center">
-              <SkeCard.Chip />
-              <SkeCard.Chip />
-            </XStack>
-            <SkeCard.Title />
-            <SkeCard.Description />
-            <SkeCard.Separator />
-            <SkeCard.Date />
-            <SkeCard.Date />
-            <SkeCard.Date />
-            <SkeCard.Section>
-              <SkeCard.Author />
-            </SkeCard.Section>
-            <SkeCard.Section>
-              <SkeCard.Button full size="xl" />
-              <SkeCard.Button full size="xl" />
-            </SkeCard.Section>
-          </SkeCard.Content>
-        </SkeCard>
-      </YStack>
-    </LayoutScrollView>
+    <Layout.Main maxWidth={892}>
+      <LayoutScrollView padding={false}>
+        <YStack>
+          <SkeCard.Image />
+          <SkeCard>
+            <SkeCard.Content>
+              <XStack justifyContent="space-between" alignItems="center">
+                <SkeCard.Chip />
+                <SkeCard.Chip />
+              </XStack>
+              <SkeCard.Title />
+              <SkeCard.Description />
+              <SkeCard.Separator />
+              <SkeCard.Date />
+              <SkeCard.Date />
+              <SkeCard.Date />
+              <SkeCard.Section>
+                <SkeCard.Author />
+              </SkeCard.Section>
+              <SkeCard.Section>
+                <SkeCard.Button full size="xl" />
+                <SkeCard.Button full size="xl" />
+              </SkeCard.Section>
+            </SkeCard.Content>
+          </SkeCard>
+        </YStack>
+      </LayoutScrollView>
+    </Layout.Main>
   )
 }
 
