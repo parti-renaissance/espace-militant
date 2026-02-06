@@ -4,6 +4,7 @@ import { ScrollView, useMedia, View, XStack, YStack } from 'tamagui'
 import { ListTodo, Medal } from '@tamagui/lucide-icons'
 
 import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
+import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView, { type LayoutScrollViewRef } from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import BreadCrumb from '@/components/BreadCrumb/BreadCrumb'
@@ -66,92 +67,94 @@ export function ReferralsDesktopContent({ user, scoreboard, statistics }: Referr
   const shouldShowAssemblyFirst = !isInTop5National && hasAssemblyRanking
 
   return (
-    <LayoutScrollView
-      contentContainerStyle={{ paddingBottom: 100, backgroundColor: '$textSurface' }}
-      ref={scrollViewRef}
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
-    >
-      <View backgroundColor="$orange1" pt="$6" pb={52} borderRadius="$medium" mx={spacingValues.paddingLeft}>
-        <View maxWidth={480} width="100%" margin="auto">
-          <ReferralScoreCard
-            fullName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}
-            globalRank={!shouldShowAssemblyFirst ? scoreboard?.global_rank : undefined}
-            assemblyRank={shouldShowAssemblyFirst ? scoreboard?.assembly_rank : undefined}
-            nbReferralFinished={statistics?.nb_referral_finished ?? 0}
-            nbReferralSent={statistics?.nb_referral_sent ?? 0}
-            assemblyName={scoreboard?.assembly?.[0]?.assembly_name ?? undefined}
-            profileImage={user?.image_url}
-          />
-        </View>
-      </View>
-      <View mt={-48}>
-        <View maxWidth={892} width="100%" margin="auto">
-          <VoxCard>
-            <VoxCard.Content>
-              <XStack gap="$medium">
-                <YStack flex={1} maxWidth={422}>
-                  <ReferralsLinkCard />
-                </YStack>
-                <YStack flex={1} maxWidth={422}>
-                  <ReferralsInviteCard />
-                </YStack>
-              </XStack>
-            </VoxCard.Content>
-          </VoxCard>
-        </View>
-      </View>
-      <XStack maxWidth={892} py="$medium" width="100%" margin="auto" height="auto">
-        <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
-          <View pl="$medium" pt="$medium" width={200}>
-            <BreadCrumb
-              items={[
-                { id: 'cl', label: 'Classement', icon: <Medal size={16} /> },
-                { id: 'suivi', label: 'Suivi', icon: <ListTodo size={16} /> },
-              ]}
-              value={activeSection}
-              vertical
-              onChange={(value) => {
-                if (value === 'cl') scrollToRanking()
-                if (value === 'suivi') scrollToTracking()
-              }}
+    <Layout.Main maxWidth="100%">
+      <LayoutScrollView
+        contentContainerStyle={{ paddingBottom: 100, backgroundColor: '$textSurface' }}
+        ref={scrollViewRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
+        <View backgroundColor="$orange1" pt="$6" pb={52} borderRadius="$medium" mx={spacingValues.paddingLeft}>
+          <View maxWidth={480} width="100%" margin="auto">
+            <ReferralScoreCard
+              fullName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}
+              globalRank={!shouldShowAssemblyFirst ? scoreboard?.global_rank : undefined}
+              assemblyRank={shouldShowAssemblyFirst ? scoreboard?.assembly_rank : undefined}
+              nbReferralFinished={statistics?.nb_referral_finished ?? 0}
+              nbReferralSent={statistics?.nb_referral_sent ?? 0}
+              assemblyName={scoreboard?.assembly?.[0]?.assembly_name ?? undefined}
+              profileImage={user?.image_url}
             />
           </View>
-        </StickyBox>
-        <YStack gap="$medium" flex={1}>
-          {/* Section Classement */}
-          <YStack
-            onLayout={(e) => {
-              rankingLayout.current = e.nativeEvent.layout
-            }}
-            gap="$medium"
-          >
-            <YStack gap="$medium">
-              {shouldShowAssemblyFirst ? (
-                <>
-                  <ReferralsRankingCard title={assemblyTitle} data={scoreboard?.assembly} />
-                  <ReferralsRankingCard title="National" data={scoreboard?.global} />
-                </>
-              ) : (
-                <>
-                  <ReferralsRankingCard title="National" data={scoreboard?.global} />
-                  {hasAssemblyRanking && <ReferralsRankingCard title={assemblyTitle} data={scoreboard?.assembly} />}
-                </>
-              )}
+        </View>
+        <View mt={-48}>
+          <View maxWidth={892} width="100%" margin="auto">
+            <VoxCard>
+              <VoxCard.Content>
+                <XStack gap="$medium">
+                  <YStack flex={1} maxWidth={422}>
+                    <ReferralsLinkCard />
+                  </YStack>
+                  <YStack flex={1} maxWidth={422}>
+                    <ReferralsInviteCard />
+                  </YStack>
+                </XStack>
+              </VoxCard.Content>
+            </VoxCard>
+          </View>
+        </View>
+        <XStack maxWidth={892} py="$medium" width="100%" margin="auto" height="auto">
+          <StickyBox offsetTop="$xxlarge" offsetBottom="$medium">
+            <View pl="$medium" pt="$medium" width={200}>
+              <BreadCrumb
+                items={[
+                  { id: 'cl', label: 'Classement', icon: <Medal size={16} /> },
+                  { id: 'suivi', label: 'Suivi', icon: <ListTodo size={16} /> },
+                ]}
+                value={activeSection}
+                vertical
+                onChange={(value) => {
+                  if (value === 'cl') scrollToRanking()
+                  if (value === 'suivi') scrollToTracking()
+                }}
+              />
+            </View>
+          </StickyBox>
+          <YStack gap="$medium" flex={1}>
+            {/* Section Classement */}
+            <YStack
+              onLayout={(e) => {
+                rankingLayout.current = e.nativeEvent.layout
+              }}
+              gap="$medium"
+            >
+              <YStack gap="$medium">
+                {shouldShowAssemblyFirst ? (
+                  <>
+                    <ReferralsRankingCard title={assemblyTitle} data={scoreboard?.assembly} />
+                    <ReferralsRankingCard title="National" data={scoreboard?.global} />
+                  </>
+                ) : (
+                  <>
+                    <ReferralsRankingCard title="National" data={scoreboard?.global} />
+                    {hasAssemblyRanking && <ReferralsRankingCard title={assemblyTitle} data={scoreboard?.assembly} />}
+                  </>
+                )}
+              </YStack>
+            </YStack>
+            {/* Section Suivi */}
+            <YStack
+              flex={1}
+              onLayout={(e) => {
+                trackingLayout.current = e.nativeEvent.layout
+              }}
+            >
+              <ReferralsTrackingCard />
             </YStack>
           </YStack>
-          {/* Section Suivi */}
-          <YStack
-            flex={1}
-            onLayout={(e) => {
-              trackingLayout.current = e.nativeEvent.layout
-            }}
-          >
-            <ReferralsTrackingCard />
-          </YStack>
-        </YStack>
-      </XStack>
-    </LayoutScrollView>
+        </XStack>
+      </LayoutScrollView>
+    </Layout.Main>
   )
 }
 

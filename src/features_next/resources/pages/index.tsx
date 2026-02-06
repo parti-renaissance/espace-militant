@@ -13,8 +13,8 @@ import { useGetRessources } from '@/services/ressources/hook'
 
 const ResourcesSkeleton = ({ media }: { media: ReturnType<typeof useMedia> }) => {
   return (
-    <LayoutScrollView contentContainerStyle={{ alignItems: media.gtSm ? 'center' : undefined }}>
-      <Layout.Main maxWidth={892} width="100%">
+    <Layout.Main maxWidth={892} width="100%">
+      <LayoutScrollView contentContainerStyle={{ alignItems: media.gtSm ? 'center' : undefined }}>
         <View flexDirection={media.gtSm ? 'row' : 'column'} flexWrap="wrap" gap="$medium" px="$medium" width="100%">
           {Array.from({ length: 4 }).map((_, index) => (
             <SkeCard key={index} height="$13" width={media.gtSm ? (isWeb ? 'calc(50% - 9px)' : '48.8%') : '100%'}>
@@ -32,8 +32,8 @@ const ResourcesSkeleton = ({ media }: { media: ReturnType<typeof useMedia> }) =>
             </SkeCard>
           ))}
         </View>
-      </Layout.Main>
-    </LayoutScrollView>
+      </LayoutScrollView>
+    </Layout.Main>
   )
 }
 
@@ -58,11 +58,11 @@ const ResourcesScreen = () => {
   }
 
   return (
-    <LayoutScrollView
-      contentContainerStyle={{ alignItems: media.gtSm ? 'center' : undefined }}
-      refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}
-    >
-      <Layout.Main maxWidth={892} width="100%">
+    <Layout.Main maxWidth={892} width="100%">
+      <LayoutScrollView
+        contentContainerStyle={{ alignItems: media.gtSm ? 'center' : undefined }}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}
+      >
         <View flexDirection={media.gtSm ? 'row' : 'column'} flexWrap="wrap" gap="$medium" px="$medium" width="100%">
           {tools.length > 0 ? (
             tools?.map((item) => (
@@ -76,8 +76,8 @@ const ResourcesScreen = () => {
             </View>
           )}
         </View>
-      </Layout.Main>
-    </LayoutScrollView>
+      </LayoutScrollView>
+    </Layout.Main>
   )
 }
 

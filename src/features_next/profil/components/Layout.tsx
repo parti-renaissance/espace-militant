@@ -101,7 +101,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                   Anciens outils
                 </Text.SM>
                 <NavItem text="Actions" iconLeft={Zap} href="/old/actions" />
-                <NavItem text="Scanner" iconLeft={QrCode} href="/old/scanner" />
+                <NavItem text="Scanner" iconLeft={QrCode} href="/scanner" />
                 <NavItem text="Porte à porte" iconLeft={DoorOpen} href="/old/porte-a-porte" />
                 <NavItem text="Formations" iconLeft={GraduationCap} href="/old/formations" />
               </VoxCard.Content>
