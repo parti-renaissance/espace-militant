@@ -143,6 +143,7 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
     const allFields = [
       'is_certified',
       'is_committee_member',
+      'committee',
       'mandate_type',
       'declared_mandate',
       'is_campus_registered',

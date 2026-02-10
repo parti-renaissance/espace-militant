@@ -7,6 +7,8 @@ import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 
 import { RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
 
+const toSnake = (s: string) => s.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '')
+
 export const useCreateMessage = (props: { uuid?: string }) => {
   const toast = useToastController()
   const errorMessage = props.uuid ? 'Impossible de modifier ce message' : 'Impossible de créer ce message'
@@ -274,7 +276,10 @@ export { useAutoSave } from '@/features_next/publications/components/Editor/hook
 export const useGetFilterCollection = (props: { scope: string; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['filter-collection', props.scope],
-    queryFn: () => api.getFilterCollection({ scope: props.scope }),
+    queryFn: async () => {
+      const data = await api.getFilterCollection({ scope: props.scope })
+      return data.map((c) => ({ ...c, filters: c.filters.map((f) => ({ ...f, code: toSnake(f.code) })) }))
+    },
     enabled: props.enabled !== false,
     staleTime: (query) => (query.state.error ? 0 : 60 * 1000),
   })

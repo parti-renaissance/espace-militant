@@ -18,11 +18,7 @@ export type FiltersChipsProps = {
   filterCollection?: RestFilterCollectionResponse | null
 }
 
-const getFilterLabel = (
-  key: string,
-  value: FilterValue,
-  filterCollection: RestFilterCollectionResponse | null | undefined,
-): string => {
+const getFilterLabel = (key: string, value: FilterValue, filterCollection: RestFilterCollectionResponse | null | undefined): string => {
   // Exception pour le filtre zone : afficher zone.name (zone.code)
   if (key === 'zone' && typeof value === 'object' && value !== null && 'name' in value && 'code' in value) {
     return `${value.name} (${value.code})`
@@ -52,18 +48,33 @@ const getFilterLabel = (
   }
 
   const collection = filterCollection && filterCollection.length > 0 ? filterCollection : AVAILABLE_FILTERS
+  const keyWithoutSuffix = key.replace(/_(since|until|before|after)$/, '')
 
   for (const category of collection) {
-    const filter = category.filters.find((f) => f.code === key)
+    const filter = category.filters.find((f) => f.code === key) ?? category.filters.find((f) => f.code === keyWithoutSuffix)
 
     if (filter) {
       // Si c'est un select avec des choix, récupérer le label de la valeur
-      if (filter.type === 'select' && filter.options && typeof value === 'string') {
+      if (filter.type === 'select' && filter.options) {
         const options = filter.options as { choices?: Record<string, string> | string[] }
-        if (options.choices && typeof options.choices === 'object' && !Array.isArray(options.choices)) {
-          const choiceLabel = options.choices[value]
-          if (choiceLabel) {
-            return choiceLabel
+        if (options.choices && typeof options.choices === 'object') {
+          if (!Array.isArray(options.choices)) {
+            const choiceLabel = typeof value === 'string' ? options.choices[value] : undefined
+            if (choiceLabel) {
+              return choiceLabel
+            }
+          } else {
+            // choices est un tableau (ex. isCommitteeMember : ["Non", "Oui"]) → afficher "Label : Valeur"
+            const idx = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : -1
+            const choiceLabel =
+              Number.isInteger(idx) && idx >= 0 && idx < options.choices.length
+                ? options.choices[idx]
+                : typeof value === 'string' && options.choices.includes(value)
+                  ? value
+                  : undefined
+            if (choiceLabel) {
+              return `${filter.label} : ${choiceLabel}`
+            }
           }
         }
       }
@@ -121,12 +132,7 @@ export const calculateDefaultValues = (selectedFilters: Record<string, FilterVal
   return defaults
 }
 
-export const FiltersChips = ({
-  selectedFilters,
-  onFilterChange,
-  isStatic = false,
-  filterCollection,
-}: FiltersChipsProps) => {
+export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false, filterCollection }: FiltersChipsProps) => {
   // Calculer automatiquement les valeurs par défaut
   const defaultValues = calculateDefaultValues(selectedFilters)
 

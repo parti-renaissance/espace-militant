@@ -64,10 +64,7 @@ export default function SelectFilters({
     return undefined
   }, [filterCollection])
 
-  const zoneProvider = useMemo(
-    () => new ZoneProvider(zoneAutocompleteOptions),
-    [zoneAutocompleteOptions],
-  )
+  const zoneProvider = useMemo(() => new ZoneProvider(zoneAutocompleteOptions), [zoneAutocompleteOptions])
 
   // Fonction pour fusionner les filtres du filtre rapide avec les filtres avancés
   const mergeQuickFilterWithAdvancedFilters = useCallback(
@@ -83,7 +80,7 @@ export default function SelectFilters({
         })
       } else {
         // En mode filtres rapides : on réinitialise les filtres avancés non protégés
-        const protectedFilters = ['zone', 'zones', 'committee']
+        const protectedFilters = ['zone', 'zones']
 
         // EXEMPLE - Protéger static_tags si sa valeur est liée à la rentrée
         // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
@@ -128,15 +125,8 @@ export default function SelectFilters({
       }
     }
 
-    if (selectedFilters.committee && typeof selectedFilters.committee === 'object' && 'name' in selectedFilters.committee) {
-      return {
-        label: selectedFilters.committee.name,
-        value: null,
-      }
-    }
-
     return undefined
-  }, [selectedFilters.zone, selectedFilters.zones, selectedFilters.committee, messageId]) // update when zone changes
+  }, [selectedFilters.zone, selectedFilters.zones, messageId]) // update when zone changes
 
   // Calculer les valeurs par défaut en fonction de messageId et des zones disponibles
   const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), [messageId, selectedFilters.zones, selectedFilters.zone])
@@ -160,7 +150,7 @@ export default function SelectFilters({
       return baseLabel
     }
 
-    const excludedFilters = ['zone', 'zones', 'committee']
+    const excludedFilters = ['zone', 'zones']
 
     // EXEMPLE - Exclure static_tags s'il est protégé (lié à la rentrée)
     // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
@@ -229,8 +219,8 @@ export default function SelectFilters({
     [updateFilter],
   )
 
-  const handleZoneAndCommitteeReset = useCallback(() => {
-    updateFilter({ zone: null, committee: null })
+  const handleZoneReset = useCallback(() => {
+    updateFilter({ zone: null })
   }, [updateFilter])
 
   const handleAdvancedFiltersToggle = useCallback(() => {
@@ -309,11 +299,7 @@ export default function SelectFilters({
           {media.gtMd ? <Header /> : null}
           <YStack gap="$medium" padding="$medium">
             {/* Affichage des filtres actifs sous forme de chips */}
-            <FiltersChips
-              selectedFilters={selectedFilters}
-              onFilterChange={handleFilterChange}
-              filterCollection={filterCollection ?? undefined}
-            />
+            <FiltersChips selectedFilters={selectedFilters} onFilterChange={handleFilterChange} filterCollection={filterCollection ?? undefined} />
             <YStack gap="$medium">
               <YStack gap="$small">
                 <XStack alignItems="center" flexWrap="wrap">
@@ -374,11 +360,11 @@ export default function SelectFilters({
                 key={`zone-search-${zoneResetKey}`}
                 provider={zoneProvider}
                 onSelect={handleZoneSelect}
-                onReset={handleZoneAndCommitteeReset}
+                onReset={handleZoneReset}
                 placeholder="Zone géographique"
                 scope={scope}
                 defaultValue={zoneDefaultValue}
-                nullable={!!selectedFilters.committee && !!selectedFilters.zone}
+                nullable={!!selectedFilters.zone}
                 helpText={
                   <Text.SM>
                     <Text.SM semibold>Toutes les zones inclues dans votre zone de gestion sont filtrables. </Text.SM> Exemple : Circonscriptions, Cantons,

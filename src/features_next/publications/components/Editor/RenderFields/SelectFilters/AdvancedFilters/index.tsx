@@ -202,6 +202,10 @@ function AdvancedFiltersInner({ scope, selectedFilters = {}, onFilterChange }: A
       if (typeof value === 'string') return value
       if (typeof value === 'number') return value.toString()
       if (typeof value === 'boolean') return value.toString()
+      if (typeof value === 'object' && value !== null) {
+        if ('uuid' in value && typeof (value as { uuid: unknown }).uuid === 'string') return (value as { uuid: string }).uuid
+        if ('value' in value && typeof (value as { value: unknown }).value === 'string') return (value as { value: string }).value
+      }
       return ''
     },
     [selectedFilters],

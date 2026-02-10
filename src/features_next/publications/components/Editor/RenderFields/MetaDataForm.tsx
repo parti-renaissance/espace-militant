@@ -17,9 +17,7 @@ import { identifyQuickFilter } from './SelectFilters/helpers'
 import { FilterValue } from './SelectFilters/type'
 
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
-  const { committee: _committee, ...filtersWithoutCommittee } = filters
-
-  const mappedFilters = { ...filtersWithoutCommittee }
+  const mappedFilters = { ...filters }
 
   if (mappedFilters.zone && typeof mappedFilters.zone === 'object' && 'uuid' in mappedFilters.zone) {
     mappedFilters.zone = (mappedFilters.zone as { uuid: string }).uuid
@@ -27,6 +25,13 @@ const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFilter
     const firstZone = mappedFilters.zones[0] as { uuid: string; type: string; code: string; name: string }
     mappedFilters.zone = firstZone.uuid
   }
+
+  if (mappedFilters.committee != null) {
+    if (typeof mappedFilters.committee === 'object' && 'uuid' in mappedFilters.committee) {
+      mappedFilters.committee = (mappedFilters.committee as { uuid: string }).uuid
+    }
+  }
+
   return mappedFilters
 }
 
@@ -123,6 +128,8 @@ export const MetaDataForm = memo(
       (updatedFilter: { [code: string]: FilterValue }) => {
         setFilters((oldFilters) => {
           const newFilters = { ...oldFilters, ...updatedFilter }
+
+          console.log('newFilters', newFilters)
 
           const correspondingQuickFilter = identifyQuickFilter(newFilters)
           setQuickFilterId(correspondingQuickFilter)
