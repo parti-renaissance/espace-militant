@@ -1,11 +1,12 @@
 import { MutableRefObject, PropsWithChildren, ReactNode } from 'react'
 import { Modal, Pressable, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Spacing } from '@/styles'
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { ScrollView, Sheet, useMedia, View } from 'tamagui'
 import { gray } from '@tamagui/colors'
 import { X } from '@tamagui/lucide-icons'
-import { ScrollView, Sheet, useMedia, View } from 'tamagui'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+
+import { Spacing } from '@/styles'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
@@ -19,6 +20,7 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   mobileBackdrop?: boolean
   snapPoints?: number[]
   withKeyboard?: boolean
+  modalBreakpoint?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'gtXs' | 'gtSm' | 'gtMd' | 'gtLg' | 'gtXl'
 }
 
 /**
@@ -38,28 +40,25 @@ export default function ModalOrPageBase({
   allowDrag,
   mobileBackdrop,
   withKeyboard = true,
+  modalBreakpoint = 'gtMd',
 }: ModalOrPageBaseProps) {
   const viewport = useMedia()
   const insets = useSafeAreaInsets()
+  const breakpointKey = modalBreakpoint ?? 'gtMd'
+  const isModal = breakpointKey in viewport ? Boolean(viewport[breakpointKey as keyof typeof viewport]) : viewport.gtMd
 
-  if (viewport.gtMd) {
+  if (isModal) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContainer}
-            bounces={false}
-            showsVerticalScrollIndicator={false}
-          >
+          <ScrollView contentContainerStyle={styles.scrollContainer} bounces={false} showsVerticalScrollIndicator={false}>
             <View style={styles.modalView}>
               {children}
-              {shouldDisplayCloseButton
-                ? (
-                  <TouchableOpacity style={{ position: 'absolute', top: 0, right: 0, padding: 14 }} onPress={onClose}>
-                    <X />
-                  </TouchableOpacity>
-                ) : null
-              }
+              {shouldDisplayCloseButton ? (
+                <TouchableOpacity style={{ position: 'absolute', top: 0, right: 0, padding: 14 }} onPress={onClose}>
+                  <X />
+                </TouchableOpacity>
+              ) : null}
             </View>
           </ScrollView>
         </Pressable>
@@ -153,5 +152,5 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 })
