@@ -25,11 +25,14 @@ export const Default: Story = {
     const [openAdherent, setOpenAdherent] = useState(false)
     const [openSympathisant, setOpenSympathisant] = useState(false)
     const [openCadre, setOpenCadre] = useState(false)
-
+    const [openAdherentPlusJour, setOpenAdherentPlusJour] = useState(false)
     return (
       <YStack gap="$medium" width={250}>
         <VoxButton theme="blue" onPress={() => setOpenAdherent(true)} width="100%">
           Adhérent à jour
+        </VoxButton>
+        <VoxButton theme="blue" onPress={() => setOpenAdherentPlusJour(true)} width="100%">
+          Adhérent plus à jour
         </VoxButton>
         <VoxButton theme="blue" onPress={() => setOpenSympathisant(true)} width="100%">
           Sympathisant
@@ -44,6 +47,15 @@ export const Default: Story = {
           profileOverride={{
             first_name: 'Marie',
             tags: [{ code: 'adherent:a_jour_2026' }],
+            cadre_access: false,
+          }}
+        />
+        <OnboardModal
+          open={openAdherentPlusJour}
+          onClose={() => setOpenAdherentPlusJour(false)}
+          profileOverride={{
+            first_name: 'Patrick',
+            tags: [{ code: 'adherent:plus_a_jour:annee_2025' }],
             cadre_access: false,
           }}
         />
