@@ -16,6 +16,8 @@ interface UserState {
   user: User | null
   setCredentials: (user: User) => void
   removeCredentials: () => void
+  onboardingOpenedAt: string | null
+  setOnboardingOpenedAt: (date: string | null) => void
   hideResubscribeAlert: string | null
   setHideReSubscribeAlert: (x: string | null) => void
   setDefaultScope: (scope: string) => void
@@ -30,6 +32,7 @@ interface UserState {
 const userStoreSlice: StateCreator<UserState> = (set) => ({
   user: null,
   _hasHydrated: false,
+  onboardingOpenedAt: null,
   hideResubscribeAlert: null,
   defaultScope: null,
   lastAvailableScopes: null,
@@ -45,7 +48,8 @@ const userStoreSlice: StateCreator<UserState> = (set) => ({
     }
     set({ user: userWithExpiration })
   },
-  removeCredentials: () => set({ user: null }),
+  removeCredentials: () => set({ user: null, onboardingOpenedAt: null }),
+  setOnboardingOpenedAt: (onboardingOpenedAt) => set({ onboardingOpenedAt }),
   _setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   setHideReSubscribeAlert: (hideResubscribeAlert) => set({ hideResubscribeAlert }),
   rehydrateFromStorage: async () => {
