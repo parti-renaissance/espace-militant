@@ -1,18 +1,26 @@
-import clientEnv from '@/config/clientEnv'
-import { UserTagEnum } from '@/core/entities/UserProfile'
-import * as api from '@/services/profile/api'
-import { RestProfilResponse, RestProfilResponseTagTypes, RestUpdateProfileRequest, RestRemoveProfileRequest, RestDonationsResponse } from '@/services/profile/schema'
-import { useUserStore } from '@/store/user-store'
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
-import { getFullVersion } from '@/utils/version'
-import { useToastController } from '@tamagui/toast'
-import { PlaceholderDataFunction, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import * as FileSystem from 'expo-file-system'
 import { isWeb } from 'tamagui'
+import { useToastController } from '@tamagui/toast'
+import { PlaceholderDataFunction, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+
+import clientEnv from '@/config/clientEnv'
+import { UserTagEnum } from '@/core/entities/UserProfile'
+import { useSession } from '@/ctx/SessionProvider'
+import * as api from '@/services/profile/api'
+import {
+  RestDonationsResponse,
+  RestProfilResponse,
+  RestProfilResponseTagTypes,
+  RestRemoveProfileRequest,
+  RestUpdateProfileRequest,
+} from '@/services/profile/schema'
+import { useUserStore } from '@/store/user-store'
+import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { getMembershipStatus } from '@/utils/membershipStatus'
+import { getFullVersion } from '@/utils/version'
+
 import { GenericResponseError } from '../common/errors/generic-errors'
 import { ProfilChangePasswordFormError } from './error'
-import { useSession } from '@/ctx/SessionProvider'
-import { getMembershipStatus } from '@/utils/membershipStatus'
 
 export const PROFIL_QUERY_KEY = 'profil'
 
@@ -71,23 +79,23 @@ const processExecutiveScopes = (
   localDefaultScopeCode?: string | null,
   lastAvailableScopes?: string[] | null,
   additionalProps?: Record<string, unknown>,
-  isLoading?: boolean
+  isLoading?: boolean,
 ) => {
   if (!isAuth || !data) {
-    return { 
-      data: null, 
-      isLoading: false, 
-      isError: false, 
+    return {
+      data: null,
+      isLoading: false,
+      isError: false,
       hasFeature: () => false,
       ...additionalProps,
     }
   }
-  
+
   const cadre_scopes = data?.filter((s) => s.apps.includes('data_corner'))
   const [scopeWithMoreFeatures] = cadre_scopes?.sort((a, b) => (b.features.length > a.features.length ? 1 : -1)) || []
   const localDefaultScope = localDefaultScopeCode ? cadre_scopes?.find((s) => s.code === localDefaultScopeCode) : undefined
   const defaultScope = localDefaultScope ?? scopeWithMoreFeatures
-  
+
   return {
     data: {
       list: cadre_scopes,
@@ -104,15 +112,16 @@ const processExecutiveScopes = (
 }
 
 export const useGetExecutiveScopes = () => {
-  const { isAuth } = useSession()
+  const session = useSession()
   const queryClient = useQueryClient()
   const cachedData = queryClient.getQueryData<Awaited<ReturnType<typeof api.getUserScopes>>>(['userScopes'])
-  const { data: suspenseData, ...rest } = useGetUserScopes({ enabled: isAuth })
+  const { data: suspenseData, ...rest } = useGetUserScopes({ enabled: session.isAuth })
   const { defaultScope: localDefaultScopeCode, lastAvailableScopes } = useUserStore()
 
   const dataToUse = suspenseData || cachedData
-  
-  return processExecutiveScopes(dataToUse, isAuth, localDefaultScopeCode, lastAvailableScopes, rest, rest.isLoading)
+  const effectiveIsAuth = session.isAuth || !!dataToUse
+
+  return processExecutiveScopes(dataToUse, effectiveIsAuth, localDefaultScopeCode, lastAvailableScopes, rest, rest.isLoading)
 }
 
 export const useGetSuspenseExecutiveScopes = () => {
@@ -323,11 +332,7 @@ export const useIsAdherentDues = () => {
   const profil = useGetProfil()
   const currentYear = new Date().getFullYear()
 
-  return profil.data?.tags?.some(
-    (tag) =>
-      tag.type === UserTagEnum.ADHERENT &&
-      tag.code?.startsWith(`adherent:a_jour_${currentYear}`)
-  )
+  return profil.data?.tags?.some((tag) => tag.type === UserTagEnum.ADHERENT && tag.code?.startsWith(`adherent:a_jour_${currentYear}`))
 }
 
 export const usePostElectPayment = () => {

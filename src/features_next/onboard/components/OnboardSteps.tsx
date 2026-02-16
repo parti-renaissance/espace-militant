@@ -155,7 +155,7 @@ export function OnboardStep7Cadre({ stepIndex, totalSteps, onFooterAction }: Onb
 
   return (
     <OnboardStepLayout
-      title={`Vous avez ${scopes?.list?.length ?? 1} rôles Cadre`}
+      title={`Vous avez ${scopes?.list?.length ?? 1} rôle${(scopes?.list?.length ?? 1 > 1) ? 's' : ''} Cadre`}
       illustration={illustration}
       footer={{ left: 'prev', right: 'cest-note' }}
       stepIndex={stepIndex}

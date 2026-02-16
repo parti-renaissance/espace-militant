@@ -99,7 +99,7 @@ export default function OnboardStepLayout({
   const insets = useSafeAreaInsets()
 
   return (
-    <LinearGradient colors={gradientColors} start={[0, 0]} end={[0, 1]} style={{ flex: 1 }}>
+    <LinearGradient colors={gradientColors} start={[0, 0]} end={[0, 1]} style={{ flex: 1, userSelect: 'none' }}>
       <YStack gap="$medium" width={media.gtSm ? 520 : '100%'} height={media.gtSm ? 520 : '100%'} position="relative" justifyContent="space-between">
         {backgroundImage && (
           <>
@@ -131,7 +131,7 @@ export default function OnboardStepLayout({
             <Title>{title}</Title>
             {Description}
           </YStack>
-          <YStack flex={1} alignItems="center" justifyContent="center" minHeight={120}>
+          <YStack flex={1} alignItems="center" justifyContent="center" minHeight={120} pointerEvents="none" userSelect="none">
             <Image source={illustration} style={{ flex: 1, width: '100%', height: '100%' }} contentFit="contain" cachePolicy="memory-disk" />
           </YStack>
         </YStack>

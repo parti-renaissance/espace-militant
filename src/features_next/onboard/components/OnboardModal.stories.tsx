@@ -25,11 +25,10 @@ export const Default: Story = {
     const [openAdherent, setOpenAdherent] = useState(false)
     const [openSympathisant, setOpenSympathisant] = useState(false)
     const [openCadre, setOpenCadre] = useState(false)
-
     return (
       <YStack gap="$medium" width={250}>
         <VoxButton theme="blue" onPress={() => setOpenAdherent(true)} width="100%">
-          Adhérent à jour
+          Adhérent
         </VoxButton>
         <VoxButton theme="blue" onPress={() => setOpenSympathisant(true)} width="100%">
           Sympathisant

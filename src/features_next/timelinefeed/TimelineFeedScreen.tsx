@@ -26,6 +26,7 @@ import { useGetPaginatedFeed } from '@/services/timeline-feed/hook'
 import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
 
 import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
+import { OnboardConditional } from './components/OnboardConditional'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 
@@ -169,6 +170,7 @@ const TimelineFeedScreen = () => {
 
   return (
     <>
+      <OnboardConditional />
       <Layout.Main>
         <BoundarySuspenseWrapper fallback={<HomeFeedMainSkeleton />}>
           <TimelineFeedMain />
