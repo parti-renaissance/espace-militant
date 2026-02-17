@@ -2,7 +2,7 @@ import type { ImageSourcePropType } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Image, ImageBackground } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
-import { styled, useMedia, XStack, YStack } from 'tamagui'
+import { styled, useMedia, View, XStack, YStack } from 'tamagui'
 import { ArrowLeft, ArrowRight } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
@@ -80,6 +80,7 @@ type OnboardStepLayoutProps = {
   onFooterAction: (action: FooterAction) => void
   theme?: 'blue' | 'purple'
   Description?: React.ReactNode | React.ReactNode[]
+  buttonDirection?: 'row' | 'column'
 }
 
 export default function OnboardStepLayout({
@@ -92,6 +93,7 @@ export default function OnboardStepLayout({
   onFooterAction,
   theme = 'blue',
   Description,
+  buttonDirection = 'row',
 }: OnboardStepLayoutProps) {
   const media = useMedia()
   const gradientColors = theme === 'purple' ? GRADIENT_PURPLE : GRADIENT_BLUE
@@ -136,14 +138,14 @@ export default function OnboardStepLayout({
           </YStack>
         </YStack>
 
-        <XStack gap="$small" zIndex={1} px={24} pb={24} width="100%">
-          <YStack flex={1} flexBasis={0} minWidth={0} alignItems="stretch">
+        <View flexDirection={buttonDirection === 'column' ? 'column' : 'row'} gap={10} zIndex={1} px={24} pb={24} width="100%">
+          <YStack flex={1} flexBasis={buttonDirection === 'row' ? 0 : undefined} minWidth={0} alignItems="stretch">
             <OnboardFooterButton action={footer.left ?? 'passer'} theme={theme} onPress={() => onFooterAction(footer.left ?? 'passer')} />
           </YStack>
-          <YStack flex={1} flexBasis={0} minWidth={0} alignItems="stretch">
+          <YStack flex={1} flexBasis={buttonDirection === 'row' ? 0 : undefined} minWidth={0} alignItems="stretch">
             <OnboardFooterButton action={footer.right} theme={theme} onPress={() => onFooterAction(footer.right)} />
           </YStack>
-        </XStack>
+        </View>
       </YStack>
     </LinearGradient>
   )

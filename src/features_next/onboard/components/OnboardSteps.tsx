@@ -120,6 +120,7 @@ export function OnboardStep5NonAdherent({ stepIndex, totalSteps, onFooterAction 
       footer={{ left: 'continuer-sans-adherer', right: 'adherer' }}
       stepIndex={stepIndex}
       totalSteps={totalSteps}
+      buttonDirection={media.gtSm ? 'row' : 'column'}
       onFooterAction={onFooterAction}
     />
   )
