@@ -2,10 +2,11 @@ import React, { memo, RefObject, useCallback, useEffect, useMemo } from 'react'
 import { TextInput } from 'react-native'
 import { useMedia, View, YStack } from 'tamagui'
 
-import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
 import { assemblies } from '@/components/AssemblySelect/assemblies'
+import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
 import SearchBox from '@/components/Search/SearchBox'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
+
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
 

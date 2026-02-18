@@ -9,6 +9,7 @@ import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import EventListItem from '@/features_next/events/components/EventListItem'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
+import { groupEventsBySection } from '@/features_next/events/utils'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
@@ -16,9 +17,16 @@ import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useHits } from '@/services/hits/hook'
 import { useGetProfil } from '@/services/profile/hook'
 
+import type { EmptyStateReason } from './components/EmptyStateSection'
 import { EmptyStateSection } from './components/EmptyStateSection'
 import EventsHeader from './components/Header'
+import { EventSectionHeader } from './components/SectionHeader'
 import EventsListSkeleton from './components/Skeleton'
+
+type FeedListItem =
+  | { type: 'header'; sectionId: string; title: string }
+  | { type: 'event'; event: RestItemEvent | RestPublicItemEvent }
+  | { type: 'empty_state'; reason: EmptyStateReason }
 
 const EventCard = memo(({ event, userUuid, source }: { event: RestItemEvent | RestPublicItemEvent; userUuid?: string; source: string }) => {
   if (Platform.OS === 'web') {
@@ -34,7 +42,7 @@ const EventCard = memo(({ event, userUuid, source }: { event: RestItemEvent | Re
 
 const EventFeed = () => {
   const media = useMedia()
-  const { session, isAuth } = useSession()
+  const { session } = useSession()
   const user = useGetProfil({ enabled: Boolean(session) })
 
   const [activeTab, setActiveTab] = useState<'events' | 'myEvents'>('events')
@@ -90,14 +98,94 @@ const EventFeed = () => {
     return paginatedFeed.pages.flatMap((page) => page.items)
   }, [paginatedFeed])
 
-  const flatListRef = useRef<FlatList<RestItemEvent | RestPublicItemEvent>>(null)
+  const emptyStateReason = useMemo((): EmptyStateReason | null => {
+    if (isFetching && feedData.length === 0) return null
+    if (feedData.length === 0) {
+      if (filters.search.trim()) return { kind: 'search_no_results', search: filters.search }
+      if (activeTab === 'myEvents') return { kind: 'subscriptions_empty' }
+      const zoneLabel = filters.detailZone?.label
+      if (zoneLabel && zoneLabel !== 'Toutes') return { kind: 'zone_no_upcoming', zoneLabel }
+      return { kind: 'generic' }
+    }
+    const zoneLabel = filters.detailZone?.label
+    const sections = groupEventsBySection(feedData, { zoneLabel })
+    const hasUpcomingEvents = sections.some((s) => s.id !== 'past' && s.data.length > 0)
+    const hasOnlyPastEvents =
+      !hasUpcomingEvents && sections.some((s) => s.id === 'past' && s.data.length > 0)
+    if (hasOnlyPastEvents && (filters.search.trim() || activeTab === 'myEvents')) {
+      return activeTab === 'myEvents'
+        ? { kind: 'subscriptions_no_upcoming' }
+        : { kind: 'search_no_upcoming', search: filters.search.trim() || undefined }
+    }
+    const zoneSection = sections.find((s) => s.id === 'zone')
+    if (zoneSection && zoneSection.data.length === 0 && zoneLabel && zoneLabel !== 'Toutes') {
+      return { kind: 'zone_no_upcoming', zoneLabel }
+    }
+    return null
+  }, [feedData, filters.detailZone?.label, filters.search, activeTab, isFetching])
+
+  const hasActiveFilters = Boolean(
+    filters.search.trim() || (filters.zone && filters.zone !== user.data?.instances?.assembly?.code),
+  )
+
+  const sectionedData = useMemo((): FeedListItem[] => {
+    if (isFetching && feedData.length === 0) return []
+    if (filters.search.trim() && feedData.length === 0) return []
+
+    const zoneLabel = filters.detailZone?.label
+    const sections = groupEventsBySection(feedData, { zoneLabel })
+    const hasUpcomingEvents = sections.some((s) => s.id !== 'past' && s.data.length > 0)
+    const hasOnlyPastEvents =
+      !hasUpcomingEvents && sections.some((s) => s.id === 'past' && s.data.length > 0)
+    const showEmptyUpcoming =
+      hasOnlyPastEvents && (filters.search.trim() || activeTab === 'myEvents')
+
+    const emptyStateItem: FeedListItem[] =
+      showEmptyUpcoming && emptyStateReason
+        ? [{ type: 'empty_state', reason: emptyStateReason }]
+        : []
+
+    const listItems = sections.flatMap((section): FeedListItem[] => {
+      if (section.id === 'zone' && section.data.length === 0 && zoneLabel) {
+        if (emptyStateReason?.kind === 'zone_no_upcoming') {
+          return [{ type: 'empty_state', reason: emptyStateReason }]
+        }
+        return []
+      }
+      return [
+        { type: 'header', sectionId: section.id, title: section.title },
+        ...section.data.map((event) => ({ type: 'event' as const, event })),
+      ]
+    })
+
+    if (showEmptyUpcoming) {
+      return [...emptyStateItem, ...listItems]
+    }
+    return [...listItems]
+  }, [feedData, filters.detailZone?.label, filters.search, activeTab, isFetching, emptyStateReason])
+
+  const flatListRef = useRef<FlatList<FeedListItem>>(null)
   useScrollToTop(flatListRef)
 
-  const renderEventItem = useCallback(
-    ({ item }: { item: RestItemEvent | RestPublicItemEvent }) => {
-      return <EventCard event={item} userUuid={user.data?.uuid} source="page_events" />
+  const handleSwitchToAllEvents = useCallback(() => setActiveTab('events'), [])
+
+  const renderItem = useCallback(
+    ({ item }: { item: FeedListItem }) => {
+      if (item.type === 'header') {
+        return <EventSectionHeader title={item.title} />
+      }
+      if (item.type === 'empty_state') {
+        return (
+          <EmptyStateSection
+            reason={item.reason}
+            onSwitchToAllEvents={handleSwitchToAllEvents}
+            showResetButton={hasActiveFilters}
+          />
+        )
+      }
+      return <EventCard event={item.event} userUuid={user.data?.uuid} source="page_events" />
     },
-    [user.data?.uuid],
+    [user.data?.uuid, hasActiveFilters, handleSwitchToAllEvents],
   )
 
   const header = useMemo(() => (media.gtMd ? null : <EventsHeader mode="compact" value={activeTab} onChange={setActiveTab} />), [activeTab, media.gtMd])
@@ -105,10 +193,10 @@ const EventFeed = () => {
   const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     if (Platform.OS !== 'web') {
       viewableItems.forEach((viewToken) => {
-        if (viewToken.isViewable && viewToken.item) {
+        if (viewToken.isViewable && viewToken.item && viewToken.item.type === 'event') {
           trackImpressionRef.current({
             object_type: 'event',
-            object_id: viewToken.item.uuid,
+            object_id: viewToken.item.event.uuid,
             source: 'page_events',
           })
         }
@@ -127,12 +215,18 @@ const EventFeed = () => {
   return (
     <>
       <Layout.Main>
-        <LayoutFlatList<RestItemEvent | RestPublicItemEvent>
+        <LayoutFlatList<FeedListItem>
           ref={flatListRef}
           padding="left"
-          data={feedData}
-          renderItem={renderEventItem}
-          keyExtractor={(item) => item.uuid}
+          data={sectionedData}
+          renderItem={renderItem}
+          keyExtractor={(item) =>
+            item.type === 'header'
+              ? `header-${item.sectionId}`
+              : item.type === 'empty_state'
+                ? `empty-state-${item.reason.kind}`
+                : item.event.uuid
+          }
           ListHeaderComponent={header}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
@@ -144,7 +238,17 @@ const EventFeed = () => {
           contentContainerStyle={{
             gap: getToken('$medium', 'space'),
           }}
-          ListEmptyComponent={isFetching ? <EventsListSkeleton /> : <EmptyStateSection isAuth={isAuth} />}
+          ListEmptyComponent={
+            isFetching ? (
+              <EventsListSkeleton />
+            ) : (
+              <EmptyStateSection
+                reason={emptyStateReason ?? { kind: 'generic' }}
+                onSwitchToAllEvents={handleSwitchToAllEvents}
+                showResetButton={hasActiveFilters}
+              />
+            )
+          }
           ListFooterComponent={
             hasNextPage ? (
               <YStack p="$medium" pb="$large">
