@@ -3,7 +3,7 @@ import { Link } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack, YStackProps } from 'tamagui'
 import { Sparkle } from '@tamagui/lucide-icons'
 
-import BigSwitch, { OptionsTuple } from '@/components/base/BigSwitch'
+import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import { VoxButton } from '@/components/Button'
 import EventFilterForm from '@/features_next/events/components/EventFilterForm/EventFilterForm'
 
@@ -13,7 +13,7 @@ import { useGetExecutiveScopes } from '@/services/profile/hook'
 const options = [
   { label: 'Tous', value: 'events' },
   { label: 'Les miens', value: 'myEvents' },
-] as OptionsTuple
+] as OptionsArray
 
 const NewEventBtn = ({ children, ...props }: YStackProps & { children: string }) => {
   const { hasFeature } = useGetExecutiveScopes()
