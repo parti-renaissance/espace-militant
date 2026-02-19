@@ -19,7 +19,7 @@ import { calculateDefaultValues, FiltersChips } from '../../../FiltersChips'
 import AdvancedFilters from './AdvancedFilters'
 import { getHierarchicalQuickFilters, getItemState } from './helpers'
 import QuickFilter from './QuickFilter'
-import { FilterValue, HierarchicalQuickFilterType, SelectedFiltersType } from './type'
+import { FilterValue, HierarchicalQuickFilterType, isFilterValueFilled, SelectedFiltersType } from './type'
 
 interface SelectFiltersProps {
   updateFilter: (updatedFilter: { [code: string]: FilterValue }) => void
@@ -150,7 +150,7 @@ export default function SelectFilters({
       return baseLabel
     }
 
-    const excludedFilters = ['zone', 'zones']
+    const excludedFilters = ['zone', 'zones', 'uuid']
 
     // EXEMPLE - Exclure static_tags s'il est protégé (lié à la rentrée)
     // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
@@ -158,7 +158,7 @@ export default function SelectFilters({
     //   excludedFilters.push('static_tags')
     // }
 
-    const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) => value !== null && value !== undefined && !excludedFilters.includes(key))
+    const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) => !excludedFilters.includes(key) && isFilterValueFilled(value))
     return nonNullFilters.length > 0
       ? `${nonNullFilters.length} filtre${nonNullFilters.length > 1 ? 's' : ''} avancé${nonNullFilters.length > 1 ? 's' : ''}`
       : 'Sélectionner'

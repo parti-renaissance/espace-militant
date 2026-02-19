@@ -6,7 +6,12 @@ import { VoxButton } from '@/components/Button'
 import type { RestFilterCollectionResponse } from '@/services/publications/schema'
 
 import { AVAILABLE_FILTERS } from './Editor/RenderFields/SelectFilters/AdvancedFilters'
-import type { FilterValue, SelectedFiltersType } from './Editor/RenderFields/SelectFilters/type'
+import {
+  type FilterValue,
+  type SelectedFiltersType,
+  isIntervalObject,
+  isEmptyInterval,
+} from './Editor/RenderFields/SelectFilters/type'
 
 export type { FilterValue, SelectedFiltersType }
 
@@ -136,8 +141,8 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
   // Calculer automatiquement les valeurs par défaut
   const defaultValues = calculateDefaultValues(selectedFilters)
 
-  // Exclure 'zones' de l'affichage (on garde seulement 'zone')
-  const excludedKeys = ['zones']
+  // Exclure de l'affichage : zones (redondant avec zone), uuid (métadonnée, pas un filtre)
+  const excludedKeys = ['zones', 'uuid']
 
   // Ajouter adherent_tags s'il n'est pas dans selectedFilters mais qu'il a une valeur par défaut
   const filtersToDisplay = { ...selectedFilters }
@@ -151,6 +156,7 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
     .filter(([key, value]) => {
       if (excludedKeys.includes(key)) return false
       if (key === 'adherent_tags') return true // Toujours afficher adherent_tags
+      if (isIntervalObject(value)) return !isEmptyInterval(value)
       return value !== null && value !== undefined
     })
     // Trier : filtres avec valeur par défaut en premier

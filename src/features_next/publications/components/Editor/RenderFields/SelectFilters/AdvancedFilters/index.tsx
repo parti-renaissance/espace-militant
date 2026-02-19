@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { XStack, YStack } from 'tamagui'
+import { Spinner, XStack, YStack } from 'tamagui'
 
 import DateInput from '@/components/base/DateInput'
 import SelectV3 from '@/components/base/Select/SelectV3'
@@ -78,39 +78,21 @@ export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
     color: '#10B981',
     filters: [
       {
-        code: 'first_membership_since',
-        label: 'Première cotisation - Depuis',
-        type: 'date',
+        code: 'first_membership',
+        label: 'Première cotisation',
+        type: 'date_interval',
         options: null,
       },
       {
-        code: 'first_membership_before',
-        label: "Première cotisation - Jusqu'au",
-        type: 'date',
+        code: 'last_membership',
+        label: 'Dernière cotisation',
+        type: 'date_interval',
         options: null,
       },
       {
-        code: 'last_membership_since',
-        label: 'Dernière cotisation - Depuis',
-        type: 'date',
-        options: null,
-      },
-      {
-        code: 'last_membership_before',
-        label: "Dernière cotisation - Jusqu'au",
-        type: 'date',
-        options: null,
-      },
-      {
-        code: 'registered_since',
-        label: 'Création de compte - Depuis',
-        type: 'date',
-        options: null,
-      },
-      {
-        code: 'registered_until',
-        label: "Création de compte - Jusqu'au",
-        type: 'date',
+        code: 'registered',
+        label: 'Création de compte',
+        type: 'date_interval',
         options: null,
       },
     ],
@@ -213,7 +195,8 @@ function AdvancedFiltersInner({ scope, selectedFilters = {}, onFilterChange }: A
 
   if (isLoading) {
     return (
-      <YStack gap="$medium">
+      <YStack gap="$small" padding="$medium" justifyContent="center" alignItems="center">
+        <Spinner size="small" color="$blue6" />
         <Text.SM secondary>Chargement des filtres...</Text.SM>
       </YStack>
     )

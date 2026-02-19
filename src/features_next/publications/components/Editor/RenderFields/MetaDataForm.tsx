@@ -19,6 +19,7 @@ import { FilterValue } from './SelectFilters/type'
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
   const mappedFilters = { ...filters }
 
+  // Extraction uuid de zone si l'API PUT attend une string
   if (mappedFilters.zone && typeof mappedFilters.zone === 'object' && 'uuid' in mappedFilters.zone) {
     mappedFilters.zone = (mappedFilters.zone as { uuid: string }).uuid
   } else if (!mappedFilters.zone && mappedFilters.zones && Array.isArray(mappedFilters.zones) && mappedFilters.zones.length > 0) {
@@ -31,6 +32,9 @@ const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFilter
       mappedFilters.committee = (mappedFilters.committee as { uuid: string }).uuid
     }
   }
+
+  // uuid est un identifiant métadonnée, pas un filtre — ne pas l'envoyer à l'API
+  delete mappedFilters.uuid
 
   return mappedFilters
 }
@@ -52,7 +56,8 @@ export const MetaDataForm = memo(
 
     const [filters, setFilters] = useState<SelectedFiltersType>(() => {
       if (props.messageFilters) {
-        return props.messageFilters as SelectedFiltersType
+        const { uuid: _uuid, ...filtersWithoutUuid } = props.messageFilters as SelectedFiltersType
+        return filtersWithoutUuid as SelectedFiltersType
       }
       return { adherent_tags: 'adherent' }
     })
@@ -100,7 +105,9 @@ export const MetaDataForm = memo(
     }, [props.displayToolbar, animatedProgress])
 
     useEffect(() => {
-      const newFilters = (props.messageFilters as SelectedFiltersType) ?? { adherent_tags: 'adherent' }
+      const rawFilters = (props.messageFilters as SelectedFiltersType) ?? { adherent_tags: 'adherent' }
+      const { uuid: _uuid, ...filtersWithoutUuid } = rawFilters
+      const newFilters = filtersWithoutUuid as SelectedFiltersType
       const correspondingQuickFilter = identifyQuickFilter(newFilters)
       setQuickFilterId(correspondingQuickFilter)
       setFilters(newFilters)
@@ -128,8 +135,6 @@ export const MetaDataForm = memo(
       (updatedFilter: { [code: string]: FilterValue }) => {
         setFilters((oldFilters) => {
           const newFilters = { ...oldFilters, ...updatedFilter }
-
-          console.log('newFilters', newFilters)
 
           const correspondingQuickFilter = identifyQuickFilter(newFilters)
           setQuickFilterId(correspondingQuickFilter)
