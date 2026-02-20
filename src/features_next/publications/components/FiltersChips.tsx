@@ -3,31 +3,27 @@ import { CircleX, EqualNot, Undo2 } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
 
+import type { RestFilterCollectionResponse } from '@/services/publications/schema'
+
 import { AVAILABLE_FILTERS } from './Editor/RenderFields/SelectFilters/AdvancedFilters'
+import {
+  type FilterValue,
+  type SelectedFiltersType,
+  isIntervalObject,
+  isEmptyInterval,
+} from './Editor/RenderFields/SelectFilters/type'
 
-export type FilterValue =
-  | string
-  | number
-  | boolean
-  | string[]
-  | { min: number; max: number }
-  | { start: string; end: string }
-  | Record<string, string>
-  | Record<string, string>[]
-  | { uuid: string; type: string; code: string; name: string }
-  | { uuid: string; type: string; code: string; name: string }[]
-  | undefined
-  | null
-
-export type SelectedFiltersType = Record<string, FilterValue>
+export type { FilterValue, SelectedFiltersType }
 
 export type FiltersChipsProps = {
   selectedFilters: Record<string, FilterValue>
   onFilterChange?: (filterKey: string, value: FilterValue) => void
   isStatic?: boolean
+  /** Collection de filtres depuis l’API (si fournie, utilisée pour les libellés ; sinon fallback sur AVAILABLE_FILTERS) */
+  filterCollection?: RestFilterCollectionResponse | null
 }
 
-const getFilterLabel = (key: string, value: FilterValue): string => {
+const getFilterLabel = (key: string, value: FilterValue, filterCollection: RestFilterCollectionResponse | null | undefined): string => {
   // Exception pour le filtre zone : afficher zone.name (zone.code)
   if (key === 'zone' && typeof value === 'object' && value !== null && 'name' in value && 'code' in value) {
     return `${value.name} (${value.code})`
@@ -56,18 +52,34 @@ const getFilterLabel = (key: string, value: FilterValue): string => {
     return 'Tous mes contacts'
   }
 
-  // Rechercher le filtre dans AVAILABLE_FILTERS
-  for (const category of AVAILABLE_FILTERS) {
-    const filter = category.filters.find((f) => f.code === key)
+  const collection = filterCollection && filterCollection.length > 0 ? filterCollection : AVAILABLE_FILTERS
+  const keyWithoutSuffix = key.replace(/_(since|until|before|after)$/, '')
+
+  for (const category of collection) {
+    const filter = category.filters.find((f) => f.code === key) ?? category.filters.find((f) => f.code === keyWithoutSuffix)
 
     if (filter) {
       // Si c'est un select avec des choix, récupérer le label de la valeur
-      if (filter.type === 'select' && filter.options && typeof value === 'string') {
+      if (filter.type === 'select' && filter.options) {
         const options = filter.options as { choices?: Record<string, string> | string[] }
-        if (options.choices && typeof options.choices === 'object' && !Array.isArray(options.choices)) {
-          const choiceLabel = options.choices[value]
-          if (choiceLabel) {
-            return choiceLabel
+        if (options.choices && typeof options.choices === 'object') {
+          if (!Array.isArray(options.choices)) {
+            const choiceLabel = typeof value === 'string' ? options.choices[value] : undefined
+            if (choiceLabel) {
+              return choiceLabel
+            }
+          } else {
+            // choices est un tableau (ex. isCommitteeMember : ["Non", "Oui"]) → afficher "Label : Valeur"
+            const idx = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : -1
+            const choiceLabel =
+              Number.isInteger(idx) && idx >= 0 && idx < options.choices.length
+                ? options.choices[idx]
+                : typeof value === 'string' && options.choices.includes(value)
+                  ? value
+                  : undefined
+            if (choiceLabel) {
+              return `${filter.label} : ${choiceLabel}`
+            }
           }
         }
       }
@@ -125,12 +137,12 @@ export const calculateDefaultValues = (selectedFilters: Record<string, FilterVal
   return defaults
 }
 
-export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false }: FiltersChipsProps) => {
+export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false, filterCollection }: FiltersChipsProps) => {
   // Calculer automatiquement les valeurs par défaut
   const defaultValues = calculateDefaultValues(selectedFilters)
 
-  // Exclure 'zones' de l'affichage (on garde seulement 'zone')
-  const excludedKeys = ['zones']
+  // Exclure de l'affichage : zones (redondant avec zone), uuid (métadonnée, pas un filtre)
+  const excludedKeys = ['zones', 'uuid']
 
   // Ajouter adherent_tags s'il n'est pas dans selectedFilters mais qu'il a une valeur par défaut
   const filtersToDisplay = { ...selectedFilters }
@@ -144,6 +156,7 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
     .filter(([key, value]) => {
       if (excludedKeys.includes(key)) return false
       if (key === 'adherent_tags') return true // Toujours afficher adherent_tags
+      if (isIntervalObject(value)) return !isEmptyInterval(value)
       return value !== null && value !== undefined
     })
     // Trier : filtres avec valeur par défaut en premier
@@ -176,7 +189,7 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
     <YStack gap="$small">
       <XStack flexWrap="wrap" gap="$small">
         {activeFilters.map(([key, value]) => {
-          const label = getFilterLabel(key, value)
+          const label = getFilterLabel(key, value, filterCollection)
 
           // Détecter si la valeur commence par "!" (négation)
           const isNegation = typeof value === 'string' && value.startsWith('!')

@@ -174,15 +174,31 @@ export const RestGetMessageResponseSchema = z.object({
 
 export type RestGetMessageResponse = z.infer<typeof RestGetMessageResponseSchema>
 
+const RestMessageFilterZoneSchema = z.object({
+  uuid: z.string(),
+  type: z.string(),
+  code: z.string(),
+  name: z.string(),
+})
+
+const RestMessageFilterDateIntervalSchema = z.object({
+  start: z.string().nullable(),
+  end: z.string().nullable(),
+})
+
+const RestMessageFilterAgeIntervalSchema = z.object({
+  start: z.number().nullable(),
+  end: z.number().nullable(),
+})
+
 export const RestGetMessageFiltersResponseSchema = z.object({
-  is_certified: z.boolean().nullable(),
-  zone: z.object({
-    uuid: z.string(),
-    type: z.string(),
-    code: z.string(),
-    name: z.string(),
-  }).nullable(),
+  gender: z.string().nullable(),
+  first_name: z.string().nullable(),
+  last_name: z.string().nullable(),
+  zones: z.array(RestMessageFilterZoneSchema).nullable(),
   committee: z.string().nullable(),
+  is_certified: z.boolean().nullable(),
+  zone: RestMessageFilterZoneSchema.nullable(),
   is_committee_member: z.boolean().nullable(),
   mandate_type: z.string().nullable(),
   declared_mandate: z.string().nullable(),
@@ -191,31 +207,25 @@ export const RestGetMessageFiltersResponseSchema = z.object({
   adherent_tags: z.string().nullable(),
   elect_tags: z.string().nullable(),
   static_tags: z.string().nullable(),
-  zones: z.array(z.object({
-    uuid: z.string(),
-    type: z.string(),
-    code: z.string(),
-    name: z.string(),
-  })).nullable(),
-  gender: z.string().nullable(),
-  age_min: z.number().nullable(),
-  age_max: z.number().nullable(),
-  first_name: z.string().nullable(),
-  last_name: z.string().nullable(),
-  registered_since: z.string().nullable(),
-  registered_until: z.string().nullable(),
-  first_membership_since: z.string().nullable(),
-  first_membership_before: z.string().nullable(),
-  last_membership_since: z.string().nullable(),
-  last_membership_before: z.string().nullable(),
-}).passthrough() // Permet d'ajouter des champs supplémentaires
+  uuid: z.string().optional(),
+  age: RestMessageFilterAgeIntervalSchema.nullable(),
+  registered: RestMessageFilterDateIntervalSchema.nullable(),
+  first_membership: RestMessageFilterDateIntervalSchema.nullable(),
+  last_membership: RestMessageFilterDateIntervalSchema.nullable(),
+}).passthrough()
 
 export type RestGetMessageFiltersResponse = z.infer<typeof RestGetMessageFiltersResponseSchema>
+export type RestMessageFilterDateInterval = z.infer<typeof RestMessageFilterDateIntervalSchema>
+export type RestMessageFilterAgeInterval = z.infer<typeof RestMessageFilterAgeIntervalSchema>
 
 export const RestPutMessageFiltersRequestSchema = z.object({
-  is_certified: z.boolean().nullable().optional(),
-  zone: z.string().nullable().optional(),
+  gender: z.string().nullable().optional(),
+  first_name: z.string().nullable().optional(),
+  last_name: z.string().nullable().optional(),
+  zones: z.array(RestMessageFilterZoneSchema).nullable().optional(),
   committee: z.string().nullable().optional(),
+  is_certified: z.boolean().nullable().optional(),
+  zone: z.union([z.string(), RestMessageFilterZoneSchema]).nullable().optional(),
   is_committee_member: z.boolean().nullable().optional(),
   mandate_type: z.string().nullable().optional(),
   declared_mandate: z.string().nullable().optional(),
@@ -224,28 +234,10 @@ export const RestPutMessageFiltersRequestSchema = z.object({
   adherent_tags: z.string().nullable().optional(),
   elect_tags: z.string().nullable().optional(),
   static_tags: z.string().nullable().optional(),
-  zones: z
-    .array(
-      z.object({
-        uuid: z.string(),
-        type: z.string(),
-        code: z.string(),
-        name: z.string(),
-      })
-    )
-    .nullable()
-    .optional(),
-  gender: z.string().nullable().optional(),
-  age_min: z.number().nullable().optional(),
-  age_max: z.number().nullable().optional(),
-  first_name: z.string().nullable().optional(),
-  last_name: z.string().nullable().optional(),
-  registered_since: z.string().nullable().optional(),
-  registered_until: z.string().nullable().optional(),
-  first_membership_since: z.string().nullable().optional(),
-  first_membership_before: z.string().nullable().optional(),
-  last_membership_since: z.string().nullable().optional(),
-  last_membership_before: z.string().nullable().optional(),
+  age: RestMessageFilterAgeIntervalSchema.nullable().optional(),
+  registered: RestMessageFilterDateIntervalSchema.nullable().optional(),
+  first_membership: RestMessageFilterDateIntervalSchema.nullable().optional(),
+  last_membership: RestMessageFilterDateIntervalSchema.nullable().optional(),
 }).passthrough()
 
 export type RestPutMessageFiltersRequest = z.infer<typeof RestPutMessageFiltersRequestSchema>

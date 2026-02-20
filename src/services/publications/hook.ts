@@ -1,14 +1,18 @@
+import { useToastController } from '@tamagui/toast'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInfiniteQuery } from '@tanstack/react-query'
+
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/publications/api'
-import { useToastController } from '@tamagui/toast'
-import { useMutation, useQuery, useQueryClient, useInfiniteQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query'
-import { RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
+
+import { RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
+
+const toSnake = (s: string) => s.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '')
 
 export const useCreateMessage = (props: { uuid?: string }) => {
   const toast = useToastController()
   const errorMessage = props.uuid ? 'Impossible de modifier ce message' : 'Impossible de créer ce message'
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn:
       props.uuid !== undefined
@@ -22,7 +26,7 @@ export const useCreateMessage = (props: { uuid?: string }) => {
         queryClient.invalidateQueries({ queryKey: ['message', data.uuid] })
         queryClient.invalidateQueries({ queryKey: ['message-content', data.uuid] })
       }
-      queryClient.invalidateQueries({ queryKey: ['messages'], exact: false, })
+      queryClient.invalidateQueries({ queryKey: ['messages'], exact: false })
     },
     onError: (error) => {
       if (error instanceof GenericResponseError) {
@@ -44,9 +48,9 @@ export const useSendMessage = (props: { uuid: string }) => {
       test
         ? api.sendTestMessage({ scope, messageId: props.uuid })
         : api.sendMessage({
-          scope,
-          messageId: props.uuid,
-        }),
+            scope,
+            messageId: props.uuid,
+          }),
     onSuccess: () => {
       // Invalider le feed pour rafraîchir les publications après envoi
       queryClient.invalidateQueries({
@@ -70,7 +74,7 @@ export const useGetMessage = (props: { messageId: string; scope: string; enabled
     queryFn: () => api.getMessage({ messageId: props.messageId, scope: props.scope }),
     enabled: props.enabled,
     refetchOnMount: true,
-    staleTime: (query) => query.state.error ? 0 : 60 * 5000,
+    staleTime: (query) => (query.state.error ? 0 : 60 * 5000),
   })
 }
 
@@ -95,11 +99,11 @@ export const useGetIsMessageTilSync = (props: { payload?: { messageId: string; s
     queryFn: () =>
       props.payload?.messageId && props.payload?.scope
         ? api.getMessage({ messageId: props.payload.messageId, scope: props.payload.scope }).then((x) => {
-          if (x.synchronized) {
-            return x as Omit<RestGetMessageResponse, 'synchronized'> & { synchronized: true }
-          }
-          throw new MessageNotSynchronizedError(props.payload?.messageId)
-        })
+            if (x.synchronized) {
+              return x as Omit<RestGetMessageResponse, 'synchronized'> & { synchronized: true }
+            }
+            throw new MessageNotSynchronizedError(props.payload?.messageId)
+          })
         : Promise.resolve(undefined),
     enabled: Boolean(props.payload?.messageId && props.payload?.scope),
     retry: (attempts, error) => {
@@ -153,12 +157,8 @@ export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') =
     queryKey: ['messages', scope, status],
     queryFn: ({ pageParam = 1 }) => api.getMessages({ scope, page: pageParam, status, orderCreatedAt: 'desc' }),
     initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.metadata.current_page < lastPage.metadata.last_page
-        ? lastPage.metadata.current_page + 1
-        : undefined,
-    getPreviousPageParam: (firstPage) =>
-      firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined,
+    getNextPageParam: (lastPage) => (lastPage.metadata.current_page < lastPage.metadata.last_page ? lastPage.metadata.current_page + 1 : undefined),
+    getPreviousPageParam: (firstPage) => (firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined),
     placeholderData: (prev) => prev,
     refetchOnMount: true,
     staleTime: 60 * 1000,
@@ -170,12 +170,8 @@ export const usePaginatedMessagesSuspense = (scope: string, status?: 'draft' | '
     queryKey: ['messages', scope, status],
     queryFn: ({ pageParam = 1 }) => api.getMessages({ scope, page: pageParam, status, orderCreatedAt: 'desc' }),
     initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.metadata.current_page < lastPage.metadata.last_page
-        ? lastPage.metadata.current_page + 1
-        : undefined,
-    getPreviousPageParam: (firstPage) =>
-      firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined,
+    getNextPageParam: (lastPage) => (lastPage.metadata.current_page < lastPage.metadata.last_page ? lastPage.metadata.current_page + 1 : undefined),
+    getPreviousPageParam: (firstPage) => (firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined),
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   })
@@ -184,7 +180,8 @@ export const usePaginatedMessagesSuspense = (scope: string, status?: 'draft' | '
 export const useGetMessageCountRecipients = (props: { messageId?: string; scope?: string; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['message-count-recipients', props.messageId],
-    queryFn: () => (props.messageId && props.scope ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined)),
+    queryFn: () =>
+      props.messageId && props.scope ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined),
     enabled: Boolean(props.messageId && props.scope) && props.enabled,
   })
 }
@@ -192,16 +189,19 @@ export const useGetMessageCountRecipients = (props: { messageId?: string; scope?
 export const useGetMessageCountRecipientsPartial = (props: { messageId?: string; scope?: string; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['message-count-recipients-partial', props.messageId],
-    queryFn: () => (props.messageId && props.scope ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope, partial: true }) : Promise.resolve(undefined)),
+    queryFn: () =>
+      props.messageId && props.scope
+        ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope, partial: true })
+        : Promise.resolve(undefined),
     enabled: Boolean(props.messageId && props.scope) && props.enabled,
   })
 }
 
-export const useGetAvailableSenders = (props: { scope: string; }) => {
+export const useGetAvailableSenders = (props: { scope: string }) => {
   return useQuery({
     queryKey: ['available-senders', props.scope],
     queryFn: () => api.getAvailableSenders({ scope: props.scope }),
-    staleTime: (query) => query.state.error ? 0 : 60 * 1000,
+    staleTime: (query) => (query.state.error ? 0 : 60 * 1000),
   })
 }
 
@@ -221,7 +221,7 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
       api.putMessageFilters({
         messageId: props.messageId!,
         payload,
-        scope: props.scope!
+        scope: props.scope!,
       }),
     onSuccess: () => {
       queryClient.refetchQueries({
@@ -231,7 +231,7 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
     onError: (error) => {
       toast.show('Erreur', { message: 'Une erreur est survenue lors de la mise à jour des filtres', type: 'error' })
       return error
-    }
+    },
   })
 }
 
@@ -239,10 +239,11 @@ export const useDeleteMessage = (props: { messageId?: string; scope?: string }) 
   const toast = useToastController()
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: () => api.deleteMessage({
-      messageId: props.messageId!,
-      scope: props.scope!
-    }),
+    mutationFn: () =>
+      api.deleteMessage({
+        messageId: props.messageId!,
+        scope: props.scope!,
+      }),
     onSuccess: () => {
       // Invalider les requêtes liées au message supprimé
       if (props.messageId) {
@@ -252,21 +253,21 @@ export const useDeleteMessage = (props: { messageId?: string; scope?: string }) 
         queryClient.removeQueries({ queryKey: ['message-count-recipients', props.messageId] })
         queryClient.removeQueries({ queryKey: ['message-count-recipients-partial', props.messageId] })
       }
-      
+
       // Invalider la liste des messages pour rafraîchir l'affichage
       queryClient.invalidateQueries({ queryKey: ['messages', props.scope] })
-      
+
       // Invalider le feed pour rafraîchir les publications
       queryClient.invalidateQueries({
         queryKey: [PAGINATED_QUERY_FEED],
       })
-      
+
       toast.show('Succès', { message: 'Publication supprimée avec succès', type: 'success' })
     },
     onError: (error) => {
       toast.show('Erreur', { message: 'Une erreur est survenue lors de la suppression de la publication', type: 'error' })
       return error
-    }
+    },
   })
 }
 
@@ -275,9 +276,12 @@ export { useAutoSave } from '@/features_next/publications/components/Editor/hook
 export const useGetFilterCollection = (props: { scope: string; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['filter-collection', props.scope],
-    queryFn: () => api.getFilterCollection({ scope: props.scope }),
+    queryFn: async () => {
+      const data = await api.getFilterCollection({ scope: props.scope })
+      return data.map((c) => ({ ...c, filters: c.filters.map((f) => ({ ...f, code: toSnake(f.code) })) }))
+    },
     enabled: props.enabled !== false,
-    staleTime: (query) => query.state.error ? 0 : 60 * 1000,
+    staleTime: (query) => (query.state.error ? 0 : 60 * 1000),
   })
 }
 
@@ -285,7 +289,7 @@ export const useGetAvailableVariables = (props: { scope?: string; enabled?: bool
   return useQuery({
     queryKey: ['available-variables'],
     queryFn: () => api.getAvailableVariables({ scope: props?.scope }),
-      enabled: props.enabled !== false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: props.enabled !== false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }

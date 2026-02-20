@@ -8,7 +8,7 @@ import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
-import { useGetMessageCountRecipientsPartial, usePutMessageFilters } from '@/services/publications/hook'
+import { useGetFilterCollection, useGetMessageCountRecipientsPartial, usePutMessageFilters } from '@/services/publications/hook'
 import { RestAvailableSender, RestAvailableSendersResponse, RestGetMessageFiltersResponse, RestGetMessageResponse } from '@/services/publications/schema'
 
 import SenderView from '../../SenderView'
@@ -17,16 +17,25 @@ import { identifyQuickFilter } from './SelectFilters/helpers'
 import { FilterValue } from './SelectFilters/type'
 
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
-  const { committee: _committee, ...filtersWithoutCommittee } = filters
+  const mappedFilters = { ...filters }
 
-  const mappedFilters = { ...filtersWithoutCommittee }
-
+  // Extraction uuid de zone si l'API PUT attend une string
   if (mappedFilters.zone && typeof mappedFilters.zone === 'object' && 'uuid' in mappedFilters.zone) {
     mappedFilters.zone = (mappedFilters.zone as { uuid: string }).uuid
   } else if (!mappedFilters.zone && mappedFilters.zones && Array.isArray(mappedFilters.zones) && mappedFilters.zones.length > 0) {
     const firstZone = mappedFilters.zones[0] as { uuid: string; type: string; code: string; name: string }
     mappedFilters.zone = firstZone.uuid
   }
+
+  if (mappedFilters.committee != null) {
+    if (typeof mappedFilters.committee === 'object' && 'uuid' in mappedFilters.committee) {
+      mappedFilters.committee = (mappedFilters.committee as { uuid: string }).uuid
+    }
+  }
+
+  // uuid est un identifiant métadonnée, pas un filtre — ne pas l'envoyer à l'API
+  delete mappedFilters.uuid
+
   return mappedFilters
 }
 
@@ -47,7 +56,8 @@ export const MetaDataForm = memo(
 
     const [filters, setFilters] = useState<SelectedFiltersType>(() => {
       if (props.messageFilters) {
-        return props.messageFilters as SelectedFiltersType
+        const { uuid: _uuid, ...filtersWithoutUuid } = props.messageFilters as SelectedFiltersType
+        return filtersWithoutUuid as SelectedFiltersType
       }
       return { adherent_tags: 'adherent' }
     })
@@ -59,6 +69,8 @@ export const MetaDataForm = memo(
     })
 
     const { mutate: putMessageFilters, isPending: isPuttingMessageFilters } = usePutMessageFilters({ messageId: props.messageId, scope: props.scope })
+    // Prefetch filter collection
+    useGetFilterCollection({ scope: props.scope, enabled: !!props.scope })
     const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({
       messageId: props.messageId,
       scope: props.scope,
@@ -93,7 +105,9 @@ export const MetaDataForm = memo(
     }, [props.displayToolbar, animatedProgress])
 
     useEffect(() => {
-      const newFilters = (props.messageFilters as SelectedFiltersType) ?? { adherent_tags: 'adherent' }
+      const rawFilters = (props.messageFilters as SelectedFiltersType) ?? { adherent_tags: 'adherent' }
+      const { uuid: _uuid, ...filtersWithoutUuid } = rawFilters
+      const newFilters = filtersWithoutUuid as SelectedFiltersType
       const correspondingQuickFilter = identifyQuickFilter(newFilters)
       setQuickFilterId(correspondingQuickFilter)
       setFilters(newFilters)

@@ -1,7 +1,19 @@
-import { SearchProvider, SearchResult } from '../types'
 import { ChevronsUpDown } from '@tamagui/lucide-icons'
+
+import { authInstance } from '@/lib/axios'
 import type { IconComponent } from '@/models/common.model'
 import { getZoneAutocomplete } from '@/services/search/api'
+
+import { SearchProvider, SearchResult } from '../types'
+
+export interface ZoneProviderOptions {
+  url: string
+  query_param: string
+  value_param: string
+  label_param: string
+  multiple?: boolean
+  required?: boolean
+}
 
 const ZONE_TYPE_LABELS: Record<string, string> = {
   custom: 'Personnalisé',
@@ -15,12 +27,39 @@ const ZONE_TYPE_LABELS: Record<string, string> = {
   canton: 'Canton',
   foreign_district: 'Circonscription',
   consular_district: 'District consulaire',
-  vote_place: 'Bureau de vote'
+  vote_place: 'Bureau de vote',
 }
 
 export class ZoneProvider implements SearchProvider {
+  private options?: ZoneProviderOptions
+
+  constructor(options?: ZoneProviderOptions) {
+    this.options = options
+  }
+
   async search(query: string, scope: string = 'president_departmental_assembly'): Promise<SearchResult[]> {
     try {
+      if (this.options?.url) {
+        const params: Record<string, string | number | undefined> = {
+          [this.options.query_param]: query,
+          scope,
+        }
+        const response = await authInstance.get(this.options.url, { params })
+        const data = Array.isArray(response.data) ? response.data : []
+        const valueParam = this.options.value_param
+        const labelParam = this.options.label_param
+        return data.map((item: Record<string, unknown>) => {
+          const id = String(item[valueParam] ?? '')
+          const label = String(item[labelParam] ?? '')
+          return {
+            id,
+            label,
+            type: 'zone' as const,
+            metadata: { zone: item, zoneType: item.type, zoneCode: item.code },
+          }
+        })
+      }
+
       const response = await getZoneAutocomplete({
         q: query,
         scope,
@@ -28,17 +67,17 @@ export class ZoneProvider implements SearchProvider {
         searchEvenEmptyTerm: query.length === 0 ? 1 : undefined,
       })
 
-      return response.map(zone => ({
+      return response.map((zone) => ({
         id: zone.uuid,
         label: zone.name + ' (' + zone.code + ')',
         subLabel: ZONE_TYPE_LABELS[zone.type] || zone.type,
         type: 'zone' as const,
-        metadata: { 
+        metadata: {
           zone,
           zoneType: zone.type,
           zoneCode: zone.code,
-          postalCodes: zone.postal_code
-        }
+          postalCodes: zone.postal_code,
+        },
       }))
     } catch (error) {
       console.error('Error searching zones:', error)
@@ -65,4 +104,4 @@ export class ZoneProvider implements SearchProvider {
   getPlaceholder(): string {
     return 'Rechercher une zone...'
   }
-} 
+}
