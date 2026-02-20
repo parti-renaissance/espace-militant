@@ -1,6 +1,6 @@
-import { format, parseISO, subMonths } from 'date-fns'
+import { format, parseISO, startOfDay, subMonths } from 'date-fns'
 
-import { HierarchicalQuickFilterType, SelectedFiltersType, isIntervalObject, isEmptyInterval } from './type'
+import { HierarchicalQuickFilterType, isEmptyInterval, isIntervalObject, SelectedFiltersType } from './type'
 
 export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
   const today = new Date()
@@ -123,13 +123,12 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
     },
   ]
 
-  /** Vérifie si une date string est dans les N derniers jours (date >= aujourd'hui - N jours) */
-  const isDateWithinLastDays = (dateStr: string, days: number): boolean => {
+  /** Vérifie si une date string correspond à "aujourd'hui - 1 mois" (aligné avec getHierarchicalQuickFilters qui utilise subMonths) */
+  const isDateWithinLastMonth = (dateStr: string): boolean => {
     try {
-      const date = parseISO(dateStr)
+      const date = startOfDay(parseISO(dateStr))
       if (isNaN(date.getTime())) return false
-      const cutoff = new Date()
-      cutoff.setDate(cutoff.getDate() - days)
+      const cutoff = startOfDay(subMonths(new Date(), 1))
       return date >= cutoff
     } catch {
       return false
@@ -143,10 +142,10 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
       const filterValue = filters[key]
       if (isIntervalObject(quickFilterValue)) {
         if (!isIntervalObject(filterValue) || isEmptyInterval(filterValue)) return false
-        // Cas spécial "primos-recents" : vérifier que first_membership.start est dans les 30 derniers jours
+        // Cas spécial "primos-recents" : vérifier que first_membership.start correspond au dernier mois
         if (key === 'first_membership' && quickFilterValue.start === 'today - 30 days') {
           const start = filterValue.start
-          return typeof start === 'string' && isDateWithinLastDays(start, 30)
+          return typeof start === 'string' && isDateWithinLastMonth(start)
         }
         return true
       }

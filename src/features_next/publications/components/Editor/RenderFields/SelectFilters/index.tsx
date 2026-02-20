@@ -187,7 +187,6 @@ export default function SelectFilters({
       if (!item) return
 
       const mergedFilters = mergeQuickFilterWithAdvancedFilters(item, selectedFilters, isAdvancedFilters)
-
       // Appliquer tous les filtres fusionnés en une seule fois
       updateFilter(mergedFilters)
     },
