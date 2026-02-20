@@ -93,6 +93,7 @@ interface ContainerProps extends ViewProps {
   sidebarState?: SideBarState
   safeHorizontalPadding?: boolean
   alwaysShowScrollbar?: boolean
+  floatingContent?: React.ReactNode
 }
 
 const Container = ({
@@ -102,12 +103,13 @@ const Container = ({
   sidebarState,
   safeHorizontalPadding = true,
   alwaysShowScrollbar = false,
+  floatingContent,
   ...props
 }: ContainerProps) => {
   const insets = useSafeAreaInsets()
   const layoutRef = useRef<HTMLDivElement>(null)
   const media = useMedia()
-  const { setHideSideBar, setHideTabBar, setSidebarState } = useLayoutContext()
+  const { setHideSideBar, setHideTabBar, setSidebarState, setFloatingContent } = useLayoutContext()
   const spacingValues = useLayoutSpacing({ left: true, right: true })
 
   useFocusEffect(
@@ -115,7 +117,8 @@ const Container = ({
       setSidebarState(sidebarState ?? 'militant')
       setHideSideBar(hideSideBar ?? false)
       setHideTabBar(hideTabBar ?? false)
-    }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, sidebarState]),
+      setFloatingContent(floatingContent ?? null)
+    }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, setFloatingContent, sidebarState, floatingContent]),
   )
 
   const scrollBehavior = alwaysShowScrollbar ? 'scroll' : 'auto'

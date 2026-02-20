@@ -48,6 +48,7 @@ export default function AppNewLayout() {
   const [sidebarState, setSidebarState] = useState<SideBarState>('militant')
   const [hideTabBar, setHideTabBar] = useState(false)
   const [hideSideBar, setHideSideBar] = useState(false)
+  const [floatingContent, setFloatingContent] = useState<React.ReactNode | null>(null)
 
   const setSidebarStateOptimized = useCallback((newState: SideBarState) => {
     setSidebarState((prev) => (prev === newState ? prev : newState))
@@ -61,6 +62,10 @@ export default function AppNewLayout() {
     setHideSideBar((prev) => (prev === newValue ? prev : newValue))
   }, [])
 
+  const setFloatingContentOptimized = useCallback((newValue: React.ReactNode | null) => {
+    setFloatingContent((prev) => (prev === newValue ? prev : newValue))
+  }, [])
+
   const contextValue = useMemo(
     () => ({
       sidebarState,
@@ -69,8 +74,19 @@ export default function AppNewLayout() {
       setHideTabBar: setHideTabBarOptimized,
       hideSideBar,
       setHideSideBar: setHideSideBarOptimized,
+      floatingContent,
+      setFloatingContent: setFloatingContentOptimized,
     }),
-    [sidebarState, hideTabBar, hideSideBar, setSidebarStateOptimized, setHideTabBarOptimized, setHideSideBarOptimized],
+    [
+      sidebarState,
+      hideTabBar,
+      hideSideBar,
+      floatingContent,
+      setSidebarStateOptimized,
+      setHideTabBarOptimized,
+      setHideSideBarOptimized,
+      setFloatingContentOptimized,
+    ],
   )
 
   return (
