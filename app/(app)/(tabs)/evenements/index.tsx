@@ -1,10 +1,37 @@
-import React from 'react'
+import React, { Suspense, useMemo } from 'react'
+import { Link } from 'expo-router'
 import Head from 'expo-router/head'
+import { isWeb, YStack } from 'tamagui'
+import { Sparkle } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
+import { VoxButton } from '@/components/Button'
 import EventFeed from '@/features_next/events/pages/feed'
 
 import * as metatags from '@/config/metatags'
+import { useSession } from '@/ctx/SessionProvider'
+import { useGetExecutiveScopes } from '@/services/profile/hook'
+
+const CreateEventFloatingButton = () => {
+  const { isAuth } = useSession()
+  const { hasFeature } = useGetExecutiveScopes()
+  const canCreate = isAuth && hasFeature ? hasFeature('events') : false
+
+  const floatingContent = useMemo(() => {
+    if (!canCreate) return null
+    return (
+      <YStack>
+        <Link href="/evenements/creer" asChild={!isWeb}>
+          <VoxButton size="lg" theme="purple" iconLeft={Sparkle}>
+            Organiser un événement
+          </VoxButton>
+        </Link>
+      </YStack>
+    )
+  }, [canCreate])
+
+  return floatingContent
+}
 
 export default function EvenementsPage() {
   return (
@@ -12,7 +39,13 @@ export default function EvenementsPage() {
       <Head>
         <title>{metatags.createTitle('Nos événements')}</title>
       </Head>
-      <Layout.Container>
+      <Layout.Container
+        floatingContent={
+          <Suspense fallback={null}>
+            <CreateEventFloatingButton />
+          </Suspense>
+        }
+      >
         <EventFeed />
       </Layout.Container>
     </>

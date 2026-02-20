@@ -2,16 +2,17 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, LayoutRectangle, Platform, SafeAreaView as RNSafeAreaView, StyleSheet } from 'react-native'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { LinearGradient } from 'expo-linear-gradient'
 import { usePathname, useRouter } from 'expo-router'
-import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, XStack, YStack } from 'tamagui'
-import { MoreHorizontal, QrCode, Sparkle } from '@tamagui/lucide-icons'
+import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, YStack } from 'tamagui'
+import { MoreHorizontal, Sparkle } from '@tamagui/lucide-icons'
 
+import { useLayoutContext } from '@/components/AppStructure/Layout/LayoutContext'
 import { FeaturebaseFooterItems } from '@/components/AppStructure/Navigation/FeaturebaseFooterItems'
 import NavSheet, { NavSheetRef } from '@/components/AppStructure/Navigation/NavSheet'
 import { ScopeSelector } from '@/components/AppStructure/Navigation/ScopeSelector'
 import { isNavItemActive } from '@/components/AppStructure/utils'
 import Text from '@/components/base/Text'
-import FutureButton from '@/components/Buttons/FutureButton'
 
 import { cadreNavItems, useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
 import type { IconComponent } from '@/models/common.model'
@@ -146,6 +147,7 @@ const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'formations', 'm
 const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: ConfigurableTabBarProps = {} as ConfigurableTabBarProps) => {
   const router = useRouter()
   const pathname = usePathname()
+  const { floatingContent } = useLayoutContext()
   const [activeSpecialTab, setActiveSpecialTab] = useState<string | null>(null)
   const themes = getThemes()
   const militantNavItems = useMilitantNavItems()
@@ -154,8 +156,6 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
   const hasExecutiveScope = useMemo(() => {
     return userScopes?.some((s) => s.apps.includes('data_corner')) ?? false
   }, [userScopes])
-
-  const hasScannerScope = useMemo(() => userScopes?.some((s) => s.code === 'meeting_scanner') ?? false, [userScopes])
 
   const visibleItemIds = useMemo(() => {
     return hasExecutiveScope ? CADRE_TAB_ORDER : DEFAULT_TAB_ORDER
@@ -336,86 +336,85 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
 
   return (
     <>
-      <SAV
-        {...SAVProps}
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: 'white',
-          opacity: hide ? 0 : 1,
-          pointerEvents: hide ? 'none' : 'auto',
-          ...(isWeb && hide ? { display: 'none' } : {}),
-        }}
+      <YStack
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        opacity={hide ? 0 : 1}
+        pointerEvents={hide ? 'none' : 'box-none'}
+        {...(isWeb && hide ? { display: 'none' } : {})}
       >
-        {hasScannerScope && (
-          <XStack justifyContent="center" alignItems="center" flex={1} pb={16}>
-            <FutureButton onPress={() => router.push('/scanner')}>
-              <XStack alignItems="center" gap={8}>
-                <QrCode size={20} color="white" />
-                <Text.LG regular color="white">
-                  Scanner un billet
-                </Text.LG>
-              </XStack>
-            </FutureButton>
-          </XStack>
+        {floatingContent && (
+          <LinearGradient
+            colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.7)']}
+            start={[0, 0]}
+            end={[0, 1]}
+            style={{ flex: 1, paddingTop: 16 }}
+            pointerEvents="box-none"
+          >
+            <YStack flex={1} justifyContent="center" alignItems="center" pb={24} pointerEvents="box-none">
+              {floatingContent}
+            </YStack>
+          </LinearGradient>
         )}
 
-        <TabBarComponent>
-          <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
-          {visibleItemIds.map((id) => {
-            const isFocus = activeTabKey === id
+        <SAV {...SAVProps} style={{ backgroundColor: 'white' }}>
+          <TabBarComponent>
+            <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
+            {visibleItemIds.map((id) => {
+              const isFocus = activeTabKey === id
 
-            if (id === 'more') {
+              if (id === 'more') {
+                return (
+                  <MemoTab
+                    key="more"
+                    name="more"
+                    isFocus={isFocus}
+                    onPress={() => handleTabPress('more')}
+                    onLayout={handleSaveLayout('more')}
+                    label="Autre"
+                    icon={MoreHorizontal}
+                    theme="blue"
+                  />
+                )
+              }
+
+              if (id === 'cadreSheet') {
+                return (
+                  <MemoTab
+                    key="cadreSheet"
+                    name="cadreSheet"
+                    isFocus={isFocus}
+                    onPress={() => handleTabPress('cadreSheet')}
+                    onLayout={handleSaveLayout('cadreSheet')}
+                    label="Cadre"
+                    icon={Sparkle}
+                    theme="purple"
+                  />
+                )
+              }
+
+              const config = getConfig(id)
+              if (!config) return null
+
               return (
                 <MemoTab
-                  key="more"
-                  name="more"
+                  key={id}
+                  name={id}
                   isFocus={isFocus}
-                  onPress={() => handleTabPress('more')}
-                  onLayout={handleSaveLayout('more')}
-                  label="Autre"
-                  icon={MoreHorizontal}
-                  theme="blue"
+                  onPress={() => handleTabPress(id)}
+                  onLayout={handleSaveLayout(id)}
+                  label={config.text}
+                  icon={config.iconLeft}
+                  theme={(config.theme ?? 'blue') as Theme}
+                  externalLink={config.externalUrlSlug ? true : false}
                 />
               )
-            }
-
-            if (id === 'cadreSheet') {
-              return (
-                <MemoTab
-                  key="cadreSheet"
-                  name="cadreSheet"
-                  isFocus={isFocus}
-                  onPress={() => handleTabPress('cadreSheet')}
-                  onLayout={handleSaveLayout('cadreSheet')}
-                  label="Cadre"
-                  icon={Sparkle}
-                  theme="purple"
-                />
-              )
-            }
-
-            const config = getConfig(id)
-            if (!config) return null
-
-            return (
-              <MemoTab
-                key={id}
-                name={id}
-                isFocus={isFocus}
-                onPress={() => handleTabPress(id)}
-                onLayout={handleSaveLayout(id)}
-                label={config.text}
-                icon={config.iconLeft}
-                theme={(config.theme ?? 'blue') as Theme}
-                externalLink={config.externalUrlSlug ? true : false}
-              />
-            )
-          })}
-        </TabBarComponent>
-      </SAV>
+            })}
+          </TabBarComponent>
+        </SAV>
+      </YStack>
 
       <NavSheet ref={moreSheetRef} onClose={() => handleSheetClose('more')} items={moreItems} />
       <NavSheet
