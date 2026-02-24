@@ -47,12 +47,14 @@ export const MetaDataForm = memo(
     displayToolbar?: boolean
     onMetaDataChange?: () => void
     messageFilters?: RestGetMessageFiltersResponse
+    isMessageFiltersLoading?: boolean
     messageId?: string
     scope: string
     onSenderChange: (sender: RestAvailableSender) => void
     selectedSender: RestAvailableSender | null
   }) => {
     const { setValue } = useFormContext<S.GlobalForm>()
+    const isMessageFiltersLoading = props.isMessageFiltersLoading ?? false
 
     const [filters, setFilters] = useState<SelectedFiltersType>(() => {
       if (props.messageFilters) {
@@ -190,6 +192,7 @@ export const MetaDataForm = memo(
                     messageId={props.messageId}
                     scope={props.scope}
                     isLoading={isPuttingMessageFilters}
+                    isMessageFiltersLoading={isMessageFiltersLoading}
                   />
                   {fieldState.error ? (
                     <XStack gap="$small" alignItems="center" pl="$medium" mt="$small">

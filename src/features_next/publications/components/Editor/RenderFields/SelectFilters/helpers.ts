@@ -156,8 +156,7 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
 
     const metadataKeys = ['uuid']
     const protectedKeys = ['zone', 'zones'] // coexistent avec les quick filters, ne doivent pas être vides
-    const isFilterEmpty = (v: unknown): boolean =>
-      v === null || v === undefined || (isIntervalObject(v) && isEmptyInterval(v))
+    const isFilterEmpty = (v: unknown): boolean => v === null || v === undefined || (isIntervalObject(v) && isEmptyInterval(v))
 
     const nonQuickFilterKeys = Object.keys(filters).filter(
       (key) => !quickFilterFields.includes(key) && !metadataKeys.includes(key) && !protectedKeys.includes(key),

@@ -23,6 +23,7 @@ type RenderFieldsProps = {
   message?: RestGetMessageResponse
   onNodeChange?: () => void
   messageFilters?: RestGetMessageFiltersResponse
+  isMessageFiltersLoading?: boolean
   messageId?: string
   scope: string
   onSenderChange: (sender: RestAvailableSender) => void
@@ -133,6 +134,7 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
         displayToolbar={props.displayToolbar}
         onMetaDataChange={props.onNodeChange}
         messageFilters={props.messageFilters}
+        isMessageFiltersLoading={props.isMessageFiltersLoading}
         messageId={props.messageId}
         scope={props.scope}
         onSenderChange={props.onSenderChange}
@@ -146,6 +148,7 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
       props.displayToolbar,
       props.onNodeChange,
       props.messageFilters,
+      props.isMessageFiltersLoading,
       props.messageId,
       props.scope,
       props.onSenderChange,

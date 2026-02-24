@@ -39,15 +39,17 @@ export class ZoneProvider implements SearchProvider {
 
   async search(query: string, scope: string = 'president_departmental_assembly'): Promise<SearchResult[]> {
     try {
-      if (this.options?.url) {
+      const options = this.options
+      const useCustomUrl = options?.url && query.length > 0
+      if (useCustomUrl && options) {
         const params: Record<string, string | number | undefined> = {
-          [this.options.query_param]: query,
+          [options.query_param]: query,
           scope,
         }
-        const response = await authInstance.get(this.options.url, { params })
+        const response = await authInstance.get(options.url, { params })
         const data = Array.isArray(response.data) ? response.data : []
-        const valueParam = this.options.value_param
-        const labelParam = this.options.label_param
+        const valueParam = options.value_param
+        const labelParam = options.label_param
         return data.map((item: Record<string, unknown>) => {
           const id = String(item[valueParam] ?? '')
           const label = String(item[labelParam] ?? '')

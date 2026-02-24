@@ -29,6 +29,7 @@ export type MessageEditorProps = {
   sender: RestAvailableSender | null
   onMessageIdCreated?: (messageId: string) => void
   messageFilters?: RestGetMessageFiltersResponse
+  isMessageFiltersLoading?: boolean
   onDebouncedSave: DebouncedSaveFunction
   onImmediateSave: ImmediateSaveFunction
   createdMessageId?: string | null
@@ -234,6 +235,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
                 message={message}
                 onNodeChange={handleNodeChange}
                 messageFilters={props.messageFilters}
+                isMessageFiltersLoading={props.isMessageFiltersLoading}
                 messageId={props.messageId}
                 scope={scopeFromQuery ?? ''}
                 onSenderChange={handleSenderChange}

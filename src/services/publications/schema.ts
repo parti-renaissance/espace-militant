@@ -218,18 +218,20 @@ export type RestGetMessageFiltersResponse = z.infer<typeof RestGetMessageFilters
 export type RestMessageFilterDateInterval = z.infer<typeof RestMessageFilterDateIntervalSchema>
 export type RestMessageFilterAgeInterval = z.infer<typeof RestMessageFilterAgeIntervalSchema>
 
+const booleanOrOuiNonSchema = z.union([z.boolean(), z.literal('Oui'), z.literal('Non')]).nullable().optional()
+
 export const RestPutMessageFiltersRequestSchema = z.object({
   gender: z.string().nullable().optional(),
   first_name: z.string().nullable().optional(),
   last_name: z.string().nullable().optional(),
   zones: z.array(RestMessageFilterZoneSchema).nullable().optional(),
   committee: z.string().nullable().optional(),
-  is_certified: z.boolean().nullable().optional(),
+  is_certified: booleanOrOuiNonSchema,
   zone: z.union([z.string(), RestMessageFilterZoneSchema]).nullable().optional(),
-  is_committee_member: z.boolean().nullable().optional(),
+  is_committee_member: booleanOrOuiNonSchema,
   mandate_type: z.string().nullable().optional(),
   declared_mandate: z.string().nullable().optional(),
-  is_campus_registered: z.boolean().nullable().optional(),
+  is_campus_registered: booleanOrOuiNonSchema,
   donator_status: z.string().nullable().optional(),
   adherent_tags: z.string().nullable().optional(),
   elect_tags: z.string().nullable().optional(),

@@ -42,13 +42,26 @@ const MessageEditorPage = (props?: { scope?: string; messageId?: string }) => {
 
   const messageQuery = useCreateMessage({ uuid: currentMessageId })
 
+  const {
+    debouncedSave,
+    immediateSave,
+    isPending: isAutoSaving,
+    hasError,
+    createdMessageId,
+  } = useAutoSave({
+    messageId: currentMessageId,
+    scope: props?.scope ?? '',
+  })
+
+  const effectiveMessageId = props?.messageId ?? createdMessageId ?? ''
+
   const messageQueryParams = useMemo(() => {
     return {
-      messageId: props?.messageId ?? '',
+      messageId: effectiveMessageId,
       scope: props?.scope ?? '',
-      enabled: !!props?.messageId,
+      enabled: !!effectiveMessageId,
     }
-  }, [props?.messageId, props?.scope])
+  }, [effectiveMessageId, props?.scope])
 
   const { data: messageFiltersData, isLoading: isMessageFiltersLoading } = useGetMessageFilters(messageQueryParams)
   const { data: messageData, isLoading: isMessageLoading, error: messageError } = useGetMessage(messageQueryParams)
@@ -80,18 +93,6 @@ const MessageEditorPage = (props?: { scope?: string; messageId?: string }) => {
 
   const isInitialLoading = !wasInitiallyInCreation && (isMessageLoading || isSendersLoading || isMessageContentLoading || isMessageFiltersLoading)
 
-  // Hook de sauvegarde automatique
-  const {
-    debouncedSave,
-    immediateSave,
-    isPending: isAutoSaving,
-    hasError,
-    createdMessageId,
-  } = useAutoSave({
-    messageId: currentMessageId,
-    scope: props?.scope ?? '',
-  })
-
   if (messageError || messageContentError) {
     return <Error404 />
   }
@@ -121,7 +122,7 @@ const MessageEditorPage = (props?: { scope?: string; messageId?: string }) => {
   }
 
   return (
-    <YStack flex={1} backgroundColor="red">
+    <YStack flex={1} backgroundColor="$background">
       <QuitConfirmModal
         isOpen={displayQuitModal}
         onConfirm={handleQuit}
@@ -224,6 +225,7 @@ const MessageEditorPage = (props?: { scope?: string; messageId?: string }) => {
                 }}
                 sender={selectedSender}
                 messageFilters={messageFiltersData}
+                isMessageFiltersLoading={isMessageFiltersLoading}
                 onDebouncedSave={debouncedSave}
                 onImmediateSave={immediateSave}
                 createdMessageId={createdMessageId}
