@@ -50,7 +50,7 @@ export const groupEventsBySection = <T extends RestItemEvent | RestPublicItemEve
   const sections: EventSection<T>[] = []
 
   if (national.length > 0) {
-    sections.push({ id: 'national', title: 'Événements nationaux', data: national })
+    sections.push({ id: 'national', title: 'Événements à la une', data: national })
   }
   if (zone.length > 0 || zoneLabel) {
     const zoneTitle = zoneLabel === 'Toutes' ? 'À venir' : zoneLabel ? `${zoneLabel.replace(' • ', ' - ')}` : 'À venir'

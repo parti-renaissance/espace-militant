@@ -347,13 +347,13 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
       >
         {floatingContent && (
           <LinearGradient
-            colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.7)']}
+            colors={['rgba(242, 238, 238, 0)', 'rgba(238,240,242,0.8)', 'rgba(238,240,242,0.8)']}
             start={[0, 0]}
             end={[0, 1]}
-            style={{ flex: 1, paddingTop: 16 }}
+            style={{ flex: 1, paddingTop: 16, paddingBottom: 16 }}
             pointerEvents="box-none"
           >
-            <YStack flex={1} justifyContent="center" alignItems="center" pb={24} pointerEvents="box-none">
+            <YStack flex={1} justifyContent="center" alignItems="center" pointerEvents="box-none">
               {floatingContent}
             </YStack>
           </LinearGradient>

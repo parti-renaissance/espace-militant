@@ -4,6 +4,7 @@ import { useScrollToTop } from '@react-navigation/native'
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
 import { useDebounce, useDebouncedCallback } from 'use-debounce'
 
+import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
@@ -19,9 +20,14 @@ import { useGetProfil } from '@/services/profile/hook'
 
 import type { EmptyStateReason } from './components/EmptyStateSection'
 import { EmptyStateSection } from './components/EmptyStateSection'
-import EventsHeader from './components/Header'
+import EventsSideContent from './components/SideContent'
 import { EventSectionHeader } from './components/SectionHeader'
 import EventsListSkeleton from './components/Skeleton'
+
+const EVENTS_SWITCH_OPTIONS: OptionsArray = [
+  { label: 'Tous', value: 'events' },
+  { label: "J'y participe", value: 'myEvents' },
+]
 
 const FEED_VIEWABILITY_CONFIG = {
   itemVisiblePercentThreshold: 50,
@@ -48,7 +54,7 @@ const EventCard = memo(({ event, userUuid, source }: { event: RestItemEvent | Re
 
 const EventFeed = () => {
   const media = useMedia()
-  const { session } = useSession()
+  const { session, isAuth } = useSession()
   const { data: userData } = useGetProfil({ enabled: Boolean(session) })
   const { trackImpression } = useHits()
 
@@ -183,7 +189,19 @@ const EventFeed = () => {
     })
   }, [])
 
-  const header = useMemo(() => (media.gtMd ? null : <EventsHeader mode="compact" value={activeTab} onChange={setActiveTab} />), [activeTab, media.gtMd])
+  const handleSwitchChange = useCallback((value: string | undefined) => {
+    if (value === 'events' || value === 'myEvents') setActiveTab(value)
+  }, [])
+
+  const listHeader = useMemo(
+    () => (
+      <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
+        {isAuth && <BigSwitch options={EVENTS_SWITCH_OPTIONS} value={activeTab} onChange={handleSwitchChange} />}
+        {!media.gtMd && <EventsSideContent />}
+      </YStack>
+    ),
+    [activeTab, media.gtMd, media.sm, isAuth, handleSwitchChange],
+  )
 
   return (
     <>
@@ -200,7 +218,7 @@ const EventFeed = () => {
                 ? `e-${item.reason.kind}${item.reason.kind === 'zone_no_upcoming' ? `-${item.reason.zoneLabel}` : ''}`
                 : item.event.uuid
           }
-          ListHeaderComponent={header}
+          ListHeaderComponent={listHeader}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={FEED_VIEWABILITY_CONFIG}
           refreshing={isManualRefreshing}
@@ -232,7 +250,7 @@ const EventFeed = () => {
       {media.gtMd ? (
         <Layout.SideBar isSticky padding="right">
           <YStack>
-            <EventsHeader mode="aside" value={activeTab} onChange={setActiveTab} />
+            <EventsSideContent />
           </YStack>
         </Layout.SideBar>
       ) : null}
