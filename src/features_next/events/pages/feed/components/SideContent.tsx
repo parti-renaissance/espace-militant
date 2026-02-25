@@ -30,7 +30,7 @@ const EventsSideContent = () => {
   const media = useMedia()
 
   return (
-    <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
+    <YStack gap="$medium">
       {canCreate && media.gtSm && (
         <Suspense>
           <NewEventBtn>Organiser un événement</NewEventBtn>
