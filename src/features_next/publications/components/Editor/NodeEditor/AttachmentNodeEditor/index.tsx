@@ -1,7 +1,6 @@
 import { memo, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useLocalSearchParams } from 'expo-router'
 import { getTokenValue, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { AlertTriangle, FileCheck2, Paperclip, Save, Upload, UploadCloud } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,6 +17,8 @@ import * as S from '@/features_next/publications/components/Editor/schemas/messa
 
 import ProgressBar from '@/screens/shared/ProgressBar'
 import { useUploadPublicationFile } from '@/services/files/hook'
+
+import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 
 import { useDocumentSelector } from './useDocumentSelector'
 
@@ -171,8 +172,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
   const insets = useSafeAreaInsets()
   const media = useMedia()
   const isIosMobile = media.sm && Platform.OS === 'ios'
-  const searchParams = useLocalSearchParams<{ scope?: string }>()
-  const scope = searchParams?.scope || ''
+  const scope = useEditorStore((s) => s.scope) ?? ''
 
   const documentSelector = useDocumentSelector()
   const { mutateAsync: uploadFile, progress, isPending } = useUploadPublicationFile()

@@ -29,7 +29,8 @@ export const isEmptyInterval = (v: unknown): boolean => {
 
 /** Indique si une valeur de filtre est considérée comme "remplie" (non vide) */
 export const isFilterValueFilled = (v: unknown): boolean => {
-  if (v === null || v === undefined) return false
+  if (v == null || v === '') return false
+  if (Array.isArray(v)) return v.length > 0
   if (isIntervalObject(v)) return !isEmptyInterval(v)
   return true
 }

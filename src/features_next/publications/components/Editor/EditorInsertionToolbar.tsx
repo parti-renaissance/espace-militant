@@ -2,8 +2,6 @@ import React, { memo, RefObject, useEffect } from 'react'
 import { Platform } from 'react-native'
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
 import { styled, ThemeableStack, YStack } from 'tamagui'
-import { Control } from 'react-hook-form'
-
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
 import MessageEditorAddToolbar from './AddToolBar'
@@ -39,7 +37,6 @@ const EditorInsertionToolbarSeparator = ({ bottom }: { bottom?: boolean }) => {
 
 type EditorInsertionToolbarProps = {
   display: boolean
-  control: Control<S.GlobalForm>
   editorMethods: RefObject<EditorMethods>
   field?: S.FieldsArray[number]
   asLast?: boolean
@@ -88,7 +85,6 @@ export const EditorInsertionToolbar = memo((props: EditorInsertionToolbarProps) 
       <EditorInsertionToolbarSeparator />
       <YStack paddingHorizontal="$medium" width="100%" justifyContent="center" alignItems="center" zIndex={10}>
         <MessageEditorAddToolbar
-          control={props.control}
           editorMethods={props.editorMethods}
           field={props.field}
           asLast={props.asLast}

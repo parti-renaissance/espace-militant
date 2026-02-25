@@ -2,13 +2,11 @@ import React, { forwardRef, RefObject, useCallback, useImperativeHandle, useMemo
 import { ScrollView, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { isWeb, YStack } from 'tamagui'
-import { Control } from 'react-hook-form'
-
 import { usePageLayoutScroll } from '@/components/layouts/PageLayout/usePageLayoutScroll'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 import { EditorMethods, RenderFieldRef } from '@/features_next/publications/components/Editor/types'
 
-import { RestAvailableSender, RestAvailableSendersResponse, RestGetMessageFiltersResponse, RestGetMessageResponse } from '@/services/publications/schema'
+import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 
 import { EditorInsertionToolbar } from '../EditorInsertionToolbar'
 import { MetaDataForm } from './MetaDataForm'
@@ -16,18 +14,8 @@ import { RenderField } from './RenderField'
 
 type RenderFieldsProps = {
   defaultStruct: S.FieldsArray
-  control: Control<S.GlobalForm>
   editorMethods: RefObject<EditorMethods>
-  displayToolbar?: boolean
-  availableSenders?: RestAvailableSendersResponse
-  message?: RestGetMessageResponse
   onNodeChange?: () => void
-  messageFilters?: RestGetMessageFiltersResponse
-  isMessageFiltersLoading?: boolean
-  messageId?: string
-  scope: string
-  onSenderChange: (sender: RestAvailableSender) => void
-  selectedSender: RestAvailableSender | null
 }
 
 export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(function RenderFields(props, ref) {
@@ -35,8 +23,9 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
   const scrollRef = useRef<ScrollView>(null)
   const insets = useSafeAreaInsets()
   const fieldLength = useRef(fields.length)
-  const memoizedAvailableSenders = useMemo(() => props.availableSenders, [props.availableSenders])
-  const memoizedMessage = useMemo(() => props.message, [props.message])
+  const displayToolbar = useEditorStore((s) => s.displayToolbar)
+  const availableSenders = useEditorStore((s) => s.availableSenders)
+  const message = useEditorStore((s) => s.message)
 
   const getFieldEdge = useCallback((index: number) => {
     if (index === 0 && fieldLength.current === 1) {
@@ -119,41 +108,15 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
   }, [fields])
 
   const senderThemeColor = useMemo(() => {
-    const sender = props.message?.sender || (props.availableSenders && props.availableSenders.length > 0 ? props.availableSenders[0] : null)
+    const sender = message?.sender || (availableSenders && availableSenders.length > 0 ? availableSenders[0] : null)
     return sender?.theme?.primary || '#4291E1'
-  }, [props.message?.sender, props.availableSenders])
+  }, [message?.sender, availableSenders])
 
   const { isWebPageLayoutScrollActive } = usePageLayoutScroll()
 
   const memoizedHeaderComponent = useMemo(
-    () => (
-      <MetaDataForm
-        control={props.control}
-        availableSenders={memoizedAvailableSenders}
-        message={memoizedMessage}
-        displayToolbar={props.displayToolbar}
-        onMetaDataChange={props.onNodeChange}
-        messageFilters={props.messageFilters}
-        isMessageFiltersLoading={props.isMessageFiltersLoading}
-        messageId={props.messageId}
-        scope={props.scope}
-        onSenderChange={props.onSenderChange}
-        selectedSender={props.selectedSender}
-      />
-    ),
-    [
-      props.control,
-      memoizedAvailableSenders,
-      memoizedMessage,
-      props.displayToolbar,
-      props.onNodeChange,
-      props.messageFilters,
-      props.isMessageFiltersLoading,
-      props.messageId,
-      props.scope,
-      props.onSenderChange,
-      props.selectedSender,
-    ],
+    () => <MetaDataForm onMetaDataChange={props.onNodeChange} />,
+    [props.onNodeChange],
   )
 
   return (
@@ -168,7 +131,6 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
         {memoizedHeaderComponent}
         {fields.length === 0 ? (
           <EditorInsertionToolbar
-            control={props.control}
             editorMethods={props.editorMethods}
             field={undefined}
             display={true}
@@ -181,10 +143,8 @@ export const RenderFields = forwardRef<RenderFieldRef, RenderFieldsProps>(functi
             <RenderField
               key={field.id}
               field={field}
-              control={props.control}
               edgePosition={getFieldEdge(index)}
               editorMethods={props.editorMethods}
-              displayToolbar={props.displayToolbar}
               senderThemeColor={senderThemeColor}
               onNodeChange={props.onNodeChange}
             />

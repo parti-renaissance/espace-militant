@@ -10,38 +10,44 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
 import type { ZoneProviderOptions } from '@/components/GlobalSearch/providers/ZoneProvider'
+import type { SearchResult } from '@/components/GlobalSearch/types'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
+import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 
-import { useGetFilterCollection, useGetMessageCountRecipientsPartial } from '@/services/publications/hook'
+import { useGetFilterCollection } from '@/services/publications/hook'
 import type { RestFilterOptionZoneAutocomplete } from '@/services/publications/schema'
 
 import { calculateDefaultValues, FiltersChips } from '../../../FiltersChips'
 import AdvancedFilters from './AdvancedFilters'
-import { getHierarchicalQuickFilters, getItemState } from './helpers'
+import { getHierarchicalQuickFilters, getItemState, getProtectedFilterKeys, identifyQuickFilter } from './helpers'
 import QuickFilter from './QuickFilter'
 import { FilterValue, HierarchicalQuickFilterType, isFilterValueFilled, SelectedFiltersType } from './type'
 
 interface SelectFiltersProps {
   updateFilter: (updatedFilter: { [code: string]: FilterValue }) => void
   selectedFilters?: SelectedFiltersType
-  selectedQuickFilterId?: string | null
-  messageId?: string
-  scope?: string
   isLoading?: boolean
-  isMessageFiltersLoading?: boolean
   hasError?: boolean
+  messageCountRecipients?: { contacts?: number; total?: number }
+  isFetchingMessageCountRecipients?: boolean
 }
 
 export default function SelectFilters({
   updateFilter,
   selectedFilters = {},
-  selectedQuickFilterId = null,
-  messageId,
-  scope,
   isLoading = false,
-  isMessageFiltersLoading = false,
   hasError = false,
+  messageCountRecipients,
+  isFetchingMessageCountRecipients = false,
 }: SelectFiltersProps) {
+  const messageId = useEditorStore((s) => s.messageId)
+  const scope = useEditorStore((s) => s.scope)
+  const { data: filterCollection } = useGetFilterCollection({ scope: scope ?? '', enabled: !!scope })
+
+  const selectedQuickFilterId = useMemo(
+    () => identifyQuickFilter(selectedFilters, filterCollection ?? undefined),
+    [selectedFilters, filterCollection]
+  )
   const media = useMedia()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isAdvancedFilters, setIsAdvancedFilters] = useState(false)
@@ -49,11 +55,9 @@ export default function SelectFilters({
   const quickFilters: HierarchicalQuickFilterType[] = useMemo(() => getHierarchicalQuickFilters(), [])
   const queryClient = useQueryClient()
 
-  const { data: filterCollection } = useGetFilterCollection({ scope: scope ?? '', enabled: !!scope })
-
   useEffect(() => {
-    setIsAdvancedFilters(selectedQuickFilterId ? false : true)
-  }, [])
+    setIsAdvancedFilters(!selectedQuickFilterId)
+  }, [selectedQuickFilterId])
 
   const zoneAutocompleteOptions = useMemo((): ZoneProviderOptions | undefined => {
     if (!filterCollection?.length) return undefined
@@ -82,13 +86,7 @@ export default function SelectFilters({
         })
       } else {
         // En mode filtres rapides : on réinitialise les filtres avancés non protégés
-        const protectedFilters = ['zone', 'zones']
-
-        // EXEMPLE - Protéger static_tags si sa valeur est liée à la rentrée
-        // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
-        // if (currentFilters.static_tags === 'national_event:rentree-2025' || currentFilters.static_tags === '!national_event:rentree-2025') {
-        //   protectedFilters.push('static_tags')
-        // }
+        const protectedFilters = getProtectedFilterKeys(currentFilters, filterCollection)
 
         protectedFilters.forEach((filterKey) => {
           if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
@@ -106,7 +104,7 @@ export default function SelectFilters({
 
       return mergedFilters
     },
-    [],
+    [filterCollection],
   )
 
   const zoneDefaultValue = useMemo(() => {
@@ -126,11 +124,12 @@ export default function SelectFilters({
         }
       }
     }
+
     return undefined
   }, [selectedFilters.zone, selectedFilters.zones, messageId]) // update when zone changes
 
   // Calculer les valeurs par défaut en fonction de messageId et des zones disponibles
-  const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), [messageId, selectedFilters.zones, selectedFilters.zone])
+  const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), [selectedFilters])
 
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
@@ -151,24 +150,13 @@ export default function SelectFilters({
       return baseLabel
     }
 
-    const excludedFilters = ['zone', 'zones', 'uuid']
-
-    // EXEMPLE - Exclure static_tags s'il est protégé (lié à la rentrée)
-    // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
-    // if (selectedFilters.static_tags === 'national_event:rentree-2025' || selectedFilters.static_tags === '!national_event:rentree-2025') {
-    //   excludedFilters.push('static_tags')
-    // }
+    const excludedFilters = [...getProtectedFilterKeys(selectedFilters, filterCollection ?? undefined), 'uuid']
 
     const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) => !excludedFilters.includes(key) && isFilterValueFilled(value))
     return nonNullFilters.length > 0
       ? `${nonNullFilters.length} filtre${nonNullFilters.length > 1 ? 's' : ''} avancé${nonNullFilters.length > 1 ? 's' : ''}`
       : 'Sélectionner'
-  }, [selectedQuickFilterId, quickFilters, selectedFilters, isAdvancedFilters])
-
-  const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({
-    messageId: messageId,
-    scope: scope,
-  })
+  }, [selectedQuickFilterId, quickFilters, selectedFilters, isAdvancedFilters, filterCollection])
 
   const handleOpenModal = useCallback(() => {
     setIsModalOpen(true)
@@ -178,7 +166,7 @@ export default function SelectFilters({
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false)
     queryClient.refetchQueries({
-      queryKey: ['message-count-recipients', messageId],
+      queryKey: ['message-count-recipients-partial', messageId],
     })
   }, [messageId, queryClient])
 
@@ -195,23 +183,24 @@ export default function SelectFilters({
   )
 
   const handleAdvancedFilterChange = useCallback(
-    (filterCode: string, value: any) => {
+    (filterCode: string, value: FilterValue) => {
       updateFilter({ [filterCode]: value })
     },
     [updateFilter],
   )
 
   const handleZoneSelect = useCallback(
-    (result: any) => {
+    (result: SearchResult | null) => {
       if (!result) {
         updateFilter({ zone: null })
       } else if (result.id) {
+        const meta = result.metadata as { zone?: { name: string }; zoneCode?: string; zoneType?: string } | undefined
         updateFilter({
           zone: {
             uuid: result.id,
-            name: result.metadata?.zone?.name || '',
-            code: result.metadata?.zoneCode || '',
-            type: result.metadata?.zoneType || 'custom',
+            name: meta?.zone?.name || '',
+            code: meta?.zoneCode || '',
+            type: meta?.zoneType || 'custom',
           },
         })
       }
@@ -246,7 +235,7 @@ export default function SelectFilters({
 
       updateFilter({ [filterKey]: value })
     },
-    [updateFilter, defaultFiltersValues, setZoneResetKey, messageId],
+    [updateFilter, defaultFiltersValues],
   )
 
   const Header = useCallback(() => {
@@ -265,7 +254,7 @@ export default function SelectFilters({
   return (
     <>
       <SF.Props themedText={false}>
-        <SF theme="gray" size="lg" onPress={handleOpenModal} error={hasError} disabled={!messageId || !scope || isMessageFiltersLoading}>
+        <SF theme="gray" size="lg" onPress={handleOpenModal} error={hasError} disabled={!messageId || !scope}>
           <SF.Container>
             <SF.Label>Destinataires</SF.Label>
             <SF.ValueContainer alignItems="flex-end">
@@ -295,104 +284,103 @@ export default function SelectFilters({
         }
         withKeyboard={false}
       >
-        {messageId && !isMessageFiltersLoading ? (
-          <YStack width={media.gtMd ? 500 : undefined}>
-            {media.gtMd ? <Header /> : null}
-            <YStack gap="$medium" padding="$medium">
-              {/* Affichage des filtres actifs sous forme de chips */}
-              <FiltersChips selectedFilters={selectedFilters} onFilterChange={handleFilterChange} filterCollection={filterCollection ?? undefined} />
-              <YStack gap="$medium">
-                <YStack gap="$small">
-                  <XStack alignItems="center" flexWrap="wrap">
-                    <Text.MD secondary>Votre publication sera notifiée à</Text.MD>
-                    <XStack alignItems="center" justifyContent="center" position="relative" minWidth={18}>
-                      {isFetchingMessageCountRecipients || isLoading ? (
-                        <YStack
-                          position="absolute"
-                          left={0}
-                          top={0}
-                          right={0}
-                          bottom={0}
-                          justifyContent="center"
-                          alignItems="center"
-                          backgroundColor="white"
-                          zIndex={10}
-                        >
-                          <ActivityIndicator size={14} color="#6B7280" />
-                        </YStack>
-                      ) : null}
-                      <Text.MD primary semibold>
-                        {' '}
-                        {messageCountRecipients?.contacts}{' '}
-                      </Text.MD>
-                    </XStack>
-                    <Text.MD secondary>contacts.</Text.MD>
+        <YStack width={media.gtMd ? 500 : undefined}>
+          {media.gtMd ? <Header /> : null}
+          <YStack gap="$medium" padding="$medium">
+            {/* Affichage des filtres actifs sous forme de chips */}
+            <FiltersChips selectedFilters={selectedFilters} onFilterChange={handleFilterChange} filterCollection={filterCollection ?? undefined} />
+            <YStack gap="$medium">
+              <YStack gap="$small">
+                <XStack alignItems="center" flexWrap="wrap">
+                  <Text.MD secondary>Votre publication sera notifiée à</Text.MD>
+                  <XStack alignItems="center" justifyContent="center" position="relative" minWidth={18}>
+                    {isFetchingMessageCountRecipients || isLoading ? (
+                      <YStack
+                        position="absolute"
+                        left={0}
+                        top={0}
+                        right={0}
+                        bottom={0}
+                        justifyContent="center"
+                        alignItems="center"
+                        backgroundColor="white"
+                        zIndex={10}
+                      >
+                        <ActivityIndicator size={14} color="#6B7280" />
+                      </YStack>
+                    ) : null}
+                    <Text.MD primary semibold>
+                      {' '}
+                      {messageCountRecipients?.contacts}{' '}
+                    </Text.MD>
                   </XStack>
-                  <XStack alignItems="center" flexWrap="wrap">
-                    <Text.MD secondary>Elle sera visible à</Text.MD>
-                    <XStack alignItems="center" justifyContent="center" position="relative" minWidth={18}>
-                      {isFetchingMessageCountRecipients || isLoading ? (
-                        <YStack
-                          position="absolute"
-                          left={0}
-                          top={0}
-                          right={0}
-                          bottom={0}
-                          justifyContent="center"
-                          alignItems="center"
-                          backgroundColor="white"
-                          zIndex={10}
-                        >
-                          <ActivityIndicator size={14} color="#6B7280" />
-                        </YStack>
-                      ) : null}
-                      <Text.MD primary semibold>
-                        {' '}
-                        {messageCountRecipients?.total}{' '}
-                      </Text.MD>
-                    </XStack>
-                    <Text.MD secondary>personnes.</Text.MD>
+                  <Text.MD secondary>contacts.</Text.MD>
+                </XStack>
+                <XStack alignItems="center" flexWrap="wrap">
+                  <Text.MD secondary>Elle sera visible à</Text.MD>
+                  <XStack alignItems="center" justifyContent="center" position="relative" minWidth={18}>
+                    {isFetchingMessageCountRecipients || isLoading ? (
+                      <YStack
+                        position="absolute"
+                        left={0}
+                        top={0}
+                        right={0}
+                        bottom={0}
+                        justifyContent="center"
+                        alignItems="center"
+                        backgroundColor="white"
+                        zIndex={10}
+                      >
+                        <ActivityIndicator size={14} color="#6B7280" />
+                      </YStack>
+                    ) : null}
+                    <Text.MD primary semibold>
+                      {' '}
+                      {messageCountRecipients?.total}{' '}
+                    </Text.MD>
                   </XStack>
-                </YStack>
-              </YStack>
-
-              <YStack gap="$small" w="100%">
-                {selectedFilters?.zone !== undefined && !isMessageFiltersLoading ? (
-                  <GlobalSearch
-                    key={`zone-search-${zoneResetKey}`}
-                    provider={zoneProvider}
-                    onSelect={handleZoneSelect}
-                    onReset={handleZoneReset}
-                    placeholder="Zone géographique"
-                    scope={scope}
-                    defaultValue={zoneDefaultValue}
-                    nullable={!!selectedFilters.zone}
-                    helpText={
-                      <Text.SM>
-                        <Text.SM semibold>Toutes les zones inclues dans votre zone de gestion sont filtrables. </Text.SM> Exemple : Circonscriptions, Cantons,
-                        Communauté de communes, Communes et Bureaux de vote.
-                      </Text.SM>
-                    }
-                  />
-                ) : null}
-                <Text.SM secondary>Ciblez votre publication géographiquement (Circonscriptions, communes, etc.)</Text.SM>
-              </YStack>
-              <YStack gap="$small" marginVertical="$small">
-                <XStack alignItems="center" gap="$xsmall" justifyContent="flex-end">
-                  <Text.MD color="$blue6" semibold onPress={handleAdvancedFiltersToggle}>
-                    Filtres avancés
-                  </Text.MD>
-                  <XStack alignItems="center" gap="$small">
-                    <SwitchV2 checked={isAdvancedFilters} onPress={handleAdvancedFiltersToggle} />
-                  </XStack>
+                  <Text.MD secondary>personnes.</Text.MD>
                 </XStack>
               </YStack>
-              {isAdvancedFilters ? (
-                <AdvancedFilters scope={scope} selectedFilters={selectedFilters} onFilterChange={handleAdvancedFilterChange} />
-              ) : (
-                <>
-                  <QuickFilter quickFilters={quickFilters} selectedQuickFilterId={selectedQuickFilterId} onItemSelection={handleQuickFilterSelection} />
-                  {/* 
+            </YStack>
+
+            <YStack gap="$small" w="100%">
+              {selectedFilters?.zone !== undefined ? (
+                <GlobalSearch
+                  key={`zone-search-${zoneResetKey}`}
+                  provider={zoneProvider}
+                  onSelect={handleZoneSelect}
+                  onReset={handleZoneReset}
+                  placeholder="Zone géographique"
+                  scope={scope}
+                  defaultValue={zoneDefaultValue}
+                  nullable={!!selectedFilters.zone}
+                  helpText={
+                    <Text.SM>
+                      <Text.SM semibold>Toutes les zones inclues dans votre zone de gestion sont filtrables. </Text.SM> Exemple : Circonscriptions, Cantons,
+                      Communauté de communes, Communes et Bureaux de vote.
+                    </Text.SM>
+                  }
+                />
+              ) : null}
+              <Text.SM secondary>Ciblez votre publication géographiquement (Circonscriptions, communes, etc.)</Text.SM>
+            </YStack>
+            <YStack gap="$small" marginVertical="$small">
+              <XStack alignItems="center" gap="$xsmall" justifyContent="flex-end">
+                <Text.MD color="$blue6" semibold onPress={handleAdvancedFiltersToggle}>
+                  Filtres avancés
+                </Text.MD>
+                <XStack alignItems="center" gap="$small">
+                  <SwitchV2 checked={isAdvancedFilters} onPress={handleAdvancedFiltersToggle} />
+                </XStack>
+              </XStack>
+            </YStack>
+            {isAdvancedFilters ? (
+              <AdvancedFilters selectedFilters={selectedFilters} onFilterChange={handleAdvancedFilterChange} />
+            ) : (
+              <>
+                <QuickFilter quickFilters={quickFilters} selectedQuickFilterId={selectedQuickFilterId} onItemSelection={handleQuickFilterSelection} />
+                {/* 
                   EXEMPLE - Filtres circonstanciels
                   Pour réactiver cette section, décommenter le code ci-dessous :
                   
@@ -427,11 +415,10 @@ export default function SelectFilters({
                     />
                   </YStack>
                 */}
-                </>
-              )}
-            </YStack>
+              </>
+            )}
           </YStack>
-        ) : null}
+        </YStack>
       </ModalOrPageBase>
     </>
   )

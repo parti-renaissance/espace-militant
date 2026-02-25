@@ -5,6 +5,7 @@ import DateInput from '@/components/base/DateInput'
 import SelectV3 from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 
+import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 import { useGetFilterCollection } from '@/services/publications/hook'
 import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/publications/schema'
 
@@ -153,14 +154,14 @@ export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
 ]
 
 interface AdvancedFiltersProps {
-  scope?: string
   selectedFilters?: SelectedFiltersType
   onFilterChange?: (filterCode: string, value: FilterValue) => void
 }
 
-function AdvancedFiltersInner({ scope, selectedFilters = {}, onFilterChange }: AdvancedFiltersProps) {
+function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: AdvancedFiltersProps) {
+  const scope = useEditorStore((s) => s.scope) ?? ''
   const { data: filterCollection, isLoading } = useGetFilterCollection({
-    scope: scope ?? '',
+    scope,
     enabled: !!scope,
   })
 

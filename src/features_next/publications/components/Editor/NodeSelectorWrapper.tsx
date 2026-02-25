@@ -2,10 +2,12 @@ import React, { memo, ReactNode, RefObject, useCallback, useMemo } from 'react'
 import { GestureResponderEvent } from 'react-native'
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
-import { Control, useFormContext, useWatch } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 
 import Text from '@/components/base/Text'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+
+import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 
 import { EditorInsertionToolbar } from './EditorInsertionToolbar'
 import MessageEditorEditToolbar from './EditToolBar'
@@ -133,7 +135,6 @@ const Wrapper = withStaticProperties(WrapperFrame, {
 type NodeSelectorProps = {
   field: S.FieldsArray[number]
   children: ReactNode
-  control: Control<S.GlobalForm>
   edgePosition?: 'trailing' | 'leading' | 'alone'
   error?: string
   editorMethods: RefObject<EditorMethods>
@@ -149,7 +150,6 @@ const MemoWrapper = memo(
     error?: string
     editorMethods: RefObject<EditorMethods>
     field: S.FieldsArray[number]
-    control: Control<S.GlobalForm>
     onShowAddBarTop: () => void
     onShowAddBarBottom: () => void
     onCloseAddBar: () => void
@@ -185,7 +185,6 @@ const MemoWrapper = memo(
     return (
       <Wrapper.Props selected={props.selected} edgePosition={props.edgePosition} error={Boolean(props.error)} editMode={props.displayToolbar}>
         <EditorInsertionToolbar
-          control={props.control}
           editorMethods={props.editorMethods}
           field={props.field}
           display={props.displayToolbar}
@@ -207,7 +206,6 @@ const MemoWrapper = memo(
         </AnimatedWrapperFrame>
         {displayBottomAddBar ? (
           <EditorInsertionToolbar
-            control={props.control}
             editorMethods={props.editorMethods}
             field={props.field}
             asLast={true}
@@ -224,13 +222,13 @@ const MemoWrapper = memo(
 
 MemoWrapper.displayName = 'MemoWrapper'
 
-export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToolbar?: boolean }) => {
+export const NodeSelectorWrapper = memo((props: NodeSelectorProps) => {
   const content = useMemo(() => props.children, [props.children])
-  const displayToolbar = props.displayToolbar ?? true
+  const displayToolbar = useEditorStore((s) => s.displayToolbar) ?? true
 
-  const { setValue } = useFormContext<S.GlobalForm>()
-  const selectedField = useWatch({ control: props.control, name: 'selectedField' })
-  const addBarOpenForFieldId = useWatch({ control: props.control, name: 'addBarOpenForFieldId' })
+  const { control, setValue } = useFormContext<S.GlobalForm>()
+  const selectedField = useWatch({ control, name: 'selectedField' })
+  const addBarOpenForFieldId = useWatch({ control, name: 'addBarOpenForFieldId' })
 
   const topKey = useMemo(() => `${props.field.id}:top`, [props.field.id])
   const bottomKey = useMemo(() => `${props.field.id}:bottom`, [props.field.id])
@@ -277,7 +275,6 @@ export const NodeSelectorWrapper = memo((props: NodeSelectorProps & { displayToo
       edgePosition={props.edgePosition}
       editorMethods={props.editorMethods}
       field={props.field}
-      control={props.control}
       onShowAddBarTop={handleShowAddBarTop}
       onShowAddBarBottom={handleShowAddBarBottom}
       onCloseAddBar={handleCloseAddBar}

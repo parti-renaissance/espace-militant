@@ -197,7 +197,7 @@ export const useGetMessageCountRecipientsPartial = (props: { messageId?: string;
       props.messageId && props.scope
         ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope, partial: true })
         : Promise.resolve(undefined),
-    enabled: Boolean(props.messageId && props.scope) && props.enabled,
+    enabled: Boolean(props.messageId && props.scope) && (props.enabled !== false),
   })
 }
 
@@ -231,6 +231,9 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
     onSuccess: () => {
       queryClient.refetchQueries({
         queryKey: ['message-count-recipients-partial', props.messageId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['message-filters', props.messageId],
       })
     },
     onError: (error) => {

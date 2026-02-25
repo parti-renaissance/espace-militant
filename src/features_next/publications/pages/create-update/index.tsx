@@ -225,7 +225,6 @@ const MessageEditorPage = (props?: { scope?: string; messageId?: string }) => {
                 }}
                 sender={selectedSender}
                 messageFilters={messageFiltersData}
-                isMessageFiltersLoading={isMessageFiltersLoading}
                 onDebouncedSave={debouncedSave}
                 onImmediateSave={immediateSave}
                 createdMessageId={createdMessageId}
