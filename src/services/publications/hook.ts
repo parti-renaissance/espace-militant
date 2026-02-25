@@ -7,7 +7,11 @@ import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 
 import { RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
 
-const toSnake = (s: string) => s.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '')
+const toSnake = (s: string) =>
+  s
+    .replace(/([A-Z])/g, '_$1')
+    .toLowerCase()
+    .replace(/^_/, '')
 
 export const useCreateMessage = (props: { uuid?: string }) => {
   const toast = useToastController()
@@ -193,7 +197,7 @@ export const useGetMessageCountRecipientsPartial = (props: { messageId?: string;
       props.messageId && props.scope
         ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope, partial: true })
         : Promise.resolve(undefined),
-    enabled: Boolean(props.messageId && props.scope) && props.enabled,
+    enabled: Boolean(props.messageId && props.scope) && (props.enabled !== false),
   })
 }
 
@@ -210,6 +214,7 @@ export const useGetMessageFilters = (props: { messageId?: string; scope?: string
     queryKey: ['message-filters', props.messageId],
     queryFn: () => (props.messageId && props.scope ? api.getMessageFilters({ messageId: props.messageId, scope: props.scope }) : Promise.resolve(undefined)),
     enabled: props.enabled,
+    refetchOnMount: true,
   })
 }
 
@@ -226,6 +231,9 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
     onSuccess: () => {
       queryClient.refetchQueries({
         queryKey: ['message-count-recipients-partial', props.messageId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['message-filters', props.messageId],
       })
     },
     onError: (error) => {

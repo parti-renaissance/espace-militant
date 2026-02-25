@@ -6,6 +6,7 @@ import { VoxButton } from '@/components/Button'
 import type { RestFilterCollectionResponse } from '@/services/publications/schema'
 
 import { AVAILABLE_FILTERS } from './Editor/RenderFields/SelectFilters/AdvancedFilters'
+import { getProtectedFilterKeys } from './Editor/RenderFields/SelectFilters/helpers'
 import {
   type FilterValue,
   type SelectedFiltersType,
@@ -140,6 +141,7 @@ export const calculateDefaultValues = (selectedFilters: Record<string, FilterVal
 export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false, filterCollection }: FiltersChipsProps) => {
   // Calculer automatiquement les valeurs par défaut
   const defaultValues = calculateDefaultValues(selectedFilters)
+  const protectedKeys = getProtectedFilterKeys(selectedFilters, filterCollection ?? undefined)
 
   // Exclure de l'affichage : zones (redondant avec zone), uuid (métadonnée, pas un filtre)
   const excludedKeys = ['zones', 'uuid']
@@ -159,13 +161,13 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
       if (isIntervalObject(value)) return !isEmptyInterval(value)
       return value !== null && value !== undefined
     })
-    // Trier : filtres avec valeur par défaut en premier
+    // Trier : filtres avec valeur par défaut ou protégés en premier
     .sort(([keyA], [keyB]) => {
-      const hasDefaultA = hasDefaultValue(keyA, defaultValues)
-      const hasDefaultB = hasDefaultValue(keyB, defaultValues)
+      const isDefaultLikeA = hasDefaultValue(keyA, defaultValues) || protectedKeys.includes(keyA)
+      const isDefaultLikeB = hasDefaultValue(keyB, defaultValues) || protectedKeys.includes(keyB)
 
-      if (hasDefaultA && !hasDefaultB) return -1
-      if (!hasDefaultA && hasDefaultB) return 1
+      if (isDefaultLikeA && !isDefaultLikeB) return -1
+      if (!isDefaultLikeA && isDefaultLikeB) return 1
       return 0
     })
 
@@ -175,6 +177,7 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
 
   const handleChipPress = (key: string) => {
     if (isStatic || !onFilterChange) return
+    if (protectedKeys.includes(key)) return
 
     // Si le filtre a une valeur par défaut, on remet la valeur par défaut
     if (hasDefaultValue(key, defaultValues)) {
@@ -196,9 +199,15 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
           const theme = isNegation ? 'orange' : 'gray'
           const iconLeft = isNegation ? EqualNot : undefined
 
-          // Si le filtre a une valeur par défaut
-          if (hasDefaultValue(key, defaultValues)) {
-            const isDefault = isValueDefault(key, value, defaultValues[key])
+          // Si le filtre a une valeur par défaut ou est protégé (affichage "par défaut")
+          const isProtected = protectedKeys.includes(key)
+          const hasDefault = hasDefaultValue(key, defaultValues)
+          const zonesNotEmpty =
+            selectedFilters.zones && Array.isArray(selectedFilters.zones) && selectedFilters.zones.length > 0
+          if (hasDefault || isProtected) {
+            const isDefaultRaw = isProtected ? true : isValueDefault(key, value, defaultValues[key])
+            const isDefault = key === 'zone' ? isDefaultRaw && !!zonesNotEmpty : isDefaultRaw
+            const showIconRight = !isProtected && !isDefault && !isStatic
 
             return (
               <VoxButton
@@ -207,7 +216,7 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
                 theme={theme}
                 variant={isDefault ? 'outlined' : 'contained'}
                 iconLeft={iconLeft}
-                iconRight={!isDefault && !isStatic ? Undo2 : undefined}
+                iconRight={showIconRight ? Undo2 : undefined}
                 onPress={() => handleChipPress(key)}
                 testID={`filter-chip-${key}`}
                 asChip={isStatic}
@@ -218,7 +227,7 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
             )
           }
 
-          // Pour les filtres sans valeur par défaut (filtres actifs)
+          // Pour les filtres sans valeur par défaut (filtres actifs, non protégés)
           return (
             <VoxButton
               key={key}

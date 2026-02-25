@@ -1,5 +1,6 @@
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { AxiosError } from 'axios'
+
+import { ErrorMonitor } from '@/utils/ErrorMonitor'
 
 export const logTypeError = (error: TypeError) => {
   ErrorMonitor.log('[NetworkLogger] Type error', {

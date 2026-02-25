@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useRouter } from 'expo-router'
-import { getToken, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { getToken, isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { Clock, PenLine } from '@tamagui/lucide-icons'
 import { InfiniteData } from '@tanstack/react-query'
 
@@ -57,7 +57,7 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
             <Clock size={16} color="$textSecondary" />
             <Text.SM secondary>Créé {relativeDateFormatter(item.created_at)}</Text.SM>
           </XStack>
-          <VoxButton variant="outlined" iconLeft={PenLine} size="sm" onPress={handlePress}>
+          <VoxButton variant="outlined" iconLeft={PenLine} size="sm" onPress={isWeb ? undefined : handlePress}>
             Éditer / publier
           </VoxButton>
         </XStack>

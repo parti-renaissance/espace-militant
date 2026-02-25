@@ -2,8 +2,6 @@ import { forwardRef, RefObject, useCallback, useEffect } from 'react'
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 import { Image, MousePointerSquare, Paperclip, Plus, Text as TextIcon, X } from '@tamagui/lucide-icons'
-import { Control } from 'react-hook-form'
-
 import Text from '@/components/base/Text'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
@@ -153,7 +151,6 @@ const ToolBarItem = ({ title, icon: Icon, onPress, visible = true }: ToolBarItem
 }
 
 type MessageEditorToolBarProps = {
-  control: Control<S.GlobalForm>
   editorMethods: RefObject<EditorMethods>
   field?: S.FieldsArray[number]
   onClose?: () => void

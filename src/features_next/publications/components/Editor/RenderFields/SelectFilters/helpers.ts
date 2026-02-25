@@ -1,6 +1,8 @@
 import { format, parseISO, startOfDay, subMonths } from 'date-fns'
 
-import { HierarchicalQuickFilterType, isEmptyInterval, isIntervalObject, SelectedFiltersType } from './type'
+import type { RestFilterCollectionResponse } from '@/services/publications/schema'
+
+import { HierarchicalQuickFilterType, isEmptyInterval, isFilterValueFilled, isIntervalObject, SelectedFiltersType } from './type'
 
 export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
   const today = new Date()
@@ -88,7 +90,21 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
   ]
 }
 
-export const identifyQuickFilter = (filters: SelectedFiltersType): string | null => {
+export const getProtectedFilterKeys = (messageFilters: SelectedFiltersType, filterCollection: RestFilterCollectionResponse | undefined): string[] => {
+  const ALWAYS_PROTECTED = ['zone', 'zones']
+  const availableCodes = new Set(filterCollection?.flatMap((c) => c.filters.map((f) => f.code)) ?? [])
+
+  const conditionallyProtected = Object.entries(messageFilters)
+    .filter(([key, value]) => {
+      if (ALWAYS_PROTECTED.includes(key)) return false
+      return isFilterValueFilled(value) && !availableCodes.has(key)
+    })
+    .map(([key]) => key)
+
+  return [...ALWAYS_PROTECTED, ...conditionallyProtected]
+}
+
+export const identifyQuickFilter = (filters: SelectedFiltersType, filterCollection?: RestFilterCollectionResponse | undefined): string | null => {
   const quickFilters = [
     {
       value: 'tous-contacts',
@@ -155,9 +171,9 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
     if (!hasMatchingQuickFilterFields) return false
 
     const metadataKeys = ['uuid']
-    const protectedKeys = ['zone', 'zones'] // coexistent avec les quick filters, ne doivent pas être vides
+    const protectedKeys = filterCollection ? getProtectedFilterKeys(filters, filterCollection) : ['zone', 'zones']
     const isFilterEmpty = (v: unknown): boolean =>
-      v === null || v === undefined || (isIntervalObject(v) && isEmptyInterval(v))
+      v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0) || (isIntervalObject(v) && isEmptyInterval(v))
 
     const nonQuickFilterKeys = Object.keys(filters).filter(
       (key) => !quickFilterFields.includes(key) && !metadataKeys.includes(key) && !protectedKeys.includes(key),
