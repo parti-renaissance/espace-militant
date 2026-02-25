@@ -1,19 +1,13 @@
 import React, { Suspense } from 'react'
 import { Link } from 'expo-router'
-import { isWeb, useMedia, XStack, YStack, YStackProps } from 'tamagui'
+import { isWeb, useMedia, YStack, YStackProps } from 'tamagui'
 import { Sparkle } from '@tamagui/lucide-icons'
 
-import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import { VoxButton } from '@/components/Button'
 import EventFilterForm from '@/features_next/events/components/EventFilterForm/EventFilterForm'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
-
-const options = [
-  { label: 'Tous', value: 'events' },
-  { label: 'Les miens', value: 'myEvents' },
-] as OptionsArray
 
 const NewEventBtn = ({ children, ...props }: YStackProps & { children: string }) => {
   const { hasFeature } = useGetExecutiveScopes()
@@ -29,29 +23,18 @@ const NewEventBtn = ({ children, ...props }: YStackProps & { children: string })
   )
 }
 
-const EventsHeader = ({ mode, value, onChange }: { mode: 'compact' | 'aside'; value: 'events' | 'myEvents'; onChange: (x: 'events' | 'myEvents') => void }) => {
+const EventsSideContent = () => {
   const { isAuth } = useSession()
   const { hasFeature } = useGetExecutiveScopes()
   const canCreate = isAuth && hasFeature ? hasFeature('events') : false
   const media = useMedia()
 
-  const isAside = mode === 'aside'
-
   return (
     <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
-      {isAuth && (
-        <XStack gap={isAside ? '$medium' : '$small'} flexDirection={isAside ? 'column-reverse' : 'row'}>
-          <XStack flex={isAside ? undefined : 2}>
-            <BigSwitch options={options} value={value} onChange={onChange} />
-          </XStack>
-          {canCreate && (
-            <Suspense>
-              <NewEventBtn paddingBottom={isAside ? '$small' : undefined}>
-                {isAside ? 'Organiser un événement' : media.sm ? 'Créer' : 'Organiser un événement'}
-              </NewEventBtn>
-            </Suspense>
-          )}
-        </XStack>
+      {canCreate && media.gtSm && (
+        <Suspense>
+          <NewEventBtn>Organiser un événement</NewEventBtn>
+        </Suspense>
       )}
       <YStack>
         <EventFilterForm />
@@ -60,4 +43,4 @@ const EventsHeader = ({ mode, value, onChange }: { mode: 'compact' | 'aside'; va
   )
 }
 
-export default EventsHeader
+export default EventsSideContent

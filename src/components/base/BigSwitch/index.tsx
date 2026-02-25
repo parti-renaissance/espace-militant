@@ -46,7 +46,7 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
       // Position initiale sans animation
       translateX.value = selectedIndex >= 0 ? selectedIndex * sW : 0
     },
-    [options.length],
+    [options.length, selectedIndex],
   )
 
   // 4. Synchronisation externe (ex: reset des filtres)
@@ -103,14 +103,16 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
       {options.map((option, index) => (
         <View
           key={option.value ?? `opt-${index}`}
-          flex={1} // Utilisation de flex: 1 au lieu d'une largeur calculée JS
+          flex={1}
+          flexBasis={0}
+          minWidth={0}
           alignItems="center"
           justifyContent="center"
           onPress={() => handlePress(option.value, index)}
           hitSlop={8}
           zIndex={1}
         >
-          <Text fontWeight="600" fontSize={14} color={selectedIndex === index ? '$textPrimary' : '$textSecondary'}>
+          <Text fontWeight="600" fontSize={14} color={selectedIndex === index ? '$textPrimary' : '$textSecondary'} numberOfLines={1}>
             {option.label}
           </Text>
         </View>

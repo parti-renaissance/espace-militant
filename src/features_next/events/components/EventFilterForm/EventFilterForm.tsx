@@ -31,6 +31,7 @@ const AssemblySelectWrapper = memo(({ zone, defaultAssembly, onDetailChange }: A
         color="white"
         value={zone}
         onDetailChange={onDetailChange}
+        label="Département" // le terme assemblée n'est pas clair pour les utilisateurs
       />
     </YStack>
   )
