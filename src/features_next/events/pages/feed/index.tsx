@@ -4,9 +4,9 @@ import { useScrollToTop } from '@react-navigation/native'
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
 import { useDebounce, useDebouncedCallback } from 'use-debounce'
 
-import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
+import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import EventListItem from '@/features_next/events/components/EventListItem'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
@@ -20,8 +20,8 @@ import { useGetProfil } from '@/services/profile/hook'
 
 import type { EmptyStateReason } from './components/EmptyStateSection'
 import { EmptyStateSection } from './components/EmptyStateSection'
-import EventsSideContent from './components/SideContent'
 import { EventSectionHeader } from './components/SectionHeader'
+import EventsSideContent from './components/SideContent'
 import EventsListSkeleton from './components/Skeleton'
 
 const EVENTS_SWITCH_OPTIONS: OptionsArray = [
@@ -62,6 +62,9 @@ const EventFeed = () => {
   const filtersValue = eventFiltersState((s) => s.value)
   const [filters] = useDebounce(filtersValue, 300)
 
+  const zone = filters.zone ?? userData?.instances?.assembly?.code
+  const filtersReady = !isAuth || userData !== undefined
+
   const trackImpressionRef = useRef(trackImpression)
   useEffect(() => {
     trackImpressionRef.current = trackImpression
@@ -75,11 +78,8 @@ const EventFeed = () => {
     isFetching,
     refetch,
   } = useSuspensePaginatedEvents({
-    filters: {
-      searchText: filters.search,
-      zone: filters.zone,
-      subscribedOnly: activeTab === 'myEvents',
-    },
+    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents' },
+    enabled: filtersReady,
   })
 
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
@@ -159,7 +159,7 @@ const EventFeed = () => {
 
   // Garde le skeleton si deferredFeed retarde (évite le flash EmptyState)
   const isDeferredLagging = deferredFeed.sectionedData.length === 0 && feedState.sectionedData.length > 0
-  const showSkeleton = isFetching || isDeferredLagging
+  const showSkeleton = isFetching || isDeferredLagging || !filtersReady || !filtersReady
 
   const flatListRef = useRef<FlatList<FeedListItem>>(null)
   useScrollToTop(flatListRef)
