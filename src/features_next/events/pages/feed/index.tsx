@@ -157,6 +157,10 @@ const EventFeed = () => {
 
   const deferredFeed = useDeferredValue(feedState)
 
+  // Garde le skeleton si deferredFeed retarde (évite le flash EmptyState)
+  const isDeferredLagging = deferredFeed.sectionedData.length === 0 && feedState.sectionedData.length > 0
+  const showSkeleton = isFetching || isDeferredLagging
+
   const flatListRef = useRef<FlatList<FeedListItem>>(null)
   useScrollToTop(flatListRef)
 
@@ -232,7 +236,7 @@ const EventFeed = () => {
           initialNumToRender={10}
           maxToRenderPerBatch={10}
           ListEmptyComponent={
-            isFetching ? (
+            showSkeleton ? (
               <EventsListSkeleton />
             ) : (
               <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllEvents={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />

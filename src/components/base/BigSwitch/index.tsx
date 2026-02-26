@@ -111,6 +111,7 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
           onPress={() => handlePress(option.value, index)}
           hitSlop={8}
           zIndex={1}
+          cursor={index === selectedIndex ? 'default' : 'pointer'}
         >
           <Text fontWeight="600" fontSize={14} color={selectedIndex === index ? '$textPrimary' : '$textSecondary'} numberOfLines={1}>
             {option.label}
