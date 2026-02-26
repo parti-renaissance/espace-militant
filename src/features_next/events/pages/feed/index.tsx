@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
@@ -6,9 +6,11 @@ import { useDebounce, useDebouncedCallback } from 'use-debounce'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
+import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import EventListItem from '@/features_next/events/components/EventListItem'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
+import { groupEventsBySection } from '@/features_next/events/utils'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
@@ -16,36 +18,54 @@ import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useHits } from '@/services/hits/hook'
 import { useGetProfil } from '@/services/profile/hook'
 
+import type { EmptyStateReason } from './components/EmptyStateSection'
 import { EmptyStateSection } from './components/EmptyStateSection'
-import EventsHeader from './components/Header'
+import { EventSectionHeader } from './components/SectionHeader'
+import EventsSideContent from './components/SideContent'
 import EventsListSkeleton from './components/Skeleton'
 
+const EVENTS_SWITCH_OPTIONS: OptionsArray = [
+  { label: 'Tous', value: 'events' },
+  { label: "J'y participe", value: 'myEvents' },
+]
+
+const FEED_VIEWABILITY_CONFIG = {
+  itemVisiblePercentThreshold: 50,
+  minimumViewTime: 400,
+} as const
+
+type FeedListItem =
+  | { type: 'header'; sectionId: string; title: string }
+  | { type: 'event'; event: RestItemEvent | RestPublicItemEvent }
+  | { type: 'empty_state'; reason: EmptyStateReason }
+
 const EventCard = memo(({ event, userUuid, source }: { event: RestItemEvent | RestPublicItemEvent; userUuid?: string; source: string }) => {
+  const content = <EventListItem event={event} userUuid={userUuid} source={source} />
+
   if (Platform.OS === 'web') {
     return (
       <TrackImpressionWeb objectType="event" objectId={event.uuid} source={source}>
-        <EventListItem event={event} userUuid={userUuid} source={source} />
+        {content}
       </TrackImpressionWeb>
     )
   }
-
-  return <EventListItem event={event} userUuid={userUuid} source={source} />
+  return content
 })
 
 const EventFeed = () => {
   const media = useMedia()
   const { session, isAuth } = useSession()
-  const user = useGetProfil({ enabled: Boolean(session) })
+  const { data: userData } = useGetProfil({ enabled: Boolean(session) })
+  const { trackImpression } = useHits()
 
   const [activeTab, setActiveTab] = useState<'events' | 'myEvents'>('events')
+  const filtersValue = eventFiltersState((s) => s.value)
+  const [filters] = useDebounce(filtersValue, 300)
 
-  const { value: _filters } = eventFiltersState()
-  const [filters] = useDebounce(_filters, 300)
+  const zone = filters.zone ?? userData?.instances?.assembly?.code
+  const filtersReady = !isAuth || userData !== undefined
 
-  // Impression tracking avec pattern stable
-  const { trackImpression } = useHits()
   const trackImpressionRef = useRef(trackImpression)
-
   useEffect(() => {
     trackImpressionRef.current = trackImpression
   }, [trackImpression])
@@ -58,15 +78,11 @@ const EventFeed = () => {
     isFetching,
     refetch,
   } = useSuspensePaginatedEvents({
-    filters: {
-      searchText: filters.search,
-      zone: filters.zone,
-      subscribedOnly: activeTab === 'myEvents',
-    },
+    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents' },
+    enabled: filtersReady,
   })
 
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
-
   useEffect(() => {
     if (!isRefetching) setIsManualRefreshing(false)
   }, [isRefetching])
@@ -76,75 +92,156 @@ const EventFeed = () => {
     refetch()
   }, [refetch])
 
-  const loadMoreGeneric = () => {
-    if (isRefetching) return
-    if (hasNextPage) {
-      fetchNextPage()
-    }
-  }
-
-  const loadMore = useDebouncedCallback(loadMoreGeneric, 1000, { leading: true, trailing: false })
-
-  const feedData = useMemo(() => {
-    if (!paginatedFeed) return []
-    return paginatedFeed.pages.flatMap((page) => page.items)
-  }, [paginatedFeed])
-
-  const flatListRef = useRef<FlatList<RestItemEvent | RestPublicItemEvent>>(null)
-  useScrollToTop(flatListRef)
-
-  const renderEventItem = useCallback(
-    ({ item }: { item: RestItemEvent | RestPublicItemEvent }) => {
-      return <EventCard event={item} userUuid={user.data?.uuid} source="page_events" />
+  const loadMore = useDebouncedCallback(
+    () => {
+      if (!isRefetching && hasNextPage) fetchNextPage()
     },
-    [user.data?.uuid],
+    1000,
+    { leading: true, trailing: false },
   )
 
-  const header = useMemo(() => (media.gtMd ? null : <EventsHeader mode="compact" value={activeTab} onChange={setActiveTab} />), [activeTab, media.gtMd])
+  const handleSwitchToAllEvents = useCallback(() => setActiveTab('events'), [])
+
+  const feedData = useMemo(() => paginatedFeed?.pages.flatMap((page) => page.items) ?? [], [paginatedFeed])
+
+  const hasActiveFilters = useMemo(
+    () => Boolean(filters.search.trim() || (filters.zone && filters.zone !== userData?.instances?.assembly?.code)),
+    [filters.search, filters.zone, userData?.instances?.assembly?.code],
+  )
+
+  const feedState = useMemo(() => {
+    if (isFetching && feedData.length === 0) {
+      return { sectionedData: [], emptyReason: { kind: 'generic' } as EmptyStateReason }
+    }
+
+    const zoneLabel = filters.detailZone?.label
+    const sections = groupEventsBySection(feedData, { zoneLabel })
+    const hasUpcoming = sections.some((s) => s.id !== 'past' && s.data.length > 0)
+    const hasOnlyPast = !hasUpcoming && sections.some((s) => s.id === 'past' && s.data.length > 0)
+    const isSearchActive = filters.search.trim().length > 0
+
+    let globalReason: EmptyStateReason | null = null
+
+    if (feedData.length === 0) {
+      if (isSearchActive) globalReason = { kind: 'search_no_results', search: filters.search }
+      else if (activeTab === 'myEvents') globalReason = { kind: 'subscriptions_empty' }
+      else if (zoneLabel && zoneLabel !== 'Toutes') globalReason = { kind: 'zone_no_upcoming', zoneLabel }
+      else globalReason = { kind: 'generic' }
+    } else if (hasOnlyPast && (isSearchActive || activeTab === 'myEvents')) {
+      globalReason =
+        activeTab === 'myEvents' ? { kind: 'subscriptions_no_upcoming' } : { kind: 'search_no_upcoming', search: filters.search.trim() || undefined }
+    }
+
+    const items: FeedListItem[] = []
+
+    if (globalReason && feedData.length > 0) {
+      items.push({ type: 'empty_state', reason: globalReason })
+    }
+
+    sections.forEach((section) => {
+      if (section.id === 'zone' && section.data.length === 0 && zoneLabel && zoneLabel !== 'Toutes') {
+        if (!globalReason) {
+          items.push({ type: 'empty_state', reason: { kind: 'zone_no_upcoming', zoneLabel } })
+        }
+        return
+      }
+
+      if (section.data.length > 0) {
+        items.push({ type: 'header', sectionId: section.id, title: section.title })
+        section.data.forEach((event) => items.push({ type: 'event', event }))
+      }
+    })
+
+    return { sectionedData: items, emptyReason: (globalReason ?? { kind: 'generic' }) as EmptyStateReason }
+  }, [feedData, filters.search, filters.detailZone?.label, activeTab, isFetching])
+
+  const deferredFeed = useDeferredValue(feedState)
+
+  // Garde le skeleton si deferredFeed retarde (évite le flash EmptyState)
+  const isDeferredLagging = deferredFeed.sectionedData.length === 0 && feedState.sectionedData.length > 0
+  const showSkeleton = isFetching || isDeferredLagging || !filtersReady || !filtersReady
+
+  const flatListRef = useRef<FlatList<FeedListItem>>(null)
+  useScrollToTop(flatListRef)
+
+  const renderItem = useCallback(
+    ({ item }: { item: FeedListItem }) => {
+      switch (item.type) {
+        case 'header':
+          return <EventSectionHeader title={item.title} />
+        case 'empty_state':
+          return <EmptyStateSection reason={item.reason} onSwitchToAllEvents={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
+        case 'event':
+          return <EventCard event={item.event} userUuid={userData?.uuid} source="page_events" />
+        default:
+          return null
+      }
+    },
+    [userData?.uuid, hasActiveFilters, handleSwitchToAllEvents],
+  )
 
   const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    if (Platform.OS !== 'web') {
-      viewableItems.forEach((viewToken) => {
-        if (viewToken.isViewable && viewToken.item) {
-          trackImpressionRef.current({
-            object_type: 'event',
-            object_id: viewToken.item.uuid,
-            source: 'page_events',
-          })
-        }
-      })
-    }
+    if (Platform.OS === 'web') return
+    viewableItems.forEach((viewToken) => {
+      if (viewToken.isViewable && viewToken.item?.type === 'event') {
+        trackImpressionRef.current({
+          object_type: 'event',
+          object_id: viewToken.item.event.uuid,
+          source: 'page_events',
+        })
+      }
+    })
   }, [])
 
-  const viewabilityConfig = useMemo(
-    () => ({
-      itemVisiblePercentThreshold: 50,
-      minimumViewTime: 400,
-    }),
-    [],
+  const handleSwitchChange = useCallback((value: string | undefined) => {
+    if (value === 'events' || value === 'myEvents') setActiveTab(value)
+  }, [])
+
+  const listHeader = useMemo(
+    () => (
+      <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
+        {isAuth && <BigSwitch options={EVENTS_SWITCH_OPTIONS} value={activeTab} onChange={handleSwitchChange} />}
+        {!media.gtMd && <EventsSideContent />}
+      </YStack>
+    ),
+    [activeTab, media.gtMd, media.sm, isAuth, handleSwitchChange],
   )
 
   return (
     <>
-      <Layout.Main>
-        <LayoutFlatList<RestItemEvent | RestPublicItemEvent>
+      <Layout.Main width="100%">
+        <LayoutFlatList<FeedListItem>
           ref={flatListRef}
           padding="left"
-          data={feedData}
-          renderItem={renderEventItem}
-          keyExtractor={(item) => item.uuid}
-          ListHeaderComponent={header}
+          data={deferredFeed.sectionedData}
+          renderItem={renderItem}
+          keyExtractor={(item) =>
+            item.type === 'header'
+              ? `h-${item.sectionId}`
+              : item.type === 'empty_state'
+                ? `e-${item.reason.kind}${item.reason.kind === 'zone_no_upcoming' ? `-${item.reason.zoneLabel}` : ''}`
+                : item.event.uuid
+          }
+          ListHeaderComponent={listHeader}
           onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
+          viewabilityConfig={FEED_VIEWABILITY_CONFIG}
           refreshing={isManualRefreshing}
           onRefresh={handleManualRefresh}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
           hasMore={hasNextPage ?? false}
-          contentContainerStyle={{
-            gap: getToken('$medium', 'space'),
-          }}
-          ListEmptyComponent={isFetching ? <EventsListSkeleton /> : <EmptyStateSection isAuth={isAuth} />}
+          contentContainerStyle={{ gap: getToken('$medium', 'space') }}
+          removeClippedSubviews={Platform.OS === 'android'}
+          windowSize={21}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          ListEmptyComponent={
+            showSkeleton ? (
+              <EventsListSkeleton />
+            ) : (
+              <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllEvents={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
+            )
+          }
           ListFooterComponent={
             hasNextPage ? (
               <YStack p="$medium" pb="$large">
@@ -157,7 +254,7 @@ const EventFeed = () => {
       {media.gtMd ? (
         <Layout.SideBar isSticky padding="right">
           <YStack>
-            <EventsHeader mode="aside" value={activeTab} onChange={setActiveTab} />
+            <EventsSideContent />
           </YStack>
         </Layout.SideBar>
       ) : null}

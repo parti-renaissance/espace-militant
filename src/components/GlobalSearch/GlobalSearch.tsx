@@ -1,8 +1,10 @@
-import React, { memo, useCallback, useState, useMemo, useEffect, useRef } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDebounceValue, YStack } from 'tamagui'
-import Select from '@/components/base/Select/SelectV3'
-import { GlobalSearchProps, SearchResult } from './types'
 import { Search } from '@tamagui/lucide-icons'
+
+import Select from '@/components/base/Select/SelectV3'
+
+import { GlobalSearchProps, SearchResult } from './types'
 
 function GlobalSearch({
   provider,
@@ -35,20 +37,20 @@ function GlobalSearch({
   const [results, setResults] = useState<SearchResult[]>([])
   const [isFetching, setIsFetching] = useState(false)
   const hasLoadedInitialResults = useRef(false)
-  
+
   // Handle defaultValue which can be {value, label}, label string, or undefined
   const defaultOption = useMemo(() => {
     if (!defaultValue) return null
-    
+
     if (typeof defaultValue === 'string') {
       return { value: '', label: defaultValue }
     }
-    
+
     // defaultValue is an object with {value, label}
     const defaultObj = defaultValue as { value?: string; label: string }
     return {
       value: defaultObj.value || '',
-      label: defaultObj.label
+      label: defaultObj.label,
     }
   }, [defaultValue])
 
@@ -57,28 +59,28 @@ function GlobalSearch({
   const shouldShowNoResults = results?.length === 0 && debouncedQuery.length > 2 && !isFetching && debouncedQuery === query
   const debouncedShowNoResults = useDebounceValue(shouldShowNoResults, 100)
 
-  const performSearch = useCallback(async (searchQuery: string) => {
+  const performSearch = useCallback(
+    async (searchQuery: string) => {
+      if (!provider.isSearchable(searchQuery)) {
+        return
+      }
 
-    if (!provider.isSearchable(searchQuery)) {
-      return
-    }
+      setIsFetching(true)
+      try {
+        const searchResults = await provider.search(searchQuery, scope)
 
-    setIsFetching(true)
-    try {
-      const searchResults = await provider.search(searchQuery, scope)
-      
-      const sortedResults = searchResults
-        .sort((a, b) => a.label.localeCompare(b.label))
-        .slice(0, 20)
+        const sortedResults = searchResults.sort((a, b) => a.label.localeCompare(b.label)).slice(0, 20)
 
-      setResults(sortedResults)
-    } catch (error) {
-      console.error('Search error:', error)
-      setResults([])
-    } finally {
-      setIsFetching(false)
-    }
-  }, [provider, scope])
+        setResults(sortedResults)
+      } catch (error) {
+        console.error('Search error:', error)
+        setResults([])
+      } finally {
+        setIsFetching(false)
+      }
+    },
+    [provider, scope],
+  )
 
   useEffect(() => {
     if (debouncedQuery.length > 0) {
@@ -98,39 +100,42 @@ function GlobalSearch({
     }
   }, [performSearch])
 
-  const onResultSelect = useCallback(async (id: string) => {
-    if (id === '') {
-      setValue('')
-      setSelectedLabel('')
-      onReset?.()
-      onBlur?.()
-      return
-    }
-
-    if (id === '__null__') {
-      setValue('__null__')
-      setSelectedLabel('Remettre à zéro')
-      onSelect(null)
-      onBlur?.()
-      return
-    }
-
-    setValue(id)
-    const selectedResult = results.find(r => r.id === id)
-    
-    if (selectedResult) {
-      setSelectedLabel(selectedResult.label)
-      const details = await provider.getDetails(id)
-      
-      if (details) {
-        onSelect(details)
-      } else {
-        onSelect(selectedResult)
+  const onResultSelect = useCallback(
+    async (id: string) => {
+      if (id === '') {
+        setValue('')
+        setSelectedLabel('')
+        onReset?.()
+        onBlur?.()
+        return
       }
-    }
 
-    onBlur?.()
-  }, [results, provider, onSelect, onReset, onBlur])
+      if (id === '__null__') {
+        setValue('__null__')
+        setSelectedLabel('Remettre à zéro')
+        onSelect(null)
+        onBlur?.()
+        return
+      }
+
+      setValue(id)
+      const selectedResult = results.find((r) => r.id === id)
+
+      if (selectedResult) {
+        setSelectedLabel(selectedResult.label)
+        const details = await provider.getDetails(id)
+
+        if (details) {
+          onSelect(details)
+        } else {
+          onSelect(selectedResult)
+        }
+      }
+
+      onBlur?.()
+    },
+    [results, provider, onSelect, onReset, onBlur],
+  )
 
   const providerIcon = useMemo(() => provider.getIcon(), [provider])
 
@@ -143,33 +148,37 @@ function GlobalSearch({
       })),
       ...(defaultOption ? [defaultOption] : []),
       // Always include the currently selected value if it's not already in results
-      ...(value && value !== '' && value !== '__null__' && !results.find(r => r.id === value) && selectedLabel ? [{
-        value: value,
-        label: selectedLabel,
-      }] : []),
+      ...(value && value !== '' && value !== '__null__' && !results.find((r) => r.id === value) && selectedLabel
+        ? [
+            {
+              value: value,
+              label: selectedLabel,
+            },
+          ]
+        : []),
       ...(nullable ? [{ value: '__null__', label: 'Remettre à zéro' }] : []),
     ]
 
     // Remove duplicates by keeping only the first occurrence of each value
-    const uniqueOptions = allOptions.reduce((acc, option) => {
-      const existingIndex = acc.findIndex(existing => existing.value === option.value)
-      if (existingIndex !== -1) {
-        // Skip duplicate - keep the first occurrence (search results have priority)
+    const uniqueOptions = allOptions.reduce(
+      (acc, option) => {
+        const existingIndex = acc.findIndex((existing) => existing.value === option.value)
+        if (existingIndex !== -1) {
+          // Skip duplicate - keep the first occurrence (search results have priority)
+          return acc
+        } else {
+          // Add new option
+          acc.push(option)
+        }
         return acc
-      } else {
-        // Add new option
-        acc.push(option)
-      }
-      return acc
-    }, [] as typeof allOptions)
+      },
+      [] as typeof allOptions,
+    )
 
     return uniqueOptions
   }, [results, defaultOption, nullable, value, selectedLabel])
 
-  const searchPlaceholder = useMemo(() => 
-    placeholder || provider.getPlaceholder(), 
-    [placeholder, provider]
-  )
+  const searchPlaceholder = useMemo(() => placeholder || provider.getPlaceholder(), [placeholder, provider])
 
   const valueMemo = useMemo(() => {
     if (value) {
@@ -179,7 +188,7 @@ function GlobalSearch({
       return value === '__null__' ? undefined : value
     }
     if (defaultValue && typeof defaultValue === 'object' && 'value' in defaultValue) {
-      return defaultValue.value || undefined
+      return defaultValue.value || undefined
     }
     return undefined
   }, [value, nullable, defaultValue])
@@ -210,4 +219,4 @@ function GlobalSearch({
   )
 }
 
-export default memo(GlobalSearch) 
+export default memo(GlobalSearch)

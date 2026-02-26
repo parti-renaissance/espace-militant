@@ -51,6 +51,11 @@ export const RestEventAddressSchema = z.object({
   longitude: z.number().nullable(),
 })
 
+export const RestEventRegionSchema = z.object({
+  code: z.string(),
+  name: z.string(),
+})
+
 export const RestBaseEventSchema = z.object({
   uuid: z.string(),
   name: z.string(),
@@ -73,6 +78,7 @@ export const RestBaseEventSchema = z.object({
   category: RestEventCategorySchema.nullable(),
   participants_count: z.number().nullish(),
   visio_url: z.string().nullish(),
+  region: RestEventRegionSchema.nullish(),
 })
 
 export const RestFullEventSchema = z

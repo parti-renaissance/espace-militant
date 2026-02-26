@@ -1,10 +1,14 @@
-import React, { memo, RefObject, useCallback, useMemo } from 'react'
+import React, { memo, RefObject, useCallback, useEffect, useMemo } from 'react'
 import { TextInput } from 'react-native'
 import { useMedia, View, YStack } from 'tamagui'
 
+import { assemblies } from '@/components/AssemblySelect/assemblies'
 import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
 import SearchBox from '@/components/Search/SearchBox'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
+
+import { useSession } from '@/ctx/SessionProvider'
+import { useGetProfil } from '@/services/profile/hook'
 
 type EventFiltersProps = {
   onSearchFocus?: () => void
@@ -27,6 +31,7 @@ const AssemblySelectWrapper = memo(({ zone, defaultAssembly, onDetailChange }: A
         color="white"
         value={zone}
         onDetailChange={onDetailChange}
+        label="Département" // le terme assemblée n'est pas clair pour les utilisateurs
       />
     </YStack>
   )
@@ -36,7 +41,23 @@ AssemblySelectWrapper.displayName = 'AssemblySelectWrapper'
 
 const EventFilters = ({ onSearchFocus }: EventFiltersProps) => {
   const media = useMedia()
+  const { isAuth } = useSession()
+  const { data: user } = useGetProfil({ enabled: isAuth })
   const { value, setValue, searchInputRef } = eventFiltersState()
+
+  const defaultAssembly = user?.instances?.assembly?.code
+
+  useEffect(() => {
+    if (value.zone === undefined && defaultAssembly) {
+      const assembly = assemblies.find((a) => a.value === defaultAssembly)
+      const detailZone = assembly ? { value: assembly.value, label: `${assembly.value} • ${assembly.label}` } : undefined
+      setValue((y) => ({
+        ...y,
+        zone: defaultAssembly,
+        detailZone: detailZone ?? { value: defaultAssembly, label: defaultAssembly },
+      }))
+    }
+  }, [defaultAssembly, setValue, value.zone])
 
   const handleAssemblyChange = useCallback((x?: { value: string; label: string }) => {
     setValue((y) => ({ ...y, zone: x?.value, detailZone: x }))
@@ -51,7 +72,7 @@ const EventFilters = ({ onSearchFocus }: EventFiltersProps) => {
 
   return (
     <View flexDirection={flexDirection} gap={gap}>
-      <AssemblySelectWrapper zone={value.zone} onDetailChange={handleAssemblyChange} />
+      <AssemblySelectWrapper zone={value.zone} defaultAssembly={defaultAssembly} onDetailChange={handleAssemblyChange} />
       <YStack flex={1}>
         <SearchBox
           label={value.detailZone ? `Dans ${value.detailZone.label}` : undefined}

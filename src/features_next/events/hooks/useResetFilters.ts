@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 
+import { assemblies } from '@/components/AssemblySelect/assemblies'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
 
 import { useSession } from '@/ctx/SessionProvider'
@@ -12,10 +13,12 @@ export default function useResetFilters() {
   const defaultAssembly = user?.instances?.assembly?.code
 
   const handleReset = useCallback(() => {
+    const assembly = defaultAssembly ? assemblies.find((a) => a.value === defaultAssembly) : undefined
+    const detailZone = assembly ? { value: assembly.value, label: `${assembly.value} • ${assembly.label}` } : undefined
     setValue((x) => ({
       ...x,
       zone: defaultAssembly,
-      detailZone: undefined,
+      detailZone,
       search: '',
     }))
   }, [defaultAssembly])

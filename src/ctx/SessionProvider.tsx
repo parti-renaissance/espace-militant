@@ -15,6 +15,7 @@ type AuthContext = {
   signOut: () => Promise<void>
   signUp: (props?: { utm_campaign?: string }) => Promise<void>
   isAuth: boolean
+  isAdmin: boolean
   session?: User | null
   isLoading: boolean
   user: ReturnType<typeof useGetProfil>
@@ -26,6 +27,7 @@ export const AuthContext = React.createContext<AuthContext>({
   signOut: () => Promise.resolve(),
   signUp: (props?: { utm_campaign?: string }) => Promise.resolve(),
   isAuth: false,
+  isAdmin: false,
   session: null,
   isLoading: false,
   user: {} as ReturnType<typeof useGetProfil>,
@@ -148,6 +150,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
         session: existingSession,
         isLoading: isGlobalLoading,
         isAuth,
+        isAdmin: existingSession?.isAdmin === true,
         user,
         scope,
       }) satisfies AuthContext,

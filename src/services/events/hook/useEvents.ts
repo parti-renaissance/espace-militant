@@ -1,12 +1,14 @@
+import { useToastController } from '@tamagui/toast'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { format } from 'date-fns'
+
 import { EventFilters } from '@/core/entities/Event'
 import { useSession } from '@/ctx/SessionProvider'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/events/api'
 import { eventPostFormError } from '@/services/events/error'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook'
-import { useToastController } from '@tamagui/toast'
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { format } from 'date-fns'
+
 import { RestPostCountInvitationsEventRequest, RestPostEventRequest, RestPostEventSubsciptionRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
 import { optimisticToggleSubscribe, optimisticUpdate } from './helpers'
 import { QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
@@ -24,22 +26,29 @@ const fetchEventPublicList = async (pageParam: number, opts: FetchShortEventsOpt
   return await api.getPublicEvents({ page: pageParam, filters: opts.filters, zoneCode: opts.zoneCode, orderByBeginAt: true })
 }
 
-export const useSuspensePaginatedEvents = (opts: { filters?: EventFilters; postalCode?: string; zoneCode?: string }) => {
+export const useSuspensePaginatedEvents = (opts: {
+  filters?: EventFilters
+  postalCode?: string
+  zoneCode?: string
+  enabled?: boolean
+}) => {
   const { isAuth } = useSession()
-  const filtersKey = opts.filters
+  const { enabled = true, ...queryOpts } = opts
+  const filtersKey = queryOpts.filters
     ? JSON.stringify({
-        ...opts.filters,
-        finishAfter: opts.filters.finishAfter ? format(opts.filters.finishAfter, 'yyyy-MM-dd') : '',
+        ...queryOpts.filters,
+        finishAfter: queryOpts.filters.finishAfter ? format(queryOpts.filters.finishAfter, 'yyyy-MM-dd') : '',
       })
     : ''
 
   return useInfiniteQuery({
     queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', filtersKey],
-    queryFn: ({ pageParam }) => (isAuth ? fetchEventList(pageParam, opts) : fetchEventPublicList(pageParam, opts)),
+    queryFn: ({ pageParam }) => (isAuth ? fetchEventList(pageParam, queryOpts) : fetchEventPublicList(pageParam, queryOpts)),
     getNextPageParam: (lastPage) =>
       lastPage ? (lastPage.metadata.last_page > lastPage.metadata.current_page ? lastPage.metadata.current_page + 1 : null) : null,
     getPreviousPageParam: (firstPage) => (firstPage ? firstPage.metadata.current_page - 1 : null),
     initialPageParam: 1,
+    enabled,
   })
 }
 

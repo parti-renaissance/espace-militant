@@ -1,6 +1,8 @@
-import { format, subMonths } from 'date-fns'
+import { format, parseISO, startOfDay, subMonths } from 'date-fns'
 
-import { HierarchicalQuickFilterType, SelectedFiltersType } from './type'
+import type { RestFilterCollectionResponse } from '@/services/publications/schema'
+
+import { HierarchicalQuickFilterType, isEmptyInterval, isFilterValueFilled, isIntervalObject, SelectedFiltersType } from './type'
 
 export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
   const today = new Date()
@@ -16,7 +18,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       parentId: null,
       filters: {
         adherent_tags: null,
-        first_membership_since: null,
+        first_membership: null,
       },
     },
     {
@@ -27,7 +29,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       parentId: 'tous-contacts',
       filters: {
         adherent_tags: 'adherent',
-        first_membership_since: null,
+        first_membership: null,
       },
     },
     {
@@ -38,7 +40,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       parentId: 'adherents',
       filters: {
         adherent_tags: 'adherent:a_jour_2026',
-        first_membership_since: null,
+        first_membership: null,
       },
     },
     {
@@ -49,7 +51,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       parentId: 'a-jour',
       filters: {
         adherent_tags: 'adherent:a_jour_2026:primo',
-        first_membership_since: null,
+        first_membership: null,
       },
     },
     {
@@ -60,7 +62,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       parentId: 'primos',
       filters: {
         adherent_tags: 'adherent:a_jour_2026:primo',
-        first_membership_since: formatDate(oneMonthAgo),
+        first_membership: { start: formatDate(oneMonthAgo), end: null },
       },
     },
     {
@@ -71,7 +73,7 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       parentId: 'adherents',
       filters: {
         adherent_tags: 'adherent:plus_a_jour',
-        first_membership_since: null,
+        first_membership: null,
       },
     },
     {
@@ -82,13 +84,27 @@ export function getHierarchicalQuickFilters(): HierarchicalQuickFilterType[] {
       parentId: 'tous-contacts',
       filters: {
         adherent_tags: 'sympathisant',
-        first_membership_since: null,
+        first_membership: null,
       },
     },
   ]
 }
 
-export const identifyQuickFilter = (filters: SelectedFiltersType): string | null => {
+export const getProtectedFilterKeys = (messageFilters: SelectedFiltersType, filterCollection: RestFilterCollectionResponse | undefined): string[] => {
+  const ALWAYS_PROTECTED = ['zone', 'zones']
+  const availableCodes = new Set(filterCollection?.flatMap((c) => c.filters.map((f) => f.code)) ?? [])
+
+  const conditionallyProtected = Object.entries(messageFilters)
+    .filter(([key, value]) => {
+      if (ALWAYS_PROTECTED.includes(key)) return false
+      return isFilterValueFilled(value) && !availableCodes.has(key)
+    })
+    .map(([key]) => key)
+
+  return [...ALWAYS_PROTECTED, ...conditionallyProtected]
+}
+
+export const identifyQuickFilter = (filters: SelectedFiltersType, filterCollection?: RestFilterCollectionResponse | undefined): string | null => {
   const quickFilters = [
     {
       value: 'tous-contacts',
@@ -106,7 +122,7 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
       value: 'primos-recents',
       filters: {
         adherent_tags: 'adherent:a_jour_2026:primo',
-        first_membership_since: 'today - 30 days',
+        first_membership: { start: 'today - 30 days', end: null },
       },
     },
     {
@@ -123,58 +139,46 @@ export const identifyQuickFilter = (filters: SelectedFiltersType): string | null
     },
   ]
 
+  /** Vérifie si une date string correspond à "aujourd'hui - 1 mois" (aligné avec getHierarchicalQuickFilters qui utilise subMonths) */
+  const isDateWithinLastMonth = (dateStr: string): boolean => {
+    try {
+      const date = startOfDay(parseISO(dateStr))
+      if (isNaN(date.getTime())) return false
+      const cutoff = startOfDay(subMonths(new Date(), 1))
+      return date >= cutoff
+    } catch {
+      return false
+    }
+  }
+
   const matchingQuickFilter = quickFilters.find((qf) => {
     const quickFilterFields = Object.keys(qf.filters)
     const hasMatchingQuickFilterFields = quickFilterFields.every((key) => {
       const quickFilterValue = qf.filters[key]
       const filterValue = filters[key]
-
-      if (key === 'first_membership_since') {
-        return filterValue !== null && filterValue !== undefined
+      if (isIntervalObject(quickFilterValue)) {
+        if (!isIntervalObject(filterValue) || isEmptyInterval(filterValue)) return false
+        // Cas spécial "primos-recents" : vérifier que first_membership.start correspond au dernier mois
+        if (key === 'first_membership' && quickFilterValue.start === 'today - 30 days') {
+          const start = filterValue.start
+          return typeof start === 'string' && isDateWithinLastMonth(start)
+        }
+        return true
       }
-
       return JSON.stringify(quickFilterValue) === JSON.stringify(filterValue)
     })
 
-    if (!hasMatchingQuickFilterFields) {
-      return false
-    }
+    if (!hasMatchingQuickFilterFields) return false
 
-    const allFields = [
-      'is_certified',
-      'is_committee_member',
-      'mandate_type',
-      'declared_mandate',
-      'is_campus_registered',
-      'donator_status',
-      'adherent_tags',
-      'elect_tags',
-      'static_tags',
-      'gender',
-      'age_min',
-      'age_max',
-      'first_name',
-      'last_name',
-      'registered_since',
-      'registered_until',
-      'first_membership_since',
-      'first_membership_before',
-      'last_membership_since',
-      'last_membership_before',
-    ]
+    const metadataKeys = ['uuid']
+    const protectedKeys = filterCollection ? getProtectedFilterKeys(filters, filterCollection) : ['zone', 'zones']
+    const isFilterEmpty = (v: unknown): boolean =>
+      v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0) || (isIntervalObject(v) && isEmptyInterval(v))
 
-    const nonQuickFilterFields = allFields.filter((field) => !quickFilterFields.includes(field))
-    const hasNullNonQuickFilterFields = nonQuickFilterFields.every((field) => {
-      // EXEMPLE - Vérification de static_tags pour les filtres circonstanciels (décommenter si réactivation)
-      // if (field === 'static_tags') {
-      //   const staticTagsValue = filters[field]
-      //   if (staticTagsValue === 'national_event:rentree-2025' || staticTagsValue === '!national_event:rentree-2025') {
-      //     return true
-      //   }
-      // }
-
-      return filters[field] === null || filters[field] === undefined
-    })
+    const nonQuickFilterKeys = Object.keys(filters).filter(
+      (key) => !quickFilterFields.includes(key) && !metadataKeys.includes(key) && !protectedKeys.includes(key),
+    )
+    const hasNullNonQuickFilterFields = nonQuickFilterKeys.every((key) => isFilterEmpty(filters[key]))
 
     return hasNullNonQuickFilterFields
   })

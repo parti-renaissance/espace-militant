@@ -1,7 +1,9 @@
 import React, { ComponentRef, useCallback, useMemo, useRef } from 'react'
 import { GestureResponderEvent, Platform, TouchableOpacity } from 'react-native'
-import Text from '@/components/base/Text'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
+
+import Text from '@/components/base/Text'
+
 import { SelectFrames as SF } from './Frames'
 import SelectBottomSheet from './SelectBottomSheet'
 import SelectDropdown, { SelectDropdownRef } from './SelectDropdown'
@@ -69,12 +71,14 @@ const Select = <A extends string>(props: SelectProps<A>) => {
           {...props.frameProps}
         >
           <SF.Container resetable={props.resetable && !!props.value} icon={props.icon} onResetPress={handleResetPress}>
-            <Text width="fit-content" maxWidth="50%" mr="$medium">
-              {props.label || props.placeholder ? <SF.Label>{props.label || props.placeholder}</SF.Label> : null}
+            <Text width="fit-content" maxWidth="50%" mr="$medium" numberOfLines={1}>
+              {props.label || props.placeholder ? <SF.Label numberOfLines={1}>{props.label || props.placeholder}</SF.Label> : null}
             </Text>
             <SF.ValueContainer theme={fullValue?.theme}>
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}
-              <SF.Text themedText={Boolean(fullValue?.theme)} placeholder={!fullValue}>{parseFullValueLabel(fullValue)}</SF.Text>
+              <SF.Text themedText={Boolean(fullValue?.theme)} placeholder={!fullValue}>
+                {parseFullValueLabel(fullValue)}
+              </SF.Text>
             </SF.ValueContainer>
           </SF.Container>
         </SF>

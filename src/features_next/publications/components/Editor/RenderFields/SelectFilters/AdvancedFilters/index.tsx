@@ -1,14 +1,29 @@
-import React from 'react'
-import { XStack, YStack } from 'tamagui'
+import React, { useCallback, useMemo } from 'react'
+import { Spinner, XStack, YStack } from 'tamagui'
 
 import DateInput from '@/components/base/DateInput'
 import SelectV3 from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 
+import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 import { useGetFilterCollection } from '@/services/publications/hook'
 import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/publications/schema'
 
-import { SelectedFiltersType } from '../type'
+import { FilterValue, SelectedFiltersType } from '../type'
+import DateInterval, { type DateIntervalValue } from './DateInterval'
+
+/** Codes de filtre à ne pas afficher dans les filtres avancés (déjà gérés dans le parent, ex. zone) */
+const ADVANCED_FILTERS_BLACKLIST = ['zone'] as const
+
+const getSelectOptions = (choices: Record<string, string> | string[]) => {
+  if (Array.isArray(choices)) {
+    return choices.map((c) => ({ value: c, label: c }))
+  }
+  return Object.entries(choices).map(([value, label]) => ({
+    value,
+    label,
+  }))
+}
 
 // Filtres temporaires en attendant la mise à jour de l'API
 export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
@@ -16,17 +31,6 @@ export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
     label: 'Filtres militants',
     color: '#3B82F6',
     filters: [
-      //   {
-      //     code: "committee",
-      //     label: "Membres du comité",
-      //     type: "select",
-      //     options: {
-      //       choices: {
-      //         "Non": "Non",
-      //         "Oui": "Oui"
-      //       }
-      //     }
-      //   },
       {
         code: 'adherent_tags',
         label: 'Label militant',
@@ -58,22 +62,6 @@ export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
         },
       },
       {
-        code: 'static_tags',
-        label: 'Labels divers',
-        type: 'select',
-        options: {
-          favorite: true,
-          advanced: true,
-          choices: {
-            'national_event:rentree-2025': 'Inscrits à la rentrée 2025',
-            '!national_event:rentree-2025': 'Non-inscrits à la rentrée 2025',
-            'conseil-national:membre-du-burex': 'Conseil national - Membre du Burex',
-            'conseil-national:ancien-membre-du-burex': 'Conseil national - Ancien membre du Burex',
-            'conseil-national:membre-du-cese': 'Conseil national - Membre du CESE',
-          },
-        },
-      },
-      {
         code: 'gender',
         label: 'Civilité',
         type: 'select',
@@ -91,39 +79,21 @@ export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
     color: '#10B981',
     filters: [
       {
-        code: 'first_membership_since',
-        label: 'Première cotisation - Depuis',
-        type: 'date',
+        code: 'first_membership',
+        label: 'Première cotisation',
+        type: 'date_interval',
         options: null,
       },
       {
-        code: 'first_membership_before',
-        label: "Première cotisation - Jusqu'au",
-        type: 'date',
+        code: 'last_membership',
+        label: 'Dernière cotisation',
+        type: 'date_interval',
         options: null,
       },
       {
-        code: 'last_membership_since',
-        label: 'Dernière cotisation - Depuis',
-        type: 'date',
-        options: null,
-      },
-      {
-        code: 'last_membership_before',
-        label: "Dernière cotisation - Jusqu'au",
-        type: 'date',
-        options: null,
-      },
-      {
-        code: 'registered_since',
-        label: 'Création de compte - Depuis',
-        type: 'date',
-        options: null,
-      },
-      {
-        code: 'registered_until',
-        label: "Création de compte - Jusqu'au",
-        type: 'date',
+        code: 'registered',
+        label: 'Création de compte',
+        type: 'date_interval',
         options: null,
       },
     ],
@@ -184,66 +154,58 @@ export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
 ]
 
 interface AdvancedFiltersProps {
-  scope?: string
   selectedFilters?: SelectedFiltersType
-  onFilterChange?: (filterCode: string, value: string | null) => void
+  onFilterChange?: (filterCode: string, value: FilterValue) => void
 }
 
-export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterChange }: AdvancedFiltersProps) {
-  // Disabled for now - will be enabled when backend is ready
-  // const { data: filterCollection, isLoading, error } = useGetFilterCollection({
-  //   scope: scope || '',
-  //   enabled: false
-  // })
+function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: AdvancedFiltersProps) {
+  const scope = useEditorStore((s) => s.scope) ?? ''
+  const { data: filterCollection, isLoading } = useGetFilterCollection({
+    scope,
+    enabled: !!scope,
+  })
 
-  //   if (isLoading) {
-  //     return (
-  //       <YStack gap="$medium">
-  //         <Text.SM secondary>Chargement des filtres...</Text.SM>
-  //       </YStack>
-  //     )
-  //   }
+  const displayFilters = useMemo(() => (filterCollection && filterCollection.length > 0 ? filterCollection : AVAILABLE_FILTERS), [filterCollection])
 
-  //   if (error || !filterCollection) {
-  //     return (
-  //       <YStack gap="$medium">
-  //         <Text.SM secondary>Erreur lors du chargement des filtres</Text.SM>
-  //       </YStack>
-  //     )
-  //   }
+  const visibleCategories = useMemo(
+    () => displayFilters.filter((category) => category.filters.some((filter) => !(ADVANCED_FILTERS_BLACKLIST as readonly string[]).includes(filter.code))),
+    [displayFilters],
+  )
 
-  //   if (filterCollection.length === 0) {
-  //     return (
-  //       <YStack gap="$medium">
-  //         <Text.SM secondary>Aucun filtre avancé disponible</Text.SM>
-  //       </YStack>
-  //     )
-  //   }
+  const handleFilterChange = useCallback(
+    (filterCode: string, value: FilterValue) => {
+      onFilterChange?.(filterCode, value)
+    },
+    [onFilterChange],
+  )
 
-  const displayFilters = AVAILABLE_FILTERS
+  const getFilterValue = useCallback(
+    (filterCode: string): string => {
+      const value = selectedFilters[filterCode]
+      if (typeof value === 'string') return value
+      if (typeof value === 'number') return value.toString()
+      if (typeof value === 'boolean') return value.toString()
+      if (typeof value === 'object' && value !== null) {
+        if ('uuid' in value && typeof (value as { uuid: unknown }).uuid === 'string') return (value as { uuid: string }).uuid
+        if ('value' in value && typeof (value as { value: unknown }).value === 'string') return (value as { value: string }).value
+      }
+      return ''
+    },
+    [selectedFilters],
+  )
 
-  const getSelectOptions = (choices: Record<string, string>) => {
-    return Object.entries(choices).map(([value, label]) => ({
-      value,
-      label,
-    }))
-  }
-
-  const handleFilterChange = (filterCode: string, value: string | null) => {
-    onFilterChange?.(filterCode, value)
-  }
-
-  const getFilterValue = (filterCode: string): string => {
-    const value = selectedFilters[filterCode]
-    if (typeof value === 'string') return value
-    if (typeof value === 'number') return value.toString()
-    if (typeof value === 'boolean') return value.toString()
-    return ''
+  if (isLoading) {
+    return (
+      <YStack gap="$small" padding="$medium" justifyContent="center" alignItems="center">
+        <Spinner size="small" color="$blue6" />
+        <Text.SM secondary>Chargement des filtres...</Text.SM>
+      </YStack>
+    )
   }
 
   return (
     <YStack gap="$medium">
-      {displayFilters.map((category: RestFilterCategory, categoryIndex: number) => (
+      {visibleCategories.map((category: RestFilterCategory, categoryIndex: number) => (
         <YStack key={categoryIndex} gap="$small">
           <XStack alignItems="center" gap="$small">
             <Text.MD secondary>{category.label}</Text.MD>
@@ -251,11 +213,14 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
           </XStack>
           <YStack gap="$small">
             {category.filters.map((filter, filterIndex: number) => {
+              if (ADVANCED_FILTERS_BLACKLIST.includes(filter.code as (typeof ADVANCED_FILTERS_BLACKLIST)[number])) {
+                return null
+              }
               if (filter.type === 'select' && filter.options && 'choices' in filter.options) {
                 const choices = filter.options.choices
                 if (typeof choices === 'object' && choices !== null) {
-                  const options = getSelectOptions(choices as Record<string, string>)
-                  const isLastCategory = categoryIndex === displayFilters.length - 1
+                  const options = getSelectOptions(choices as Record<string, string> | string[])
+                  const isLastCategory = categoryIndex === visibleCategories.length - 1
                   const isLastTwoInLastCategory = isLastCategory && filterIndex >= category.filters.length - 2
                   const hasEmptyOption = options.some((option) => option.value === '' || option.value === null)
 
@@ -265,7 +230,7 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                       label={filter.label}
                       value={getFilterValue(filter.code)}
                       options={options}
-                      onChange={(value) => handleFilterChange(filter.code, value)}
+                      onChange={(value) => handleFilterChange(filter.code, value === '' || value === null ? null : value)}
                       noValuePlaceholder={filter.options.placeholder || 'Choisir'}
                       nullableOption={!hasEmptyOption ? 'Aucune sélection' : undefined}
                       size="md"
@@ -294,13 +259,36 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
                 )
               }
 
+              if (filter.type === 'date_interval') {
+                const raw = selectedFilters[filter.code]
+                const intervalValue: DateIntervalValue =
+                  raw && typeof raw === 'object' && 'start' in raw && 'end' in raw
+                    ? {
+                        start: (raw as DateIntervalValue).start ?? null,
+                        end: (raw as DateIntervalValue).end ?? null,
+                      }
+                    : { start: null, end: null }
+                return (
+                  <DateInterval
+                    key={filterIndex}
+                    labelFrom={`${filter.label} - Depuis`}
+                    labelTo={`${filter.label} - Jusqu'au`}
+                    value={intervalValue}
+                    onChange={(value) => handleFilterChange(filter.code, value)}
+                    size="md"
+                    color="gray"
+                    resetable
+                  />
+                )
+              }
+
               // Pour les autres types de filtres, afficher juste le label et le type
               return (
                 <SelectV3
                   key={filterIndex}
                   label={filter.label}
                   value=""
-                  options={[{ value: 'dev', label: 'En cours de développement' }]}
+                  options={[{ value: '', label: 'En cours de développement' }]}
                   onChange={() => {}}
                   placeholder="En cours de développement"
                   size="sm"
@@ -315,3 +303,5 @@ export default function AdvancedFilters({ scope, selectedFilters = {}, onFilterC
     </YStack>
   )
 }
+
+export default React.memo(AdvancedFiltersInner)

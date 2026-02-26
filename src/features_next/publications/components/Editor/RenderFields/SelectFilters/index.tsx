@@ -9,35 +9,45 @@ import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
+import type { ZoneProviderOptions } from '@/components/GlobalSearch/providers/ZoneProvider'
+import type { SearchResult } from '@/components/GlobalSearch/types'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
+import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 
-import { useGetMessageCountRecipientsPartial } from '@/services/publications/hook'
+import { useGetFilterCollection } from '@/services/publications/hook'
+import type { RestFilterOptionZoneAutocomplete } from '@/services/publications/schema'
 
 import { calculateDefaultValues, FiltersChips } from '../../../FiltersChips'
 import AdvancedFilters from './AdvancedFilters'
-import { getHierarchicalQuickFilters, getItemState } from './helpers'
+import { getHierarchicalQuickFilters, getItemState, getProtectedFilterKeys, identifyQuickFilter } from './helpers'
 import QuickFilter from './QuickFilter'
-import { FilterValue, HierarchicalQuickFilterType, SelectedFiltersType } from './type'
+import { FilterValue, HierarchicalQuickFilterType, isFilterValueFilled, SelectedFiltersType } from './type'
 
 interface SelectFiltersProps {
   updateFilter: (updatedFilter: { [code: string]: FilterValue }) => void
   selectedFilters?: SelectedFiltersType
-  selectedQuickFilterId?: string | null
-  messageId?: string
-  scope?: string
   isLoading?: boolean
   hasError?: boolean
+  messageCountRecipients?: { contacts?: number; total?: number }
+  isFetchingMessageCountRecipients?: boolean
 }
 
 export default function SelectFilters({
   updateFilter,
   selectedFilters = {},
-  selectedQuickFilterId = null,
-  messageId,
-  scope,
   isLoading = false,
   hasError = false,
+  messageCountRecipients,
+  isFetchingMessageCountRecipients = false,
 }: SelectFiltersProps) {
+  const messageId = useEditorStore((s) => s.messageId)
+  const scope = useEditorStore((s) => s.scope)
+  const { data: filterCollection } = useGetFilterCollection({ scope: scope ?? '', enabled: !!scope })
+
+  const selectedQuickFilterId = useMemo(
+    () => identifyQuickFilter(selectedFilters, filterCollection ?? undefined),
+    [selectedFilters, filterCollection]
+  )
   const media = useMedia()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isAdvancedFilters, setIsAdvancedFilters] = useState(false)
@@ -46,10 +56,21 @@ export default function SelectFilters({
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    setIsAdvancedFilters(selectedQuickFilterId ? false : true)
-  }, [])
+    setIsAdvancedFilters(!selectedQuickFilterId)
+  }, [selectedQuickFilterId])
 
-  const zoneProvider = useMemo(() => new ZoneProvider(), [])
+  const zoneAutocompleteOptions = useMemo((): ZoneProviderOptions | undefined => {
+    if (!filterCollection?.length) return undefined
+    for (const category of filterCollection) {
+      const zoneFilter = category.filters.find((f) => f.type === 'zone_autocomplete' && f.options != null)
+      if (zoneFilter?.options && 'url' in zoneFilter.options) {
+        return zoneFilter.options as RestFilterOptionZoneAutocomplete
+      }
+    }
+    return undefined
+  }, [filterCollection])
+
+  const zoneProvider = useMemo(() => new ZoneProvider(zoneAutocompleteOptions), [zoneAutocompleteOptions])
 
   // Fonction pour fusionner les filtres du filtre rapide avec les filtres avancés
   const mergeQuickFilterWithAdvancedFilters = useCallback(
@@ -65,13 +86,7 @@ export default function SelectFilters({
         })
       } else {
         // En mode filtres rapides : on réinitialise les filtres avancés non protégés
-        const protectedFilters = ['zone', 'zones', 'committee']
-
-        // EXEMPLE - Protéger static_tags si sa valeur est liée à la rentrée
-        // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
-        // if (currentFilters.static_tags === 'national_event:rentree-2025' || currentFilters.static_tags === '!national_event:rentree-2025') {
-        //   protectedFilters.push('static_tags')
-        // }
+        const protectedFilters = getProtectedFilterKeys(currentFilters, filterCollection)
 
         protectedFilters.forEach((filterKey) => {
           if (currentFilters[filterKey] !== null && currentFilters[filterKey] !== undefined) {
@@ -89,7 +104,7 @@ export default function SelectFilters({
 
       return mergedFilters
     },
-    [],
+    [filterCollection],
   )
 
   const zoneDefaultValue = useMemo(() => {
@@ -110,18 +125,11 @@ export default function SelectFilters({
       }
     }
 
-    if (selectedFilters.committee && typeof selectedFilters.committee === 'object' && 'name' in selectedFilters.committee) {
-      return {
-        label: selectedFilters.committee.name,
-        value: null,
-      }
-    }
-
     return undefined
-  }, [selectedFilters.zone, selectedFilters.zones, selectedFilters.committee, messageId]) // update when zone changes
+  }, [selectedFilters.zone, selectedFilters.zones, messageId]) // update when zone changes
 
   // Calculer les valeurs par défaut en fonction de messageId et des zones disponibles
-  const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), [messageId, selectedFilters.zones, selectedFilters.zone])
+  const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), [selectedFilters])
 
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
@@ -142,24 +150,13 @@ export default function SelectFilters({
       return baseLabel
     }
 
-    const excludedFilters = ['zone', 'zones', 'committee']
+    const excludedFilters = [...getProtectedFilterKeys(selectedFilters, filterCollection ?? undefined), 'uuid']
 
-    // EXEMPLE - Exclure static_tags s'il est protégé (lié à la rentrée)
-    // Pour réactiver cette fonctionnalité, décommenter le code ci-dessous :
-    // if (selectedFilters.static_tags === 'national_event:rentree-2025' || selectedFilters.static_tags === '!national_event:rentree-2025') {
-    //   excludedFilters.push('static_tags')
-    // }
-
-    const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) => value !== null && value !== undefined && !excludedFilters.includes(key))
+    const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) => !excludedFilters.includes(key) && isFilterValueFilled(value))
     return nonNullFilters.length > 0
       ? `${nonNullFilters.length} filtre${nonNullFilters.length > 1 ? 's' : ''} avancé${nonNullFilters.length > 1 ? 's' : ''}`
       : 'Sélectionner'
-  }, [selectedQuickFilterId, quickFilters, selectedFilters, isAdvancedFilters])
-
-  const { data: messageCountRecipients, isFetching: isFetchingMessageCountRecipients } = useGetMessageCountRecipientsPartial({
-    messageId: messageId,
-    scope: scope,
-  })
+  }, [selectedQuickFilterId, quickFilters, selectedFilters, isAdvancedFilters, filterCollection])
 
   const handleOpenModal = useCallback(() => {
     setIsModalOpen(true)
@@ -169,7 +166,7 @@ export default function SelectFilters({
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false)
     queryClient.refetchQueries({
-      queryKey: ['message-count-recipients', messageId],
+      queryKey: ['message-count-recipients-partial', messageId],
     })
   }, [messageId, queryClient])
 
@@ -179,7 +176,6 @@ export default function SelectFilters({
       if (!item) return
 
       const mergedFilters = mergeQuickFilterWithAdvancedFilters(item, selectedFilters, isAdvancedFilters)
-
       // Appliquer tous les filtres fusionnés en une seule fois
       updateFilter(mergedFilters)
     },
@@ -187,23 +183,24 @@ export default function SelectFilters({
   )
 
   const handleAdvancedFilterChange = useCallback(
-    (filterCode: string, value: any) => {
+    (filterCode: string, value: FilterValue) => {
       updateFilter({ [filterCode]: value })
     },
     [updateFilter],
   )
 
   const handleZoneSelect = useCallback(
-    (result: any) => {
+    (result: SearchResult | null) => {
       if (!result) {
         updateFilter({ zone: null })
       } else if (result.id) {
+        const meta = result.metadata as { zone?: { name: string }; zoneCode?: string; zoneType?: string } | undefined
         updateFilter({
           zone: {
             uuid: result.id,
-            name: result.metadata?.zone?.name || '',
-            code: result.metadata?.zoneCode || '',
-            type: result.metadata?.zoneType || 'custom',
+            name: meta?.zone?.name || '',
+            code: meta?.zoneCode || '',
+            type: meta?.zoneType || 'custom',
           },
         })
       }
@@ -211,8 +208,8 @@ export default function SelectFilters({
     [updateFilter],
   )
 
-  const handleZoneAndCommitteeReset = useCallback(() => {
-    updateFilter({ zone: null, committee: null })
+  const handleZoneReset = useCallback(() => {
+    updateFilter({ zone: null })
   }, [updateFilter])
 
   const handleAdvancedFiltersToggle = useCallback(() => {
@@ -238,7 +235,7 @@ export default function SelectFilters({
 
       updateFilter({ [filterKey]: value })
     },
-    [updateFilter, defaultFiltersValues, setZoneResetKey, messageId],
+    [updateFilter, defaultFiltersValues],
   )
 
   const Header = useCallback(() => {
@@ -291,7 +288,7 @@ export default function SelectFilters({
           {media.gtMd ? <Header /> : null}
           <YStack gap="$medium" padding="$medium">
             {/* Affichage des filtres actifs sous forme de chips */}
-            <FiltersChips selectedFilters={selectedFilters} onFilterChange={handleFilterChange} />
+            <FiltersChips selectedFilters={selectedFilters} onFilterChange={handleFilterChange} filterCollection={filterCollection ?? undefined} />
             <YStack gap="$medium">
               <YStack gap="$small">
                 <XStack alignItems="center" flexWrap="wrap">
@@ -348,22 +345,24 @@ export default function SelectFilters({
             </YStack>
 
             <YStack gap="$small" w="100%">
-              <GlobalSearch
-                key={`zone-search-${zoneResetKey}`}
-                provider={zoneProvider}
-                onSelect={handleZoneSelect}
-                onReset={handleZoneAndCommitteeReset}
-                placeholder="Zone géographique"
-                scope={scope}
-                defaultValue={zoneDefaultValue}
-                nullable={!!selectedFilters.committee && !!selectedFilters.zone}
-                helpText={
-                  <Text.SM>
-                    <Text.SM semibold>Toutes les zones inclues dans votre zone de gestion sont filtrables. </Text.SM> Exemple : Circonscriptions, Cantons,
-                    Communauté de communes, Communes et Bureaux de vote.
-                  </Text.SM>
-                }
-              />
+              {selectedFilters?.zone !== undefined ? (
+                <GlobalSearch
+                  key={`zone-search-${zoneResetKey}`}
+                  provider={zoneProvider}
+                  onSelect={handleZoneSelect}
+                  onReset={handleZoneReset}
+                  placeholder="Zone géographique"
+                  scope={scope}
+                  defaultValue={zoneDefaultValue}
+                  nullable={!!selectedFilters.zone}
+                  helpText={
+                    <Text.SM>
+                      <Text.SM semibold>Toutes les zones inclues dans votre zone de gestion sont filtrables. </Text.SM> Exemple : Circonscriptions, Cantons,
+                      Communauté de communes, Communes et Bureaux de vote.
+                    </Text.SM>
+                  }
+                />
+              ) : null}
               <Text.SM secondary>Ciblez votre publication géographiquement (Circonscriptions, communes, etc.)</Text.SM>
             </YStack>
             <YStack gap="$small" marginVertical="$small">
@@ -377,7 +376,7 @@ export default function SelectFilters({
               </XStack>
             </YStack>
             {isAdvancedFilters ? (
-              <AdvancedFilters scope={scope} selectedFilters={selectedFilters} onFilterChange={handleAdvancedFilterChange} />
+              <AdvancedFilters selectedFilters={selectedFilters} onFilterChange={handleAdvancedFilterChange} />
             ) : (
               <>
                 <QuickFilter quickFilters={quickFilters} selectedQuickFilterId={selectedQuickFilterId} onItemSelection={handleQuickFilterSelection} />

@@ -164,16 +164,17 @@ export const MessageFormValuesValidatorSchema = z.object({
         required_error: "L'objet est obligatoire",
       })
       .min(5, {
-        message: "L'objet doit faire minimum 5 charatères",
+        message: "L'objet doit faire minimum 5 caractères",
       })
       .max(255, {
-        message: "L'objet doit faire maximum 255 charatères",
+        message: "L'objet doit faire maximum 255 caractères",
       }),
   }),
   filters: z.object({
     hasRecipients: z.boolean().refine((value) => value === true, {
       message: 'Ce filtre ne correspond à aucun contact',
     }),
+    data: z.record(z.string(), z.any()).optional(),
   }),
   formValues: z.record(
     z.enum(nodeTypesArray),
@@ -215,6 +216,7 @@ export type GlobalForm = {
   addBarOpenForFieldId?: string | null
   filters: {
     hasRecipients: boolean
+    data?: Record<string, unknown>
   }
 }
 

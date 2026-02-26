@@ -13,6 +13,7 @@ import { DebouncedSaveFunction, ImmediateSaveFunction } from './hooks/useAutoSav
 import { getHTML } from './HtmlOneRenderer'
 import { RenderFields } from './RenderFields'
 import * as S from './schemas/messageBuilderSchema'
+import { useEditorStore } from './store/editorStore'
 import defaultTheme from './themes/default-theme'
 import { EditorMethods, RenderFieldRef } from './types'
 import { createNodeByType, getDefaultFormValues, unZipMessage, zipMessage } from './utils'
@@ -100,6 +101,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
       addBarOpenForFieldId: null,
       filters: {
         hasRecipients: true,
+        data: { adherent_tags: 'adherent' },
       },
     },
     resolver: zodResolver(S.MessageFormValuesValidatorSchema),
@@ -181,6 +183,30 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
     [props.onSenderChange, getValues, onImmediateSave],
   )
 
+  const hydrateStore = useEditorStore((s) => s.hydrate)
+  useEffect(() => {
+    hydrateStore({
+      messageId: props.messageId,
+      scope: scopeFromQuery ?? '',
+      displayToolbar: props.displayToolbar,
+      availableSenders: props.availableSenders,
+      message,
+      messageFilters: props.messageFilters,
+      selectedSender: props.sender,
+      onSenderChange: handleSenderChange,
+    })
+  }, [
+    hydrateStore,
+    props.messageId,
+    scopeFromQuery,
+    props.displayToolbar,
+    props.availableSenders,
+    message,
+    props.messageFilters,
+    props.sender,
+    handleSenderChange,
+  ])
+
   useImperativeHandle(ref, () => ({
     submit: handleSubmit(
       (x) => {
@@ -224,21 +250,7 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
         <YStack flex={1} gap="$medium" position="relative">
           <StyleRendererContextProvider value={props.theme}>
             <FormProvider {...formMethods}>
-              <RenderFields
-                ref={renderFieldsRef}
-                control={control}
-                defaultStruct={defaultData.struct}
-                editorMethods={editorMethods}
-                displayToolbar={props.displayToolbar}
-                availableSenders={props.availableSenders}
-                message={message}
-                onNodeChange={handleNodeChange}
-                messageFilters={props.messageFilters}
-                messageId={props.messageId}
-                scope={scopeFromQuery ?? ''}
-                onSenderChange={handleSenderChange}
-                selectedSender={props.sender}
-              />
+              <RenderFields ref={renderFieldsRef} defaultStruct={defaultData.struct} editorMethods={editorMethods} onNodeChange={handleNodeChange} />
             </FormProvider>
           </StyleRendererContextProvider>
         </YStack>

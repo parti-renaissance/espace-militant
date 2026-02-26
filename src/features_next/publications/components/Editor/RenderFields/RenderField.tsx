@@ -1,7 +1,9 @@
 import React, { memo, RefObject } from 'react'
 import { XStack, YStack } from 'tamagui'
 import { Image as ImageIcon } from '@tamagui/lucide-icons'
-import { Control, Controller } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
+
+import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 
 import { FormFrame } from '@/components/base/FormFrames'
 import Text from '@/components/base/Text'
@@ -80,38 +82,36 @@ const EmptyAttachmentRenderer = (props: { data: S.AttachmentNode; edgePosition?:
 export const RenderField = memo(
   (props: {
     field: S.FieldsArray[number]
-    control: Control<S.GlobalForm>
     edgePosition?: 'leading' | 'trailing' | 'alone'
     editorMethods: RefObject<EditorMethods>
-    displayToolbar?: boolean
     senderThemeColor?: string
     onNodeChange?: (fieldId: string, nodeType: string, newValue: S.Node) => void
   }) => {
+    const { control } = useFormContext<S.GlobalForm>()
+    const displayToolbar = useEditorStore((s) => s.displayToolbar)
     switch (props.field.type) {
       case 'image':
         return (
           <Controller
-            control={props.control}
+            control={control}
             name={`formValues.image.${props.field.id}`}
             render={({ field, fieldState }) => {
               return (
                 <>
                   <NodeSelectorWrapper
-                    control={props.control}
                     field={props.field}
                     edgePosition={props.edgePosition}
                     error={fieldState.error?.message}
                     editorMethods={props.editorMethods}
-                    displayToolbar={props.displayToolbar ?? true}
                   >
-                    {field?.value?.content ? (
-                      <ImageRenderer data={field.value} edgePosition={props.edgePosition} displayToolbar={props.displayToolbar} />
+                  {field?.value?.content ? (
+                      <ImageRenderer data={field.value} edgePosition={props.edgePosition} displayToolbar={displayToolbar} />
                     ) : (
                       <EmptyImageRenderer data={field.value} />
                     )}
                   </NodeSelectorWrapper>
                   <Controller
-                    control={props.control}
+                    control={control}
                     render={({ field: { value, onChange } }) => {
                       return (
                         <ImageNodeEditor
@@ -135,26 +135,24 @@ export const RenderField = memo(
       case 'button':
         return (
           <Controller
-            control={props.control}
+            control={control}
             name={`formValues.button.${props.field.id}`}
             render={({ field, fieldState }) => (
               <>
                 <NodeSelectorWrapper
-                  control={props.control}
                   field={props.field}
                   edgePosition={props.edgePosition}
                   error={fieldState.error?.message}
                   editorMethods={props.editorMethods}
-                  displayToolbar={props.displayToolbar ?? true}
                 >
                   {field.value.content ? (
-                    <ButtonRenderer data={field.value} edgePosition={props.edgePosition} displayToolbar={props.displayToolbar} />
+                    <ButtonRenderer data={field.value} edgePosition={props.edgePosition} displayToolbar={displayToolbar} />
                   ) : (
                     <EmptyButtonRenderer edgePosition={props.edgePosition} color={props.senderThemeColor} />
                   )}
                 </NodeSelectorWrapper>
                 <Controller
-                  control={props.control}
+                  control={control}
                   render={({ field: { value, onChange } }) => {
                     return (
                       <ButtonNodeEditor
@@ -179,23 +177,21 @@ export const RenderField = memo(
       case 'attachment':
         return (
           <Controller
-            control={props.control}
+            control={control}
             name={`formValues.attachment.${props.field.id}`}
             render={({ field, fieldState }) => (
               <>
                 <NodeSelectorWrapper
-                  control={props.control}
                   field={props.field}
                   edgePosition={props.edgePosition}
                   error={fieldState.error?.message}
                   editorMethods={props.editorMethods}
-                  displayToolbar={props.displayToolbar ?? true}
                 >
                   {field.value.content ? (
                     <AttachmentRenderer
                       data={field.value}
                       edgePosition={props.edgePosition}
-                      displayToolbar={props.displayToolbar}
+                      displayToolbar={displayToolbar}
                       senderThemeColor={props.senderThemeColor}
                     />
                   ) : (
@@ -203,7 +199,7 @@ export const RenderField = memo(
                   )}
                 </NodeSelectorWrapper>
                 <Controller
-                  control={props.control}
+                  control={control}
                   render={({ field: { value, onChange } }) => {
                     return (
                       <AttachmentNodeEditor
@@ -226,32 +222,30 @@ export const RenderField = memo(
       case 'richtext':
         return (
           <Controller
-            control={props.control}
+            control={control}
             name={`formValues.richtext.${props.field.id}`}
             render={({ field, fieldState }) => (
               <>
                 <NodeSelectorWrapper
-                  control={props.control}
                   field={props.field}
                   edgePosition={props.edgePosition}
                   error={fieldState.error?.message}
                   editorMethods={props.editorMethods}
-                  displayToolbar={props.displayToolbar ?? true}
                 >
                   {field.value.content && field.value.content.pure.length > 0 ? (
                     <RichTextRenderer
                       id={props.field.id}
                       data={field.value}
                       edgePosition={props.edgePosition}
-                      displayToolbar={props.displayToolbar}
-                      previewMode={!props.displayToolbar}
+                      displayToolbar={displayToolbar}
+                      previewMode={!displayToolbar}
                     />
                   ) : (
                     <EmptyRichTextRender data={field.value} edgePosition={props.edgePosition} />
                   )}
                 </NodeSelectorWrapper>
                 <Controller
-                  control={props.control}
+                  control={control}
                   render={({ field: { value, onChange } }) => {
                     return (
                       <RichTextNodeEditor

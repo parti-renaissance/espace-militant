@@ -1,6 +1,75 @@
 import { isAfter, isBefore, subHours } from 'date-fns'
 
-import { RestFullEvent, RestItemEvent, RestPartialEvent } from '@/services/events/schema'
+import { RestFullEvent, RestItemEvent, RestPartialEvent, RestPublicItemEvent } from '@/services/events/schema'
+
+export type EventSectionId = 'national' | 'zone' | 'region' | 'past'
+
+export type EventSection<T extends RestItemEvent | RestPublicItemEvent = RestItemEvent> = {
+  id: string
+  title: string
+  data: T[]
+}
+
+type GroupEventsBySectionOptions = {
+  zoneLabel?: string
+}
+
+export const groupEventsBySection = <T extends RestItemEvent | RestPublicItemEvent>(events: T[], options?: GroupEventsBySectionOptions): EventSection<T>[] => {
+  const zoneLabel = options?.zoneLabel
+  const national: T[] = []
+  const zone: T[] = []
+  const regionByCode = new Map<string, { region: { code: string; name: string }; events: T[] }>()
+  const past: T[] = []
+
+  for (const event of events) {
+    const isPast = isEventPast(event)
+    if (isPast) {
+      past.push(event)
+      continue
+    }
+
+    const isNational = isEventFull(event) && event.is_national === true
+    if (isNational) {
+      national.push(event)
+      continue
+    }
+
+    const hasRegion = event.region != null && event.region !== undefined
+    if (hasRegion && event.region) {
+      const existing = regionByCode.get(event.region.code)
+      if (existing) {
+        existing.events.push(event)
+      } else {
+        regionByCode.set(event.region.code, { region: event.region, events: [event] })
+      }
+    } else {
+      zone.push(event)
+    }
+  }
+
+  const sections: EventSection<T>[] = []
+
+  if (national.length > 0) {
+    sections.push({ id: 'national', title: 'Événements à la une', data: national })
+  }
+  if (zone.length > 0 || zoneLabel) {
+    const zoneTitle = zoneLabel === 'Toutes' ? 'À venir' : zoneLabel ? `${zoneLabel.replace(' • ', ' - ')}` : 'À venir'
+    sections.push({ id: 'zone', title: zoneTitle, data: zone })
+  }
+  const regionEntries = [...regionByCode.entries()].sort(([a], [b]) => a.localeCompare(b))
+  for (const [code, { region, events: regionEvents }] of regionEntries) {
+    sections.push({
+      id: `region-${code}`,
+      title: `Région ${region.name}`,
+      data: regionEvents,
+    })
+  }
+  if (past.length > 0) {
+    sections.push({ id: 'past', title: 'Événements passés', data: past })
+  }
+
+  return sections
+}
 
 export const isEventPast = (event: Partial<RestItemEvent>) => {
   const date = event.finish_at || event.begin_at
