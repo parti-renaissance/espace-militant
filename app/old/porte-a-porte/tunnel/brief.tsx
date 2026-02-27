@@ -9,7 +9,7 @@ import { CloseButton } from '@/screens/shared/NavigationHeaderButton'
 import { StatefulView } from '@/screens/shared/StatefulView'
 import { Colors, Spacing, Typography } from '@/styles'
 import i18n from '@/utils/i18n'
-import Markdown from '@ronradtke/react-native-markdown-display'
+import Markdown from 'react-native-markdown-display'
 import { useNavigation } from 'expo-router'
 
 const DoorToDoorBriefScreen = () => {

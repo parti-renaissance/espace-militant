@@ -7,7 +7,7 @@ import { ViewStateUtils } from '@/screens/shared/ViewStateUtils'
 import { Colors, Spacing, Typography } from '@/styles'
 import i18n from '@/utils/i18n'
 import { useFocusEffect } from '@react-navigation/native'
-import Markdown from '@ronradtke/react-native-markdown-display'
+import Markdown from 'react-native-markdown-display'
 import { Stack } from 'expo-router'
 
 export interface TutorialResources {

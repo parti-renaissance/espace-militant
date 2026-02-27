@@ -1,6 +1,6 @@
 import React from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
-import Markdown from '@ronradtke/react-native-markdown-display'
+import Markdown from 'react-native-markdown-display'
 import PhoningCampaignRepository from '@/data/PhoningCampaignRepository'
 import { Colors, Spacing, Styles, Typography } from '@/styles'
 import i18n from '@/utils/i18n'
