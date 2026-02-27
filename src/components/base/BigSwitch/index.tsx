@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 import { LayoutChangeEvent } from 'react-native'
-import Animated, { runOnUI, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { scheduleOnUI } from 'react-native-worklets'
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { Text, View, XStack } from 'tamagui'
 
 type Option = { label: string; value: string | undefined }
@@ -51,7 +52,7 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
 
   // 4. Synchronisation externe (ex: reset des filtres)
   useEffect(() => {
-    runOnUI(animateToIndex)(selectedIndex >= 0 ? selectedIndex : 0)
+    scheduleOnUI(animateToIndex, selectedIndex >= 0 ? selectedIndex : 0)
   }, [selectedIndex, animateToIndex])
 
   // 5. Handler de clic optimisé
@@ -59,7 +60,7 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
     if (index === selectedIndex) return
 
     // On lance l'animation UI immédiatement
-    runOnUI(animateToIndex)(index)
+    scheduleOnUI(animateToIndex, index)
 
     // On délègue la mise à jour lourde au cycle suivant pour laisser
     // l'animation démarrer avant que le JS Thread ne freeze

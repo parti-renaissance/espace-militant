@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { ActivityIndicator, Platform, SafeAreaView } from 'react-native'
+import { ActivityIndicator, Platform } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { Save } from '@tamagui/lucide-icons'
 import { useQueryClient } from '@tanstack/react-query'

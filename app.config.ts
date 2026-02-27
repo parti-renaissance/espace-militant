@@ -82,6 +82,8 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
         barStyle: 'dark',
       },
     ])
+    plugins.push('@react-native-community/datetimepicker')
+    plugins.push('@sentry/react-native')
   }
   config.plugins = plugins
 

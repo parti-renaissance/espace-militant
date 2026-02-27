@@ -7,44 +7,12 @@ import { useToastController } from '@tamagui/toast'
 import useLogin, { useRegister } from '@/hooks/useLogin'
 import { useLogOut } from '@/services/logout/api'
 import { useGetProfil, useGetUserScopes } from '@/services/profile/hook'
-import { User, useUserStore } from '@/store/user-store'
+import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 
-type AuthContext = {
-  signIn: (props?: { code?: string; isAdmin?: boolean; state?: string }) => Promise<void>
-  signOut: () => Promise<void>
-  signUp: (props?: { utm_campaign?: string }) => Promise<void>
-  isAuth: boolean
-  isAdmin: boolean
-  session?: User | null
-  isLoading: boolean
-  user: ReturnType<typeof useGetProfil>
-  scope: ReturnType<typeof useGetUserScopes>
-}
+import { AuthContext, type AuthContextType } from './AuthContext'
 
-export const AuthContext = React.createContext<AuthContext>({
-  signIn: () => Promise.resolve(),
-  signOut: () => Promise.resolve(),
-  signUp: (props?: { utm_campaign?: string }) => Promise.resolve(),
-  isAuth: false,
-  isAdmin: false,
-  session: null,
-  isLoading: false,
-  user: {} as ReturnType<typeof useGetProfil>,
-  scope: {} as ReturnType<typeof useGetUserScopes>,
-})
-
-// This hook can be used to access the user info.
-export function useSession() {
-  const value = React.useContext(AuthContext)
-  if (process.env.NODE_ENV !== 'production') {
-    if (!value) {
-      throw new Error('useSession must be wrapped in a <SessionProvider />')
-    }
-  }
-
-  return value
-}
+export { useSession } from './AuthContext'
 
 export function SessionProvider(props: React.PropsWithChildren) {
   const { user: existingSession, setCredentials: setSession, _hasHydrated } = useUserStore()
@@ -74,7 +42,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
     }
   }, [existingSession, params, isGlobalLoading])
 
-  const handleSignIn: AuthContext['signIn'] = React.useCallback(
+  const handleSignIn: AuthContextType['signIn'] = React.useCallback(
     async (props) => {
       try {
         if (isLoginInProgress) {
@@ -153,8 +121,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
         isAdmin: existingSession?.isAdmin === true,
         user,
         scope,
-      }) satisfies AuthContext,
-    [handleSignIn, handleSignOut, existingSession, isLoginInProgress, isGlobalLoading],
+      }) satisfies AuthContextType,
+    [handleSignIn, handleSignOut, handleRegister, existingSession, isGlobalLoading, isAuth, user, scope],
   )
 
   return <AuthContext.Provider value={providerValue}>{props.children}</AuthContext.Provider>

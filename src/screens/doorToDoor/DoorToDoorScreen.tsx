@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Modal, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { Modal, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { LatLng, Region } from '@/components/Maps/Maps'
 import { useFocusEffect } from '@react-navigation/native'
 import * as Geolocation from 'expo-location'

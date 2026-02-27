@@ -1,4 +1,4 @@
-import React, { forwardRef, RefObject, useCallback } from 'react'
+import React, { forwardRef, RefObject, useCallback, useImperativeHandle } from 'react'
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
 import { styled, ThemeableStack } from 'tamagui'
 import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2, X } from '@tamagui/lucide-icons'
@@ -55,7 +55,13 @@ export type MessageEditorToolBarRef = {
   toggleAddBar: (show: boolean) => void
 }
 
-const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props) => {
+const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props, ref) => {
+  useImperativeHandle(ref, () => ({
+    toggleAddBar: (_show: boolean) => {
+      // EditToolbar ne gère pas l'add bar - délégation au parent si nécessaire
+    },
+  }), [])
+
   const animatedOpacity = useSharedValue(0)
   const animatedToolBarOpacity = useSharedValue(0)
   const animatedToolBarWidth = useSharedValue(TOOLBAR_WIDTH_COLLAPSED)
