@@ -1,41 +1,76 @@
-# Application deployment
+# Déploiement de l'application
 
-# Deployment trigger rules
+## Règles de déclenchement automatique
 
-- `develop` branch: trigger build to **live** version of **staging** project.
-- `rc/**`: trigger build to **ephemeral** version of **production** project.
-- `release` in `published` state: trigger build to **live** version of **production** project. 
-- PR with requested review : trigger build to **ephemeral** version of **staging** project.
+| Branche / État | Cible |
+|---|---|
+| `develop` | Version **live** du projet **staging** |
+| `rc/**` | Version **éphémère** du projet **production** |
+| Release en état `published` | Version **live** du projet **production** |
+| PR avec revue demandée | Version **éphémère** du projet **staging** |
 
-## Web part
+---
 
-The web build uses local build with metro & tamagui compiler for assets generation.
-At the time of writing this documentation, we have a compatibility bug with tamagui,
-in fact we have to launch three times the build process to make it works. It's probably an issue with CSS flattening.
+## Partie Web
 
-## Mobile part
+Le build web utilise une compilation locale avec Metro et le compilateur Tamagui pour la génération des assets.
 
-Mobile depend upon the version number in app.json
+> **Note :** Un bug de compatibilité entre Tamagui et le CSS flattening peut nécessiter de relancer le process de build plusieurs fois. Si le build web échoue, tenter une seconde ou troisième exécution avant d'investiguer.
 
-- 1.0.0 to 1.0.0 : archive -> new build
-- 1.0.0 to 1.0.1 : patch -> expo update
-- 1.0.0 to 1.1.0 : build -> new build
-- 1.0.0 to 2.0.0 : build -> new build
+---
 
-In case of an Expo Update, environments are defined in Expo Secrets.
+## Partie Mobile
 
-In Case of a build, environment is set the following:
+La stratégie de déploiement dépend du numéro de version dans `app.json` :
 
-- production : when it's a `branch` and start with `rc/` OR when it's a `tag` and start with `v`
-- staging : any other cases
+| Changement de version | Type de déploiement |
+|---|---|
+| `1.0.0` → `1.0.0` | Archive → nouveau build |
+| `1.0.0` → `1.0.1` | Patch → **EAS Update** (OTA, sans passage en store) |
+| `1.0.0` → `1.1.0` | Mineure → nouveau build |
+| `1.0.0` → `2.0.0` | Majeure → nouveau build |
 
-### Global secrets used
+### EAS Update (mise à jour OTA)
 
-- `GCP_SA_KEY_FIREBASE_DEPLOYER`: Firebase service account token, see [official documentation](https://github.com/FirebaseExtended/action-hosting-deploy/blob/main/docs/service-account.md) for creation & rotation.
+Permet de pousser des correctifs JavaScript sans passer par les stores.
 
-### Deploy on firebase
+1. Incrémenter `eas_update_version` dans `app.json` (champ `extra`)
+2. Utiliser le workflow `deploy`, sélectionner la branche, l'environnement, et choisir `update` comme type EAS
 
-The firebase deployment occur depending on cases on live of ephemeral version of firebase project.
+### Build interne (staging)
 
-By default, TTL is 7 days, but can be raised if needed, generally, 7 days is sufficient because every time a
-commit is done, the deployment process reset the TTL value.
+1. Utiliser le workflow `deploy`
+2. Sélectionner la branche, l'environnement `staging`, et le type `build`
+
+### Build production
+
+1. Incrémenter `version` dans `app.json`
+2. Utiliser le workflow `deploy`, sélectionner l'environnement `production` et le type `build`
+
+---
+
+## Profils et identifiants
+
+| Profil EAS | Nom affiché | Bundle ID (iOS) | Package (Android) | Scheme |
+|---|---|---|---|---|
+| `development` | Vox Dev | `fr.en-marche.jecoute.development` | `fr.en_marche.jecoute.development` | `vox-dev://` |
+| `staging` | _(variable)_ | `fr.en-marche.jecoute.staging` | `fr.en_marche.jecoute.staging` | `vox-staging://` |
+| `production` | Renaissance | `fr.en-marche.jecoute` | `fr.en_marche.jecoute` | `vox://` |
+
+---
+
+## Secrets GitHub Actions
+
+| Secret | Usage |
+|---|---|
+| `GCP_SA_KEY_FIREBASE_DEPLOYER` | Compte de service Firebase. Voir la [documentation officielle](https://github.com/FirebaseExtended/action-hosting-deploy/blob/main/docs/service-account.md) pour la création et la rotation. |
+
+---
+
+## Déploiement Firebase
+
+Le déploiement Firebase cible une version live ou éphémère selon le cas.
+
+- **TTL par défaut** : 7 jours
+- Chaque nouveau commit sur une PR réinitialise le TTL à 7 jours
+- Le TTL peut être augmenté sur demande si nécessaire
