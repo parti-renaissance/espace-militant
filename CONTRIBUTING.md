@@ -54,29 +54,32 @@ docs/     → documentation uniquement
 Ce projet suit [Conventional Commits](https://www.conventionalcommits.org/fr/) :
 
 ```
-<type>(<scope>): <description courte en français>
+<type>(<scope>): <description courte en anglais>
 ```
 
 **Types courants :**
 
 | Type | Usage |
-|---|---|
+|------|-------|
 | `feat` | Nouvelle fonctionnalité |
 | `fix` | Correction de bug |
+| `bump` | Mise à jour de version |
+| `clean` | Nettoyage de code |
 | `chore` | Maintenance, dépendances |
 | `refactor` | Refactoring sans changement de comportement |
 | `docs` | Documentation uniquement |
-| `test` | Ajout ou modification de tests |
 | `style` | Formatage, sans changement fonctionnel |
+
+**Scopes courants :** `event`, `messages`, `nav`, `onboard`, `base`, `formations`, `chatbot`, `scan`, `profile`, `cadre`, `timeline`
 
 **Exemples :**
 
 ```
-feat(ui): ajouter le composant carte événement
-fix(android): corriger le crash de navigation sur retour arrière
-fix(ios): résoudre le décalage du clavier sur le formulaire d'adhésion
-chore(deps): mettre à jour expo vers 53.0.1
-docs: mettre à jour le guide d'installation
+feat(event): add event card component
+fix(nav): fix navigation crash on back press
+fix(onboard): fix keyboard offset on adhesion form
+bump(deps): update expo to 53.0.1
+docs: update installation guide
 ```
 
 ---
@@ -90,26 +93,9 @@ docs: mettre à jour le guide d'installation
 Outils à lancer avant de commiter :
 
 ```bash
-yarn format      # Prettier — formatage automatique
 yarn lint        # ESLint
 yarn ts:check    # Vérification TypeScript
 yarn knip        # Détection de code mort (exports/imports inutilisés)
-```
-
----
-
-## Tests
-
-```bash
-yarn test          # Suite complète
-yarn test:watch    # Mode watch pendant le développement
-```
-
-Pour le développement et la vérification visuelle de composants UI :
-
-```bash
-yarn storybook          # Sur simulateur/émulateur
-yarn storybook:web      # Dans le navigateur
 ```
 
 ---
@@ -128,10 +114,8 @@ Ces règles sont non-négociables :
 
 ## Checklist avant de soumettre une PR
 
-- [ ] `yarn format` passé
 - [ ] `yarn lint` sans erreur
 - [ ] `yarn ts:check` sans erreur
-- [ ] `yarn test` sans régression
 - [ ] Les composants UI utilisent les primitives Tamagui
 - [ ] Pas de `console.log` de debug
 - [ ] Pas de `any` TypeScript non justifié
