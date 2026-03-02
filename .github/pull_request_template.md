@@ -18,10 +18,8 @@
 
 ## Checklist
 
-- [ ] `yarn format` passé
 - [ ] `yarn lint` sans erreur
 - [ ] `yarn ts:check` sans erreur
-- [ ] `yarn test` sans régression
 - [ ] Les composants UI utilisent les primitives Tamagui
 - [ ] Pas de `console.log` de debug
 - [ ] Pas de `any` TypeScript non justifié
