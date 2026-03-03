@@ -80,7 +80,7 @@ export default function TicketScannerPage() {
         },
       })
     },
-    [scanTicketMutation, lastScannedId],
+    [scanTicketMutation, lastScannedId, toast],
   )
 
   // Nettoyer le timeout au démontage du composant
@@ -117,7 +117,7 @@ export default function TicketScannerPage() {
         type: 'error',
       })
     }
-  }, [requestPermission])
+  }, [requestPermission, toast])
 
   if (!permission) {
     return <YStack />

@@ -178,7 +178,7 @@ const ButtonFrame = forwardRef<
   TamaguiElement,
   React.ComponentPropsWithoutRef<typeof ButtonFrameStyled> & { variant?: 'outlined' | 'text' | 'soft' | 'contained'; inverse?: boolean }
 >(({ variant, inverse, ...props }, ref) => {
-  const Frame = getFrame(variant ? variant : (props.asChip ? 'text' : undefined), inverse)
+  const resolvedVariant = variant ?? (props.asChip ? 'text' : undefined)
   const outlinedException =
     variant === 'outlined' && (props.theme === 'gray' || !props.theme) && !props.asChip
       ? {
@@ -186,7 +186,12 @@ const ButtonFrame = forwardRef<
       }
       : {}
 
-  return <Frame ref={ref} {...props} {...outlinedException} />
+  const frameProps = { ref, ...props, ...outlinedException }
+  if (resolvedVariant === 'outlined') return <OutlinedFrame {...frameProps} />
+  if (resolvedVariant === 'text') return <TextFrame {...frameProps} />
+  if (resolvedVariant === 'soft') return inverse ? <InverseSoftFrame {...frameProps} /> : <SoftFrame {...frameProps} />
+  if (resolvedVariant === 'contained') return inverse ? <InverseContainedFrame {...frameProps} /> : <ContainedFrame {...frameProps} />
+  return inverse ? <InverseContainedFrame {...frameProps} /> : <ContainedFrame {...frameProps} />
 })
 
 const ButtonSpinner = styled(Spinner, {

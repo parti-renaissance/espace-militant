@@ -52,7 +52,7 @@ type _TabProps<A extends string> = {
 
 export const Tab = <A extends string>(props: _TabProps<A>) => {
   const ctx = useContext(TabsContext)
-  const handlePress = useCallback(() => ctx.setActiveTab(props.id), [props.id])
+  const handlePress = useCallback(() => ctx.setActiveTab(props.id), [ctx, props.id])
   return <TabMemo {...props} grouped={ctx.grouped} active={ctx.activeTab === props.id} onPress={handlePress} />
 }
 

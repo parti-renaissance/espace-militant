@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react'
+import { memo, useRef, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { getTokenValue, Spinner, useMedia, XStack, YStack } from 'tamagui'
@@ -177,6 +177,8 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
   const documentSelector = useDocumentSelector()
   const { mutateAsync: uploadFile, progress, isPending } = useUploadPublicationFile()
   const [uploadError, setUploadError] = useState<string | undefined>(undefined)
+  const lastSyncedPayloadRef = useRef<typeof documentSelector.data | null>(null)
+  const lastUploadedPayloadRef = useRef<typeof documentSelector.data>(null)
 
   const { control, handleSubmit, setValue, getValues } = useForm({
     defaultValues: {
@@ -191,26 +193,27 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
     resolver: zodResolver(S.AttachmentNodeValidationSchema),
   })
 
+  const payload = documentSelector.data
+
+  // Sync form from payload in effect only — avoids render-phase setState and cascading re-renders
   useEffect(() => {
-    if (!documentSelector.data) {
-      return
-    }
-
-    const payload = documentSelector.data
-
+    if (!payload || payload === lastSyncedPayloadRef.current) return
+    lastSyncedPayloadRef.current = payload
     if (payload.error) {
       setUploadError(payload.error)
-      return
+    } else {
+      setUploadError(undefined)
+      setValue('content.name', payload.filename)
+      const currentTitle = getValues('content.title')
+      if (!currentTitle) setValue('content.title', payload.filename)
     }
+  }, [payload, setValue, getValues])
 
-    setValue('content.name', payload.filename)
-
-    const currentTitle = getValues('content.title')
-    if (!currentTitle) {
-      setValue('content.title', payload.filename)
-    }
-
-    setUploadError(undefined)
+  // Effet de bord : uniquement l’upload async ; ref utilisé uniquement dans l’effet
+  useEffect(() => {
+    if (!payload || payload.error) return
+    if (lastUploadedPayloadRef.current === payload) return
+    lastUploadedPayloadRef.current = payload
     uploadFile({ uri: payload.uri, filename: payload.filename, dataType: payload.dataType, scope })
       .then((x) => {
         setValue('content.url', x.url)
@@ -223,7 +226,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
         setValue('content.size', undefined)
         setUploadError("Une erreur est survenue lors de l'importation du fichier. Veuillez réessayer.")
       })
-  }, [documentSelector.data, scope, uploadFile, setValue, getValues])
+  }, [payload, scope, uploadFile, setValue])
 
   const onSubmit = useDebouncedCallback(() => {
     const values = control._formValues

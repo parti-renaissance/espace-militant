@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import OnboardModal from '@/features_next/onboard/components/OnboardModal'
 
@@ -22,9 +22,9 @@ export function OnboardConditional() {
   const setOnboardingOpenedAt = useUserStore((s) => s.setOnboardingOpenedAt)
   const [isLatched, setIsLatched] = useState(false)
 
-  useEffect(() => {
-    if (needsOnboarding) setIsLatched(true)
-  }, [needsOnboarding])
+  if (needsOnboarding && !isLatched) {
+    setIsLatched(true)
+  }
 
   if (!isAuth) return null
   if (isAdmin) return null

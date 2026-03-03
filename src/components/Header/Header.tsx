@@ -91,6 +91,54 @@ const NavItem = (props: { route: (typeof ROUTES)[number]; isActive: boolean }) =
 
 const MemoizedNavItem = React.memo(NavItem)
 
+type HeaderBackBtnProps = {
+  navigation: NativeStackHeaderProps['navigation']
+  back: NativeStackHeaderProps['back']
+}
+
+const HeaderBackBtn = ({ navigation, back }: HeaderBackBtnProps) => (
+  <Stack justifyContent="center" alignItems="center">
+    <TouchableWithoutFeedback onPress={() => (navigation.canGoBack() ? navigation.goBack() : router.navigate('/'))}>
+      <XStack gap={'$medium'} alignItems="center" cursor="pointer">
+        <View flexDirection="row" gap={'$medium'} alignItems="center">
+          <ArrowLeft color="$textPrimary" />
+        </View>
+        <Text fontSize="$4" fontWeight="$6">
+          {back?.title ?? 'Retour'}
+        </Text>
+      </XStack>
+    </TouchableWithoutFeedback>
+  </Stack>
+)
+
+type HeaderLeftNavProps = {
+  options: NativeStackHeaderProps['options']
+  navigation: NativeStackHeaderProps['navigation']
+  back: NativeStackHeaderProps['back']
+  segments: string[]
+  media: ReturnType<typeof useMedia>
+}
+
+const HeaderLeftNav = ({ options, navigation, back, segments, media }: HeaderLeftNavProps) => {
+  if (options.headerLeft) return options.headerLeft({ label: back?.title, canGoBack: navigation.canGoBack() })
+
+  if (navigation.canGoBack() && segments.includes('(tabs)') ? navigation.getState().index > 0 : true) {
+    return <HeaderBackBtn key={segments.join('')} navigation={navigation} back={back} />
+  }
+
+  return media.gtSm && isWeb ? (
+    <Link href="/" asChild>
+      <View cursor="pointer">
+        <EuCampaignIllustration />
+      </View>
+    </Link>
+  ) : (
+    <Text fontSize="$4" fontWeight="$6">
+      {capitalize(options.title)}
+    </Text>
+  )
+}
+
 export const NavBar = () => {
   const pathname = usePathname()
   const { gtSm } = useMedia()
@@ -162,40 +210,6 @@ const Header = (_props: NativeStackHeaderProps & YStackProps) => {
   const media = useMedia()
   const segments = useSegments()
 
-  const BackBtn = () => (
-    <Stack justifyContent="center" alignItems="center">
-      <TouchableWithoutFeedback onPress={() => (navigation.canGoBack() ? navigation.goBack() : router.navigate('/'))}>
-        <XStack gap={'$medium'} alignItems="center" cursor="pointer">
-          <View flexDirection="row" gap={'$medium'} alignItems="center">
-            <ArrowLeft color="$textPrimary" />
-          </View>
-          <Text fontSize="$4" fontWeight="$6">
-            {back?.title ?? 'Retour'}
-          </Text>
-        </XStack>
-      </TouchableWithoutFeedback>
-    </Stack>
-  )
-
-  const LeftNav = () => {
-    if (options.headerLeft) return options.headerLeft({ label: back?.title, canGoBack: navigation.canGoBack() })
-
-    if (navigation.canGoBack() && segments.includes('(tabs)') ? navigation.getState().index > 0 : true) {
-      return <BackBtn key={segments.join('')} />
-    }
-
-    return media.gtSm && isWeb ? (
-      <Link href="/" asChild>
-        <View cursor="pointer">
-          <EuCampaignIllustration />
-        </View>
-      </Link>
-    ) : (
-      <Text fontSize="$4" fontWeight="$6">
-        {capitalize(options.title)}
-      </Text>
-    )
-  }
   return (
     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
       <Container
@@ -207,7 +221,7 @@ const Header = (_props: NativeStackHeaderProps & YStackProps) => {
         alignContent="center"
       >
         <Stack flexDirection="row" justifyContent="space-between" alignItems="center" flex={1}>
-          <LeftNav />
+          <HeaderLeftNav options={options} navigation={navigation} back={back} segments={segments} media={media} />
           {!(navigation.canGoBack() && navigation.getState().index > 0) && <NavBar />}
           {options.headerRight ? options.headerRight({ canGoBack: navigation.canGoBack() }) : <ProfileNav />}
         </Stack>

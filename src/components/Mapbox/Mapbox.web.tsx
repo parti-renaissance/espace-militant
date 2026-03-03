@@ -1,4 +1,5 @@
 import React, { ComponentProps, ComponentRef, forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react'
+import * as Image from 'expo-image'
 import {
   CameraStop,
   type Camera as C,
@@ -8,13 +9,15 @@ import {
   type ShapeSource as SS,
   type UserLocation as UL,
 } from '@rnmapbox/maps'
-import * as Image from 'expo-image'
 import type mapboxgl from 'mapbox-gl'
 import Map, { GeolocateControl, Layer, MapRef, PaddingOptions, Source, useMap } from 'react-map-gl'
+
 import 'mapbox-gl/dist/mapbox-gl.css'
+
 import _ from 'lodash'
 import { MapLayerMouseEvent } from 'mapbox-gl'
 import { create } from 'zustand'
+
 import MapboxGl from './Mapbox'
 
 const mapPadding = (padding?: MapboxGl.CameraPadding): PaddingOptions | undefined => {

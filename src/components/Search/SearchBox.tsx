@@ -1,4 +1,4 @@
-import React, { ComponentProps, forwardRef, useCallback } from 'react'
+import React, { ComponentProps, forwardRef } from 'react'
 import { Platform, Pressable, TextInput, TextInputProps } from 'react-native'
 import Input from '@/components/base/Input/Input'
 import { useForwardRef } from '@/hooks/useForwardRef'
@@ -14,15 +14,15 @@ type SearchBoxProps = {
 const SearchBox = forwardRef<TextInput, SearchBoxProps>(({ label, value, onChange, onFocus, DefaultIcon = Search, ...rest }, ref) => {
   const searchInputRef = useForwardRef(ref)
 
-  const IconRight = useCallback((props: { isInputFill: boolean }) => {
-    return props.isInputFill ? (
+  const renderIconRight = () => {
+    return value.length > 0 ? (
       <Pressable onPress={() => onChange('')}>
         <XCircle color="$blue9" width={20} height={20} />
       </Pressable>
     ) : (
       <DefaultIcon />
     )
-  }, [])
+  }
 
   return (
     <Input
@@ -34,7 +34,7 @@ const SearchBox = forwardRef<TextInput, SearchBoxProps>(({ label, value, onChang
       placeholderTextColor={'$textSecondary'}
       value={value}
       onFocus={onFocus}
-      iconRight={<IconRight isInputFill={value.length > 0} />}
+      iconRight={renderIconRight()}
       onChangeText={onChange}
       {...rest}
     />

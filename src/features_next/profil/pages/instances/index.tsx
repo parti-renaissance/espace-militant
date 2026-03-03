@@ -139,7 +139,7 @@ const InstancesContent = () => {
         button: <CommitteeCreationButton profile={profile} assemblyName={assembly?.name} />,
       }
     }
-  }, [committee])
+  }, [committee, isSympathisant, openAdhCommitee, isPendingCommitee, profile, assembly, setOpenChange])
 
   const agorasContent = useMemo(() => {
     if (isSympathisant) {
@@ -231,7 +231,7 @@ const InstancesContent = () => {
         </VoxButton>
       ),
     }
-  }, [isSympathisant, agoras])
+  }, [isSympathisant, agoras, isPendingAgora, openAdhAgora, handleLeave, isAdherentDues, setOpenChangeAgora])
 
   return (
     <>

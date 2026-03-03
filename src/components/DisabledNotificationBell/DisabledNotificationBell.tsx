@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import useCheckNotificationsState from '@/hooks/notifications/useCheckNotificationsState'
 import { Button } from 'tamagui'
 import BellOff from './BellOff'
@@ -14,15 +13,11 @@ import BellOff from './BellOff'
 export default function DisabledNotificationBell() {
   const { notificationGranted, triggerNotificationRequest } = useCheckNotificationsState()
 
-  const onPress = useCallback(() => {
-    triggerNotificationRequest()
-  }, [])
-
   if (notificationGranted || notificationGranted === null) return null
 
   return (
     <Button
-      onPress={onPress}
+      onPress={triggerNotificationRequest}
       icon={<BellOff size={16} />}
       borderRadius={100}
       variant={'outlined'}

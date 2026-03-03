@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { XStack } from 'tamagui'
 import { AlertCircle } from '@tamagui/lucide-icons'
 
@@ -10,25 +10,18 @@ type AutoSaveErrorIndicatorProps = {
 
 export const AutoSaveErrorIndicator = ({ hasError }: AutoSaveErrorIndicatorProps) => {
   const [showError, setShowError] = useState(false)
-  const [hasInitialized, setHasInitialized] = useState(false)
 
+  // All state updates in effect only — no setState during render (avoids cascading re-renders and JS thread lag)
   useEffect(() => {
-    if (!hasInitialized) {
-      setHasInitialized(true)
-      return
-    }
-
     if (hasError) {
       setShowError(true)
-      // L'erreur disparaît automatiquement après 6 secondes
       const timer = setTimeout(() => setShowError(false), 6000)
       return () => clearTimeout(timer)
-    } else {
-      setShowError(false)
     }
-  }, [hasError, hasInitialized])
+    setShowError(false)
+  }, [hasError])
 
-  if (!hasInitialized || !showError) {
+  if (!showError) {
     return null
   }
 

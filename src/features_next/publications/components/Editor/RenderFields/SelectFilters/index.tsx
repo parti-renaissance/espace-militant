@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { memo, useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, Platform } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useMedia, XStack, YStack } from 'tamagui'
@@ -33,7 +33,7 @@ interface SelectFiltersProps {
   isFetchingMessageCountRecipients?: boolean
 }
 
-export default function SelectFilters({
+function SelectFiltersInner({
   updateFilter,
   selectedFilters = {},
   isLoading = false,
@@ -55,10 +55,6 @@ export default function SelectFilters({
   const [zoneResetKey, setZoneResetKey] = useState(0)
   const quickFilters: HierarchicalQuickFilterType[] = useMemo(() => getHierarchicalQuickFilters(), [])
   const queryClient = useQueryClient()
-
-  useEffect(() => {
-    setIsAdvancedFilters(!selectedQuickFilterId)
-  }, [selectedQuickFilterId])
 
   const zoneAutocompleteOptions = useMemo((): ZoneProviderOptions | undefined => {
     if (!filterCollection?.length) return undefined
@@ -424,5 +420,8 @@ export default function SelectFilters({
     </>
   )
 }
+
+const SelectFilters = memo(SelectFiltersInner)
+export default SelectFilters
 
 export { getHierarchicalQuickFilters, getItemState, SelectedFiltersType, HierarchicalQuickFilterType }

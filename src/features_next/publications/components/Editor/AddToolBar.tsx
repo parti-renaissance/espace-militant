@@ -2,6 +2,7 @@ import { forwardRef, RefObject, useCallback, useEffect, useImperativeHandle } fr
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
 import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 import { Image, MousePointerSquare, Paperclip, Plus, Text as TextIcon, X } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
@@ -164,15 +165,19 @@ export type MessageEditorToolBarRef = {
 }
 
 const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props, ref) => {
-  useImperativeHandle(ref, () => ({
-    toggleAddBar: (show: boolean) => {
-      if (show) {
-        props.onShowAddBar?.()
-      } else {
-        props.onClose?.()
-      }
-    },
-  }), [props.onShowAddBar, props.onClose])
+  useImperativeHandle(
+    ref,
+    () => ({
+      toggleAddBar: (show: boolean) => {
+        if (show) {
+          props.onShowAddBar?.()
+        } else {
+          props.onClose?.()
+        }
+      },
+    }),
+    [props.onShowAddBar, props.onClose],
+  )
 
   const animatedFrameHeight = useAnimatedState({
     openValue: TOOLBAR_ITEM_HEIGHT * 5,

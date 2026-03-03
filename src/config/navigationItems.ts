@@ -219,7 +219,7 @@ export const useCadreNavItems = (): NavItemConfig[] => {
 
         return config
       })
-  }, [isAuth, defaultScopeCode, defaultScopeFeaturesKey])
+  }, [isAuth, defaultScopeCode, defaultScopeFeaturesKey, defaultScopeFeatures])
 }
 
 export const cadreNavItems: NavItemConfig[] = []

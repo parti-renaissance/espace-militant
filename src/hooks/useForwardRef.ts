@@ -1,6 +1,6 @@
 import { ForwardedRef, useEffect, useRef } from 'react'
 
-export const useForwardRef = <T>(ref: ForwardedRef<T>, initialValue: any = null) => {
+export const useForwardRef = <T>(ref: ForwardedRef<T>, initialValue: T | null = null) => {
   const targetRef = useRef<T>(initialValue)
 
   useEffect(() => {

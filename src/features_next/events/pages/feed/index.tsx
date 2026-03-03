@@ -60,7 +60,7 @@ const EventFeed = () => {
 
   const [activeTab, setActiveTab] = useState<'events' | 'myEvents'>('events')
   const filtersValue = eventFiltersState((s) => s.value)
-  const [filters] = useDebounce(filtersValue, 300)
+  const filters = filtersValue
 
   const zone = filters.zone ?? userData?.instances?.assembly?.code
   const filtersReady = !isAuth || userData !== undefined
@@ -83,9 +83,12 @@ const EventFeed = () => {
   })
 
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
+
   useEffect(() => {
-    if (!isRefetching) setIsManualRefreshing(false)
-  }, [isRefetching])
+    if (!isRefetching && isManualRefreshing) {
+      setIsManualRefreshing(false)
+    }
+  }, [isRefetching, isManualRefreshing])
 
   const handleManualRefresh = useCallback(() => {
     setIsManualRefreshing(true)

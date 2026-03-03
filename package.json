@@ -9,6 +9,7 @@
     "web": "vite build --config vite.worker.config.js && expo start --web",
     "web:export": "vite build --config vite.worker.config.js && expo export -p web",
     "lint": "eslint .",
+    "lint:errors": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "prettier-watch": "onchange '**/*.ts' '**/*.tsx' '**/*.cjs' '**/*.js' '**/*.json' --exclude-path .gitignore -- prettier --write {{changed}}",

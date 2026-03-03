@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
@@ -15,16 +15,14 @@ export default function ScopesSelector() {
   const scopesCodeList = useMemo(() => scopes?.list?.map((scope) => scope.code) ?? [], [scopes])
   const [shouldOpen, setShouldOpen] = useState(false)
 
-  // Mettre à jour shouldOpen seulement quand les données sont chargées
-  useEffect(() => {
-    if (!isLoadingScopes && scopes) {
-      const shouldOpenModal = 
-        !scopes.lastAvailableScopes || 
-        scopes.lastAvailableScopes.length === 0 || 
-        xor(scopesCodeList, scopes.lastAvailableScopes).length > 0
-      setShouldOpen(shouldOpenModal)
-    }
-  }, [isLoadingScopes, scopes, scopesCodeList])
+  // Mise à jour pendant le rendu : ouvrir le modal quand les données sont chargées et la condition est remplie
+  if (!isLoadingScopes && scopes && !shouldOpen) {
+    const shouldOpenModal =
+      !scopes.lastAvailableScopes ||
+      scopes.lastAvailableScopes.length === 0 ||
+      xor(scopesCodeList, scopes.lastAvailableScopes).length > 0
+    if (shouldOpenModal) setShouldOpen(true)
+  }
 
   const media = useMedia()
 

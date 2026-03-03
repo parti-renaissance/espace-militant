@@ -26,7 +26,6 @@ const UnSubscribeCase = () => {
     enabled: enableLoop,
   })
 
-  useEffect(() => setEnableLoop(false), [])
   const { data: config } = useGetReSubscribeConfig()
 
   const getUrl = () => {
@@ -93,11 +92,13 @@ const UnSubscribeCase = () => {
     }
   }
 
+  // Latch pendant le rendu : on ne fait que synchroniser l’état, pas d’effet de bord
+  if (autorun === '1' && !hasAutorun) setHasAutoRun(true)
+
+  // Effet de bord : lancer handlePress en microtask pour éviter setState synchrone dans l’effet
   useEffect(() => {
-    if (autorun === '1' && !hasAutorun) {
-      handlePress()
-      setHasAutoRun(true)
-    }
+    if (autorun !== '1' || hasAutorun) return
+    queueMicrotask(() => handlePress())
   }, [autorun, hasAutorun])
 
   return (
@@ -227,8 +228,7 @@ const NotificationForm = (props: { cardProps?: React.ComponentProps<typeof VoxCa
     }
   }, [shouldAutoCheck, onSubmit])
 
-  const SmsSection = () => {
-    return props.profile.phone ? (
+  const smsSectionContent = props.profile.phone ? (
       <>
         <YStack gap="$small">
           <Text.MD multiline secondary semibold>
@@ -253,8 +253,7 @@ const NotificationForm = (props: { cardProps?: React.ComponentProps<typeof VoxCa
           Ajoutez un numéro de téléphone pour ne pas manquer les informations les plus importantes.
         </MessageCard>
       </>
-    )
-  }
+    );
 
   return (
     <>
@@ -265,7 +264,7 @@ const NotificationForm = (props: { cardProps?: React.ComponentProps<typeof VoxCa
             <UnSubscribeCase />
           ) : (
             <>
-              <SmsSection />
+              {smsSectionContent}
               <Separator backgroundColor="$textOutlined" />
               <YStack gap="$small">
                 <Text.MD multiline secondary semibold>
