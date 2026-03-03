@@ -51,6 +51,7 @@ const TrackImpressionWeb: React.FC<TrackImpressionWebProps> = ({
               } catch (error) {
                 // Silently ignore tracking errors - they should not impact user experience
                 if (__DEV__) {
+                  // eslint-disable-next-line no-console
                   console.warn('[TrackImpressionWeb] trackImpression error:', error)
                 }
               }

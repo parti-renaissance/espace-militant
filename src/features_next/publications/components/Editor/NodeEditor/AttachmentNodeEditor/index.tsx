@@ -217,6 +217,7 @@ const AttachmentNodeEditorContent = (props: NodeEditorProps) => {
         setValue('content.size', payload.size)
       })
       .catch((error) => {
+        // eslint-disable-next-line no-console
         console.error('Upload error:', error)
         setValue('content.url', '')
         setValue('content.size', undefined)

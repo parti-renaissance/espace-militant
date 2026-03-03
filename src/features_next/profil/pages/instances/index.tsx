@@ -54,6 +54,7 @@ const InstancesContent = () => {
     try {
       mutateAsync(uuid)
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err)
     }
   }

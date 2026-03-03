@@ -73,6 +73,7 @@ export const unZipMessage = (x: S.Message) => {
   return x.content.reduce<{ states: S.MessageFormValues; struct: S.FieldsArray; metaData: S.MessageMetaData }>(
     (acc, next) => {
       if (!acc.states[next.type]) {
+        // eslint-disable-next-line no-console
         console.warn(`Type de node non supporté: ${next.type}`)
         return acc
       }

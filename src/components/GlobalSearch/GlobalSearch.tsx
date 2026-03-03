@@ -73,6 +73,7 @@ function GlobalSearch({
 
         setResults(sortedResults)
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Search error:', error)
         setResults([])
       } finally {

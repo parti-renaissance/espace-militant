@@ -32,5 +32,6 @@ export const blue = ${JSON.stringify(hslBlue, null, 4)}`
 
 fs.writeFile('colors.hsl.ts', hslColors, (err) => {
   if (err) throw err
+  // eslint-disable-next-line no-console
   console.log('The file has been saved!')
 })

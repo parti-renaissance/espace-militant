@@ -21,7 +21,10 @@ function initFirebase() {
   
 
   const logNotImplemented = (x: string, payload?: unknown) => {
-    if (__DEV__) console.warn('Firebase Web - not implemented', x, payload)
+    if (__DEV__) {
+      // eslint-disable-next-line no-console
+      console.warn('Firebase Web - not implemented', x, payload)
+    }
   }
 
   let Messaging: ReturnType<typeof wMessaging.getMessaging> | null = null
@@ -30,6 +33,7 @@ function initFirebase() {
     Messaging = wMessaging.getMessaging(app)
   } catch (err) {
     if (__DEV__) {
+      // eslint-disable-next-line no-console
       console.warn('Firebase Messaging not supported or failed to initialize:', err)
     }
     return null

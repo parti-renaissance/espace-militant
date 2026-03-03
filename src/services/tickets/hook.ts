@@ -6,6 +6,7 @@ export const useScanTicket = () => {
   return useMutation<ScanTicketResponse, Error, string>({
     mutationFn: scanTicket,
     onError: (error) => {
+      // eslint-disable-next-line no-console
       console.error('Erreur lors du scan du ticket:', error)
     }
   })

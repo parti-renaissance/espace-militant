@@ -152,6 +152,7 @@ async function convertBlobUrlToFormData(props: { uri: string; filename: string; 
 
     return formData
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error converting Blob URL to FormData:', error)
     throw error
   }

@@ -1,19 +1,22 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ActivityIndicator, Dimensions, Platform } from 'react-native'
-import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { BarcodeScanningResult, CameraView, useCameraPermissions } from 'expo-camera'
 import { useRouter } from 'expo-router'
-import { useScanTicket } from '@/services/tickets/hook'
-import { ScanTicketResponse } from '@/services/tickets/schema'
-import { Tickets, CameraOff, ArrowLeft } from '@tamagui/lucide-icons'
-import { YStack, XStack, ScrollView, View, useMedia } from 'tamagui'
+import { ScrollView, useMedia, View, XStack, YStack } from 'tamagui'
+import { ArrowLeft, CameraOff, Tickets } from '@tamagui/lucide-icons'
 import { useToastController } from '@tamagui/toast'
-import StatusIndicator, { StatusIndicatorSkeleton } from '../components/StatusIndicator'
-import VoxCard from '@/components/VoxCard/VoxCard'
+
+import ActivistTags from '@/components/ActivistTags'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import ActivistTags from '@/components/ActivistTags'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import VoxCard from '@/components/VoxCard/VoxCard'
+
+import { useScanTicket } from '@/services/tickets/hook'
+import { ScanTicketResponse } from '@/services/tickets/schema'
+
+import StatusIndicator, { StatusIndicatorSkeleton } from '../components/StatusIndicator'
 
 const { width, height } = Dimensions.get('window')
 
@@ -28,9 +31,8 @@ export default function TicketScannerPage() {
   const toast = useToastController()
   const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const safeAreaInsets = useSafeAreaInsets()
-  
+
   const handleBack = useCallback(() => {
-    console.log('handleBack')
     if (Platform.OS === 'web') {
       if (router.canGoBack()) {
         router.back()
@@ -46,16 +48,15 @@ export default function TicketScannerPage() {
     }
   }, [router])
 
-  const handleScanTicket = useCallback((ticketUuid: string) => {
-    // Vérifier si c'est le même ticket que le dernier scanné
-    if (lastScannedId === ticketUuid) {
-      return
-    }
-    setScanned(true)
-    // Appeler l'API pour vérifier le ticket
-    scanTicketMutation.mutate(
-      ticketUuid,
-      {
+  const handleScanTicket = useCallback(
+    (ticketUuid: string) => {
+      // Vérifier si c'est le même ticket que le dernier scanné
+      if (lastScannedId === ticketUuid) {
+        return
+      }
+      setScanned(true)
+      // Appeler l'API pour vérifier le ticket
+      scanTicketMutation.mutate(ticketUuid, {
         onSettled: () => {
           // Annuler le timeout précédent s'il existe
           if (resetTimeoutRef.current) {
@@ -73,12 +74,14 @@ export default function TicketScannerPage() {
           setLastScannedId(ticketUuid)
         },
         onError: (error) => {
+          // eslint-disable-next-line no-console
           console.error('Erreur lors du scan:', error)
           toast.show('Erreur', { message: 'Impossible de vérifier le ticket. Veuillez réessayer.', type: 'error' })
         },
-      }
-    )
-  }, [scanTicketMutation, lastScannedId])
+      })
+    },
+    [scanTicketMutation, lastScannedId],
+  )
 
   // Nettoyer le timeout au démontage du composant
   useEffect(() => {
@@ -89,12 +92,14 @@ export default function TicketScannerPage() {
     }
   }, [])
 
-  const handleBarCodeScanned = useCallback(({ type, data }: BarcodeScanningResult) => {
-    if (scanned) return
+  const handleBarCodeScanned = useCallback(
+    ({ type, data }: BarcodeScanningResult) => {
+      if (scanned) return
 
-    handleScanTicket(data)
-  }, [scanned, handleScanTicket])
-
+      handleScanTicket(data)
+    },
+    [scanned, handleScanTicket],
+  )
 
   const handleRequestPermission = useCallback(async () => {
     try {
@@ -102,18 +107,17 @@ export default function TicketScannerPage() {
 
       if (!result.granted) {
         toast.show('Permission refusée', {
-          message: 'Veuillez autoriser l\'accès à la caméra dans les paramètres de l\'appareil',
-          type: 'error'
+          message: "Veuillez autoriser l'accès à la caméra dans les paramètres de l'appareil",
+          type: 'error',
         })
       }
     } catch (error) {
       toast.show('Erreur', {
         message: 'Impossible de demander la permission. Veuillez réessayer.',
-        type: 'error'
+        type: 'error',
       })
     }
   }, [requestPermission])
-
 
   if (!permission) {
     return <YStack />
@@ -142,10 +146,7 @@ export default function TicketScannerPage() {
             </Text.MD>
           </YStack>
           <YStack>
-            <VoxButton
-              onPress={handleRequestPermission}
-              variant="outlined"
-            >
+            <VoxButton onPress={handleRequestPermission} variant="outlined">
               J'autorise
             </VoxButton>
           </YStack>
@@ -175,21 +176,20 @@ export default function TicketScannerPage() {
           justifyContent="center"
           alignItems="center"
         >
-          <View
-            position="absolute"
-            top={16}
-            left={16}
-            zIndex={10}
-          >
-            <VoxButton
-              shrink
-              iconLeft={ArrowLeft}
-              onPress={handleBack}
-              variant="contained"
-            />
+          <View position="absolute" top={16} left={16} zIndex={10}>
+            <VoxButton shrink iconLeft={ArrowLeft} onPress={handleBack} variant="contained" />
           </View>
           <View width={150} height={150} marginTop={32} justifyContent="center" alignItems="center">
-            <View width="100%" height="100%" borderWidth={8} borderColor={scanned ? '$gray7' : '#F5D900'} borderRadius={10} backgroundColor="transparent" justifyContent="center" alignItems="center">
+            <View
+              width="100%"
+              height="100%"
+              borderWidth={8}
+              borderColor={scanned ? '$gray7' : '#F5D900'}
+              borderRadius={10}
+              backgroundColor="transparent"
+              justifyContent="center"
+              alignItems="center"
+            >
               {scanTicketMutation.isPending && <ActivityIndicator size="large" color="#F5D900" />}
             </View>
           </View>
@@ -252,26 +252,29 @@ export default function TicketScannerPage() {
                     <VoxCard.Content>
                       <YStack gap="$small">
                         <YStack gap="$xsmall">
-                          <Text.MD secondary regular>{ticketData.user.public_id}</Text.MD>
-                          <Text.LG primary semibold>{ticketData.user.civility && `${ticketData.user.civility} `}{ticketData.user.first_name} {ticketData.user.last_name}</Text.LG>
+                          <Text.MD secondary regular>
+                            {ticketData.user.public_id}
+                          </Text.MD>
+                          <Text.LG primary semibold>
+                            {ticketData.user.civility && `${ticketData.user.civility} `}
+                            {ticketData.user.first_name} {ticketData.user.last_name}
+                          </Text.LG>
                         </YStack>
-                        {ticketData.user.tags && ticketData.user.tags.length > 0 && (
-                          <ActivistTags tags={ticketData.user.tags} />
-                        )}
+                        {ticketData.user.tags && ticketData.user.tags.length > 0 && <ActivistTags tags={ticketData.user.tags} />}
                         {ticketData.user.age && (
-                          <Text.MD secondary regular>{ticketData.user.age} ans</Text.MD>
+                          <Text.MD secondary regular>
+                            {ticketData.user.age} ans
+                          </Text.MD>
                         )}
 
                         <YStack>
                           {ticketData.visit_day && (
-                            <Text fontSize={20} semibold >{ticketData.visit_day}</Text>
+                            <Text fontSize={20} semibold>
+                              {ticketData.visit_day}
+                            </Text>
                           )}
-                          {ticketData.transport && (
-                            <Text.MD regular>{ticketData.transport}</Text.MD>
-                          )}
-                          {ticketData.accommodation && (
-                            <Text.MD regular>{ticketData.accommodation}</Text.MD>
-                          )}
+                          {ticketData.transport && <Text.MD regular>{ticketData.transport}</Text.MD>}
+                          {ticketData.accommodation && <Text.MD regular>{ticketData.accommodation}</Text.MD>}
                         </YStack>
                       </YStack>
                     </VoxCard.Content>
@@ -289,14 +292,15 @@ export default function TicketScannerPage() {
                           <Text.SM secondary>
                             {scan.name} ({scan.public_id})
                           </Text.SM>
-
                         </XStack>
                       ))
                     ) : (
-                      <Text.SM secondary regular>Aucun historique de scan</Text.SM>
+                      <Text.SM secondary regular>
+                        Aucun historique de scan
+                      </Text.SM>
                     )}
                   </YStack>
-                ) : null }
+                ) : null}
               </YStack>
             )}
           </YStack>
@@ -305,4 +309,3 @@ export default function TicketScannerPage() {
     </YStack>
   )
 }
-

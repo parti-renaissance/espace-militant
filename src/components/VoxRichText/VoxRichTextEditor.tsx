@@ -112,6 +112,7 @@ function insertTextAtCursor(editor: InjectJSEditor, text: string): void {
           });
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.warn('Error inserting variable:', error);
       }
     })();

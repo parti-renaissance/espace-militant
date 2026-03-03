@@ -106,6 +106,7 @@ class TokenRefreshManager {
 
       if (shouldLogPredictive) {
         if (__DEV__) {
+          // eslint-disable-next-line no-console
           console.warn('[RefreshToken] Predictive refresh failed (network error)', refreshError)
         } else {
           this.logError(refreshError, context)
@@ -179,6 +180,7 @@ class TokenRefreshManager {
       this.lastRehydrateAt = now
     } catch (err) {
       if (__DEV__) {
+        // eslint-disable-next-line no-console
         console.warn('[RefreshToken] Rehydrate failed', err)
       }
     }
@@ -284,6 +286,7 @@ class TokenRefreshManager {
       return await this.performTokenRefresh(refreshToken, context, applyBackoff)
     } catch (err) {
       if (context === 'predictive refresh token failed' && __DEV__) {
+        // eslint-disable-next-line no-console
         console.warn('[RefreshToken] Predictive refresh error', err)
       }
       return undefined
@@ -292,6 +295,7 @@ class TokenRefreshManager {
 
   logError(error: unknown, context: string): void {
     if (__DEV__) {
+      // eslint-disable-next-line no-console
       console.warn(`[RefreshToken] ${context}`, error)
       return
     }

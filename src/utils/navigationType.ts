@@ -22,6 +22,7 @@ export function getNavigationType(): NavigationType {
       return navigationType as NavigationType
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.warn('[navigationType] Failed to get navigation type:', error)
   }
 

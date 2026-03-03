@@ -154,6 +154,7 @@ export const useAutoSave = (props: { messageId?: string; scope: string }) => {
         lastSavedContent.current = currentContent
         setLastSaved(new Date())
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error saving message:', error)
         setHasError(true)
         if (throwOnError) {

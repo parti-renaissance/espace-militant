@@ -198,6 +198,7 @@ const ImageNodeEditorContent = (props: NodeEditorProps) => {
         setValue('content.height', payload.height)
       })
       .catch((error) => {
+        // eslint-disable-next-line no-console
         console.error('Upload error:', error)
         setValue('content.url', '')
         setValue('content.width', 0)

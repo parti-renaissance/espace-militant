@@ -21,15 +21,19 @@ const matomoApiObject =
       }
     : {
         trackEvent: async (x: Parameters<typeof api.trackEvent>[0]) => {
+          // eslint-disable-next-line no-console
           console.log('trackEvent', x)
         },
         trackAction: (x: Parameters<typeof api.trackAction>[0]) => {
+          // eslint-disable-next-line no-console
           console.log('trackAction', x)
         },
         trackScreenView: (x: Parameters<typeof api.trackScreenView>[0]) => {
+          // eslint-disable-next-line no-console
           console.log('trackScreenView', x)
         },
         trackAppStart: (x?: Parameters<typeof api.trackAppStart>[0]) => {
+          // eslint-disable-next-line no-console
           console.log('trackAppStart', x)
         },
       }

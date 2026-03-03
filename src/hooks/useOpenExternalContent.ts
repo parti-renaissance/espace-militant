@@ -28,6 +28,7 @@ function useOpenExternalContent(props: { slug: types.Slugs; utm_source?: string;
         } catch (error) {
           // Silently ignore tracking errors - they should not impact user experience
           if (__DEV__) {
+            // eslint-disable-next-line no-console
             console.warn('[useOpenExternalContent] trackClick error:', error)
           }
         }

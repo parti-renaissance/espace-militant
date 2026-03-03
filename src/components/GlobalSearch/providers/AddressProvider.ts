@@ -16,6 +16,7 @@ export class AddressProvider implements SearchProvider {
         metadata: { googlePlace: result }
       }))
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error searching addresses:', error)
       return []
     }
@@ -48,6 +49,7 @@ export class AddressProvider implements SearchProvider {
         }
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error fetching address details:', error)
     }
     

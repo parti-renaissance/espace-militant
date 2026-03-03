@@ -222,6 +222,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
         params: { id: survey.uuid },
       })
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Erreur lors de la soumission:', error)
     } finally {
       setSubmitLoading(false)
