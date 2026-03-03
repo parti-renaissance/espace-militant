@@ -10,8 +10,7 @@ import { EventItemProps } from '@/features_next/events/types'
 
 import { useEventSharing } from '../EventShareGroup'
 
-// eslint-disable-next-line
-const EventIllustration = require('@/features_next/events/assets/images/event_illustration.png')
+import EventIllustration from '@/features_next/events/assets/images/event_illustration.png'
 
 export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof ModalOrBottomSheet> } & EventItemProps) => {
   const { copyUrl, isShareAvailable, openShareDialog } = useEventSharing({ event: props.event })

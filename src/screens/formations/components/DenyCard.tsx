@@ -4,11 +4,13 @@ import RenewMembershipButton from '@/features_next/profil/pages/donations/compon
 import { FormationScreenProps } from '@/screens/formations/types'
 import { Image, XStack, YStack } from 'tamagui'
 
+import visuCadnasImg from '@/assets/illustrations/VisuCadnas.png'
+
 export const FormationDenyCard: FormationScreenProps = () => {
   return (
     <VoxCard.Content>
       <YStack alignItems="center" justifyContent="center" paddingVertical="$xxlarge" gap="$xlarge">
-        <Image src={require('@/assets/illustrations/VisuCadnas.png')} />
+        <Image src={visuCadnasImg} />
         <Text.LG>Les formations sont réservées aux adhérents.</Text.LG>
         <XStack>
           <RenewMembershipButton text="J'adhère dès maintenant !" page="formation" state="/formations" />

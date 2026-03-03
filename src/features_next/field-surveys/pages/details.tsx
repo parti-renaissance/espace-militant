@@ -23,6 +23,11 @@ import QuestionProgressBar from '../components/QuestionProgressBar'
 import QuitConfirmModal from '../components/QuitConfirmModal'
 import RespondentProfile, { RespondentProfileData } from '../components/RespondentProfile'
 
+import bgSurveys from '../assets/bg-surveys.png'
+import googlePlayImg from '@/assets/images/stores/google-play.png'
+import appStoreImg from '@/assets/images/stores/app-store.png'
+import protoAlerteMobile from '../assets/proto-alertes-mobile.png'
+
 // Types pour les réponses
 interface Answer {
   surveyQuestion: number
@@ -400,7 +405,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
           </VoxHeader>
           <LayoutScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 16 }} showsVerticalScrollIndicator={false} disablePadding>
             <Container flex={1}>
-              {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
+              {media.gtSm ? <ImageBackground source={bgSurveys} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
               <ContentWrapper flex={1}>
                 <SideLeft></SideLeft>
                 <Main>
@@ -438,14 +443,14 @@ const FieldSurveyDetailsPage: React.FC = () => {
                             </Text.SM>
                             <XStack flex={1} justifyContent={'center'} gap={'$medium'}>
                               <TouchableOpacity onPress={redirectToAndroid}>
-                                <Image source={require('@/assets/images/stores/google-play.png')} contentFit="contain" style={{ width: 120, height: 45 }} />
+                                <Image source={googlePlayImg} contentFit="contain" style={{ width: 120, height: 45 }} />
                               </TouchableOpacity>
                               <TouchableOpacity onPress={redirectToApple}>
-                                <Image source={require('@/assets/images/stores/app-store.png')} contentFit="contain" style={{ width: 120, height: 45 }} />
+                                <Image source={appStoreImg} contentFit="contain" style={{ width: 120, height: 45 }} />
                               </TouchableOpacity>
                             </XStack>
                             <YStack pl="$medium" width="100%" alignItems="center">
-                              <Image source={require('../assets/proto-alertes-mobile.png')} contentFit="contain" style={{ width: '100%', height: 180 }} />
+                              <Image source={protoAlerteMobile} contentFit="contain" style={{ width: '100%', height: 180 }} />
                             </YStack>
                           </VoxCard.Content>
                         </LinearGradient>

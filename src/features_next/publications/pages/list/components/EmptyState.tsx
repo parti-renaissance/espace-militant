@@ -6,7 +6,7 @@ import { Sparkle } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 
-const EmptyStateIllustration = require('../../../assets/empty-publication.png')
+import EmptyStateIllustration from '../../../assets/empty-publication.png'
 
 export default function EmptyState() {
   const router = useRouter()

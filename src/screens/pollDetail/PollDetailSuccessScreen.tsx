@@ -10,6 +10,8 @@ import { FlexibleVerticalSpacer } from '../shared/Spacer'
 
 import {Stack, router, useLocalSearchParams} from 'expo-router'
 
+import imageMerci from '../../assets/images/imageMerci.png'
+
 type PollDetailSuccessScreenProps =
   PollDetailModalNavigatorScreenProps<'PollDetailSuccess'>
 
@@ -33,7 +35,7 @@ const PollDetailSuccess: FunctionComponent<PollDetailSuccessScreenProps> = ({
       <View style={styles.container}>
         <CircularIcon
           style={styles.image}
-          source={require('../../assets/images/imageMerci.png')}
+          source={imageMerci}
         />
         <View style={styles.content}>
           <Text style={styles.title}>{i18n.t('polldetail.success.title')}</Text>

@@ -2,6 +2,9 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { Image, styled, View, XStack, YStack } from 'tamagui'
 
+import deleteAccountImg from '../Assets/DeleteAccount/deleteAccount.png'
+import deleteAccountAltImg from '../Assets/DeleteAccount/deleteAccountAlt.png'
+
 interface Props {
   onClose: () => void
   onConfirm: () => void
@@ -12,7 +15,7 @@ export default function DeleteAccountModalStep1({ onClose, onConfirm, isAdherent
   return (
     <>
       <View backgroundColor="#F9F9FA" alignItems="center" paddingVertical={48}>
-        <Image source={isAdherent ? require('../Assets/DeleteAccount/deleteAccount.png') : require('../Assets/DeleteAccount/deleteAccountAlt.png')} />
+        <Image source={isAdherent ? deleteAccountImg : deleteAccountAltImg} />
       </View>
 
       <YStack padding={'$medium'} gap={'$large'} paddingHorizontal={'$medium'}>

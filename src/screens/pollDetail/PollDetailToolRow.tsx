@@ -3,6 +3,8 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import { Colors, Spacing, Typography } from '../../styles'
 import { TouchablePlatform } from '../shared/TouchablePlatform'
 
+import disclosureIndicator from '../../assets/images/disclosureIndicator.png'
+
 type Props = Readonly<{
   title: string
   onPress?: () => void
@@ -15,7 +17,7 @@ const PollDetailToolRow: FunctionComponent<Props> = ({ title, onPress }) => {
         <Text style={styles.text}>{title}</Text>
         <Image
           style={styles.image}
-          source={require('../../assets/images/disclosureIndicator.png')}
+          source={disclosureIndicator}
         />
       </View>
     </TouchablePlatform>

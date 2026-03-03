@@ -7,6 +7,8 @@ import Text from '@/components/base/Text'
 import { ReferralStatusEnum, ReferralType, TypeReferralEnum } from '@/services/referral/schema'
 import { getHumanFormattedDateShort } from '@/utils/date'
 
+import emptyListImg from '@/assets/illustrations/empty-list.png'
+
 // ============================================================================
 // LIST ITEM
 // ============================================================================
@@ -100,7 +102,7 @@ export function ReferralListEmptyState() {
       alignItems={'center'}
       gap={'$medium'}
     >
-      <Image source={require('@/assets/illustrations/empty-list.png')} />
+      <Image source={emptyListImg} />
       <Text.MD fontWeight={500} color={'$textSecondary'}>
         Vous pourrez suivre vos parrainages ici. Faites une première invitation
       </Text.MD>

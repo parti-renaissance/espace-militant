@@ -6,6 +6,8 @@ import { VoxButton } from '@/components/Button'
 
 import useResetFilters from '../hooks/useResetFilters'
 
+import emptyCardState from '@/assets/images/empty_card_state.png'
+
 export default function EmptyState() {
   const { handleReset } = useResetFilters()
   return (
@@ -17,7 +19,7 @@ export default function EmptyState() {
       </XStack>
       <XStack width="100%" maxWidth={342}>
         <Image
-          source={require('@/assets/images/empty_card_state.png')}
+          source={emptyCardState}
           width="100%"
           mb="$medium"
           resizeMode="contain"

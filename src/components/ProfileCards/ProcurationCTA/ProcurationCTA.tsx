@@ -5,6 +5,8 @@ import { ProfileCallToActionLayout } from '@/components/ProfileCards/ProfileCall
 import clientEnv from '@/config/clientEnv'
 import { gray } from '../../../../theme/colors.hex'
 
+import boxImg from './box.png'
+
 export default function ProcurationCTA() {
   // desactivate procuration block
   return null
@@ -32,7 +34,7 @@ export default function ProcurationCTA() {
           <Button.Text>Accéder aux démarches</Button.Text>
         </Button>
       </ProfileCallToActionLayout.Actions>
-      <ProfileCallToActionLayout.BackgroundImageBottomRight source={require('./box.png')} />
+      <ProfileCallToActionLayout.BackgroundImageBottomRight source={boxImg} />
     </ProfileCallToActionLayout>
   )
 }

@@ -1,15 +1,19 @@
 import { ImageSourcePropType } from 'react-native'
 import { RetaliationSiteType } from '../../core/entities/Retaliation'
 
+import facebookImg from '../../assets/images/facebook.png'
+import twitterImg from '../../assets/images/twitter.png'
+import otherSocialNetworkImg from '../../assets/images/otherSocialNetwork.png'
+
 export const RetaliationSocialIconImageMapper = {
   map: (site: RetaliationSiteType): ImageSourcePropType => {
     switch (site) {
       case 'facebook':
-        return require('../../assets/images/facebook.png')
+        return facebookImg
       case 'twitter':
-        return require('../../assets/images/twitter.png')
+        return twitterImg
       case 'others':
-        return require('../../assets/images/otherSocialNetwork.png')
+        return otherSocialNetworkImg
     }
   },
 }

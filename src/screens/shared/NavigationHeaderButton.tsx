@@ -12,6 +12,10 @@ import {
 } from 'react-native'
 import { Colors, Spacing } from '@/styles'
 
+import navigationBarClose from '../../assets/images/navigationBarClose.png'
+import profileIcon from '../../assets/images/profileIcon.png'
+import iconFilters from '../../assets/images/iconFilters.png'
+
 type NavigationHeaderButtonProps = Readonly<{
   style?: StyleProp<ViewStyle>
   buttonStyle?: StyleProp<ViewStyle>
@@ -67,7 +71,7 @@ export const CloseButton: FunctionComponent<ButtonProps> = (props) => {
   return (
     <NavigationHeaderButton
       {...props}
-      source={require('../../assets/images/navigationBarClose.png')}
+      source={navigationBarClose}
       tintColor={Colors.navigationTint}
     />
   )
@@ -79,7 +83,7 @@ export const ProfileButton: FunctionComponent<ButtonProps> = (props) => {
       {...props}
       style={[props.style, { backgroundColor: Colors.primaryColor }]}
       tintColor={Colors.veryLightText}
-      source={require('../../assets/images/profileIcon.png')}
+      source={profileIcon}
     />
   )
 }
@@ -90,7 +94,7 @@ export const EventsFilterButton: FunctionComponent<ButtonProps> = (props) => {
       {...props}
       style={props.style}
       tintColor={Colors.primaryColor}
-      source={require('../../assets/images/iconFilters.png')}
+      source={iconFilters}
     />
   )
 }

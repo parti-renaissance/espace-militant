@@ -14,6 +14,10 @@ import {
   PollDetailQuestionUserProfileViewModel,
 } from './PollDetailQuestionUserProfileViewModel'
 
+import genderFemale from '../../assets/images/genderFemale.png'
+import genderMale from '../../assets/images/genderMale.png'
+import genderOther from '../../assets/images/genderOther.png'
+
 const genderTitle = (gender: Gender): string => {
   switch (gender) {
     case Gender.Male:
@@ -28,11 +32,11 @@ const genderTitle = (gender: Gender): string => {
 const genderImage = (gender: Gender): ImageSourcePropType => {
   switch (gender) {
     case Gender.Male:
-      return require('../../assets/images/genderMale.png')
+      return genderMale
     case Gender.Female:
-      return require('../../assets/images/genderFemale.png')
+      return genderFemale
     case Gender.Other:
-      return require('../../assets/images/genderOther.png')
+      return genderOther
   }
 }
 

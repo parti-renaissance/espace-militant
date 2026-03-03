@@ -24,6 +24,8 @@ import ReferralFormModal from './Form'
 import { ReferralListEmptyState } from './List'
 import ReferralScoreboardTable, { ReferralScoreboardTableEmptyState } from './Scoreboard'
 
+import visuCadnasImg from '@/assets/illustrations/VisuCadnas.png'
+
 // ============================================================================
 // RANKING CARD
 // ============================================================================
@@ -355,7 +357,7 @@ export const ReferralLockedCard = ({ hideHeader }: { hideHeader?: boolean }) => 
     <InstanceCard title="Parrainages" icon={HeartHandshake} hideHeader={hideHeader}>
       <YStack alignItems={'center'} gap={'$medium'} justifyContent={'center'}>
         <View margin={'$medium'}>
-          <Image source={require('@/assets/illustrations/VisuCadnas.png')} contentFit={'contain'} style={{ height: 153, width: 88 }} />
+          <Image source={visuCadnasImg} contentFit={'contain'} style={{ height: 153, width: 88 }} />
         </View>
 
         <Text bold>Les parrainages sont réservés aux adhérents. Adhérez pour y participer.</Text>

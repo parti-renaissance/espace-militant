@@ -4,6 +4,8 @@ import VoxCard, { VoxCardAuthorProps, VoxCardDateProps, VoxCardFrameProps } from
 import { Eye } from '@tamagui/lucide-icons'
 import { XStack } from 'tamagui'
 
+import eventRestrictedImagePlaceholder from '@/assets/images/eventRestrictedImagePlaceholder.png'
+
 type VoxCardBasePayload = {
   id: string
   title: string
@@ -18,7 +20,7 @@ export type PartialEventVoxCardProps = {
 } & VoxCardFrameProps
 
 const PartialEventCard = ({ payload, onShow, ...props }: PartialEventVoxCardProps) => {
-  const image = payload.image ?? require('@/assets/images/eventRestrictedImagePlaceholder.png')
+  const image = payload.image ?? eventRestrictedImagePlaceholder
   return (
     <VoxCard {...props}>
       <VoxCard.Content minHeight={200} justifyContent="space-between">

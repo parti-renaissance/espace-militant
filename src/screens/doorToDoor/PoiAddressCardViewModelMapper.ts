@@ -7,6 +7,15 @@ import { DateFormatter } from '../../utils/DateFormatter'
 import i18n from '../../utils/i18n'
 import { PoiAddressCardViewModel } from './PoiAddressCardViewModel'
 
+import papHomeIcon from '../../assets/images/papHomeIcon.png'
+import papBuildingIcon from '../../assets/images/papBuildingIcon.png'
+import papToFinishIcon from '../../assets/images/papToFinishIcon.png'
+import papDoneIcon from '../../assets/images/papDoneIcon.png'
+import papTodoIcon from '../../assets/images/papTodoIcon.png'
+import papToFinishCard from '../../assets/images/papToFinishCard.png'
+import papDoneCard from '../../assets/images/papDoneCard.png'
+import papTodoCard from '../../assets/images/papTodoCard.png'
+
 export const PoiAddressCardViewModelMapper = {
   map: (
     poiAddress?: DoorToDoorAddress,
@@ -21,8 +30,8 @@ export const PoiAddressCardViewModelMapper = {
           }),
           icon:
             poiAddress.building.type === 'house'
-              ? require('../../assets/images/papHomeIcon.png')
-              : require('../../assets/images/papBuildingIcon.png'),
+              ? papHomeIcon
+              : papBuildingIcon,
           statusIcon: mapStatusIcon(poiAddress.building.campaignStatistics),
           mapStatusIcon: mapMapStatusIcon(
             poiAddress.building.campaignStatistics,
@@ -60,11 +69,11 @@ function mapStatusIcon(
 ): ImageRequireSource {
   switch (campaignStatistics?.status) {
     case 'ongoing':
-      return require('../../assets/images/papToFinishIcon.png')
+      return papToFinishIcon
     case 'completed':
-      return require('../../assets/images/papDoneIcon.png')
+      return papDoneIcon
     default:
-      return require('../../assets/images/papTodoIcon.png')
+      return papTodoIcon
   }
 }
 
@@ -73,10 +82,10 @@ function mapMapStatusIcon(
 ): ImageRequireSource {
   switch (campaignStatistics?.status) {
     case 'ongoing':
-      return require('../../assets/images/papToFinishCard.png')
+      return papToFinishCard
     case 'completed':
-      return require('../../assets/images/papDoneCard.png')
+      return papDoneCard
     default:
-      return require('../../assets/images/papTodoCard.png')
+      return papTodoCard
   }
 }

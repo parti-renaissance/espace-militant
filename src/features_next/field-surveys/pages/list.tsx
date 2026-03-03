@@ -17,6 +17,9 @@ import { useFieldSurveysWithRefresh } from '@/services/field-surveys/hook'
 import { FieldSurvey } from '@/services/field-surveys/schema'
 import { getFormattedDate } from '@/utils/date'
 
+import bgSurveys from '../assets/bg-surveys.png'
+import notepadSurvey from '../assets/notepad-survey.png'
+
 const Container = styled(YStack, {
   flex: 1,
   paddingBottom: '$xxlarge',
@@ -277,7 +280,7 @@ const FieldSurveysListPage: React.FC = () => {
       >
         <Container>
           <ImageBackground
-            source={require('../assets/bg-surveys.png')}
+            source={bgSurveys}
             style={{ height: media.sm ? 250 : 350, marginHorizontal: spacingValues.paddingLeft, borderRadius: 16, overflow: 'hidden' }}
           />
           <ContentWrapper>
@@ -301,7 +304,7 @@ const FieldSurveysListPage: React.FC = () => {
                         </Text>
                       </YStack>
                       <Image
-                        source={require('../assets/notepad-survey.png')}
+                        source={notepadSurvey}
                         objectFit="contain"
                         display={media.sm ? 'none' : 'block'}
                         width={129}

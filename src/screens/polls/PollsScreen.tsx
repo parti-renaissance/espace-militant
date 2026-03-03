@@ -11,6 +11,8 @@ import { PollsScreenViewModel } from './PollsScreenViewModel'
 import { usePollsScreen } from './usePollsScreen.hook'
 import { useMedia } from 'tamagui'
 
+import emptyPollIcon from '../../assets/images/emptyPollIcon.png'
+
 const PollsScreen = () => {
   const { statefulState, isRefreshing, onPollSelected, onRefresh } = usePollsScreen()
   const media = useMedia()
@@ -28,7 +30,7 @@ const PollsScreen = () => {
         ListHeaderComponent={<PollsHeader style={styles.header} viewModel={viewModel.header} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <CircularIcon style={styles.emptyIcon} source={require('../../assets/images/emptyPollIcon.png')} />
+            <CircularIcon style={styles.emptyIcon} source={emptyPollIcon} />
             <Text style={styles.emptyText}>{i18n.t('polls.subtitle_no_polls')}</Text>
           </View>
         }

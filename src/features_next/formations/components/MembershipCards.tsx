@@ -7,7 +7,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
-const illuFormations = require('../assets/illu-formations.png')
+import illuFormations from '../assets/illu-formations.png'
 
 export function JoinMembershipCard() {
   const media = useMedia()
