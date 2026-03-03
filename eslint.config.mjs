@@ -13,6 +13,21 @@ export default defineConfig(
       'ios/build/**',
       '.expo/**',
       '**/mapbox-gl*.js',
+      'src/screens/**',
+      // Config / tooling (Node env, CommonJS)
+      '.prettierrc.js',
+      'babel.config.js',
+      'metro.config.cjs',
+      'vite.worker.config.js',
+      // Scripts (CI, build, prepare)
+      '.github/scripts/**',
+      'scripts/**',
+      // Generated / third-party
+      '.tamagui/**',
+      '.storybook/**',
+      'assets/fonts/generated-*',
+      'assets/images/generated-*',
+      'public/firebase-messaging-sw.js',
     ],
   },
   eslint.configs.recommended,
