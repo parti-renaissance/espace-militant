@@ -1,6 +1,7 @@
 import { Href, router } from 'expo-router'
-import { isWeb } from 'tamagui'
 import * as WebBrowser from 'expo-web-browser'
+import { isWeb } from 'tamagui'
+
 import clientEnv from '@/config/clientEnv'
 
 type LinkPressEvent = { preventDefault?: () => void }
@@ -9,9 +10,7 @@ type LinkPressEvent = { preventDefault?: () => void }
  * Vérifie si une URL est un lien interne (relatif ou vers le domaine associé)
  */
 export const isInternalLink = (url: string): boolean => {
-  return url.startsWith('/') || 
-    url.startsWith(`https://${clientEnv.ASSOCIATED_DOMAIN}`) || 
-    url.startsWith(`http://${clientEnv.ASSOCIATED_DOMAIN}`)
+  return url.startsWith('/') || url.startsWith(`https://${clientEnv.ASSOCIATED_DOMAIN}`) || url.startsWith(`http://${clientEnv.ASSOCIATED_DOMAIN}`)
 }
 
 /**
@@ -21,22 +20,17 @@ export const isInternalLink = (url: string): boolean => {
  * @param linkText - Texte du lien (pour le callback)
  * @param e - Événement (pour empêcher le comportement par défaut sur web)
  */
-export const handleLinkPress = async (
-  url: string, 
-  onLinkClick?: (target_url: string, button_name: string) => void,
-  linkText?: string,
-  e?: LinkPressEvent
-) => {
+export const handleLinkPress = async (url: string, onLinkClick?: (target_url: string, button_name: string) => void, linkText?: string, e?: LinkPressEvent) => {
   if (onLinkClick && linkText) {
     onLinkClick(url, linkText)
   }
-  
+
   const internal = isInternalLink(url)
-  
+
   if (isWeb && internal && e) {
     e.preventDefault?.()
   }
-  
+
   if (url.startsWith('/')) {
     router.push(url as Href)
   } else if (url.startsWith(`https://${clientEnv.ASSOCIATED_DOMAIN}`) || url.startsWith(`http://${clientEnv.ASSOCIATED_DOMAIN}`)) {

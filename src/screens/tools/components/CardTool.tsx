@@ -1,9 +1,10 @@
 import React from 'react'
-import Text from '@/components/base/Text'
-import VoxCard, { VoxCardContent } from '@/components/VoxCard/VoxCard'
-import { ArrowUpRight } from '@tamagui/lucide-icons'
 import * as WebBrowser from 'expo-web-browser'
 import { Image, View } from 'tamagui'
+import { ArrowUpRight } from '@tamagui/lucide-icons'
+
+import Text from '@/components/base/Text'
+import VoxCard, { VoxCardContent } from '@/components/VoxCard/VoxCard'
 
 interface CardToolProps {
   name?: string

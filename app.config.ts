@@ -1,4 +1,5 @@
 import { ConfigContext, ExpoConfig } from 'expo/config'
+
 import FontLib from './assets/fonts/generated-lib-fonts'
 
 const baseIdentifier = 'fr.en-marche.jecoute'
@@ -62,15 +63,10 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
         ? './assets/notif-icon.png'
         : './assets/staging/notif-icon.png'
 
-  const plugins = (config.plugins || []).filter(
-    (p: unknown) => (typeof p === 'string' ? p : Array.isArray(p) ? p[0] : null) !== 'expo-notifications'
-  )
+  const plugins = (config.plugins || []).filter((p: unknown) => (typeof p === 'string' ? p : Array.isArray(p) ? p[0] : null) !== 'expo-notifications')
   if (plugins) {
     plugins.push(['expo-font', { fonts: FontLib }])
-    plugins.push([
-      '@rnmapbox/maps',
-      { RNMapboxMapsDownloadToken: process.env.MAP_BOX_SECRET_KEY },
-    ])
+    plugins.push(['@rnmapbox/maps', { RNMapboxMapsDownloadToken: process.env.MAP_BOX_SECRET_KEY }])
     plugins.push(['expo-router', { origin: `https://${process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN}` }])
     plugins.push('expo-web-browser')
     plugins.push('expo-image')

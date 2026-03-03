@@ -1,9 +1,11 @@
-import { VoxButton } from '@/components/Button'
-import VoxCard, { VoxCardAuthorProps, VoxCardDateProps, VoxCardFrameProps, VoxCardLocationProps } from '@/components/VoxCard/VoxCard'
-import { genericErrorThrower } from '@/services/common/errors/generic-errors'
-import { Bell, ExternalLink } from '@tamagui/lucide-icons'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb, XStack } from 'tamagui'
+import { Bell, ExternalLink } from '@tamagui/lucide-icons'
+
+import { VoxButton } from '@/components/Button'
+import VoxCard, { VoxCardAuthorProps, VoxCardDateProps, VoxCardFrameProps, VoxCardLocationProps } from '@/components/VoxCard/VoxCard'
+
+import { genericErrorThrower } from '@/services/common/errors/generic-errors'
 import { useHits } from '@/services/hits/hook'
 
 export type NewsVoxCardProps = {
@@ -22,11 +24,11 @@ export type NewsVoxCardProps = {
 
 const NewsCard = ({ payload, ...props }: NewsVoxCardProps) => {
   const { trackClick } = useHits()
-  
+
   const onShow = async () => {
     if (payload.ctaLink) {
       const url = payload.ctaLink
-      
+
       try {
         trackClick({
           object_type: 'news',
@@ -39,7 +41,7 @@ const NewsCard = ({ payload, ...props }: NewsVoxCardProps) => {
           console.warn('[NewsCard] trackClick error:', error)
         }
       }
-      
+
       try {
         if (isWeb) {
           window.open(url, '_blank')

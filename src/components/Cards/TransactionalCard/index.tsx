@@ -1,11 +1,13 @@
-import { VoxCard } from "@/components/VoxCard/VoxCard";
-import Text from "@/components/base/Text";
-import { BellDot } from "@tamagui/lucide-icons";
-import { YStack, XStack, isWeb } from "tamagui";
-import { Href, useRouter } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
-import { genericErrorThrower } from "@/services/common/errors/generic-errors";
-import { useHits } from "@/services/hits/hook";
+import { Href, useRouter } from 'expo-router'
+import * as WebBrowser from 'expo-web-browser'
+import { isWeb, XStack, YStack } from 'tamagui'
+import { BellDot } from '@tamagui/lucide-icons'
+
+import Text from '@/components/base/Text'
+import { VoxCard } from '@/components/VoxCard/VoxCard'
+
+import { genericErrorThrower } from '@/services/common/errors/generic-errors'
+import { useHits } from '@/services/hits/hook'
 
 export type TransactionalCardProps = {
   title: string
