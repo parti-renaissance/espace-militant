@@ -1,7 +1,6 @@
 import React from 'react'
 import { YStack } from 'tamagui'
 
-import { AgeRange } from '@/core/entities/UserProfile'
 
 import { UniqueChoiceQuestion } from './FieldQuestion'
 

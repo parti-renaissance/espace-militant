@@ -1,7 +1,7 @@
-import { defineConfig } from 'eslint/config'
 import eslint from '@eslint/js'
 import reactHooks from 'eslint-plugin-react-hooks'
 import unusedImports from 'eslint-plugin-unused-imports'
+import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig(
@@ -24,6 +24,7 @@ export default defineConfig(
       'scripts/**',
       // Generated / third-party
       '.tamagui/**',
+      'themes.ts',
       '.storybook/**',
       'assets/fonts/generated-*',
       'assets/images/generated-*',

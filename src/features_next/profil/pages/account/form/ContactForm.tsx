@@ -1,6 +1,5 @@
 import { View, XStack } from 'tamagui'
 import { Info } from '@tamagui/lucide-icons'
-import { getCountryCodeForRegionCode, getSupportedRegionCodes } from 'awesome-phonenumber'
 import { Controller } from 'react-hook-form'
 
 import Input from '@/components/base/Input/Input'
@@ -9,7 +8,6 @@ import Text from '@/components/base/Text'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 
 import { RestDetailedProfileResponse } from '@/services/profile/schema'
-import isoToEmoji from '@/utils/isoToEmoji'
 import { phoneCodes } from '@/utils/phoneCodes'
 
 import AbstractProfilForm from './AbstractProfilForm'

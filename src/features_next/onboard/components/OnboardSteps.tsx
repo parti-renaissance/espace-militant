@@ -3,7 +3,6 @@ import { useMedia } from 'tamagui'
 
 import Text from '@/components/base/Text'
 
-import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 
 import type { FooterAction } from '../types'

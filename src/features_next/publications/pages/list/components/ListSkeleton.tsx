@@ -1,7 +1,6 @@
 import React from 'react'
 import { useMedia, XStack, YStack } from 'tamagui'
 
-import { Layout, LayoutScrollView } from '@/components/AppStructure'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 import { PublicationsListHeader } from './Header'

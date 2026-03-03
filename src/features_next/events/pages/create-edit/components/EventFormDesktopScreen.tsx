@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useNavigation } from 'expo-router'
-import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 import { ArrowLeft, Calendar, Info, Sparkle, Users, Video, Webcam } from '@tamagui/lucide-icons'
 import { Controller } from 'react-hook-form'
 

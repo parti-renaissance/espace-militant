@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { ImageSourcePropType, Platform } from 'react-native'
+import { ImageSourcePropType } from 'react-native'
 import { Link } from 'expo-router'
-import { Image, useMedia, XStack, YStack } from 'tamagui'
+import { Image, XStack, YStack } from 'tamagui'
 import { ChevronRight, FileEdit, X } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'

@@ -1,5 +1,5 @@
 import { MutableRefObject, PropsWithChildren, ReactNode } from 'react'
-import { Modal, Pressable, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native'
+import { Modal, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ScrollView, Sheet, useMedia, View } from 'tamagui'
 import { gray } from '@tamagui/colors'

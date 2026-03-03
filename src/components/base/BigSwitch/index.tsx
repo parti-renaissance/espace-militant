@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { LayoutChangeEvent } from 'react-native'
 import { scheduleOnUI } from 'react-native-worklets'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'

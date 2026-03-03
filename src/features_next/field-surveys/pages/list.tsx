@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { RefreshControl } from 'react-native'
 import { ImageBackground } from 'expo-image'
 import { router } from 'expo-router'
-import { Circle, Image, ScrollView, styled, useMedia, XStack, YStack } from 'tamagui'
+import { Circle, Image, styled, useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft, Calendar, ClipboardCheck, FileQuestion, Flag, MapPin, Pen, RotateCw } from '@tamagui/lucide-icons'
 
 import { Layout } from '@/components/AppStructure'

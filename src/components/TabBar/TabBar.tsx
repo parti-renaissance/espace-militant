@@ -8,7 +8,6 @@ import { MoreHorizontal, QrCode } from '@tamagui/lucide-icons'
 import { getThemes, isWeb, styled, ThemeableStack, withStaticProperties, XStack } from 'tamagui'
 import MoreSheet from './MoreSheet'
 import { TabBarNavProps, TabNavOptions } from './types'
-import clientEnv from '@/config/clientEnv'
 import FutureButton from '../Buttons/FutureButton'
 import { useGetUserScopes } from '@/services/profile/hook'
 

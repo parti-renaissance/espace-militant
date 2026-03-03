@@ -3,7 +3,6 @@ import { MapPin } from '@tamagui/lucide-icons'
 import { getPlaceAutocomplete, getPlaceDetails } from '@/services/search/api'
 import googleAddressMapper from '@/data/mapper/googleAddressMapper'
 import type { IconComponent } from '@/models/common.model'
-import { GoogleAddressPlaceResult } from '@/data/network/ApiService'
 
 export class AddressProvider implements SearchProvider {
   async search(query: string): Promise<SearchResult[]> {

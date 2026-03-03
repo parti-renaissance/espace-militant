@@ -3,7 +3,6 @@ import { useRouter } from 'expo-router'
 import { useMedia, View, XStack, YStack } from 'tamagui'
 import { Sparkle } from '@tamagui/lucide-icons'
 
-import { Header } from '@/components/AppStructure'
 import BigSwitch from '@/components/base/BigSwitch'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'

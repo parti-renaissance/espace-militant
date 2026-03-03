@@ -7,7 +7,6 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { isWeb, styled, useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft, ArrowRight, ClipboardCheck, SendHorizontal } from '@tamagui/lucide-icons'
 
-import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'

@@ -5,7 +5,7 @@ import { Circle, useMedia, View, XStack, YStack } from 'tamagui'
 import { HeartHandshake, Share2 } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
-import Button, { VoxButton } from '@/components/Button'
+import { VoxButton } from '@/components/Button'
 import ShareButton from '@/components/Buttons/ShareButton'
 import InstanceCard from '@/components/InstanceCard/InstanceCard'
 import ProfilePicture from '@/components/ProfilePicture'

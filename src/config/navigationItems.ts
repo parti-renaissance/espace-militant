@@ -1,4 +1,4 @@
-import { ComponentProps, useCallback, useEffect, useMemo, useRef } from 'react'
+import { ComponentProps, useEffect, useMemo, useRef } from 'react'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 import {
@@ -23,7 +23,6 @@ import {
   Link,
   Mail,
   Map,
-  MapPin,
   MessageSquareDot,
   MessageSquareQuote,
   Network,
