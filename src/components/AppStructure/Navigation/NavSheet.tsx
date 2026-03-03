@@ -51,14 +51,13 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
   useImperativeHandle(ref, () => {
     return {
       expand: () => {
-        bsRef.current?.expand()
         zIndex.value = 10
         setCurrentIndex(0)
+        bsRef.current?.expand()
       },
       close: () => {
         bsRef.current?.close()
-        zIndex.value = -10
-        setCurrentIndex(-1)
+        // zIndex et setCurrentIndex sont mis à jour dans handleClose (onClose) une fois l'animation terminée
       },
     }
   })

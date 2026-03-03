@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { LayoutChangeEvent, LayoutRectangle, Platform, SafeAreaView as RNSafeAreaView, StyleSheet } from 'react-native'
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
 import { usePathname, useRouter } from 'expo-router'
@@ -24,11 +24,8 @@ const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
 const SAVProps: { edges?: ('bottom' | 'top' | 'left' | 'right')[] } = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
 
 const springConfig = {
-  duration: 2000,
-  dampingRatio: 0.7,
-  restDisplacementThreshold: 0.01,
-  restSpeedThreshold: 0.01,
-  stiffness: 1,
+  duration: 350,
+  dampingRatio: 0.75,
 }
 
 const indicatorStyle = StyleSheet.create({
@@ -65,62 +62,75 @@ const TabBarFrame = styled(ThemeableStack, {
   height: 64,
 })
 
-const TabBarComponent = withStaticProperties(TabBarFrame, {
-  Tab: TabFrame,
-})
+const TabBarComponent = withStaticProperties(TabBarFrame, { Tab: TabFrame })
 
 type TabProps = {
   name: string
   isFocus: boolean
-  onPress: () => void
   label: string
   icon: IconComponent
   theme?: Theme
-  onLayout: (e: LayoutChangeEvent) => void
   externalLink?: boolean
+  onPressRef: React.MutableRefObject<((id: string) => void) | null>
+  tabId: string
+  onLayoutRef: React.MutableRefObject<((key: string, layout: LayoutRectangle) => void) | null>
+  layoutKey: string
+  activeColorVal?: string
+  inactiveColorVal?: string
 }
 
-const Tab = ({ isFocus, onPress, onLayout, label, icon: Icon, theme = 'blue', externalLink }: TabProps) => {
+const Tab = ({
+  isFocus,
+  label,
+  icon: Icon,
+  theme = 'blue',
+  externalLink,
+  onPressRef,
+  tabId,
+  onLayoutRef,
+  layoutKey,
+  activeColorVal,
+  inactiveColorVal,
+}: TabProps) => {
   const scale = useSharedValue(0)
-  const themes = getThemes()
+  const themes = activeColorVal != null && inactiveColorVal != null ? null : getThemes()
+  const activeColor = activeColorVal ?? themes?.light?.[`${theme}5`]?.val ?? themes?.light?.color5?.val ?? '#000'
+  const inactiveColor = inactiveColorVal ?? themes?.light?.textPrimary?.val ?? '#666'
+  const color = isFocus ? activeColor : inactiveColor
 
-  const handlePress = () => {
-    scale.value = withSpring(1, { duration: 350 })
-    onPress()
-  }
+  const onPress = useCallback(() => {
+    scale.value = withSpring(1, springConfig)
+    onPressRef.current?.(tabId)
+  }, [tabId, onPressRef])
+
+  const onLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      onLayoutRef.current?.(layoutKey, e.nativeEvent.layout)
+    },
+    [layoutKey, onLayoutRef],
+  )
 
   React.useEffect(() => {
-    scale.value = withSpring(isFocus ? 1 : 0, { duration: 350 })
+    scale.value = withSpring(isFocus ? 1 : 0, springConfig)
   }, [isFocus])
 
   const animatedIconStyle = useAnimatedStyle(() => {
-    if (externalLink) {
-      return {
-        transform: [{ scale: 1 }, { translateY: 0 }],
-      }
-    }
+    if (externalLink) return { transform: [{ scale: 1 }, { translateY: 0 }] }
     return {
-      transform: [{ scale: interpolate(scale.value, [0, 1], [1, 1.334]) }, { translateY: interpolate(scale.value, [0, 1], [0, 6]) }],
+      transform: [
+        { scale: interpolate(scale.value, [0, 1], [1, 1.334]) },
+        { translateY: interpolate(scale.value, [0, 1], [0, 6]) },
+      ],
     }
   })
 
   const animatedTextStyle = useAnimatedStyle(() => {
-    if (externalLink) {
-      return {
-        opacity: 1,
-      }
-    }
-    return {
-      opacity: interpolate(scale.value, [0, 1], [1, 0]),
-    }
+    if (externalLink) return { opacity: 1 }
+    return { opacity: interpolate(scale.value, [0, 1], [1, 0]) }
   })
 
-  const activeColor = themes.light[`${theme}5`]?.val ?? themes.light.color5.val
-  const inactiveColor = themes.light.textPrimary.val
-  const color = isFocus ? activeColor : inactiveColor
-
   return (
-    <TabBarComponent.Tab theme={theme} onPress={handlePress} group onLayout={onLayout} flex={1} width={50}>
+    <TabBarComponent.Tab theme={theme} onPress={onPress} group onLayout={onLayout} flex={1} width={50}>
       {Icon && (
         <Animated.View style={[animatedIconStyle]}>
           <Icon color={color} size={16} />
@@ -143,8 +153,9 @@ type ConfigurableTabBarProps = {
 
 const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'parrainages', 'formations', 'more']
 const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'formations', 'more']
+const SHEET_SWITCH_DELAY_MS = 200
 
-const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: ConfigurableTabBarProps = {} as ConfigurableTabBarProps) => {
+const ConfigurableTabBar = ({ hide = false, navCadreItems = cadreNavItems }: ConfigurableTabBarProps) => {
   const router = useRouter()
   const pathname = usePathname()
   const { floatingContent } = useLayoutContext()
@@ -161,178 +172,193 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
     return hasExecutiveScope ? CADRE_TAB_ORDER : DEFAULT_TAB_ORDER
   }, [hasExecutiveScope])
 
-  // Filter items based on displayIn property (default to 'all')
   const navItems = useMemo(() => {
-    return militantNavItems.filter((item) => {
-      const displayIn = item.displayIn ?? 'all'
-      return displayIn === 'all' || displayIn === 'tabbar'
-    })
+    return militantNavItems.filter((item) => (item.displayIn ?? 'all') === 'all' || item.displayIn === 'tabbar')
   }, [militantNavItems])
 
-  // Helper to get config by ID
   const getAllItems = useMemo(() => [...navItems, ...navCadreItems], [navItems, navCadreItems])
-  const getConfig = (id: string) => getAllItems.find((item) => item.id === id)
+  const getConfig = useCallback((id: string) => getAllItems.find((item) => item.id === id), [getAllItems])
 
-  // Identify items for sheets
   const cadreItems = useMemo(() => {
-    const filtered = navCadreItems.filter((item) => {
-      const displayIn = item.displayIn ?? 'all'
-      return displayIn === 'all' || displayIn === 'tabbar'
-    })
-    // Add active state based on current pathname (including sub-routes)
-    return filtered.map((item) => ({
-      ...item,
-      active: isNavItemActive(pathname, item.href),
-    }))
+    return navCadreItems
+      .filter((item) => (item.displayIn ?? 'all') === 'all' || item.displayIn === 'tabbar')
+      .map((item) => ({ ...item, active: isNavItemActive(pathname, item.href) }))
   }, [navCadreItems, pathname])
 
   const moreItems = useMemo(() => {
-    const filtered = navItems.filter((item) => !visibleItemIds.includes(item.id))
-    // Add active state based on current pathname (including sub-routes)
-    return filtered.map((item) => ({
-      ...item,
-      active: isNavItemActive(pathname, item.href),
-    }))
+    return navItems
+      .filter((item) => !visibleItemIds.includes(item.id))
+      .map((item) => ({ ...item, active: isNavItemActive(pathname, item.href) }))
   }, [navItems, visibleItemIds, pathname])
 
-  // Map pathname to route ID
   const currentRouteId = useMemo(() => {
-    // Find matching nav item using isNavItemActive helper
-    // This handles route groups (like /(app)/) which don't appear in the URL
-    const matchingItem = getAllItems.find((item) => isNavItemActive(pathname, item.href))
-    return matchingItem?.id || null
+    return getAllItems.find((item) => isNavItemActive(pathname, item.href))?.id || null
   }, [pathname, getAllItems])
 
-  // Determine active tab key
   const activeTabKey = useMemo(() => {
-    // Check if manually set (opened sheet)
     if (activeSpecialTab) return activeSpecialTab
-
-    // If no route found, activate "Autre" (more)
-    if (!currentRouteId) {
-      if (visibleItemIds.includes('more')) return 'more'
-      return visibleItemIds[0] || 'accueil'
-    }
-
-    // Check direct match with visible tabs
+    if (!currentRouteId) return visibleItemIds.includes('more') ? 'more' : visibleItemIds[0] || 'accueil'
     if (visibleItemIds.includes(currentRouteId)) return currentRouteId
-
-    // Check if route is a cadre item
-    if (cadreItems.some((item) => item.id === currentRouteId)) {
-      if (visibleItemIds.includes('cadreSheet')) return 'cadreSheet'
-    }
-
-    // Check if route is in more items
-    if (moreItems.some((item) => item.id === currentRouteId)) {
-      if (visibleItemIds.includes('more')) return 'more'
-    }
-
-    // Fallback to "Autre" (more) if route not found in any category
-    if (visibleItemIds.includes('more')) return 'more'
-    return visibleItemIds[0] || 'accueil'
-  }, [currentRouteId, visibleItemIds, cadreItems, moreItems, activeSpecialTab, pathname])
+    if (cadreItems.some((item) => item.id === currentRouteId) && visibleItemIds.includes('cadreSheet')) return 'cadreSheet'
+    if (moreItems.some((item) => item.id === currentRouteId) && visibleItemIds.includes('more')) return 'more'
+    return visibleItemIds.includes('more') ? 'more' : visibleItemIds[0] || 'accueil'
+  }, [currentRouteId, visibleItemIds, cadreItems, moreItems, activeSpecialTab])
 
   const layoutsByKey = useRef(new Map<string, LayoutRectangle>())
-  const getPosition = (layout: LayoutRectangle) => {
-    return layout.x + layout?.width / 2 - (isWeb ? 50 : 27)
-  }
-
-  const getPositionFromKey = (key: string) => {
-    const layout = layoutsByKey.current.get(key)
-    if (!layout) return 0
-    return getPosition(layout)
-  }
+  const getPosition = useCallback((layout: LayoutRectangle) => layout.x + layout.width / 2 - (isWeb ? 50 : 27), [])
+  const getPositionFromKey = useCallback(
+    (key: string) => {
+      const layout = layoutsByKey.current.get(key)
+      return layout ? getPosition(layout) : 0
+    },
+    [getPosition],
+  )
 
   const position = useSharedValue(0)
   const activeColor = useSharedValue(themes.light.gray1.val)
 
-  React.useEffect(() => {
-    if (activeTabKey) {
-      const pos = getPositionFromKey(activeTabKey)
-      position.value = withSpring(pos, springConfig)
-
-      // Determine active color based on the active tab
-      let theme: Theme = 'blue'
-      if (activeTabKey === 'cadreSheet') {
-        theme = 'purple'
-      } else if (activeTabKey !== 'more') {
-        const config = getAllItems.find((item) => item.id === activeTabKey)
-        theme = (config?.theme ?? 'blue') as Theme
-      }
-
-      // Wait a bit for animation to complete
-      setTimeout(() => {
-        activeColor.value = themes.light[`${theme}1`]?.val ?? themes.light.gray1.val
-      }, 100)
-    }
-  }, [activeTabKey, getAllItems, themes])
-
-  const indicatorAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: position.value }],
-      backgroundColor: activeColor.value,
-    }
-  })
-
-  const handleSaveLayout = (key: string) => (e: LayoutChangeEvent) => {
-    if (layoutsByKey.current) {
-      layoutsByKey.current.set(key, e.nativeEvent.layout)
-      if (key === activeTabKey) {
-        position.value = getPosition(e.nativeEvent.layout)
-      }
-    }
-  }
-
   const moreSheetRef = useRef<NavSheetRef>(null)
   const cadreSheetRef = useRef<NavSheetRef>(null)
 
-  const handleTabPress = (id: string) => {
-    if (id === 'more') {
-      if (activeSpecialTab === 'more') {
-        moreSheetRef.current?.close()
-      } else {
-        moreSheetRef.current?.expand()
-        cadreSheetRef.current?.close()
-        setActiveSpecialTab('more')
+  const handleTabPress = useCallback(
+    (id: string) => {
+      const sheetsMap: Record<string, React.RefObject<NavSheetRef | null>> = {
+        more: moreSheetRef,
+        cadreSheet: cadreSheetRef,
       }
-      return
-    }
-    if (id === 'cadreSheet') {
-      if (activeSpecialTab === 'cadreSheet') {
-        cadreSheetRef.current?.close()
-      } else {
-        cadreSheetRef.current?.expand()
-        moreSheetRef.current?.close()
-        setActiveSpecialTab('cadreSheet')
+      const targetSheet = sheetsMap[id]
+
+      if (targetSheet) {
+        if (activeSpecialTab === id) {
+          targetSheet.current?.close()
+          setActiveSpecialTab(null)
+          return
+        }
+        if (activeSpecialTab && sheetsMap[activeSpecialTab]) {
+          sheetsMap[activeSpecialTab].current?.close()
+          setTimeout(() => {
+            targetSheet.current?.expand()
+            setActiveSpecialTab(id)
+          }, SHEET_SWITCH_DELAY_MS)
+          return
+        }
+        targetSheet.current?.expand()
+        setActiveSpecialTab(id)
+        return
       }
-      return
-    }
 
-    // Normal tab
-    moreSheetRef.current?.close()
-    cadreSheetRef.current?.close()
-    setActiveSpecialTab(null)
+      // Normal tab
+      moreSheetRef.current?.close()
+      cadreSheetRef.current?.close()
+      setActiveSpecialTab(null)
+      if (id === currentRouteId) return
 
-    if (id === currentRouteId) return
-
-    const config = getConfig(id)
-    if (config) {
-      if (config.onPress) {
-        config.onPress()
-      } else if (config.href) {
-        router.navigate(config.href)
+      const config = getConfig(id)
+      if (config) {
+        if (config.onPress) config.onPress()
+        else if (config.href) router.navigate(config.href)
       }
+    },
+    [activeSpecialTab, currentRouteId, getConfig, router],
+  )
+
+  const handleTabPressRef = useRef(handleTabPress)
+  useLayoutEffect(() => {
+    handleTabPressRef.current = handleTabPress
+  }, [handleTabPress])
+
+  const saveLayoutToRef = useCallback(
+    (key: string, layout: LayoutRectangle) => {
+      layoutsByKey.current.set(key, layout)
+      if (key === activeTabKey) {
+        position.value = getPosition(layout)
+      }
+    },
+    [activeTabKey, getPosition],
+  )
+  const handleSaveLayoutRef = useRef(saveLayoutToRef)
+  useLayoutEffect(() => {
+    handleSaveLayoutRef.current = saveLayoutToRef
+  }, [saveLayoutToRef])
+
+  React.useEffect(() => {
+    if (activeTabKey) {
+      const pos = getPositionFromKey(activeTabKey)
+      position.value = withSpring(pos)
+
+      let theme: Theme = 'blue'
+      if (activeTabKey === 'cadreSheet') theme = 'purple'
+      else if (activeTabKey !== 'more') {
+        const config = getConfig(activeTabKey)
+        theme = (config?.theme ?? 'blue') as Theme
+      }
+      const colorVal = themes.light[`${theme}1`]?.val ?? themes.light.gray1.val
+      activeColor.value = withDelay(50, withTiming(colorVal, { duration: 150 }))
     }
-  }
+  }, [activeTabKey, getConfig, themes, getPositionFromKey])
+
+  const indicatorAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: position.value }],
+    backgroundColor: activeColor.value,
+  }))
 
   const handleSheetClose = useCallback((id?: string) => {
-    setActiveSpecialTab((current) => {
-      if (current === id) {
-        return null
-      }
-      return current
-    })
+    setActiveSpecialTab((current) => (current === id ? null : current))
   }, [])
+
+  const getTabProps = useCallback(
+    (id: string): (TabProps & { key: string }) | null => {
+      const isFocus = activeTabKey === id
+      const common = {
+        isFocus,
+        onPressRef: handleTabPressRef,
+        onLayoutRef: handleSaveLayoutRef,
+        inactiveColorVal: themes.light.textPrimary.val,
+      }
+      if (id === 'more') {
+        return {
+          key: 'more',
+          name: 'more',
+          label: 'Autre',
+          icon: MoreHorizontal,
+          theme: 'blue',
+          tabId: 'more',
+          layoutKey: 'more',
+          activeColorVal: themes.light.blue5?.val,
+          ...common,
+        }
+      }
+      if (id === 'cadreSheet') {
+        return {
+          key: 'cadreSheet',
+          name: 'cadreSheet',
+          label: 'Cadre',
+          icon: Sparkle,
+          theme: 'purple',
+          tabId: 'cadreSheet',
+          layoutKey: 'cadreSheet',
+          activeColorVal: themes.light.purple5?.val,
+          ...common,
+        }
+      }
+      const config = getConfig(id)
+      if (!config) return null
+      const themeKey = (config.theme ?? 'blue') as Theme
+      return {
+        key: id,
+        name: id,
+        label: config.text,
+        icon: config.iconLeft,
+        theme: themeKey,
+        externalLink: config.externalUrlSlug ? true : false,
+        tabId: id,
+        layoutKey: id,
+        activeColorVal: themes.light[`${themeKey}5`]?.val,
+        ...common,
+      }
+    },
+    [activeTabKey, getConfig, themes],
+  )
 
   return (
     <>
@@ -363,54 +389,10 @@ const ConfigurableTabBar = ({ hide, navCadreItems = cadreNavItems }: Configurabl
           <TabBarComponent>
             <Animated.View style={[indicatorStyle.indicator, indicatorAnimatedStyle]} />
             {visibleItemIds.map((id) => {
-              const isFocus = activeTabKey === id
-
-              if (id === 'more') {
-                return (
-                  <MemoTab
-                    key="more"
-                    name="more"
-                    isFocus={isFocus}
-                    onPress={() => handleTabPress('more')}
-                    onLayout={handleSaveLayout('more')}
-                    label="Autre"
-                    icon={MoreHorizontal}
-                    theme="blue"
-                  />
-                )
-              }
-
-              if (id === 'cadreSheet') {
-                return (
-                  <MemoTab
-                    key="cadreSheet"
-                    name="cadreSheet"
-                    isFocus={isFocus}
-                    onPress={() => handleTabPress('cadreSheet')}
-                    onLayout={handleSaveLayout('cadreSheet')}
-                    label="Cadre"
-                    icon={Sparkle}
-                    theme="purple"
-                  />
-                )
-              }
-
-              const config = getConfig(id)
-              if (!config) return null
-
-              return (
-                <MemoTab
-                  key={id}
-                  name={id}
-                  isFocus={isFocus}
-                  onPress={() => handleTabPress(id)}
-                  onLayout={handleSaveLayout(id)}
-                  label={config.text}
-                  icon={config.iconLeft}
-                  theme={(config.theme ?? 'blue') as Theme}
-                  externalLink={config.externalUrlSlug ? true : false}
-                />
-              )
+              const props = getTabProps(id)
+              if (!props) return null
+              const { key, ...tabProps } = props
+              return <MemoTab key={key} {...tabProps} />
             })}
           </TabBarComponent>
         </SAV>
