@@ -1,11 +1,11 @@
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import { PlaceholderDataFunction, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
 import clientEnv from '@/config/clientEnv'
 import { UserTagEnum } from '@/core/entities/UserProfile'
-import { useSession } from '@/ctx/SessionProvider'
+import { useSession } from '@/ctx/AuthContext'
 import * as api from '@/services/profile/api'
 import {
   RestDonationsResponse,

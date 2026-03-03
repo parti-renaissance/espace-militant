@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { router, useNavigation } from 'expo-router'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -144,7 +144,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
       }
       onChange(x)
     },
-    [],
+    [getValues, setValue],
   )
 
   const handleOnChangeFinishAt = useCallback(
@@ -157,7 +157,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
       }
       onChange(x)
     },
-    [],
+    [getValues, setValue],
   )
 
   const selectedScope = useWatch({
@@ -170,16 +170,19 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     [selectedScope],
   )
 
-  useEffect(() => {
+  const [prevIsAgoraLeader, setPrevIsAgoraLeader] = useState(isAgoraLeader)
+  if (isAgoraLeader !== prevIsAgoraLeader) {
+    setPrevIsAgoraLeader(isAgoraLeader)
     if (isAgoraLeader) {
       setValue('mode', 'online')
       setValue('category', 'reunion-d-equipe')
       setValue('visibility', 'invitation_agora')
       setMode('online')
-    } else if (edit?.visibility === 'invitation_agora') {
-      setValue('visibility', 'public')
     }
-  }, [isAgoraLeader])
+  }
+  if (!isAgoraLeader && edit?.visibility === 'invitation_agora') {
+    setValue('visibility', 'public')
+  }
 
   const currentScope = useWatch({ control, name: 'scope' })
   const visibilityOptions = useMemo(() => getVisibilityOptions(currentScope), [currentScope])

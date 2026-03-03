@@ -17,12 +17,12 @@ export default function ProfilePopover({ children }: PropsWithChildren) {
   const onGoToStorybook = useCallback(() => {
     ref.current?.close()
     router.replace('/storybook/')
-  }, [])
+  }, [router])
 
   const onDisconnect = useCallback(async () => {
     ref.current?.close()
     await signOut()
-  }, [])
+  }, [signOut])
 
   return (
     <Popover ref={ref} hoverable allowFlip placement={'bottom'} offset={{ mainAxis: isWeb ? 10 : 60, crossAxis: -20 }}>

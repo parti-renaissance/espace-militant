@@ -20,7 +20,7 @@ export default function DeleteAccountModal({ isOpen, onClose, isAdherent }: Read
     } else {
       onClose()
     }
-  }, [step])
+  }, [step, onClose])
 
   return (
     <ModalOrBottomSheet open={isOpen} onClose={onClose} allowDrag>

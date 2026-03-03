@@ -1,19 +1,23 @@
 import DoorToDoorRepository from '../../data/DoorToDoorRepository'
-import {
-  SendDoorToDoorPollAnswersJobQueue,
-  SendDoorToDoorPollAnswersJobQueueItem,
-} from '../../data/store/SendDoorToDoorPollAnswersJobQueue'
 import { DoorToDoorPollResult } from '../../screens/doorToDoor/tunnel/survey/DoorToDoorQuestionResult'
+import type { BuildingSelectedParams } from '../entities/DoorToDoor'
 import { DoorToDoorPollParams } from '../entities/DoorToDoorPollParams'
-import { ServerTimeoutError } from '../errors'
 
 export const INTERLOCUTOR_ACCEPT_TO_ANSWER_CODE = 'accept_to_answer'
+
+export type DoorToDoorPollSubmissionParams = {
+  campaignId: string
+  doorStatus: string
+  buildingParams: BuildingSelectedParams
+  pollResult?: DoorToDoorPollResult
+  visitStartDateISOString: string
+}
 
 export class SendDoorPollAnswersInteractor {
   private repository = DoorToDoorRepository.getInstance()
 
   public async execute(
-    params: SendDoorToDoorPollAnswersJobQueueItem,
+    params: DoorToDoorPollSubmissionParams,
   ): Promise<void> {
     const pollParams = {
       campaignId: params.campaignId,
@@ -23,20 +27,13 @@ export class SendDoorPollAnswersInteractor {
       floor: params.buildingParams.floor,
       door: params.buildingParams.door,
     }
-    try {
-      await this.sendAnswers(
-        params.doorStatus,
-        pollParams,
-        params.pollResult ?? { answers: [], qualificationAnswers: [] },
-        params.visitStartDateISOString,
-      )
-    } catch (error) {
-      if (error instanceof ServerTimeoutError) {
-        this.enqueueAnswers(params)
-        return
-      }
-      throw error
-    }
+
+    await this.sendAnswers(
+      params.doorStatus,
+      pollParams,
+      params.pollResult ?? { answers: [], qualificationAnswers: [] },
+      params.visitStartDateISOString,
+    )
 
     if (params.buildingParams.type === 'house') {
       await DoorToDoorRepository.getInstance().closeBuildingBlockFloor(
@@ -64,8 +61,4 @@ export class SendDoorPollAnswersInteractor {
     }
   }
 
-  private async enqueueAnswers(params: SendDoorToDoorPollAnswersJobQueueItem) {
-    const queue = await SendDoorToDoorPollAnswersJobQueue.getInstance()
-    await queue.enqueue(params)
-  }
 }

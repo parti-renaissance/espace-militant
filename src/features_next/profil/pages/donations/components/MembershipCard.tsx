@@ -4,7 +4,6 @@ import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useGetTags } from '@/services/profile/hook'
 import type { RestDetailedProfileResponse } from '@/services/profile/schema'
 import { RestProfilResponse } from '@/services/profile/schema'
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { getMembershipStatus } from '@/utils/membershipStatus'
 
 import { FullWrapper } from './FullWrapper'

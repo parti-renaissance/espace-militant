@@ -1,7 +1,9 @@
 import React, { memo, RefObject, useEffect } from 'react'
 import { Platform } from 'react-native'
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
+import { Line, Svg } from 'react-native-svg'
 import { styled, ThemeableStack, YStack } from 'tamagui'
+
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
 import MessageEditorAddToolbar from './AddToolBar'
@@ -20,17 +22,13 @@ const EditorInsertionToolbarSeparator = ({ bottom }: { bottom?: boolean }) => {
       position="absolute"
       top={bottom ? undefined : 13}
       bottom={bottom ? 13 : undefined}
-      left={0}
-      right={0}
+      width="100%"
       height={2}
-      flexDirection="row"
-      alignItems="center"
-      justifyContent="space-between"
       style={{ pointerEvents: 'none' }}
     >
-      {Array.from({ length: Platform.OS === 'web' ? 90 : 60 }).map((_, i) => (
-        <ThemeableStack key={i} width={6} height={2} backgroundColor={i % 2 === 0 ? '$gray3' : 'transparent'} borderRadius={1} />
-      ))}
+      <Svg height="2" width="100%">
+        <Line x1="0" y1="1" x2="100%" y2="1" stroke="#D2DCE5" strokeWidth="2" strokeDasharray="6, 6" strokeLinecap="round" />
+      </Svg>
     </ThemeableStack>
   )
 }

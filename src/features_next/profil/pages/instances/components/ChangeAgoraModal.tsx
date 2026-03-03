@@ -1,5 +1,6 @@
 import { ComponentPropsWithoutRef, memo, useMemo, useRef, useState } from 'react'
-import { Dimensions, FlatList, SafeAreaView, View } from 'react-native'
+import { Dimensions, FlatList, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Spinner, useMedia, YStack } from 'tamagui'
 import { Diamond, X } from '@tamagui/lucide-icons'
 import { sortBy } from 'lodash'

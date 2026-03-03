@@ -10,16 +10,18 @@ import { BuildingHistoryViewModelMapper } from './BuildingHistoryViewModelMapper
 import { BuildingLayoutViewModelMapper } from './BuildingLayoutViewModelMapper'
 import { BuildingStatusViewModelMapper } from './BuildingStatusViewModelMapper'
 
+import imageHouse from '../../assets/images/imageHouse.png'
+import imageBuilding from '../../assets/images/imageBuilding.png'
+
 export const BuildingDetailScreenViewModelMapper = {
   map: (address: DoorToDoorAddress, history: BuildingHistoryPoint[], layout: BuildingBlock[]): BuildingDetailScreenViewModel => {
     const illustration = (): ImageSourcePropType => {
       switch (address.building.type) {
         case 'house':
-          return require('../../assets/images/imageHouse.png')
+          return imageHouse
         case 'building':
-          return require('../../assets/images/imageBuilding.png')
         default:
-          return require('../../assets/images/imageBuilding.png')
+          return imageBuilding
       }
     }
     return {

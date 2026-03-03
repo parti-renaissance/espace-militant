@@ -118,7 +118,7 @@ const Container = ({
       setHideSideBar(hideSideBar ?? false)
       setHideTabBar(hideTabBar ?? false)
       setFloatingContent(floatingContent ?? null)
-    }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, setFloatingContent, sidebarState, floatingContent]),
+    }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, setFloatingContent, setSidebarState, sidebarState, floatingContent]),
   )
 
   const scrollBehavior = alwaysShowScrollbar ? 'scroll' : 'auto'

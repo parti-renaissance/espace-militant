@@ -2,7 +2,7 @@
   "expo": {
     "slug": "vox",
     "scheme": "vox",
-    "version": "6.0.0",
+    "version": "6.0.1",
     "owner": "parti-renaissance",
     "runtimeVersion": {
       "policy": "appVersion"
@@ -64,6 +64,20 @@
     },
     "plugins": [
       [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "forceStaticLinking": ["RNFBApp", "RNFBMessaging"]
+          },
+          "android": {
+            "playServicesLocationVersion": "21.0.1",
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#ffffff",
@@ -90,19 +104,6 @@
       "expo-localization",
       "expo-secure-store",
       [
-        "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static"
-          },
-          "android": {
-            "playServicesLocationVersion": "21.0.1",
-            "enableProguardInReleaseBuilds": true,
-            "enableShrinkResourcesInReleaseBuilds": true
-          }
-        }
-      ],
-      [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Autorisez $(PRODUCT_NAME) à vous localiser pour vous aider à trouver les portes à frapper et les actions à réaliser."
@@ -125,7 +126,7 @@
       "@react-native-firebase/messaging"
     ],
     "extra": {
-      "eas_update_version": "13",
+      "eas_update_version": "0",
 
       "router": {
         "origin": false

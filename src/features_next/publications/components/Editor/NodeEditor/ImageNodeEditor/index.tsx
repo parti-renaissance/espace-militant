@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react'
+import { memo, useRef, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Image } from 'expo-image'
@@ -179,18 +179,19 @@ const ImageNodeEditorContent = (props: NodeEditorProps) => {
     resolver: zodResolver(S.ImageNodeValidationSchema),
   })
 
+  const payload = imageSelector.data
+  const lastUploadedPayloadRef = useRef<typeof payload>(null)
+
+  // Clear upload error when new payload arrives — in effect only to avoid render-phase setState
   useEffect(() => {
-    if (!imageSelector.data) {
-      return
-    }
+    if (payload) setUploadError(undefined)
+  }, [payload])
 
-    const payload = imageSelector.data
-
-    if (!payload) {
-      return
-    }
-
-    setUploadError(undefined)
+  // Effet de bord : uniquement l’upload async
+  useEffect(() => {
+    if (!payload) return
+    if (lastUploadedPayloadRef.current === payload) return
+    lastUploadedPayloadRef.current = payload
     uploadFile({ uri: payload.url, filename: payload.filename ?? 'image.png', dataType: 'image/png' })
       .then((x) => {
         setValue('content.url', x.url)
@@ -198,13 +199,14 @@ const ImageNodeEditorContent = (props: NodeEditorProps) => {
         setValue('content.height', payload.height)
       })
       .catch((error) => {
+        // eslint-disable-next-line no-console
         console.error('Upload error:', error)
         setValue('content.url', '')
         setValue('content.width', 0)
         setValue('content.height', 0)
         setUploadError("Une erreur est survenue lors de l'importation de l'image. Veuillez réessayer.")
       })
-  }, [imageSelector.data, uploadFile, setValue])
+  }, [payload, uploadFile, setValue])
 
   const onSubmit = useDebouncedCallback(() => {
     const values = control._formValues

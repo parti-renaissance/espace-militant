@@ -7,7 +7,7 @@ import { VoxButton } from '@/components/Button'
 
 import { PublicationsFilters } from '../index'
 
-const EmptyStateIllustration = require('../../../assets/empty-publication.png')
+import EmptyStateIllustration from '../../../assets/empty-publication.png'
 
 interface EmptyStateWithFiltersProps {
   filters: PublicationsFilters

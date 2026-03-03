@@ -6,6 +6,8 @@ import { PrimaryButton } from './Buttons'
 import CircularIcon from './CircularIcon'
 import { ViewStateError } from './ViewState'
 
+import networkErrorIcon from '../../assets/images/networkErrorIcon.png'
+
 type Props = Readonly<{
   state: ViewStateError
 }>
@@ -16,7 +18,7 @@ const ErrorView: FunctionComponent<Props> = (props) => {
     <View style={styles.container}>
       <CircularIcon
         style={styles.icon}
-        source={require('../../assets/images/networkErrorIcon.png')}
+        source={networkErrorIcon}
       />
       <Text style={styles.title}>{i18n.t('common.error_title')}</Text>
       <Text style={styles.text}>{currentState.errorMessage}</Text>

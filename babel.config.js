@@ -5,7 +5,7 @@ module.exports = function (api) {
       [
         'babel-preset-expo',
         {
-            unstable_transformImportMeta: true,
+          unstable_transformImportMeta: true,
         },
       ],
     ],
@@ -18,7 +18,7 @@ module.exports = function (api) {
           disableExtraction: true,
         },
       ],
-      'react-native-reanimated/plugin'
-    ]
+      'react-native-worklets/plugin',
+    ],
   }
 }

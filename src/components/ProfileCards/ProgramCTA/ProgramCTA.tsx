@@ -5,6 +5,8 @@ import clientEnv from '@/config/clientEnv'
 import { gray } from '../../../../theme/colors.hex'
 import { VoxButton } from '../../Button'
 
+import programImg from './assets/program.png'
+
 export default function ProgramCTA() {
   const onPress = useCallback(async () => {
     const link = `https://${clientEnv.CAMPAIGN_DOMAIN}/projet?utm_source=app`
@@ -33,7 +35,7 @@ export default function ProgramCTA() {
           Voir Notre Projet
         </VoxButton>
       </ProfileCallToActionLayout.Actions>
-      <ProfileCallToActionLayout.BackgroundImageBottomRight source={require('./assets/program.png')} bottom={-20} right={-16} height={170} />
+      <ProfileCallToActionLayout.BackgroundImageBottomRight source={programImg} bottom={-20} right={-16} height={170} />
     </ProfileCallToActionLayout>
   )
 }

@@ -9,6 +9,8 @@ import ProgressBar from '../../shared/ProgressBar'
 import { VerticalSpacer } from '../../shared/Spacer'
 import { TouchablePlatform } from '../../shared/TouchablePlatform'
 
+import disclosureIndicator from '../../../assets/images/disclosureIndicator.png'
+
 type Props = Readonly<{
   viewModel: PhoningCampaignRowViewModel
   onCallButtonPressed: () => void
@@ -69,7 +71,7 @@ const PhoningCampaignRow: FunctionComponent<Props> = ({
             </Text>
             <Image
               style={styles.scoreboardImage}
-              source={require('../../../assets/images/disclosureIndicator.png')}
+              source={disclosureIndicator}
             />
           </View>
         </TouchablePlatform>

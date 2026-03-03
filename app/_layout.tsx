@@ -85,7 +85,7 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
       {(isLoading || props.isLoading) && (
         <>
           <BlurView
-            experimentalBlurMethod="dimezisBlurView"
+            blurMethod="dimezisBlurView"
             intensity={50}
             style={{
               position: 'absolute',

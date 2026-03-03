@@ -96,8 +96,10 @@ export const AllVariants: Story = {
   render: () => {
     const media = useMedia()
     const handleSelect = (result: SearchResult) => {
+      // eslint-disable-next-line no-console
       console.log('Résultat sélectionné:', result)
       if (result.type === 'address' && result.metadata?.addressComponents) {
+        // eslint-disable-next-line no-console
         console.log('Composants d\'adresse:', result.metadata.addressComponents)
       }
     }
@@ -221,8 +223,10 @@ export const AddressSearch: Story = {
     provider: new AddressProvider(),
     placeholder: 'Rechercher une adresse...',
     onSelect: (result: SearchResult) => {
+      // eslint-disable-next-line no-console
       console.log('Résultat sélectionné:', result)
       if (result.type === 'address' && result.metadata?.addressComponents) {
+        // eslint-disable-next-line no-console
         console.log('Composants d\'adresse:', result.metadata.addressComponents)
       }
     }
@@ -234,6 +238,7 @@ export const ZoneSearch: Story = {
     provider: new ZoneProvider(),
     placeholder: 'Rechercher une zone...',
     onSelect: (result: SearchResult) => {
+      // eslint-disable-next-line no-console
       console.log('Résultat sélectionné:', result)
     }
   },

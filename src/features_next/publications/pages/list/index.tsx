@@ -33,11 +33,7 @@ function PublicationsContent({ scope, accessDenyButton }: { scope: string; acces
     return data?.pages.flatMap((page: { items: RestMessageListItem[] }) => page.items) || []
   }, [data])
 
-  useEffect(() => {
-    if (!isRefetching) {
-      setIsManualRefreshing(false)
-    }
-  }, [isRefetching])
+  if (!isRefetching && isManualRefreshing) setIsManualRefreshing(false)
 
   const handleManualRefresh = useCallback(() => {
     setIsManualRefreshing(true)

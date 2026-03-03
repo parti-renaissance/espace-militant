@@ -29,6 +29,8 @@ import { spacing } from '@/styles/spacing'
 import { errorMessages } from '@/utils/errorMessages'
 import { phoneCodes } from '@/utils/phoneCodes'
 
+import sentImg from '@/assets/illustrations/sent.png'
+
 // ============================================================================
 // SCHEMAS
 // ============================================================================
@@ -72,7 +74,7 @@ interface ReferralSuccessProps {
 export const ReferralSuccess = ({ onClose, name }: ReferralSuccessProps) => {
   return (
     <YStack gap={'$medium'} paddingHorizontal={'$medium'} paddingBottom={'$12'} paddingTop={'$10'} alignItems={'center'} maxWidth={480}>
-      <Image source={require('@/assets/illustrations/sent.png')} style={{ width: 200, height: 200 }} />
+      <Image source={sentImg} style={{ width: 200, height: 200 }} />
       <Text.LG bold textAlign={'center'}>
         Et hop,{'\n'}une invitation envoyée à {name} !
       </Text.LG>

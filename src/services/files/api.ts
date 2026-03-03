@@ -3,7 +3,7 @@ import clientEnv from '@/config/clientEnv'
 import { useUserStore } from '@/store/user-store'
 import { api } from '@/utils/api'
 import { getFullVersion } from '@/utils/version'
-import { createUploadTask, FileSystemUploadType } from 'expo-file-system'
+import { createUploadTask, FileSystemUploadType } from 'expo-file-system/legacy'
 import { z } from 'zod'
 import { parseError } from '../common/errors/utils'
 
@@ -152,6 +152,7 @@ async function convertBlobUrlToFormData(props: { uri: string; filename: string; 
 
     return formData
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error converting Blob URL to FormData:', error)
     throw error
   }

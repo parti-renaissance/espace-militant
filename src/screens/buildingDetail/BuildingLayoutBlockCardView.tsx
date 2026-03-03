@@ -7,6 +7,8 @@ import i18n from '../../utils/i18n'
 import { TouchablePlatform } from '../shared/TouchablePlatform'
 import BuildingLayoutFloorCell, { BuildingLayoutFloorCellViewModel } from './BuildingLayoutFloorCell'
 
+import iconMore from '../../assets/images/iconMore.png'
+
 export interface BuildingLayoutBlockCardViewModel {
   id: string
   buildingTypeName: string
@@ -66,7 +68,7 @@ const AddBuildingFloorCard: FunctionComponent<AddBuildingFloorCardProps> = ({ on
       <View style={styles.newFloorCard}>
         <TouchablePlatform touchHighlight={Colors.touchHighlight} onPress={() => onAddBuildingFloor()}>
           <View style={styles.newFloorContainer}>
-            <Image source={require('../../assets/images/iconMore.png')} style={styles.newFloorIcon} />
+            <Image source={iconMore} style={styles.newFloorIcon} />
             <Text style={styles.newFloorText}>{i18n.t('building.layout.add_floor')}</Text>
           </View>
         </TouchablePlatform>

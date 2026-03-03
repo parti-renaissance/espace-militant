@@ -3,6 +3,8 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Colors, Spacing, Typography } from '../../../styles'
 import { QuestionRateRowViewModel } from './QuestionRateRowViewModel'
 
+import starImg from '../../../assets/images/star.png'
+
 type Props = Readonly<{
   viewModel: QuestionRateRowViewModel
   onRateUpdate: (rate: number) => void
@@ -30,7 +32,7 @@ const QuestionRateRow: FunctionComponent<Props> = ({
                     ? [styles.starImageStyle, styles.starImageFilled]
                     : styles.starImageStyle
                 }
-                source={require('../../../assets/images/star.png')}
+                source={starImg}
               />
             </TouchableOpacity>
           )

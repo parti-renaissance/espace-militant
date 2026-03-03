@@ -15,6 +15,8 @@ import { DetailedAPIErrorPayload, ForbiddenError, UnauthorizedError } from '@/co
 import { useSession } from '@/ctx/SessionProvider'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
+import visuCadnasImg from '@/assets/illustrations/VisuCadnas.png'
+
 const AdhButton = () => {
   const { isPending, open: handleClick } = useOpenExternalContent({
     slug: 'adhesion',
@@ -114,7 +116,7 @@ const MobileDeny = ({ error }: { error: DetailedAPIErrorPayload }) => {
   return (
     <>
       <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="#ECF1F5">
-        <Image src={require('@/assets/illustrations/VisuCadnas.png')} />
+        <Image src={visuCadnasImg} />
       </YStack>
       <YStack padding="$xlarge" pb={getTokenValue('$xlarge') + insets.bottom} bg="white" justifyContent="center" alignItems="center">
         <DenyContent error={error} />
@@ -135,7 +137,7 @@ const DesktopDeny = ({ error }: { error: DetailedAPIErrorPayload }) => {
           <YStack flex={1} height={500}>
             <VoxCard overflow="hidden" height="100%">
               <YStack flex={1} justifyContent="center" alignItems="center" backgroundColor="#ECF1F5">
-                <Image src={require('@/assets/illustrations/VisuCadnas.png')} />
+                <Image src={visuCadnasImg} />
               </YStack>
             </VoxCard>
           </YStack>

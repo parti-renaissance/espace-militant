@@ -1,5 +1,5 @@
 import React from 'react'
-import { XStack, YStack } from 'tamagui'
+import { XStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import DatePickerField from '@/components/DatePickerV2'
 import { FormFrame } from '@/components/base/FormFrames'

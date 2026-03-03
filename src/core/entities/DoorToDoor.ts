@@ -34,3 +34,11 @@ export type DoorToDoorAddressCampaign = {
 }
 
 export type DoorToDoorAddressStatus = 'todo' | 'ongoing' | 'completed'
+
+export type BuildingSelectedParams = {
+  id: string
+  block: string
+  floor: number
+  door: number
+  type: BuildingType
+}

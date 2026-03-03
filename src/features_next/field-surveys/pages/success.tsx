@@ -12,6 +12,8 @@ import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
+import bgSurveys from '../assets/bg-surveys.png'
+
 const Container = styled(YStack, {
   flex: 1,
 })
@@ -85,7 +87,7 @@ const FieldSurveySuccessPage: React.FC = () => {
       <Layout.Main maxWidth="100%">
         <LayoutScrollView showsVerticalScrollIndicator={false} disablePadding>
           <Container flex={1}>
-            {media.gtSm ? <ImageBackground source={require('../assets/bg-surveys.png')} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
+            {media.gtSm ? <ImageBackground source={bgSurveys} style={{ height: media.sm ? 250 : 350, width: '100%' }} /> : null}
             <ContentWrapper flex={1}>
               <VoxCard
                 inside={media.sm ? true : false}

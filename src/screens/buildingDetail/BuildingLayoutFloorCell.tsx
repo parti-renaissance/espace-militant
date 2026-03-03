@@ -5,6 +5,9 @@ import { margin } from '../../styles/spacing'
 import { TouchablePlatform } from '../shared/TouchablePlatform'
 import BuildingActionTitleView from './BuildingActionTitleView'
 
+import arrowImg from '../../assets/images/arrow.png'
+import checkIconImg from '../../assets/images/checkIcon.png'
+
 export interface BuildingLayoutFloorCellViewModel {
   id: string
   floorNumber: number
@@ -35,11 +38,11 @@ export const BuildingLayoutActionType: FunctionComponent<ActionProps> = ({ viewM
   function icon(): JSX.Element {
     return completed ? (
       <View style={styles.buttonInvertedColors}>
-        <Image style={styles.iconInvertedColors} source={require('../../assets/images/checkIcon.png')} />
+        <Image style={styles.iconInvertedColors} source={checkIconImg} />
       </View>
     ) : (
       <TouchablePlatform style={styles.button} onPress={onPress} touchHighlight={Colors.touchHighlight}>
-        <Image style={styles.icon} source={require('../../assets/images/arrow.png')} />
+        <Image style={styles.icon} source={arrowImg} />
       </TouchablePlatform>
     )
   }
@@ -68,13 +71,13 @@ const BuildingLayoutFloorCell: FunctionComponent<Props> = ({ viewModel, style, c
           }}
           touchHighlight={Colors.touchHighlight}
         >
-          <Image style={styles.icon} source={require('../../assets/images/arrow.png')} />
+          <Image style={styles.icon} source={arrowImg} />
         </TouchablePlatform>
       )
     } else {
       return (
         <View style={styles.buttonInvertedColors}>
-          <Image style={styles.iconInvertedColors} source={require('../../assets/images/checkIcon.png')} />
+          <Image style={styles.iconInvertedColors} source={checkIconImg} />
         </View>
       )
     }

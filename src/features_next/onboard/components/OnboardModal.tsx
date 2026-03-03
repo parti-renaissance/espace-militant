@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Image } from 'expo-image'
+import { useMemo, useState } from 'react'
 import { router } from 'expo-router'
 import { YStack } from 'tamagui'
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { Keyboard } from 'react-native'
 import { router } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
@@ -34,11 +34,9 @@ const MessageEditorPage = (props?: { scope?: string; messageId?: string }) => {
   const [wasInitiallyInCreation] = useState(!props?.messageId)
   const [displayQuitModal, setDisplayQuitModal] = useState(false)
 
-  useEffect(() => {
-    if (props?.messageId) {
-      setCurrentMessageId(props.messageId)
-    }
-  }, [props?.messageId])
+  if (props?.messageId != null && currentMessageId !== props.messageId) {
+    setCurrentMessageId(props.messageId)
+  }
 
   const messageQuery = useCreateMessage({ uuid: currentMessageId })
 
@@ -71,7 +69,7 @@ const MessageEditorPage = (props?: { scope?: string; messageId?: string }) => {
     () => ({
       scope: props?.scope ?? messageData?.author?.scope ?? '',
     }),
-    [messageData?.author?.scope, props?.scope],
+    [messageData?.author?.scope, messageData, props?.scope],
   )
 
   const { data: availableSenders, isLoading: isSendersLoading } = useGetAvailableSenders(availableSendersQueryParams)

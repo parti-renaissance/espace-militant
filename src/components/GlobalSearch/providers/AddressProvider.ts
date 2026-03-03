@@ -3,7 +3,6 @@ import { MapPin } from '@tamagui/lucide-icons'
 import { getPlaceAutocomplete, getPlaceDetails } from '@/services/search/api'
 import googleAddressMapper from '@/data/mapper/googleAddressMapper'
 import type { IconComponent } from '@/models/common.model'
-import { GoogleAddressPlaceResult } from '@/data/network/ApiService'
 
 export class AddressProvider implements SearchProvider {
   async search(query: string): Promise<SearchResult[]> {
@@ -17,6 +16,7 @@ export class AddressProvider implements SearchProvider {
         metadata: { googlePlace: result }
       }))
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error searching addresses:', error)
       return []
     }
@@ -49,6 +49,7 @@ export class AddressProvider implements SearchProvider {
         }
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error fetching address details:', error)
     }
     

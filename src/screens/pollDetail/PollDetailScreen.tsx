@@ -60,6 +60,7 @@ const PollDetailScreen = ({ navigation }: PollDetailScreenProps) => {
         setStatefulState(ViewState.Content(poll))
       })
       .catch((error) => {
+        // eslint-disable-next-line no-console
         console.error(error)
         setStatefulState(ViewStateUtils.networkError(error, fetchPoll))
       })

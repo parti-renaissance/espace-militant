@@ -13,6 +13,8 @@ import { TouchablePlatform } from '../shared/TouchablePlatform'
 import BuildingLayoutBlockCardView, { BuildingLayoutBlockCardViewModel } from './BuildingLayoutBlockCardView'
 import { BuildingLayoutActionType } from './BuildingLayoutFloorCell'
 
+import iconMore from '../../assets/images/iconMore.png'
+
 export interface BuildingLayoutViewModel {
   buildings: BuildingLayoutBlockCardViewModel[]
   buildingStatus: DoorToDoorAddressStatus
@@ -177,7 +179,7 @@ const AddBuildingCard: FunctionComponent<AddBuildingCardProps> = ({ onAddBuildin
     <CardView backgroundColor={Colors.defaultBackground} style={styles.newBuildingCard}>
       <TouchablePlatform touchHighlight={Colors.touchHighlight} onPress={() => onAddBuildingBlock()}>
         <View style={styles.newBuildingContainer}>
-          <Image source={require('../../assets/images/iconMore.png')} style={styles.newBuildingIcon} />
+          <Image source={iconMore} style={styles.newBuildingIcon} />
           <Text style={styles.newBuildingText}>{i18n.t('building.layout.add_building')}</Text>
         </View>
       </TouchablePlatform>

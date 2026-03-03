@@ -3,7 +3,7 @@ import { Platform } from 'react-native'
 import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import { Save } from '@tamagui/lucide-icons'
-import { isWeb, XStack } from 'tamagui'
+import { XStack } from 'tamagui'
 import { VoxRichTextEditor } from './VoxRichTextEditor'
 import { RichTextContent, EditorRef } from './types'
 import { normalizeHtmlLinks, normalizeJsonLinks } from '@/utils/normalizeUrl'
@@ -41,6 +41,7 @@ export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({
 
   const handleSave = async () => {
     if (!editorRef.current) {
+      // eslint-disable-next-line no-console
       console.error('Editor ref is not available')
       return
     }
@@ -55,6 +56,7 @@ export const VoxRichTextModalEditor: React.FC<VoxRichTextModalEditorProps> = ({
       })
       onClose()
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error saving editor content:', error)
     } finally {
       setIsSaving(false)

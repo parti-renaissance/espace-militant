@@ -22,6 +22,9 @@ import {
 } from '../../../../pollDetailUserData/PollDetailQuestionUserDataViewModelMapper'
 import { QualificationFormUserDataViewModel } from '../../qualification/QualificationFormUserDataViewModel'
 
+import genderFemale from '../../../../../assets/images/genderFemale.png'
+import genderMale from '../../../../../assets/images/genderMale.png'
+
 export const QUESTION_CODE_GENDER = 'gender'
 
 export const PollExtraQuestionMapper = {
@@ -50,9 +53,9 @@ export const PollExtraQuestionMapper = {
       if (questionCode === QUESTION_CODE_GENDER) {
         switch (choice.code) {
           case 'female':
-            return require('../../../../../assets/images/genderFemale.png')
+            return genderFemale
           case 'male':
-            return require('../../../../../assets/images/genderMale.png')
+            return genderMale
         }
       }
       return undefined

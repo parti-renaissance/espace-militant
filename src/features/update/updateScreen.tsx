@@ -9,6 +9,8 @@ import useAsyncFn from '@/hooks/useAsyncFn'
 import { Image } from 'expo-image'
 import { getTokenValue, Spinner, View, XStack, YStack } from 'tamagui'
 
+import updateRefreshImg from './assets/updateRefresh.png'
+
 export function UpdateStoreScreen() {
   const { isProcessing, trigger: onUpdate } = useAsyncFn(
     useCallback(async () => {
@@ -25,7 +27,7 @@ export function UpdateStoreScreen() {
           <EuCampaignIllustration pt={'$large'} showIcon={false} />
         </XStack>
         <YStack alignItems="center" justifyContent="center" flex={1} gap={'$large'}>
-          <Image source={require('./assets/updateRefresh.png')} style={{ width: '100%', height: 200 }} contentFit="contain" />
+          <Image source={updateRefreshImg} style={{ width: '100%', height: 200 }} contentFit="contain" />
           <YStack alignItems="center" justifyContent="center" gap={'$medium'} p={'$medium'}>
             <Text.LG fontSize={20} bold textAlign="center">
               Nouvelles fonctionnalités disponibles !
@@ -55,7 +57,7 @@ export function UpdateExpoScreen() {
           <EuCampaignIllustration pt={'$large'} showIcon={false} />
         </XStack>
         <YStack alignItems="center" justifyContent="center" flex={1} gap={'$large'}>
-          <Image source={require('./assets/updateRefresh.png')} style={{ width: '100%', height: 200 }} contentFit="contain" />
+          <Image source={updateRefreshImg} style={{ width: '100%', height: 200 }} contentFit="contain" />
           <YStack alignItems="center" justifyContent="center" gap={'$medium'} p={'$medium'}>
             <Text.LG fontSize={20} bold textAlign="center">
               Nouvelles fonctionnalités disponibles !

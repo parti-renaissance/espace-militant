@@ -1,7 +1,6 @@
 import { RestProfilResponse } from '@/services/profile/schema'
 import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap, HeartHandshake } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
-import clientEnv from './clientEnv'
 import { IconComponent } from '@/models/common.model'
 import * as magicLinkTypes from '@/services/magic-link/schema'
 

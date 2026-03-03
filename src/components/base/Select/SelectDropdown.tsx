@@ -97,7 +97,7 @@ const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ fram
       dropdownX.value = x
       dropdownWidth.value = w
     })
-  }, [openAbove, searchable, options.length])
+  }, [openAbove, searchable, options.length, frameRef, dropdownTop, dropdownX, dropdownWidth])
 
   useImperativeHandle(
     ref,

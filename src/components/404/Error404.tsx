@@ -6,6 +6,8 @@ import { Image, useMedia, View, YStack } from 'tamagui'
 import Text from '../base/Text'
 import { VoxButton } from '../Button'
 
+import img404 from '../../assets/images/404.png'
+
 export default function Error404() {
   const media = useMedia()
   
@@ -13,7 +15,7 @@ export default function Error404() {
     <PageLayout>
       <PageLayout.StateFrame justifyContent="center" mt={media.gtSm ? 0 : undefined}>
         <Image
-          source={require('../../assets/images/404.png')}
+          source={img404}
           resizeMode="contain"
           width={media.md ? 400 : (media.sm ? 300 : undefined)}
           height={media.md ? 400 : (media.sm ? 300 : undefined)}

@@ -1,5 +1,4 @@
 import React from 'react'
-import { Text as TextIcon } from '@tamagui/lucide-icons'
 
 import { RichTextContent, VoxRichTextModalEditor } from '@/components/VoxRichText'
 

@@ -1,8 +1,9 @@
-import { useGetMagicLink } from '@/services/magic-link/hook'
-import * as types from '@/services/magic-link/schema'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
+
 import { useHits } from '@/services/hits/hook'
+import { useGetMagicLink } from '@/services/magic-link/hook'
+import * as types from '@/services/magic-link/schema'
 
 function useOpenExternalContent(props: { slug: types.Slugs; utm_source?: string; utm_campaign?: string }) {
   const queryLink = useGetMagicLink(props)
@@ -27,6 +28,7 @@ function useOpenExternalContent(props: { slug: types.Slugs; utm_source?: string;
         } catch (error) {
           // Silently ignore tracking errors - they should not impact user experience
           if (__DEV__) {
+            // eslint-disable-next-line no-console
             console.warn('[useOpenExternalContent] trackClick error:', error)
           }
         }

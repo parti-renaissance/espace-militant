@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useId } from 'react'
 import { View } from 'react-native'
 import Text from '@/components/base/Text'
 import { Href, Link } from 'expo-router'
@@ -23,7 +23,8 @@ type HitsContext = {
 const LimitedContent = ({ children, numberOfLines }: { children: React.ReactNode; numberOfLines?: number }) => {
   if (!numberOfLines) return <>{children}</>
 
-  const gradientId = useMemo(() => `fadeGradient-${Math.random().toString(36).substring(2, 11)}`, [])
+  const uniqueId = useId()
+  const gradientId = `fadeGradient-${uniqueId.replace(/:/g, '-')}`
 
   return (
     <YStack maxHeight={numberOfLines * 20 + 20} position="relative" overflow="hidden">
@@ -357,6 +358,7 @@ export const TipTapRenderer = (props: {
       } catch (error) {
         // Silently ignore tracking errors - they should not impact user experience
         if (__DEV__) {
+          // eslint-disable-next-line no-console
           console.warn('[TipTapRenderer] trackClick error:', error)
         }
       }

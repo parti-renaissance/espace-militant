@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { RefreshControl } from 'react-native'
 import { ImageBackground } from 'expo-image'
 import { router } from 'expo-router'
-import { Circle, Image, ScrollView, styled, useMedia, XStack, YStack } from 'tamagui'
+import { Circle, Image, styled, useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft, Calendar, ClipboardCheck, FileQuestion, Flag, MapPin, Pen, RotateCw } from '@tamagui/lucide-icons'
 
 import { Layout } from '@/components/AppStructure'
@@ -16,6 +16,9 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { useFieldSurveysWithRefresh } from '@/services/field-surveys/hook'
 import { FieldSurvey } from '@/services/field-surveys/schema'
 import { getFormattedDate } from '@/utils/date'
+
+import bgSurveys from '../assets/bg-surveys.png'
+import notepadSurvey from '../assets/notepad-survey.png'
 
 const Container = styled(YStack, {
   flex: 1,
@@ -277,7 +280,7 @@ const FieldSurveysListPage: React.FC = () => {
       >
         <Container>
           <ImageBackground
-            source={require('../assets/bg-surveys.png')}
+            source={bgSurveys}
             style={{ height: media.sm ? 250 : 350, marginHorizontal: spacingValues.paddingLeft, borderRadius: 16, overflow: 'hidden' }}
           />
           <ContentWrapper>
@@ -301,7 +304,7 @@ const FieldSurveysListPage: React.FC = () => {
                         </Text>
                       </YStack>
                       <Image
-                        source={require('../assets/notepad-survey.png')}
+                        source={notepadSurvey}
                         objectFit="contain"
                         display={media.sm ? 'none' : 'block'}
                         width={129}

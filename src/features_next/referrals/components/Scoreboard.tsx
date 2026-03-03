@@ -6,6 +6,8 @@ import ProfilePicture from '@/components/ProfilePicture'
 
 import { ReferralScoreboardItemType } from '@/services/referral/schema'
 
+import emptyStateImg from '@/assets/illustrations/empty-state.png'
+
 // ============================================================================
 // SCOREBOARD TABLE
 // ============================================================================
@@ -89,7 +91,7 @@ export function ReferralScoreboardTableEmptyState() {
       alignItems={'center'}
       gap={'$medium'}
     >
-      <Image source={require('@/assets/illustrations/empty-state.png')} />
+      <Image source={emptyStateImg} />
       <Text.MD fontWeight={500} color={'$textSecondary'}>
         Parrainez un nouveau pour participer au classement
       </Text.MD>

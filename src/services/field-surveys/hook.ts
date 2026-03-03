@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FieldSurveysService } from './api'
-import { FieldSurvey, FieldSurveyResultRequest } from './schema'
+import { FieldSurveyResultRequest } from './schema'
 
 export const FIELD_SURVEYS_QUERY_KEY = 'field-surveys'
 

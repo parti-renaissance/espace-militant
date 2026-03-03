@@ -62,6 +62,7 @@ const PhonePollDetailScreen= () => {
                 setStatefulState(ViewState.Content(resources))
             })
             .catch((error) => {
+                // eslint-disable-next-line no-console
                 console.error(error)
                 setStatefulState(ViewStateUtils.networkError(error, fetchResources))
             })

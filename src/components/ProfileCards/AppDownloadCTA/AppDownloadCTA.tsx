@@ -5,6 +5,11 @@ import { ProfileCallToActionLayout } from '@/components/ProfileCards/ProfileCall
 import redirectToStore from '@/helpers/redirectToStore'
 import { Image, View } from 'tamagui'
 
+import downloadCTAImg from './Assets/downloadCTA.png'
+import screenshotsImg from './Assets/screenshots.png'
+import appleImg from './Assets/Apple.png'
+import googleImg from './Assets/Google.png'
+
 export interface AppDownloadCTAProps {
   variant?: 'date' | 'screenshots'
 }
@@ -18,7 +23,7 @@ export default function AppDownloadCTA({ variant = 'date' }: AppDownloadCTAProps
   return (
     <ProfileCallToActionLayout>
       <ProfileCallToActionLayout.Image
-        source={isDateVariant ? require('./Assets/downloadCTA.png') : require('./Assets/screenshots.png')}
+        source={isDateVariant ? downloadCTAImg : screenshotsImg}
         height={isDateVariant ? 120 : 220}
       />
       <ProfileCallToActionLayout.Content>
@@ -37,11 +42,11 @@ export default function AppDownloadCTA({ variant = 'date' }: AppDownloadCTAProps
       <ProfileCallToActionLayout.Actions>
         <View flexDirection={'row'} flex={1} justifyContent={'center'} gap={'$medium'}>
           <TouchableOpacity onPress={redirectToApple}>
-            <Image source={require('./Assets/Apple.png')} resizeMode={'contain'} width={115} height={40} />
+            <Image source={appleImg} resizeMode={'contain'} width={115} height={40} />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={redirectToAndroid}>
-            <Image source={require('./Assets/Google.png')} resizeMode={'contain'} width={115} height={40} />
+            <Image source={googleImg} resizeMode={'contain'} width={115} height={40} />
           </TouchableOpacity>
         </View>
       </ProfileCallToActionLayout.Actions>

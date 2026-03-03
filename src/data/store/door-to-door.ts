@@ -1,6 +1,5 @@
 import { create } from 'zustand'
-import { DoorToDoorAddress } from '@/core/entities/DoorToDoor'
-import { BuildingSelectedParams } from './SendDoorToDoorPollAnswersJobQueue'
+import { BuildingSelectedParams, DoorToDoorAddress } from '@/core/entities/DoorToDoor'
 
 type DoorToDoorStore = {
   address: DoorToDoorAddress | null

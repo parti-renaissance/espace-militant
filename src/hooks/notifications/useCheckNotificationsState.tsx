@@ -48,25 +48,22 @@ export default function useCheckNotificationsState() {
     const { canAskAgain, status } = await getPermissionsAsync()
 
     if (canAskAgain && status !== PermissionStatus.DENIED) {
+      // Options iOS pour la version native ; typage unifié FB ne les expose pas
       FB?.messaging
-        .requestPermission({
-          sound: true,
-          alert: true,
-        })
-        .catch(() => {
-          //
-        })
+        .requestPermission({ sound: true, alert: true } as never)
+        .catch(() => {})
+        .finally(checkPermissions)
     } else {
       Alert.alert('Notifications désactivées', 'Veuillez activer les notifications dans les paramètres pour rester informé.', [
         { text: 'Annuler', style: 'cancel' },
         { text: 'Ouvrir les paramètres', onPress: Linking.openSettings },
       ])
     }
-  }, [postPushToken, checkPermissions])
+  }, [checkPermissions])
 
   useEffect(() => {
     if (isAuth) {
-      checkPermissions()
+      queueMicrotask(() => checkPermissions())
       const interval = setInterval(() => {
         if (!isCheckingPermissions.current) {
           checkPermissions()

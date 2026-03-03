@@ -11,7 +11,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import { Colors, ColorUtils, Spacing, Typography } from '../../styles'
+import { Colors, Spacing, Typography } from '../../styles'
 import { TouchablePlatform } from './TouchablePlatform'
 
 type ButtonProps = Readonly<{
@@ -53,8 +53,9 @@ const BaseButton: FunctionComponent<
 > = (props) => {
   const opacity = props.disabled ? 0.5 : 1.0
   const defaultBackground = props.backgroundColor
-  const disabledBackground = ColorUtils.lighten(defaultBackground, 0.7)
-  const highlightedBackground = ColorUtils.lighten(defaultBackground, 0.5)
+  const isPrimary = defaultBackground === Colors.primaryColor || defaultBackground === Colors.accent
+  const disabledBackground = isPrimary ? Colors.primaryDisabledBackground : Colors.secondaryDisabledBackground
+  const highlightedBackground = isPrimary ? Colors.primaryHighlightBackground : Colors.secondaryHighlightBackground
 
   const computedBackground = props.disabled
     ? disabledBackground

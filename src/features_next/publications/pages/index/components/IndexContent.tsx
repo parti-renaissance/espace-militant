@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { ImageSourcePropType, Platform } from 'react-native'
+import { ImageSourcePropType } from 'react-native'
 import { Link } from 'expo-router'
-import { Image, useMedia, XStack, YStack } from 'tamagui'
+import { Image, XStack, YStack } from 'tamagui'
 import { ChevronRight, FileEdit, X } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
@@ -13,9 +13,9 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import MessageScopeSelector from '../../../components/MessageScopeSelector'
 
-const postSimpleImage = require('@/assets/images/post-simple.png')
-const postWithCtaImage = require('@/assets/images/post-with-cta.png')
-const postIllustratedImage = require('@/assets/images/post-illustrated.png')
+import postSimpleImage from '@/assets/images/post-simple.png'
+import postWithCtaImage from '@/assets/images/post-with-cta.png'
+import postIllustratedImage from '@/assets/images/post-illustrated.png'
 
 const HelpCard = () => {
   const [isOpen, setIsOpen] = useState(true)
