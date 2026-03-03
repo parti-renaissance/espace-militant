@@ -1,8 +1,12 @@
+import { createRequire } from 'node:module'
 import eslint from '@eslint/js'
 import reactHooks from 'eslint-plugin-react-hooks'
 import unusedImports from 'eslint-plugin-unused-imports'
 import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
+
+const require = createRequire(import.meta.url)
+const reactHooksPlatformOS = require('./eslint-rules/index.js')
 
 export default defineConfig(
   {
@@ -34,6 +38,17 @@ export default defineConfig(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,
+  // Désactiver rules-of-hooks et utiliser notre règle qui autorise le garde Platform.OS (optimisation RN web)
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    plugins: {
+      'react-hooks-platform-os': reactHooksPlatformOS,
+    },
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks-platform-os/rules-of-hooks-allow-platform-os': 'error',
+    },
+  },
   {
     plugins: {
       'unused-imports': unusedImports,
