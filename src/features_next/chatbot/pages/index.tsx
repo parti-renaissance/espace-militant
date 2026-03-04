@@ -5,13 +5,13 @@ import { ArrowUpRight } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button/Button'
 import InternAlert from '@/components/InternAlert/InternAlert'
+import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
 
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { useChatbotStream } from '@/services/chatbot/hook'
-import { RestChatbotStartRequest } from '@/services/chatbot/schema'
+import type { RestChatbotChatRequest } from '@/services/chatbot/schema'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
@@ -22,14 +22,15 @@ type TamaguiInputRef = ComponentRef<typeof Input> & {
 export default function ChatbotPage() {
   const media = useMedia()
   const [messages, setMessages] = useState<Message[]>([])
+  const [threadId, setThreadId] = useState<string | null>(null)
   const [input, setInput] = useState('')
-  const [params, setParams] = useState<RestChatbotStartRequest>({ messages: [] })
+  const [params, setParams] = useState<RestChatbotChatRequest | null>(null)
   const [enabled, setEnabled] = useState(false)
   const scrollViewRef = useRef<ScrollView>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
   const keyboardHeight = useKeyboardHeight()
 
-  const { data: chunks, isFetching } = useChatbotStream(params, enabled)
+  const { data: chunks, isFetching } = useChatbotStream(params ?? { message: '' }, enabled, { onThreadId: setThreadId })
   const streamText = Array.isArray(chunks) ? chunks.join('') : chunks || ''
 
   const scrollToBottom = () => {
@@ -42,12 +43,19 @@ export default function ChatbotPage() {
 
   const send = useCallback(() => {
     if (!input.trim() || isFetching) return
-    const newMsgs = [...messages, ...(streamText ? [{ role: 'assistant', content: streamText } as Message] : []), { role: 'user', content: input } as Message]
-    setMessages(newMsgs)
-    setParams({ messages: newMsgs })
+    const userMessage = input.trim()
+    setMessages((prev) => [
+      ...prev,
+      ...(streamText ? [{ role: 'assistant' as const, content: String(streamText) }] : []),
+      { role: 'user' as const, content: userMessage },
+    ])
+    setParams({
+      message: userMessage,
+      ...(threadId ? { thread_id: threadId } : {}),
+    })
     setEnabled(true)
     setInput('')
-  }, [input, isFetching, messages, streamText])
+  }, [input, isFetching, threadId, streamText])
 
   // Gestion des événements clavier sur le web pour l'input
   useEffect(() => {
@@ -115,6 +123,8 @@ export default function ChatbotPage() {
               key={i}
               alignSelf={m.role === 'user' ? 'flex-end' : 'flex-start'}
               maxWidth={m.role === 'user' ? '80%' : '100%'}
+              minWidth={0}
+              overflow="hidden"
               bg={m.role === 'user' ? '$textOutline20' : undefined}
               p="$medium"
               borderTopLeftRadius="$medium"
@@ -122,12 +132,12 @@ export default function ChatbotPage() {
               borderBottomLeftRadius="$medium"
               borderBottomRightRadius="$medium"
             >
-              <Text>{m.content}</Text>
+              <VoxMarkdown content={m.content} />
             </View>
           ))}
           {enabled && (
-            <View alignSelf="flex-start" p="$medium" br="$medium">
-              {streamText ? <Text>{streamText}</Text> : <Spinner size="small" />}
+            <View alignSelf="flex-start" maxWidth="100%" minWidth={0} overflow="hidden" p="$medium" br="$medium">
+              {streamText ? <VoxMarkdown content={String(streamText)} isStreaming={isFetching} /> : <Spinner size="small" />}
             </View>
           )}
         </LayoutScrollView>
