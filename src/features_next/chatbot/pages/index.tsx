@@ -1,4 +1,4 @@
-import { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
+import { ComponentRef, useEffect, useRef } from 'react'
 import { NativeSyntheticEvent, ScrollView, TextInputKeyPressEventData } from 'react-native'
 import { Input, isWeb, Spinner, useMedia, View, YStack } from 'tamagui'
 import { ArrowUpRight } from '@tamagui/lucide-icons'
@@ -6,14 +6,10 @@ import { ArrowUpRight } from '@tamagui/lucide-icons'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import { VoxButton } from '@/components/Button/Button'
-import InternAlert from '@/components/InternAlert/InternAlert'
 import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
 
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
-import { useChatbotStream } from '@/services/chatbot/hook'
-import type { RestChatbotChatRequest } from '@/services/chatbot/schema'
-
-type Message = { role: 'user' | 'assistant'; content: string }
+import { useCustomChat } from '@/services/chatbot/hook'
 
 type TamaguiInputRef = ComponentRef<typeof Input> & {
   getNativeRef?: () => ComponentRef<typeof Input> | null
@@ -21,17 +17,12 @@ type TamaguiInputRef = ComponentRef<typeof Input> & {
 
 export default function ChatbotPage() {
   const media = useMedia()
-  const [messages, setMessages] = useState<Message[]>([])
-  const [threadId, setThreadId] = useState<string | null>(null)
-  const [input, setInput] = useState('')
-  const [params, setParams] = useState<RestChatbotChatRequest | null>(null)
-  const [enabled, setEnabled] = useState(false)
   const scrollViewRef = useRef<ScrollView>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
   const keyboardHeight = useKeyboardHeight()
 
-  const { data: chunks, isFetching } = useChatbotStream(params ?? { message: '' }, enabled, { onThreadId: setThreadId })
-  const streamText = Array.isArray(chunks) ? chunks.join('') : chunks || ''
+  const { messages, input, handleInputChange, handleSubmit, isLoading, stop, streamedContent, error } = useCustomChat()
+  const canStop = isLoading
 
   const scrollToBottom = () => {
     setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100)
@@ -39,34 +30,16 @@ export default function ChatbotPage() {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages, streamText])
+  }, [messages, streamedContent])
 
-  const send = useCallback(() => {
-    if (!input.trim() || isFetching) return
-    const userMessage = input.trim()
-    setMessages((prev) => [
-      ...prev,
-      ...(streamText ? [{ role: 'assistant' as const, content: String(streamText) }] : []),
-      { role: 'user' as const, content: userMessage },
-    ])
-    setParams({
-      message: userMessage,
-      ...(threadId ? { thread_id: threadId } : {}),
-    })
-    setEnabled(true)
-    setInput('')
-  }, [input, isFetching, threadId, streamText])
-
-  // Gestion des événements clavier sur le web pour l'input
   useEffect(() => {
     if (!isWeb || !inputRef.current) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault()
-        send()
+        handleSubmit()
       }
-      // Si Maj+Entrée, laisser le comportement par défaut (saut de ligne)
     }
 
     const element = inputRef.current
@@ -76,27 +49,20 @@ export default function ChatbotPage() {
 
     if (domElement && domElement instanceof HTMLElement) {
       domElement.addEventListener('keydown', handleKeyDown)
-      return () => {
-        domElement.removeEventListener('keydown', handleKeyDown)
-      }
+      return () => domElement.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isWeb, send])
+  }, [isWeb, handleSubmit])
 
   const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
-    // Sur le web : Entrée seule = envoi, Maj+Entrée = saut de ligne
     if (isWeb) {
       const key = e.nativeEvent.key
       const shiftKey = (e.nativeEvent as TextInputKeyPressEventData & { shiftKey?: boolean }).shiftKey
-
       if (key === 'Enter' && !shiftKey) {
-        // Empêcher le comportement par défaut et envoyer le message
         e.preventDefault?.()
-        send()
+        handleSubmit()
         return false
       }
-      // Si Maj+Entrée, laisser le comportement par défaut (saut de ligne)
     }
-    // Sur mobile : onSubmitEditing gère l'envoi
   }
 
   return (
@@ -107,16 +73,16 @@ export default function ChatbotPage() {
           style={{ flex: 1 }}
           contentContainerStyle={{
             gap: 10,
-            paddingBottom: isWeb ? 32 : 32 + keyboardHeight,
+            paddingBottom: isWeb ? 160 : 160 + keyboardHeight,
             minHeight: '100%',
             ...(isWeb ? { flex: 1 } : {}),
           }}
           onContentSizeChange={scrollToBottom}
         >
-          {!isWeb && (
-            <InternAlert type="warning" marginHorizontal="$medium" marginTop="$medium">
-              Ce POC n'est pas encore disponible sur mobile. Veuillez utiliser la version web.
-            </InternAlert>
+          {error && (
+            <View padding="$medium" backgroundColor="$red3" borderRadius="$medium" marginHorizontal="$medium">
+              <VoxMarkdown content={error.message} />
+            </View>
           )}
           {messages.map((m, i) => (
             <View
@@ -135,17 +101,18 @@ export default function ChatbotPage() {
               <VoxMarkdown content={m.content} />
             </View>
           ))}
-          {enabled && (
+          {isLoading && (
             <View alignSelf="flex-start" maxWidth="100%" minWidth={0} overflow="hidden" p="$medium" br="$medium">
-              {streamText ? <VoxMarkdown content={String(streamText)} isStreaming={isFetching} /> : <Spinner size="small" />}
+              {streamedContent ? <VoxMarkdown content={streamedContent} isStreaming /> : <Spinner size="small" />}
             </View>
           )}
         </LayoutScrollView>
         <YStack
-          position={isWeb ? 'sticky' : 'absolute'}
+          position={isWeb ? 'fixed' : 'absolute'}
           bottom={isWeb ? 0 : keyboardHeight}
-          left={0}
-          right={0}
+          width="100%"
+          maxWidth={520}
+          alignSelf="center"
           zIndex={100}
           bg="$textSurface"
           pb={media.gtMd ? '$medium' : 0}
@@ -165,30 +132,24 @@ export default function ChatbotPage() {
                 ref={inputRef}
                 multiline
                 value={input}
-                onChangeText={setInput}
+                onChangeText={handleInputChange}
                 onKeyPress={!isWeb ? handleKeyPress : undefined}
-                onSubmitEditing={isWeb ? undefined : send}
+                onSubmitEditing={isWeb ? undefined : handleSubmit}
                 borderWidth={0}
-                focusStyle={{
-                  outlineWidth: 0,
-                }}
+                focusStyle={{ outlineWidth: 0 }}
                 maxHeight={160}
                 textAlignVertical="top"
-                placeholder={isWeb ? 'Formulez votre demande' : 'Non disponible sur mobile'}
-                editable={isWeb}
-                opacity={isWeb ? 1 : 0.5}
+                placeholder="Formulez votre demande"
+                editable
               />
             </View>
-            <View flex={1} pb="$medium" pt={4} paddingHorizontal={16}>
-              <VoxButton
-                theme="blue"
-                onPress={send}
-                iconLeft={ArrowUpRight}
-                shrink
-                loading={isFetching}
-                disabled={!input.trim() || isFetching || !isWeb}
-                alignSelf="flex-end"
-              />
+            <View flex={1} pb="$medium" pt={4} paddingHorizontal={16} flexDirection="row" gap="$small" justifyContent="flex-end">
+              {canStop && (
+                <VoxButton theme="gray" onPress={stop} shrink>
+                  Arrêter
+                </VoxButton>
+              )}
+              <VoxButton theme="blue" onPress={handleSubmit} iconLeft={ArrowUpRight} shrink loading={isLoading} disabled={!input.trim() || isLoading} />
             </View>
           </YStack>
         </YStack>
