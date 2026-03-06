@@ -1,6 +1,7 @@
-import { ComponentRef, useEffect, useRef } from 'react'
+import { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
 import { NativeSyntheticEvent, ScrollView, TextInputKeyPressEventData } from 'react-native'
-import { Input, isWeb, Spinner, useMedia, View, YStack } from 'tamagui'
+import { useQueryClient } from '@tanstack/react-query'
+import { Input, isWeb, Spinner, useMedia, View, XStack, YStack } from 'tamagui'
 import { ArrowUpRight } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
@@ -11,17 +12,32 @@ import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { useCustomChat } from '@/services/chatbot/hook'
 
+import { ChatBotNavigation } from '../components/ChatBotNavigation'
+
 type TamaguiInputRef = ComponentRef<typeof Input> & {
   getNativeRef?: () => ComponentRef<typeof Input> | null
 }
 
 export default function ChatbotPage() {
   const media = useMedia()
+  const queryClient = useQueryClient()
   const scrollViewRef = useRef<ScrollView>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
   const keyboardHeight = useKeyboardHeight()
+  const [activeDiscussionId, setActiveDiscussionId] = useState<string | null>(null)
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, stop, streamedContent, error } = useCustomChat()
+  const onThreadCreated = useCallback(
+    (threadId: string) => {
+      setActiveDiscussionId(threadId)
+      queryClient.invalidateQueries({ queryKey: ['chatbot-threads'] })
+    },
+    [queryClient],
+  )
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading, stop, streamedContent, error } = useCustomChat({
+    threadId: activeDiscussionId,
+    onThreadCreated,
+  })
   const canStop = isLoading
 
   const scrollToBottom = () => {
@@ -66,94 +82,97 @@ export default function ChatbotPage() {
   }
 
   return (
-    <Layout.Main>
-      <YStack position="relative" flex={1} minHeight={isWeb ? '100dvh' : '100%'} gap="$medium">
-        <LayoutScrollView
-          ref={scrollViewRef}
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            gap: 10,
-            paddingBottom: isWeb ? 160 : 160 + keyboardHeight,
-            minHeight: '100%',
-            ...(isWeb ? { flex: 1 } : {}),
-          }}
-          onContentSizeChange={scrollToBottom}
-        >
-          {error && (
-            <View padding="$medium" backgroundColor="$red3" borderRadius="$medium" marginHorizontal="$medium">
-              <VoxMarkdown content={error.message} />
-            </View>
-          )}
-          {messages.map((m, i) => (
-            <View
-              key={i}
-              alignSelf={m.role === 'user' ? 'flex-end' : 'flex-start'}
-              maxWidth={m.role === 'user' ? '80%' : '100%'}
-              minWidth={0}
-              overflow="hidden"
-              bg={m.role === 'user' ? '$textOutline20' : undefined}
-              p="$medium"
-              borderTopLeftRadius="$medium"
-              borderTopRightRadius="$xsmall"
-              borderBottomLeftRadius="$medium"
-              borderBottomRightRadius="$medium"
-            >
-              <VoxMarkdown content={m.content} />
-            </View>
-          ))}
-          {isLoading && (
-            <View alignSelf="flex-start" maxWidth="100%" minWidth={0} overflow="hidden" p="$medium" br="$medium">
-              {streamedContent ? <VoxMarkdown content={streamedContent} isStreaming /> : <Spinner size="small" />}
-            </View>
-          )}
-        </LayoutScrollView>
-        <YStack
-          position={isWeb ? 'fixed' : 'absolute'}
-          bottom={isWeb ? 0 : keyboardHeight}
-          width="100%"
-          maxWidth={520}
-          alignSelf="center"
-          zIndex={100}
-          bg="$textSurface"
-          pb={media.gtMd ? '$medium' : 0}
-        >
-          <YStack
-            backgroundColor="$white1"
-            borderColor="$textOutline"
-            borderWidth={1}
-            borderTopLeftRadius={24}
-            borderTopRightRadius={24}
-            borderBottomLeftRadius={media.gtMd ? 24 : 0}
-            borderBottomRightRadius={media.gtMd ? 24 : 0}
-            overflow="hidden"
+    <>
+      <ChatBotNavigation activeDiscussionId={activeDiscussionId} onActiveDiscussionChange={setActiveDiscussionId} />
+      <Layout.Main>
+        <YStack position="relative" flex={1} minHeight={isWeb ? '100dvh' : '100%'} gap="$medium">
+          <LayoutScrollView
+            ref={scrollViewRef}
+            style={{ flex: 1 }}
+            contentContainerStyle={{
+              gap: 10,
+              paddingBottom: isWeb ? 160 : 160 + keyboardHeight,
+              minHeight: '100%',
+              ...(isWeb ? { flex: 1 } : {}),
+            }}
+            onContentSizeChange={scrollToBottom}
           >
-            <View paddingTop={8}>
-              <Input
-                ref={inputRef}
-                multiline
-                value={input}
-                onChangeText={handleInputChange}
-                onKeyPress={!isWeb ? handleKeyPress : undefined}
-                onSubmitEditing={isWeb ? undefined : handleSubmit}
-                borderWidth={0}
-                focusStyle={{ outlineWidth: 0 }}
-                maxHeight={160}
-                textAlignVertical="top"
-                placeholder="Formulez votre demande"
-                editable
-              />
-            </View>
-            <View flex={1} pb="$medium" pt={4} paddingHorizontal={16} flexDirection="row" gap="$small" justifyContent="flex-end">
-              {canStop && (
-                <VoxButton theme="gray" onPress={stop} shrink>
-                  Arrêter
-                </VoxButton>
-              )}
-              <VoxButton theme="blue" onPress={handleSubmit} iconLeft={ArrowUpRight} shrink loading={isLoading} disabled={!input.trim() || isLoading} />
-            </View>
+            {error && (
+              <View padding="$medium" backgroundColor="$red3" borderRadius="$medium" marginHorizontal="$medium">
+                <VoxMarkdown content={error.message} />
+              </View>
+            )}
+            {messages.map((m, i) => (
+              <View
+                key={i}
+                alignSelf={m.role === 'user' ? 'flex-end' : 'flex-start'}
+                maxWidth={m.role === 'user' ? '80%' : '100%'}
+                minWidth={0}
+                overflow="hidden"
+                bg={m.role === 'user' ? '$textOutline20' : undefined}
+                p="$medium"
+                borderTopLeftRadius="$medium"
+                borderTopRightRadius="$xsmall"
+                borderBottomLeftRadius="$medium"
+                borderBottomRightRadius="$medium"
+              >
+                <VoxMarkdown content={m.content} />
+              </View>
+            ))}
+            {isLoading && (
+              <View alignSelf="flex-start" maxWidth="100%" minWidth={0} overflow="hidden" p="$medium" br="$medium">
+                {streamedContent ? <VoxMarkdown content={streamedContent} isStreaming /> : <Spinner size="small" />}
+              </View>
+            )}
+          </LayoutScrollView>
+          <YStack
+            position={isWeb ? 'fixed' : 'absolute'}
+            bottom={isWeb ? 0 : keyboardHeight}
+            width="100%"
+            maxWidth={520}
+            alignSelf="center"
+            zIndex={100}
+            bg="$textSurface"
+            pb={media.gtMd ? '$medium' : 0}
+          >
+            <YStack
+              backgroundColor="$white1"
+              borderColor="$textOutline"
+              borderWidth={1}
+              borderTopLeftRadius={24}
+              borderTopRightRadius={24}
+              borderBottomLeftRadius={media.gtMd ? 24 : 0}
+              borderBottomRightRadius={media.gtMd ? 24 : 0}
+              overflow="hidden"
+            >
+              <View paddingTop={8}>
+                <Input
+                  ref={inputRef}
+                  multiline
+                  value={input}
+                  onChangeText={handleInputChange}
+                  onKeyPress={!isWeb ? handleKeyPress : undefined}
+                  onSubmitEditing={isWeb ? undefined : handleSubmit}
+                  borderWidth={0}
+                  focusStyle={{ outlineWidth: 0 }}
+                  maxHeight={160}
+                  textAlignVertical="top"
+                  placeholder="Formulez votre demande"
+                  editable
+                />
+              </View>
+              <View flex={1} pb="$medium" pt={4} paddingHorizontal={16} flexDirection="row" gap="$small" justifyContent="flex-end">
+                {canStop && (
+                  <VoxButton theme="gray" onPress={stop} shrink>
+                    Arrêter
+                  </VoxButton>
+                )}
+                <VoxButton theme="blue" onPress={handleSubmit} iconLeft={ArrowUpRight} shrink loading={isLoading} disabled={!input.trim() || isLoading} />
+              </View>
+            </YStack>
           </YStack>
         </YStack>
-      </YStack>
-    </Layout.Main>
+      </Layout.Main>
+    </>
   )
 }

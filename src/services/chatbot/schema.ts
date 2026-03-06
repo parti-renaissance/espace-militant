@@ -32,3 +32,29 @@ export const RestChatbotThreadsResponseSchema = z.object({
   items: z.array(RestChatbotThreadItemSchema),
 })
 export type RestChatbotThreadsResponse = z.infer<typeof RestChatbotThreadsResponseSchema>
+
+/** Élément message d'un thread (GET /ai/threads/:uuid/messages) */
+export const RestChatbotThreadMessageItemSchema = z.object({
+  role: z.enum(['user', 'assistant', 'system']),
+  content: z.string(),
+  date: z.string(),
+  uuid: z.string().uuid(),
+})
+export type RestChatbotThreadMessageItem = z.infer<typeof RestChatbotThreadMessageItemSchema>
+
+/** Métadonnées de pagination pour les messages d'un thread */
+export const RestChatbotThreadMessagesMetadataSchema = z.object({
+  total_items: z.number(),
+  items_per_page: z.number(),
+  count: z.number(),
+  current_page: z.number(),
+  last_page: z.number(),
+})
+export type RestChatbotThreadMessagesMetadata = z.infer<typeof RestChatbotThreadMessagesMetadataSchema>
+
+/** Réponse GET /ai/threads/:uuid/messages */
+export const RestChatbotThreadMessagesResponseSchema = z.object({
+  metadata: RestChatbotThreadMessagesMetadataSchema,
+  items: z.array(RestChatbotThreadMessageItemSchema),
+})
+export type RestChatbotThreadMessagesResponse = z.infer<typeof RestChatbotThreadMessagesResponseSchema>
