@@ -1,7 +1,7 @@
 import { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
-import { NativeSyntheticEvent, ScrollView, TextInputKeyPressEventData } from 'react-native'
+import { NativeSyntheticEvent, ScrollView } from 'react-native'
 import { useQueryClient } from '@tanstack/react-query'
-import { Input, isWeb, Spinner, useMedia, View, XStack, YStack } from 'tamagui'
+import { Input, isWeb, Spinner, useMedia, View, YStack } from 'tamagui'
 import { ArrowUpRight } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
@@ -69,10 +69,10 @@ export default function ChatbotPage() {
     }
   }, [isWeb, handleSubmit])
 
-  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+  const handleKeyPress = (e: NativeSyntheticEvent<{ key: string; shiftKey?: boolean }>) => {
     if (isWeb) {
       const key = e.nativeEvent.key
-      const shiftKey = (e.nativeEvent as TextInputKeyPressEventData & { shiftKey?: boolean }).shiftKey
+      const shiftKey = e.nativeEvent.shiftKey
       if (key === 'Enter' && !shiftKey) {
         e.preventDefault?.()
         handleSubmit()

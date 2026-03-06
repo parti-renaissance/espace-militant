@@ -1,5 +1,5 @@
 import React, { Component, useMemo } from 'react'
-import { Linking, Platform, Text } from 'react-native'
+import { Linking, Text } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 import { useTheme } from 'tamagui'
 

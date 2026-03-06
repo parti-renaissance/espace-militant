@@ -3,7 +3,6 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
 import clientEnv from '@/config/clientEnv'
 import { useUserStore } from '@/store/user-store'
-import { api } from '@/utils/api'
 
 import * as chatbotApi from './api'
 import type { RestChatbotChatRequest } from './schema'
@@ -48,7 +47,7 @@ function parseSSEChunk(line: string): string | null {
     return typeof val === 'string' ? val : String(val)
   } catch {
     // JSON tronqué (chunk coupé au milieu d'un objet) : ne pas afficher de déchet
-    const looksLikeIncompleteJson = /^[\s]*[\{\[]/.test(data) && !/[\}\]]\s*$/.test(data)
+    const looksLikeIncompleteJson = /^[\s]*[{\[]/.test(data) && !/[}\]]\s*$/.test(data)
     if (looksLikeIncompleteJson) return null
     return data
   }
@@ -78,7 +77,9 @@ export function useCustomChat(options: UseCustomChatOptions = {}): UseCustomChat
 
   const threadIdRef = useRef<string | null>(threadIdProp ?? null)
   const onThreadCreatedRef = useRef(onThreadCreated)
-  onThreadCreatedRef.current = onThreadCreated
+  useEffect(() => {
+    onThreadCreatedRef.current = onThreadCreated
+  }, [onThreadCreated])
   const xhrRef = useRef<XMLHttpRequest | null>(null)
   const streamBufferRef = useRef('')
   /** Index du dernier caractère déjà traité dans xhr.responseText (évite .split sur tout le texte) */
