@@ -145,7 +145,7 @@ const cadreNavItemsConfig: NavItemConfig[] = [
   { id: 'news', iconLeft: MessageSquareDot, text: 'Notifications', theme: 'purple', externalUrlSlug: '/notifications', externalLink: true },
   { id: 'department_site', iconLeft: Laptop, text: 'Site départemental', theme: 'purple', externalUrlSlug: '/site-departemental', externalLink: true },
   { id: 'mobile_app', iconLeft: TabletSmartphone, text: 'Application mobile', theme: 'purple', externalUrlSlug: '/', externalLink: true },
-  { id: 'contacts', iconLeft: UsersRound, text: 'Militants', theme: 'purple', externalUrlSlug: '/militants', externalLink: true },
+  { id: 'contacts', iconLeft: UsersRound, text: 'Mes militants', theme: 'purple', href: '/cadre/militants' },
   { id: 'referrals', iconLeft: HeartHandshake, text: 'Suivi des parrainages', theme: 'purple', externalUrlSlug: '/parrainages', externalLink: true },
   { id: 'rentree', iconLeft: PartyPopper, text: 'Rentrée', theme: 'purple', externalUrlSlug: '/rentree', externalLink: true },
   { id: 'events', iconLeft: Calendar, text: 'Mes événements', theme: 'purple', externalUrlSlug: '/evenements', externalLink: true, displayIn: 'never' },
