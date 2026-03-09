@@ -61,10 +61,10 @@ export function MilitantCadreItem({ public_id, first_name, last_name, image_url,
   const media = useMedia()
 
   const isMobileLayout = media.md || media.sm
-  const col1Width = isMobileLayout ? '55%' : '28%'
-  const col2Width = isMobileLayout ? '45%' : '22%'
+  const col1Width = isMobileLayout ? '100%' : '25%'
+  const col2Width = isMobileLayout ? '100%' : '30%'
   const col3Width = isMobileLayout ? '50%' : '25%'
-  const col4Width = isMobileLayout ? '50%' : '25%'
+  const col4Width = isMobileLayout ? '50%' : '20%'
 
   return (
     <VoxCard>
@@ -77,7 +77,7 @@ export function MilitantCadreItem({ public_id, first_name, last_name, image_url,
               <Text.SM medium numberOfLines={1}>
                 {first_name} {last_name}
               </Text.SM>
-              {age && (
+              {age != null && (
                 <Text.SM secondary medium numberOfLines={1}>
                   {age} ans
                 </Text.SM>
@@ -116,7 +116,7 @@ export function MilitantCadreItem({ public_id, first_name, last_name, image_url,
             <Text.SM secondary regular numberOfLines={1}>
               Comité
             </Text.SM>
-            <XStack gap={4} mt={4} flexWrap="wrap">
+            <XStack gap={12} mt={4} flexWrap="wrap">
               <ContactStatusChip status="active" Icon={Smartphone} />
               <ContactStatusChip status="disabled" Icon={Monitor} />
               <ContactStatusChip status="neutral" Icon={Phone} />

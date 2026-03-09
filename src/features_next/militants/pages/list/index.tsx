@@ -21,10 +21,17 @@ function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDe
   const [currentPage, setCurrentPage] = useState(1)
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
 
-  const { data, isLoading, refetch, isRefetching } = useAdherentsPage(scope, currentPage, PAGE_SIZE)
+  const { data, isLoading, isFetching, isPlaceholderData, refetch, isRefetching } = useAdherentsPage(
+    scope,
+    currentPage,
+    PAGE_SIZE,
+  )
 
-  const militants = useMemo(() => data?.items ?? [], [data?.items])
   const metadata = data?.metadata
+  const militants = useMemo(
+    () => (isPlaceholderData ? [] : (data?.items ?? [])),
+    [isPlaceholderData, data?.items],
+  )
 
   const handleManualRefresh = useCallback(async () => {
     setIsManualRefreshing(true)
@@ -43,7 +50,34 @@ function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDe
     if (!isNextDisabled) setCurrentPage((p) => p + 1)
   }, [isNextDisabled])
 
-  const headerComponent = useMemo(() => <MilitantListHeader />, [])
+  const total = metadata?.total_items
+  const pageStart = useMemo(() => {
+    if (isPlaceholderData && metadata) {
+      return (currentPage - 1) * PAGE_SIZE + 1
+    }
+    return metadata ? (metadata.current_page - 1) * metadata.items_per_page + 1 : undefined
+  }, [isPlaceholderData, metadata, currentPage])
+  const pageEnd = useMemo(() => {
+    if (isPlaceholderData && metadata) {
+      return Math.min(currentPage * PAGE_SIZE, metadata.total_items)
+    }
+    return metadata ? Math.min(metadata.current_page * metadata.items_per_page, metadata.total_items) : undefined
+  }, [isPlaceholderData, metadata, currentPage])
+
+  const headerComponent = useMemo(
+    () => (
+      <MilitantListHeader
+        isPrevDisabled={isPrevDisabled}
+        isNextDisabled={isNextDisabled}
+        handlePrevPage={handlePrevPage}
+        handleNextPage={handleNextPage}
+        pageStart={pageStart}
+        pageEnd={pageEnd}
+        total={total}
+      />
+    ),
+    [isPrevDisabled, isNextDisabled, handlePrevPage, handleNextPage, pageStart, pageEnd, total],
+  )
 
   const renderItem = useCallback(({ item }: { item: RestAdherentListItem }) => {
     const displayName = [item.first_name, item.last_name].filter(Boolean).join(' ') || item.public_id
@@ -61,52 +95,18 @@ function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDe
     return baseStyle
   }, [media.sm])
 
-  const shouldShowHeader = militants.length > 0 || metadata != null
-
   const listEmptyComponent = useMemo(() => {
-    if (isLoading) {
-      return <ListSkeleton />
+    const hasResolvedData = data != null
+    const isPending = isLoading || isFetching
+    if (!hasResolvedData || isPending) {
+      return <ListSkeleton showHeader={false} />
     }
     return (
       <YStack gap="$medium">
-        <MilitantListHeader />
         <Text.SM secondary>Aucun militant pour le moment.</Text.SM>
       </YStack>
     )
-  }, [isLoading])
-
-  const listFooterComponent = useMemo(() => {
-    if (!metadata && !isLoading) return null
-    return (
-      <XStack paddingVertical="$medium" justifyContent="space-between" alignItems="center" gap="$medium">
-        <VoxButton
-          variant="soft"
-          theme="gray"
-          size="md"
-          iconLeft={ChevronLeft}
-          onPress={handlePrevPage}
-          disabled={isPrevDisabled}
-          opacity={isPrevDisabled ? 0.5 : 1}
-        >
-          Précédent
-        </VoxButton>
-        <Text.SM secondary>
-          Page {metadata?.current_page ?? currentPage} / {metadata?.last_page ?? 1}
-        </Text.SM>
-        <VoxButton
-          variant="soft"
-          theme="gray"
-          size="md"
-          iconRight={ChevronRight}
-          onPress={handleNextPage}
-          disabled={isNextDisabled}
-          opacity={isNextDisabled ? 0.5 : 1}
-        >
-          Suivant
-        </VoxButton>
-      </XStack>
-    )
-  }, [metadata, currentPage, isLoading, isPrevDisabled, isNextDisabled, handlePrevPage, handleNextPage])
+  }, [data, isLoading, isFetching])
 
   return (
     <Layout.Main maxWidth={892}>
@@ -115,9 +115,8 @@ function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDe
         data={militants}
         renderItem={renderItem}
         keyExtractor={(item) => item.adherent_uuid}
-        ListHeaderComponent={shouldShowHeader ? headerComponent : undefined}
+        ListHeaderComponent={headerComponent}
         ListEmptyComponent={listEmptyComponent}
-        ListFooterComponent={listFooterComponent}
         refreshing={isManualRefreshing}
         onRefresh={handleManualRefresh}
         contentContainerStyle={contentContainerStyle}

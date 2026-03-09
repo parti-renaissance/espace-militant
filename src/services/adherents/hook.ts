@@ -9,8 +9,7 @@ export const usePaginatedAdherents = (scope: string, pageSize: number = DEFAULT_
     queryKey: ['adherents', scope, pageSize],
     queryFn: ({ pageParam = 1 }) => api.getAdherents({ scope, page: pageParam, page_size: pageSize }),
     initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.metadata.current_page < lastPage.metadata.last_page ? lastPage.metadata.current_page + 1 : undefined,
+    getNextPageParam: (lastPage) => (lastPage.metadata.current_page < lastPage.metadata.last_page ? lastPage.metadata.current_page + 1 : undefined),
     getPreviousPageParam: (firstPage) => (firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined),
     placeholderData: (prev) => prev,
     refetchOnMount: true,
