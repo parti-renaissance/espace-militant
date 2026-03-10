@@ -5,7 +5,9 @@ import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import PanelOrBottomSheet from '@/components/PanelOrBottomSheet/PanelOrBottomSheet'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
+import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
 import { MilitantListHeader } from '@/features_next/militants/components/MilitantListHeader'
 
 import { useAdherentsPage } from '@/services/adherents/hook'
@@ -20,6 +22,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
   const media = useMedia()
   const [currentPage, setCurrentPage] = useState(1)
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   const { data, isLoading, isFetching, isPlaceholderData, refetch } = useAdherentsPage(scope, currentPage, PAGE_SIZE)
 
@@ -61,6 +64,9 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
     return metadata ? Math.min(metadata.current_page * metadata.items_per_page, metadata.total_items) : undefined
   }, [isPageTransition, isPlaceholderData, metadata, currentPage])
 
+  const handleFilterPress = useCallback(() => setIsFilterOpen(true), [])
+  const handleCloseFilter = useCallback(() => setIsFilterOpen(false), [])
+
   const headerComponent = useMemo(
     () => (
       <MilitantListHeader
@@ -71,9 +77,10 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         pageStart={pageStart}
         pageEnd={pageEnd}
         total={total}
+        onFilterPress={handleFilterPress}
       />
     ),
-    [isPrevDisabled, isNextDisabled, handlePrevPage, handleNextPage, pageStart, pageEnd, total],
+    [isPrevDisabled, isNextDisabled, handlePrevPage, handleNextPage, pageStart, pageEnd, total, handleFilterPress],
   )
 
   const renderItem = useCallback(({ item }: { item: RestAdherentListItem }) => {
@@ -117,6 +124,9 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         onRefresh={handleManualRefresh}
         contentContainerStyle={contentContainerStyle}
       />
+      <PanelOrBottomSheet isOpen={isFilterOpen} onClose={handleCloseFilter}>
+        <MilitantFilterPanel />
+      </PanelOrBottomSheet>
     </Layout.Main>
   )
 }

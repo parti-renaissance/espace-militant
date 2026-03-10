@@ -1,6 +1,6 @@
 import React from 'react'
-import { useMedia, XStack, YStack } from 'tamagui'
-import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
+import { useMedia, View, XStack, YStack } from 'tamagui'
+import { ChevronLeft, ChevronRight, Filter } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
@@ -25,6 +25,7 @@ export interface MilitantListHeaderProps {
   pageStart?: number
   pageEnd?: number
   total?: number
+  onFilterPress: () => void
 }
 
 export function MilitantHeaderTop() {
@@ -57,7 +58,7 @@ function MilitantHeaderPagination({
   const rangeText = pageStart != null && pageEnd != null ? `${pageStart}-${pageEnd}` : '1-1'
 
   return (
-    <XStack justifyContent={media.sm ? 'space-between' : 'flex-end'} alignItems="center" mx={media.sm ? '$medium' : undefined} mt="$medium" gap="$medium">
+    <XStack justifyContent={media.sm ? 'space-between' : 'flex-end'} alignItems="center" gap="$medium">
       <Text.SM>
         <Text.SM secondary>{rangeText ?? '1 - 25'} sur </Text.SM>
         <Text.SM semibold>{total ?? '25'}</Text.SM>
@@ -101,7 +102,9 @@ export function MilitantListHeader({
   pageStart,
   pageEnd,
   total,
+  onFilterPress,
 }: MilitantListHeaderProps) {
+  const media = useMedia()
   const prevDisabled = paginationDisabled || isPrevDisabled
   const nextDisabled = paginationDisabled || isNextDisabled
   const onPrev = paginationDisabled ? () => {} : handlePrevPage
@@ -110,15 +113,21 @@ export function MilitantListHeader({
   return (
     <YStack>
       <MilitantHeaderTop />
-      <MilitantHeaderPagination
-        isPrevDisabled={prevDisabled}
-        isNextDisabled={nextDisabled}
-        handlePrevPage={onPrev}
-        handleNextPage={onNext}
-        pageStart={pageStart}
-        pageEnd={pageEnd}
-        total={total}
-      />
+      <View flexDirection={media.sm ? 'column' : 'row'} justifyContent="space-between" gap="$small" mt="$medium" mx={media.sm ? '$medium' : undefined}>
+        <VoxButton variant="outlined" theme="gray" size="md" iconLeft={Filter} onPress={onFilterPress}>
+          Filtrer
+        </VoxButton>
+
+        <MilitantHeaderPagination
+          isPrevDisabled={prevDisabled}
+          isNextDisabled={nextDisabled}
+          handlePrevPage={onPrev}
+          handleNextPage={onNext}
+          pageStart={pageStart}
+          pageEnd={pageEnd}
+          total={total}
+        />
+      </View>
     </YStack>
   )
 }

@@ -15,7 +15,6 @@ interface PanelOrBottomSheetProps extends PropsWithChildren {
 const PANEL_WIDTH_LG = 390
 const PANEL_WIDTH_BELOW_LG = 340
 const ANIMATION = { duration: 300, easing: Easing.out(Easing.cubic) }
-const AnimatedYStack = Animated.createAnimatedComponent(YStack)
 
 export default function PanelOrBottomSheet({ isOpen, onClose, children, snapPoints }: PanelOrBottomSheetProps) {
   const media = useMedia()
@@ -111,22 +110,20 @@ export default function PanelOrBottomSheet({ isOpen, onClose, children, snapPoin
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </Animated.View>
 
-      <AnimatedYStack
-        position="absolute"
-        top={0}
-        right={0}
-        bottom={0}
-        width={panelWidth}
-        backgroundColor="$background"
-        elevation="$4"
-        borderLeftWidth={1}
-        borderColor="$borderColor"
-        style={[animatedPanelStyle, styles.desktopPanelShadow]}
+      <Animated.View
+        style={[
+          styles.desktopPanelPosition,
+          { width: panelWidth },
+          animatedPanelStyle,
+          styles.desktopPanelShadow,
+        ]}
       >
-        <ScrollView flex={1} contentContainerStyle={styles.desktopScrollContent}>
-          {children}
-        </ScrollView>
-      </AnimatedYStack>
+        <YStack flex={1} backgroundColor="$background" elevation="$4" borderLeftWidth={1} borderColor="$borderColor">
+          <ScrollView flex={1} contentContainerStyle={styles.desktopScrollContent}>
+            {children}
+          </ScrollView>
+        </YStack>
+      </Animated.View>
     </Modal>
   )
 }
@@ -136,6 +133,12 @@ const styles = StyleSheet.create({
   mobileModal: { width: '100%' },
   mobileScrollContent: { width: '100%' },
   backdrop: { backgroundColor: 'black' },
+  desktopPanelPosition: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+  },
   desktopPanelShadow: {
     shadowColor: '#000',
     shadowOffset: { width: -4, height: 0 },
