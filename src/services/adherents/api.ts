@@ -8,3 +8,12 @@ export const getAdherents = api({
   responseSchema: schemas.RestAdherentListResponseSchema,
   type: 'private',
 })
+
+export const getAdherentDetail = (uuid: string) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherents/${uuid}`,
+    requestSchema: schemas.RestAdherentDetailRequestSchema,
+    responseSchema: schemas.RestAdherentDetailSchema,
+    type: 'private',
+  })

@@ -1,6 +1,8 @@
-import { ComponentProps } from 'react'
-import type { IconComponent } from '@/models/common.model'
+import { ComponentProps, ReactNode } from 'react'
 import { styled, XStack } from 'tamagui'
+
+import type { IconComponent } from '@/models/common.model'
+
 import Text from '../base/Text'
 
 const ChipFrame = styled(XStack, {
@@ -27,17 +29,25 @@ const ChipFrame = styled(XStack, {
 } as const)
 
 export type ChipProps = {
-  children: string
+  /** Contenu du chip : passer un nœud Text pour garder ton style (ex. <Text.SM numberOfLines={1}>...</Text.SM>), ou une string (style par défaut). */
+  children: ReactNode
 } & ComponentProps<typeof ChipFrame>
 
 const Chip = ({ children, icon, ...props }: ChipProps & { icon?: IconComponent }) => {
   const Icon = icon
-  return (
-    <ChipFrame {...props} theme={props.theme ?? 'gray'}>
-      {Icon && <Icon color={props.alert ? 'white' : '$color5'} testID={`chip-icon`} size={12} />}
+  const content =
+    typeof children === 'string' ? (
       <Text.SM semibold color={props.alert ? 'white' : '$color5'}>
         {children}
       </Text.SM>
+    ) : (
+      children
+    )
+
+  return (
+    <ChipFrame {...props} theme={props.theme ?? 'gray'}>
+      {Icon && <Icon color={props.alert ? 'white' : '$color5'} testID="chip-icon" size={12} />}
+      {content}
     </ChipFrame>
   )
 }

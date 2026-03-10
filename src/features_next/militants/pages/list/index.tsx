@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getToken, useMedia, XStack, YStack } from 'tamagui'
-import { ArrowLeft, ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
+import { getToken, useMedia, YStack } from 'tamagui'
+import { ArrowLeft } from '@tamagui/lucide-icons'
 
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
 import Text from '@/components/base/Text'
@@ -16,28 +16,24 @@ import { ListSkeleton } from './components/ListSkeleton'
 
 const PAGE_SIZE = 25
 
-function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDenyButton?: React.ReactNode }) {
+function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scope: string; accessDenyButton?: React.ReactNode }) {
   const media = useMedia()
   const [currentPage, setCurrentPage] = useState(1)
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
 
-  const { data, isLoading, isFetching, isPlaceholderData, refetch, isRefetching } = useAdherentsPage(
-    scope,
-    currentPage,
-    PAGE_SIZE,
-  )
+  const { data, isLoading, isFetching, isPlaceholderData, refetch } = useAdherentsPage(scope, currentPage, PAGE_SIZE)
 
   const metadata = data?.metadata
-  const militants = useMemo(
-    () => (isPlaceholderData ? [] : (data?.items ?? [])),
-    [isPlaceholderData, data?.items],
-  )
+  const militants = useMemo(() => (isPlaceholderData ? [] : (data?.items ?? [])), [isPlaceholderData, data?.items])
 
   const handleManualRefresh = useCallback(async () => {
     setIsManualRefreshing(true)
-    await refetch()
-    if (!isRefetching) setIsManualRefreshing(false)
-  }, [refetch, isRefetching])
+    try {
+      await refetch()
+    } finally {
+      setIsManualRefreshing(false)
+    }
+  }, [refetch])
 
   const isPrevDisabled = currentPage <= 1
   const isNextDisabled = !metadata || currentPage >= metadata.last_page
@@ -51,18 +47,19 @@ function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDe
   }, [isNextDisabled])
 
   const total = metadata?.total_items
+  const isPageTransition = isFetching && metadata && currentPage !== metadata.current_page
   const pageStart = useMemo(() => {
-    if (isPlaceholderData && metadata) {
+    if (isPageTransition || (isPlaceholderData && metadata)) {
       return (currentPage - 1) * PAGE_SIZE + 1
     }
     return metadata ? (metadata.current_page - 1) * metadata.items_per_page + 1 : undefined
-  }, [isPlaceholderData, metadata, currentPage])
+  }, [isPageTransition, isPlaceholderData, metadata, currentPage])
   const pageEnd = useMemo(() => {
-    if (isPlaceholderData && metadata) {
+    if (isPageTransition || (isPlaceholderData && metadata)) {
       return Math.min(currentPage * PAGE_SIZE, metadata.total_items)
     }
     return metadata ? Math.min(metadata.current_page * metadata.items_per_page, metadata.total_items) : undefined
-  }, [isPlaceholderData, metadata, currentPage])
+  }, [isPageTransition, isPlaceholderData, metadata, currentPage])
 
   const headerComponent = useMemo(
     () => (
@@ -80,13 +77,12 @@ function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDe
   )
 
   const renderItem = useCallback(({ item }: { item: RestAdherentListItem }) => {
-    const displayName = [item.first_name, item.last_name].filter(Boolean).join(' ') || item.public_id
-    return <MilitantCadreItem {...item} />
+    return <MilitantCadreItem key={item.uuid} {...item} onPress={() => console.log(`MilitantCadreItem pressed ${item.uuid}`)} />
   }, [])
 
   const contentContainerStyle = useMemo(() => {
     const baseStyle: { gap: number; paddingTop?: number; marginTop?: number } = {
-      gap: getToken('$medium', 'space'),
+      gap: getToken('$small', 'space'),
     }
     if (media.sm) {
       baseStyle.paddingTop = 0
@@ -112,9 +108,9 @@ function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDe
     <Layout.Main maxWidth={892}>
       <LayoutFlatList<RestAdherentListItem>
         padding={media.sm ? false : undefined}
-        data={militants}
+        data={militants as RestAdherentListItem[]}
         renderItem={renderItem}
-        keyExtractor={(item) => item.adherent_uuid}
+        keyExtractor={(item) => item.uuid}
         ListHeaderComponent={headerComponent}
         ListEmptyComponent={listEmptyComponent}
         refreshing={isManualRefreshing}

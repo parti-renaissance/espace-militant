@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { styled, useMedia, View, ViewProps, XStack, YStack } from 'tamagui'
 import { Mail, Monitor, Phone, Smartphone } from '@tamagui/lucide-icons'
 
@@ -8,9 +8,46 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { Chip } from '@/components'
 import { IconComponent } from '@/models/common.model'
-import { RestAdherentListItem } from '@/services/adherents/schema'
+import type { RestAdherentListItem } from '@/services/adherents/schema'
 
-// 1. On crée le conteneur stylé
+type ChipTheme = 'yellow' | 'blue' | 'gray' | 'purple' | 'orange'
+type TagLike = { label: string; code?: string }
+
+const TagChipRow = memo(function TagChipRow({ tags, theme }: { tags?: TagLike[] | null; theme: ChipTheme }) {
+  const list = tags ?? []
+  if (!list.length) return null
+  const first = list[0]
+  const restCount = Math.max(0, list.length - 1)
+  return (
+    <XStack overflow="hidden" minWidth={0} flexWrap="nowrap" gap={4} alignItems="center">
+      <Chip theme={theme} flexShrink={1} minWidth={0}>
+        <Text.SM numberOfLines={1} ellipsizeMode="tail" semibold color="$color5" textTransform="capitalize">
+          {first.label}
+        </Text.SM>
+      </Chip>
+      {restCount > 0 && <Chip theme={theme}>{`+${restCount}`}</Chip>}
+    </XStack>
+  )
+})
+
+const yearFromIsoDate = (iso?: string | null): string | null => {
+  if (!iso) return null
+  const y = new Date(iso).getFullYear()
+  return Number.isNaN(y) ? null : String(y)
+}
+
+const subscriptionStatus = (channel?: { available: boolean; subscribed: boolean }): ContactStatus => {
+  if (!channel?.available) return 'disabled'
+  return channel.subscribed ? 'active' : 'inactive'
+}
+
+const getAdherentTagChipStyle = (code?: string): ChipTheme => {
+  if (!code) return 'blue'
+  if (code.includes('adherent:a_jour')) return 'yellow'
+  if (code.includes('adherent')) return 'blue'
+  return 'gray'
+}
+
 const ChipContainer = styled(View, {
   bg: '$gray1',
   w: 24,
@@ -41,23 +78,62 @@ const StatusBadge = styled(View, {
 
 export type ContactStatus = 'active' | 'inactive' | 'neutral' | 'disabled'
 
-type ContactStatusChipProps = ViewProps & {
+interface ContactStatusChipProps extends ViewProps {
   status: ContactStatus
   Icon: IconComponent
 }
 
-export function ContactStatusChip({ status, Icon, ...props }: ContactStatusChipProps) {
+export const ContactStatusChip = memo(function ContactStatusChip({ status, Icon, ...props }: ContactStatusChipProps) {
   const isDisabled = status === 'disabled'
-
   return (
-    <ChipContainer {...props}>
+    <ChipContainer {...props} role="img" aria-label={isDisabled ? 'Canal désactivé' : `Canal ${status}`}>
       <Icon size={12} color={isDisabled ? '$textDisabled' : '$primary'} />
       {!isDisabled && <StatusBadge status={status} />}
     </ChipContainer>
   )
+})
+
+const SUBSCRIPTION_CHANNELS: { key: keyof RestAdherentListItem['subscriptions']; Icon: IconComponent }[] = [
+  { key: 'mobile', Icon: Smartphone },
+  { key: 'web', Icon: Monitor },
+  { key: 'sms', Icon: Phone },
+  { key: 'email', Icon: Mail },
+]
+
+const SubscriptionChannelsRow = memo(function SubscriptionChannelsRow({
+  subscriptions,
+}: {
+  subscriptions: RestAdherentListItem['subscriptions'] | null | undefined
+}) {
+  return (
+    <XStack gap={12} mt={4} flexWrap="wrap" role="list" aria-label="Canaux de contact">
+      {SUBSCRIPTION_CHANNELS.map(({ key, Icon }) => (
+        <ContactStatusChip key={key} status={subscriptionStatus(subscriptions?.[key])} Icon={Icon} />
+      ))}
+    </XStack>
+  )
+})
+
+export type MilitantCadreItemProps = RestAdherentListItem & {
+  onPress: () => void
 }
 
-export function MilitantCadreItem({ public_id, first_name, last_name, image_url, age }: RestAdherentListItem) {
+function MilitantCadreItemInner({
+  public_id,
+  first_name,
+  last_name,
+  image_url,
+  age,
+  adherent_tags,
+  static_tags,
+  elect_tags,
+  instances = [],
+  subscriptions,
+  account_created_at,
+  first_contribution_at,
+  roles,
+  onPress,
+}: MilitantCadreItemProps) {
   const media = useMedia()
 
   const isMobileLayout = media.md || media.sm
@@ -66,13 +142,32 @@ export function MilitantCadreItem({ public_id, first_name, last_name, image_url,
   const col3Width = isMobileLayout ? '50%' : '25%'
   const col4Width = isMobileLayout ? '50%' : '20%'
 
+  const circonscription = instances.find((i) => i.type === 'circonscription')
+  const assembly = instances.find((i) => i.type === 'assembly')
+  const committee = instances.find((i) => i.type === 'committee')
+  const anciennete = yearFromIsoDate(account_created_at)
+  const cotisationYear = yearFromIsoDate(first_contribution_at) ?? anciennete
+  const displayName = [first_name, last_name].filter(Boolean).join(' ') || ''
+  const listItemAriaLabel = [displayName, age != null ? `${age} ans` : null, public_id].filter(Boolean).join(', ')
+
   return (
-    <VoxCard>
+    <VoxCard
+      tag="button"
+      focusable
+      role="listitem"
+      aria-label={listItemAriaLabel || undefined}
+      onPress={onPress}
+      cursor="pointer"
+      focusVisibleStyle={{
+        outlineWidth: 2,
+        outlineColor: '$gray2',
+        outlineStyle: 'solid',
+      }}
+    >
       <VoxCard.Content>
         <XStack flexWrap="wrap" width="100%" rowGap={isMobileLayout ? 16 : 0}>
-          {/* --- COLONNE 1 : PROFIL --- */}
           <XStack width={col1Width} pr={8} alignItems="center" gap={12} overflow="hidden">
-            <ProfilePicture size={40} rounded src={image_url ?? undefined} fullName={`${first_name} ${last_name}`} alt={`${first_name} ${last_name}`} />
+            <ProfilePicture size={40} rounded src={image_url ?? undefined} fullName={displayName} alt={displayName} />
             <YStack flex={1} overflow="hidden">
               <Text.SM medium numberOfLines={1}>
                 {first_name} {last_name}
@@ -90,64 +185,54 @@ export function MilitantCadreItem({ public_id, first_name, last_name, image_url,
             </YStack>
           </XStack>
 
-          {/* --- COLONNE 2 : TAGS --- */}
-          <YStack width={col2Width} pr={8} gap={6} overflow="hidden">
-            <XStack gap={4}>
-              <Chip theme="yellow">Todo Tag adherent</Chip>
-            </XStack>
-            <XStack gap={4}>
-              <Chip theme="purple">Todo cadre</Chip>
-              <Chip theme="purple">+2</Chip>
-            </XStack>
-            <XStack gap={4}>
-              <Chip theme="orange">Todo élu</Chip>
-              <Chip theme="orange">+1</Chip>
-            </XStack>
+          <YStack width={col2Width} pr={8} gap={6} overflow="hidden" minWidth={0} justifyContent="center">
+            {adherent_tags && <TagChipRow tags={adherent_tags} theme={getAdherentTagChipStyle(adherent_tags?.[0]?.code)} />}
+            {roles && <TagChipRow tags={roles} theme="purple" />}
+            {elect_tags && <TagChipRow tags={elect_tags} theme="orange" />}
+            {static_tags && <TagChipRow tags={static_tags} theme="gray" />}
           </YStack>
 
-          {/* --- COLONNE 3 : LOCALISATION & STATUT --- */}
           <YStack width={col3Width} pr={8} gap={2} overflow="hidden">
-            <Text.SM semibold numberOfLines={1}>
-              Circonscription
-            </Text.SM>
-            <Text.SM semibold numberOfLines={1}>
-              Commune
-            </Text.SM>
-            <Text.SM secondary regular numberOfLines={1}>
-              Comité
-            </Text.SM>
-            <XStack gap={12} mt={4} flexWrap="wrap">
-              <ContactStatusChip status="active" Icon={Smartphone} />
-              <ContactStatusChip status="disabled" Icon={Monitor} />
-              <ContactStatusChip status="neutral" Icon={Phone} />
-              <ContactStatusChip status="inactive" Icon={Mail} />
-            </XStack>
+            {circonscription && (
+              <Text.SM semibold numberOfLines={1}>
+                {circonscription.name}
+              </Text.SM>
+            )}
+            {assembly && (
+              <Text.SM semibold numberOfLines={1}>
+                {assembly.name}
+              </Text.SM>
+            )}
+            {committee && (
+              <Text.SM secondary regular numberOfLines={1}>
+                {committee.name}
+              </Text.SM>
+            )}
+            <SubscriptionChannelsRow subscriptions={subscriptions} />
           </YStack>
 
-          {/* --- COLONNE 4 : SCORES & DATES --- */}
           <YStack width={col4Width} overflow="hidden">
-            <XStack display="none">
-              <Text.SM semibold numberOfLines={1}>
-                TODO score RFE
-              </Text.SM>
-            </XStack>
             <XStack gap={12}>
-              <YStack>
-                <Text.XSM secondary numberOfLines={1}>
-                  Ancienneté
-                </Text.XSM>
-                <Text.SM semibold numberOfLines={1}>
-                  2023
-                </Text.SM>
-              </YStack>
-              <YStack>
-                <Text.XSM secondary numberOfLines={1}>
-                  Cotisation
-                </Text.XSM>
-                <Text.SM semibold numberOfLines={1}>
-                  2023
-                </Text.SM>
-              </YStack>
+              {anciennete && (
+                <YStack>
+                  <Text.XSM secondary numberOfLines={1}>
+                    Ancienneté
+                  </Text.XSM>
+                  <Text.SM semibold numberOfLines={1}>
+                    {anciennete}
+                  </Text.SM>
+                </YStack>
+              )}
+              {cotisationYear && (
+                <YStack>
+                  <Text.XSM secondary numberOfLines={1}>
+                    Cotisation
+                  </Text.XSM>
+                  <Text.SM semibold numberOfLines={1}>
+                    {cotisationYear}
+                  </Text.SM>
+                </YStack>
+              )}
             </XStack>
           </YStack>
         </XStack>
@@ -155,3 +240,5 @@ export function MilitantCadreItem({ public_id, first_name, last_name, image_url,
     </VoxCard>
   )
 }
+
+export const MilitantCadreItem = memo(MilitantCadreItemInner)
