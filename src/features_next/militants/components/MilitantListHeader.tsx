@@ -1,31 +1,63 @@
 import React from 'react'
-import { useMedia, View, XStack, YStack } from 'tamagui'
-import { ChevronLeft, ChevronRight, Filter } from '@tamagui/lucide-icons'
+import { useMedia, XStack, YStack } from 'tamagui'
+import { ChevronLeft, ChevronRight, CircleX, Filter, RotateCcw } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import type { ActiveFilterChip } from '@/components/Filters'
+
+function ActiveFilterChipsRow({
+  chips,
+  onRemoveFilter,
+  onResetAllFilters,
+}: {
+  chips: ActiveFilterChip[]
+  onRemoveFilter: (key: string) => void
+  onResetAllFilters: () => void
+}) {
+  if (chips.length === 0) return null
+  return (
+    <XStack flexWrap="wrap" alignItems="center" gap="$small">
+      {chips.map((chip) => (
+        <VoxButton
+          key={chip.key}
+          size="xxs"
+          theme="blue"
+          variant="contained"
+          iconRight={CircleX}
+          onPress={() => onRemoveFilter(chip.key)}
+          testID={`filter-chip-${chip.key}`}
+        >
+          {chip.label} : {chip.value_label}
+        </VoxButton>
+      ))}
+      {chips.length >= 2 ? (
+        <VoxButton size="xxs" theme="gray" variant="outlined" iconLeft={RotateCcw} onPress={onResetAllFilters} testID="filter-reset-all">
+          Réinitialiser tous les filtres
+        </VoxButton>
+      ) : null}
+    </XStack>
+  )
+}
 
 interface MilitantHeaderPaginationProps {
-  isPrevDisabled: boolean
-  isNextDisabled: boolean
-  handlePrevPage: () => void
-  handleNextPage: () => void
-  pageStart?: number
-  pageEnd?: number
-  total?: number
+  page: number
+  pageSize: number
+  totalItems?: number
+  onPageChange: (page: number) => void
+  disabled?: boolean
 }
 
 export interface MilitantListHeaderProps {
-  /** Désactive les boutons de pagination (ex: skeleton) */
-  paginationDisabled?: boolean
-  isPrevDisabled?: boolean
-  isNextDisabled?: boolean
-  handlePrevPage?: () => void
-  handleNextPage?: () => void
-  pageStart?: number
-  pageEnd?: number
-  total?: number
   onFilterPress: () => void
+  activeFilterChips?: ActiveFilterChip[]
+  onRemoveFilter: (filterKey: string) => void
+  onResetAllFilters: () => void
+  paginationDisabled?: boolean
+  page: number
+  pageSize: number
+  totalItems?: number
+  onPageChange: (page: number) => void
 }
 
 export function MilitantHeaderTop() {
@@ -46,22 +78,25 @@ export function MilitantHeaderTop() {
 }
 
 function MilitantHeaderPagination({
-  isPrevDisabled,
-  isNextDisabled,
-  handlePrevPage,
-  handleNextPage,
-  pageStart,
-  pageEnd,
-  total,
+  page,
+  pageSize,
+  totalItems,
+  onPageChange,
+  disabled = false,
 }: MilitantHeaderPaginationProps) {
   const media = useMedia()
-  const rangeText = pageStart != null && pageEnd != null ? `${pageStart}-${pageEnd}` : '1-1'
+  const lastPage = totalItems != null ? Math.ceil(totalItems / pageSize) : undefined
+  const isPrevDisabled = disabled || page <= 1
+  const isNextDisabled = disabled || (lastPage == null || page >= lastPage)
+  const pageStart = totalItems === 0 ? 0 : (page - 1) * pageSize + 1
+  const pageEnd = totalItems === 0 ? 0 : totalItems != null ? Math.min(page * pageSize, totalItems) : page * pageSize
+  const rangeText = `${pageStart}-${pageEnd}`
 
   return (
     <XStack justifyContent={media.sm ? 'space-between' : 'flex-end'} alignItems="center" gap="$medium">
       <Text.SM>
-        <Text.SM secondary>{rangeText ?? '1 - 25'} sur </Text.SM>
-        <Text.SM semibold>{total ?? '25'}</Text.SM>
+        <Text.SM secondary>{rangeText} sur </Text.SM>
+        <Text.SM semibold>{totalItems ?? '–'}</Text.SM>
       </Text.SM>
       <XStack gap={4}>
         <VoxButton
@@ -70,7 +105,7 @@ function MilitantHeaderPagination({
           size="md"
           shrink
           iconLeft={ChevronLeft}
-          onPress={handlePrevPage}
+          onPress={() => onPageChange(page - 1)}
           disabled={isPrevDisabled}
           opacity={isPrevDisabled ? 0.5 : 1}
         >
@@ -82,7 +117,7 @@ function MilitantHeaderPagination({
           size="md"
           shrink
           iconRight={ChevronRight}
-          onPress={handleNextPage}
+          onPress={() => onPageChange(page + 1)}
           disabled={isNextDisabled}
           opacity={isNextDisabled ? 0.5 : 1}
         >
@@ -94,40 +129,59 @@ function MilitantHeaderPagination({
 }
 
 export function MilitantListHeader({
-  paginationDisabled = false,
-  isPrevDisabled = true,
-  isNextDisabled = true,
-  handlePrevPage = () => {},
-  handleNextPage = () => {},
-  pageStart,
-  pageEnd,
-  total,
   onFilterPress,
+  activeFilterChips = [],
+  onRemoveFilter,
+  onResetAllFilters,
+  paginationDisabled = false,
+  page,
+  pageSize,
+  totalItems,
+  onPageChange,
 }: MilitantListHeaderProps) {
   const media = useMedia()
-  const prevDisabled = paginationDisabled || isPrevDisabled
-  const nextDisabled = paginationDisabled || isNextDisabled
-  const onPrev = paginationDisabled ? () => {} : handlePrevPage
-  const onNext = paginationDisabled ? () => {} : handleNextPage
+  const hasActiveFilters = activeFilterChips.length > 0
+  const filterChipsRow = (
+    <ActiveFilterChipsRow chips={activeFilterChips} onRemoveFilter={onRemoveFilter} onResetAllFilters={onResetAllFilters} />
+  )
+
+  if (media.sm) {
+    return (
+      <YStack gap="$small">
+        <MilitantHeaderTop />
+        <YStack gap="$small" mt="$medium" mx="$medium">
+          <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="md" iconLeft={Filter} onPress={onFilterPress}>
+            Filtrer
+          </VoxButton>
+          {filterChipsRow}
+          <MilitantHeaderPagination
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={onPageChange}
+            disabled={paginationDisabled}
+          />
+        </YStack>
+      </YStack>
+    )
+  }
 
   return (
-    <YStack>
+    <YStack gap="$small">
       <MilitantHeaderTop />
-      <View flexDirection={media.sm ? 'column' : 'row'} justifyContent="space-between" gap="$small" mt="$medium" mx={media.sm ? '$medium' : undefined}>
-        <VoxButton variant="outlined" theme="gray" size="md" iconLeft={Filter} onPress={onFilterPress}>
+      <XStack justifyContent="space-between" alignItems="center" gap="$small" mt="$medium">
+        <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="md" iconLeft={Filter} onPress={onFilterPress}>
           Filtrer
         </VoxButton>
-
         <MilitantHeaderPagination
-          isPrevDisabled={prevDisabled}
-          isNextDisabled={nextDisabled}
-          handlePrevPage={onPrev}
-          handleNextPage={onNext}
-          pageStart={pageStart}
-          pageEnd={pageEnd}
-          total={total}
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+          disabled={paginationDisabled}
         />
-      </View>
+      </XStack>
+      {filterChipsRow}
     </YStack>
   )
 }

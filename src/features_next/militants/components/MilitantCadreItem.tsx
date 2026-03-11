@@ -138,9 +138,9 @@ function MilitantCadreItemInner({
 
   const isMobileLayout = media.md || media.sm
   const col1Width = isMobileLayout ? '100%' : '25%'
-  const col2Width = isMobileLayout ? '100%' : '30%'
-  const col3Width = isMobileLayout ? '50%' : '25%'
-  const col4Width = isMobileLayout ? '50%' : '20%'
+  const col2Width = isMobileLayout ? '100%' : '36%'
+  const col3Width = isMobileLayout ? '50%' : '22%'
+  const col4Width = isMobileLayout ? '50%' : '17%'
 
   const circonscription = instances.find((i) => i.type === 'circonscription')
   const assembly = instances.find((i) => i.type === 'assembly')
@@ -166,7 +166,7 @@ function MilitantCadreItemInner({
     >
       <VoxCard.Content>
         <XStack flexWrap="wrap" width="100%" rowGap={isMobileLayout ? 16 : 0}>
-          <XStack width={col1Width} pr={8} alignItems="center" gap={12} overflow="hidden">
+          <XStack width={col1Width} pr="$medium" alignItems="center" gap={12} overflow="hidden">
             <ProfilePicture size={40} rounded src={image_url ?? undefined} fullName={displayName} alt={displayName} />
             <YStack flex={1} overflow="hidden">
               <Text.SM medium numberOfLines={1}>
@@ -185,14 +185,14 @@ function MilitantCadreItemInner({
             </YStack>
           </XStack>
 
-          <YStack width={col2Width} pr={8} gap={6} overflow="hidden" minWidth={0} justifyContent="center">
+          <YStack width={col2Width} pr="$medium" gap={6} overflow="hidden" minWidth={0} justifyContent="center">
             {adherent_tags && <TagChipRow tags={adherent_tags} theme={getAdherentTagChipStyle(adherent_tags?.[0]?.code)} />}
             {roles && <TagChipRow tags={roles} theme="purple" />}
             {elect_tags && <TagChipRow tags={elect_tags} theme="orange" />}
             {static_tags && <TagChipRow tags={static_tags} theme="gray" />}
           </YStack>
 
-          <YStack width={col3Width} pr={8} gap={2} overflow="hidden">
+          <YStack width={col3Width} pr="$medium" gap={2} overflow="hidden">
             {circonscription && (
               <Text.SM semibold numberOfLines={1}>
                 {circonscription.name}

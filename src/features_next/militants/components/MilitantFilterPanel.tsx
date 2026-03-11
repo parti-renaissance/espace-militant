@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import { YStack } from 'tamagui'
 
 import Text from '@/components/base/Text'
@@ -7,18 +7,15 @@ import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'
 
 interface MilitantFilterPanelProps {
   scope?: string
+  initialValues?: FilterValues
+  onChangeFilter: (values: FilterValues) => void
 }
 
-export function MilitantFilterPanel({ scope }: MilitantFilterPanelProps) {
-  const handleChangeFilter = useCallback((values: FilterValues) => {
-    // eslint-disable-next-line no-console
-    console.log('FilterCollectionBuilder onChangeFilter', values)
-  }, [])
-
+export function MilitantFilterPanel({ scope, initialValues, onChangeFilter }: MilitantFilterPanelProps) {
   return (
     <YStack padding="$medium" gap="$medium" mb={350}>
       <Text.LG semibold>Tous les filtres</Text.LG>
-      <FilterCollectionBuilder featureKey="contacts" scope={scope} onChangeFilter={handleChangeFilter} />
+      <FilterCollectionBuilder featureKey="publications" scope={scope} initialValues={initialValues} onChangeFilter={onChangeFilter} />
     </YStack>
   )
 }

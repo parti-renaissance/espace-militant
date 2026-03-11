@@ -5,6 +5,8 @@ import { ArrowLeft } from '@tamagui/lucide-icons'
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'
+import { getActiveFilterChips } from '@/components/Filters/filterCollectionUtils'
 import PanelOrBottomSheet from '@/components/PanelOrBottomSheet/PanelOrBottomSheet'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
 import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
@@ -12,19 +14,33 @@ import { MilitantListHeader } from '@/features_next/militants/components/Militan
 
 import { useAdherentsPage } from '@/services/adherents/hook'
 import { RestAdherentListItem } from '@/services/adherents/schema'
+import { useGetFiltersCollection } from '@/services/filters-collection/hook'
 import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
 
 import { ListSkeleton } from './components/ListSkeleton'
+import { PAGE_SIZE } from './constants'
 
-const PAGE_SIZE = 25
+const FILTERS_FEATURE_KEY = 'publications'
 
 function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scope: string; accessDenyButton?: React.ReactNode }) {
   const media = useMedia()
   const [currentPage, setCurrentPage] = useState(1)
+  const [filters, setFilters] = useState<FilterValues>({})
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  const { data, isLoading, isFetching, isPlaceholderData, refetch } = useAdherentsPage(scope, currentPage, PAGE_SIZE)
+  const { data: collection } = useGetFiltersCollection({
+    featureKey: FILTERS_FEATURE_KEY,
+    scope,
+  })
+  const { data, isLoading, isFetching, isPlaceholderData, refetch } = useAdherentsPage({
+    scope,
+    page: currentPage,
+    pageSize: PAGE_SIZE,
+    filters,
+  })
+
+  const activeFilterChips = useMemo(() => getActiveFilterChips(filters, collection), [filters, collection])
 
   const metadata = data?.metadata
   const militants = useMemo(() => (isPlaceholderData ? [] : (data?.items ?? [])), [isPlaceholderData, data?.items])
@@ -38,49 +54,55 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
     }
   }, [refetch])
 
-  const isPrevDisabled = currentPage <= 1
-  const isNextDisabled = !metadata || currentPage >= metadata.last_page
-
-  const handlePrevPage = useCallback(() => {
-    if (!isPrevDisabled) setCurrentPage((p) => p - 1)
-  }, [isPrevDisabled])
-
-  const handleNextPage = useCallback(() => {
-    if (!isNextDisabled) setCurrentPage((p) => p + 1)
-  }, [isNextDisabled])
-
-  const total = metadata?.total_items
-  const isPageTransition = isFetching && metadata && currentPage !== metadata.current_page
-  const pageStart = useMemo(() => {
-    if (isPageTransition || (isPlaceholderData && metadata)) {
-      return (currentPage - 1) * PAGE_SIZE + 1
-    }
-    return metadata ? (metadata.current_page - 1) * metadata.items_per_page + 1 : undefined
-  }, [isPageTransition, isPlaceholderData, metadata, currentPage])
-  const pageEnd = useMemo(() => {
-    if (isPageTransition || (isPlaceholderData && metadata)) {
-      return Math.min(currentPage * PAGE_SIZE, metadata.total_items)
-    }
-    return metadata ? Math.min(metadata.current_page * metadata.items_per_page, metadata.total_items) : undefined
-  }, [isPageTransition, isPlaceholderData, metadata, currentPage])
+  const lastPage = metadata?.total_items != null ? Math.ceil(metadata.total_items / PAGE_SIZE) : undefined
+  const handlePageChange = useCallback((page: number) => setCurrentPage(() => Math.max(1, Math.min(page, lastPage ?? Infinity))), [lastPage])
 
   const handleFilterPress = useCallback(() => setIsFilterOpen(true), [])
   const handleCloseFilter = useCallback(() => setIsFilterOpen(false), [])
 
+  const handleChangeFilter = useCallback((values: FilterValues) => {
+    setFilters(values)
+    setCurrentPage(1)
+  }, [])
+
+  const handleRemoveFilter = useCallback((filterKey: string) => {
+    setFilters((prev) => {
+      const { [filterKey]: _, ...rest } = prev
+      return rest
+    })
+    setCurrentPage(1)
+  }, [])
+
+  const handleResetAllFilters = useCallback(() => {
+    setFilters({})
+    setCurrentPage(1)
+  }, [])
+
   const headerComponent = useMemo(
     () => (
       <MilitantListHeader
-        isPrevDisabled={isPrevDisabled}
-        isNextDisabled={isNextDisabled}
-        handlePrevPage={handlePrevPage}
-        handleNextPage={handleNextPage}
-        pageStart={pageStart}
-        pageEnd={pageEnd}
-        total={total}
         onFilterPress={handleFilterPress}
+        activeFilterChips={activeFilterChips}
+        onRemoveFilter={handleRemoveFilter}
+        onResetAllFilters={handleResetAllFilters}
+        paginationDisabled={isFetching && !isPlaceholderData}
+        page={currentPage}
+        pageSize={PAGE_SIZE}
+        totalItems={metadata?.total_items}
+        onPageChange={handlePageChange}
       />
     ),
-    [isPrevDisabled, isNextDisabled, handlePrevPage, handleNextPage, pageStart, pageEnd, total, handleFilterPress],
+    [
+      handleFilterPress,
+      activeFilterChips,
+      handleRemoveFilter,
+      handleResetAllFilters,
+      isFetching,
+      isPlaceholderData,
+      currentPage,
+      metadata?.total_items,
+      handlePageChange,
+    ],
   )
 
   const renderItem = useCallback(({ item }: { item: RestAdherentListItem }) => {
@@ -125,7 +147,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         contentContainerStyle={contentContainerStyle}
       />
       <PanelOrBottomSheet isOpen={isFilterOpen} onClose={handleCloseFilter}>
-        <MilitantFilterPanel scope={scope} />
+        <MilitantFilterPanel scope={scope} initialValues={filters} onChangeFilter={handleChangeFilter} />
       </PanelOrBottomSheet>
     </Layout.Main>
   )
