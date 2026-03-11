@@ -1,9 +1,11 @@
-import { ComponentProps, ComponentRef, forwardRef, useEffect, useMemo, useState, createContext, useContext } from 'react'
+import { ComponentProps, ComponentRef, createContext, forwardRef, useContext, useEffect, useMemo, useState } from 'react'
 import { GestureResponderEvent, LayoutChangeEvent, NativeSyntheticEvent, Platform, TextInput, TextInputFocusEventData, TextInputProps } from 'react-native'
-import Text from '@/components/base/Text'
-import { useForwardRef } from '@/hooks/useForwardRef'
-import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
 import { AnimatePresence, isWeb, Spinner, styled, TamaguiElement, useTheme, XStack, YStack } from 'tamagui'
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
+
+import Text from '@/components/base/Text'
+
+import { useForwardRef } from '@/hooks/useForwardRef'
 
 // Contexte pour indiquer si on est dans un vrai BottomSheet
 const BottomSheetContext = createContext<boolean>(false)
@@ -55,7 +57,7 @@ const InputFrame = styled(XStack, {
     backgroundColor: '$gray2',
     cursor: 'text',
   },
-  focusStyle: {
+  focusVisibleStyle: {
     borderColor: '$blue9',
   },
 
@@ -76,7 +78,7 @@ const InputFrame = styled(XStack, {
     error: {
       true: {
         backgroundColor: '$orange1',
-        focusStyle: {
+        focusVisibleStyle: {
           borderColor: '$orange1',
         },
       },
@@ -257,12 +259,12 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
               (label ||
                 (placeholder && inputProps.value && inputProps.value.length > 0) ||
                 (placeholder && inputProps.defaultValue && inputProps.defaultValue.length > 0)) && (
-              <XStack alignSelf="flex-start" width="100%">
-                <Text.XSM flex={1} color={error ? '$orange5' : '$textPrimary'} numberOfLines={1}>
-                  {label ?? placeholder}
-                </Text.XSM>
-              </XStack>
-            )}
+                <XStack alignSelf="flex-start" width="100%">
+                  <Text.XSM flex={1} color={error ? '$orange5' : '$textPrimary'} numberOfLines={1}>
+                    {label ?? placeholder}
+                  </Text.XSM>
+                </XStack>
+              )}
           </AnimatePresence>
           {fake ? (
             <FakeTextComponent {...defaultFakeTextProps} />

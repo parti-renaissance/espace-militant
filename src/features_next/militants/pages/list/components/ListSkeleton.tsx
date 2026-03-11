@@ -17,12 +17,12 @@ export function MilitantItemSkeleton() {
   )
 }
 
-export function ListSkeleton() {
+export function ListSkeleton({ showHeader = true }: { showHeader?: boolean }) {
   const media = useMedia()
 
   return (
     <YStack gap="$medium" paddingHorizontal={media.sm ? 0 : undefined}>
-      <MilitantListHeader />
+      {showHeader && <MilitantListHeader paginationDisabled />}
       <MilitantItemSkeleton />
       <MilitantItemSkeleton />
       <MilitantItemSkeleton />

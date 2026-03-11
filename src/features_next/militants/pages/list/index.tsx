@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getToken, useMedia, XStack, YStack } from 'tamagui'
-import { ArrowLeft, ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
+import { getToken, useMedia, YStack } from 'tamagui'
+import { ArrowLeft } from '@tamagui/lucide-icons'
 
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import PanelOrBottomSheet from '@/components/PanelOrBottomSheet/PanelOrBottomSheet'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
+import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
 import { MilitantListHeader } from '@/features_next/militants/components/MilitantListHeader'
 
 import { useAdherentsPage } from '@/services/adherents/hook'
@@ -16,21 +18,25 @@ import { ListSkeleton } from './components/ListSkeleton'
 
 const PAGE_SIZE = 25
 
-function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDenyButton?: React.ReactNode }) {
+function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scope: string; accessDenyButton?: React.ReactNode }) {
   const media = useMedia()
   const [currentPage, setCurrentPage] = useState(1)
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  const { data, isLoading, refetch, isRefetching } = useAdherentsPage(scope, currentPage, PAGE_SIZE)
+  const { data, isLoading, isFetching, isPlaceholderData, refetch } = useAdherentsPage(scope, currentPage, PAGE_SIZE)
 
-  const militants = useMemo(() => data?.items ?? [], [data?.items])
   const metadata = data?.metadata
+  const militants = useMemo(() => (isPlaceholderData ? [] : (data?.items ?? [])), [isPlaceholderData, data?.items])
 
   const handleManualRefresh = useCallback(async () => {
     setIsManualRefreshing(true)
-    await refetch()
-    if (!isRefetching) setIsManualRefreshing(false)
-  }, [refetch, isRefetching])
+    try {
+      await refetch()
+    } finally {
+      setIsManualRefreshing(false)
+    }
+  }, [refetch])
 
   const isPrevDisabled = currentPage <= 1
   const isNextDisabled = !metadata || currentPage >= metadata.last_page
@@ -43,16 +49,47 @@ function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDe
     if (!isNextDisabled) setCurrentPage((p) => p + 1)
   }, [isNextDisabled])
 
-  const headerComponent = useMemo(() => <MilitantListHeader />, [])
+  const total = metadata?.total_items
+  const isPageTransition = isFetching && metadata && currentPage !== metadata.current_page
+  const pageStart = useMemo(() => {
+    if (isPageTransition || (isPlaceholderData && metadata)) {
+      return (currentPage - 1) * PAGE_SIZE + 1
+    }
+    return metadata ? (metadata.current_page - 1) * metadata.items_per_page + 1 : undefined
+  }, [isPageTransition, isPlaceholderData, metadata, currentPage])
+  const pageEnd = useMemo(() => {
+    if (isPageTransition || (isPlaceholderData && metadata)) {
+      return Math.min(currentPage * PAGE_SIZE, metadata.total_items)
+    }
+    return metadata ? Math.min(metadata.current_page * metadata.items_per_page, metadata.total_items) : undefined
+  }, [isPageTransition, isPlaceholderData, metadata, currentPage])
+
+  const handleFilterPress = useCallback(() => setIsFilterOpen(true), [])
+  const handleCloseFilter = useCallback(() => setIsFilterOpen(false), [])
+
+  const headerComponent = useMemo(
+    () => (
+      <MilitantListHeader
+        isPrevDisabled={isPrevDisabled}
+        isNextDisabled={isNextDisabled}
+        handlePrevPage={handlePrevPage}
+        handleNextPage={handleNextPage}
+        pageStart={pageStart}
+        pageEnd={pageEnd}
+        total={total}
+        onFilterPress={handleFilterPress}
+      />
+    ),
+    [isPrevDisabled, isNextDisabled, handlePrevPage, handleNextPage, pageStart, pageEnd, total, handleFilterPress],
+  )
 
   const renderItem = useCallback(({ item }: { item: RestAdherentListItem }) => {
-    const displayName = [item.first_name, item.last_name].filter(Boolean).join(' ') || item.public_id
-    return <MilitantCadreItem {...item} />
+    return <MilitantCadreItem key={item.uuid} {...item} onPress={() => console.log(`MilitantCadreItem pressed ${item.uuid}`)} />
   }, [])
 
   const contentContainerStyle = useMemo(() => {
     const baseStyle: { gap: number; paddingTop?: number; marginTop?: number } = {
-      gap: getToken('$medium', 'space'),
+      gap: getToken('$small', 'space'),
     }
     if (media.sm) {
       baseStyle.paddingTop = 0
@@ -61,67 +98,35 @@ function MilitantsContent({ scope, accessDenyButton }: { scope: string; accessDe
     return baseStyle
   }, [media.sm])
 
-  const shouldShowHeader = militants.length > 0 || metadata != null
-
   const listEmptyComponent = useMemo(() => {
-    if (isLoading) {
-      return <ListSkeleton />
+    const hasResolvedData = data != null
+    const isPending = isLoading || isFetching
+    if (!hasResolvedData || isPending) {
+      return <ListSkeleton showHeader={false} />
     }
     return (
       <YStack gap="$medium">
-        <MilitantListHeader />
         <Text.SM secondary>Aucun militant pour le moment.</Text.SM>
       </YStack>
     )
-  }, [isLoading])
-
-  const listFooterComponent = useMemo(() => {
-    if (!metadata && !isLoading) return null
-    return (
-      <XStack paddingVertical="$medium" justifyContent="space-between" alignItems="center" gap="$medium">
-        <VoxButton
-          variant="soft"
-          theme="gray"
-          size="md"
-          iconLeft={ChevronLeft}
-          onPress={handlePrevPage}
-          disabled={isPrevDisabled}
-          opacity={isPrevDisabled ? 0.5 : 1}
-        >
-          Précédent
-        </VoxButton>
-        <Text.SM secondary>
-          Page {metadata?.current_page ?? currentPage} / {metadata?.last_page ?? 1}
-        </Text.SM>
-        <VoxButton
-          variant="soft"
-          theme="gray"
-          size="md"
-          iconRight={ChevronRight}
-          onPress={handleNextPage}
-          disabled={isNextDisabled}
-          opacity={isNextDisabled ? 0.5 : 1}
-        >
-          Suivant
-        </VoxButton>
-      </XStack>
-    )
-  }, [metadata, currentPage, isLoading, isPrevDisabled, isNextDisabled, handlePrevPage, handleNextPage])
+  }, [data, isLoading, isFetching])
 
   return (
     <Layout.Main maxWidth={892}>
       <LayoutFlatList<RestAdherentListItem>
         padding={media.sm ? false : undefined}
-        data={militants}
+        data={militants as RestAdherentListItem[]}
         renderItem={renderItem}
-        keyExtractor={(item) => item.adherent_uuid}
-        ListHeaderComponent={shouldShowHeader ? headerComponent : undefined}
+        keyExtractor={(item) => item.uuid}
+        ListHeaderComponent={headerComponent}
         ListEmptyComponent={listEmptyComponent}
-        ListFooterComponent={listFooterComponent}
         refreshing={isManualRefreshing}
         onRefresh={handleManualRefresh}
         contentContainerStyle={contentContainerStyle}
       />
+      <PanelOrBottomSheet isOpen={isFilterOpen} onClose={handleCloseFilter}>
+        <MilitantFilterPanel scope={scope} />
+      </PanelOrBottomSheet>
     </Layout.Main>
   )
 }
