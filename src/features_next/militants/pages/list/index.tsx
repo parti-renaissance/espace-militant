@@ -125,7 +125,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         contentContainerStyle={contentContainerStyle}
       />
       <PanelOrBottomSheet isOpen={isFilterOpen} onClose={handleCloseFilter}>
-        <MilitantFilterPanel />
+        <MilitantFilterPanel scope={scope} />
       </PanelOrBottomSheet>
     </Layout.Main>
   )

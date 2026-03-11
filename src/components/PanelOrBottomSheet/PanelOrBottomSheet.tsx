@@ -110,14 +110,7 @@ export default function PanelOrBottomSheet({ isOpen, onClose, children, snapPoin
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </Animated.View>
 
-      <Animated.View
-        style={[
-          styles.desktopPanelPosition,
-          { width: panelWidth },
-          animatedPanelStyle,
-          styles.desktopPanelShadow,
-        ]}
-      >
+      <Animated.View style={[styles.desktopPanelPosition, { width: panelWidth }, animatedPanelStyle, styles.desktopPanelShadow]}>
         <YStack flex={1} backgroundColor="$background" elevation="$4" borderLeftWidth={1} borderColor="$borderColor">
           <ScrollView flex={1} contentContainerStyle={styles.desktopScrollContent}>
             {children}
