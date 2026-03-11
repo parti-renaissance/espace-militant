@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Pressable } from 'react-native'
 import { Spinner, XStack, YStack } from 'tamagui'
 import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
@@ -25,7 +25,6 @@ import type {
 
 import IntegerInterval, { type IntegerIntervalValue } from './IntegerInterval'
 
-/** Valeur d'un filtre : string, number, boolean, tableau, intervalle dates/nombres, zone(s) */
 export type FilterValue =
   | string
   | number
@@ -43,11 +42,8 @@ export type FilterValues = Record<string, FilterValue>
 export interface FilterCollectionBuilderProps {
   featureKey: string
   scope?: string
-  /** Valeurs initiales (ex. depuis l'URL) */
   initialValues?: FilterValues
-  /** Appelé à chaque modification des filtres */
   onChangeFilter: (values: FilterValues) => void
-  /** Collection de filtres en mode mock (ex. Storybook). Si fourni, pas d'appel API. */
   collection?: FiltersCollectionResponse
 }
 
@@ -67,6 +63,10 @@ function FilterCollectionBuilder({ featureKey, scope, initialValues, onChangeFil
   const collection = collectionProp ?? collectionFromApi
   const [values, setValues] = useState<FilterValues>(() => ({ ...(initialValues ?? {}) }))
   const [collapsedGroupIndices, setCollapsedGroupIndices] = useState<Set<number>>(new Set())
+
+  useEffect(() => {
+    setValues({ ...(initialValues ?? {}) })
+  }, [initialValues])
 
   const toggleGroup = useCallback((groupIndex: number) => {
     setCollapsedGroupIndices((prev) => {

@@ -61,14 +61,13 @@ export const RestAdherentListItemSchema = z.object({
 
 export const RestAdherentListResponseSchema = createRestPaginationSchema(RestAdherentListItemSchema)
 
-/** Query params GET /api/v3/adherents */
-export const RestAdherentListRequestSchema = z.object({
-  scope: z.string(),
-  page: z.number().optional(),
-  page_size: z.number().optional(),
-})
-
-/** --- Détail adhérent GET /api/v3/adherents/:uuid --- */
+export const RestAdherentListRequestSchema = z
+  .object({
+    scope: z.string(),
+    page: z.number().optional(),
+    page_size: z.number().optional(),
+  })
+  .passthrough()
 
 const RestSubscriptionTypeSchema = z.object({
   code: z.string(),
