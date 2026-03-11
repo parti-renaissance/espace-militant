@@ -1,10 +1,44 @@
 import React from 'react'
-import { useMedia, View, XStack, YStack } from 'tamagui'
+import { useMedia, XStack, YStack } from 'tamagui'
 import { ChevronLeft, ChevronRight, CircleX, Filter, RotateCcw } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import type { ActiveFilterChip } from '@/components/Filters'
+
+function ActiveFilterChipsRow({
+  chips,
+  onRemoveFilter,
+  onResetAllFilters,
+}: {
+  chips: ActiveFilterChip[]
+  onRemoveFilter: (key: string) => void
+  onResetAllFilters: () => void
+}) {
+  if (chips.length === 0) return null
+  return (
+    <XStack flexWrap="wrap" alignItems="center" gap="$small">
+      {chips.map((chip) => (
+        <VoxButton
+          key={chip.key}
+          size="xxs"
+          theme="blue"
+          variant="contained"
+          iconRight={CircleX}
+          onPress={() => onRemoveFilter(chip.key)}
+          testID={`filter-chip-${chip.key}`}
+        >
+          {chip.label} : {chip.value_label}
+        </VoxButton>
+      ))}
+      {chips.length >= 2 ? (
+        <VoxButton size="xxs" theme="gray" variant="outlined" iconLeft={RotateCcw} onPress={onResetAllFilters} testID="filter-reset-all">
+          Réinitialiser tous les filtres
+        </VoxButton>
+      ) : null}
+    </XStack>
+  )
+}
 
 interface MilitantHeaderPaginationProps {
   page: number
@@ -107,15 +141,38 @@ export function MilitantListHeader({
 }: MilitantListHeaderProps) {
   const media = useMedia()
   const hasActiveFilters = activeFilterChips.length > 0
+  const filterChipsRow = (
+    <ActiveFilterChipsRow chips={activeFilterChips} onRemoveFilter={onRemoveFilter} onResetAllFilters={onResetAllFilters} />
+  )
+
+  if (media.sm) {
+    return (
+      <YStack gap="$small">
+        <MilitantHeaderTop />
+        <YStack gap="$small" mt="$medium" mx="$medium">
+          <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="md" iconLeft={Filter} onPress={onFilterPress}>
+            Filtrer
+          </VoxButton>
+          {filterChipsRow}
+          <MilitantHeaderPagination
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={onPageChange}
+            disabled={paginationDisabled}
+          />
+        </YStack>
+      </YStack>
+    )
+  }
 
   return (
     <YStack gap="$small">
       <MilitantHeaderTop />
-      <View flexDirection={media.sm ? 'column' : 'row'} justifyContent="space-between" gap="$small" mt="$medium" mx={media.sm ? '$medium' : undefined}>
+      <XStack justifyContent="space-between" alignItems="center" gap="$small" mt="$medium">
         <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="md" iconLeft={Filter} onPress={onFilterPress}>
           Filtrer
         </VoxButton>
-
         <MilitantHeaderPagination
           page={page}
           pageSize={pageSize}
@@ -123,29 +180,8 @@ export function MilitantListHeader({
           onPageChange={onPageChange}
           disabled={paginationDisabled}
         />
-      </View>
-      {activeFilterChips.length > 0 ? (
-        <XStack flexWrap="wrap" alignItems="center" gap="$small" mx={media.sm ? '$medium' : undefined}>
-          {activeFilterChips.map((chip) => (
-            <VoxButton
-              key={chip.key}
-              size="xxs"
-              theme="blue"
-              variant="contained"
-              iconRight={CircleX}
-              onPress={() => onRemoveFilter(chip.key)}
-              testID={`filter-chip-${chip.key}`}
-            >
-              {chip.label} : {chip.value_label}
-            </VoxButton>
-          ))}
-          {activeFilterChips.length >= 2 ? (
-            <VoxButton size="xxs" theme="gray" variant="outlined" iconLeft={RotateCcw} onPress={onResetAllFilters} testID="filter-reset-all">
-              Réinitialiser tous les filtres
-            </VoxButton>
-          ) : null}
-        </XStack>
-      ) : null}
+      </XStack>
+      {filterChipsRow}
     </YStack>
   )
 }

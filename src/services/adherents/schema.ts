@@ -30,11 +30,11 @@ export const RestSubscriptionsSchema = z.object({
   email: RestSubscriptionChannelSchema,
 })
 
-/** Rôle avec délégation */
+/** Rôle avec délégation (API peut renvoyer is_delegated en 0/1) */
 export const RestAdherentRoleSchema = z.object({
   code: z.string(),
   label: z.string(),
-  is_delegated: z.boolean(),
+  is_delegated: z.union([z.boolean(), z.number()]).transform((x) => Boolean(x)),
   function: z.string().nullable(),
 })
 
