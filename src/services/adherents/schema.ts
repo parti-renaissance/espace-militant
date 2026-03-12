@@ -57,6 +57,7 @@ export const RestAdherentListItemSchema = z.object({
   instances: z.array(RestAdherentInstanceSchema).default([]),
   subscriptions: RestSubscriptionsSchema,
   roles: z.array(RestAdherentRoleSchema).default([]),
+  nationality: z.string().nullable().optional(),
 })
 
 export const RestAdherentListResponseSchema = createRestPaginationSchema(RestAdherentListItemSchema)
@@ -75,13 +76,20 @@ const RestSubscriptionTypeSchema = z.object({
   checked: z.boolean(),
 })
 
-const RestSessionSchema = z.object({
-  type: z.string(),
+/** Une session (web ou mobile) */
+export const RestSessionSchema = z.object({
   device: z.string().nullable(),
+  status: z.string(),
+  subscribed: z.boolean(),
   active_since: z.string().nullable(),
   last_activity_at: z.string().nullable(),
-  subscribed: z.boolean(),
 })
+
+/** Sessions groupées par canal : { web: [...], mobile: [...] } */
+export const RestSessionsByChannelSchema = z
+  .record(z.string(), z.array(RestSessionSchema))
+  .optional()
+  .default({})
 
 const RestSocialLinksSchema = z.object({
   facebook: z.string().nullable(),
@@ -89,6 +97,7 @@ const RestSocialLinksSchema = z.object({
   instagram: z.string().nullable(),
   linkedin: z.string().nullable(),
   telegram: z.string().nullable(),
+  tiktok: z.string().nullable().optional(),
 })
 
 /** Réponse détail GET /api/v3/adherents/:uuid */
@@ -111,9 +120,10 @@ export const RestAdherentDetailSchema = z.object({
   subscriptions: RestSubscriptionsSchema,
   subscription_types: z.array(RestSubscriptionTypeSchema).default([]),
   roles: z.array(RestAdherentRoleSchema).default([]),
-  sessions: z.array(RestSessionSchema).default([]),
+  sessions: RestSessionsByChannelSchema,
   social_links: RestSocialLinksSchema.optional(),
   available_for_resubscribe_email: z.boolean(),
+  nationality: z.string().nullable().optional(),
 })
 
 /** Query params GET /api/v3/adherents/:uuid */
@@ -124,6 +134,8 @@ export const RestAdherentDetailRequestSchema = z.object({
 export type RestAdherentTag = z.infer<typeof RestAdherentTagSchema>
 export type RestAdherentInstance = z.infer<typeof RestAdherentInstanceSchema>
 export type RestSubscriptions = z.infer<typeof RestSubscriptionsSchema>
+export type RestSession = z.infer<typeof RestSessionSchema>
+export type RestSessionsByChannel = z.infer<typeof RestSessionsByChannelSchema>
 export type RestAdherentRole = z.infer<typeof RestAdherentRoleSchema>
 export type RestAdherentListItem = z.infer<typeof RestAdherentListItemSchema>
 export type RestAdherentListResponse = z.infer<typeof RestAdherentListResponseSchema>

@@ -39,6 +39,9 @@ export function ListSkeleton({ showHeader = true }: { showHeader?: boolean }) {
       <MilitantItemSkeleton />
       <MilitantItemSkeleton />
       <MilitantItemSkeleton />
+      <MilitantItemSkeleton />
+      <MilitantItemSkeleton />
+      <MilitantItemSkeleton />
     </YStack>
   )
 }
