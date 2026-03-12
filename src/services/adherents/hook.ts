@@ -15,12 +15,7 @@ export type UseAdherentsPageParams = {
   filters?: Record<string, unknown>
 }
 
-export const useAdherentsPage = ({
-  scope,
-  page,
-  pageSize = DEFAULT_PAGE_SIZE,
-  filters = {},
-}: UseAdherentsPageParams) => {
+export const useAdherentsPage = ({ scope, page, pageSize = DEFAULT_PAGE_SIZE, filters = {} }: UseAdherentsPageParams) => {
   return useQuery({
     queryKey: [...ADHERENTS_QUERY_KEY, scope, page, pageSize, filters],
     queryFn: () =>

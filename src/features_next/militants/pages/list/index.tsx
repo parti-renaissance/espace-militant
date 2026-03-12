@@ -9,6 +9,7 @@ import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'
 import { getActiveFilterChips } from '@/components/Filters/filterCollectionUtils'
 import PanelOrBottomSheet from '@/components/PanelOrBottomSheet/PanelOrBottomSheet'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
+import { MilitantDetailsPanel } from '@/features_next/militants/components/MilitantDetailsPanel'
 import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
 import { MilitantListHeader } from '@/features_next/militants/components/MilitantListHeader'
 
@@ -28,6 +29,8 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
   const [filters, setFilters] = useState<FilterValues>({})
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [selectedUuid, setSelectedUuid] = useState<string | undefined>(undefined)
+  const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   const { data: collection } = useGetFiltersCollection({
     featureKey: FILTERS_FEATURE_KEY,
@@ -59,6 +62,14 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
 
   const handleFilterPress = useCallback(() => setIsFilterOpen(true), [])
   const handleCloseFilter = useCallback(() => setIsFilterOpen(false), [])
+  const handleOpenDetail = useCallback((uuid: string) => {
+    setSelectedUuid(uuid)
+    setIsDetailOpen(true)
+  }, [])
+  const handleCloseDetail = useCallback(() => {
+    setIsDetailOpen(false)
+    setSelectedUuid(undefined)
+  }, [])
 
   const handleChangeFilter = useCallback((values: FilterValues) => {
     setFilters(values)
@@ -105,9 +116,16 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
     ],
   )
 
-  const renderItem = useCallback(({ item }: { item: RestAdherentListItem }) => {
-    return <MilitantCadreItem key={item.uuid} {...item} onPress={() => console.log(`MilitantCadreItem pressed ${item.uuid}`)} />
-  }, [])
+  const renderItem = useCallback(
+    ({ item }: { item: RestAdherentListItem }) => {
+      return <MilitantCadreItem key={item.uuid} {...item} onPress={() => handleOpenDetail(item.uuid)} />
+    },
+    [handleOpenDetail],
+  )
+  const selectedInitialData = useMemo(
+    (): RestAdherentListItem | undefined => (selectedUuid ? (militants.find((m) => m.uuid === selectedUuid) as RestAdherentListItem | undefined) : undefined),
+    [selectedUuid, militants],
+  )
 
   const contentContainerStyle = useMemo(() => {
     const baseStyle: { gap: number; paddingTop?: number; marginTop?: number } = {
@@ -149,6 +167,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
       <PanelOrBottomSheet isOpen={isFilterOpen} onClose={handleCloseFilter}>
         <MilitantFilterPanel scope={scope} initialValues={filters} onChangeFilter={handleChangeFilter} />
       </PanelOrBottomSheet>
+      <MilitantDetailsPanel uuid={selectedUuid} scope={scope} isOpen={isDetailOpen} onClose={handleCloseDetail} initialData={selectedInitialData} />
     </Layout.Main>
   )
 }
