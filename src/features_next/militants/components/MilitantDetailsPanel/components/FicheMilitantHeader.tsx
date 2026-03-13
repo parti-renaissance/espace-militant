@@ -1,6 +1,6 @@
 import React from 'react'
 import { Pressable } from 'react-native'
-import { XStack, YStack } from 'tamagui'
+import { XStack } from 'tamagui'
 import { X } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'

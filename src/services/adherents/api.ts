@@ -17,3 +17,12 @@ export const getAdherentDetail = (uuid: string) =>
     responseSchema: schemas.RestAdherentDetailSchema,
     type: 'private',
   })
+
+export const getAdherentSensitiveData = (uuid: string) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherents/${uuid}/sensitive-data`,
+    requestSchema: schemas.RestAdherentSensitiveRequestSchema,
+    responseSchema: schemas.RestAdherentSensitiveDataSchema,
+    type: 'private',
+  })

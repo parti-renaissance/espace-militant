@@ -1,20 +1,20 @@
 import React, { memo, useCallback, useState } from 'react'
 import { ActivityIndicator, Pressable } from 'react-native'
 import { View, XStack, YStack } from 'tamagui'
-import { Activity, Mail, MessageCircle, Phone } from '@tamagui/lucide-icons'
+import { Activity } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
-import PanelOrBottomSheet from '@/components/PanelOrBottomSheet/PanelOrBottomSheet'
+import PanelModal from '@/components/PanelModal/PanelModal'
 import ProfilePicture from '@/components/ProfilePicture'
 
 import { Chip } from '@/components'
-import type { IconComponent } from '@/models/common.model'
 import { useAdherentDetail } from '@/services/adherents/hook'
 import type { RestAdherentDetail, RestAdherentListItem } from '@/services/adherents/schema'
 import { getRelativeActivityLabel } from '@/utils/DateFormatter'
 
 import { FicheMilitantHeader } from './components/FicheMilitantHeader'
 import { IdentiteTabContent } from './components/IdentiteTab'
+import { MilitantActionButtons } from './components/MilitantActionButtons'
 
 export type FicheMilitantTabId = 'identite' | 'notes' | 'mandats'
 
@@ -64,41 +64,6 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
         )}
       </XStack>
     </YStack>
-  )
-}
-
-function ActionButton({ Icon, label, onPress }: { Icon: IconComponent; label: string; onPress: () => void }) {
-  return (
-    <YStack
-      onPress={onPress}
-      alignItems="center"
-      justifyContent="center"
-      gap="$small"
-      bg="$gray1"
-      paddingVertical={12}
-      paddingHorizontal={16}
-      borderRadius="$small"
-      flex={1}
-      flexBasis={0}
-      cursor="pointer"
-      hoverStyle={{ bg: '$gray2' }}
-      pressStyle={{ bg: '$gray3' }}
-    >
-      <Icon size={16} color="$textPrimary" />
-      <Text.SM primary semibold>
-        {label}
-      </Text.SM>
-    </YStack>
-  )
-}
-
-function MilitantActionButtons({ onSms, onCall, onEmail }: { onSms?: () => void; onCall?: () => void; onEmail?: () => void }) {
-  return (
-    <XStack paddingHorizontal="$medium" paddingVertical="$medium" gap="$small">
-      <ActionButton Icon={MessageCircle} label="SMS" onPress={onSms ?? (() => {})} />
-      <ActionButton Icon={Phone} label="Appeler" onPress={onCall ?? (() => {})} />
-      <ActionButton Icon={Mail} label="Email" onPress={onEmail ?? (() => {})} />
-    </XStack>
   )
 }
 
@@ -159,36 +124,38 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
 
   if (uuid && !hasSummary && isLoading) {
     return (
-      <PanelOrBottomSheet isOpen={isOpen} onClose={onClose}>
+      <PanelModal isOpen={isOpen} onClose={onClose}>
         <YStack padding="$medium" alignItems="center" justifyContent="center" minHeight={200}>
           <ActivityIndicator size="large" />
           <Text.SM secondary style={{ marginTop: 12 }}>
             Chargement…
           </Text.SM>
         </YStack>
-      </PanelOrBottomSheet>
+      </PanelModal>
     )
   }
 
   if (isError && !hasSummary) {
     return (
-      <PanelOrBottomSheet isOpen={isOpen} onClose={onClose}>
+      <PanelModal isOpen={isOpen} onClose={onClose}>
         <FicheMilitantHeader onClose={onClose} />
         <YStack padding="$medium" gap="$small">
           <Text.SM semibold>Erreur</Text.SM>
           <Text.SM secondary>{errorMessage}</Text.SM>
         </YStack>
-      </PanelOrBottomSheet>
+      </PanelModal>
     )
   }
 
   if (hasSummary && displayData) {
+    const smsAvailable = displayData.subscriptions?.sms?.available ?? true
+
     return (
-      <PanelOrBottomSheet isOpen={isOpen} onClose={onClose}>
+      <PanelModal isOpen={isOpen} onClose={onClose}>
         <YStack flex={1}>
           <FicheMilitantHeader onClose={onClose} />
           <MilitantSummaryCard data={displayData} />
-          {/* <MilitantActionButtons onSms={() => {}} onCall={() => {}} onEmail={() => {}} /> */}
+          <MilitantActionButtons uuid={uuid} scope={scope} smsAvailable={smsAvailable} />
           <MilitantDetailTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
           {activeTab === 'identite' && (
@@ -198,6 +165,8 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
               detailData={data ?? null}
               availableForResubscribeEmail={data?.available_for_resubscribe_email}
               onResubscribeEmail={() => {}}
+              uuid={uuid}
+              scope={scope}
             />
           )}
 
@@ -207,17 +176,17 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
             </YStack>
           )}
         </YStack>
-      </PanelOrBottomSheet>
+      </PanelModal>
     )
   }
 
   return (
-    <PanelOrBottomSheet isOpen={isOpen} onClose={onClose}>
+    <PanelModal isOpen={isOpen} onClose={onClose}>
       <FicheMilitantHeader onClose={onClose} />
       <YStack padding="$medium">
         <Text.SM secondary>Sélectionnez un militant pour afficher ses détails.</Text.SM>
       </YStack>
-    </PanelOrBottomSheet>
+    </PanelModal>
   )
 }
 

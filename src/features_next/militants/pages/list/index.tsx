@@ -4,12 +4,11 @@ import { ArrowLeft } from '@tamagui/lucide-icons'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
-import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import EmptyStateWithFilters from '@/components/EmptyStates/EmptyStateWithFilters'
 import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'
 import { getActiveFilterChips } from '@/components/Filters/filterCollectionUtils'
-import PanelOrBottomSheet from '@/components/PanelOrBottomSheet/PanelOrBottomSheet'
+import PanelModal from '@/components/PanelModal/PanelModal'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
 import { MilitantDetailsPanel } from '@/features_next/militants/components/MilitantDetailsPanel'
 import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
@@ -23,7 +22,7 @@ import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profi
 import { ListSkeleton } from './components/ListSkeleton'
 import { PAGE_SIZE } from './constants'
 
-const FILTERS_FEATURE_KEY = 'publications'
+const FILTERS_FEATURE_KEY = 'contacts'
 
 function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scope: string; accessDenyButton?: React.ReactNode }) {
   const media = useMedia()
@@ -206,9 +205,15 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         onRefresh={handleManualRefresh}
         contentContainerStyle={contentContainerStyle}
       />
-      <PanelOrBottomSheet isOpen={isFilterOpen} onClose={handleCloseFilter}>
-        <MilitantFilterPanel scope={scope} initialValues={filters} onChangeFilter={handleChangeFilter} />
-      </PanelOrBottomSheet>
+      <PanelModal isOpen={isFilterOpen} onClose={handleCloseFilter}>
+        <MilitantFilterPanel
+          scope={scope}
+          initialValues={filters}
+          onChangeFilter={handleChangeFilter}
+          onClose={handleCloseFilter}
+          hiddenFilterCodes={['search_term']}
+        />
+      </PanelModal>
       <MilitantDetailsPanel uuid={selectedUuid} scope={scope} isOpen={isDetailOpen} onClose={handleCloseDetail} initialData={selectedInitialData} />
     </Layout.Main>
   )

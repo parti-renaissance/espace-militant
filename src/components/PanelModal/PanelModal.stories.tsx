@@ -4,11 +4,11 @@ import { YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 
-import PanelOrBottomSheet from './PanelOrBottomSheet'
+import PanelModal from './PanelModal'
 
 export default {
-  title: 'Components/PanelOrBottomSheet',
-  component: PanelOrBottomSheet,
+  title: 'Components/PanelModal',
+  component: PanelModal,
 }
 
 export const Default = () => {
@@ -16,15 +16,14 @@ export const Default = () => {
 
   return (
     <YStack flex={1} padding="$medium" gap="$medium" backgroundColor="$background">
-      <Text.LG semibold>PanelOrBottomSheet</Text.LG>
-      <Text.SM secondary>Grand écran : panneau latéral. Petit écran : bottom sheet.</Text.SM>
+      <Text.LG semibold>PanelModal</Text.LG>
+      <Text.SM secondary>Panneau latéral ; 100 % de largeur sous SM.</Text.SM>
       <VoxButton size="lg" theme="green" onPress={() => setIsOpen(true)}>
         Ouvrir le panel
       </VoxButton>
-      <PanelOrBottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)}>
+      <PanelModal isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <YStack gap="$small" padding="$medium">
           <Text.MD semibold>Contenu du panneau</Text.MD>
-          <Text.SM secondary>Glisser vers le bas pour fermer (mobile).</Text.SM>
           <Text.SM secondary>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
             quis nostrud exercitation ullamco laboris.
@@ -47,7 +46,7 @@ export const Default = () => {
           </Text.SM>
           <VoxButton onPress={() => setIsOpen(false)}>Fermer</VoxButton>
         </YStack>
-      </PanelOrBottomSheet>
+      </PanelModal>
     </YStack>
   )
 }
