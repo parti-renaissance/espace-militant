@@ -9,7 +9,7 @@ import { PAGE_SIZE } from '../constants'
 export function MilitantItemSkeleton() {
   return (
     <SkeCard>
-      <SkeCard.Content>
+      <SkeCard.Content minHeight={122} justifyContent="center">
         <YStack gap="$small">
           <SkeCard.Author />
           <SkeCard.Title />
@@ -23,7 +23,7 @@ export function ListSkeleton({ showHeader = true }: { showHeader?: boolean }) {
   const media = useMedia()
 
   return (
-    <YStack gap="$medium" paddingHorizontal={media.sm ? 0 : undefined}>
+    <YStack gap="$small" paddingHorizontal={media.sm ? 0 : undefined}>
       {showHeader && (
         <MilitantListHeader
           paginationDisabled

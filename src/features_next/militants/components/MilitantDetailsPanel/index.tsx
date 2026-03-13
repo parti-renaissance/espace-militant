@@ -11,28 +11,12 @@ import { Chip } from '@/components'
 import type { IconComponent } from '@/models/common.model'
 import { useAdherentDetail } from '@/services/adherents/hook'
 import type { RestAdherentDetail, RestAdherentListItem } from '@/services/adherents/schema'
+import { getRelativeActivityLabel } from '@/utils/DateFormatter'
 
 import { FicheMilitantHeader } from './components/FicheMilitantHeader'
 import { IdentiteTabContent } from './components/IdentiteTab'
 
 export type FicheMilitantTabId = 'identite' | 'notes' | 'mandats'
-
-function getRelativeActivityLabel(lastActivityAt?: string | null): string | null {
-  if (!lastActivityAt) return null
-  try {
-    const then = new Date(lastActivityAt).getTime()
-    const now = Date.now()
-    const diffDays = Math.floor((now - then) / (1000 * 60 * 60 * 24))
-    if (diffDays === 0) return "Actif aujourd'hui"
-    if (diffDays === 1) return 'Actif hier'
-    if (diffDays < 7) return `Actif il y a ${diffDays} jours`
-    if (diffDays < 30) return `Actif il y a ${Math.floor(diffDays / 7)} sem.`
-    if (diffDays < 365) return `Actif il y a ${Math.floor(diffDays / 30)} mois`
-    return `Actif il y a ${Math.floor(diffDays / 365)} an(s)`
-  } catch {
-    return null
-  }
-}
 
 function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdherentDetail | RestAdherentListItem; engagementScore?: number | null }) {
   const { first_name, last_name, image_url, age, public_id, last_activity_at, adherent_tags } = data
@@ -64,10 +48,10 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
           )}
         </XStack>
       </XStack>
-      <XStack flexWrap="wrap" alignItems="center" gap="$medium">
+      <XStack alignItems="center" justifyContent="space-between" gap="$medium">
         {adherentLabel && (
-          <Chip theme="yellow">
-            <Text.SM semibold color={'$color5'}>
+          <Chip theme="yellow" flexShrink={1}>
+            <Text.SM semibold color={'$color5'} numberOfLines={1} ellipsizeMode="tail" textTransform="capitalize">
               {adherentLabel}
             </Text.SM>
           </Chip>

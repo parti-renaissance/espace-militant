@@ -1,5 +1,5 @@
 import React from 'react'
-import { Linking, Pressable } from 'react-native'
+import { Linking } from 'react-native'
 import { View, XStack, YStack } from 'tamagui'
 import {
   Calendar,
@@ -26,19 +26,7 @@ import { getNationalityLabel } from '@/components/NationalitySelect/NationalityS
 import { Chip } from '@/components'
 import type { IconComponent } from '@/models/common.model'
 import type { RestAdherentDetail, RestAdherentListItem, RestAdherentRole, RestAdherentTag, RestSession } from '@/services/adherents/schema'
-
-function formatShortDate(iso?: string | null): string {
-  if (!iso) return '—'
-  try {
-    const d = new Date(iso)
-    const day = String(d.getDate()).padStart(2, '0')
-    const month = String(d.getMonth() + 1).padStart(2, '0')
-    const year = d.getFullYear()
-    return `${day}/${month}/${year}`
-  } catch {
-    return iso
-  }
-}
+import { formatShortDate } from '@/utils/DateFormatter'
 
 function DetailSection({ title, children, actionButton }: { title: string; children: React.ReactNode; actionButton?: React.ReactNode }) {
   return (
@@ -121,17 +109,7 @@ function InfoRowSkeleton({ showStatusLine = true }: { showStatusLine?: boolean }
   )
 }
 
-function InformationsPersonnellesSection({
-  isLoading,
-  data,
-  availableForResubscribeEmail,
-  onResubscribeEmail,
-}: {
-  isLoading?: boolean
-  data: RestAdherentDetail | RestAdherentListItem
-  availableForResubscribeEmail?: boolean
-  onResubscribeEmail?: () => void
-}) {
+function InformationsPersonnellesSection({ isLoading, data }: { isLoading?: boolean; data: RestAdherentDetail | RestAdherentListItem }) {
   const { birthdate, subscriptions } = data
   const emailSubscribed = subscriptions?.email?.subscribed
   const emailStatus = emailSubscribed ? 'Abonné' : 'Désabonné'
@@ -164,20 +142,7 @@ function InformationsPersonnellesSection({
           statusColor={!smsAvailable ? undefined : smsSubscribed ? 'green' : 'orange'}
           desactivated={!smsAvailable}
         />
-        <InfoRow
-          Icon={Mail}
-          status={emailStatus}
-          value={undefined}
-          statusColor={emailSubscribed ? 'green' : 'orange'}
-          actionButton={
-            availableForResubscribeEmail &&
-            onResubscribeEmail && (
-              <VoxButton size="xs" iconLeft={Send} theme="blue" onPress={onResubscribeEmail} paddingHorizontal={12}>
-                Envoyer un mail de réabonnement
-              </VoxButton>
-            )
-          }
-        />
+        <InfoRow Icon={Mail} status={emailStatus} value={undefined} statusColor={emailSubscribed ? 'green' : 'orange'} />
 
         <InfoRow Icon={MapPin} value={undefined} />
         <InfoRow Icon={Calendar} value={birthdate ? `Né(e) le ${formatShortDate(birthdate)}` : '—'} />
@@ -291,11 +256,11 @@ function RolesSection({ roles }: { roles: RestAdherentRole[] }) {
           {roles.length === 0 ? (
             <Text.SM color="$textDisabled">Ce militant ne dispose d’aucun rôle.</Text.SM>
           ) : (
-            roles.map((r) => {
+            roles.map((r, index) => {
               const main = r.function ?? r.label ?? '—'
               const text = r.is_delegated ? `${main} (délégué)` : main
               return (
-                <Chip key={r.code} theme="purple" flexShrink={1} minWidth={0} maxWidth="100%">
+                <Chip key={`${r.code ?? 'role'}-${index}`} theme="purple" flexShrink={1} minWidth={0} maxWidth="100%">
                   <Text.SM color="$color5" semibold numberOfLines={1} ellipsizeMode="tail">
                     {text}
                   </Text.SM>
@@ -319,7 +284,7 @@ function LabelsNationauxSection({ labels }: { labels: RestAdherentTag[] | null |
         <XStack flexWrap="wrap" gap="$small">
           {list.map((l, index) => (
             <Chip key={l.code ?? `${l.label}-${index}`} theme="gray">
-              <Text.SM color="$color5" semibold>
+              <Text.SM color="$color5" semibold numberOfLines={1} ellipsizeMode="tail" textTransform="capitalize">
                 {l.label}
               </Text.SM>
             </Chip>
@@ -340,7 +305,7 @@ function PreferencesNotificationSection({ subscriptionTypes }: { subscriptionTyp
         ) : (
           list.map((st) => (
             <XStack key={st.code} alignItems="center" gap="$small">
-              <View w={8} h={8} borderRadius={4} backgroundColor={st.checked ? '$green9' : '$orange9'} />
+              <View w={8} h={8} borderRadius={4} backgroundColor={st.checked === true ? '$green9' : '$orange9'} />
               <Text.SM color="$gray5" numberOfLines={1} ellipsizeMode="tail">
                 {st.label}
               </Text.SM>
@@ -366,12 +331,7 @@ export function IdentiteTabContent({ isLoading, summaryData, detailData, availab
 
   return (
     <YStack padding="$medium" gap="$large" paddingBottom={80}>
-      <InformationsPersonnellesSection
-        isLoading={isLoading}
-        data={summaryData}
-        availableForResubscribeEmail={detailData?.available_for_resubscribe_email}
-        onResubscribeEmail={onResubscribeEmail}
-      />
+      <InformationsPersonnellesSection isLoading={isLoading} data={summaryData} />
       {(detailData || isLoading) && <SessionsSection isLoading={isLoading} data={detailData ?? null} />}
       <RolesSection roles={roles} />
       <LabelsNationauxSection labels={staticTags} />

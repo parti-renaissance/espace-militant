@@ -6,7 +6,7 @@ import { Sparkle } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 
-import EmptyStateIllustration from '../../../assets/empty-publication.png'
+import EmptyStateImage from '@/assets/illustrations/empty-state.png'
 
 export default function EmptyState() {
   const router = useRouter()
@@ -17,7 +17,7 @@ export default function EmptyState() {
 
   return (
     <YStack alignItems="center" justifyContent="center" flex={1} gap={32} py={42} px={16}>
-      <Image source={EmptyStateIllustration} width={178} height={189} objectFit="contain" />
+      <Image source={EmptyStateImage} width={178} height={189} objectFit="contain" />
       <YStack gap={24}>
         <Text.MD semibold secondary textAlign="center" textWrap="balance">
           Aucune publication pour le moment

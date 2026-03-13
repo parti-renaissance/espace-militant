@@ -1,8 +1,5 @@
-import type {
-  FilterDefinition,
-  FilterOptionSelect,
-  FiltersCollectionResponse,
-} from '@/services/filters-collection/schema'
+import type { FilterDefinition, FilterOptionSelect, FiltersCollectionResponse } from '@/services/filters-collection/schema'
+import { formatShortDate } from '@/utils/DateFormatter'
 
 import type { FilterValue, FilterValues } from './FilterCollectionBuilder'
 
@@ -27,10 +24,7 @@ export interface ActiveFilterChip {
   value_label: string
 }
 
-export function getActiveFilterChips(
-  filters: FilterValues,
-  collection: FiltersCollectionResponse | undefined,
-): ActiveFilterChip[] {
+export function getActiveFilterChips(filters: FilterValues, collection: FiltersCollectionResponse | undefined): ActiveFilterChip[] {
   if (!collection?.length) return []
 
   const byCode = new Map<string, FilterDefinition>()
@@ -83,8 +77,8 @@ function formatFilterValueLabel(value: FilterValue, definition: FilterDefinition
   if (typeof value === 'object' && value !== null) {
     if ('start' in value && 'end' in value) {
       const interval = value as { start: number | string | null; end: number | string | null }
-      const s = interval.start
-      const e = interval.end
+      const s = interval.start != null ? formatShortDate(interval.start.toString()) : null
+      const e = interval.end != null ? formatShortDate(interval.end.toString()) : null
       if (s != null && e != null) return `${s} - ${e}`
       if (s != null) return `≥ ${s}`
       if (e != null) return `≤ ${e}`
