@@ -14,7 +14,7 @@ export default function MilitantsPage() {
         <title>{metatags.createTitle('Mes militants')}</title>
       </Head>
       <Header title="Mes militants" navigation={{ showBackButton: false }} />
-      <Layout.Container sidebarState="cadre">
+      <Layout.Container alwaysShowScrollbar sidebarState="cadre">
         <MilitantsScreen />
       </Layout.Container>
     </>

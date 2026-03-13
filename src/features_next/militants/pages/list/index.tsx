@@ -6,13 +6,14 @@ import { useDebouncedCallback } from 'use-debounce'
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import EmptyStateWithFilters from '@/components/EmptyStates/EmptyStateWithFilters'
 import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'
 import { getActiveFilterChips } from '@/components/Filters/filterCollectionUtils'
 import PanelOrBottomSheet from '@/components/PanelOrBottomSheet/PanelOrBottomSheet'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
 import { MilitantDetailsPanel } from '@/features_next/militants/components/MilitantDetailsPanel'
 import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
-import { MilitantListHeader } from '@/features_next/militants/components/MilitantListHeader'
+import { MilitantHeaderPagination, MilitantListHeader } from '@/features_next/militants/components/MilitantListHeader'
 
 import { useAdherentsPage } from '@/services/adherents/hook'
 import { RestAdherentListItem } from '@/services/adherents/schema'
@@ -147,8 +148,9 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
   )
 
   const contentContainerStyle = useMemo(() => {
-    const baseStyle: { gap: number; paddingTop?: number; marginTop?: number } = {
+    const baseStyle: { gap: number; paddingTop?: number; marginTop?: number; paddingBottom: number } = {
       gap: getToken('$small', 'space'),
+      paddingBottom: 300,
     }
     if (media.sm) {
       baseStyle.paddingTop = 0
@@ -164,11 +166,31 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
       return <ListSkeleton showHeader={false} />
     }
     return (
-      <YStack gap="$medium">
-        <Text.SM secondary>Aucun militant pour le moment.</Text.SM>
+      <YStack gap="$medium" alignItems="center" justifyContent="center" flex={1} minHeight={300}>
+        <EmptyStateWithFilters
+          title="Aucun militant trouvé"
+          subtitle={activeFilterChips && activeFilterChips.length > 0 ? 'Aucun militant ne correspond à vos filtres actifs' : undefined}
+          onResetFilters={activeFilterChips && activeFilterChips.length > 0 ? handleResetAllFilters : undefined}
+        />
       </YStack>
     )
-  }, [data, isLoading, isFetching])
+  }, [data, isLoading, isFetching, activeFilterChips, handleResetAllFilters])
+
+  const listFooterComponent = useMemo(
+    () =>
+      data != null ? (
+        <YStack py="$small" px={media.sm ? '$medium' : undefined} alignItems={media.sm ? 'stretch' : 'flex-end'}>
+          <MilitantHeaderPagination
+            page={currentPage}
+            pageSize={PAGE_SIZE}
+            totalItems={metadata?.total_items}
+            onPageChange={handlePageChange}
+            disabled={isFetching && !isPlaceholderData}
+          />
+        </YStack>
+      ) : null,
+    [data, currentPage, metadata?.total_items, handlePageChange, isFetching, isPlaceholderData, media.sm],
+  )
 
   return (
     <Layout.Main maxWidth={892}>
@@ -179,6 +201,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         keyExtractor={(item) => item.uuid}
         ListHeaderComponent={headerComponent}
         ListEmptyComponent={listEmptyComponent}
+        ListFooterComponent={listFooterComponent}
         refreshing={isManualRefreshing}
         onRefresh={handleManualRefresh}
         contentContainerStyle={contentContainerStyle}

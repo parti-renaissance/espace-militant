@@ -153,18 +153,18 @@ function MilitantCadreItemInner({
   return (
     <VoxCard
       tag="button"
-      focusable
       role="listitem"
       aria-label={listItemAriaLabel || undefined}
       onPress={onPress}
       cursor="pointer"
+      userSelect="none"
       focusVisibleStyle={{
         outlineWidth: 2,
         outlineColor: '$gray2',
         outlineStyle: 'solid',
       }}
     >
-      <VoxCard.Content>
+      <VoxCard.Content minHeight={122} justifyContent="center">
         <XStack flexWrap="wrap" width="100%" rowGap={isMobileLayout ? 16 : 0}>
           <XStack width={col1Width} pr="$medium" alignItems="center" gap={12} overflow="hidden">
             <ProfilePicture size={40} rounded src={image_url ?? undefined} fullName={displayName} alt={displayName} />

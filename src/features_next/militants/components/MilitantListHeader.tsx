@@ -80,7 +80,7 @@ export function MilitantHeaderTop() {
   )
 }
 
-function MilitantHeaderPagination({ page, pageSize, totalItems, onPageChange, disabled = false }: MilitantHeaderPaginationProps) {
+export function MilitantHeaderPagination({ page, pageSize, totalItems, onPageChange, disabled = false }: MilitantHeaderPaginationProps) {
   const media = useMedia()
   const lastPage = totalItems != null ? Math.ceil(totalItems / pageSize) : undefined
   const isPrevDisabled = disabled || page <= 1
@@ -144,22 +144,24 @@ export function MilitantListHeader({
 
   if (media.sm) {
     return (
-      <YStack gap="$small" marginBottom="$small">
+      <YStack gap="$medium" marginBottom="$small">
         <MilitantHeaderTop />
         <YStack gap="$small" mt="$medium" mx="$medium">
           <XStack flex={1} gap="$small" alignItems="center">
             <YStack flex={1}>
               <Input
-              placeholder="Rechercher un nom, email..."
-              size="xs"
-              value={searchValue}
-              onChange={onSearchChange}
-              iconRight={<Search size={20} color="$textSecondary" />}
-            />
+                placeholder="Rechercher un nom, email..."
+                size="xs"
+                value={searchValue}
+                onChange={onSearchChange}
+                iconRight={<Search size={20} color="$textSecondary" />}
+              />
             </YStack>
-            <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="lg" iconLeft={Filter} onPress={onFilterPress}>
-              Filtrer
-            </VoxButton>
+            <YStack>
+              <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="md" iconLeft={Filter} onPress={onFilterPress}>
+                Filtrer
+              </VoxButton>
+            </YStack>
           </XStack>
           {filterChipsRow}
           <MilitantHeaderPagination page={page} pageSize={pageSize} totalItems={totalItems} onPageChange={onPageChange} disabled={paginationDisabled} />
@@ -169,9 +171,9 @@ export function MilitantListHeader({
   }
 
   return (
-    <YStack gap="$small" marginBottom="$small">
+    <YStack gap="$medium" marginBottom="$small">
       <MilitantHeaderTop />
-      <XStack justifyContent="space-between" alignItems="center" gap="$medium" mt="$medium">
+      <XStack justifyContent="space-between" alignItems="center" gap="$medium">
         <XStack flex={1} gap="$small" alignItems="center">
           <YStack flex={1} maxWidth={320}>
             <Input
@@ -182,9 +184,11 @@ export function MilitantListHeader({
               iconRight={<Search size={20} color="$textSecondary" />}
             />
           </YStack>
-          <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="lg" iconLeft={Filter} onPress={onFilterPress}>
-            Filtrer
-          </VoxButton>
+          <YStack>
+            <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="md" iconLeft={Filter} onPress={onFilterPress}>
+              Filtrer
+            </VoxButton>
+          </YStack>
         </XStack>
         <MilitantHeaderPagination page={page} pageSize={pageSize} totalItems={totalItems} onPageChange={onPageChange} disabled={paginationDisabled} />
       </XStack>

@@ -256,11 +256,11 @@ function RolesSection({ roles }: { roles: RestAdherentRole[] }) {
           {roles.length === 0 ? (
             <Text.SM color="$textDisabled">Ce militant ne dispose d’aucun rôle.</Text.SM>
           ) : (
-            roles.map((r) => {
+            roles.map((r, index) => {
               const main = r.function ?? r.label ?? '—'
               const text = r.is_delegated ? `${main} (délégué)` : main
               return (
-                <Chip key={r.code} theme="purple" flexShrink={1} minWidth={0} maxWidth="100%">
+                <Chip key={`${r.code ?? 'role'}-${index}`} theme="purple" flexShrink={1} minWidth={0} maxWidth="100%">
                   <Text.SM color="$color5" semibold numberOfLines={1} ellipsizeMode="tail">
                     {text}
                   </Text.SM>
@@ -305,7 +305,7 @@ function PreferencesNotificationSection({ subscriptionTypes }: { subscriptionTyp
         ) : (
           list.map((st) => (
             <XStack key={st.code} alignItems="center" gap="$small">
-              <View w={8} h={8} borderRadius={4} backgroundColor={st.checked ? '$green9' : '$orange9'} />
+              <View w={8} h={8} borderRadius={4} backgroundColor={st.checked === true ? '$green9' : '$orange9'} />
               <Text.SM color="$gray5" numberOfLines={1} ellipsizeMode="tail">
                 {st.label}
               </Text.SM>
