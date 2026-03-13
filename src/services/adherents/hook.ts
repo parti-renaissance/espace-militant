@@ -12,17 +12,26 @@ export type UseAdherentsPageParams = {
   scope: string
   page: number
   pageSize?: number
+  searchTerm?: string
   filters?: Record<string, unknown>
 }
 
-export const useAdherentsPage = ({ scope, page, pageSize = DEFAULT_PAGE_SIZE, filters = {} }: UseAdherentsPageParams) => {
+export const useAdherentsPage = ({
+  scope,
+  page,
+  pageSize = DEFAULT_PAGE_SIZE,
+  searchTerm,
+  filters = {},
+}: UseAdherentsPageParams) => {
+  const search_term = searchTerm?.trim() || undefined
   return useQuery({
-    queryKey: [...ADHERENTS_QUERY_KEY, scope, page, pageSize, filters],
+    queryKey: [...ADHERENTS_QUERY_KEY, scope, page, pageSize, search_term, filters],
     queryFn: () =>
       api.getAdherents({
         scope,
         page,
         page_size: pageSize,
+        ...(search_term != null && { search_term }),
         ...filters,
       }),
     enabled: Boolean(scope) && page >= 1,

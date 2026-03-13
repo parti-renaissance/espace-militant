@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getToken, useMedia, YStack } from 'tamagui'
 import { ArrowLeft } from '@tamagui/lucide-icons'
+import { useDebouncedCallback } from 'use-debounce'
 
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
 import Text from '@/components/base/Text'
@@ -26,11 +27,21 @@ const FILTERS_FEATURE_KEY = 'publications'
 function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scope: string; accessDenyButton?: React.ReactNode }) {
   const media = useMedia()
   const [currentPage, setCurrentPage] = useState(1)
+  const [searchInput, setSearchInput] = useState('')
   const [filters, setFilters] = useState<FilterValues>({})
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [selectedUuid, setSelectedUuid] = useState<string | undefined>(undefined)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [apiSearchTerm, setApiSearchTerm] = useState('')
+
+  const debouncedSetApiSearchTerm = useDebouncedCallback((value: string) => {
+    setApiSearchTerm(value.trim())
+  }, 400)
+
+  useEffect(() => {
+    debouncedSetApiSearchTerm(searchInput)
+  }, [searchInput, debouncedSetApiSearchTerm])
 
   const { data: collection } = useGetFiltersCollection({
     featureKey: FILTERS_FEATURE_KEY,
@@ -40,8 +51,13 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
     scope,
     page: currentPage,
     pageSize: PAGE_SIZE,
+    searchTerm: apiSearchTerm || undefined,
     filters,
   })
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [apiSearchTerm])
 
   const activeFilterChips = useMemo(() => getActiveFilterChips(filters, collection), [filters, collection])
 
@@ -101,6 +117,8 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         pageSize={PAGE_SIZE}
         totalItems={metadata?.total_items}
         onPageChange={handlePageChange}
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
       />
     ),
     [
@@ -113,6 +131,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
       currentPage,
       metadata?.total_items,
       handlePageChange,
+      searchInput,
     ],
   )
 

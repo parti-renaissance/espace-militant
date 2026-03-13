@@ -11,14 +11,7 @@ interface FicheMilitantHeaderProps {
 
 export function FicheMilitantHeader({ onClose }: FicheMilitantHeaderProps) {
   return (
-    <XStack
-      paddingHorizontal="$medium"
-      paddingVertical="$small"
-      alignItems="center"
-      justifyContent="space-between"
-      borderBottomWidth={1}
-      borderColor="$borderColor"
-    >
+    <XStack paddingHorizontal="$medium" paddingVertical="$small" alignItems="center" justifyContent="space-between">
       <Text.LG semibold>Fiche militant</Text.LG>
       <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Fermer">
         <X size={24} color="$textPrimary" />

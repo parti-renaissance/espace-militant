@@ -67,6 +67,7 @@ export const RestAdherentListRequestSchema = z
     scope: z.string(),
     page: z.number().optional(),
     page_size: z.number().optional(),
+    search_term: z.string().optional(),
   })
   .passthrough()
 

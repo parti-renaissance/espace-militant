@@ -1,7 +1,8 @@
 import React from 'react'
 import { useMedia, XStack, YStack } from 'tamagui'
-import { ChevronLeft, ChevronRight, CircleX, Filter, RotateCcw } from '@tamagui/lucide-icons'
+import { ChevronLeft, ChevronRight, CircleX, Filter, RotateCcw, Search } from '@tamagui/lucide-icons'
 
+import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import type { ActiveFilterChip } from '@/components/Filters'
@@ -58,6 +59,8 @@ export interface MilitantListHeaderProps {
   pageSize: number
   totalItems?: number
   onPageChange: (page: number) => void
+  searchValue?: string
+  onSearchChange?: (value: string) => void
 }
 
 export function MilitantHeaderTop() {
@@ -77,17 +80,11 @@ export function MilitantHeaderTop() {
   )
 }
 
-function MilitantHeaderPagination({
-  page,
-  pageSize,
-  totalItems,
-  onPageChange,
-  disabled = false,
-}: MilitantHeaderPaginationProps) {
+function MilitantHeaderPagination({ page, pageSize, totalItems, onPageChange, disabled = false }: MilitantHeaderPaginationProps) {
   const media = useMedia()
   const lastPage = totalItems != null ? Math.ceil(totalItems / pageSize) : undefined
   const isPrevDisabled = disabled || page <= 1
-  const isNextDisabled = disabled || (lastPage == null || page >= lastPage)
+  const isNextDisabled = disabled || lastPage == null || page >= lastPage
   const pageStart = totalItems === 0 ? 0 : (page - 1) * pageSize + 1
   const pageEnd = totalItems === 0 ? 0 : totalItems != null ? Math.min(page * pageSize, totalItems) : page * pageSize
   const rangeText = `${pageStart}-${pageEnd}`
@@ -138,48 +135,58 @@ export function MilitantListHeader({
   pageSize,
   totalItems,
   onPageChange,
+  searchValue = '',
+  onSearchChange,
 }: MilitantListHeaderProps) {
   const media = useMedia()
   const hasActiveFilters = activeFilterChips.length > 0
-  const filterChipsRow = (
-    <ActiveFilterChipsRow chips={activeFilterChips} onRemoveFilter={onRemoveFilter} onResetAllFilters={onResetAllFilters} />
-  )
+  const filterChipsRow = <ActiveFilterChipsRow chips={activeFilterChips} onRemoveFilter={onRemoveFilter} onResetAllFilters={onResetAllFilters} />
 
   if (media.sm) {
     return (
-      <YStack gap="$small">
+      <YStack gap="$small" marginBottom="$small">
         <MilitantHeaderTop />
         <YStack gap="$small" mt="$medium" mx="$medium">
-          <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="md" iconLeft={Filter} onPress={onFilterPress}>
-            Filtrer
-          </VoxButton>
+          <XStack flex={1} gap="$small" alignItems="center">
+            <YStack flex={1}>
+              <Input
+              placeholder="Rechercher un nom, email..."
+              size="xs"
+              value={searchValue}
+              onChange={onSearchChange}
+              iconRight={<Search size={20} color="$textSecondary" />}
+            />
+            </YStack>
+            <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="lg" iconLeft={Filter} onPress={onFilterPress}>
+              Filtrer
+            </VoxButton>
+          </XStack>
           {filterChipsRow}
-          <MilitantHeaderPagination
-            page={page}
-            pageSize={pageSize}
-            totalItems={totalItems}
-            onPageChange={onPageChange}
-            disabled={paginationDisabled}
-          />
+          <MilitantHeaderPagination page={page} pageSize={pageSize} totalItems={totalItems} onPageChange={onPageChange} disabled={paginationDisabled} />
         </YStack>
       </YStack>
     )
   }
 
   return (
-    <YStack gap="$small">
+    <YStack gap="$small" marginBottom="$small">
       <MilitantHeaderTop />
-      <XStack justifyContent="space-between" alignItems="center" gap="$small" mt="$medium">
-        <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="md" iconLeft={Filter} onPress={onFilterPress}>
-          Filtrer
-        </VoxButton>
-        <MilitantHeaderPagination
-          page={page}
-          pageSize={pageSize}
-          totalItems={totalItems}
-          onPageChange={onPageChange}
-          disabled={paginationDisabled}
-        />
+      <XStack justifyContent="space-between" alignItems="center" gap="$medium" mt="$medium">
+        <XStack flex={1} gap="$small" alignItems="center">
+          <YStack flex={1} maxWidth={320}>
+            <Input
+              placeholder="Rechercher un nom, email..."
+              size="xs"
+              value={searchValue}
+              onChange={onSearchChange}
+              iconRight={<Search size={20} color="$textSecondary" />}
+            />
+          </YStack>
+          <VoxButton variant="outlined" theme={hasActiveFilters ? 'blue' : 'gray'} size="lg" iconLeft={Filter} onPress={onFilterPress}>
+            Filtrer
+          </VoxButton>
+        </XStack>
+        <MilitantHeaderPagination page={page} pageSize={pageSize} totalItems={totalItems} onPageChange={onPageChange} disabled={paginationDisabled} />
       </XStack>
       {filterChipsRow}
     </YStack>
