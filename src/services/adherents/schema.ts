@@ -132,6 +132,53 @@ export const RestAdherentDetailRequestSchema = z.object({
   scope: z.string(),
 })
 
+/**
+ * Données sensibles d'un adhérent
+ * GET /api/v3/adherents/{uuid}/sensitive-data?scope={scope}&type={type}
+ */
+export const RestAdherentSensitivePhoneSchema = z
+  .object({
+    phone: z.string().min(1),
+  })
+  .partial()
+
+export const RestAdherentSensitiveEmailSchema = z
+  .object({
+    email: z.string().email(),
+  })
+  .partial()
+
+export const RestAdherentSensitiveAddressSchema = z
+  .object({
+    address: z
+      .object({
+        address: z.string().min(1),
+        postal_code: z.string().min(1),
+        city: z.string().min(1),
+        country: z.string().min(1),
+      })
+      .partial(),
+  })
+  .partial()
+
+export const RestAdherentSensitiveRequestSchema = z.object({
+  scope: z.string(),
+  type: z.enum(['phone', 'email', 'address']),
+})
+
+export const RestAdherentSensitiveDataSchema = z
+  .object({
+    phone: RestAdherentSensitivePhoneSchema.shape.phone,
+    email: RestAdherentSensitiveEmailSchema.shape.email,
+    address: RestAdherentSensitiveAddressSchema.shape.address,
+  })
+  .partial()
+
+export type RestAdherentSensitivePhone = z.infer<typeof RestAdherentSensitivePhoneSchema>
+export type RestAdherentSensitiveEmail = z.infer<typeof RestAdherentSensitiveEmailSchema>
+export type RestAdherentSensitiveAddress = z.infer<typeof RestAdherentSensitiveAddressSchema>
+export type RestAdherentSensitiveData = z.infer<typeof RestAdherentSensitiveDataSchema>
+
 export type RestAdherentTag = z.infer<typeof RestAdherentTagSchema>
 export type RestAdherentInstance = z.infer<typeof RestAdherentInstanceSchema>
 export type RestSubscriptions = z.infer<typeof RestSubscriptionsSchema>
@@ -143,3 +190,4 @@ export type RestAdherentListResponse = z.infer<typeof RestAdherentListResponseSc
 export type RestAdherentListRequest = z.infer<typeof RestAdherentListRequestSchema>
 export type RestAdherentDetail = z.infer<typeof RestAdherentDetailSchema>
 export type RestAdherentDetailRequest = z.infer<typeof RestAdherentDetailRequestSchema>
+export type RestAdherentSensitiveRequest = z.infer<typeof RestAdherentSensitiveRequestSchema>

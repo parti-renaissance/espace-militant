@@ -1,20 +1,20 @@
 import React, { memo, useCallback, useState } from 'react'
 import { ActivityIndicator, Pressable } from 'react-native'
 import { View, XStack, YStack } from 'tamagui'
-import { Activity, Mail, MessageCircle, Phone } from '@tamagui/lucide-icons'
+import { Activity } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import PanelModal from '@/components/PanelModal/PanelModal'
 import ProfilePicture from '@/components/ProfilePicture'
 
 import { Chip } from '@/components'
-import type { IconComponent } from '@/models/common.model'
 import { useAdherentDetail } from '@/services/adherents/hook'
 import type { RestAdherentDetail, RestAdherentListItem } from '@/services/adherents/schema'
 import { getRelativeActivityLabel } from '@/utils/DateFormatter'
 
 import { FicheMilitantHeader } from './components/FicheMilitantHeader'
 import { IdentiteTabContent } from './components/IdentiteTab'
+import { MilitantActionButtons } from './components/MilitantActionButtons'
 
 export type FicheMilitantTabId = 'identite' | 'notes' | 'mandats'
 
@@ -64,42 +64,6 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
         )}
       </XStack>
     </YStack>
-  )
-}
-
-function ActionButton({ Icon, label, onPress }: { Icon: IconComponent; label: string; onPress: () => void }) {
-  return (
-    <YStack
-      onPress={onPress}
-      alignItems="center"
-      justifyContent="center"
-      gap="$small"
-      bg="$gray1"
-      paddingVertical={12}
-      paddingHorizontal={16}
-      borderRadius="$small"
-      flex={1}
-      flexBasis={0}
-      cursor="pointer"
-      hoverStyle={{ bg: '$gray2' }}
-      pressStyle={{ bg: '$gray3' }}
-    >
-      <Icon size={16} color="$textPrimary" />
-      <Text.SM primary semibold>
-        {label}
-      </Text.SM>
-    </YStack>
-  )
-}
-
-// TODO: implement action buttons in the UI (SMS, call, email)
-function _MilitantActionButtons({ onSms, onCall, onEmail }: { onSms?: () => void; onCall?: () => void; onEmail?: () => void }) {
-  return (
-    <XStack paddingHorizontal="$medium" paddingVertical="$medium" gap="$small">
-      <ActionButton Icon={MessageCircle} label="SMS" onPress={onSms ?? (() => {})} />
-      <ActionButton Icon={Phone} label="Appeler" onPress={onCall ?? (() => {})} />
-      <ActionButton Icon={Mail} label="Email" onPress={onEmail ?? (() => {})} />
-    </XStack>
   )
 }
 
@@ -184,12 +148,14 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
   }
 
   if (hasSummary && displayData) {
+    const smsAvailable = displayData.subscriptions?.sms?.available ?? true
+
     return (
       <PanelModal isOpen={isOpen} onClose={onClose}>
         <YStack flex={1}>
           <FicheMilitantHeader onClose={onClose} />
           <MilitantSummaryCard data={displayData} />
-          {/* <MilitantActionButtons onSms={() => {}} onCall={() => {}} onEmail={() => {}} /> */}
+          <MilitantActionButtons uuid={uuid} scope={scope} smsAvailable={smsAvailable} />
           <MilitantDetailTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
           {activeTab === 'identite' && (
@@ -199,6 +165,8 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
               detailData={data ?? null}
               availableForResubscribeEmail={data?.available_for_resubscribe_email}
               onResubscribeEmail={() => {}}
+              uuid={uuid}
+              scope={scope}
             />
           )}
 

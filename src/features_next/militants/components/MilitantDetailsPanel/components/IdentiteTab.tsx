@@ -25,8 +25,10 @@ import { getNationalityLabel } from '@/components/NationalitySelect/NationalityS
 
 import { Chip } from '@/components'
 import type { IconComponent } from '@/models/common.model'
+import { useAdherentAddress, useAdherentEmail, useAdherentPhone } from '@/services/adherents/hook'
 import type { RestAdherentDetail, RestAdherentListItem, RestAdherentRole, RestAdherentTag, RestSession } from '@/services/adherents/schema'
 import { formatShortDate } from '@/utils/DateFormatter'
+import { useToastController } from '@tamagui/toast'
 
 function DetailSection({ title, children, actionButton }: { title: string; children: React.ReactNode; actionButton?: React.ReactNode }) {
   return (
@@ -50,6 +52,7 @@ function InfoRow({
   desactivated,
   onSeeSecureData,
   actionButton,
+  seeSecureDataLoading,
 }: {
   Icon: IconComponent
   status?: string | null
@@ -58,6 +61,7 @@ function InfoRow({
   desactivated?: boolean
   onSeeSecureData?: () => void
   actionButton?: React.ReactNode
+  seeSecureDataLoading?: boolean
 }) {
   return (
     <YStack gap={12} bg="$textSurface" justifyContent="center" py="$small" pl={12} pr="$small" borderRadius="$small" minHeight={40}>
@@ -79,7 +83,16 @@ function InfoRow({
           )}
         </YStack>
         {onSeeSecureData && (
-          <VoxButton size="sm" iconLeft={Eye} theme="gray" variant="outlined" onPress={onSeeSecureData} paddingHorizontal={12}>
+          <VoxButton
+            size="sm"
+            iconLeft={Eye}
+            theme="gray"
+            variant="outlined"
+            onPress={onSeeSecureData}
+            paddingHorizontal={12}
+            disabled={seeSecureDataLoading}
+            loading={seeSecureDataLoading ?? false}
+          >
             Voir
           </VoxButton>
         )}
@@ -109,7 +122,17 @@ function InfoRowSkeleton({ showStatusLine = true }: { showStatusLine?: boolean }
   )
 }
 
-function InformationsPersonnellesSection({ isLoading, data }: { isLoading?: boolean; data: RestAdherentDetail | RestAdherentListItem }) {
+function InformationsPersonnellesSection({
+  isLoading,
+  data,
+  uuid,
+  scope,
+}: {
+  isLoading?: boolean
+  data: RestAdherentDetail | RestAdherentListItem
+  uuid?: string
+  scope?: string
+}) {
   const { birthdate, subscriptions } = data
   const emailSubscribed = subscriptions?.email?.subscribed
   const emailStatus = emailSubscribed ? 'Abonné' : 'Désabonné'
@@ -117,6 +140,38 @@ function InformationsPersonnellesSection({ isLoading, data }: { isLoading?: bool
   const smsSubscribed = subscriptions?.sms?.subscribed
   const smsStatus = smsSubscribed ? 'SMS autorisé' : 'SMS non autorisé'
   const nationality = 'nationality' in data ? data.nationality : undefined
+
+  const toast = useToastController()
+
+  const { data: phoneData, isFetching: isFetchingPhone, refetch: refetchPhone } = useAdherentPhone(uuid, scope)
+
+  const { data: emailData, isFetching: isFetchingEmail, refetch: refetchEmail } = useAdherentEmail(uuid, scope)
+
+  const { data: addressData, isFetching: isFetchingAddress, refetch: refetchAddress } = useAdherentAddress(uuid, scope)
+
+  const handleSeePhone = React.useCallback(async () => {
+    if (!uuid || !scope) return
+    const result = await refetchPhone()
+    if (result.isError) {
+      toast.show('Erreur', { message: 'Impossible de récupérer le numéro.', type: 'error' })
+    }
+  }, [refetchPhone, scope, toast, uuid])
+
+  const handleSeeEmail = React.useCallback(async () => {
+    if (!uuid || !scope) return
+    const result = await refetchEmail()
+    if (result.isError) {
+      toast.show('Erreur', { message: "Impossible de récupérer l'adresse email.", type: 'error' })
+    }
+  }, [refetchEmail, scope, toast, uuid])
+
+  const handleSeeAddress = React.useCallback(async () => {
+    if (!uuid || !scope) return
+    const result = await refetchAddress()
+    if (result.isError) {
+      toast.show('Erreur', { message: "Impossible de récupérer l'adresse postale.", type: 'error' })
+    }
+  }, [refetchAddress, scope, toast, uuid])
 
   if (isLoading) {
     return (
@@ -138,13 +193,31 @@ function InformationsPersonnellesSection({ isLoading, data }: { isLoading?: bool
         <InfoRow
           Icon={Phone}
           status={!smsAvailable ? undefined : smsStatus}
-          value={!smsAvailable ? 'Téléphone inconnu' : undefined}
+          value={phoneData?.phone ?? (!smsAvailable ? 'Téléphone inconnu' : undefined)}
           statusColor={!smsAvailable ? undefined : smsSubscribed ? 'green' : 'orange'}
           desactivated={!smsAvailable}
+          onSeeSecureData={phoneData?.phone || !smsAvailable ? undefined : handleSeePhone}
+          seeSecureDataLoading={isFetchingPhone}
         />
-        <InfoRow Icon={Mail} status={emailStatus} value={undefined} statusColor={emailSubscribed ? 'green' : 'orange'} />
+        <InfoRow
+          Icon={Mail}
+          status={emailStatus}
+          value={emailData?.email ?? undefined}
+          statusColor={emailSubscribed ? 'green' : 'orange'}
+          onSeeSecureData={emailData?.email ? undefined : handleSeeEmail}
+          seeSecureDataLoading={isFetchingEmail}
+        />
 
-        <InfoRow Icon={MapPin} value={undefined} />
+        <InfoRow
+          Icon={MapPin}
+          value={
+            addressData?.address
+              ? `${addressData.address.address}, ${addressData.address.postal_code} ${addressData.address.city}, ${addressData.address.country}`
+              : undefined
+          }
+          onSeeSecureData={addressData?.address ? undefined : handleSeeAddress}
+          seeSecureDataLoading={isFetchingAddress}
+        />
         <InfoRow Icon={Calendar} value={birthdate ? `Né(e) le ${formatShortDate(birthdate)}` : '—'} />
         <InfoRow Icon={Flag} value={`Nationalité ${nationality ? getNationalityLabel(nationality) : 'inconnue'}`} />
       </YStack>
@@ -323,6 +396,8 @@ interface IdentiteTabContentProps {
   detailData: RestAdherentDetail | null
   availableForResubscribeEmail?: boolean
   onResubscribeEmail?: () => void
+  uuid?: string
+  scope?: string
 }
 
 // TODO: implement resubscribe email functionality (availableForResubscribeEmail, onResubscribeEmail)
@@ -332,13 +407,15 @@ export function IdentiteTabContent({
   detailData,
   availableForResubscribeEmail: _availableForResubscribeEmail,
   onResubscribeEmail: _onResubscribeEmail,
+  uuid,
+  scope,
 }: IdentiteTabContentProps) {
   const roles = Array.isArray(summaryData.roles) ? summaryData.roles : []
   const staticTags = Array.isArray(summaryData.static_tags) ? summaryData.static_tags : []
 
   return (
     <YStack padding="$medium" gap="$large" paddingBottom={80}>
-      <InformationsPersonnellesSection isLoading={isLoading} data={summaryData} />
+      <InformationsPersonnellesSection isLoading={isLoading} data={summaryData} uuid={uuid} scope={scope} />
       {(detailData || isLoading) && <SessionsSection isLoading={isLoading} data={detailData ?? null} />}
       <RolesSection roles={roles} />
       <LabelsNationauxSection labels={staticTags} />
