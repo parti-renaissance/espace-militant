@@ -325,7 +325,14 @@ interface IdentiteTabContentProps {
   onResubscribeEmail?: () => void
 }
 
-export function IdentiteTabContent({ isLoading, summaryData, detailData, availableForResubscribeEmail, onResubscribeEmail }: IdentiteTabContentProps) {
+// TODO: implement resubscribe email functionality (availableForResubscribeEmail, onResubscribeEmail)
+export function IdentiteTabContent({
+  isLoading,
+  summaryData,
+  detailData,
+  availableForResubscribeEmail: _availableForResubscribeEmail,
+  onResubscribeEmail: _onResubscribeEmail,
+}: IdentiteTabContentProps) {
   const roles = Array.isArray(summaryData.roles) ? summaryData.roles : []
   const staticTags = Array.isArray(summaryData.static_tags) ? summaryData.static_tags : []
 

@@ -4,7 +4,6 @@ import { ArrowLeft } from '@tamagui/lucide-icons'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
-import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import EmptyStateWithFilters from '@/components/EmptyStates/EmptyStateWithFilters'
 import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'

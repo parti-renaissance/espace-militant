@@ -92,7 +92,8 @@ function ActionButton({ Icon, label, onPress }: { Icon: IconComponent; label: st
   )
 }
 
-function MilitantActionButtons({ onSms, onCall, onEmail }: { onSms?: () => void; onCall?: () => void; onEmail?: () => void }) {
+// TODO: implement action buttons in the UI (SMS, call, email)
+function _MilitantActionButtons({ onSms, onCall, onEmail }: { onSms?: () => void; onCall?: () => void; onEmail?: () => void }) {
   return (
     <XStack paddingHorizontal="$medium" paddingVertical="$medium" gap="$small">
       <ActionButton Icon={MessageCircle} label="SMS" onPress={onSms ?? (() => {})} />
