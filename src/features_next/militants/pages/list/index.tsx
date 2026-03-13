@@ -9,7 +9,7 @@ import { VoxButton } from '@/components/Button'
 import EmptyStateWithFilters from '@/components/EmptyStates/EmptyStateWithFilters'
 import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'
 import { getActiveFilterChips } from '@/components/Filters/filterCollectionUtils'
-import PanelOrBottomSheet from '@/components/PanelOrBottomSheet/PanelOrBottomSheet'
+import PanelModal from '@/components/PanelModal/PanelModal'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
 import { MilitantDetailsPanel } from '@/features_next/militants/components/MilitantDetailsPanel'
 import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
@@ -206,9 +206,9 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         onRefresh={handleManualRefresh}
         contentContainerStyle={contentContainerStyle}
       />
-      <PanelOrBottomSheet isOpen={isFilterOpen} onClose={handleCloseFilter}>
-        <MilitantFilterPanel scope={scope} initialValues={filters} onChangeFilter={handleChangeFilter} />
-      </PanelOrBottomSheet>
+      <PanelModal isOpen={isFilterOpen} onClose={handleCloseFilter}>
+        <MilitantFilterPanel scope={scope} initialValues={filters} onChangeFilter={handleChangeFilter} onClose={handleCloseFilter} />
+      </PanelModal>
       <MilitantDetailsPanel uuid={selectedUuid} scope={scope} isOpen={isDetailOpen} onClose={handleCloseDetail} initialData={selectedInitialData} />
     </Layout.Main>
   )

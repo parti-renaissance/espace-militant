@@ -4,7 +4,7 @@ import { View, XStack, YStack } from 'tamagui'
 import { Activity, Mail, MessageCircle, Phone } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
-import PanelOrBottomSheet from '@/components/PanelOrBottomSheet/PanelOrBottomSheet'
+import PanelModal from '@/components/PanelModal/PanelModal'
 import ProfilePicture from '@/components/ProfilePicture'
 
 import { Chip } from '@/components'
@@ -159,32 +159,32 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
 
   if (uuid && !hasSummary && isLoading) {
     return (
-      <PanelOrBottomSheet isOpen={isOpen} onClose={onClose}>
+      <PanelModal isOpen={isOpen} onClose={onClose}>
         <YStack padding="$medium" alignItems="center" justifyContent="center" minHeight={200}>
           <ActivityIndicator size="large" />
           <Text.SM secondary style={{ marginTop: 12 }}>
             Chargement…
           </Text.SM>
         </YStack>
-      </PanelOrBottomSheet>
+      </PanelModal>
     )
   }
 
   if (isError && !hasSummary) {
     return (
-      <PanelOrBottomSheet isOpen={isOpen} onClose={onClose}>
+      <PanelModal isOpen={isOpen} onClose={onClose}>
         <FicheMilitantHeader onClose={onClose} />
         <YStack padding="$medium" gap="$small">
           <Text.SM semibold>Erreur</Text.SM>
           <Text.SM secondary>{errorMessage}</Text.SM>
         </YStack>
-      </PanelOrBottomSheet>
+      </PanelModal>
     )
   }
 
   if (hasSummary && displayData) {
     return (
-      <PanelOrBottomSheet isOpen={isOpen} onClose={onClose}>
+      <PanelModal isOpen={isOpen} onClose={onClose}>
         <YStack flex={1}>
           <FicheMilitantHeader onClose={onClose} />
           <MilitantSummaryCard data={displayData} />
@@ -207,17 +207,17 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
             </YStack>
           )}
         </YStack>
-      </PanelOrBottomSheet>
+      </PanelModal>
     )
   }
 
   return (
-    <PanelOrBottomSheet isOpen={isOpen} onClose={onClose}>
+    <PanelModal isOpen={isOpen} onClose={onClose}>
       <FicheMilitantHeader onClose={onClose} />
       <YStack padding="$medium">
         <Text.SM secondary>Sélectionnez un militant pour afficher ses détails.</Text.SM>
       </YStack>
-    </PanelOrBottomSheet>
+    </PanelModal>
   )
 }
 
