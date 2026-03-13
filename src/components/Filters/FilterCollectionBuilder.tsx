@@ -45,6 +45,8 @@ export interface FilterCollectionBuilderProps {
   initialValues?: FilterValues
   onChangeFilter: (values: FilterValues) => void
   collection?: FiltersCollectionResponse
+  /** Filter codes to hide from the UI (e.g. filters rendered elsewhere like search in header). */
+  hiddenFilterCodes?: string[]
 }
 
 function getSelectOptions(choices: Record<string, string> | string[]) {
@@ -54,13 +56,30 @@ function getSelectOptions(choices: Record<string, string> | string[]) {
   return Object.entries(choices).map(([value, label]) => ({ value, label }))
 }
 
-function FilterCollectionBuilder({ featureKey, scope, initialValues, onChangeFilter, collection: collectionProp }: FilterCollectionBuilderProps) {
+function FilterCollectionBuilder({
+  featureKey,
+  scope,
+  initialValues,
+  onChangeFilter,
+  collection: collectionProp,
+  hiddenFilterCodes,
+}: FilterCollectionBuilderProps) {
   const { data: collectionFromApi, isLoading } = useGetFiltersCollection({
     featureKey,
     scope,
     enabled: collectionProp === undefined,
   })
-  const collection = collectionProp ?? collectionFromApi
+  const rawCollection = collectionProp ?? collectionFromApi
+  const collection = useMemo(() => {
+    if (!rawCollection?.length || !hiddenFilterCodes?.length) return rawCollection
+    const set = new Set(hiddenFilterCodes)
+    return rawCollection
+      .map((group) => ({
+        ...group,
+        filters: group.filters.filter((f) => !set.has(f.code)),
+      }))
+      .filter((group) => group.filters.length > 0)
+  }, [rawCollection, hiddenFilterCodes])
   const [values, setValues] = useState<FilterValues>(() => ({ ...(initialValues ?? {}) }))
   const [collapsedGroupIndices, setCollapsedGroupIndices] = useState<Set<number>>(new Set())
 
