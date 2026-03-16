@@ -1,5 +1,6 @@
 import React from 'react'
 import { Pressable } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { XStack, YStack } from 'tamagui'
 import { X } from '@tamagui/lucide-icons'
 
@@ -17,9 +18,11 @@ interface MilitantFilterPanelProps {
 }
 
 export function MilitantFilterPanel({ scope, initialValues, onChangeFilter, onClose, hiddenFilterCodes }: MilitantFilterPanelProps) {
+  const insets = useSafeAreaInsets()
+
   return (
     <YStack flex={1} mb={350}>
-      <XStack paddingHorizontal="$medium" paddingVertical="$small" alignItems="center" justifyContent="space-between">
+      <XStack paddingHorizontal="$medium" paddingVertical="$small" marginTop={insets.top} alignItems="center" justifyContent="space-between">
         <Text.LG semibold>Tous les filtres</Text.LG>
         {onClose && (
           <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Fermer">

@@ -1,8 +1,10 @@
-import { PropsWithChildren, useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native'
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import Animated, { Easing, Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { ScrollView, useMedia, YStack } from 'tamagui'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 
 interface PanelModalProps extends PropsWithChildren {
   isOpen: boolean
@@ -44,9 +46,36 @@ export default function PanelModal({ isOpen, onClose, children }: PanelModalProp
       }
     })
     backdropOpacity.value = withTiming(isOpen ? 0.5 : 0, ANIMATION)
-    // translateX et backdropOpacity sont des shared values Reanimated (refs stables), pas des deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, panelWidth, hidePanel])
+
+  const panGesture = useMemo(() => {
+    return Gesture.Pan()
+      .activeOffsetX([-10, 10])
+      .onUpdate((event) => {
+        if (event.translationX > 0) {
+          translateX.value = event.translationX
+
+          backdropOpacity.value = interpolate(event.translationX, [0, panelWidth], [0.5, 0], Extrapolation.CLAMP)
+        }
+      })
+      .onEnd((event) => {
+        const positionThreshold = panelWidth / 2
+        const velocityThreshold = 800
+
+        if (event.translationX > positionThreshold || event.velocityX > velocityThreshold) {
+          translateX.value = withTiming(panelWidth, ANIMATION, (finished) => {
+            if (finished) {
+              scheduleOnRN(onClose)
+            }
+          })
+          backdropOpacity.value = withTiming(0, ANIMATION)
+        } else {
+          translateX.value = withTiming(0, ANIMATION)
+          backdropOpacity.value = withTiming(0.5, ANIMATION)
+        }
+      })
+  }, [panelWidth, onClose, translateX, backdropOpacity])
 
   const animatedPanelStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
@@ -61,18 +90,22 @@ export default function PanelModal({ isOpen, onClose, children }: PanelModalProp
   }
 
   return (
-    <Modal transparent visible={shouldRender || isOpen} animationType="none">
-      <Animated.View style={[StyleSheet.absoluteFill, styles.backdrop, animatedBackdropStyle]}>
+    <Modal transparent visible={shouldRender || isOpen} animationType="none" onRequestClose={onClose}>
+      <Animated.View style={[StyleSheet.absoluteFill, styles.backdrop, animatedBackdropStyle]} pointerEvents={isOpen ? 'auto' : 'none'}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </Animated.View>
 
-      <Animated.View style={[styles.panelPosition, { width: panelWidth }, animatedPanelStyle, styles.panelShadow]}>
-        <YStack flex={1} backgroundColor="$background" elevation="$4" borderLeftWidth={isBelowSm ? 0 : 1} borderColor="$borderColor">
-          <ScrollView flex={1} contentContainerStyle={styles.scrollContent}>
-            {children}
-          </ScrollView>
-        </YStack>
-      </Animated.View>
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[styles.panelPosition, { width: panelWidth }, animatedPanelStyle, styles.panelShadow]}>
+          <YStack flex={1} backgroundColor="$background" elevation="$4" borderLeftWidth={isBelowSm ? 0 : 1} borderColor="$borderColor">
+            <BottomSheetModalProvider>
+              <ScrollView flex={1} contentContainerStyle={styles.scrollContent}>
+                {children}
+              </ScrollView>
+            </BottomSheetModalProvider>
+          </YStack>
+        </Animated.View>
+      </GestureDetector>
     </Modal>
   )
 }

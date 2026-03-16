@@ -1,5 +1,6 @@
 import React from 'react'
 import { Pressable } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { XStack } from 'tamagui'
 import { X } from '@tamagui/lucide-icons'
 
@@ -10,8 +11,10 @@ interface FicheMilitantHeaderProps {
 }
 
 export function FicheMilitantHeader({ onClose }: FicheMilitantHeaderProps) {
+  const insets = useSafeAreaInsets()
+
   return (
-    <XStack paddingHorizontal="$medium" paddingVertical="$small" alignItems="center" justifyContent="space-between">
+    <XStack paddingHorizontal="$medium" paddingVertical="$small" marginTop={insets.top} alignItems="center" justifyContent="space-between">
       <Text.LG semibold>Fiche militant</Text.LG>
       <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Fermer">
         <X size={24} color="$textPrimary" />

@@ -18,6 +18,7 @@ import {
   Smartphone,
   Twitter,
 } from '@tamagui/lucide-icons'
+import { useToastController } from '@tamagui/toast'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
@@ -28,7 +29,6 @@ import type { IconComponent } from '@/models/common.model'
 import { useAdherentAddress, useAdherentEmail, useAdherentPhone } from '@/services/adherents/hook'
 import type { RestAdherentDetail, RestAdherentListItem, RestAdherentRole, RestAdherentTag, RestSession } from '@/services/adherents/schema'
 import { formatShortDate } from '@/utils/DateFormatter'
-import { useToastController } from '@tamagui/toast'
 
 function DetailSection({ title, children, actionButton }: { title: string; children: React.ReactNode; actionButton?: React.ReactNode }) {
   return (
@@ -84,7 +84,7 @@ function InfoRow({
         </YStack>
         {onSeeSecureData && (
           <VoxButton
-            size="sm"
+            size="xxs"
             iconLeft={Eye}
             theme="gray"
             variant="outlined"
@@ -92,6 +92,7 @@ function InfoRow({
             paddingHorizontal={12}
             disabled={seeSecureDataLoading}
             loading={seeSecureDataLoading ?? false}
+            px="$small"
           >
             Voir
           </VoxButton>
@@ -378,7 +379,7 @@ function PreferencesNotificationSection({ subscriptionTypes }: { subscriptionTyp
         ) : (
           list.map((st) => (
             <XStack key={st.code} alignItems="center" gap="$small">
-              <View w={8} h={8} borderRadius={4} backgroundColor={st.checked === true ? '$green9' : '$orange9'} />
+              <View w={8} h={8} borderRadius={4} backgroundColor={st.subscribed === true ? '$green9' : '$orange9'} />
               <Text.SM color="$gray5" numberOfLines={1} ellipsizeMode="tail">
                 {st.label}
               </Text.SM>
