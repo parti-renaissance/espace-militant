@@ -154,6 +154,7 @@ function MilitantCadreItemInner({
     <VoxCard
       tag="button"
       role="listitem"
+      tabIndex={0}
       aria-label={listItemAriaLabel || undefined}
       onPress={onPress}
       cursor="pointer"
@@ -163,6 +164,8 @@ function MilitantCadreItemInner({
         outlineColor: '$gray2',
         outlineStyle: 'solid',
       }}
+      hoverStyle={{ backgroundColor: '$textSurface' }}
+      pressStyle={{ backgroundColor: '$textSurface' }}
     >
       <VoxCard.Content minHeight={122} justifyContent="center">
         <XStack flexWrap="wrap" width="100%" rowGap={isMobileLayout ? 16 : 0}>
@@ -192,26 +195,28 @@ function MilitantCadreItemInner({
             {static_tags && <TagChipRow tags={static_tags} theme="gray" />}
           </YStack>
 
-          <YStack width={col3Width} pr="$medium" gap={2} overflow="hidden">
-            {circonscription && (
-              <Text.SM semibold numberOfLines={1}>
-                {circonscription.name}
-              </Text.SM>
-            )}
-            {assembly && (
-              <Text.SM semibold numberOfLines={1}>
-                {assembly.name}
-              </Text.SM>
-            )}
-            {committee && (
-              <Text.SM secondary regular numberOfLines={1}>
-                {committee.name}
-              </Text.SM>
-            )}
+          <YStack width={col3Width} pr="$medium" gap={20} overflow="hidden" justifyContent="center">
+            <YStack gap={2}>
+              {circonscription && (
+                <Text.SM semibold numberOfLines={1}>
+                  {circonscription.name}
+                </Text.SM>
+              )}
+              {assembly && (
+                <Text.SM semibold numberOfLines={1}>
+                  {assembly.name}
+                </Text.SM>
+              )}
+              {committee && (
+                <Text.SM secondary regular numberOfLines={1}>
+                  {committee.name}
+                </Text.SM>
+              )}
+            </YStack>
             <SubscriptionChannelsRow subscriptions={subscriptions} />
           </YStack>
 
-          <YStack width={col4Width} overflow="hidden">
+          <YStack width={col4Width} overflow="hidden" justifyContent="center">
             <XStack gap={12}>
               {anciennete && (
                 <YStack>

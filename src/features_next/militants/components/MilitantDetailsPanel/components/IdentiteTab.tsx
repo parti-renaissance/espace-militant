@@ -23,6 +23,7 @@ import { useToastController } from '@tamagui/toast'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { getNationalityLabel } from '@/components/NationalitySelect/NationalitySelect'
+import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 import { Chip } from '@/components'
 import type { IconComponent } from '@/models/common.model'
@@ -64,9 +65,9 @@ function InfoRow({
   seeSecureDataLoading?: boolean
 }) {
   return (
-    <YStack gap={12} bg="$textSurface" justifyContent="center" py="$small" pl={12} pr="$small" borderRadius="$small" minHeight={40}>
+    <YStack gap={12} bg="$textSurface" justifyContent="center" py="$small" pl={12} pr="$small" borderRadius="$small" minHeight={status ? 50 : 40}>
       <XStack gap={12} alignItems="center">
-        <Icon size={18} color={desactivated ? '$textDisabled' : '$textPrimary'} />
+        <Icon size={12} color={desactivated ? '$textDisabled' : '$textPrimary'} />
         <YStack flex={1} minWidth={0} gap={6}>
           {status != null && status !== '' && (
             <XStack gap="$xsmall" alignItems="center">
@@ -83,19 +84,22 @@ function InfoRow({
           )}
         </YStack>
         {onSeeSecureData && (
-          <VoxButton
-            size="xxs"
-            iconLeft={Eye}
-            theme="gray"
-            variant="outlined"
-            onPress={onSeeSecureData}
-            paddingHorizontal={12}
-            disabled={seeSecureDataLoading}
-            loading={seeSecureDataLoading ?? false}
-            px="$small"
-          >
-            Voir
-          </VoxButton>
+          <YStack>
+            <VoxButton
+              size="xxs"
+              iconLeft={Eye}
+              theme="gray"
+              variant="outlined"
+              onPress={onSeeSecureData}
+              paddingHorizontal={12}
+              disabled={seeSecureDataLoading}
+              loading={seeSecureDataLoading ?? false}
+              px="$small"
+              py="$xsmall"
+            >
+              Voir
+            </VoxButton>
+          </YStack>
         )}
       </XStack>
       {actionButton}
@@ -106,7 +110,7 @@ function InfoRow({
 /** Skeleton qui reprend la structure d’un InfoRow (icône + lignes) */
 function InfoRowSkeleton({ showStatusLine = true }: { showStatusLine?: boolean }) {
   return (
-    <YStack gap={12} bg="$textSurface" py="$small" pl={12} pr="$small" borderRadius="$small" minHeight={40}>
+    <YStack gap={12} bg="$textSurface" py="$small" pl={12} pr="$small" borderRadius="$small" minHeight={showStatusLine ? 50 : 40}>
       <XStack gap={12} alignItems="center">
         <View w={18} h={18} borderRadius={9} backgroundColor="$gray2" />
         <YStack flex={1} minWidth={0} gap={6}>
@@ -178,7 +182,7 @@ function InformationsPersonnellesSection({
     return (
       <DetailSection title="Informations personnelles">
         <YStack gap="$small">
-          <InfoRowSkeleton showStatusLine />
+          <InfoRowSkeleton showStatusLine={smsAvailable} />
           <InfoRowSkeleton showStatusLine />
           <InfoRowSkeleton showStatusLine={false} />
           <InfoRowSkeleton showStatusLine={false} />
@@ -268,6 +272,7 @@ function SessionsSection({ isLoading, data }: { isLoading?: boolean; data?: Rest
             <InfoRowSkeleton showStatusLine />
           </YStack>
         </DetailSection>
+        <SkeCard.Button size="sm" />
       </YStack>
     )
   }

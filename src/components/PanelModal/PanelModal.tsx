@@ -51,11 +51,11 @@ export default function PanelModal({ isOpen, onClose, children }: PanelModalProp
 
   const panGesture = useMemo(() => {
     return Gesture.Pan()
+      .enabled(isBelowSm)
       .activeOffsetX([-10, 10])
       .onUpdate((event) => {
         if (event.translationX > 0) {
           translateX.value = event.translationX
-
           backdropOpacity.value = interpolate(event.translationX, [0, panelWidth], [0.5, 0], Extrapolation.CLAMP)
         }
       })
@@ -75,7 +75,7 @@ export default function PanelModal({ isOpen, onClose, children }: PanelModalProp
           backdropOpacity.value = withTiming(0.5, ANIMATION)
         }
       })
-  }, [panelWidth, onClose, translateX, backdropOpacity])
+  }, [isBelowSm, panelWidth, onClose, translateX, backdropOpacity])
 
   const animatedPanelStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
