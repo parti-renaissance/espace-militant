@@ -74,7 +74,7 @@ export const RestAdherentListRequestSchema = z
 const RestSubscriptionTypeSchema = z.object({
   code: z.string(),
   label: z.string(),
-  checked: z.boolean().optional(),
+  subscribed: z.boolean().optional(),
 })
 
 /** Une session (web ou mobile) */
@@ -87,10 +87,7 @@ export const RestSessionSchema = z.object({
 })
 
 /** Sessions groupées par canal : { web: [...], mobile: [...] } (les valeurs peuvent être null) */
-export const RestSessionsByChannelSchema = z
-  .record(z.string(), z.array(RestSessionSchema).nullable())
-  .optional()
-  .default({})
+export const RestSessionsByChannelSchema = z.record(z.string(), z.array(RestSessionSchema).nullable()).optional().default({})
 
 const RestSocialLinksSchema = z.object({
   facebook: z.string().nullable(),

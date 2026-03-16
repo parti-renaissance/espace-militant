@@ -46,7 +46,7 @@ export default function IntegerInterval({ labelFrom, labelTo, value, onChange, o
 
   return (
     <XStack borderRadius="$medium" gap="$xsmall">
-      <YStack flexShrink={1}>
+      <YStack flexShrink={1} flex={1}>
         <Input
           value={value.start != null ? String(value.start) : ''}
           onChangeText={handleStartChange}
@@ -56,7 +56,7 @@ export default function IntegerInterval({ labelFrom, labelTo, value, onChange, o
           keyboardType="number-pad"
         />
       </YStack>
-      <YStack flexShrink={1}>
+      <YStack flexShrink={1} flex={1}>
         <Input
           value={value.end != null ? String(value.end) : ''}
           onChangeText={handleEndChange}
