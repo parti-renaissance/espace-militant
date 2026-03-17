@@ -163,11 +163,11 @@ function FilterCollectionBuilder({
   }
 
   return (
-    <YStack gap="$medium">
+    <YStack gap="$xlarge">
       {collection.map((group: FilterGroup, groupIndex: number) => {
         const isCollapsed = collapsedGroupIndices.has(groupIndex)
         return (
-          <YStack key={groupIndex} gap="$small">
+          <YStack key={groupIndex} gap="$medium">
             {group.label ? (
               <Pressable onPress={() => toggleGroup(groupIndex)}>
                 <XStack alignItems="center" justifyContent="space-between" gap="$small">

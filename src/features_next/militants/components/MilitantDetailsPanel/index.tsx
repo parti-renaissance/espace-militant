@@ -1,9 +1,10 @@
 import React, { memo, useCallback, useState } from 'react'
 import { ActivityIndicator, Pressable } from 'react-native'
 import { View, XStack, YStack } from 'tamagui'
-import { Activity } from '@tamagui/lucide-icons'
+import { Activity, CircleAlert } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
 import PanelModal from '@/components/PanelModal/PanelModal'
 import ProfilePicture from '@/components/ProfilePicture'
 
@@ -82,14 +83,14 @@ function MilitantDetailTabs({ activeTab, onTabChange }: { activeTab: FicheMilita
           <Pressable
             key={tab.id}
             onPress={() => onTabChange(tab.id)}
-            style={{ paddingVertical: 12, paddingHorizontal: 4, marginBottom: -1 }}
+            style={{ paddingVertical: 12, paddingHorizontal: 4, marginBottom: -1, flex: 1, flexShrink: 0 }}
             accessibilityRole="tab"
             accessibilityState={{ selected: isActive }}
           >
             <YStack position="relative">
-              <Text.SM semibold color={isActive ? '$blue5' : '$textSecondary'}>
+              <Text.MD semibold textAlign="center" color={isActive ? '$blue5' : '$textPrimary'}>
                 {tab.label}
-              </Text.SM>
+              </Text.MD>
             </YStack>
             {isActive && <XStack position="absolute" bottom={-1} left={0} right={0} height={2} backgroundColor="$blue5" borderRadius={1} />}
           </Pressable>
@@ -110,7 +111,7 @@ export interface MilitantDetailsPanelProps {
 function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }: MilitantDetailsPanelProps) {
   const [activeTab, setActiveTab] = useState<FicheMilitantTabId>('identite')
 
-  const { data, isLoading, isFetching, isError, error } = useAdherentDetail(uuid, scope, {
+  const { data, isLoading, isFetching, isError, error, refetch } = useAdherentDetail(uuid, scope, {
     initialData: initialData ?? undefined,
   })
 
@@ -135,13 +136,20 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
     )
   }
 
-  if (isError && !hasSummary) {
+  if (isError) {
     return (
       <PanelModal isOpen={isOpen} onClose={onClose}>
         <FicheMilitantHeader onClose={onClose} />
-        <YStack padding="$medium" gap="$small">
-          <Text.SM semibold>Erreur</Text.SM>
-          <Text.SM secondary>{errorMessage}</Text.SM>
+        <YStack gap="$medium" alignItems="center" justifyContent="center" flex={1} minHeight={300}>
+          <CircleAlert size={48} color="$orange5" />
+          <Text.SM color="$textDisabled" textAlign="center">
+            {error?.message ?? 'Impossible de charger les détails.'}
+          </Text.SM>
+          <YStack>
+            <VoxButton theme="orange" size="sm" variant="outlined" onPress={() => refetch()}>
+              Réessayer
+            </VoxButton>
+          </YStack>
         </YStack>
       </PanelModal>
     )
