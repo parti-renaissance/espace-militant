@@ -275,8 +275,8 @@ function FilterField({ filter, values, getFilterValue, getFilterValueForSelect, 
         : { start: null, end: null }
     return (
       <DateInterval
-        labelFrom={`${label} - Depuis`}
-        labelTo={`${label} - Jusqu'au`}
+        labelFrom={`${label} après le`}
+        labelTo={`${label} avant le`}
         value={intervalValue}
         onChange={(v) => onChange(code, v)}
         size="md"
