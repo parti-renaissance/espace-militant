@@ -26,3 +26,12 @@ export const getAdherentSensitiveData = (uuid: string) =>
     responseSchema: schemas.RestAdherentSensitiveDataSchema,
     type: 'private',
   })
+
+export const getAdherentDonations = (uuid: string) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherents/${uuid}/donations`,
+    requestSchema: schemas.RestAdherentDonationsRequestSchema,
+    responseSchema: schemas.RestAdherentDonationsResponseSchema,
+    type: 'private',
+  })
