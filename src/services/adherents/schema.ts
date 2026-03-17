@@ -163,6 +163,27 @@ export const RestAdherentSensitiveRequestSchema = z.object({
   type: z.enum(['phone', 'email', 'address']),
 })
 
+export const RestAdherentDonationSchema = z.object({
+  date: z.string(),
+  type: z.string(),
+  subscription: z.boolean(),
+  membership: z.boolean(),
+  status: z.string(),
+  uuid: z.string(),
+  amount: z.number(),
+  type_label: z.string(),
+})
+
+export const RestAdherentDonationsResponseSchema = z.array(RestAdherentDonationSchema)
+
+export const RestAdherentDonationsRequestSchema = z.object({
+  scope: z.string(),
+})
+
+export type RestAdherentDonation = z.infer<typeof RestAdherentDonationSchema>
+export type RestAdherentDonationsResponse = z.infer<typeof RestAdherentDonationsResponseSchema>
+export type RestAdherentDonationsRequest = z.infer<typeof RestAdherentDonationsRequestSchema>
+
 export const RestAdherentSensitiveDataSchema = z
   .object({
     phone: RestAdherentSensitivePhoneSchema.shape.phone,

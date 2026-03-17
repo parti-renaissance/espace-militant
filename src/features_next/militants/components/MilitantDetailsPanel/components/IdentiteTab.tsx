@@ -3,6 +3,9 @@ import { Linking } from 'react-native'
 import { View, XStack, YStack } from 'tamagui'
 import {
   Calendar,
+  CircleAlert,
+  CircleCheck,
+  Clock,
   Eye,
   Facebook,
   Flag,
@@ -27,17 +30,34 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 import { Chip } from '@/components'
 import type { IconComponent } from '@/models/common.model'
-import { useAdherentAddress, useAdherentEmail, useAdherentPhone } from '@/services/adherents/hook'
-import type { RestAdherentDetail, RestAdherentListItem, RestAdherentRole, RestAdherentTag, RestSession } from '@/services/adherents/schema'
+import { useAdherentAddress, useAdherentDonations, useAdherentEmail, useAdherentPhone } from '@/services/adherents/hook'
+import type {
+  RestAdherentDetail,
+  RestAdherentDonation,
+  RestAdherentListItem,
+  RestAdherentRole,
+  RestAdherentTag,
+  RestSession,
+} from '@/services/adherents/schema'
 import { formatShortDate } from '@/utils/DateFormatter'
 
-function DetailSection({ title, children, actionButton }: { title: string; children: React.ReactNode; actionButton?: React.ReactNode }) {
+function DetailSection({
+  title,
+  children,
+  actionButton,
+  subSection,
+}: {
+  title: string
+  children: React.ReactNode
+  actionButton?: React.ReactNode
+  subSection?: boolean
+}): React.ReactNode {
   return (
-    <YStack gap="$small">
+    <YStack gap={subSection ? '$small' : '$medium'}>
       <XStack justifyContent="space-between" alignItems="center">
-        <Text.MD semibold primary>
+        <Text semibold primary fontSize={subSection ? 12 : 16}>
           {title}
-        </Text.MD>
+        </Text>
         {actionButton}
       </XStack>
       {children}
@@ -266,7 +286,7 @@ function SessionsSection({ isLoading, data }: { isLoading?: boolean; data?: Rest
   if (isLoading) {
     return (
       <YStack gap="$medium">
-        <DetailSection title="Sessions">
+        <DetailSection title="Sessions" subSection={true}>
           <YStack gap="$small">
             <InfoRowSkeleton showStatusLine />
             <InfoRowSkeleton showStatusLine />
@@ -284,7 +304,7 @@ function SessionsSection({ isLoading, data }: { isLoading?: boolean; data?: Rest
 
   return (
     <YStack gap="$medium">
-      <DetailSection title="Sessions">
+      <DetailSection title="Sessions" subSection={true}>
         <YStack gap="$small">
           {SESSION_CHANNELS.map(({ id: channel, Icon }) => {
             const list = Array.isArray(sessionsByChannel[channel]) ? (sessionsByChannel[channel] as RestSession[]) : []
@@ -329,7 +349,7 @@ function SessionsSection({ isLoading, data }: { isLoading?: boolean; data?: Rest
 
 function RolesSection({ roles }: { roles: RestAdherentRole[] }) {
   return (
-    <DetailSection title="Rôle(s)">
+    <DetailSection title="Rôle(s)" subSection={true}>
       <YStack gap="$small">
         <XStack flexWrap="wrap" gap={4}>
           {roles.length === 0 ? (
@@ -356,7 +376,7 @@ function RolesSection({ roles }: { roles: RestAdherentRole[] }) {
 function LabelsNationauxSection({ labels }: { labels: RestAdherentTag[] | null | undefined }) {
   const list = Array.isArray(labels) ? labels : []
   return (
-    <DetailSection title="Labels nationaux">
+    <DetailSection title="Labels nationaux" subSection={true}>
       {list.length === 0 ? (
         <Text.SM color="$textDisabled">Ce militant ne dispose d’aucun label national.</Text.SM>
       ) : (
@@ -396,6 +416,86 @@ function PreferencesNotificationSection({ subscriptionTypes }: { subscriptionTyp
   )
 }
 
+const DONATION_STATUS_CONFIG: Record<string, { label: string; icon: typeof CircleCheck; color: string; bg: string }> = {
+  finished: { label: 'PAYÉ', icon: CircleCheck, color: '$green5', bg: '$green2' },
+  error: { label: 'ÉCHOUÉ', icon: CircleAlert, color: '$orange5', bg: '$orange2' },
+  canceled: { label: 'ÉCHOUÉ', icon: CircleAlert, color: '$orange5', bg: '$orange2' },
+  refunded: { label: 'ÉCHOUÉ', icon: CircleAlert, color: '$orange5', bg: '$orange2' },
+  waiting_confirmation: { label: 'EN ATTENTE', icon: Clock, color: '$orange9', bg: '$orange2' },
+  subscription_in_progress: { label: 'EN COURS', icon: Clock, color: '$orange9', bg: '$orange2' },
+}
+
+function getDonationStatusConfig(status: string) {
+  return DONATION_STATUS_CONFIG[status] ?? { label: status, icon: CircleAlert, color: '$gray5', bg: '$gray2' }
+}
+
+function DonationsItem({ donation }: { donation: RestAdherentDonation }) {
+  const nature = donation.membership ? 'Cotisation' : 'Don'
+  const { label: statusLabel, icon: StatusIcon, color, bg } = getDonationStatusConfig(donation.status)
+  const isFinished = donation.status === 'finished'
+  const iconColor = isFinished ? (donation.membership ? '$green5' : '$blue5') : color
+  const iconBg = isFinished ? (donation.membership ? '$green2' : '$blue2') : bg
+  return (
+    <XStack gap="$medium" pl={14} py={12} pr={16} bg="$textSurface" borderRadius={8} alignItems="center" justifyContent="space-between" minHeight={56}>
+      <YStack bg={iconBg} borderRadius={14} w={28} h={28} alignItems="center" justifyContent="center">
+        <StatusIcon size={16} color={iconColor} />
+      </YStack>
+      <YStack flex={1} gap={4}>
+        <Text.SM semibold>{nature}</Text.SM>
+        <Text.SM secondary>{formatShortDate(donation.date)}</Text.SM>
+      </YStack>
+      <YStack alignItems="flex-end" gap={4}>
+        <Text.SM semibold>{`${donation.amount} €`}</Text.SM>
+        <Text.XSM color={color} semibold>
+          {statusLabel}
+        </Text.XSM>
+      </YStack>
+    </XStack>
+  )
+}
+
+function DonationsSection({ uuid, scope }: { uuid?: string; scope?: string }) {
+  const enabled = Boolean(uuid && scope)
+  const { data, isLoading, isError } = useAdherentDonations(uuid, scope)
+
+  if (!enabled) return null
+
+  if (isLoading) {
+    return (
+      <DetailSection title="Cotisations">
+        <YStack gap="$small">
+          <InfoRowSkeleton showStatusLine />
+          <InfoRowSkeleton showStatusLine />
+        </YStack>
+      </DetailSection>
+    )
+  }
+
+  if (isError) {
+    return (
+      <DetailSection title="Cotisations">
+        <Text.SM color="$textDisabled">Impossible de récupérer les cotisations.</Text.SM>
+      </DetailSection>
+    )
+  }
+
+  const list = Array.isArray(data) ? data : []
+
+  return (
+    <DetailSection title="Cotisations">
+      {list.length === 0 ? (
+        <Text.SM color="$textDisabled">Ce militant ne dispose d’aucune cotisation.</Text.SM>
+      ) : (
+        <YStack gap="$small">
+          {list.map((d) => (
+            <DonationsItem key={d.uuid} donation={d} />
+          ))}
+        </YStack>
+      )}
+    </DetailSection>
+  )
+}
+
 interface IdentiteTabContentProps {
   isLoading: boolean
   summaryData: RestAdherentDetail | RestAdherentListItem
@@ -426,6 +526,7 @@ export function IdentiteTabContent({
       <RolesSection roles={roles} />
       <LabelsNationauxSection labels={staticTags} />
       {detailData && <PreferencesNotificationSection subscriptionTypes={detailData.subscription_types} />}
+      <DonationsSection uuid={uuid} scope={scope} />
     </YStack>
   )
 }
