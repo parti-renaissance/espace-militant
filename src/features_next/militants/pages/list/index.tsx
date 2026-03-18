@@ -12,6 +12,7 @@ import { getActiveFilterChips } from '@/components/Filters/filterCollectionUtils
 import PanelModal from '@/components/PanelModal/PanelModal'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
 import { MilitantDetailsPanel } from '@/features_next/militants/components/MilitantDetailsPanel'
+import { MilitantExportButton } from '@/features_next/militants/components/MilitantExportButton'
 import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
 import { MilitantHeaderPagination, MilitantListHeader } from '@/features_next/militants/components/MilitantListHeader'
 
@@ -120,6 +121,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         onPageChange={handlePageChange}
         searchValue={searchInput}
         onSearchChange={setSearchInput}
+        paginationRightSlot={<MilitantExportButton scope={scope} />}
       />
     ),
     [
@@ -133,6 +135,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
       metadata?.total_items,
       handlePageChange,
       searchInput,
+      scope,
     ],
   )
 

@@ -86,7 +86,7 @@ const processExecutiveScopes = (
       data: null,
       isLoading: false,
       isError: false,
-      hasFeature: () => false,
+      hasFeature: (_featureKey: string, _scopeCode?: string | null) => false,
       ...additionalProps,
     }
   }
@@ -102,9 +102,13 @@ const processExecutiveScopes = (
       default: defaultScope,
       lastAvailableScopes,
     },
-    hasFeature: (x: string) => {
-      const features = cadre_scopes?.flatMap((x) => x.features)
-      return features?.includes(x)
+    hasFeature: (featureKey: string, scopeCode?: string | null) => {
+      if (scopeCode != null) {
+        const scope = cadre_scopes?.find((s) => s.code === scopeCode)
+        return scope?.features?.includes(featureKey) ?? false
+      }
+      const features = cadre_scopes?.flatMap((s) => s.features)
+      return features?.includes(featureKey) ?? false
     },
     isLoading: isLoading ?? false,
     ...additionalProps,
