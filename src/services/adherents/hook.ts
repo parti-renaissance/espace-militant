@@ -1,12 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
 import * as api from '@/services/adherents/api'
-import type {
-  RestAdherentDetail,
-  RestAdherentDonation,
-  RestAdherentListItem,
-  RestAdherentSensitiveData,
-} from '@/services/adherents/schema'
+import type { RestAdherentDetail, RestAdherentDonation, RestAdherentListItem, RestAdherentSensitiveData } from '@/services/adherents/schema'
 
 const DEFAULT_PAGE_SIZE = 25
 
@@ -40,6 +35,7 @@ export const useAdherentsPage = ({ scope, page, pageSize = DEFAULT_PAGE_SIZE, se
     enabled: Boolean(scope) && page >= 1,
     staleTime: 60 * 1000,
     placeholderData: (previousData) => previousData,
+    networkMode: 'always',
   })
 }
 
@@ -53,6 +49,7 @@ export const useAdherentDetail = (uuid: string | undefined, scope: string | unde
     enabled: Boolean(uuid && scope),
     placeholderData: (options?.initialData ?? undefined) as RestAdherentDetail | undefined,
     staleTime: 60 * 1000,
+    networkMode: 'always',
   })
 }
 

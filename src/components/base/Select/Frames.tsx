@@ -31,7 +31,7 @@ const SelectFrame = styled(XStack, {
     error: {
       true: {
         backgroundColor: '$orange1',
-        focusVisibleStyle: {
+        focusStyle: {
           borderColor: '$orange1',
         },
       },
@@ -45,7 +45,7 @@ const SelectFrame = styled(XStack, {
         pressStyle: {
           backgroundColor: '$color2',
         },
-        focusVisibleStyle: {
+        focusStyle: {
           borderColor: '$color9',
         },
         disabledStyle: {
@@ -62,7 +62,7 @@ const SelectFrame = styled(XStack, {
         pressStyle: {
           backgroundColor: '$color3',
         },
-        focusVisibleStyle: {
+        focusStyle: {
           borderColor: '$color9',
         },
         disabledStyle: {

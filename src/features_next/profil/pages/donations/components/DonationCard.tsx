@@ -6,7 +6,7 @@ import SubscribeDonationCard from './SubscribeDonationCard'
 
 const DonationCard = (props: { full?: boolean }) => {
   const { data } = useGetDonations()
-  const hasSubscriptions = data?.find((x) => x.status === 'subscription_in_progress')
+  const hasSubscriptions = data?.find((x) => x.type === 'recurring' && x.status === 'paid') ?? null
   return (
     <FullWrapper title="Dons" full={props.full}>
       {hasSubscriptions ? <SubscribeDonationCard full={props.full} subscription={hasSubscriptions} /> : <FirstDonationCard full={props.full} />}

@@ -163,11 +163,11 @@ function FilterCollectionBuilder({
   }
 
   return (
-    <YStack gap="$medium">
+    <YStack gap="$xlarge">
       {collection.map((group: FilterGroup, groupIndex: number) => {
         const isCollapsed = collapsedGroupIndices.has(groupIndex)
         return (
-          <YStack key={groupIndex} gap="$small">
+          <YStack key={groupIndex} gap="$medium">
             {group.label ? (
               <Pressable onPress={() => toggleGroup(groupIndex)}>
                 <XStack alignItems="center" justifyContent="space-between" gap="$small">
@@ -275,8 +275,8 @@ function FilterField({ filter, values, getFilterValue, getFilterValueForSelect, 
         : { start: null, end: null }
     return (
       <DateInterval
-        labelFrom={`${label} - Depuis`}
-        labelTo={`${label} - Jusqu'au`}
+        labelFrom={`${label} après le`}
+        labelTo={`${label} avant le`}
         value={intervalValue}
         onChange={(v) => onChange(code, v)}
         size="md"

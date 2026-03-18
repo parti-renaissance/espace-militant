@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getToken, useMedia, YStack } from 'tamagui'
-import { ArrowLeft } from '@tamagui/lucide-icons'
+import { ArrowLeft, CircleAlert } from '@tamagui/lucide-icons'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
+import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import EmptyStateWithFilters from '@/components/EmptyStates/EmptyStateWithFilters'
 import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'
@@ -11,6 +12,7 @@ import { getActiveFilterChips } from '@/components/Filters/filterCollectionUtils
 import PanelModal from '@/components/PanelModal/PanelModal'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
 import { MilitantDetailsPanel } from '@/features_next/militants/components/MilitantDetailsPanel'
+import { MilitantExportButton } from '@/features_next/militants/components/MilitantExportButton'
 import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
 import { MilitantHeaderPagination, MilitantListHeader } from '@/features_next/militants/components/MilitantListHeader'
 
@@ -47,7 +49,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
     featureKey: FILTERS_FEATURE_KEY,
     scope,
   })
-  const { data, isLoading, isFetching, isPlaceholderData, refetch } = useAdherentsPage({
+  const { data, isLoading, isFetching, isPlaceholderData, refetch, isError, error } = useAdherentsPage({
     scope,
     page: currentPage,
     pageSize: PAGE_SIZE,
@@ -119,6 +121,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         onPageChange={handlePageChange}
         searchValue={searchInput}
         onSearchChange={setSearchInput}
+        paginationRightSlot={<MilitantExportButton scope={scope} />}
       />
     ),
     [
@@ -132,6 +135,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
       metadata?.total_items,
       handlePageChange,
       searchInput,
+      scope,
     ],
   )
 
@@ -161,6 +165,23 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
   const listEmptyComponent = useMemo(() => {
     const hasResolvedData = data != null
     const isPending = isLoading || isFetching
+
+    if (isError) {
+      return (
+        <YStack gap="$medium" alignItems="center" justifyContent="center" flex={1} minHeight={300}>
+          <CircleAlert size={48} color="$orange5" />
+          <Text.SM color="$textDisabled" textAlign="center">
+            {error?.message ?? 'Impossible de charger la liste des militants.'}
+          </Text.SM>
+          <YStack>
+            <VoxButton theme="orange" size="sm" variant="outlined" onPress={() => refetch()}>
+              Réessayer
+            </VoxButton>
+          </YStack>
+        </YStack>
+      )
+    }
+
     if (!hasResolvedData || isPending) {
       return <ListSkeleton showHeader={false} />
     }
@@ -173,7 +194,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         />
       </YStack>
     )
-  }, [data, isLoading, isFetching, activeFilterChips, handleResetAllFilters])
+  }, [data, isLoading, isFetching, isError, error?.message, refetch, activeFilterChips, handleResetAllFilters])
 
   const listFooterComponent = useMemo(
     () =>

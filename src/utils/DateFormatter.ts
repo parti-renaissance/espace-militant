@@ -45,6 +45,7 @@ export function getRelativeActivityLabel(lastActivityAt?: string | null): string
   if (!lastActivityAt) return null
   try {
     const then = new Date(lastActivityAt).getTime()
+    if (Number.isNaN(then)) return null
     const now = Date.now()
     const diffMs = now - then
     const diffMinutes = Math.floor(diffMs / (1000 * 60))

@@ -209,6 +209,7 @@ function GlobalSearch({
           icon: Search,
           noResults: debouncedShowNoResults ? 'Aucun résultat trouvé' : undefined,
         }}
+        noValuePlaceholder="Choisir"
         helpText={helpText}
         disabled={disabled}
         size={size}

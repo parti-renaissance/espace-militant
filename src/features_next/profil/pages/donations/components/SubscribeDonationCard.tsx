@@ -15,6 +15,9 @@ export default function (props: { subscription: RestDonationsResponse[number]; f
   const { isPending, open: handlePress } = useOpenExternalContent({ slug: 'donation' })
   const { mutate: cancelDonation, isPending: isCancelPending } = useCancelDonation()
 
+  const subscriptionDate = props.subscription?.date ? new Date(props.subscription.date) : null
+  const isValidDate = subscriptionDate !== null && !Number.isNaN(subscriptionDate.getTime())
+
   const handleCancel = () => {
     AlertUtils.showDestructiveAlert('Confirmation', 'Êtes-vous sûr de vouloir annuler votre don ?', 'Oui', 'Non', () => {
       cancelDonation()
@@ -34,11 +37,11 @@ export default function (props: { subscription: RestDonationsResponse[number]; f
                 <VoxCard.Content>
                   <XStack alignItems="center" flex={1}>
                     <YStack gap="$small" flex={2}>
-                      {props.subscription?.date ? (
+                      {isValidDate && (
                         <Text.SM semibold color="$green6">
-                          Vous êtes financeur depuis le {getHumanFormattedDate(props.subscription?.date)}
+                          Vous êtes financeur depuis le {getHumanFormattedDate(subscriptionDate)}
                         </Text.SM>
-                      ) : null}
+                      )}
                       <Text.MD secondary color="$green6">
                         Un don de <Text.LG color="$green6">{props.subscription?.amount ?? 'Oups'} €</Text.LG> est programmé mensuellement.
                       </Text.MD>

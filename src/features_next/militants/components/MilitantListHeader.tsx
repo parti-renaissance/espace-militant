@@ -47,6 +47,7 @@ interface MilitantHeaderPaginationProps {
   totalItems?: number
   onPageChange: (page: number) => void
   disabled?: boolean
+  rightSlot?: React.ReactNode
 }
 
 export interface MilitantListHeaderProps {
@@ -61,6 +62,7 @@ export interface MilitantListHeaderProps {
   onPageChange: (page: number) => void
   searchValue?: string
   onSearchChange?: (value: string) => void
+  paginationRightSlot?: React.ReactNode
 }
 
 export function MilitantHeaderTop() {
@@ -80,7 +82,14 @@ export function MilitantHeaderTop() {
   )
 }
 
-export function MilitantHeaderPagination({ page, pageSize, totalItems, onPageChange, disabled = false }: MilitantHeaderPaginationProps) {
+export function MilitantHeaderPagination({
+  page,
+  pageSize,
+  totalItems,
+  onPageChange,
+  disabled = false,
+  rightSlot,
+}: MilitantHeaderPaginationProps) {
   const media = useMedia()
   const lastPage = totalItems != null ? Math.ceil(totalItems / pageSize) : undefined
   const isPrevDisabled = disabled || page <= 1
@@ -90,11 +99,12 @@ export function MilitantHeaderPagination({ page, pageSize, totalItems, onPageCha
   const rangeText = `${pageStart}-${pageEnd}`
 
   return (
-    <XStack justifyContent={media.sm ? 'space-between' : 'flex-end'} alignItems="center" gap="$medium">
+    <XStack justifyContent={media.sm ? 'space-between' : 'flex-end'} alignItems="center" gap={rightSlot ? 0 : '$medium'}>
       <Text.SM>
         <Text.SM secondary>{rangeText} sur </Text.SM>
         <Text.SM semibold>{totalItems ?? '–'}</Text.SM>
       </Text.SM>
+      {rightSlot ? <YStack>{rightSlot}</YStack> : null}
       <XStack gap={4}>
         <VoxButton
           variant="outlined"
@@ -137,6 +147,7 @@ export function MilitantListHeader({
   onPageChange,
   searchValue = '',
   onSearchChange,
+  paginationRightSlot,
 }: MilitantListHeaderProps) {
   const media = useMedia()
   const hasActiveFilters = activeFilterChips.length > 0
@@ -164,7 +175,14 @@ export function MilitantListHeader({
             </YStack>
           </XStack>
           {filterChipsRow}
-          <MilitantHeaderPagination page={page} pageSize={pageSize} totalItems={totalItems} onPageChange={onPageChange} disabled={paginationDisabled} />
+          <MilitantHeaderPagination
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={onPageChange}
+            disabled={paginationDisabled}
+            rightSlot={paginationRightSlot}
+          />
         </YStack>
       </YStack>
     )
@@ -190,7 +208,14 @@ export function MilitantListHeader({
             </VoxButton>
           </YStack>
         </XStack>
-        <MilitantHeaderPagination page={page} pageSize={pageSize} totalItems={totalItems} onPageChange={onPageChange} disabled={paginationDisabled} />
+        <MilitantHeaderPagination
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+          disabled={paginationDisabled}
+          rightSlot={paginationRightSlot}
+        />
       </XStack>
       {filterChipsRow}
     </YStack>

@@ -57,7 +57,7 @@ const InputFrame = styled(XStack, {
     backgroundColor: '$gray2',
     cursor: 'text',
   },
-  focusVisibleStyle: {
+  focusStyle: {
     borderColor: '$blue9',
   },
 
