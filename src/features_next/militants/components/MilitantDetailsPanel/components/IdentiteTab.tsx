@@ -5,7 +5,6 @@ import {
   Calendar,
   CircleAlert,
   CircleCheck,
-  Clock,
   Eye,
   Facebook,
   Flag,

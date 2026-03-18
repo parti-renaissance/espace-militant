@@ -194,7 +194,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         />
       </YStack>
     )
-  }, [data, isLoading, isFetching, activeFilterChips, handleResetAllFilters])
+  }, [data, isLoading, isFetching, isError, error?.message, refetch, activeFilterChips, handleResetAllFilters])
 
   const listFooterComponent = useMemo(
     () =>

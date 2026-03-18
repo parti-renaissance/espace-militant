@@ -143,7 +143,7 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
         <YStack gap="$medium" alignItems="center" justifyContent="center" flex={1} minHeight={300}>
           <CircleAlert size={48} color="$orange5" />
           <Text.SM color="$textDisabled" textAlign="center">
-            {error?.message ?? 'Impossible de charger les détails.'}
+            {errorMessage}
           </Text.SM>
           <YStack>
             <VoxButton theme="orange" size="sm" variant="outlined" onPress={() => refetch()}>
