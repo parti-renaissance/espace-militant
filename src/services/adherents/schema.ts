@@ -163,15 +163,26 @@ export const RestAdherentSensitiveRequestSchema = z.object({
   type: z.enum(['phone', 'email', 'address']),
 })
 
+const RestAdherentDonationTransactionTypeKnownSchema = z.enum(['cb', 'check', 'transfer', 'tpe'])
+
+const RestAdherentDonationTypeKnownSchema = z.enum(['simple', 'recurring', 'membership'])
+
+const RestAdherentDonationStatusKnownSchema = z.enum(['paid', 'failed', 'refunded'])
+
+export type RestAdherentDonationTransactionType = z.infer<typeof RestAdherentDonationTransactionTypeKnownSchema> | (string & {})
+export type RestAdherentDonationType = z.infer<typeof RestAdherentDonationTypeKnownSchema> | (string & {})
+export type RestAdherentDonationStatus = z.infer<typeof RestAdherentDonationStatusKnownSchema> | (string & {})
+
 export const RestAdherentDonationSchema = z.object({
-  date: z.string(),
-  type: z.string(),
-  subscription: z.boolean(),
-  membership: z.boolean(),
-  status: z.string(),
   uuid: z.string(),
+  date: z.string(),
   amount: z.number(),
+  transaction_type: RestAdherentDonationTransactionTypeKnownSchema.or(z.string()),
+  transaction_type_label: z.string(),
+  type: RestAdherentDonationTypeKnownSchema.or(z.string()),
   type_label: z.string(),
+  status: RestAdherentDonationStatusKnownSchema.or(z.string()),
+  status_label: z.string(),
 })
 
 export const RestAdherentDonationsResponseSchema = z.array(RestAdherentDonationSchema)

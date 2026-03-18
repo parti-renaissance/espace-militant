@@ -99,7 +99,7 @@ export default function PanelModal({ isOpen, onClose, children }: PanelModalProp
         <Animated.View style={[styles.panelPosition, { width: panelWidth }, animatedPanelStyle, styles.panelShadow]}>
           <YStack flex={1} backgroundColor="$background" elevation="$4" borderLeftWidth={isBelowSm ? 0 : 1} borderColor="$borderColor">
             <BottomSheetModalProvider>
-              <ScrollView flex={1} contentContainerStyle={styles.scrollContent}>
+              <ScrollView flex={1} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {children}
               </ScrollView>
             </BottomSheetModalProvider>

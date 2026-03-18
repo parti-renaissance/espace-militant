@@ -273,12 +273,13 @@ function SessionRow({ session, Icon }: { session: RestSession; Icon: IconCompone
 /** Retourne la session la plus récente (par last_activity_at) ou null */
 function getLastSession(list: RestSession[]): RestSession | null {
   if (!Array.isArray(list) || list.length === 0) return null
+  const safeTime = (s: string | null | undefined): number => {
+    if (!s) return 0
+    const t = new Date(s).getTime()
+    return Number.isNaN(t) ? 0 : t
+  }
   return (
-    [...list].sort((a, b) => {
-      const at = a.last_activity_at ? new Date(a.last_activity_at).getTime() : 0
-      const bt = b.last_activity_at ? new Date(b.last_activity_at).getTime() : 0
-      return bt - at
-    })[0] ?? null
+    [...list].sort((a, b) => safeTime(b.last_activity_at) - safeTime(a.last_activity_at))[0] ?? null
   )
 }
 
@@ -416,25 +417,25 @@ function PreferencesNotificationSection({ subscriptionTypes }: { subscriptionTyp
   )
 }
 
-const DONATION_STATUS_CONFIG: Record<string, { label: string; icon: typeof CircleCheck; color: string; bg: string }> = {
-  finished: { label: 'PAYÉ', icon: CircleCheck, color: '$green5', bg: '$green2' },
-  error: { label: 'ÉCHOUÉ', icon: CircleAlert, color: '$orange5', bg: '$orange2' },
-  canceled: { label: 'ÉCHOUÉ', icon: CircleAlert, color: '$orange5', bg: '$orange2' },
-  refunded: { label: 'ÉCHOUÉ', icon: CircleAlert, color: '$orange5', bg: '$orange2' },
-  waiting_confirmation: { label: 'EN ATTENTE', icon: Clock, color: '$orange9', bg: '$orange2' },
-  subscription_in_progress: { label: 'EN COURS', icon: Clock, color: '$orange9', bg: '$orange2' },
+const DONATION_STATUS_STYLE: Record<string, { icon: typeof CircleCheck; color: string; bg: string }> = {
+  paid: { icon: CircleCheck, color: '$green5', bg: '$green2' },
+  failed: { icon: CircleAlert, color: '$orange5', bg: '$orange2' },
+  refunded: { icon: CircleCheck, color: '$orange9', bg: '$orange2' },
 }
 
-function getDonationStatusConfig(status: string) {
-  return DONATION_STATUS_CONFIG[status] ?? { label: status, icon: CircleAlert, color: '$gray5', bg: '$gray2' }
+function getDonationStatusStyle(status: string) {
+  return DONATION_STATUS_STYLE[status] ?? { icon: CircleAlert, color: '$gray5', bg: '$gray2' }
 }
 
 function DonationsItem({ donation }: { donation: RestAdherentDonation }) {
-  const nature = donation.membership ? 'Cotisation' : 'Don'
-  const { label: statusLabel, icon: StatusIcon, color, bg } = getDonationStatusConfig(donation.status)
-  const isFinished = donation.status === 'finished'
-  const iconColor = isFinished ? (donation.membership ? '$green5' : '$blue5') : color
-  const iconBg = isFinished ? (donation.membership ? '$green2' : '$blue2') : bg
+  const nature = donation.type_label || donation.type
+  const statusLabel = donation.status_label || donation.status
+  const { icon: StatusIcon, color, bg } = getDonationStatusStyle(donation.status)
+
+  const isPaid = donation.status === 'paid'
+  const isMembership = donation.type === 'membership'
+  const iconColor = isPaid ? (isMembership ? '$blue5' : '$green5') : color
+  const iconBg = isPaid ? (isMembership ? '$blue2' : '$green2') : bg
   return (
     <XStack gap="$medium" pl={14} py={12} pr={16} bg="$textSurface" borderRadius={8} alignItems="center" justifyContent="space-between" minHeight={56}>
       <YStack bg={iconBg} borderRadius={14} w={28} h={28} alignItems="center" justifyContent="center">
@@ -442,11 +443,13 @@ function DonationsItem({ donation }: { donation: RestAdherentDonation }) {
       </YStack>
       <YStack flex={1} gap={4}>
         <Text.SM semibold>{nature}</Text.SM>
-        <Text.SM secondary>{formatShortDate(donation.date)}</Text.SM>
+        <Text.SM secondary>
+          {formatShortDate(donation.date)} - {donation.transaction_type_label}
+        </Text.SM>
       </YStack>
       <YStack alignItems="flex-end" gap={4}>
         <Text.SM semibold>{`${donation.amount} €`}</Text.SM>
-        <Text.XSM color={color} semibold>
+        <Text.XSM color={color} semibold textTransform="uppercase">
           {statusLabel}
         </Text.XSM>
       </YStack>

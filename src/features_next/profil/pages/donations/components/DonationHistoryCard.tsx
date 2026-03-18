@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
 import Text from '@/components/base/Text'
+import { formatShortDate } from '@/utils/DateFormatter'
 import { VoxButton } from '@/components/Button'
 import _EmptyState from '@/components/EmptyStates/EmptyState'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
@@ -13,13 +14,7 @@ import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { useGetDonations } from '@/services/profile/hook'
 import { RestDonationsResponse } from '@/services/profile/schema'
 
-const isRecuDonation = (x: RestDonationsResponse[number]) => x.status === 'subscription_in_progress'
-const getType = (x: RestDonationsResponse[number]) => {
-  if (isRecuDonation(x)) {
-    return 'Don mensuel'
-  }
-  return x.membership ? 'Cotisation' : 'Don'
-}
+const getType = (x: RestDonationsResponse[number]) => x.type_label || x.type
 
 const EmptyState = () => {
   const donationLink = useOpenExternalContent({ slug: 'donation' })
@@ -63,22 +58,28 @@ const DonationHistoryCard = () => {
         <VoxCard bg="$textSurface" inside>
           <VoxCard.Content>
             {data && data.length > 0 ? (
-              data.map((donation, i) => (
+              data.map((donation, i) => {
+                const dateObj = new Date(donation.date)
+                const dateLabel = Number.isNaN(dateObj.getTime())
+                  ? formatShortDate(donation.date)
+                  : format(dateObj, 'dd MMM yyyy', { locale: fr })
+                return (
                 <Fragment key={donation.uuid}>
                   <XStack gap="$small" flex={1}>
-                    <Text.MD semibold>{format(donation.date, 'dd MMM yyyy', { locale: fr })}</Text.MD>
+                    <Text.MD semibold>{dateLabel}</Text.MD>
                     <Text.MD secondary>
-                      {getType(donation)} • {donation.type.toUpperCase()}
+                      {getType(donation)} • {donation.transaction_type_label}
                     </Text.MD>
                     <XStack flex={1} justifyContent="flex-end">
-                      <Text.MD primary={false} semibold theme={donation.membership ? 'blue' : 'green'}>
+                      <Text.MD primary={false} semibold theme={donation.type === 'membership' ? 'blue' : 'green'}>
                         {donation.amount.toFixed(2)} €
                       </Text.MD>
                     </XStack>
                   </XStack>
                   {i < data.length - 1 && <VoxCard.Separator borderColor="$gray/32" />}
                 </Fragment>
-              ))
+              )
+              })
             ) : (
               <EmptyState />
             )}

@@ -261,7 +261,7 @@ const hasRecentMembership = (donations: RestDonationsResponse | undefined): bool
     const donationDate = new Date(donation.date)
     if (Number.isNaN(donationDate.getTime())) return false
 
-    return donation.membership === true && donation.status === 'finished' && donationDate >= sixMonthsAgo
+    return donation.type === 'membership' && donation.status === 'paid' && donationDate >= sixMonthsAgo
   })
 }
 
