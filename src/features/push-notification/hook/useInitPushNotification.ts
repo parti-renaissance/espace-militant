@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import { Platform } from 'react-native'
-import FB from '@/config/firebaseConfig'
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
-import { useToastController } from '@tamagui/toast'
+import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import * as Notifications from 'expo-notifications'
 import { router } from 'expo-router'
+import { useToastController } from '@tamagui/toast'
+
+import FB from '@/config/firebaseConfig'
+import { ErrorMonitor } from '@/utils/ErrorMonitor'
+
 import { parseHref } from '../utils'
 
 export const useInitPushNotification = () => {
@@ -24,7 +27,7 @@ export const useInitPushNotification = () => {
           const possibleLinkData2 = response.notification?.request?.trigger?.payload?.link
           const link = parseHref(possibleLinkData1 ?? possibleLinkData2, 'push_notification')
           // Cold start : attendre 2s que l'app soit chargée
-          if (link) setTimeout(() => router.replace(link), 2000)
+          if (link) setTimeout(() => router.push(link), 2000)
         }
       })
 
@@ -37,7 +40,7 @@ export const useInitPushNotification = () => {
             const possibleLinkData2 = e.notification?.request?.trigger?.payload?.link
             const link = parseHref(possibleLinkData1 ?? possibleLinkData2, 'push_notification')
             // App déjà ouverte : navigation immédiate
-            if (link) setTimeout(() => router.replace(link), 100)
+            if (link) setTimeout(() => router.push(link), 100)
           }
         } catch (e) {
           if (e instanceof Error) {
@@ -51,7 +54,7 @@ export const useInitPushNotification = () => {
     }
 
     fbNotificationSubscription = FB
-      ? FB.messaging.onMessage((message) => {
+      ? FB.messaging.onMessage((message: FirebaseMessagingTypes.RemoteMessage) => {
           if (message.data?.local) return
 
           if (Platform.OS !== 'web') {
@@ -74,7 +77,7 @@ export const useInitPushNotification = () => {
                 type: 'info',
                 action: link
                   ? {
-                      onPress: () => router.replace(link),
+                      onPress: () => router.push(link),
                       altText: 'Voir',
                     }
                   : undefined,
