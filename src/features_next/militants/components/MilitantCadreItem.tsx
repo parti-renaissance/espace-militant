@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import { styled, useMedia, View, ViewProps, XStack, YStack } from 'tamagui'
-import { Mail, Monitor, Phone, Smartphone } from '@tamagui/lucide-icons'
+import { CircleAlert, CircleCheck, CircleHelp, Mail, Monitor, Phone, Smartphone } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import ProfilePicture from '@/components/ProfilePicture'
@@ -47,6 +47,27 @@ const getAdherentTagChipStyle = (code?: string): ChipTheme => {
   if (code.includes('adherent')) return 'blue'
   return 'gray'
 }
+
+const CotisationIconByCode = memo(function CotisationIconByCode({ code }: { code?: string | null }) {
+  if (!code) return null
+  switch (code) {
+    case 'elu:attente_declaration':
+      return <CircleHelp size={12} color="$orange5" />
+
+    case 'elu:cotisation_ok':
+    case 'elu:cotisation_ok:exempte':
+    case 'elu:cotisation_ok:non_soumis':
+    case 'elu:cotisation_ok:soumis':
+      return <CircleCheck size={12} color="$orange5" />
+
+    case 'elu:cotisation_nok':
+    case 'elu:exempte_et_adherent_cotisation_nok':
+      return <CircleAlert size={12} color="$orange5" />
+
+    default:
+      return null
+  }
+})
 
 const ChipContainer = styled(View, {
   bg: '$gray1',
@@ -126,6 +147,7 @@ function MilitantCadreItemInner({
   age,
   adherent_tags,
   static_tags,
+  mandates,
   elect_tags,
   instances = [],
   subscriptions,
@@ -191,7 +213,20 @@ function MilitantCadreItemInner({
           <YStack width={col2Width} pr="$medium" gap={6} overflow="hidden" minWidth={0} justifyContent="center">
             {adherent_tags && <TagChipRow tags={adherent_tags} theme={getAdherentTagChipStyle(adherent_tags?.[0]?.code)} />}
             {roles && <TagChipRow tags={roles} theme="purple" />}
-            {elect_tags && <TagChipRow tags={elect_tags} theme="orange" />}
+            {mandates && (
+              <XStack gap={4}>
+                <TagChipRow tags={mandates} theme="orange" />
+                {elect_tags && (
+                  <Chip theme="orange">
+                    <XStack gap={4} alignItems="center">
+                      {elect_tags.map((t, idx) => (
+                        <CotisationIconByCode key={`${t.code}-${idx}`} code={t.code} />
+                      ))}
+                    </XStack>
+                  </Chip>
+                )}
+              </XStack>
+            )}
             {static_tags && <TagChipRow tags={static_tags} theme="gray" />}
           </YStack>
 
