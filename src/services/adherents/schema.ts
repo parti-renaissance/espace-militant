@@ -36,6 +36,14 @@ export const RestAdherentRoleSchema = z.object({
   label: z.string(),
   is_delegated: z.union([z.boolean(), z.number()]).transform((x) => Boolean(x)),
   function: z.string().nullable(),
+  zones: z.string().nullable().optional(),
+  zone_codes: z.string().nullable().optional(),
+})
+
+/** Mandat (député, conseiller, etc.) */
+export const RestAdherentMandateSchema = z.object({
+  code: z.string(),
+  label: z.string(),
 })
 
 /** Item liste GET /api/v3/adherents (split tags + roles) */
@@ -51,6 +59,7 @@ export const RestAdherentListItemSchema = z.object({
   account_created_at: z.string().nullable(),
   first_contribution_at: z.string().nullable(),
   last_activity_at: z.string().nullable(),
+  mandates: z.array(RestAdherentMandateSchema).default([]),
   adherent_tags: z.array(RestAdherentTagSchema).nullable(),
   static_tags: z.array(RestAdherentTagSchema).nullable(),
   elect_tags: z.array(RestAdherentTagSchema).nullable(),
