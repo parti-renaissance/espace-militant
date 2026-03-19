@@ -331,8 +331,8 @@ const MessageEditorAddToolbar = forwardRef<MessageEditorToolBarRef, MessageEdito
             <Text.LG padding="$medium" numberOfLines={1}>
               Ajouter un élément
             </Text.LG>
-            <YStack padding="$medium" cursor="pointer">
-              <X color="$textPrimary" onPress={props.onClose} size={24} />
+            <YStack padding="$medium" cursor="pointer" onPress={props.onClose}>
+              <X color="$textPrimary" size={24} />
             </YStack>
           </XStack>
           <ToolBarItem title="Texte" icon={TextIcon} onPress={() => handleAddField('richtext')} visible={props.showAddBar} />

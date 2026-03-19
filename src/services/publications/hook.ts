@@ -197,7 +197,7 @@ export const useGetMessageCountRecipientsPartial = (props: { messageId?: string;
       props.messageId && props.scope
         ? api.getMessageCountRecipients({ messageId: props.messageId, scope: props.scope, partial: true })
         : Promise.resolve(undefined),
-    enabled: Boolean(props.messageId && props.scope) && (props.enabled !== false),
+    enabled: Boolean(props.messageId && props.scope) && props.enabled !== false,
   })
 }
 
@@ -229,12 +229,9 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
         scope: props.scope!,
       }),
     onSuccess: () => {
-      queryClient.refetchQueries({
-        queryKey: ['message-count-recipients-partial', props.messageId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['message-filters', props.messageId],
-      })
+      queryClient.invalidateQueries({ queryKey: ['message-count-recipients-partial', props.messageId] })
+      queryClient.invalidateQueries({ queryKey: ['message-count-recipients', props.messageId] })
+      queryClient.invalidateQueries({ queryKey: ['message-filters', props.messageId] })
     },
     onError: (error) => {
       toast.show('Erreur', { message: 'Une erreur est survenue lors de la mise à jour des filtres', type: 'error' })
