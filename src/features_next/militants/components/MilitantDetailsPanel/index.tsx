@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useState } from 'react'
-import { ActivityIndicator, Pressable } from 'react-native'
+import { ActivityIndicator } from 'react-native'
 import { View, XStack, YStack } from 'tamagui'
 import { Activity, CircleAlert } from '@tamagui/lucide-icons'
 
@@ -17,7 +17,7 @@ import { FicheMilitantHeader } from './components/FicheMilitantHeader'
 import { IdentiteTabContent } from './components/IdentiteTab'
 import { MilitantActionButtons } from './components/MilitantActionButtons'
 
-export type FicheMilitantTabId = 'identite' | 'notes' | 'mandats'
+export type FicheMilitantTabId = 'identite' | 'notes' | 'historique' | 'mandats'
 
 function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdherentDetail | RestAdherentListItem; engagementScore?: number | null }) {
   const { first_name, last_name, image_url, age, public_id, last_activity_at, adherent_tags } = data
@@ -71,29 +71,44 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
 const TABS: { id: FicheMilitantTabId; label: string }[] = [
   { id: 'identite', label: 'Identité' },
   { id: 'notes', label: 'Notes' },
+  { id: 'historique', label: 'Historique' },
   { id: 'mandats', label: 'Mandats' },
 ]
 
 function MilitantDetailTabs({ activeTab, onTabChange }: { activeTab: FicheMilitantTabId; onTabChange: (tab: FicheMilitantTabId) => void }) {
   return (
-    <XStack borderBottomWidth={2} borderTopWidth={1} borderColor="$borderColor" paddingHorizontal="$medium" gap="$large" mt="$medium">
+    <XStack borderBottomWidth={2} borderTopWidth={1} borderColor="$borderColor" paddingHorizontal="$medium" mt="$medium">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id
         return (
-          <Pressable
+          <YStack
             key={tab.id}
             onPress={() => onTabChange(tab.id)}
-            style={{ paddingVertical: 12, paddingHorizontal: 4, marginBottom: -1, flex: 1, flexShrink: 0 }}
+            paddingVertical={12}
+            marginBottom={-1}
+            flex={1}
+            flexShrink={0}
+            cursor="pointer"
+            group
+            backgroundColor="transparent"
+            hoverStyle={{ backgroundColor: 'transparent' }}
+            pressStyle={{ backgroundColor: 'transparent' }}
             accessibilityRole="tab"
             accessibilityState={{ selected: isActive }}
           >
             <YStack position="relative">
-              <Text.MD semibold textAlign="center" color={isActive ? '$blue5' : '$textPrimary'}>
+              <Text.MD
+                semibold
+                textAlign="center"
+                color={isActive ? '$blue5' : '$textPrimary'}
+                $group-hover={!isActive ? { color: '$blue4' } : undefined}
+                $group-press={!isActive ? { color: '$blue4' } : undefined}
+              >
                 {tab.label}
               </Text.MD>
             </YStack>
-            {isActive && <XStack position="absolute" bottom={-1} left={0} right={0} height={2} backgroundColor="$blue5" borderRadius={1} />}
-          </Pressable>
+            {isActive && <XStack position="absolute" bottom={-1} left={1} right={1} height={2} backgroundColor="$blue5" borderRadius={1} />}
+          </YStack>
         )
       })}
     </XStack>
