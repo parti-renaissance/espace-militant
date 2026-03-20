@@ -7,6 +7,8 @@ import { Image, Spinner, useMedia, View, YStack } from 'tamagui'
 import Error404 from './404/Error404'
 import Text from './base/Text'
 
+import blocsImg from '../assets/images/blocs.png'
+
 type BoundarySuspenseWrapperProps = {
   children: React.ReactNode
   errorMessage?: string
@@ -21,7 +23,7 @@ export const DefaultErrorFallback = ({ resetErrorBoundary, error }: FallbackProp
   }
   return (
     <YStack flex={1} justifyContent="center" alignItems="center" gap="$medium" padding="$medium">
-      <Image source={require('../assets/images/blocs.png')} height={200} width={200} objectFit={'contain'} />
+      <Image source={blocsImg} height={200} width={200} objectFit={'contain'} />
       <Text color="$gray6" textAlign="center">
         Une erreur est survenue. Veuillez recharger la page.
       </Text>

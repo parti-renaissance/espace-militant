@@ -2,6 +2,9 @@ import { isAfter, isBefore, subHours } from 'date-fns'
 
 import { RestFullEvent, RestItemEvent, RestPartialEvent, RestPublicItemEvent } from '@/services/events/schema'
 
+import eventFallbackPrivateLock from '@/features_next/events/assets/images/event-fallback-private-lock.png'
+import eventFallback from '@/features_next/events/assets/images/event-fallback.png'
+
 export type EventSectionId = 'national' | 'zone' | 'region' | 'past'
 
 export type EventSection<T extends RestItemEvent | RestPublicItemEvent = RestItemEvent> = {
@@ -172,16 +175,16 @@ export const isEventToggleRegisterHided = (event: Partial<RestItemEvent>, userUu
 
 export const getEventItemImageFallback = (event: Partial<RestItemEvent>) => {
   if (isEventPartial(event)) {
-    return require('@/features_next/events/assets/images/event-fallback-private-lock.png')
+    return eventFallbackPrivateLock
   }
   return event.image?.url
 }
 
 export const getEventDetailImageFallback = (event: Partial<RestItemEvent>) => {
   if (isEventPartial(event)) {
-    return require('@/features_next/events/assets/images/event-fallback-private-lock.png')
+    return eventFallbackPrivateLock
   }
-  return event.image?.url ?? require('@/features_next/events/assets/images/event-fallback.png')
+  return event.image?.url ?? eventFallback
 }
 
 export const isEventHasNationalLive = (

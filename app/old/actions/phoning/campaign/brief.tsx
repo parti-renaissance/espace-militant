@@ -4,7 +4,7 @@ import { useCampaignStore } from '@/data/store/phoning'
 import { BorderlessButton, PrimaryButton } from '@/screens/shared/Buttons'
 import { Colors, Spacing, Styles, Typography } from '@/styles'
 import i18n from '@/utils/i18n'
-import Markdown from '@ronradtke/react-native-markdown-display'
+import Markdown from 'react-native-markdown-display'
 import { router, Stack } from 'expo-router'
 
 const PhoningCampaignBriefScreen = () => {

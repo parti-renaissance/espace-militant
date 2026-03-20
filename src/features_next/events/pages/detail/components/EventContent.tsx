@@ -1,6 +1,6 @@
 import React, { Children, isValidElement } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
+import { Href, useRouter } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 
@@ -41,12 +41,13 @@ const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 
 const FloatingBackButton = () => {
   const router = useRouter()
   const insets = useSafeAreaInsets()
+  const fallbackPath: Href = '/'
 
   const handleBack = () => {
     if (router.canGoBack()) {
       router.back()
     } else {
-      router.dismissAll()
+      router.replace(fallbackPath)
     }
   }
 
@@ -182,7 +183,7 @@ const DesktopLayout = (props: EventItemProps) => {
   return (
     <Layout.Main maxWidth={892}>
       <LayoutScrollView>
-        <ContentBackButton fallbackPath="/evenements" />
+        <ContentBackButton fallbackPath="/" />
         <YStack gap="$medium">
           <EventLive event={props.event} userUuid={props.userUuid} />
           <VoxCard>

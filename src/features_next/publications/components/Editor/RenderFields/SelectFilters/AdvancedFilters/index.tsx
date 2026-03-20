@@ -4,8 +4,8 @@ import { Spinner, XStack, YStack } from 'tamagui'
 import DateInput from '@/components/base/DateInput'
 import SelectV3 from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
-
 import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
+
 import { useGetFilterCollection } from '@/services/publications/hook'
 import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/publications/schema'
 
@@ -271,8 +271,8 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
                 return (
                   <DateInterval
                     key={filterIndex}
-                    labelFrom={`${filter.label} - Depuis`}
-                    labelTo={`${filter.label} - Jusqu'au`}
+                    labelFrom={`${filter.label} après le`}
+                    labelTo={`${filter.label} avant le`}
                     value={intervalValue}
                     onChange={(value) => handleFilterChange(filter.code, value)}
                     size="md"

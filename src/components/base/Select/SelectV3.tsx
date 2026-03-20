@@ -38,7 +38,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
       //@ts-expect-error type can be undefined if resetable
       props.onDetailChange?.(undefined)
     },
-    [props.resetable],
+    [props.resetable, props.onChange, props.onDetailChange],
   )
 
   const fullValue = props.options.find((option) => option.value === props.value)

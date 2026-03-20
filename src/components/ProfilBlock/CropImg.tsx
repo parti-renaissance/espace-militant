@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Dimensions, Platform, SafeAreaView, StyleSheet, View } from 'react-native'
+import { Dimensions, Platform, StyleSheet, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { VoxButton } from '@/components/Button'

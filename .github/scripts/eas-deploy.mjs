@@ -32,7 +32,8 @@ async function actionHandler() {
       case 'update': {
           console.log(chalk.magenta('Will do an update on main channel...'))
           console.log(chalk.magenta(`Expo runtime version ${candidate}.`))
-          const expoUpdateCommandBase = `eas update --auto --platform ${platform}`
+          const env = process.env.WORKFLOW_ENVIRONMENT || 'production'
+          const expoUpdateCommandBase = `eas update --auto --platform ${platform} --environment ${env}`
           await aExec(expoUpdateCommandBase)
           process.exit(0)
         break;

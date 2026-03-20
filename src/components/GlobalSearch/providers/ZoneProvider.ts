@@ -82,8 +82,10 @@ export class ZoneProvider implements SearchProvider {
         },
       }))
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error searching zones:', error)
       if (error instanceof Error) {
+        // eslint-disable-next-line no-console
         console.error('Error details:', error.message)
       }
       return []

@@ -31,7 +31,7 @@ export default function PublicationsPage() {
           </VoxButton>
         }
       />
-      <Layout.Container sidebarState="cadre">
+      <Layout.Container alwaysShowScrollbar sidebarState="cadre">
         <PublicationsScreen />
       </Layout.Container>
     </>

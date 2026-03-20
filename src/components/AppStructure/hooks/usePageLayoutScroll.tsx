@@ -26,7 +26,10 @@ const createWebScrollEvent = (scrollView: HTMLDivElement): NativeSyntheticEvent<
 export const usePageLayoutScroll = (props?: Props) => {
   const { scrollActive, layoutRef } = useContext(ScrollContext)
   const propsRef = useRef(props)
-  propsRef.current = props // Mise à jour de la référence aux props
+
+  useEffect(() => {
+    propsRef.current = props
+  }, [props])
 
   // Réf. pour le timeout du throttle et du momentum
   const throttleTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)

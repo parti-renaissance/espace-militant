@@ -12,6 +12,7 @@ export function Default() {
       <Select
         id={'select-id'}
         label={'This is the label'}
+        // eslint-disable-next-line no-console
         onChange={console.log}
         options={[
           {

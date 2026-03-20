@@ -146,7 +146,8 @@ export function useHits() {
   const trackActivitySession = React.useCallback(async () => {
     // Vérifier si l'utilisateur est connecté
     if (!user?.accessToken) return
-    
+
+    // eslint-disable-next-line no-console
     console.log('trackActivitySession')
     const now = Date.now()
     const { session, rotated } = await mutex.runExclusive(() => rotateIfNeededAndGetSessionLocked(now))

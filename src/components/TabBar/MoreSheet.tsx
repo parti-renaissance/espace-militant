@@ -42,7 +42,7 @@ const MoreSheet = forwardRef<
   const handleClose = useCallback(() => {
     onClose?.()
     zIndex.value = -10
-  }, [onClose])
+  }, [onClose, zIndex])
 
   useImperativeHandle(ref, () => {
     return {

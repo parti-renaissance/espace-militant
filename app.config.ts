@@ -1,4 +1,5 @@
 import { ConfigContext, ExpoConfig } from 'expo/config'
+
 import FontLib from './assets/fonts/generated-lib-fonts'
 
 const baseIdentifier = 'fr.en-marche.jecoute'
@@ -13,9 +14,6 @@ interface ConfigOptions {
   googleServicesFileAndroid: string
   adaptiveIcon?: string
   icon?: string
-  notification?: {
-    icon?: string
-  }
 }
 
 const setAssociatedDomain = (config: Partial<ExpoConfig>, associatedDomain: string | undefined) => {
@@ -51,41 +49,34 @@ const applyConfig = (config: Partial<ExpoConfig>, options: ConfigOptions) => {
     if (options.adaptiveIcon && config.android.adaptiveIcon) {
       config.android.adaptiveIcon.foregroundImage = options.adaptiveIcon
     }
-    if (options.notification) {
-      config.notification = { ...config.notification, ...options.notification }
-    }
   }
 }
 
 export default (payload: ConfigContext): Partial<ExpoConfig> => {
   const config = { ...payload.config }
-  const plugins = [...(config.plugins || [])]
+  const profile = process.env.EAS_BUILD_PROFILE
+
+  const notificationIcon =
+    !profile || profile === 'development'
+      ? './assets/developement/notif-icon.png'
+      : profile === 'production'
+        ? './assets/notif-icon.png'
+        : './assets/staging/notif-icon.png'
+
+  const plugins = (config.plugins || []).filter((p: unknown) => (typeof p === 'string' ? p : Array.isArray(p) ? p[0] : null) !== 'expo-notifications')
   if (plugins) {
-    plugins.push([
-      'expo-font',
-      {
-        fonts: FontLib,
-      },
-    ])
-    plugins.push([
-      '@rnmapbox/maps',
-      {
-        RNMapboxMapsDownloadToken: process.env.MAP_BOX_SECRET_KEY,
-      },
-    ])
+    plugins.push(['expo-font', { fonts: FontLib }])
+    plugins.push(['@rnmapbox/maps', { RNMapboxMapsDownloadToken: process.env.MAP_BOX_SECRET_KEY }])
     plugins.push(['expo-router', { origin: `https://${process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN}` }])
     plugins.push('expo-web-browser')
-    plugins.push([
-      'expo-navigation-bar',
-      {
-        backgroundColor: '#ffffff',
-        barStyle: 'dark',
-      },
-    ])
+    plugins.push('expo-image')
+    plugins.push('expo-sharing')
+    plugins.push('expo-navigation-bar')
+    plugins.push(['expo-notifications', { icon: notificationIcon }])
+    plugins.push('@react-native-community/datetimepicker')
+    plugins.push('@sentry/react-native')
   }
   config.plugins = plugins
-
-  const profile = process.env.EAS_BUILD_PROFILE
   setAssociatedDomain(config, process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN)
 
   if (!profile || profile === 'development') {
@@ -98,9 +89,6 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
       googleServicesFileAndroid: profile === 'development' ? process.env.GOOGLE_SERVICES_ANDROID_PATH_DEVELOPMENT || '' : './config/google-services.json',
       adaptiveIcon: './assets/developement/adaptive-icon.png',
       icon: './assets/developement/icon.png',
-      notification: {
-        icon: './assets/developement/notif-icon.png',
-      },
     })
   } else if (profile === 'production') {
     applyConfig(config, {
@@ -112,9 +100,6 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
       googleServicesFileAndroid: process.env.GOOGLE_SERVICES_ANDROID_PATH_PRODUCTION as string,
       icon: './assets/icon.png',
       adaptiveIcon: './assets/adaptive-icon.png',
-      notification: {
-        icon: './assets/notif-icon.png',
-      },
     })
   } else {
     applyConfig(config, {
@@ -126,9 +111,6 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
       googleServicesFileAndroid: process.env.GOOGLE_SERVICES_ANDROID_PATH_STAGING as string,
       adaptiveIcon: './assets/staging/adaptive-icon.png',
       icon: './assets/staging/icon.png',
-      notification: {
-        icon: './assets/staging/notif-icon.png',
-      },
     })
   }
 

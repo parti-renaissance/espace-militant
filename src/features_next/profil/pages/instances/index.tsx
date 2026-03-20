@@ -54,6 +54,7 @@ const InstancesContent = () => {
     try {
       mutateAsync(uuid)
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err)
     }
   }
@@ -138,7 +139,7 @@ const InstancesContent = () => {
         button: <CommitteeCreationButton profile={profile} assemblyName={assembly?.name} />,
       }
     }
-  }, [committee])
+  }, [committee, isSympathisant, openAdhCommitee, isPendingCommitee, profile, assembly, setOpenChange])
 
   const agorasContent = useMemo(() => {
     if (isSympathisant) {
@@ -230,7 +231,7 @@ const InstancesContent = () => {
         </VoxButton>
       ),
     }
-  }, [isSympathisant, agoras])
+  }, [isSympathisant, agoras, isPendingAgora, openAdhAgora, handleLeave, isAdherentDues, setOpenChangeAgora])
 
   return (
     <>

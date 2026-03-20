@@ -73,6 +73,7 @@ function GlobalSearch({
 
         setResults(sortedResults)
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Search error:', error)
         setResults([])
       } finally {
@@ -208,6 +209,7 @@ function GlobalSearch({
           icon: Search,
           noResults: debouncedShowNoResults ? 'Aucun résultat trouvé' : undefined,
         }}
+        noValuePlaceholder="Choisir"
         helpText={helpText}
         disabled={disabled}
         size={size}

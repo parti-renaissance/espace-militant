@@ -5,11 +5,13 @@ const items = [
   {
     id: 'coucou',
     label: 'coucou',
+    // eslint-disable-next-line no-console
     onPress: () => console.log('coucou'),
   },
   {
     id: 'lol',
     label: 'lol',
+    // eslint-disable-next-line no-console
     onPress: () => console.log('lol'),
   },
 ]

@@ -5,6 +5,10 @@ import { DoorToDoorAddress } from './../../core/entities/DoorToDoor'
 import { BuildingStatusViewModel } from './BuildingStatusViewModel'
 import { StatBlockViewModel } from './StatBlockViewModel'
 
+import buildingStatusDoneIcon from '../../assets/images/buildingStatusDoneIcon.png'
+import buildingStatusToCompleteIcon from '../../assets/images/buildingStatusToCompleteIcon.png'
+import buildingStatusToDoIcon from '../../assets/images/buildingStatusToDoIcon.png'
+
 export const BuildingStatusViewModelMapper = {
   map: (address: DoorToDoorAddress): BuildingStatusViewModel => {
     let statusTile: string
@@ -12,15 +16,15 @@ export const BuildingStatusViewModelMapper = {
     switch (address.building.campaignStatistics?.status) {
       case 'completed':
         statusTile = i18n.t('building.status.done')
-        statusIcon = require('../../assets/images/buildingStatusDoneIcon.png')
+        statusIcon = buildingStatusDoneIcon
         break
       case 'ongoing':
         statusTile = i18n.t('building.status.tocomplete')
-        statusIcon = require('../../assets/images/buildingStatusToCompleteIcon.png')
+        statusIcon = buildingStatusToCompleteIcon
         break
       default:
         statusTile = i18n.t('building.status.todo')
-        statusIcon = require('../../assets/images/buildingStatusToDoIcon.png')
+        statusIcon = buildingStatusToDoIcon
         break
     }
     return {

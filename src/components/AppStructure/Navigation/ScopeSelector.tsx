@@ -117,19 +117,21 @@ export const ScopeSelector = () => {
       const { name, description } = getFormatedScope(scope)
       return {
         id: scope.code,
-        name: description || scope.name,
+        name: scope.code === 'president_departmental_assembly' && description ? `Assemblée - ${description}` : (description ?? name),
         role: name,
       }
     })
   }, [fetchedData])
 
   const selectedScope = useMemo(() => {
-    if (!fetchedData?.default) return undefined
-    const def = fetchedData.default
+    const def = fetchedData?.default
+    if (!def) return undefined
+
     const { name, description } = getFormatedScope(def)
+
     return {
       id: def.code,
-      name: description || def.name,
+      name: def.code === 'president_departmental_assembly' && description ? `Assemblée - ${description}` : (description ?? name),
       role: name,
     }
   }, [fetchedData])

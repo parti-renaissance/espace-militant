@@ -23,6 +23,7 @@ import { StatusBar } from 'expo-status-bar'
 import { isWeb, ViewProps } from 'tamagui'
 import { useHits } from '@/services/hits/hook'
 import config from 'tamagui.config'
+import { PortalLayout } from '@/components/layouts/PortalLayout'
 
 if (isWeb) {
   require('@tamagui/core/reset.css')
@@ -85,7 +86,7 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
       {(isLoading || props.isLoading) && (
         <>
           <BlurView
-            experimentalBlurMethod="dimezisBlurView"
+            blurMethod="dimezisBlurView"
             intensity={50}
             style={{
               position: 'absolute',
@@ -130,9 +131,11 @@ function Root() {
               <ThemeProvider value={DefaultTheme}>
                 <BottomSheetModalProvider>
                   <SessionProvider>
-                    <WaitingRoomHoc isLoading={!isFontsLoaded}>
-                      <Slot />
-                    </WaitingRoomHoc>
+                    <PortalLayout>
+                      <WaitingRoomHoc isLoading={!isFontsLoaded}>
+                        <Slot />
+                      </WaitingRoomHoc>
+                    </PortalLayout>
                   </SessionProvider>
                 </BottomSheetModalProvider>
               </ThemeProvider>

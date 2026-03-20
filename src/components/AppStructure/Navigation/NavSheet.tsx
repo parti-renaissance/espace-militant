@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, useCallback, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
@@ -42,23 +42,30 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListH
     setCurrentIndex(index)
   }, [])
 
-  const handleClose = useCallback(() => {
-    onClose?.()
+  const [closeRequested, setCloseRequested] = useState(false)
+
+  useEffect(() => {
+    if (!closeRequested) return
     zIndex.value = -10
     setCurrentIndex(-1)
+    setCloseRequested(false)
+  }, [closeRequested, zIndex])
+
+  const handleClose = useCallback(() => {
+    onClose?.()
+    setCloseRequested(true)
   }, [onClose])
 
   useImperativeHandle(ref, () => {
     return {
       expand: () => {
-        bsRef.current?.expand()
         zIndex.value = 10
         setCurrentIndex(0)
+        bsRef.current?.expand()
       },
       close: () => {
         bsRef.current?.close()
-        zIndex.value = -10
-        setCurrentIndex(-1)
+        // zIndex et setCurrentIndex sont mis à jour dans handleClose (onClose) une fois l'animation terminée
       },
     }
   })

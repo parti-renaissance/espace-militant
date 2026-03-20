@@ -1,13 +1,17 @@
 import { useEffect, useRef } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { isEqual } from 'lodash'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 
-import * as S from '../schemas/messageBuilderSchema'
 import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
+
 import { usePutMessageFilters } from '@/services/publications/hook'
 
 import type { SelectedFiltersType } from '../RenderFields/SelectFilters/type'
+import * as S from '../schemas/messageBuilderSchema'
 
+/** Normalise les filtres (form ou backend) vers la forme payload API pour comparaison. */
 const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFiltersType => {
   const mappedFilters = { ...filters }
 
@@ -29,10 +33,31 @@ const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFilter
   return mappedFilters
 }
 
+/** Clés présentes côté backend mais absentes du formulaire / payload PUT — à retirer avant comparaison. */
+const BACKEND_ONLY_KEYS = ['uuid'] as const
+
+/** Retire les métadonnées strictement backend pour comparer uniquement les données de filtres. */
+function stripBackendOnlyMetadata<T extends Record<string, unknown>>(obj: T): T {
+  const out = { ...obj }
+  for (const key of BACKEND_ONLY_KEYS) {
+    delete out[key]
+  }
+  return out as T
+}
+
+/** Retourne true si les filtres form sont identiques au backend (cache ou dernière sauvegarde). Évite les PUT inutiles. */
+function areFiltersEqualToBackend(formMapped: SelectedFiltersType, backendSnapshot: SelectedFiltersType | undefined): boolean {
+  if (backendSnapshot == null) return false
+  const backendNormalized = temporaryMapFiltersForApi(backendSnapshot as SelectedFiltersType)
+  const backendMapped = stripBackendOnlyMetadata(backendNormalized as Record<string, unknown>) as SelectedFiltersType
+  return isEqual(formMapped, backendMapped)
+}
+
 export function useAutoSaveFilters(options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? true
   const messageId = useEditorStore((s) => s.messageId)
   const scope = useEditorStore((s) => s.scope)
+  const queryClient = useQueryClient()
   const { control, setValue } = useFormContext<S.GlobalForm>()
   const filtersData = useWatch({ control, name: 'filters.data' }) as SelectedFiltersType | undefined
   const previousValueRef = useRef<SelectedFiltersType | undefined>(undefined)
@@ -43,8 +68,13 @@ export function useAutoSaveFilters(options?: { enabled?: boolean }) {
   const debouncedSave = useDebouncedCallback(
     (filters: SelectedFiltersType) => {
       if (!messageId || !scope || !enabled) return
-      const prev = previousValueRef.current
       const mapped = temporaryMapFiltersForApi(filters)
+      const backendFromCache = queryClient.getQueryData<SelectedFiltersType>(['message-filters', messageId])
+      const backendSnapshot = previousValueRef.current ?? backendFromCache
+      if (areFiltersEqualToBackend(mapped, backendSnapshot)) {
+        return
+      }
+      const prev = previousValueRef.current
       putMessageFilters(mapped, {
         onSuccess: () => {
           previousValueRef.current = filters

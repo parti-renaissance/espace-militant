@@ -35,33 +35,25 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
   const [activeSection, setActiveSection] = useState<'read' | 'stats'>('read')
   const statsSectionRef = useRef<HTMLDivElement>(null)
 
+  if (params.congratulations && !showCongratulations) setShowCongratulations(true)
+
+  if (params.section === 'stats' && stats && activeSection !== 'stats') {
+    setActiveSection('stats')
+  }
+
+  // Scroll vers la section stats sur le web (effet de synchronisation DOM)
   useEffect(() => {
-    if (params.congratulations) {
-      setShowCongratulations(true)
-    }
-  }, [params.congratulations])
-
-  useEffect(() => {
-    if (params.section === 'stats' && stats) {
-      setActiveSection('stats')
-
-      // Scroll vers la section stats sur le web
-      if (isWeb) {
-        // Mettre à jour l'URL avec le hash
-        if (typeof window !== 'undefined' && !window.location.hash.includes('publication-stats')) {
-          window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#publication-stats`)
-        }
-
-        setTimeout(() => {
-          const element = document.getElementById('publication-stats')
-          if (element) {
-            element.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            })
-          }
-        }, 100)
+    if (params.section === 'stats' && stats && isWeb) {
+      if (typeof window !== 'undefined' && !window.location.hash.includes('publication-stats')) {
+        window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#publication-stats`)
       }
+      const id = setTimeout(() => {
+        const element = document.getElementById('publication-stats')
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+      return () => clearTimeout(id)
     }
   }, [params.section, stats])
 

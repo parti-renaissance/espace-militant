@@ -20,6 +20,7 @@ export const ErrorMonitor = {
   },
   log: (message: string, payload?: Record<string, unknown>, sendToSentryIfProduction = true) => {
     if (__DEV__) {
+      // eslint-disable-next-line no-console
       console.log('[ErrorMonitor]', message, payload)
     } else if (sendToSentryIfProduction) {
       Sentry.captureMessage(message, { extra: payload })

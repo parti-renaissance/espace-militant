@@ -1,5 +1,6 @@
 import { createThemeBuilder } from '@tamagui/theme-builder'
 import type { Variable } from '@tamagui/web'
+
 import { black, blue, gray, green, orange, purple, white, yellow } from './theme/colors.hsl'
 
 const colorTokens = {
@@ -70,7 +71,7 @@ const text = {
   light: {
     textPrimary: 'hsl(211,24%, 17%)',
     textSecondary: 'hsl(208, 13%, 45%)',
-    textDisabled: 'hsl(210, 13%, 52%)',
+    textDisabled: 'hsl(210, 13%, 62%)',
     textSurface: 'hsl(240, 9%, 98%)',
     textOutline32: 'hsl(210, 13%, 88%)',
     textOutline20: 'hsl(204, 13%, 92%)',

@@ -52,7 +52,7 @@ const Select = ({ id, value, onChange, placeholder, label, options, canSearch = 
 
       return lowerLabel.startsWith(candidate)
     })
-  }, [canSearch, search, matchOn])
+  }, [canSearch, search, matchOn, options])
 
   return (
     <View>

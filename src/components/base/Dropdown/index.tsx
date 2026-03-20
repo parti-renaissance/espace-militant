@@ -1,4 +1,4 @@
-import React, { ComponentRef, useCallback, useEffect } from 'react'
+import React, { ComponentRef, useEffect } from 'react'
 import { FlatList, Modal, TouchableOpacity } from 'react-native'
 import Text from '@/components/base/Text'
 import { useLazyRef } from '@/hooks/useLazyRef'
@@ -174,20 +174,21 @@ export function DropdownWrapper<A extends string>({
     })
   }, [props.open])
 
-  const handleClose = useCallback(() => {
-    setOpen(false)
-  }, [])
-
-  const handleSelect = useCallback((value: A) => {
-    onSelect(value)
-    setOpen(false)
-  }, [])
-
   return (
     <TouchableOpacity ref={container}>
-      <Modal visible={open} transparent animationType="fade" onRequestClose={handleClose}>
-        <TouchableOpacity style={{ flex: 1 }} onPress={handleClose}>
-          <Dropdown {...props} onSelect={handleSelect} position="absolute" top={dropdownTop} alignSelf="center" minWidth={media.sm ? 230 : undefined} />
+      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+        <TouchableOpacity style={{ flex: 1 }} onPress={() => setOpen(false)}>
+          <Dropdown
+            {...props}
+            onSelect={(value) => {
+              onSelect(value)
+              setOpen(false)
+            }}
+            position="absolute"
+            top={dropdownTop}
+            alignSelf="center"
+            minWidth={media.sm ? 230 : undefined}
+          />
         </TouchableOpacity>
       </Modal>
       {children}

@@ -216,10 +216,12 @@ const MessageEditor = forwardRef<MessageEditorRef, MessageEditorProps>((props, r
             props.onSubmit()
           })
           .catch((error) => {
+            // eslint-disable-next-line no-console
             console.error('Submit error:', error)
           })
       },
       (errors) => {
+        // eslint-disable-next-line no-console
         console.error('Validation errors:', errors)
       },
     ),

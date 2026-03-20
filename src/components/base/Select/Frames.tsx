@@ -1,10 +1,12 @@
 import { ComponentProps } from 'react'
-import Text from '@/components/base/Text'
-import type { IconComponent } from '@/models/common.model'
+import { createStyledContext, styled, useGetThemedIcon, View, withStaticProperties, XStack, XStackProps } from 'tamagui'
 import { ChevronsUpDown, X } from '@tamagui/lucide-icons'
 import { GestureReponderEvent } from '@tamagui/web'
-import { createStyledContext, styled, useGetThemedIcon, View, withStaticProperties, XStack, XStackProps } from 'tamagui'
+
+import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button/Button'
+
+import type { IconComponent } from '@/models/common.model'
 
 export const SelectContext = createStyledContext<{
   themedText: boolean
@@ -107,7 +109,7 @@ const SelectFrame = styled(XStack, {
 const SelectIconContainer = ({ icon, themedText }: { icon: IconComponent; themedText?: boolean }) => {
   const ctx = SelectContext.useStyledContext()
   const isThemed = ctx.themedText || themedText
-  const getIcon = useGetThemedIcon({ color: isThemed ? '$color4' : '$gray4', size: 20, })
+  const getIcon = useGetThemedIcon({ color: isThemed ? '$color4' : '$gray4', size: 20 })
   return getIcon(icon)
 }
 
@@ -125,20 +127,7 @@ const SelectFrameContainer = XStack.styleable<
         {props.children}
       </XStack>
       <XStack onPress={resetable ? onResetPress : undefined}>
-        {resetable ? (
-          <VoxButton
-            size="md"
-            variant="text"
-            onPress={onResetPress}
-            iconSize={20}
-            shrink
-            iconLeft={X}
-            textColor="$gray5"
-            theme="gray"
-          />
-        ) : (
-          defIcon
-        )}
+        {resetable ? <VoxButton size="md" variant="text" onPress={onResetPress} iconSize={20} shrink iconLeft={X} textColor="$gray5" theme="gray" /> : defIcon}
       </XStack>
     </XStack>
   )
@@ -159,25 +148,25 @@ const SelectLabel = styled(Text.MD, {
   } as const,
 })
 
-export const SelectTextValue = ({ children, themedText, placeholder, ...props }: ComponentProps<typeof Text.MD> & { themedText?: boolean, placeholder?: boolean }) => {
+export const SelectTextValue = ({
+  children,
+  themedText,
+  placeholder,
+  ...props
+}: ComponentProps<typeof Text.MD> & { themedText?: boolean; placeholder?: boolean }) => {
   const ctx = SelectContext.useStyledContext()
   const isThemed = themedText ?? ctx.themedText
-  
+
   let color: string
-  
+
   if (isThemed) {
     color = placeholder ? '$color4' : '$color6'
   } else {
     color = placeholder ? '$gray4' : '$textPrimary'
   }
-  
+
   return (
-    <Text.MD 
-      numberOfLines={1} 
-      color={color}
-      fontWeight={placeholder ? '400' : '500'}
-      {...props}
-    >
+    <Text.MD numberOfLines={1} color={color} fontWeight={placeholder ? '400' : '500'} {...props}>
       {children}
     </Text.MD>
   )
@@ -187,14 +176,18 @@ const SelectIconValue = ({ icon, themedText }: { icon: IconComponent; themedText
   const ctx = SelectContext.useStyledContext()
   const isThemed = ctx.themedText || themedText
   const getIcon = useGetThemedIcon({ color: isThemed ? '$color6' : '$textPrimary', size: 14 })
-  return (
-    <View width={16}>
-      {getIcon(icon)}
-    </View>
-  )
+  return <View width={16}>{getIcon(icon)}</View>
 }
 
-const SelectValueContainer = styled(XStack, { gap: '$xsmall', alignItems: 'center', justifyContent: 'flex-end', alignSelf: 'flex-end', marginVertical: 'auto', flex: 1, minWidth: 50 })
+const SelectValueContainer = styled(XStack, {
+  gap: '$xsmall',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  alignSelf: 'flex-end',
+  marginVertical: 'auto',
+  flex: 1,
+  minWidth: 50,
+})
 
 export const SelectFrames = withStaticProperties(SelectFrame, {
   Props: SelectContext.Provider,

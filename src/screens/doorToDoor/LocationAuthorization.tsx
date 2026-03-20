@@ -6,6 +6,8 @@ import i18n from '../../utils/i18n'
 import { BorderlessButton } from '../shared/Buttons'
 import CircularIcon from '../shared/CircularIcon'
 
+import mapIcon from '../../assets/images/mapIcon.png'
+
 type Props = {
   onAuthorizationRequest: () => void
 }
@@ -31,7 +33,7 @@ const LocationAuthorization = ({ onAuthorizationRequest }: Props) => {
   }, [])
   return (
     <View style={styles.container}>
-      <CircularIcon style={styles.phone} source={require('../../assets/images/mapIcon.png')} />
+      <CircularIcon style={styles.phone} source={mapIcon} />
       <Text style={styles.title}>{i18n.t('doorToDoor.location.title')}</Text>
       <Text style={styles.subtitle}>{i18n.t('doorToDoor.location.subtitle')}</Text>
       <BorderlessButton onPress={goToDeviceSettings} title={i18n.t('doorToDoor.location.cta')} textStyle={styles.authorise} />

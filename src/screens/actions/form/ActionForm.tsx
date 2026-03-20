@@ -95,6 +95,7 @@ function _ActionForm({ onClose, uuid, scope, data }: Props & { data: Action | un
     if (uuid) {
       cancelAction({ uuid }).then(() => {
       }).catch((e) => {
+        // eslint-disable-next-line no-console
         console.warn(e);
       }).finally(() => {
         onClose?.()

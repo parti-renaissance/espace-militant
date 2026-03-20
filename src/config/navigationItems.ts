@@ -1,4 +1,4 @@
-import { ComponentProps, useCallback, useEffect, useMemo, useRef } from 'react'
+import { ComponentProps, useEffect, useMemo, useRef } from 'react'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 import {
@@ -23,7 +23,6 @@ import {
   Link,
   Mail,
   Map,
-  MapPin,
   MessageSquareDot,
   MessageSquareQuote,
   Network,
@@ -59,7 +58,7 @@ export type NavItemConfig = {
   hasAccess?: boolean
   onPress?: () => void
   theme?: 'blue' | 'purple' | 'green' | 'orange'
-  frame?: 'default' | 'cadre'
+  frame?: 'primary' | 'cadre'
   displayIn?: 'sidebar' | 'tabbar' | 'all' | 'never'
 }
 
@@ -146,7 +145,7 @@ const cadreNavItemsConfig: NavItemConfig[] = [
   { id: 'news', iconLeft: MessageSquareDot, text: 'Notifications', theme: 'purple', externalUrlSlug: '/notifications', externalLink: true },
   { id: 'department_site', iconLeft: Laptop, text: 'Site départemental', theme: 'purple', externalUrlSlug: '/site-departemental', externalLink: true },
   { id: 'mobile_app', iconLeft: TabletSmartphone, text: 'Application mobile', theme: 'purple', externalUrlSlug: '/', externalLink: true },
-  { id: 'contacts', iconLeft: UsersRound, text: 'Militants', theme: 'purple', externalUrlSlug: '/militants', externalLink: true },
+  { id: 'contacts', iconLeft: UsersRound, text: 'Mes militants', theme: 'purple', href: '/cadre/militants' },
   { id: 'referrals', iconLeft: HeartHandshake, text: 'Suivi des parrainages', theme: 'purple', externalUrlSlug: '/parrainages', externalLink: true },
   { id: 'rentree', iconLeft: PartyPopper, text: 'Rentrée', theme: 'purple', externalUrlSlug: '/rentree', externalLink: true },
   { id: 'events', iconLeft: Calendar, text: 'Mes événements', theme: 'purple', externalUrlSlug: '/evenements', externalLink: true, displayIn: 'never' },
@@ -220,7 +219,7 @@ export const useCadreNavItems = (): NavItemConfig[] => {
 
         return config
       })
-  }, [isAuth, defaultScopeCode, defaultScopeFeaturesKey])
+  }, [isAuth, defaultScopeCode, defaultScopeFeaturesKey, defaultScopeFeatures])
 }
 
 export const cadreNavItems: NavItemConfig[] = []

@@ -7,6 +7,8 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
+import donIllu from '@/features_next/profil/assets/don-illu.png'
+
 const HeaderFrame = styled(XStack, {
   padding: '$medium',
   paddingRight: 0,
@@ -36,7 +38,7 @@ export default function (props: { full?: boolean }) {
         </YStack>
         <Image
           style={{ width: '100%', flex: 1, flexBasis: 0 }}
-          source={require('@/features_next/profil/assets/don-illu.png')}
+          source={donIllu}
           contentFit="contain"
           contentPosition="right"
         />

@@ -1,7 +1,7 @@
 import React, { ComponentProps, useId, useRef } from 'react'
 import { Linking, LogBox } from 'react-native'
 import { router } from 'expo-router'
-import { Checkbox, CheckboxProps, Dialog, H2, isWeb, Label, Paragraph, ScrollView, useMedia, XStack, YStack } from 'tamagui'
+import { Checkbox, CheckboxProps, H2, Label, Paragraph, XStack, YStack } from 'tamagui'
 import { CheckedState } from '@tamagui/checkbox-headless/src/useCheckbox'
 import { CalendarCheck2, Check as CheckIcon } from '@tamagui/lucide-icons'
 import { Formik, FormikHelpers } from 'formik'

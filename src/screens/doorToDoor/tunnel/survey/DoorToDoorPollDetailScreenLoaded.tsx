@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react'
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { BuildingSelectedParams } from '@/data/store/SendDoorToDoorPollAnswersJobQueue'
+import { BuildingSelectedParams } from '@/core/entities/DoorToDoor'
 import { router } from 'expo-router'
 import { Poll } from '../../../../core/entities/Poll'
 import { PollExtraQuestionPage } from '../../../../core/entities/PollExtraQuestion'

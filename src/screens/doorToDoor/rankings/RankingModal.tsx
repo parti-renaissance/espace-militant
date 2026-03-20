@@ -2,11 +2,11 @@ import React, { FC, useEffect, useState } from 'react'
 import {
   FlatList,
   ListRenderItemInfo,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { DoorToDoorCampaignRanking } from '../../../core/entities/DoorToDoorCampaignRanking'
 import { GetDoorToDoorCampaignInfoInteractor } from '../../../core/interactor/GetDoorToDoorCampaignInfoInteractor'
 import { Colors, Typography } from '../../../styles'

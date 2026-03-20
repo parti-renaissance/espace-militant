@@ -13,6 +13,7 @@ export async function setStorageItemAsync(key: string, value: string | null) {
         localStorage.setItem(key, value)
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('Local storage is unavailable:', e)
     }
   } else if (value == null) {
@@ -29,6 +30,7 @@ export async function getStorageItemAsync(key: string): Promise<string | null> {
         return localStorage.getItem(key)
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('Local storage is unavailable:', e)
     }
   } else {
@@ -45,6 +47,7 @@ export async function removeStorageItemAsync(key: string) {
         localStorage.removeItem(key)
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('Local storage is unavailable:', e)
     }
   } else {
@@ -78,7 +81,7 @@ export function useStorageState(key: string): UseStateHook<string> {
       setState(value)
       setStorageItemAsync(key, value)
     },
-    [key],
+    [key, setState],
   )
 
   return [state, setValue]

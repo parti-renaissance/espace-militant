@@ -256,12 +256,14 @@ export type RestDonationsRequest = z.infer<typeof RestDonationsRequestSchema>
 export const RestDonationsResponseSchema = z.array(
   z.object({
     uuid: z.string().uuid(),
-    date: z.coerce.date(),
-    type: z.enum(['cb', 'check', 'transfer', 'tpe']),
-    subscription: z.boolean(),
-    membership: z.boolean(),
-    status: z.enum(['waiting_confirmation', 'subscription_in_progress', 'refunded', 'canceled', 'finished', 'error']),
     amount: z.number(),
+    date: z.string(),
+    transaction_type: z.enum(['cb', 'check', 'transfer', 'tpe']).or(z.string()),
+    transaction_type_label: z.string(),
+    type: z.enum(['simple', 'recurring', 'membership']).or(z.string()),
+    type_label: z.string(),
+    status: z.enum(['paid', 'failed', 'refunded']).or(z.string()),
+    status_label: z.string(),
   }),
 )
 

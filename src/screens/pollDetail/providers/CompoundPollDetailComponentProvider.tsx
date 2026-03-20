@@ -51,8 +51,8 @@ export class CompoundPollDetailComponentProvider<A, B>
       return { provider: this.lhs, relativeStep: step }
     } else {
       return {
-        // TODO: fix type
-        // @ts-ignore
+        // TODO: fix type - rhs is a different provider implementation type
+        // @ts-expect-error - provider union type does not include rhs type
         provider: this.rhs,
         relativeStep: step - this.lhs.getNumberOfSteps(),
       }

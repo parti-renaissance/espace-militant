@@ -9,6 +9,8 @@ import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
 import type { CommonMembershipCardProps } from './types'
 
+import cotisationIllu from '@/features_next/profil/assets/cotisation-illu.png'
+
 const HeaderFrame = styled(XStack, {
   padding: '$medium',
   paddingLeft: 0,
@@ -21,7 +23,7 @@ export default function (props: CommonMembershipCardProps) {
     <VoxCard bg={props.full ? 'white' : '$yellow1'} inside>
       <HeaderFrame bg="$yellow1" borderRadius="$medium">
         <Image
-          source={require('@/features_next/profil/assets/cotisation-illu.png')}
+          source={cotisationIllu}
           contentFit="contain"
           contentPosition={'left'}
           style={{

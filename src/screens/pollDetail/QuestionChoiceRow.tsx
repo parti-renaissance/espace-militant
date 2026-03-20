@@ -11,6 +11,8 @@ import { Colors, Spacing, Typography } from '../../styles'
 import { TouchablePlatform } from '../shared/TouchablePlatform'
 import { QuestionChoiceRowViewModel } from './QuestionChoiceRowViewModel'
 
+import checkIconImg from '../../assets/images/checkIcon.png'
+
 type Props = Readonly<{
   style?: StyleProp<ViewStyle>
   viewModel: QuestionChoiceRowViewModel
@@ -52,7 +54,7 @@ const QuestionChoiceRow: FunctionComponent<Props> = ({
           {viewModel.isSelected ? (
             <Image
               style={styles.icon}
-              source={require('../../assets/images/checkIcon.png')}
+              source={checkIconImg}
             />
           ) : null}
         </View>

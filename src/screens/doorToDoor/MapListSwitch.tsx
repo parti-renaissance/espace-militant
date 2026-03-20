@@ -3,6 +3,9 @@ import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Colors } from '../../styles'
 import { DoorToDoorDisplayMode } from './DoorToDoor'
 
+import papMapModeIcon from '../../assets/images/papMapModeIcon.png'
+import papListModeIcon from '../../assets/images/papListModeIcon.png'
+
 type Props = {
   mode: DoorToDoorDisplayMode
   onPress: (mode: DoorToDoorDisplayMode) => void
@@ -14,7 +17,7 @@ const MapListSwitch = ({ mode, onPress }: Props) => (
       <View style={[styles.container, mode === 'map' && styles.selected]}>
         <Image
           style={styles.icon}
-          source={require('../../assets/images/papMapModeIcon.png')}
+          source={papMapModeIcon}
         />
       </View>
     </TouchableOpacity>
@@ -22,7 +25,7 @@ const MapListSwitch = ({ mode, onPress }: Props) => (
       <View style={[styles.container, mode === 'list' && styles.selected]}>
         <Image
           style={styles.icon}
-          source={require('../../assets/images/papListModeIcon.png')}
+          source={papListModeIcon}
         />
       </View>
     </TouchableOpacity>

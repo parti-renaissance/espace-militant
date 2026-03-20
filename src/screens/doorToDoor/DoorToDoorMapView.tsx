@@ -17,6 +17,9 @@ import MapButton from './DoorToDoorMapButton'
 import { PoiAddressCard } from './PoiAddressCard'
 import { PoiAddressCardViewModelMapper } from './PoiAddressCardViewModelMapper'
 
+import loopArrowImg from './../../assets/images/loopArrow.png'
+import gpsPositionImg from './../../assets/images/gpsPosition.png'
+
 MapboxGl.setAccessToken(clientEnv.MAP_BOX_ACCESS_TOKEN)
 
 const DEFAULT_DELTA = 0.01
@@ -239,7 +242,7 @@ const DoorToDoorMapView = ({ data, loading, onAddressPress, onSearchNearby, onCa
               )
             }}
             text="Rechercher dans la zone"
-            image={require('./../../assets/images/loopArrow.png')}
+            image={loopArrowImg}
             disabled={loading}
           />
           <View style={styles.mapButtonSideContainer}>
@@ -258,7 +261,7 @@ const DoorToDoorMapView = ({ data, loading, onAddressPress, onSearchNearby, onCa
                     setFollowUser(true)
                   }, 300)
                 }}
-                image={require('./../../assets/images/gpsPosition.png')}
+                image={gpsPositionImg}
               />
             )}
           </View>

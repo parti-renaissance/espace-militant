@@ -46,6 +46,7 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, onChan
         const fulldate = time && time[1] ? setMinutes(dateWHour, time[1]) : date
         onChange?.(fulldate)
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.log(e)
       }
     } else if (type === 'time') {

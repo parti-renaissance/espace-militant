@@ -1,11 +1,11 @@
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import { PlaceholderDataFunction, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
 import clientEnv from '@/config/clientEnv'
 import { UserTagEnum } from '@/core/entities/UserProfile'
-import { useSession } from '@/ctx/SessionProvider'
+import { useSession } from '@/ctx/AuthContext'
 import * as api from '@/services/profile/api'
 import {
   RestDonationsResponse,
@@ -86,7 +86,7 @@ const processExecutiveScopes = (
       data: null,
       isLoading: false,
       isError: false,
-      hasFeature: () => false,
+      hasFeature: (_featureKey: string, _scopeCode?: string | null) => false,
       ...additionalProps,
     }
   }
@@ -102,9 +102,13 @@ const processExecutiveScopes = (
       default: defaultScope,
       lastAvailableScopes,
     },
-    hasFeature: (x: string) => {
-      const features = cadre_scopes?.flatMap((x) => x.features)
-      return features?.includes(x)
+    hasFeature: (featureKey: string, scopeCode?: string | null) => {
+      if (scopeCode != null) {
+        const scope = cadre_scopes?.find((s) => s.code === scopeCode)
+        return scope?.features?.includes(featureKey) ?? false
+      }
+      const features = cadre_scopes?.flatMap((s) => s.features)
+      return features?.includes(featureKey) ?? false
     },
     isLoading: isLoading ?? false,
     ...additionalProps,
@@ -257,7 +261,7 @@ const hasRecentMembership = (donations: RestDonationsResponse | undefined): bool
     const donationDate = new Date(donation.date)
     if (Number.isNaN(donationDate.getTime())) return false
 
-    return donation.membership === true && donation.status === 'finished' && donationDate >= sixMonthsAgo
+    return donation.type === 'membership' && donation.status === 'paid' && donationDate >= sixMonthsAgo
   })
 }
 

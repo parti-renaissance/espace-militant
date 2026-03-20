@@ -8,6 +8,9 @@ import { BuildingLayoutBlockCardViewModel } from './BuildingLayoutBlockCardView'
 import { BuildingLayoutFloorCellViewModel } from './BuildingLayoutFloorCell'
 import { BuildingLayoutViewModel } from './BuildingLayoutView'
 
+import houseImg from '../../assets/images/house.png'
+import appartementBuildingImg from '../../assets/images/appartementBuilding.png'
+
 export const BuildingLayoutViewModelMapper = {
   map: (type: BuildingType, status: DoorToDoorAddressStatus, blocks: BuildingBlock[]): BuildingLayoutViewModel => {
     return {
@@ -37,13 +40,13 @@ function blockCardViewModel(
   switch (type) {
     case 'house':
       buildingTypeName = i18n.t('building.layout.buildingtype.house')
-      buildingTypeIcon = require('../../assets/images/house.png')
+      buildingTypeIcon = houseImg
       break
     case 'building':
       buildingTypeName = i18n.t('building.layout.buildingtype.appartementbuilding', {
         buildingName: block.name,
       })
-      buildingTypeIcon = require('../../assets/images/appartementBuilding.png')
+      buildingTypeIcon = appartementBuildingImg
   }
 
   return {

@@ -52,11 +52,15 @@ export default function useCheckNotificationsState() {
 
   const triggerNotificationRequest = useCallback(async () => {
     if (Notification.permission !== 'denied') {
-      FB?.messaging.requestPermission().catch().finally(checkPermissions)
+      // Signature typée attend 1 argument (optionnel côté web) ; implémentation web n'utilise pas l'argument
+      FB?.messaging
+        .requestPermission(undefined as never)
+        .catch(() => {})
+        .finally(checkPermissions)
     } else {
       toast.show('Autorisez dans les préférences.')
     }
-  }, [postPushToken, checkPermissions])
+  }, [checkPermissions, toast])
 
   useEffect(() => {
     // Handle if firebase notifications is supported by peripheral or browser (otherwise it will throw an error in console)
@@ -65,7 +69,7 @@ export default function useCheckNotificationsState() {
 
   useEffect(() => {
     if (notificationsSupported && isAuth) {
-      checkPermissions()
+      queueMicrotask(() => checkPermissions())
       const interval = setInterval(() => {
         if (!isCheckingPermissions.current) {
           checkPermissions()

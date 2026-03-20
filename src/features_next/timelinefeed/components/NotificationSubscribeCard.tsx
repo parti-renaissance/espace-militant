@@ -9,6 +9,8 @@ import { VoxCard } from '@/components/VoxCard/VoxCard'
 
 import { useUserStore } from '@/store/user-store'
 
+import reaboIllu from '../assets/reabo-illu.png'
+
 export default function NotificationSubscribeCard() {
   const userStore = useUserStore()
   const media = useMedia()
@@ -21,7 +23,7 @@ export default function NotificationSubscribeCard() {
           <VoxButton variant="text" shrink iconLeft={X} onPress={handleClose} />
         </XStack>
         <YStack alignItems="center" gap="$medium" justifyContent="center">
-          <Image source={require('../assets/reabo-illu.png')} />
+          <Image source={reaboIllu} />
           <Text.MD semibold> Pensez à vous réabonner !</Text.MD>
           <Text.SM secondary multiline textAlign="center">
             Vous ne recevez pas nos emails nationaux et locaux car vous êtes désabonnés de nos communication.

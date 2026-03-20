@@ -21,20 +21,20 @@ type ArgsFormikField<Values extends object, Name extends keyof Values> = {
 
 const FormikController = <Values extends object, Name extends keyof Values>({ children, name }: FormikControllerProps<Values, Name>): React.ReactNode => {
   const formik = useFormikContext<Values>()
-  const onChange = useCallback((x: string) => formik.handleChange(name)(x as string), [name])
+  const onChange = useCallback((x: string) => formik.handleChange(name)(x as string), [formik, name])
   const onBlur = useCallback(() => {
     formik.setFieldTouched(name as string, true)
     return formik.handleBlur(name)
-  }, [name])
+  }, [formik, name])
   const value = get(formik.values, name)
   const error = formik.touched[name] ? (formik.errors[name] as string) : undefined
   const touched = formik.touched[name]
   const inputProps = useMemo(() => ({ value, error, onChange, onBlur, id: name }), [value, error, onChange, onBlur, name])
   const setFieldValue = useCallback(
     (name: keyof Values, shouldValidate?: boolean) => (x: Values[keyof Values]) => formik.setFieldValue(name as string, x, shouldValidate),
-    [],
+    [formik],
   )
-  const args = useMemo(() => ({ inputProps, touched, setFieldValue }), [inputProps]) as ArgsFormikField<Values, Name>
+  const args = useMemo(() => ({ inputProps, touched, setFieldValue }), [inputProps, touched, setFieldValue]) as ArgsFormikField<Values, Name>
 
   return children(args)
 }

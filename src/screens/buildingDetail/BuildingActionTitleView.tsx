@@ -4,6 +4,8 @@ import { Colors, Spacing, Typography } from '../../styles'
 import { margin } from '../../styles/spacing'
 import { TouchablePlatform } from '../shared/TouchablePlatform'
 
+import iconCircledCross from '../../assets/images/iconCircledCross.png'
+
 export interface BuildingActionTitleViewModel {
   title: string
   subtitle: string
@@ -30,7 +32,7 @@ const BuildingActionTitleView: FunctionComponent<ActionTitleProps> = ({
               onPress={onRemoveBuildingFloor}
             >
               <Image
-                source={require('../../assets/images/iconCircledCross.png')}
+                source={iconCircledCross}
               />
             </TouchablePlatform>
           </View>

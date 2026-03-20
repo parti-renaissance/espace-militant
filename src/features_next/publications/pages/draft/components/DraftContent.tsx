@@ -37,7 +37,7 @@ const PublicationItem = ({ item, scope }: { item: RestMessageListItem; scope?: s
       pathname: '/publications/creer',
       params: navigationParams,
     })
-  }, [item.uuid, scope])
+  }, [item.uuid, scope, router])
 
   return (
     <VoxCard onPress={handlePress} cursor="pointer">

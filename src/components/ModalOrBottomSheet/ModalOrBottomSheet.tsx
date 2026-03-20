@@ -38,7 +38,7 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
   const onCloseModal = useCallback(() => {
     onClose?.()
     bottomSheetModalRef.current?.close()
-  }, [])
+  }, [onClose])
 
   const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={1} />, [])
 

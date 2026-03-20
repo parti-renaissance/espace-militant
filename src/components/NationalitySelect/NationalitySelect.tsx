@@ -1,7 +1,20 @@
-import Select from '@/components/base/Select/SelectV3'
 import { uniqBy, upperFirst } from 'lodash'
+
+import Select from '@/components/base/Select/SelectV3'
+
 import { InputProps } from '../base/Input/Input'
 import nationalities from './nationalities.json'
+
+type NationalityEntry = { iso: string; nationality: string }
+const nationalitiesList = nationalities as NationalityEntry[]
+const isoToLabel = new Map(uniqBy(nationalitiesList, 'iso').map((n) => [n.iso.toUpperCase(), upperFirst(n.nationality)]))
+
+/** Traduit un code ISO pays (ex: "FR") en libellé (ex: "Française"). */
+export function getNationalityLabel(isoCode: string | null | undefined): string {
+  if (!isoCode || !isoCode.trim()) return '—'
+  const label = isoToLabel.get(isoCode.trim().toUpperCase())
+  return label ?? isoCode
+}
 
 interface NationalitySelectProps {
   value?: string
@@ -14,7 +27,7 @@ interface NationalitySelectProps {
   color: InputProps['color']
 }
 
-const countriesSource = uniqBy(nationalities, 'iso').map((n) => ({
+const countriesSource = uniqBy(nationalitiesList, 'iso').map((n) => ({
   value: n.iso,
   label: upperFirst(n.nationality),
 }))

@@ -1,69 +1,149 @@
-#### Technologies
+# Renaissance App
 
-**Vox** application is built with [Expo](https://docs.expo.dev/) and [Typescript](https://www.typescriptlang.org/).
+**Application universelle d'engagement civique et militant — iOS · Android · Web**
 
-[![CodeFactor](https://www.codefactor.io/repository/github/parti-renaissance/app-mobile/badge)](https://www.codefactor.io/repository/github//parti-renaissance/app-mobile)
+[![CI/CD](https://github.com/parti-renaissance/espace-militant/actions/workflows/deploy.yml/badge.svg?branch=develop)](https://github.com/parti-renaissance/espace-militant/actions/workflows/deploy.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/parti-renaissance/espace-militant/badge)](https://www.codefactor.io/repository/github/parti-renaissance/espace-militant)
+[![Licence MIT](https://img.shields.io/badge/Licence-MIT-blue.svg)](LICENSE)
 
-## Getting started
+---
 
-### Installing dependencies
+Renaissance App est l'application mobile et web officielle de Renaissance. Elle permet aux militants et sympathisants d'accéder à leurs actions locales, événements, actualités et outils d'engagement — sur iOS, Android et le web depuis une base de code unique.
 
-To be able to run the application on iOS and Android:
+> **⚠️ Contributeurs : lisez ceci avant d'écrire du code UI.**
+>
+> Ce projet utilise [Tamagui](https://tamagui.dev/) comme système UI universel. Les composants sont compilés différemment selon la cible (Native vs Web). Vous devez utiliser les **primitives Tamagui** (`YStack`, `XStack`, `Text`, `Button`, etc.) et **non** les composants React Native bruts (`View`, `Text`) ni les éléments HTML. Consultez le [guide de contribution](CONTRIBUTING.md) pour les détails.
 
-- install [Yarn](https://yarnpkg.com/getting-started/install)
-- run `yarn install` to install the project dependencies
+## Stack technique
 
-### Building/Running the app locally
+| Technologie | Version | Rôle |
+|---|---|---|
+| [Expo](https://docs.expo.dev/) | ~53 | Framework universel |
+| React Native | 0.79.5 | Runtime iOS / Android |
+| React | 19 | Runtime Web |
+| [Tamagui](https://tamagui.dev/) | ^1.132 | UI cross-platform |
+| TypeScript | ~5.8 | Typage strict |
+| [Expo Router](https://docs.expo.dev/router/introduction/) | ~5.1.5 | Navigation file-system |
+| [EAS Build / Update](https://docs.expo.dev/eas/) | — | CI/CD mobile |
+| Firebase (FCM / APNs) | ^12 | Notifications push |
+| Mapbox | 10.x | Cartographie |
+| Sentry | ~6.14 | Monitoring et crash reporting |
+| Storybook | 7.x | Développement de composants UI |
 
-- copy the `.env` file to `.env.local` and fill in the environment variables
-- run `yarn prepare:env` to generate clientEnv.ts (this shall be done on every .env.local changes).
-- download the `GoogleService-Info.plist` and `google-services.json` files from the Firebase console and place them in the `config/` folder
-- run `yarn run start` to start the react-native bundler
-- run `yarn run ios` to start the iOS app
-- run `yarn run android` to start the Android app
-- run `yarn run web` to start the web app
+## Architecture
 
+```
+espace-militant/
+├── app/              # Écrans et routes (Expo Router, file-system based)
+├── src/              # Logique métier, hooks, services, composants partagés
+├── theme/            # Design tokens et thème Tamagui
+├── assets/           # Images, fonts, icônes (par profil : dev / staging / prod)
+├── scripts/          # Scripts de build et de préparation
+├── .env.exemple      # Variables d'environnement (template, sans secrets)
+└── app.config.ts     # Configuration Expo dynamique (profils EAS)
+```
 
-## Deploy the app
+L'application utilise trois profils EAS :
 
-- versioning structure : ex -> 1.0.0#1 -> appVersion#eas_update_version
-  - appVersion = runtimeVersion
-  - eas_update_version = eas_update_version
+| Profil | Nom affiché | Scheme |
+|---|---|---|
+| Development | Vox Dev | `vox-dev://` |
+| Staging | _(variable)_ | `vox-staging://` |
+| Production | Renaissance | `vox://` |
 
-### EAS Update
+## Prérequis
 
-- bump "eas_update_version" in app.json in extra
-- use deploy workflow, select your branch, environement, and EAS deploy type to "update"
+- **Node.js** 20+
+- **Yarn** 4 — activé via [Corepack](https://nodejs.org/api/corepack.html) :
+  ```bash
+  corepack enable
+  ```
+  ⚠️ `npm install` ne fonctionnera **pas** — utilisez toujours `yarn`.
+- Accès Firebase : les fichiers `GoogleService-Info.plist` (iOS) et `google-services.json` (Android) sont nécessaires. Ils ne sont pas versionnés — demandez-les à l'équipe technique.
 
-###  build the app for internal testing
+## Installation
 
-- use deploy workflow, select your branch, staging environement, and EAS deploy type to "build"
+```bash
+# 1. Cloner le dépôt
+git clone https://github.com/parti-renaissance/espace-militant.git
+cd espace-militant
 
-### Deploying the app for production
+# 2. Installer les dépendances
+yarn install
 
-- bump "version" in app.json
-- use deploy workflow, select your branch, productiom environement, and EAS deploy type to "build"
+# 3. Configurer l'environnement
+cp .env.exemple .env.local
+# Renseigner les variables dans .env.local
 
+# 4. Générer le fichier de configuration client (obligatoire)
+yarn prepare:env
 
+# 5. Placer les fichiers Firebase dans config/
+#    - config/GoogleService-Info.plist   (iOS)
+#    - config/google-services.json       (Android)
 
-## Contribution
+# 6. Lancer l'application
+yarn start          # Metro bundler (Expo Go ou Dev Client)
+yarn ios            # Simulateur iOS
+yarn android        # Émulateur Android
+yarn web            # Navigateur
+```
 
-- make a pull request to the `develop` branch
-- make sure to run prettier while developing with `bun prettier-watch` or use `bun format` to format the code
-- please avoid to :
-  - use `any` type
-  - use `console.log` for debugging
-  - use `@ts-ignore` or `@ts-nocheck` to ignore typescript errors
-  - use `classes` as much as possible
+> **Note :** `yarn prepare:env` doit être relancé à chaque modification de `.env.local`.
 
-## Test deep link
+## Variables d'environnement
 
-To launch with link
+Les variables préfixées `EXPO_PUBLIC_` sont **intégrées dans le binaire** au moment du build. Elles ne sont pas secrètes — ne jamais y placer de clés privées ou de tokens serveur.
 
-`adb shell am start -W -a android.intent.action.VIEW -d "exp+vox:///evenements/2025-04-16-ljzbecb" fr.en_marche.jecoute.development`
+| Variable | Description |
+|---|---|
+| `EXPO_PUBLIC_API_BASE_URL` | URL de base de l'API Renaissance Plateforme |
+| `EXPO_PUBLIC_OAUTH_BASE_URL` | URL du serveur d'authentification OAuth |
+| `EXPO_PUBLIC_OAUTH_CLIENT_ID` | Client ID OAuth 2.0 (public) |
+| `EXPO_PUBLIC_ASSOCIATED_DOMAIN` | Domaine pour les universal links |
+| `EXPO_PUBLIC_SENTRY_DSN` | DSN Sentry (public, conçu pour être exposé) |
+| `EXPO_PUBLIC_MAP_BOX_ACCESS_TOKEN` | Token Mapbox (public) |
 
-Or using npx react native tools
+Consultez `.env.exemple` pour la liste complète.
 
-`npx uri-scheme open exp+vox:///evenements/2025-04-16-ljzbecb --android`
+## Développement de composants UI
 
-`npx uri-scheme open exp+vox:///evenements/2025-04-16-ljzbecb --ios`
+Ce projet intègre [Storybook](https://storybook.js.org/) pour le développement isolé de composants :
+
+```bash
+yarn storybook          # Sur simulateur/émulateur
+yarn storybook:web      # Dans le navigateur
+```
+
+## Test des deep links
+
+Les deep links varient selon le profil actif :
+
+```bash
+# Développement (scheme : vox-dev)
+npx uri-scheme open vox-dev:///evenements/mon-evenement --android
+npx uri-scheme open vox-dev:///evenements/mon-evenement --ios
+
+# Via adb (Android)
+adb shell am start -W -a android.intent.action.VIEW \
+  -d "vox-dev:///evenements/mon-evenement" \
+  fr.en_marche.jecoute.development
+```
+
+> **Note :** Le bundle ID iOS (`fr.en-marche.jecoute`) et le package Android (`fr.en_marche.jecoute`) sont des identifiants techniques non encore rebrandés — ils ne peuvent pas être modifiés sans republier l'application sur les stores.
+
+## Contribuer
+
+Les contributions sont les bienvenues ! Lire [CONTRIBUTING.md](CONTRIBUTING.md) avant d'ouvrir une pull request.
+
+## Déploiement
+
+Le processus de déploiement est documenté dans [DEPLOY.md](DEPLOY.md).
+
+## Sécurité
+
+Pour signaler une vulnérabilité, consulter [SECURITY.md](SECURITY.md). **Ne pas ouvrir d'issue publique.**
+
+## Licence
+
+Ce projet est distribué sous licence [MIT](LICENSE).

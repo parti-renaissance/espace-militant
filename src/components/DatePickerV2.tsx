@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef, useId, useState } from 'react'
 import { Keyboard, Platform } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { FormFrame } from '@/components/base/FormFrames'
@@ -20,6 +20,7 @@ interface DatePickerFieldProps {
 
 const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabled, onChange, error, type = 'date', onBlur }, ref) => {
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false)
+  const id = useId()
   
 
   // In case of mobile component
@@ -52,7 +53,8 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabl
 
   // In case of web component
   const handleChange = (input: string) => {
-    type === 'date' ? handleDateChange(input) : handleTimeChange(input)
+    if (type === 'date') handleDateChange(input)
+    else handleTimeChange(input)
   }
 
   const onHide = () => {
@@ -80,7 +82,7 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabl
       disabled={disabled}
       placeholder={placeholder}
       name={`datepicker-${type}`}
-      id={`datepicker-${type}-${Math.random().toString(36).substr(2, 9)}`}
+      id={`datepicker-${type}-${id.replace(/:/g, '-')}`}
       style={{
         fontFamily: 'Public Sans, sans-serif',
         fontSize: 14,

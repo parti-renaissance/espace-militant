@@ -8,6 +8,8 @@ import { VerticalSpacer } from '../shared/Spacer'
 import { PhonePollDetailSuccessProgressContent } from './PhonePollDetailSuccessProgressContent'
 import { PhonePollDetailSuccessRowSuccessViewModel } from './PhonePollDetailSuccessViewModel'
 
+import imageMerci from '../../assets/images/imageMerci.png'
+
 type Props = Readonly<{
   viewModel: PhonePollDetailSuccessRowSuccessViewModel
   onNewCall: () => void
@@ -27,7 +29,7 @@ export const PhonePollDetailSuccessContent: FunctionComponent<Props> = ({
       <VerticalSpacer spacing={Spacing.margin} />
       <CircularIcon
         style={styles.image}
-        source={require('../../assets/images/imageMerci.png')}
+        source={imageMerci}
       />
       <View style={styles.content}>
         <VerticalSpacer spacing={Spacing.margin} />

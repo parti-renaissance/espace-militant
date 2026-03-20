@@ -29,6 +29,7 @@ export function cleanupUrlParams(paramsToClean: string[]): void {
     }
   } catch (error) {
     // Silently fail if URL manipulation is not possible
+    // eslint-disable-next-line no-console
     console.warn('[urlCleanup] Failed to clean URL parameters:', error)
   }
 }
