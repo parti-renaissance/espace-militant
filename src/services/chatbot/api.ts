@@ -7,7 +7,7 @@ import * as schemas from './schema'
 /** Liste des threads de conversation (GET /ai/threads) */
 export const getChatbotThreadsList = api({
   method: 'GET',
-  path: '/api/v3/ai/threads?page={page}',
+  path: '/api/v3/ai/threads',
   requestSchema: z.object({ page: z.number() }),
   responseSchema: schemas.RestChatbotThreadsResponseSchema,
   type: 'private',

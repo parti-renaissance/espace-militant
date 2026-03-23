@@ -1,6 +1,7 @@
 import React, { Component, useMemo } from 'react'
 import { Linking, Text } from 'react-native'
 import Markdown from 'react-native-markdown-display'
+import FitImage from 'react-native-fit-image'
 import { useTheme } from 'tamagui'
 
 const STREAMING_CURSOR = '▎'
@@ -281,6 +282,37 @@ function VoxMarkdownComponent({ content, isStreaming = false }: VoxMarkdownProps
     }
   }, [theme.textPrimary?.val, theme.blue6?.val, theme.blue5?.val, theme.gray2?.val, theme.gray5?.val, theme.gray4?.val, theme.background?.val])
 
+  const markdownRules = useMemo(
+    () => ({
+      image: (node: any, _children: any, _parent: any, rulesStyles: any, allowedImageHandlers: string[], defaultImageHandler: string | null) => {
+        const { src, alt } = node.attributes
+
+        const show =
+          allowedImageHandlers.filter((value) => src.toLowerCase().startsWith(value.toLowerCase())).length > 0
+
+        if (show === false && defaultImageHandler === null) return null
+
+        return (
+          <FitImage
+            key={node.key}
+            indicator
+            style={rulesStyles._VIEW_SAFE_image}
+            source={{
+              uri: show === true ? src : `${defaultImageHandler}${src}`,
+            }}
+            {...(alt
+              ? {
+                  accessible: true,
+                  accessibilityLabel: alt,
+                }
+              : {})}
+          />
+        )
+      },
+    }),
+    [],
+  )
+
   const handleLinkPress = useMemo(
     () =>
       (url: string): boolean => {
@@ -296,7 +328,7 @@ function VoxMarkdownComponent({ content, isStreaming = false }: VoxMarkdownProps
 
   return (
     <MarkdownErrorBoundary content={content}>
-      <Markdown style={markdownStyles} mergeStyle={false} onLinkPress={handleLinkPress}>
+      <Markdown style={markdownStyles} mergeStyle={false} onLinkPress={handleLinkPress} rules={markdownRules}>
         {displayContent}
       </Markdown>
     </MarkdownErrorBoundary>
