@@ -211,7 +211,7 @@ export const RestUpdateProfileRequestSchema = z
     linkedin_page_url: z.string().url().nullable().optional(),
     instagram_page_url: z.string().url().nullable().optional(),
     telegram_page_url: z.string().url().nullable().optional(),
-    mandates: z.array(z.string()),
+    declared_mandates: z.array(z.string()),
     subscription_types: z.array(z.string()).optional(),
   })
   .partial()
@@ -234,6 +234,7 @@ export const propertyPathSchema = z.enum([
   'linkedin_page_url',
   'instagram_page_url',
   'telegram_page_url',
+  'declared_mandates',
 ])
 
 export type ProfileUpdatePropertyPath = z.infer<typeof propertyPathSchema>
@@ -283,7 +284,7 @@ export type RestElectedProfileRequest = z.infer<typeof RestElectedProfileRequest
 
 export type RestElectedProfileResponse = z.infer<typeof RestElectedProfileResponseSchema>
 export const RestElectedProfileResponseSchema = z.object({
-  mandates: z.array(z.string()),
+  declared_mandates: z.array(z.string()),
   contribution_status: z.enum(['eligible', 'not_eligible']).nullable(),
   exempt_from_cotisation: z.boolean(),
   contributed_at: z.coerce.date().nullable(),

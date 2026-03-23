@@ -78,16 +78,17 @@ export default function (props: { profil: RestElectedProfileResponse }) {
   ]
   const { handleSubmit, reset, formState, control } = useForm({
     defaultValues: {
-      mandates: props.profil?.mandates || [],
+      declared_mandates: props.profil?.declared_mandates || [],
     },
   })
   const { isDirty } = formState
   const { mutateAsync, isPending } = useMutationUpdateProfil({ userUuid: props.profil.uuid })
-  const onSubmit = handleSubmit((x) =>
-    mutateAsync(x).then(() => {
-      reset({ mandates: x.mandates })
-    }),
-  )
+  const onSubmit = handleSubmit((x) => {
+    const declaredMandates = x.declared_mandates
+    return mutateAsync({ declared_mandates: declaredMandates }).then(() => {
+      reset({ declared_mandates: declaredMandates })
+    })
+  })
 
   return (
     <VoxCard>
@@ -99,7 +100,7 @@ export default function (props: { profil: RestElectedProfileResponse }) {
             le pouvoir de vous rattacher des mandats.
           </Text.P>
           <Controller
-            name="mandates"
+            name="declared_mandates"
             control={control}
             render={({ field }) => {
               return <CheckboxGroup options={declarationsValues} onChange={field.onChange} value={field.value} />
