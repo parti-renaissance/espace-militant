@@ -1,8 +1,8 @@
-import { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
+import { ComponentRef, useCallback, useEffect, useRef } from 'react'
 import { NativeSyntheticEvent, ScrollView } from 'react-native'
-import { useQueryClient } from '@tanstack/react-query'
 import { Input, isWeb, Spinner, useMedia, View, YStack } from 'tamagui'
 import { ArrowUpRight } from '@tamagui/lucide-icons'
+import { useQueryClient } from '@tanstack/react-query'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
@@ -13,25 +13,30 @@ import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { useCustomChat } from '@/services/chatbot/hook'
 
 import { ChatBotNavigation } from '../components/ChatBotNavigation'
+import { NewChat } from '../components/NewChat'
 
 type TamaguiInputRef = ComponentRef<typeof Input> & {
   getNativeRef?: () => ComponentRef<typeof Input> | null
 }
 
-export default function ChatbotPage() {
+type ChatbotPageProps = {
+  activeDiscussionId: string | null
+  onActiveDiscussionChange: (id: string | null) => void
+}
+
+export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChange }: ChatbotPageProps) {
   const media = useMedia()
   const queryClient = useQueryClient()
   const scrollViewRef = useRef<ScrollView>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
   const keyboardHeight = useKeyboardHeight()
-  const [activeDiscussionId, setActiveDiscussionId] = useState<string | null>(null)
 
   const onThreadCreated = useCallback(
     (threadId: string) => {
-      setActiveDiscussionId(threadId)
+      onActiveDiscussionChange(threadId)
       queryClient.invalidateQueries({ queryKey: ['chatbot-threads'] })
     },
-    [queryClient],
+    [queryClient, onActiveDiscussionChange],
   )
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, stop, streamedContent, error } = useCustomChat({
@@ -83,9 +88,9 @@ export default function ChatbotPage() {
 
   return (
     <>
-      <ChatBotNavigation activeDiscussionId={activeDiscussionId} onActiveDiscussionChange={setActiveDiscussionId} />
+      <ChatBotNavigation activeDiscussionId={activeDiscussionId} onActiveDiscussionChange={onActiveDiscussionChange} />
       <Layout.Main>
-        <YStack position="relative" flex={1} minHeight={isWeb ? '100dvh' : '100%'} gap="$medium">
+        <YStack position="relative" flex={1} minHeight={isWeb && media.sm ? 'calc(100dvh - 56px)' : isWeb ? '100dvh' : '100%'} gap="$medium">
           <LayoutScrollView
             ref={scrollViewRef}
             style={{ flex: 1 }}
@@ -124,12 +129,13 @@ export default function ChatbotPage() {
                 {streamedContent ? <VoxMarkdown content={streamedContent} isStreaming /> : <Spinner size="small" />}
               </View>
             )}
+            {!error && !activeDiscussionId && messages.length === 0 && !isLoading ? <NewChat /> : null}
           </LayoutScrollView>
           <YStack
             position={isWeb ? 'fixed' : 'absolute'}
             bottom={isWeb ? 0 : keyboardHeight}
             width="100%"
-            maxWidth={520}
+            maxWidth={media.gtSm ? 520 : '100%'}
             alignSelf="center"
             zIndex={100}
             bg="$textSurface"

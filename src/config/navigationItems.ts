@@ -58,7 +58,7 @@ export type NavItemConfig = {
   hasAccess?: boolean
   onPress?: () => void
   theme?: 'blue' | 'purple' | 'green' | 'orange'
-  frame?: 'primary' | 'cadre'
+  frame?: 'primary' | 'secondary' | 'cadre'
   displayIn?: 'sidebar' | 'tabbar' | 'all' | 'never'
 }
 
