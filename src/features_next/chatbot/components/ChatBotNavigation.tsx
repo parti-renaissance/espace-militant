@@ -40,12 +40,37 @@ const NavigationContainer = styled(XStack, {
   },
 })
 
+type ScrollTarget = {
+  scrollTop?: number
+  clientHeight?: number
+  scrollHeight?: number
+}
+
+type ScrollNativeEvent = {
+  contentOffset?: { y?: number }
+  layoutMeasurement?: { height?: number }
+  contentSize?: { height?: number }
+  target?: ScrollTarget
+}
+
+type ScrollEventLike = {
+  nativeEvent?: ScrollNativeEvent
+} & ScrollNativeEvent
+
 export function ChatBotNavigation({ activeDiscussionId = null, onActiveDiscussionChange }: ChatBotNavigationProps) {
   const media = useMedia()
   const [isMenuOpen, setIsMenuOpen] = useState(true)
   const { data, isLoading, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useGetPaginatedChatbotThreads()
 
   const threads = data?.pages.flatMap((p) => p.items) ?? []
+
+  const [prevGtMd, setPrevGtMd] = useState(media.gtMd)
+  if (prevGtMd !== media.gtMd) {
+    setPrevGtMd(media.gtMd)
+    if (!media.gtMd) {
+      setIsMenuOpen(false)
+    }
+  }
 
   const [viewportHeight, setViewportHeight] = useState(0)
   const [contentHeight, setContentHeight] = useState(0)
@@ -55,7 +80,8 @@ export function ChatBotNavigation({ activeDiscussionId = null, onActiveDiscussio
     (event?: unknown) => {
       if (!hasNextPage || isFetching) return
 
-      const nativeEvent = (event as { nativeEvent?: any } | undefined)?.nativeEvent ?? (event as any)
+      const parsedEvent = event as ScrollEventLike | undefined
+      const nativeEvent = parsedEvent?.nativeEvent ?? parsedEvent
       const target = nativeEvent?.target
 
       const scrollTop = nativeEvent?.contentOffset?.y ?? target?.scrollTop ?? 0
@@ -70,11 +96,6 @@ export function ChatBotNavigation({ activeDiscussionId = null, onActiveDiscussio
     },
     [fetchNextPage, hasNextPage, isFetching],
   )
-
-  useEffect(() => {
-    if (media.gtMd) return
-    setIsMenuOpen((prev) => (prev ? false : prev))
-  }, [media.gtMd])
 
   useEffect(() => {
     if (!hasNextPage || isFetching) return

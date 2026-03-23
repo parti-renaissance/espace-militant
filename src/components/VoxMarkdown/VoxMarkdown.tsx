@@ -1,7 +1,7 @@
 import React, { Component, useMemo } from 'react'
-import { Linking, Text } from 'react-native'
-import Markdown from 'react-native-markdown-display'
+import { ImageStyle, Linking, StyleProp, Text } from 'react-native'
 import FitImage from 'react-native-fit-image'
+import Markdown from 'react-native-markdown-display'
 import { useTheme } from 'tamagui'
 
 const STREAMING_CURSOR = '▎'
@@ -55,6 +55,18 @@ class MarkdownErrorBoundary extends Component<MarkdownErrorBoundaryProps, Markdo
 export type VoxMarkdownProps = {
   content: string
   isStreaming?: boolean
+}
+
+type MarkdownNode = {
+  key: string
+  attributes: {
+    src?: string
+    alt?: string
+  }
+}
+
+type MarkdownImageStyles = {
+  _VIEW_SAFE_image?: StyleProp<ImageStyle>
 }
 
 function VoxMarkdownComponent({ content, isStreaming = false }: VoxMarkdownProps) {
@@ -284,11 +296,18 @@ function VoxMarkdownComponent({ content, isStreaming = false }: VoxMarkdownProps
 
   const markdownRules = useMemo(
     () => ({
-      image: (node: any, _children: any, _parent: any, rulesStyles: any, allowedImageHandlers: string[], defaultImageHandler: string | null) => {
+      image: (
+        node: MarkdownNode,
+        _children: React.ReactNode[],
+        _parent: MarkdownNode[],
+        rulesStyles: MarkdownImageStyles,
+        allowedImageHandlers: string[],
+        defaultImageHandler: string | null,
+      ) => {
         const { src, alt } = node.attributes
+        if (!src) return null
 
-        const show =
-          allowedImageHandlers.filter((value) => src.toLowerCase().startsWith(value.toLowerCase())).length > 0
+        const show = allowedImageHandlers.filter((value) => src.toLowerCase().startsWith(value.toLowerCase())).length > 0
 
         if (show === false && defaultImageHandler === null) return null
 
