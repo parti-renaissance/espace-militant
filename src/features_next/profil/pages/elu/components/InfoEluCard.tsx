@@ -36,15 +36,15 @@ const Tags = (props: { tags: RestProfilResponse['tags'] }) => {
 }
 
 const NotElu = () => <Text.P>Vous n’avez pas de mandat rattaché à votre profil.</Text.P>
-const Elu = (props: { mandates: RestElectedProfileResponse['elect_mandates']; tags: RestProfilResponse['tags'] }) => {
-  const activeMandates = props.mandates.filter((x) => !x.finish_at || isAfter(new Date(x.finish_at), new Date()))
+const Elu = (props: { elect_mandates: RestElectedProfileResponse['elect_mandates']; tags: RestProfilResponse['tags'] }) => {
+  const activeElectMandates = props.elect_mandates.filter((x) => !x.finish_at || isAfter(new Date(x.finish_at), new Date()))
   return (
     <YStack gap="$medium">
       <Tags tags={props.tags} />
       <Text.MD>Mandats rattachés au compte </Text.MD>
-      <Text.P>Le bureau de l’Assemblée départementale vous a rattaché {activeMandates.length} mandats.</Text.P>
+      <Text.P>Le bureau de l’Assemblée départementale vous a rattaché {activeElectMandates.length} mandats.</Text.P>
       <XStack gap={8} flexWrap="wrap">
-        {activeMandates.map((x, index) => (
+        {activeElectMandates.map((x, index) => (
           <XStack key={`${x.mandate_type}-${index}`}>
             <Badge theme="green">{x.mandate_type_label}</Badge>
           </XStack>
@@ -56,7 +56,7 @@ const Elu = (props: { mandates: RestElectedProfileResponse['elect_mandates']; ta
 
 export default function (props: { profil: RestElectedProfileResponse }) {
   const { tags } = useGetTags({ tags: [UserTagEnum.ADHERENT, UserTagEnum.ELU, UserTagEnum.SYMPATHISANT] })
-  const content = props.profil.elect_mandates.length > 0 ? <Elu mandates={props.profil.elect_mandates} tags={tags ?? []} /> : <NotElu />
+  const content = props.profil.elect_mandates.length > 0 ? <Elu elect_mandates={props.profil.elect_mandates} tags={tags ?? []} /> : <NotElu />
   return (
     <VoxCard>
       <VoxCard.Content>{content}</VoxCard.Content>

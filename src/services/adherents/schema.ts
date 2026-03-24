@@ -59,7 +59,7 @@ export const RestAdherentListItemSchema = z.object({
   account_created_at: z.string().nullable(),
   first_contribution_at: z.string().nullable(),
   last_activity_at: z.string().nullable(),
-  mandates: z.array(RestAdherentMandateSchema).default([]),
+  elect_mandates: z.array(RestAdherentMandateSchema).default([]),
   adherent_tags: z.array(RestAdherentTagSchema).nullable(),
   static_tags: z.array(RestAdherentTagSchema).nullable(),
   elect_tags: z.array(RestAdherentTagSchema).nullable(),

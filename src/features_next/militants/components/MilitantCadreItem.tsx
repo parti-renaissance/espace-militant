@@ -147,7 +147,7 @@ function MilitantCadreItemInner({
   age,
   adherent_tags,
   static_tags,
-  mandates,
+  elect_mandates,
   elect_tags,
   instances = [],
   subscriptions,
@@ -213,9 +213,9 @@ function MilitantCadreItemInner({
           <YStack width={col2Width} pr="$medium" gap={6} overflow="hidden" minWidth={0} justifyContent="center">
             {adherent_tags && <TagChipRow tags={adherent_tags} theme={getAdherentTagChipStyle(adherent_tags?.[0]?.code)} />}
             {roles && <TagChipRow tags={roles} theme="purple" />}
-            {mandates && (
+            {elect_mandates.length > 0 && (
               <XStack gap={4}>
-                <TagChipRow tags={mandates} theme="orange" />
+                <TagChipRow tags={elect_mandates} theme="orange" />
                 {elect_tags && (
                   <Chip theme="orange">
                     <XStack gap={4} alignItems="center">

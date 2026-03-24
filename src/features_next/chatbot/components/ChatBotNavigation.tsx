@@ -1,4 +1,5 @@
-import { ScrollView, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ScrollView, Spinner, styled, useMedia, XStack, YStack } from 'tamagui'
 import { Bot, Menu, SquarePen } from '@tamagui/lucide-icons'
 
 import { NavItem, SideBarArea } from '@/components/AppStructure'
@@ -12,23 +13,113 @@ export type ChatBotNavigationProps = {
   onActiveDiscussionChange?: (discussionId: string | null) => void
 }
 
+const NavigationContainer = styled(XStack, {
+  position: 'fixed',
+  left: 0,
+  top: 0,
+  bottom: 0,
+  zIndex: 1000,
+  backgroundColor: '$textOutline',
+  variants: {
+    showShadow: {
+      true: {
+        shadowColor: 'rgba(0, 0, 0, 1)',
+        shadowOffset: { width: 2, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
+        boxShadow: '2px 2px 8px 0 rgba(0, 0, 0, 0.08)',
+      },
+      false: {
+        boxShadow: 'none',
+      },
+    },
+  },
+  defaultVariants: {
+    showShadow: false,
+  },
+})
+
+type ScrollTarget = {
+  scrollTop?: number
+  clientHeight?: number
+  scrollHeight?: number
+}
+
+type ScrollNativeEvent = {
+  contentOffset?: { y?: number }
+  layoutMeasurement?: { height?: number }
+  contentSize?: { height?: number }
+  target?: ScrollTarget
+}
+
+type ScrollEventLike = {
+  nativeEvent?: ScrollNativeEvent
+} & ScrollNativeEvent
+
 export function ChatBotNavigation({ activeDiscussionId = null, onActiveDiscussionChange }: ChatBotNavigationProps) {
   const media = useMedia()
-  const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useGetPaginatedChatbotThreads()
+  const [isMenuOpen, setIsMenuOpen] = useState(true)
+  const { data, isLoading, isFetching, isFetchingNextPage, fetchNextPage, hasNextPage } = useGetPaginatedChatbotThreads()
 
   const threads = data?.pages.flatMap((p) => p.items) ?? []
-  if (media.md) {
-    return <></>
+
+  const [prevGtMd, setPrevGtMd] = useState(media.gtMd)
+  if (prevGtMd !== media.gtMd) {
+    setPrevGtMd(media.gtMd)
+    if (!media.gtMd) {
+      setIsMenuOpen(false)
+    }
   }
+
+  const [viewportHeight, setViewportHeight] = useState(0)
+  const [contentHeight, setContentHeight] = useState(0)
+  const autoFetchCountRef = useRef(0)
+
+  const tryFetchNextPage = useCallback(
+    (event?: unknown) => {
+      if (!hasNextPage || isFetching) return
+
+      const parsedEvent = event as ScrollEventLike | undefined
+      const nativeEvent = parsedEvent?.nativeEvent ?? parsedEvent
+      const target = nativeEvent?.target
+
+      const scrollTop = nativeEvent?.contentOffset?.y ?? target?.scrollTop ?? 0
+      const viewportHeightEvent = nativeEvent?.layoutMeasurement?.height ?? target?.clientHeight ?? 0
+      const totalHeight = nativeEvent?.contentSize?.height ?? target?.scrollHeight ?? 0
+
+      const distanceToBottom = totalHeight - (viewportHeightEvent + scrollTop)
+
+      if (distanceToBottom < 120) {
+        fetchNextPage()
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetching],
+  )
+
+  useEffect(() => {
+    if (!hasNextPage || isFetching) return
+    if (!viewportHeight || !contentHeight) return
+    if (autoFetchCountRef.current >= 6) return
+
+    const threshold = 0
+    if (contentHeight <= viewportHeight + threshold) {
+      autoFetchCountRef.current += 1
+      fetchNextPage()
+    }
+  }, [contentHeight, viewportHeight, fetchNextPage, hasNextPage, isFetching])
+
+  if (media.sm) return null
+
   return (
     <>
-      <SideBarArea state="militant" />
-      <XStack bg="$textOutline" position="fixed" left={0} top={0} bottom={0} zIndex={1000}>
-        <SideBarArea state="militant" />
-        <YStack width={264} padding="$medium">
-          <YStack gap={32}>
+      <SideBarArea state={isMenuOpen && media.gtMd ? 'cadre' : 'collapsed'} />
+      <NavigationContainer showShadow={isMenuOpen && !media.gtMd}>
+        <SideBarArea state="cadre" />
+        <YStack width={isMenuOpen ? 264 : 56} px={isMenuOpen ? '$medium' : '$small'} pt="$medium" flex={1}>
+          <YStack gap={32} flex={1} minHeight={0}>
             <XStack gap={8} alignItems="center" justifyContent="space-between">
-              <VoxButton iconLeft={Menu} size="lg" shrink variant="soft" />
+              <VoxButton iconLeft={Menu} size="lg" shrink variant="soft" onPress={() => setIsMenuOpen(!isMenuOpen)} />
             </XStack>
             <NavItem
               iconLeft={SquarePen}
@@ -37,22 +128,25 @@ export function ChatBotNavigation({ activeDiscussionId = null, onActiveDiscussio
               frame="secondary"
               active={!activeDiscussionId}
               onPress={() => onActiveDiscussionChange?.(null)}
+              collapsed={!isMenuOpen}
             />
             <ScrollView
+              flex={1}
+              minHeight={0}
+              contentContainerStyle={{ flexGrow: 1 }}
               showsVerticalScrollIndicator={false}
-              onScroll={({ nativeEvent }) => {
-                const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
-                const distanceToBottom = contentSize.height - (layoutMeasurement.height + contentOffset.y)
-                if (distanceToBottom < 120 && hasNextPage && !isFetching) {
-                  fetchNextPage()
-                }
-              }}
-              scrollEventThrottle={100}
+              onLayout={(e) => setViewportHeight(e.nativeEvent.layout.height)}
+              onContentSizeChange={(_, h) => setContentHeight(h)}
+              onScroll={(e) => tryFetchNextPage(e)}
+              scrollEventThrottle={16}
             >
-              <Text.SM color="$textSecondary" semibold textTransform="uppercase" px={8} pb={10}>
-                Discussions
-              </Text.SM>
-              <YStack gap={4}>
+              {isMenuOpen ? (
+                <Text.SM color="$textSecondary" semibold textTransform="uppercase" px={8} pb={10}>
+                  Discussions
+                </Text.SM>
+              ) : null}
+
+              <YStack gap={4} display={isMenuOpen ? 'flex' : 'none'}>
                 {threads.map((t) => (
                   <NavItem
                     key={t.uuid}
@@ -64,7 +158,7 @@ export function ChatBotNavigation({ activeDiscussionId = null, onActiveDiscussio
                     onPress={() => onActiveDiscussionChange?.(t.uuid)}
                   />
                 ))}
-                {isLoading ? (
+                {isLoading || isFetchingNextPage ? (
                   <XStack padding="$small" justifyContent="center">
                     <Spinner size="small" />
                   </XStack>
@@ -73,7 +167,7 @@ export function ChatBotNavigation({ activeDiscussionId = null, onActiveDiscussio
             </ScrollView>
           </YStack>
         </YStack>
-      </XStack>
+      </NavigationContainer>
     </>
   )
 }
