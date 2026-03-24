@@ -1,27 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { AppState, AppStateStatus, Platform } from 'react-native'
 import { checkVersion } from 'react-native-check-version'
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import NetInfo from '@react-native-community/netinfo'
 import { nativeApplicationVersion } from 'expo-application'
 import { checkForUpdateAsync, fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates'
 
-// HOTFIX: iOS binary 6.0.1 was published as 6.1.0 on the App Store, causing a permanent update loop
-const BROKEN_IOS_VERSIONS = ['6.0.1']
-
-const getCurrentVersion = () => {
-  const version = nativeApplicationVersion ?? '0.0.0'
-  if (Platform.OS === 'ios' && BROKEN_IOS_VERSIONS.includes(version)) {
-    return '6.1.0'
-  }
-  return version
-}
+import { ErrorMonitor } from '@/utils/ErrorMonitor'
 
 const checkStoreUpdate = async () => {
   const version = await checkVersion({
     country: 'fr',
     bundleId: Platform.OS === 'android' ? 'fr.en_marche.jecoute' : 'fr.en-marche.jecoute',
-    currentVersion: getCurrentVersion(),
+    currentVersion: nativeApplicationVersion ?? '0.0.0',
   })
 
   return version
