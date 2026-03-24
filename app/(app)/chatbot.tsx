@@ -1,19 +1,16 @@
 import React, { useRef, useState } from 'react'
 import Head from 'expo-router/head'
-
-import { Menu } from '@tamagui/lucide-icons'
 import { useMedia, YStack } from 'tamagui'
+import { Menu } from '@tamagui/lucide-icons'
 
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { VoxButton } from '@/components/Button'
-
-import ChatbotPage from '@/features_next/chatbot/pages/index'
 import ChatBotSheet, { type ChatBotSheetRef } from '@/features_next/chatbot/components/ChatBotSheet'
-
-import { useGetPaginatedChatbotThreads } from '@/services/chatbot/hook'
+import ChatbotPage from '@/features_next/chatbot/pages/index'
 
 import * as metatags from '@/config/metatags'
+import { useGetPaginatedChatbotThreads } from '@/services/chatbot/hook'
 
 function ChatbotScreen() {
   const media = useMedia()
@@ -39,7 +36,7 @@ function ChatbotScreen() {
           ) : null
         }
       />
-      <Layout.Container hideTabBar>
+      <Layout.Container hideTabBar alwaysShowScrollbar sidebarState="cadre">
         <ChatbotPage activeDiscussionId={activeDiscussionId} onActiveDiscussionChange={setActiveDiscussionId} />
       </Layout.Container>
       {media.sm && <ChatBotSheet ref={sheetRef} activeDiscussionId={activeDiscussionId} onActiveDiscussionChange={setActiveDiscussionId} />}

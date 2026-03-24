@@ -113,9 +113,9 @@ export function ChatBotNavigation({ activeDiscussionId = null, onActiveDiscussio
 
   return (
     <>
-      <SideBarArea state={isMenuOpen && media.gtMd ? 'militant' : 'collapsed'} />
+      <SideBarArea state={isMenuOpen && media.gtMd ? 'cadre' : 'collapsed'} />
       <NavigationContainer showShadow={isMenuOpen && !media.gtMd}>
-        <SideBarArea state="militant" />
+        <SideBarArea state="cadre" />
         <YStack width={isMenuOpen ? 264 : 56} px={isMenuOpen ? '$medium' : '$small'} pt="$medium" flex={1}>
           <YStack gap={32} flex={1} minHeight={0}>
             <XStack gap={8} alignItems="center" justifyContent="space-between">
