@@ -3,6 +3,7 @@ import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 import {
   Award,
+  Bot,
   Calendar,
   CircleUser,
   ClipboardCheck,
@@ -146,6 +147,7 @@ const cadreNavItemsConfig: NavItemConfig[] = [
   { id: 'department_site', iconLeft: Laptop, text: 'Site départemental', theme: 'purple', externalUrlSlug: '/site-departemental', externalLink: true },
   { id: 'mobile_app', iconLeft: TabletSmartphone, text: 'Application mobile', theme: 'purple', externalUrlSlug: '/', externalLink: true },
   { id: 'contacts', iconLeft: UsersRound, text: 'Mes militants', theme: 'purple', href: '/cadre/militants' },
+  { id: 'chatbot', iconLeft: Bot, text: 'Chatbot', theme: 'purple', href: '/chatbot' },
   { id: 'referrals', iconLeft: HeartHandshake, text: 'Suivi des parrainages', theme: 'purple', externalUrlSlug: '/parrainages', externalLink: true },
   { id: 'rentree', iconLeft: PartyPopper, text: 'Rentrée', theme: 'purple', externalUrlSlug: '/rentree', externalLink: true },
   { id: 'events', iconLeft: Calendar, text: 'Mes événements', theme: 'purple', externalUrlSlug: '/evenements', externalLink: true, displayIn: 'never' },
