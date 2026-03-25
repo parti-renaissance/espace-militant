@@ -3,7 +3,7 @@ import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 import { ChevronsUpDown } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
-import { getFormatedScope } from '@/features/scopes-selector/utils'
+import { getFormatedScope } from '@/services/profile/utils'
 
 import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
 

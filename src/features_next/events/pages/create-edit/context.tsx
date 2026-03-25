@@ -7,7 +7,7 @@ import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { SelectOption, SF } from '@/components/base/Select/SelectV3'
-import { getFormatedScope as getFormatedScopeData } from '@/features/scopes-selector/utils'
+import { getFormatedScope as getFormatedScopeData } from '@/services/profile/utils'
 
 import { isPathExist } from '@/services/common/errors/utils'
 import { eventPostFormError } from '@/services/events/error'
