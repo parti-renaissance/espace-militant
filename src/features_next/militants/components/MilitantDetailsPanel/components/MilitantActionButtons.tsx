@@ -7,6 +7,7 @@ import Text from '@/components/base/Text'
 
 import type { IconComponent } from '@/models/common.model'
 import { useAdherentEmail, useAdherentPhone } from '@/services/adherents/hook'
+import type { RestAdherentSensitiveData } from '@/services/adherents/schema'
 
 function ActionButton({ Icon, label, onPress, disabled }: { Icon: IconComponent; label: string; onPress: () => void; disabled?: boolean }) {
   return (
@@ -52,7 +53,7 @@ export function MilitantActionButtons({ uuid, scope, smsAvailable = true }: Mili
   const executeAction = async (
     actionName: ActionType,
     query: ReturnType<typeof useAdherentPhone | typeof useAdherentEmail>,
-    extractData: (data: any) => string | undefined,
+    extractData: (data: RestAdherentSensitiveData) => string | undefined,
     urlPrefix: string,
     errorMessage: string,
   ) => {

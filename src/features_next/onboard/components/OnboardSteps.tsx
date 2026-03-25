@@ -5,16 +5,9 @@ import Text from '@/components/base/Text'
 
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 
-import type { FooterAction } from '../types'
-import OnboardStepLayout from './OnboardStepLayout'
-
-import ILLU_1 from '../assets/illu-onboard-step-1.png'
-import ILLU_2 from '../assets/illu-onboard-step-2.png'
-import ILLU_3 from '../assets/illu-onboard-step-3.png'
-import ILLU_4 from '../assets/illu-onboard-step-4.png'
-import ILLU_5 from '../assets/illu-onboard-step-5.png'
-import ILLU_6 from '../assets/illu-onboard-step-6.png'
-import ILLU_6_1 from '../assets/illu-onboard-step-6-1.png'
+import BG_D_1 from '../assets/bg-onboard-desktop-step-1.png'
+import BG_D_3 from '../assets/bg-onboard-desktop-step-3.png'
+import BG_D_4 from '../assets/bg-onboard-desktop-step-4.png'
 import BG_1 from '../assets/bg-onboard-step-1.png'
 import BG_3 from '../assets/bg-onboard-step-3.png'
 import BG_4 from '../assets/bg-onboard-step-4.png'
@@ -25,9 +18,15 @@ import ILLU_D_4 from '../assets/illu-onboard-desktop-step-4.png'
 import ILLU_D_5 from '../assets/illu-onboard-desktop-step-5.png'
 import ILLU_D_6 from '../assets/illu-onboard-desktop-step-6.png'
 import ILLU_D_7 from '../assets/illu-onboard-desktop-step-7.png'
-import BG_D_1 from '../assets/bg-onboard-desktop-step-1.png'
-import BG_D_3 from '../assets/bg-onboard-desktop-step-3.png'
-import BG_D_4 from '../assets/bg-onboard-desktop-step-4.png'
+import ILLU_1 from '../assets/illu-onboard-step-1.png'
+import ILLU_2 from '../assets/illu-onboard-step-2.png'
+import ILLU_3 from '../assets/illu-onboard-step-3.png'
+import ILLU_4 from '../assets/illu-onboard-step-4.png'
+import ILLU_5 from '../assets/illu-onboard-step-5.png'
+import ILLU_6_1 from '../assets/illu-onboard-step-6-1.png'
+import ILLU_6 from '../assets/illu-onboard-step-6.png'
+import type { FooterAction } from '../types'
+import OnboardStepLayout from './OnboardStepLayout'
 
 type OnboardStepProps = {
   stepIndex: number
@@ -152,7 +151,7 @@ export function OnboardStep7Cadre({ stepIndex, totalSteps, onFooterAction }: Onb
 
   return (
     <OnboardStepLayout
-      title={`Vous avez ${scopes?.list?.length ?? 1} rôle${(scopes?.list?.length ?? 1 > 1) ? 's' : ''} Cadre`}
+      title={`Vous avez ${scopes?.list?.length ?? 1} rôle${(scopes?.list?.length ?? 1) > 1 ? 's' : ''} Cadre`}
       illustration={illustration}
       footer={{ left: 'prev', right: 'cest-note' }}
       stepIndex={stepIndex}

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Sparkle } from '@tamagui/lucide-icons'
 
 import Select, { SelectOption, SF } from '@/components/base/Select/SelectV3'
-import { getFormatedScope as getFormatedScopeData } from '@/features/scopes-selector/utils'
+import { getFormatedScope as getFormatedScopeData } from '@/services/profile/utils'
 
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { RestUserScopesResponse } from '@/services/profile/schema'

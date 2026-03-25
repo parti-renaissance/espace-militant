@@ -57,9 +57,12 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
     filters,
   })
 
+  const { hasFeature } = useGetExecutiveScopes()
+  const canExport = hasFeature('contacts_export', scope)
+
   useEffect(() => {
     setCurrentPage(1)
-  }, [apiSearchTerm])
+  }, [apiSearchTerm, scope])
 
   const activeFilterChips = useMemo(() => getActiveFilterChips(filters, collection), [filters, collection])
 
@@ -121,7 +124,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         onPageChange={handlePageChange}
         searchValue={searchInput}
         onSearchChange={setSearchInput}
-        paginationRightSlot={<MilitantExportButton scope={scope} />}
+        paginationRightSlot={canExport ? <MilitantExportButton scope={scope} /> : null}
       />
     ),
     [
@@ -136,6 +139,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
       handlePageChange,
       searchInput,
       scope,
+      canExport,
     ],
   )
 

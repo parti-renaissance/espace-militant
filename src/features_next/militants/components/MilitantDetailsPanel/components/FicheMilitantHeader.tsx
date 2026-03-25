@@ -16,7 +16,7 @@ export function FicheMilitantHeader({ onClose }: FicheMilitantHeaderProps) {
   return (
     <XStack paddingHorizontal="$medium" paddingVertical="$medium" marginTop={insets.top} alignItems="center" justifyContent="space-between">
       <Text.LG semibold>Fiche militant</Text.LG>
-      <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Fermer">
+      <Pressable onPress={onClose} hitSlop={12} role="button" accessibilityLabel="Fermer">
         <X size={24} color="$textPrimary" />
       </Pressable>
     </XStack>
