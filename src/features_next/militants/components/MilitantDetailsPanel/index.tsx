@@ -93,8 +93,8 @@ function MilitantDetailTabs({ activeTab, onTabChange }: { activeTab: FicheMilita
             backgroundColor="transparent"
             hoverStyle={{ backgroundColor: 'transparent' }}
             pressStyle={{ backgroundColor: 'transparent' }}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isActive }}
+            role="tab"
+            aria-selected={isActive}
           >
             <YStack position="relative">
               <Text.MD

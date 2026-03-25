@@ -25,7 +25,7 @@ export function MilitantFilterPanel({ scope, initialValues, onChangeFilter, onCl
       <XStack paddingHorizontal="$medium" paddingVertical="$medium" marginTop={insets.top} alignItems="center" justifyContent="space-between">
         <Text.LG semibold>Filtres</Text.LG>
         {onClose && (
-          <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Fermer">
+          <Pressable onPress={onClose} hitSlop={12} role="button" accessibilityLabel="Fermer">
             <X size={24} color="$textPrimary" />
           </Pressable>
         )}
