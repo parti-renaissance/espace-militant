@@ -17,7 +17,7 @@ import { AuthContext, type AuthContextType } from './AuthContext'
 export { useSession } from './AuthContext'
 
 export function SessionProvider(props: React.PropsWithChildren) {
-  const { user: existingSession, setCredentials: setSession, _hasHydrated } = useUserStore()
+  const { user: existingSession, setCredentials: setSession, removeCredentials, _hasHydrated } = useUserStore()
   const params = useGlobalSearchParams<{ code?: string; _switch_user?: string; redirect?: string; state?: string }>()
   const [onShotParams, setOneShotParams] = React.useState(params)
 
@@ -57,8 +57,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
           return
         }
         const { accessToken, refreshToken, idToken: sessionId, expiresIn } = session
-        queryClient.clear()
         setSession({ accessToken, refreshToken, sessionId, isAdmin: props?.isAdmin, accessTokenExpiresIn: expiresIn })
+        queryClient.resetQueries()
       } catch (e) {
         ErrorMonitor.log(e.message, { e })
         toast.show('Erreur lors de la connexion', { type: 'error' })
@@ -73,6 +73,11 @@ export function SessionProvider(props: React.PropsWithChildren) {
     const { code, state: stateParam, _switch_user } = onShotParams
     if (code || url) {
       if (isWeb && code) {
+        if (_switch_user) {
+          queryClient.cancelQueries()
+          queryClient.clear()
+          removeCredentials()
+        }
         setOneShotParams({})
         const hadState = Boolean(stateParam?.startsWith('/'))
         handleSignIn({ code, isAdmin: _switch_user === 'true' }).then(() => {
