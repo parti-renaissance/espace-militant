@@ -4,6 +4,8 @@ import { Href, router, useGlobalSearchParams } from 'expo-router'
 import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 
+import { useQueryClient } from '@tanstack/react-query'
+
 import useLogin, { useRegister } from '@/hooks/useLogin'
 import { useLogOut } from '@/services/logout/api'
 import { useGetProfil, useGetUserScopes } from '@/services/profile/hook'
@@ -24,6 +26,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const [isLoginInProgress, setIsLoginInProgress] = React.useState(false)
   const toast = useToastController()
 
+  const queryClient = useQueryClient()
   const login = useLogin()
   const { mutateAsync: logout } = useLogOut()
   const register = useRegister()
@@ -54,6 +57,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
           return
         }
         const { accessToken, refreshToken, idToken: sessionId, expiresIn } = session
+        queryClient.clear()
         setSession({ accessToken, refreshToken, sessionId, isAdmin: props?.isAdmin, accessTokenExpiresIn: expiresIn })
       } catch (e) {
         ErrorMonitor.log(e.message, { e })
@@ -62,7 +66,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
         setIsLoginInProgress(false)
       }
     },
-    [isLoginInProgress, login],
+    [isLoginInProgress, login, queryClient],
   )
 
   React.useEffect(() => {
