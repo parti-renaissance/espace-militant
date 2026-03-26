@@ -178,10 +178,10 @@ export const ScopeSelector = () => {
         ref={(node) => {
           triggerRef.current = node as HTMLElement | null
         }}
-        onPress={() => canSelect && setDropdownOpen(!dropdownOpen)}
+        onPress={canSelect ? () => setDropdownOpen(!dropdownOpen) : undefined}
         cursor={canSelect ? 'pointer' : 'default'}
-        hoverStyle={!canSelect ? { backgroundColor: 'transparent' } : undefined}
-        pressStyle={!canSelect ? { backgroundColor: 'transparent' } : undefined}
+        hoverStyle={!canSelect ? { backgroundColor: '$purple1' } : undefined}
+        pressStyle={!canSelect ? { backgroundColor: '$purple1' } : undefined}
       >
         <YStack flexShrink={1} gap={4}>
           <Text.MD semibold color={'$purple6'} numberOfLines={1}>
