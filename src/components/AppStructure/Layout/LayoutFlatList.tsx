@@ -73,16 +73,13 @@ function LayoutFlatListInner<T>(props: LayoutFlatListProps<T>, ref: React.Ref<Fl
 
     if (data.length === 0) {
       const emptyNode = renderListComponent(ListEmptyComponent)
-      // Afficher le header si présent, même quand la liste est vide
-      if (headerNode) {
-        return (
-          <YStack style={baseContainerStyle}>
-            {headerNode}
-            {emptyNode}
-          </YStack>
-        )
-      }
-      return <YStack style={baseContainerStyle}>{emptyNode}</YStack>
+      return (
+        <YStack style={baseContainerStyle}>
+          {headerNode}
+          {emptyNode}
+          {footerNode}
+        </YStack>
+      )
     }
 
     return (
