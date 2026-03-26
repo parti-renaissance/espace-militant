@@ -4,7 +4,6 @@ import { Stack } from 'expo-router'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { LayoutContext, useLayoutContext } from '@/components/AppStructure/Layout/LayoutContext'
 import { SideBarState } from '@/components/AppStructure/Navigation/SideBar'
-import ScopesSelector from '@/features/scopes-selector'
 
 export const unstable_settings = {
   initialRouteName: '(tabs)',
@@ -32,7 +31,6 @@ function AppNewLayoutContent() {
   const layoutContent = useMemo(
     () => (
       <Layout sidebarState={effectiveSidebarState} hideTabBar={hideTabBar}>
-        <ScopesSelector />
         <Stack screenOptions={screenOptions} initialRouteName="(tabs)">
           <Stack.Screen name="(tabs)" />
         </Stack>

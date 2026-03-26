@@ -12,43 +12,49 @@ export interface User {
   accessTokenExpiresAt?: number
 }
 
-interface UserState {
+interface UserSessionData {
   user: User | null
+  onboardingOpenedAt: string | null
+  hideResubscribeAlert: string | null
+  defaultScope: string | null
+  lastAvailableScopes: string[] | null
+}
+
+const initialUserData: UserSessionData = {
+  user: null,
+  onboardingOpenedAt: null,
+  hideResubscribeAlert: null,
+  defaultScope: null,
+  lastAvailableScopes: null,
+}
+
+interface UserState extends UserSessionData {
   setCredentials: (user: User) => void
   removeCredentials: () => void
-  onboardingOpenedAt: string | null
   setOnboardingOpenedAt: (date: string | null) => void
-  hideResubscribeAlert: string | null
   setHideReSubscribeAlert: (x: string | null) => void
   setDefaultScope: (scope: string) => void
   setLastAvailableScopes: (scopes: string[]) => void
-  defaultScope: string | null
-  lastAvailableScopes: string[] | null
   _hasHydrated: boolean
   _setHasHydrated: (hasHydrated: boolean) => void
   rehydrateFromStorage: () => Promise<void>
 }
 
 const userStoreSlice: StateCreator<UserState> = (set) => ({
-  user: null,
+  ...initialUserData,
   _hasHydrated: false,
-  onboardingOpenedAt: null,
-  hideResubscribeAlert: null,
-  defaultScope: null,
-  lastAvailableScopes: null,
   setDefaultScope: (scope) => set({ defaultScope: scope }),
   setLastAvailableScopes: (scopes) => set({ lastAvailableScopes: scopes }),
   setCredentials: (user) => {
     const userWithExpiration: User = {
       ...user,
-      // Calcule accessTokenExpiresAt depuis accessTokenExpiresIn si disponible
       accessTokenExpiresAt: user.accessTokenExpiresIn
         ? Date.now() + user.accessTokenExpiresIn * 1000
         : user.accessTokenExpiresAt,
     }
-    set({ user: userWithExpiration })
+    set({ ...initialUserData, user: userWithExpiration })
   },
-  removeCredentials: () => set({ user: null, onboardingOpenedAt: null }),
+  removeCredentials: () => set({ ...initialUserData }),
   setOnboardingOpenedAt: (onboardingOpenedAt) => set({ onboardingOpenedAt }),
   _setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   setHideReSubscribeAlert: (hideResubscribeAlert) => set({ hideResubscribeAlert }),

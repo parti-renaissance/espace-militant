@@ -164,11 +164,11 @@ function MilitantCadreItemInner({
   const col3Width = isMobileLayout ? '50%' : '22%'
   const col4Width = isMobileLayout ? '50%' : '17%'
 
-  const circonscription = instances.find((i) => i.type === 'circonscription')
-  const assembly = instances.find((i) => i.type === 'assembly')
-  const committee = instances.find((i) => i.type === 'committee')
+  const circonscription = instances?.find((i) => i.type === 'circonscription')
+  const assembly = instances?.find((i) => i.type === 'assembly')
+  const committee = instances?.find((i) => i.type === 'committee')
   const anciennete = yearFromIsoDate(account_created_at)
-  const cotisationYear = yearFromIsoDate(first_contribution_at) ?? anciennete
+  const cotisationYear = yearFromIsoDate(first_contribution_at)
   const displayName = [first_name, last_name].filter(Boolean).join(' ') || ''
   const listItemAriaLabel = [displayName, age != null ? `${age} ans` : null, public_id].filter(Boolean).join(', ')
 

@@ -9,6 +9,7 @@ import { VoxButton } from '@/components/Button'
 import EmptyStateWithFilters from '@/components/EmptyStates/EmptyStateWithFilters'
 import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'
 import { getActiveFilterChips } from '@/components/Filters/filterCollectionUtils'
+import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import PanelModal from '@/components/PanelModal/PanelModal'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
 import { MilitantDetailsPanel } from '@/features_next/militants/components/MilitantDetailsPanel'
@@ -57,9 +58,12 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
     filters,
   })
 
+  const { hasFeature } = useGetExecutiveScopes()
+  const canExport = hasFeature('contacts_export', scope)
+
   useEffect(() => {
     setCurrentPage(1)
-  }, [apiSearchTerm])
+  }, [apiSearchTerm, scope])
 
   const activeFilterChips = useMemo(() => getActiveFilterChips(filters, collection), [filters, collection])
 
@@ -114,14 +118,14 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
         activeFilterChips={activeFilterChips}
         onRemoveFilter={handleRemoveFilter}
         onResetAllFilters={handleResetAllFilters}
-        paginationDisabled={isFetching && !isPlaceholderData}
+        paginationDisabled={isFetching}
         page={currentPage}
         pageSize={PAGE_SIZE}
         totalItems={metadata?.total_items}
         onPageChange={handlePageChange}
         searchValue={searchInput}
         onSearchChange={setSearchInput}
-        paginationRightSlot={<MilitantExportButton scope={scope} />}
+        paginationRightSlot={canExport ? <MilitantExportButton scope={scope} /> : null}
       />
     ),
     [
@@ -136,6 +140,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
       handlePageChange,
       searchInput,
       scope,
+      canExport,
     ],
   )
 
@@ -198,18 +203,18 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
 
   const listFooterComponent = useMemo(
     () =>
-      data != null ? (
+      isError ? null : (
         <YStack py="$small" px={media.sm ? '$medium' : undefined} alignItems={media.sm ? 'stretch' : 'flex-end'}>
           <MilitantHeaderPagination
             page={currentPage}
             pageSize={PAGE_SIZE}
             totalItems={metadata?.total_items}
             onPageChange={handlePageChange}
-            disabled={isFetching && !isPlaceholderData}
+            disabled={isFetching}
           />
         </YStack>
-      ) : null,
-    [data, currentPage, metadata?.total_items, handlePageChange, isFetching, isPlaceholderData, media.sm],
+      ),
+    [currentPage, metadata?.total_items, handlePageChange, isFetching, isError, media.sm],
   )
 
   return (
@@ -269,5 +274,9 @@ export default function MilitantsScreen() {
     </VoxButton>
   ) : undefined
 
-  return <MilitantsContent scope={defaultScope} accessDenyButton={accessDenyButton} />
+  return (
+    <BoundarySuspenseWrapper>
+      <MilitantsContent scope={defaultScope} accessDenyButton={accessDenyButton} />
+    </BoundarySuspenseWrapper>
+  )
 }

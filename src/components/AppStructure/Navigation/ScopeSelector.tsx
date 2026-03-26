@@ -3,7 +3,7 @@ import { styled, ThemeableStack, XStack, YStack } from 'tamagui'
 import { ChevronsUpDown } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
-import { getFormatedScope } from '@/features/scopes-selector/utils'
+import { getFormatedScope } from '@/services/profile/utils'
 
 import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
 
@@ -178,10 +178,10 @@ export const ScopeSelector = () => {
         ref={(node) => {
           triggerRef.current = node as HTMLElement | null
         }}
-        onPress={() => canSelect && setDropdownOpen(!dropdownOpen)}
+        onPress={canSelect ? () => setDropdownOpen(!dropdownOpen) : undefined}
         cursor={canSelect ? 'pointer' : 'default'}
-        hoverStyle={!canSelect ? { backgroundColor: 'transparent' } : undefined}
-        pressStyle={!canSelect ? { backgroundColor: 'transparent' } : undefined}
+        hoverStyle={!canSelect ? { backgroundColor: '$purple1' } : undefined}
+        pressStyle={!canSelect ? { backgroundColor: '$purple1' } : undefined}
       >
         <YStack flexShrink={1} gap={4}>
           <Text.MD semibold color={'$purple6'} numberOfLines={1}>
