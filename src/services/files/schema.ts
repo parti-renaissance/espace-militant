@@ -1,4 +1,5 @@
 import z from 'zod'
+import { createRestPaginationSchema } from '@/services/common/schema'
 
 export const RestPostMessageRequestSchema = z.object({
   type: z.string(),
@@ -28,3 +29,23 @@ export const RestPostMessageResponseSchema = z.object({
 })
 
 export type RestPostMessageResponse = z.infer<typeof RestPostMessageResponseSchema>
+
+const RestUploadedFileAuthorSchema = z.object({
+  first_name: z.string(),
+  last_name: z.string(),
+})
+
+export const RestUploadedFileItemSchema = z.object({
+  original_name: z.string(),
+  mime_type: z.string(),
+  author: RestUploadedFileAuthorSchema,
+  created_at: z.string(),
+  size: z.string(),
+  url: z.string().url(),
+})
+
+export const RestUploadedFileListResponseSchema = createRestPaginationSchema(RestUploadedFileItemSchema)
+
+export type RestUploadedFileAuthor = z.infer<typeof RestUploadedFileAuthorSchema>
+export type RestUploadedFileItem = z.infer<typeof RestUploadedFileItemSchema>
+export type RestUploadedFileListResponse = z.infer<typeof RestUploadedFileListResponseSchema>
