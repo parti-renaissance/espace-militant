@@ -277,9 +277,8 @@ function getLastSession(list: RestSession[]): RestSession | null {
     const t = new Date(s).getTime()
     return Number.isNaN(t) ? 0 : t
   }
-  return (
-    [...list].sort((a, b) => safeTime(b.last_activity_at) - safeTime(a.last_activity_at))[0] ?? null
-  )
+
+  return [...list].sort((a, b) => safeTime(b.last_activity_at) - safeTime(a.last_activity_at))[0] ?? null
 }
 
 function SessionsSection({ isLoading, data }: { isLoading?: boolean; data?: RestAdherentDetail | null }) {
@@ -356,12 +355,10 @@ function RolesSection({ roles }: { roles: RestAdherentRole[] }) {
             <Text.SM color="$textDisabled">Ce militant ne dispose d’aucun rôle.</Text.SM>
           ) : (
             roles.map((r, index) => {
-              const main = r.function ?? r.label ?? '—'
-              const text = r.is_delegated ? `${main} (délégué)` : main
               return (
                 <Chip key={`${r.code ?? 'role'}-${index}`} theme="purple" flexShrink={1} minWidth={0} maxWidth="100%">
                   <Text.SM color="$color5" semibold numberOfLines={1} ellipsizeMode="tail">
-                    {text}
+                    {r.label ?? r.function}
                   </Text.SM>
                 </Chip>
               )
@@ -383,7 +380,7 @@ function LabelsNationauxSection({ labels }: { labels: RestAdherentTag[] | null |
         <XStack flexWrap="wrap" gap="$small">
           {list.map((l, index) => (
             <Chip key={l.code ?? `${l.label}-${index}`} theme="gray">
-              <Text.SM color="$color5" semibold numberOfLines={1} ellipsizeMode="tail" textTransform="capitalize">
+              <Text.SM color="$color5" semibold numberOfLines={1} ellipsizeMode="tail">
                 {l.label}
               </Text.SM>
             </Chip>

@@ -21,7 +21,7 @@ const TagChipRow = memo(function TagChipRow({ tags, theme }: { tags?: TagLike[] 
   return (
     <XStack overflow="hidden" minWidth={0} flexWrap="nowrap" gap={4} alignItems="center">
       <Chip theme={theme} flexShrink={1} minWidth={0}>
-        <Text.SM numberOfLines={1} ellipsizeMode="tail" semibold color="$color5" textTransform="capitalize">
+        <Text.SM numberOfLines={1} ellipsizeMode="tail" semibold color="$color5">
           {first.label}
         </Text.SM>
       </Chip>
