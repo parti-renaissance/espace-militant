@@ -52,7 +52,7 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
       <XStack alignItems="center" justifyContent="space-between" gap="$medium">
         {adherentLabel && (
           <Chip theme="yellow" flexShrink={1}>
-            <Text.SM semibold color={'$color5'} numberOfLines={1} ellipsizeMode="tail" textTransform="capitalize">
+            <Text.SM semibold color={'$color5'} numberOfLines={1} ellipsizeMode="tail">
               {adherentLabel}
             </Text.SM>
           </Chip>
