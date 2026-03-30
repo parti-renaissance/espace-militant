@@ -1,6 +1,5 @@
 import { CircleUser, HelpingHand, KeyRound, LandPlot, MessageCircle, Settings2, Sparkle, TreeDeciduous } from '@tamagui/lucide-icons'
 
-import { UserTagEnum } from '@/core/entities/UserProfile'
 import { RestProfilResponse } from '@/services/profile/schema'
 
 export type ProfilNavItemConfig = {
@@ -70,7 +69,6 @@ export const pageConfigs: Record<string, ProfilNavItemConfig> = {
     title: 'Informations élu',
     icon: TreeDeciduous,
     iconLeft: TreeDeciduous,
-    hiddenInMenu: (profile) => !profile?.tags?.some((tag) => tag.type === UserTagEnum.ELU),
   },
   'mot-de-passe': {
     id: 'mot-de-passe',
