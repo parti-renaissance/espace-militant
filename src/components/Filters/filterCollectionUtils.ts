@@ -3,6 +3,26 @@ import { formatShortDate } from '@/utils/DateFormatter'
 
 import type { FilterValue, FilterValues } from './FilterCollectionBuilder'
 
+/**
+ * Normalise les valeurs de filtres pour l'envoi à l'API :
+ * les objets zone `{ uuid, name, code }` sont réduits à leur UUID string.
+ */
+export function normalizeFiltersForApi(filters: FilterValues): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(filters)) {
+    if (!isFilterValueActive(value)) continue
+
+    if (Array.isArray(value) && value.length > 0 && value[0] != null && typeof value[0] === 'object' && 'uuid' in value[0]) {
+      result[key] = (value as { uuid: string }[]).map((v) => v.uuid)
+    } else if (value != null && typeof value === 'object' && !Array.isArray(value) && 'uuid' in value) {
+      result[key] = (value as { uuid: string }).uuid
+    } else {
+      result[key] = value
+    }
+  }
+  return result
+}
+
 export function isFilterValueActive(value: FilterValue): boolean {
   if (value === undefined || value === null) return false
   if (value === '') return false
