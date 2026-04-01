@@ -13,6 +13,7 @@ import { useAdherentDetail } from '@/services/adherents/hook'
 import type { RestAdherentDetail, RestAdherentListItem } from '@/services/adherents/schema'
 import { getRelativeActivityLabel } from '@/utils/DateFormatter'
 
+import { ElectMandatTab } from './components/ElectMandatTab'
 import { FicheMilitantHeader } from './components/FicheMilitantHeader'
 import { IdentiteTabContent } from './components/IdentiteTab'
 import { MilitantActionButtons } from './components/MilitantActionButtons'
@@ -193,7 +194,11 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
             />
           )}
 
-          {activeTab !== 'identite' && (
+          {activeTab === 'mandats' && (
+            <ElectMandatTab uuid={uuid} scope={scope} electTags={displayData.elect_tags} electMandates={displayData.elect_mandates} />
+          )}
+
+          {activeTab !== 'identite' && activeTab !== 'mandats' && (
             <YStack padding="$medium" flex={1}>
               <Text.SM secondary>Bientôt disponible</Text.SM>
             </YStack>
