@@ -403,10 +403,11 @@ export function ElectMandatTab({
   const electTagsList = Array.isArray(electTags) ? electTags : []
   const electMandatesList = Array.isArray(electMandates) ? electMandates : []
 
-  const { hasFeature } = useGetExecutiveScopes()
+  const { hasFeature, isLoading: isScopesLoading } = useGetExecutiveScopes()
   const canSeeElectedRepresentative = hasFeature(FEATURES.ELECTED_REPRESENTATIVE, scope)
 
-  const { data, isError, isLoading } = useAdherentElect(uuid, scope, canSeeElectedRepresentative)
+  const { data, isError, isLoading: isElectLoading } = useAdherentElect(uuid, scope, canSeeElectedRepresentative)
+  const isLoading = isElectLoading || isScopesLoading
   const { mutate: toggleExempt, isPending: isTogglingExempt } = useMutationToggleAdherentElectExemptFromCotisation({
     adherentUuid: uuid,
     scope,
