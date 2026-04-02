@@ -42,6 +42,13 @@ export type RestGetMessageContentResponse = z.infer<typeof RestGetMessageContent
 
 export type RestPostMessageResponse = z.infer<typeof RestPostMessageResponseSchema>
 
+/** Réponse du POST `/api/v3/adherent_messages/:uuid/duplicate` */
+export const RestDuplicateMessageResponseSchema = z.object({
+  uuid: z.string(),
+})
+
+export type RestDuplicateMessageResponse = z.infer<typeof RestDuplicateMessageResponseSchema>
+
 export const RestAvailableSenderThemeSchema = z.object({
   primary: z.string(),
   soft: z.string(),
