@@ -123,6 +123,7 @@ export const RestAdherentDetailSchema = z.object({
   adherent_tags: z.array(RestAdherentTagSchema).nullable(),
   static_tags: z.array(RestAdherentTagSchema).nullable(),
   elect_tags: z.array(RestAdherentTagSchema).nullable(),
+  elect_mandates: z.array(RestAdherentMandateSchema).nullable(),
   instances: z.array(RestAdherentInstanceSchema).default([]),
   subscriptions: RestSubscriptionsSchema,
   subscription_types: z.array(RestSubscriptionTypeSchema).default([]),
@@ -204,6 +205,96 @@ export type RestAdherentDonation = z.infer<typeof RestAdherentDonationSchema>
 export type RestAdherentDonationsResponse = z.infer<typeof RestAdherentDonationsResponseSchema>
 export type RestAdherentDonationsRequest = z.infer<typeof RestAdherentDonationsRequestSchema>
 
+export const RestAdherentElectRequestSchema = z.object({
+  scope: z.string(),
+})
+
+export const RestAdherentElectPaymentSchema = z.object({
+  date: z.string(),
+  amount: z.number(),
+  method: z.string(),
+  uuid: z.string(),
+  status_label: z.string(),
+  created_at: z.string(),
+})
+
+export type RestAdherentElectPayment = z.infer<typeof RestAdherentElectPaymentSchema>
+
+export const RestAdherentElectMandateSchema = z.object({
+  mandate_type: z.string(),
+  mandate_type_label: z.string(),
+  delegation: z.string().nullable(),
+  zone: z.object({
+    uuid: z.string(),
+    code: z.string(),
+    name: z.string(),
+    created_at: z.string().optional(),
+  }),
+  begin_at: z.string(),
+  finish_at: z.string().nullable(),
+  uuid: z.string(),
+  created_at: z.string(),
+})
+
+export const RestAdherentElectLastRevenueDeclarationSchema = z
+  .object({
+    amount: z.number(),
+    uuid: z.string(),
+    created_at: z.string(),
+  })
+  .nullable()
+
+export const RestAdherentElectResponseSchema = z.object({
+  contribution_status: z.enum(['eligible', 'not_eligible']).nullable(),
+  exempt_from_cotisation: z.boolean(),
+  contributed_at: z.string().nullable(),
+  payments: z.array(RestAdherentElectPaymentSchema),
+  uuid: z.string(),
+  declared_mandates: z.array(z.string()),
+  contribution_amount: z.number().nullable(),
+  elect_mandates: z.array(RestAdherentElectMandateSchema),
+  last_revenue_declaration: RestAdherentElectLastRevenueDeclarationSchema,
+})
+
+export const RestAdherentElectToggleExemptPayloadSchema = z.object({
+  exemptFromCotisation: z.boolean(),
+})
+
+export const RestAdherentElectToggleExemptRequestSchema = z.object({
+  scope: z.string(),
+  payload: RestAdherentElectToggleExemptPayloadSchema,
+})
+
+export const RestAdherentElectMandateUpsertPayloadSchema = z.object({
+  adherent: z.string(),
+  begin_at: z.string(),
+  delegation: z.string(),
+  finish_at: z.string().nullable(),
+  mandate_type: z.string(),
+  zone: z.string(),
+})
+
+export const RestAdherentElectMandateUpsertRequestSchema = z.object({
+  scope: z.string(),
+  payload: RestAdherentElectMandateUpsertPayloadSchema,
+})
+
+export const RestAdherentElectMandateUpsertResponseSchema = z.object({
+  mandate_type: z.string(),
+  delegation: z.string(),
+  zone: z.object({
+    uuid: z.string(),
+    code: z.string(),
+    name: z.string(),
+  }),
+  adherent: z.object({
+    uuid: z.string(),
+  }),
+  begin_at: z.string(),
+  finish_at: z.string().nullable(),
+  uuid: z.string(),
+})
+
 export const RestAdherentSensitiveDataSchema = z
   .object({
     phone: RestAdherentSensitivePhoneSchema.shape.phone,
@@ -229,3 +320,11 @@ export type RestAdherentListRequest = z.infer<typeof RestAdherentListRequestSche
 export type RestAdherentDetail = z.infer<typeof RestAdherentDetailSchema>
 export type RestAdherentDetailRequest = z.infer<typeof RestAdherentDetailRequestSchema>
 export type RestAdherentSensitiveRequest = z.infer<typeof RestAdherentSensitiveRequestSchema>
+export type RestAdherentElectRequest = z.infer<typeof RestAdherentElectRequestSchema>
+export type RestAdherentElectResponse = z.infer<typeof RestAdherentElectResponseSchema>
+export type RestAdherentElectMandate = z.infer<typeof RestAdherentElectMandateSchema>
+export type RestAdherentElectToggleExemptPayload = z.infer<typeof RestAdherentElectToggleExemptPayloadSchema>
+export type RestAdherentElectToggleExemptRequest = z.infer<typeof RestAdherentElectToggleExemptRequestSchema>
+export type RestAdherentElectMandateUpsertPayload = z.infer<typeof RestAdherentElectMandateUpsertPayloadSchema>
+export type RestAdherentElectMandateUpsertRequest = z.infer<typeof RestAdherentElectMandateUpsertRequestSchema>
+export type RestAdherentElectMandateUpsertResponse = z.infer<typeof RestAdherentElectMandateUpsertResponseSchema>

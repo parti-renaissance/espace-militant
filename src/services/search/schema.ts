@@ -6,6 +6,7 @@ export const ZoneAutocompleteRequestSchema = z.object({
   scope: z.string().optional(),
   'types[]': z.array(z.string()).optional(),
   searchEvenEmptyTerm: z.number().optional(),
+  forMandateType: z.string().optional(),
 })
 
 export const ZoneAutocompleteResponseSchema = z.array(z.object({

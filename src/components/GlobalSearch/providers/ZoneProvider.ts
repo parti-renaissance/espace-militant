@@ -7,12 +7,13 @@ import { getZoneAutocomplete } from '@/services/search/api'
 import { SearchProvider, SearchResult } from '../types'
 
 export interface ZoneProviderOptions {
-  url: string
-  query_param: string
-  value_param: string
-  label_param: string
+  url?: string
+  query_param?: string
+  value_param?: string
+  label_param?: string
   multiple?: boolean
   required?: boolean
+  forMandateType?: string
 }
 
 const ZONE_TYPE_LABELS: Record<string, string> = {
@@ -40,16 +41,16 @@ export class ZoneProvider implements SearchProvider {
   async search(query: string, scope: string = 'president_departmental_assembly'): Promise<SearchResult[]> {
     try {
       const options = this.options
-      const useCustomUrl = options?.url && query.length > 0
-      if (useCustomUrl && options) {
+      const useCustomUrl = options?.url && options.query_param && options.value_param && options.label_param && query.length > 0
+      if (useCustomUrl && options.url) {
         const params: Record<string, string | number | undefined> = {
-          [options.query_param]: query,
+          [options.query_param!]: query,
           scope,
         }
         const response = await authInstance.get(options.url, { params })
         const data = Array.isArray(response.data) ? response.data : []
-        const valueParam = options.value_param
-        const labelParam = options.label_param
+        const valueParam = options.value_param!
+        const labelParam = options.label_param!
         return data.map((item: Record<string, unknown>) => {
           const id = String(item[valueParam] ?? '')
           const label = String(item[labelParam] ?? '')
@@ -67,6 +68,7 @@ export class ZoneProvider implements SearchProvider {
         scope,
         'types[]': ['borough', 'city', 'canton', 'department', 'region', 'country', 'district', 'foreign_district'], // Contrainte Mailchimp
         searchEvenEmptyTerm: query.length === 0 ? 1 : undefined,
+        forMandateType: this.options?.forMandateType,
       })
 
       return response.map((zone) => ({

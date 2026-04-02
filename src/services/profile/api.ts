@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import {
   profilChangePasswordFormErrorThrower,
   profileElectDeclarationFormErrorThrower,
@@ -7,7 +9,6 @@ import {
 import * as schemas from '@/services/profile/schema'
 import type * as Types from '@/services/profile/schema'
 import { api } from '@/utils/api'
-import { z } from 'zod'
 
 export const getProfile = api({
   method: 'GET',
