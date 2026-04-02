@@ -13,7 +13,7 @@ import { useAdherentDetail } from '@/services/adherents/hook'
 import type { RestAdherentDetail, RestAdherentListItem } from '@/services/adherents/schema'
 import { getRelativeActivityLabel } from '@/utils/DateFormatter'
 
-import { ElectMandatTab } from './components/ElectMandatTab'
+import { ElectMandatTab } from './components/ElectMandatTap'
 import { FicheMilitantHeader } from './components/FicheMilitantHeader'
 import { IdentiteTabContent } from './components/IdentiteTab'
 import { MilitantActionButtons } from './components/MilitantActionButtons'

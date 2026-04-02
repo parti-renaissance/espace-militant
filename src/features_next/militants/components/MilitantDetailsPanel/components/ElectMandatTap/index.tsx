@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { styled, View, XStack, YStack } from 'tamagui'
 import { CircleAlert, CircleCheck, CircleHelp, MapPin, Pencil, Plus, Trash2 } from '@tamagui/lucide-icons'
 
@@ -8,11 +8,14 @@ import { VoxButton } from '@/components/Button'
 
 import { Chip } from '@/components'
 import { declarationsValues } from '@/services/adherents/constants'
-import { useAdherentElect, useMutationToggleAdherentElectExemptFromCotisation } from '@/services/adherents/hook'
+import { useAdherentElect, useMutationDeleteAdherentElectMandate, useMutationToggleAdherentElectExemptFromCotisation } from '@/services/adherents/hook'
 import type { RestAdherentElectMandate, RestAdherentElectPayment, RestAdherentElectResponse, RestAdherentTag } from '@/services/adherents/schema'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { formatShortDate } from '@/utils/DateFormatter'
 import { FEATURES } from '@/utils/Scopes'
+
+import DeleteMandateConfirmModal from './MandateDeleteConfirmModal'
+import MandateFormModal from './MandateFormModal'
 
 const SectionCard = styled(YStack, {
   backgroundColor: '$textSurface',
@@ -71,7 +74,13 @@ function ElectPaymentItem({ payment }: { payment: RestAdherentElectPayment }) {
   )
 }
 
-function MandateItem({ mandate }: { mandate: RestAdherentElectMandate }) {
+interface MandateItemProps {
+  mandate: RestAdherentElectMandate
+  onEdit: (mandate: RestAdherentElectMandate) => void
+  onDelete: (mandate: RestAdherentElectMandate) => void
+}
+
+function MandateItem({ mandate, onEdit, onDelete }: MandateItemProps) {
   return (
     <YStack
       gap={12}
@@ -96,12 +105,10 @@ function MandateItem({ mandate }: { mandate: RestAdherentElectMandate }) {
         </XStack>
       </YStack>
       <XStack gap="$xsmall" alignItems="center">
-        {/* TODO: connecter « Modifier » à l'édition du mandat (API / formulaire) */}
-        <VoxButton size="xs" theme="gray" variant="outlined" iconLeft={Pencil} disabled>
+        <VoxButton size="xs" theme="gray" variant="outlined" iconLeft={Pencil} onPress={() => onEdit(mandate)}>
           Modifier
         </VoxButton>
-        {/* TODO: connecter la suppression du mandat (confirmation + API) */}
-        <VoxButton size="xxs" theme="orange" variant="text" iconLeft={Trash2} disabled />
+        <VoxButton size="xxs" theme="orange" variant="text" iconLeft={Trash2} onPress={() => onDelete(mandate)} />
       </XStack>
       {mandate.delegation ? <Text.SM color="$textSecondary">Délégation: {mandate.delegation}</Text.SM> : null}
     </YStack>
@@ -126,7 +133,7 @@ function MandatsTagsSection({ isLoading, canSeeElectedRepresentative, electManda
     )
   }
 
-  if (!canSeeElectedRepresentative && electMandatesList.length === 0 && electTagsList.length === 0) {
+  if (electMandatesList.length === 0 && electTagsList.length === 0) {
     return <Text.SM color="$textDisabled">Aucun mandat associé.</Text.SM>
   }
 
@@ -184,9 +191,9 @@ function DeclaredMandatesSection({ isLoading, declaredMandates, declarationLabel
       <XStack gap="$small" flexWrap="wrap">
         {declaredMandates.map((mandate) => (
           <Chip key={mandate} theme="orange" outlined>
-            <Text.MD color="$color5" semibold>
+            <Text.SM color="$color5" semibold>
               {declarationLabels.get(mandate) ?? mandate}
-            </Text.MD>
+            </Text.SM>
           </Chip>
         ))}
       </XStack>
@@ -198,9 +205,43 @@ interface CurrentAndClosedMandatesSectionProps {
   isLoading: boolean
   activeMandates: RestAdherentElectMandate[]
   closedMandates: RestAdherentElectMandate[]
+  adherentUuid: string
+  scope: string
 }
 
-function CurrentAndClosedMandatesSection({ isLoading, activeMandates, closedMandates }: CurrentAndClosedMandatesSectionProps) {
+function CurrentAndClosedMandatesSection({ isLoading, activeMandates, closedMandates, adherentUuid, scope }: CurrentAndClosedMandatesSectionProps) {
+  const [formOpen, setFormOpen] = useState(false)
+  const [editingMandate, setEditingMandate] = useState<RestAdherentElectMandate | null>(null)
+  const [deletingMandate, setDeletingMandate] = useState<RestAdherentElectMandate | null>(null)
+
+  const { mutateAsync: deleteMandate, isPending: isDeleting } = useMutationDeleteAdherentElectMandate({ adherentUuid, scope })
+
+  const handleAdd = useCallback(() => {
+    setEditingMandate(null)
+    setFormOpen(true)
+  }, [])
+
+  const handleEdit = useCallback((mandate: RestAdherentElectMandate) => {
+    setEditingMandate(mandate)
+    setFormOpen(true)
+  }, [])
+
+  const handleDelete = useCallback((mandate: RestAdherentElectMandate) => {
+    setDeletingMandate(mandate)
+  }, [])
+
+  const handleConfirmDelete = useCallback(() => {
+    if (!deletingMandate) return
+    deleteMandate({ mandateUuid: deletingMandate.uuid }).then(() => {
+      setDeletingMandate(null)
+    })
+  }, [deletingMandate, deleteMandate])
+
+  const handleCloseForm = useCallback(() => {
+    setFormOpen(false)
+    setEditingMandate(null)
+  }, [])
+
   if (isLoading) {
     return (
       <SectionCard>
@@ -212,42 +253,57 @@ function CurrentAndClosedMandatesSection({ isLoading, activeMandates, closedMand
   }
 
   return (
-    <SectionCard>
-      <YStack gap="$small">
-        <Text.MD semibold>Mandats en cours</Text.MD>
-        <Text.SM color="$textPrimary">
-          <Text.SM semibold>En déclarant des mandats à cet adhérent, vous en ferez un élu dans votre base de données.</Text.SM>
-          <Text.SM> Celui-ci sera alors invité à déclarer son indemnité d'élu et selon le montant, cotiser auprès du parti.</Text.SM>
-        </Text.SM>
-      </YStack>
-      {/* TODO: connecter « Ajouter un mandat » (création / navigation vers le flux métier) */}
-      <VoxButton size="sm" variant="outlined" iconLeft={Plus} theme="blue" disabled>
-        Ajouter un mandat
-      </VoxButton>
-
-      {activeMandates.length === 0 ? (
-        <Text.MD color="$textDisabled">Aucun mandat en cours.</Text.MD>
-      ) : (
+    <>
+      <SectionCard>
         <YStack gap="$small">
-          {activeMandates.map((mandate) => (
-            <MandateItem key={mandate.uuid} mandate={mandate} />
-          ))}
+          <Text.MD semibold>Mandats en cours</Text.MD>
+          <Text.SM color="$textPrimary">
+            <Text.SM semibold>En déclarant des mandats à cet adhérent, vous en ferez un élu dans votre base de données.</Text.SM>
+            <Text.SM> Celui-ci sera alors invité à déclarer son indemnité d'élu et selon le montant, cotiser auprès du parti.</Text.SM>
+          </Text.SM>
         </YStack>
-      )}
+        <VoxButton size="sm" variant="outlined" iconLeft={Plus} theme="blue" onPress={handleAdd}>
+          Ajouter un mandat
+        </VoxButton>
 
-      {closedMandates.length > 0 && (
-        <>
-          <Text.MD semibold mt="$small">
-            Mandats fermés
-          </Text.MD>
+        {activeMandates.length === 0 ? null : (
           <YStack gap="$small">
-            {closedMandates.map((mandate) => (
-              <MandateItem key={mandate.uuid} mandate={mandate} />
+            {activeMandates.map((mandate) => (
+              <MandateItem key={mandate.uuid} mandate={mandate} onEdit={handleEdit} onDelete={handleDelete} />
             ))}
           </YStack>
-        </>
-      )}
-    </SectionCard>
+        )}
+
+        {closedMandates.length > 0 && (
+          <>
+            <Text.MD semibold mt="$small">
+              Mandats fermés
+            </Text.MD>
+            <YStack gap="$small">
+              {closedMandates.map((mandate) => (
+                <MandateItem key={mandate.uuid} mandate={mandate} onEdit={handleEdit} onDelete={handleDelete} />
+              ))}
+            </YStack>
+          </>
+        )}
+      </SectionCard>
+
+      <MandateFormModal
+        key={editingMandate?.uuid ?? 'new'}
+        open={formOpen}
+        onClose={handleCloseForm}
+        adherentUuid={adherentUuid}
+        scope={scope}
+        mandate={editingMandate}
+      />
+
+      <DeleteMandateConfirmModal
+        open={Boolean(deletingMandate)}
+        onClose={() => setDeletingMandate(null)}
+        onConfirm={handleConfirmDelete}
+        isPending={isDeleting}
+      />
+    </>
   )
 }
 
@@ -282,13 +338,6 @@ function RevenueDeclarationSection({ isLoading, data, isTogglingExempt, onToggle
           <Text.MD semibold>{data?.contribution_amount != null ? `${data.contribution_amount} €` : '—'}</Text.MD>
         </YStack>
       </XStack>
-
-      {data?.contribution_status === 'not_eligible' && (
-        <XStack gap="$xsmall" alignItems="center">
-          <CircleAlert size={12} color="$orange5" />
-          <Text.SM color="$orange5">À jour de cotisation élu</Text.SM>
-        </XStack>
-      )}
 
       <Text.SM color="$textPrimary">
         <Text.SM semibold>Vous pouvez exonérer de cotisation les élus locaux.</Text.SM> Ils ne vous seront donc pas redevables de leur cotisation d'élu.
@@ -397,7 +446,13 @@ export function ElectMandatTab({
       {canSeeElectedRepresentative && (
         <>
           <DeclaredMandatesSection isLoading={isLoading} declaredMandates={declaredMandates} declarationLabels={declarationLabels} />
-          <CurrentAndClosedMandatesSection isLoading={isLoading} activeMandates={activeMandates} closedMandates={closedMandates} />
+          <CurrentAndClosedMandatesSection
+            isLoading={isLoading}
+            activeMandates={activeMandates}
+            closedMandates={closedMandates}
+            adherentUuid={uuid}
+            scope={scope}
+          />
           <RevenueDeclarationSection isLoading={isLoading} data={data} isTogglingExempt={isTogglingExempt} onToggleExempt={toggleExempt} />
           <ElectPaymentsSection isLoading={isLoading} payments={payments} />
         </>
