@@ -123,6 +123,15 @@ export const deleteMessage = (props: { messageId: string; scope: string }) =>
     type: 'private',
   })()
 
+export const duplicatePublication = (uuid: string, userScope: string) =>
+  api({
+    method: 'post',
+    path: `/api/v3/adherent_messages/${uuid}/duplicate?scope=${userScope}`,
+    requestSchema: z.void(),
+    responseSchema: schemas.RestDuplicateMessageResponseSchema,
+    type: 'private',
+  })()
+
 export const getAvailableVariables = (props: { scope?: string }) =>
   api({
     method: 'get',

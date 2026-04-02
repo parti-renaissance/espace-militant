@@ -7,6 +7,8 @@ import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
 
 import { RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
 
+export type DuplicatePublicationVariables = { uuid: string; scope: string }
+
 const toSnake = (s: string) =>
   s
     .replace(/([A-Z])/g, '_$1')
@@ -169,18 +171,6 @@ export const usePaginatedMessages = (scope: string, status?: 'draft' | 'sent') =
   })
 }
 
-export const usePaginatedMessagesSuspense = (scope: string, status?: 'draft' | 'sent') => {
-  return useSuspenseInfiniteQuery({
-    queryKey: ['messages', scope, status],
-    queryFn: ({ pageParam = 1 }) => api.getMessages({ scope, page: pageParam, status, orderCreatedAt: 'desc' }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => (lastPage.metadata.current_page < lastPage.metadata.last_page ? lastPage.metadata.current_page + 1 : undefined),
-    getPreviousPageParam: (firstPage) => (firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined),
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-  })
-}
-
 export const useGetMessageCountRecipients = (props: { messageId?: string; scope?: string; enabled?: boolean }) => {
   return useQuery({
     queryKey: ['message-count-recipients', props.messageId],
@@ -235,6 +225,27 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
     },
     onError: (error) => {
       toast.show('Erreur', { message: 'Une erreur est survenue lors de la mise à jour des filtres', type: 'error' })
+      return error
+    },
+  })
+}
+
+export const useDuplicatePublication = () => {
+  const toast = useToastController()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ uuid, scope }: DuplicatePublicationVariables) => api.duplicatePublication(uuid, scope),
+    onSuccess: (_data, variables) => {
+      queryClient.resetQueries({
+        queryKey: ['messages', variables.scope],
+      })
+    },
+    onError: (error) => {
+      if (error instanceof GenericResponseError) {
+        toast.show('Erreur', { message: error.message, type: 'error' })
+      } else {
+        toast.show('Erreur', { message: 'Impossible de dupliquer cette publication', type: 'error' })
+      }
       return error
     },
   })
