@@ -1,14 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { QueryClient } from '@tanstack/react-query'
 
 import * as api from '@/services/adherents/api'
+import { declarationsValues } from '@/services/adherents/constants'
 import type {
   RestAdherentDetail,
   RestAdherentDonation,
+  RestAdherentElectMandate,
   RestAdherentElectMandateUpsertPayload,
   RestAdherentElectMandateUpsertResponse,
   RestAdherentElectResponse,
   RestAdherentElectToggleExemptPayload,
   RestAdherentListItem,
+  RestAdherentListResponse,
   RestAdherentSensitiveData,
   RestAdherentSensitiveRequest,
 } from '@/services/adherents/schema'
@@ -30,6 +34,57 @@ export const adherentKeys = {
   sensitive: (type: RestAdherentSensitiveRequest['type'], uuid: string | undefined) => [...adherentKeys.all, 'sensitive', type, uuid] as const,
   donations: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'donations', uuid, scope] as const,
   elect: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'elect', uuid, scope] as const,
+}
+
+const getMandateTypeLabel = (mandateType: string): string =>
+  declarationsValues.find((d) => d.value === mandateType)?.label ?? mandateType
+
+const responseToElectMandate = (response: RestAdherentElectMandateUpsertResponse): RestAdherentElectMandate => ({
+  mandate_type: response.mandate_type,
+  mandate_type_label: getMandateTypeLabel(response.mandate_type),
+  delegation: response.delegation,
+  zone: response.zone,
+  begin_at: response.begin_at,
+  finish_at: response.finish_at,
+  uuid: response.uuid,
+  created_at: new Date().toISOString(),
+})
+
+/**
+ * After a mandate mutation, update the adherent list cache so that
+ * `elect_mandates` reflects the change immediately — the list endpoint
+ * is refreshed asynchronously by the backend so an invalidateQueries
+ * would still return stale data.
+ */
+const syncAdherentListMandates = (
+  queryClient: QueryClient,
+  adherentUuid: string | undefined,
+  scope: string | undefined,
+  getUpdatedMandates: (current: RestAdherentElectMandate[]) => RestAdherentElectMandate[],
+) => {
+  if (!adherentUuid) return
+
+  const electData = queryClient.getQueryData<RestAdherentElectResponse>(adherentKeys.elect(adherentUuid, scope))
+  if (!electData) return
+
+  const updatedMandates = getUpdatedMandates(electData.elect_mandates)
+
+  const seen = new Set<string>()
+  const activeSummary: { code: string; label: string }[] = []
+  for (const m of updatedMandates) {
+    if (m.finish_at && new Date(m.finish_at) < new Date()) continue
+    if (seen.has(m.mandate_type)) continue
+    seen.add(m.mandate_type)
+    activeSummary.push({ code: m.mandate_type, label: m.mandate_type_label })
+  }
+
+  queryClient.setQueriesData<RestAdherentListResponse>({ queryKey: [...adherentKeys.all, 'list'] }, (old) => {
+    if (!old) return old
+    return {
+      ...old,
+      items: old.items.map((item) => (item.uuid === adherentUuid ? { ...item, elect_mandates: activeSummary } : item)),
+    }
+  })
 }
 
 export type UseAdherentsPageParams = {
@@ -159,7 +214,8 @@ export const useMutationCreateAdherentElectMandate = ({ adherentUuid, scope }: U
       const safeScope = requireParam(scope, 'scope')
       return api.postAdherentElectMandate({ scope: safeScope, payload })
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      syncAdherentListMandates(queryClient, adherentUuid, scope, (current) => [...current, responseToElectMandate(data)])
       queryClient.invalidateQueries({ queryKey: adherentKeys.elect(adherentUuid, scope) })
     },
   })
@@ -172,7 +228,10 @@ export const useMutationUpdateAdherentElectMandate = ({ adherentUuid, scope }: U
       const safeScope = requireParam(scope, 'scope')
       return api.putAdherentElectMandate({ mandateUuid, scope: safeScope, payload })
     },
-    onSuccess: () => {
+    onSuccess: (data, { mandateUuid }) => {
+      syncAdherentListMandates(queryClient, adherentUuid, scope, (current) =>
+        current.map((m) => (m.uuid === mandateUuid ? responseToElectMandate(data) : m)),
+      )
       queryClient.invalidateQueries({ queryKey: adherentKeys.elect(adherentUuid, scope) })
     },
   })
@@ -185,7 +244,8 @@ export const useMutationDeleteAdherentElectMandate = ({ adherentUuid, scope }: U
       const safeScope = requireParam(scope, 'scope')
       return api.deleteAdherentElectMandate({ mandateUuid, scope: safeScope })
     },
-    onSuccess: () => {
+    onSuccess: (_, { mandateUuid }) => {
+      syncAdherentListMandates(queryClient, adherentUuid, scope, (current) => current.filter((m) => m.uuid !== mandateUuid))
       queryClient.invalidateQueries({ queryKey: adherentKeys.elect(adherentUuid, scope) })
     },
   })
