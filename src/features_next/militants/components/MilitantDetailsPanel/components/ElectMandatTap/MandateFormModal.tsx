@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia, XStack } from 'tamagui'
-import { X } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import * as z from 'zod'
@@ -11,8 +11,7 @@ import Switch from '@/components/base/SwitchV2/SwitchV2'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { GlobalSearch, ZoneProvider } from '@/components/GlobalSearch'
-import { VoxHeader } from '@/components/Header/Header'
-import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
+import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import DateInterval from '@/features_next/publications/components/Editor/RenderFields/SelectFilters/AdvancedFilters/DateInterval'
 
@@ -44,6 +43,8 @@ export interface MandateFormModalProps {
 
 export default function MandateFormModal({ open, onClose, adherentUuid, scope, mandate }: MandateFormModalProps) {
   const media = useMedia()
+  const safeAreaInsets = useSafeAreaInsets()
+  const bottomSafeAreaHeight = safeAreaInsets.bottom
   const isEditing = Boolean(mandate)
 
   const { control, handleSubmit, reset, formState, setValue, clearErrors } = useForm<MandateFormValues>({
@@ -104,23 +105,18 @@ export default function MandateFormModal({ open, onClose, adherentUuid, scope, m
   })
 
   return (
-    <ModalOrPageBase
-      open={open}
-      onClose={handleClose}
-      header={
-        <VoxHeader justifyContent="space-between">
-          <VoxHeader.Title>{isEditing ? 'Modifier le mandat' : 'Ajouter un mandat'}</VoxHeader.Title>
-          <VoxHeader.LeftButton onPress={handleClose} icon={X} />
-        </VoxHeader>
-      }
-    >
-      <VoxCard width={media.gtMd ? 500 : undefined} shadowColor={media.md ? 'transparent' : undefined}>
+    <ModalOrBottomSheet open={open} onClose={handleClose} allowDrag>
+      <VoxCard
+        width={media.gtMd ? 500 : undefined}
+        shadowColor={media.md ? 'transparent' : undefined}
+        shadowOpacity={media.md ? 0 : undefined}
+        borderWidth={media.md ? 0 : undefined}
+        paddingBottom={bottomSafeAreaHeight}
+      >
         <VoxCard.Content>
-          {media.gtMd ? (
-            <XStack justifyContent="space-between" alignItems="flex-start">
-              <Text.LG>{isEditing ? 'Modifier le mandat' : 'Ajouter un mandat'}</Text.LG>
-            </XStack>
-          ) : null}
+          <XStack justifyContent="space-between" alignItems="flex-start">
+            <Text.LG>{isEditing ? 'Modifier le mandat' : 'Ajouter un mandat'}</Text.LG>
+          </XStack>
 
           <Controller
             control={control}
@@ -206,6 +202,6 @@ export default function MandateFormModal({ open, onClose, adherentUuid, scope, m
           </XStack>
         </VoxCard.Content>
       </VoxCard>
-    </ModalOrPageBase>
+    </ModalOrBottomSheet>
   )
 }
