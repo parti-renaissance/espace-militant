@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { useMedia, XStack } from 'tamagui'
 import { X } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import * as z from 'zod'
 
 import Input from '@/components/base/Input/Input'
@@ -46,12 +46,7 @@ export default function MandateFormModal({ open, onClose, adherentUuid, scope, m
   const media = useMedia()
   const isEditing = Boolean(mandate)
 
-  const zoneDefaultValue = useMemo(() => {
-    if (!mandate?.zone) return undefined
-    return { value: mandate.zone.uuid, label: `${mandate.zone.name} (${mandate.zone.code})` }
-  }, [mandate?.zone])
-
-  const { control, handleSubmit, reset, formState, watch, setValue } = useForm<MandateFormValues>({
+  const { control, handleSubmit, reset, formState, setValue, clearErrors } = useForm<MandateFormValues>({
     defaultValues: {
       mandate_type: mandate?.mandate_type ?? '',
       zone: mandate?.zone.uuid ?? '',
@@ -66,8 +61,15 @@ export default function MandateFormModal({ open, onClose, adherentUuid, scope, m
   })
 
   const { isValid } = formState
-  const datesValue = watch('dates')
-  const mandateTypeValue = watch('mandate_type')
+  const [mandateTypeValue, zoneValue, datesValue] = useWatch({
+    control,
+    name: ['mandate_type', 'zone', 'dates'],
+  })
+
+  const zoneDefaultValue =
+    zoneValue && mandate?.zone && mandate.zone.uuid === zoneValue
+      ? { value: mandate.zone.uuid, label: `${mandate.zone.name} (${mandate.zone.code})` }
+      : undefined
 
   const zoneProvider = useMemo(() => {
     return new ZoneProvider(mandateTypeValue ? { forMandateType: mandateTypeValue } : undefined)
@@ -128,7 +130,14 @@ export default function MandateFormModal({ open, onClose, adherentUuid, scope, m
                 label="Type de mandat"
                 value={field.value}
                 options={mandateTypeOptions}
-                onChange={(v) => field.onChange(v ?? '')}
+                onChange={(v) => {
+                  const next = v ?? ''
+                  if (next !== field.value) {
+                    setValue('zone', '', { shouldValidate: false, shouldDirty: true })
+                    clearErrors('zone')
+                  }
+                  field.onChange(next)
+                }}
                 onBlur={field.onBlur}
                 error={fieldState.error?.message}
                 color="gray"
@@ -143,6 +152,7 @@ export default function MandateFormModal({ open, onClose, adherentUuid, scope, m
             name="zone"
             render={({ field, fieldState }) => (
               <GlobalSearch
+                key={mandateTypeValue}
                 provider={zoneProvider}
                 defaultValue={zoneDefaultValue}
                 placeholder="Rechercher une zone..."
