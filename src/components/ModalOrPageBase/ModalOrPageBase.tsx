@@ -48,11 +48,7 @@ export default function ModalOrPageBase({
   const breakpointKey = modalBreakpoint ?? 'gtMd'
   const isModal = breakpointKey in viewport ? Boolean(viewport[breakpointKey as keyof typeof viewport]) : viewport.gtMd
   const authContextValue = React.useContext(AuthContext)
-  const modalContent = authContextValue ? (
-    <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>
-  ) : (
-    children
-  )
+  const modalContent = authContextValue ? <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider> : children
 
   if (isModal) {
     return (
