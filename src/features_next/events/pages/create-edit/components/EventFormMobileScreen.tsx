@@ -18,7 +18,6 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import EventHandleActions from '../../../components/EventHandleActions'
 import { useEventFormContext } from '../context'
-import { EventFormData } from '../schema'
 import DescriptionInput from './DescriptionInput'
 import EventDatesField from './EventDatesField'
 import EventScopeSelect from './EventScopeSelect'
@@ -33,7 +32,6 @@ export default function EventFormMobileScreen() {
     visibilityOptions,
     catOptions,
     mode,
-    setMode,
     isPending,
     isUploadImagePending,
     isUploadDeletePending,
@@ -46,6 +44,7 @@ export default function EventFormMobileScreen() {
     handleOnChangeFinishAt,
     ConfirmAlert,
     isAgoraLeader,
+    isAgoraScope,
   } = useEventFormContext()
 
   const globalPending = isPending || isUploadImagePending || isUploadDeletePending
@@ -141,7 +140,6 @@ export default function EventFormMobileScreen() {
                         size="sm"
                         color="gray"
                         label="Catégorie"
-                        disabled={isAgoraLeader}
                         value={field.value}
                         options={catOptions}
                         onChange={field.onChange}
@@ -172,13 +170,10 @@ export default function EventFormMobileScreen() {
                         variant="soft"
                         switchMode
                         options={[
-                          { value: 'meeting', label: 'En Présentiel', disabled: isAgoraLeader },
+                          { value: 'meeting', label: 'En Présentiel', disabled: isAgoraScope },
                           { value: 'online', label: 'En ligne' },
                         ]}
-                        onChange={(x) => {
-                          field.onChange(x)
-                          setMode(x as EventFormData['mode'])
-                        }}
+                        onChange={field.onChange}
                         value={field.value}
                       />
                     )
