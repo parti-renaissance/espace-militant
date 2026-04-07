@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { router, useNavigation } from 'expo-router'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -49,6 +49,9 @@ export const formatCategorie = (cat: EventCategory): SelectOption<string> => {
   }
 }
 
+/** Seule catégorie proposée en portée Agora (aligné produit / API). */
+const AGORA_EVENT_CATEGORY_SLUG = 'reunion-d-equipe' as const
+
 const roundMinutesToNextDecimal = (date: Date) => {
   // Remove seconds and milliseconds for precision
   const cleanDate = setMilliseconds(setSeconds(date, 0), 0)
@@ -80,7 +83,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   }, [edit, data])
 
   const categories = useSuspenseGetCategories()
-  const catOptions = categories.data.map(formatCategorie)
+  const baseCatOptions = useMemo(() => categories.data.map(formatCategorie), [categories.data])
   const cleanDate = roundMinutesToNextDecimal(new Date())
   const startDate = addHours(cleanDate, 1)
   const [mode, setMode] = useState(edit?.mode ?? 'meeting')
@@ -96,9 +99,13 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const editEventScope = edit?.organizer?.scope ?? 'national'
 
+  const initialScopeCode = edit ? (edit.organizer?.scope ?? 'national') : (scopes.data?.default?.code ?? 'national')
+  const defaultVisibilityForScope =
+    edit?.visibility ?? (String(initialScopeCode).startsWith('agora_') ? 'invitation_agora' : 'public')
+
   const defaultValues = {
     isPastEvent,
-    scope: edit ? (edit.organizer?.scope ?? 'national') : (scopes.data?.default?.code ?? 'national'),
+    scope: initialScopeCode,
     name: edit?.name ?? '',
     image: edit?.image,
     category: edit?.category?.slug ?? '',
@@ -122,7 +129,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           postal_code: edit.post_address.postal_code ?? undefined,
         }
       : undefined,
-    visibility: edit?.visibility ?? 'public',
+    visibility: defaultVisibilityForScope,
     live_url: edit?.live_url ?? undefined,
     send_invitation_email: edit ? undefined : true,
   } as const
@@ -165,27 +172,60 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     name: 'scope',
   })
 
+  /** Mémoïsé une fois par `selectedScope` : réutilisé pour le select et pour l’effet de cohérence (pas d’appels redondés à `getVisibilityOptions` dans l’effet). */
+  const visibilityOptions = useMemo(() => getVisibilityOptions(selectedScope), [selectedScope])
+
+  const catOptions: SelectOption<string>[] = useMemo(() => {
+    if (!selectedScope?.startsWith('agora_')) {
+      return baseCatOptions
+    }
+    const reunion = baseCatOptions.find((o) => o.value === AGORA_EVENT_CATEGORY_SLUG)
+    if (reunion) {
+      return [reunion]
+    }
+    if (typeof __DEV__ !== 'undefined' && __DEV__) {
+      ErrorMonitor.log('Event form: catégorie Agora absente des données API', { slug: AGORA_EVENT_CATEGORY_SLUG })
+    }
+    return [{ value: AGORA_EVENT_CATEGORY_SLUG, label: 'Réunion d’équipe' }]
+  }, [baseCatOptions, selectedScope])
+
   const isAgoraLeader = useMemo(
     () => selectedScope === UserScopesEnum.AgoraPresident || selectedScope === UserScopesEnum.AgoraGeneralSecretary,
     [selectedScope],
   )
 
-  const [prevIsAgoraLeader, setPrevIsAgoraLeader] = useState(isAgoraLeader)
-  if (isAgoraLeader !== prevIsAgoraLeader) {
-    setPrevIsAgoraLeader(isAgoraLeader)
-    if (isAgoraLeader) {
+  /**
+   * Synchronise visibilité / catégorie / mode avec la portée et le rôle (un seul effet pour limiter les allers-retours).
+   * Transition « leader » : même règle qu’avant — défauts appliqués seulement quand on devient leader, pas au montage si déjà leader.
+   */
+  const prevIsAgoraLeaderRef = useRef(isAgoraLeader)
+  useEffect(() => {
+    const scope = selectedScope
+    if (!scope) return
+
+    const allowedVisibility = visibilityOptions.map((o) => o.value)
+
+    if (isAgoraLeader && !prevIsAgoraLeaderRef.current) {
       setValue('mode', 'online')
-      setValue('category', 'reunion-d-equipe')
+      setValue('category', AGORA_EVENT_CATEGORY_SLUG)
       setValue('visibility', 'invitation_agora')
       setMode('online')
     }
-  }
-  if (!isAgoraLeader && edit?.visibility === 'invitation_agora') {
-    setValue('visibility', 'public')
-  }
+    prevIsAgoraLeaderRef.current = isAgoraLeader
 
-  const currentScope = useWatch({ control, name: 'scope' })
-  const visibilityOptions = useMemo(() => getVisibilityOptions(currentScope), [currentScope])
+    if (!isAgoraLeader && edit?.visibility === 'invitation_agora' && allowedVisibility.includes('public')) {
+      setValue('visibility', 'public', { shouldValidate: true })
+    }
+
+    const currentVisibility = getValues('visibility')
+    if (allowedVisibility.length > 0 && !allowedVisibility.includes(currentVisibility)) {
+      setValue('visibility', allowedVisibility[0] as EventFormData['visibility'], { shouldValidate: true })
+    }
+
+    if (scope.startsWith('agora_') && getValues('category') !== AGORA_EVENT_CATEGORY_SLUG) {
+      setValue('category', AGORA_EVENT_CATEGORY_SLUG, { shouldValidate: true })
+    }
+  }, [edit, getValues, isAgoraLeader, selectedScope, setMode, setValue, visibilityOptions])
   const agoraUuid = useMemo(() => {
     return scopes.data?.list.find((x) => x.code === selectedScope)?.attributes?.agoras?.[0]?.uuid ?? null
   }, [selectedScope, scopes.data])

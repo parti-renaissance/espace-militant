@@ -1,11 +1,13 @@
 import React, { ComponentProps, ReactNode } from 'react'
 import { ImageRequireSource } from 'react-native'
 import Markdown from 'react-native-markdown-display'
+import { Anchor, Separator, Stack, StackProps, styled, useTheme, withStaticProperties, XStack, YStack, ZStack } from 'tamagui'
+import { CalendarDays, CheckCircle, ExternalLink, LockKeyhole, MapPin, Ticket, UserCheck, Users, Video } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import Chip from '@/components/Chip/Chip'
 import ProfilePicture from '@/components/ProfilePicture'
-import { CalendarDays, CheckCircle, ExternalLink, LockKeyhole, MapPin, Ticket, UserCheck, Users, Video } from '@tamagui/lucide-icons'
-import { Anchor, Separator, Stack, StackProps, styled, useTheme, withStaticProperties, XStack, YStack, ZStack } from 'tamagui'
+
 import AutoSizeImage from '../AutoSizeImage'
 import { getFormatedVoxCardDate } from '../utils'
 
@@ -39,7 +41,9 @@ export type VoxCardFrameProps = ComponentProps<typeof CardFrame>
 export const VoxCardFrame = CardFrame.styleable(({ children, ...props }: VoxCardFrameProps, ref) => {
   return (
     <CardFrame {...props} ref={ref}>
-      <YStack gap="$medium" flex={1}>{children}</YStack>
+      <YStack gap="$medium" flex={1}>
+        {children}
+      </YStack>
     </CardFrame>
   )
 })
@@ -261,11 +265,7 @@ const VoxCardVisio = ({ url, asLink = true }: VoxCardVisioProps) => {
     <XStack gap="$small" alignItems="center">
       <Video size={16} color="$textPrimary" />
       <XStack gap="$xsmall" alignItems="center">
-        <Text.SM
-          medium
-          color={isLink ? '$blue6' : '$textPrimary'}
-          hoverStyle={isLink ? { color: '$blue7' } : undefined}
-        >
+        <Text.SM medium color={isLink ? '$blue6' : '$textPrimary'} hoverStyle={isLink ? { color: '$blue7' } : undefined}>
           Visioconférence
         </Text.SM>
         {isLink && <ExternalLink size={12} color="$blue6" />}
@@ -274,12 +274,7 @@ const VoxCardVisio = ({ url, asLink = true }: VoxCardVisioProps) => {
   )
 
   return isLink ? (
-    <Anchor
-      href={url!}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{ textDecorationLine: 'none', lineHeight: 16 }}
-    >
+    <Anchor href={url!} target="_blank" rel="noopener noreferrer" style={{ textDecorationLine: 'none', lineHeight: 16 }}>
       {Content}
     </Anchor>
   ) : (
@@ -303,7 +298,7 @@ const VoxCardSection = ({ title, ...props }: StackProps & { title: string }) => 
 
 const VoxCardSeparator = (props: StackProps) => <Separator {...props} borderColor={props.backgroundColor ?? '$textOutline32'} borderRadius={1} />
 
-const VoxCardAdhLock = (props?: { lock?: boolean; due?: boolean; isPrivate?: boolean; isInvitationAgora?: boolean; }) => {
+const VoxCardAdhLock = (props?: { lock?: boolean; due?: boolean; isPrivate?: boolean; isInvitationAgora?: boolean }) => {
   const { lock = true, due = false, isPrivate = false, isInvitationAgora = false } = props ?? {}
 
   const color = isInvitationAgora ? '$orange5' : isPrivate ? '$gray5' : '$yellow5'

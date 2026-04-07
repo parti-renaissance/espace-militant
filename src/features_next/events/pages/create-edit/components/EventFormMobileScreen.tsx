@@ -141,7 +141,6 @@ export default function EventFormMobileScreen() {
                         size="sm"
                         color="gray"
                         label="Catégorie"
-                        disabled={isAgoraLeader}
                         value={field.value}
                         options={catOptions}
                         onChange={field.onChange}
