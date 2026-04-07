@@ -31,7 +31,8 @@ export default {
         borderBottomWidth: 0,
       },
       alone: {
-        borderRadius: 0,
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
         borderBottomRightRadius: 16,
         borderBottomLeftRadius: 16,
       },

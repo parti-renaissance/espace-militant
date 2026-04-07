@@ -39,6 +39,8 @@ export const ImageRenderer = ({
 
   if (!data.content) return null
   const { width, height, url, link_url } = data.content
+  const safeLinkUrl = typeof link_url === 'string' ? link_url.trim() : ''
+  const isClickable = safeLinkUrl.length > 0
   const dynStyle = useMemo(
     () => ({
       aspectRatio: width / height,
@@ -47,13 +49,13 @@ export const ImageRenderer = ({
   )
 
   const handlePress = async () => {
-    if (link_url) {
+    if (isClickable) {
       if (allowHits) {
         try {
           trackClick({
             object_type: 'publication',
             object_id: publicationUuid,
-            target_url: link_url,
+            target_url: safeLinkUrl,
             button_name: 'Image',
           })
         } catch (error) {
@@ -65,7 +67,7 @@ export const ImageRenderer = ({
         }
       }
 
-      await handleLinkPress(link_url, undefined, 'Image')
+      await handleLinkPress(safeLinkUrl, undefined, 'Image')
     }
   }
 
@@ -80,19 +82,23 @@ export const ImageRenderer = ({
         <View
           position="relative"
           onMouseEnter={
-            isWeb && link_url
-              ? () => { overlayOpacity.value = withTiming(1, OVERLAY_ANIMATION) }
+            isWeb && isClickable
+              ? () => {
+                  overlayOpacity.value = withTiming(1, OVERLAY_ANIMATION)
+                }
               : undefined
           }
           onMouseLeave={
-            isWeb && link_url
-              ? () => { overlayOpacity.value = withTiming(0, OVERLAY_ANIMATION) }
+            isWeb && isClickable
+              ? () => {
+                  overlayOpacity.value = withTiming(0, OVERLAY_ANIMATION)
+                }
               : undefined
           }
         >
           <Image contentFit={'cover'} source={url} style={[dynStyle, baseStyle as ImageStyle]} />
 
-          {isWeb && link_url && (
+          {isWeb && isClickable && (
             <Animated.View
               pointerEvents="none"
               style={[

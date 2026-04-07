@@ -1,6 +1,8 @@
-import { Images } from '@/assets/editor-icons'
-import { ToolbarItem } from '@10play/tentap-editor'
 import { Platform } from 'react-native'
+import { ToolbarItem } from '@10play/tentap-editor'
+
+import { Images } from '@/assets/editor-icons'
+
 import { PublicSans } from './PublicSans'
 
 export enum ToolbarContext {
@@ -9,13 +11,22 @@ export enum ToolbarContext {
   Heading,
 }
 
+export const HEADING_LAYOUT = {
+  1: { fontSize: 28, marginTop: 0, marginBottom: 16 },
+  2: { fontSize: 22, marginTop: 32, marginBottom: 12 },
+  3: { fontSize: 19, marginTop: 24, marginBottom: 8 },
+  4: { fontSize: 17, marginTop: 20, marginBottom: 8 },
+  5: { fontSize: 15, marginTop: 16, marginBottom: 6 },
+  6: { fontSize: 14, marginTop: 16, marginBottom: 6 },
+} as const
+
 export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] => {
   const baseItems: ToolbarItem[] = [
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.undo(),
+        () =>
+          editor.undo(),
       active: () => false,
       disabled: ({ editorState }) => !editorState.canUndo,
       image: () => Images.undo,
@@ -23,8 +34,8 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.redo(),
+        () =>
+          editor.redo(),
       active: () => false,
       disabled: ({ editorState }) => !editorState.canRedo,
       image: () => Images.redo,
@@ -32,8 +43,8 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.toggleBold(),
+        () =>
+          editor.toggleBold(),
       active: ({ editorState }) => editorState.isBoldActive,
       disabled: ({ editorState }) => !editorState.canToggleBold,
       image: () => Images.bold,
@@ -41,8 +52,8 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.toggleItalic(),
+        () =>
+          editor.toggleItalic(),
       active: ({ editorState }) => editorState.isItalicActive,
       disabled: ({ editorState }) => !editorState.canToggleItalic,
       image: () => Images.italic,
@@ -50,8 +61,8 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.toggleBulletList(),
+        () =>
+          editor.toggleBulletList(),
       active: ({ editorState }) => editorState.isBulletListActive,
       disabled: ({ editorState }) => !editorState.canToggleBulletList,
       image: () => Images.bulletList,
@@ -59,8 +70,8 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.toggleOrderedList(),
+        () =>
+          editor.toggleOrderedList(),
       active: ({ editorState }) => editorState.isOrderedListActive,
       disabled: ({ editorState }) => !editorState.canToggleOrderedList,
       image: () => Images.orderedList,
@@ -68,17 +79,29 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ setToolbarContext, editorState, editor }) =>
-          () => {
-            if (Platform.OS === 'android') {
-              setTimeout(() => {
-                editor.setSelection(
-                  editorState.selection.from,
-                  editorState.selection.to
-                )
-              })
-            }
-            setToolbarContext(ToolbarContext.Link)
-          },
+        () => {
+          if (Platform.OS === 'android') {
+            setTimeout(() => {
+              editor.setSelection(editorState.selection.from, editorState.selection.to)
+            })
+          }
+          setToolbarContext(ToolbarContext.Heading)
+        },
+      active: () => false,
+      disabled: ({ editorState }) => !editorState.canToggleHeading,
+      image: () => Images.Aa,
+    },
+    {
+      onPress:
+        ({ setToolbarContext, editorState, editor }) =>
+        () => {
+          if (Platform.OS === 'android') {
+            setTimeout(() => {
+              editor.setSelection(editorState.selection.from, editorState.selection.to)
+            })
+          }
+          setToolbarContext(ToolbarContext.Link)
+        },
       active: ({ editorState }) => editorState.isLinkActive,
       disabled: ({ editorState }) => !editorState.isLinkActive && !editorState.canSetLink,
       image: () => Images.link,
@@ -121,48 +144,56 @@ a {
   text-decoration: underline;
 }
 
-h1, h1 * {
-  font-size: 20px !important;
-  font-weight: 600;
-  margin: 0;
-}
-
 h1 strong, h1 b, h2 strong, h2 b, h3 strong, h3 b, h4 strong, h4 b, h5 strong, h5 b, h6 strong, h6 b {
   font-weight: bolder !important;
 }
 
-h2, h2 * {
-  font-size: 18px !important;
+h1, h1 * {
+  font-size: 28px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 0px 0 16px 0 !important;
+}
+
+h2, h2 * {
+  font-size: 22px !important;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 32px 0 12px 0 !important;
 }
 
 h3, h3 * {
-  font-size: 17px !important;
+  font-size: 19px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 24px 0 8px 0 !important;
 }
 
 h4, h4 * {
-  font-size: 16px !important;
+  font-size: 17px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 20px 0 8px 0 !important;
 }
 
 h5, h5 * {
   font-size: 15px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 16px 0 6px 0 !important;
 }
 
 h6, h6 * {
   font-size: 14px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 16px 0 6px 0 !important;
 }
 `
 
-export const CUSTOM_FONT_VIEW = (primary?: boolean) => customFontBase(primary) + `
+export const CUSTOM_FONT_VIEW = (primary?: boolean) =>
+  customFontBase(primary) +
+  `
 #root div .ProseMirror {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -198,38 +229,44 @@ h1 strong, h1 b, h2 strong, h2 b, h3 strong, h3 b, h4 strong, h4 b, h5 strong, h
 }
 
 h1, h1 * {
-  font-size: 20px !important;
+  font-size: 28px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 0px 0 16px 0 !important;
 }
 
 h2, h2 * {
-  font-size: 18px !important;
+  font-size: 22px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 32px 0 12px 0 !important;
 }
 
 h3, h3 * {
-  font-size: 17px !important;
+  font-size: 19px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 24px 0 8px 0 !important;
 }
 
 h4, h4 * {
-  font-size: 16px !important;
+  font-size: 17px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 20px 0 8px 0 !important;
 }
 
 h5, h5 * {
   font-size: 15px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 16px 0 6px 0 !important;
 }
 
 h6, h6 * {
   font-size: 14px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 16px 0 6px 0 !important;
 }
 `

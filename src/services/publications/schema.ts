@@ -209,7 +209,7 @@ export const RestGetMessageFiltersResponseSchema = z
     is_certified: z.boolean().nullable(),
     zone: RestMessageFilterZoneSchema.nullable(),
     is_committee_member: z.boolean().nullable(),
-    mandate_type: z.string().nullable(),
+    mandate_type: z.string().nullable().optional(),
     declared_mandate: z.string().nullable(),
     is_campus_registered: z.boolean().nullable(),
     donator_status: z.string().nullable(),
