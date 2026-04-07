@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
 import { router, useNavigation } from 'expo-router'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -86,7 +86,6 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const baseCatOptions = useMemo(() => categories.data.map(formatCategorie), [categories.data])
   const cleanDate = roundMinutesToNextDecimal(new Date())
   const startDate = addHours(cleanDate, 1)
-  const [mode, setMode] = useState(edit?.mode ?? 'meeting')
 
   const editMode = Boolean(edit)
   const isPastEvent = editMode && !!edit?.begin_at && isPast(edit.begin_at)
@@ -102,6 +101,8 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const initialScopeCode = edit ? (edit.organizer?.scope ?? 'national') : (scopes.data?.default?.code ?? 'national')
   const defaultVisibilityForScope =
     edit?.visibility ?? (String(initialScopeCode).startsWith('agora_') ? 'invitation_agora' : 'public')
+  /** Portée Agora : événements toujours « en ligne » (produit). */
+  const defaultModeForScope = String(initialScopeCode).startsWith('agora_') ? 'online' : (edit?.mode ?? 'meeting')
 
   const defaultValues = {
     isPastEvent,
@@ -118,7 +119,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     finish_at: edit?.finish_at ? new Date(edit.finish_at) : addHours(startDate, 1),
     time_zone: edit?.time_zone ?? 'Europe/Paris',
     capacity: edit?.capacity ?? undefined,
-    mode: edit?.mode ?? 'meeting',
+    mode: defaultModeForScope,
     visio_url: edit?.visio_url ?? undefined,
     post_address: edit?.post_address
       ? {
@@ -140,6 +141,9 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })
+
+  /** Dérivé du formulaire : évite un `useState` dupliqué et un `setMode` dans l’effet (règle set-state-in-effect). */
+  const mode = useWatch({ control, name: 'mode' })
 
   const handleOnChangeBeginAt = useCallback(
     (onChange: (y: Date) => void) => (x: Date) => {
@@ -194,9 +198,12 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     [selectedScope],
   )
 
+  const isAgoraScope = Boolean(selectedScope?.startsWith('agora_'))
+
   /**
    * Synchronise visibilité / catégorie / mode avec la portée et le rôle (un seul effet pour limiter les allers-retours).
-   * Transition « leader » : même règle qu’avant — défauts appliqués seulement quand on devient leader, pas au montage si déjà leader.
+   * Transition « leader » : catégorie + visibilité au passage non-leader → leader (pas au montage si déjà leader).
+   * Portée Agora : mode toujours « online », y compris après changement de portée ou si le formulaire était resté sur « meeting ».
    */
   const prevIsAgoraLeaderRef = useRef(isAgoraLeader)
   useEffect(() => {
@@ -206,10 +213,8 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     const allowedVisibility = visibilityOptions.map((o) => o.value)
 
     if (isAgoraLeader && !prevIsAgoraLeaderRef.current) {
-      setValue('mode', 'online')
       setValue('category', AGORA_EVENT_CATEGORY_SLUG)
       setValue('visibility', 'invitation_agora')
-      setMode('online')
     }
     prevIsAgoraLeaderRef.current = isAgoraLeader
 
@@ -225,7 +230,11 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     if (scope.startsWith('agora_') && getValues('category') !== AGORA_EVENT_CATEGORY_SLUG) {
       setValue('category', AGORA_EVENT_CATEGORY_SLUG, { shouldValidate: true })
     }
-  }, [edit, getValues, isAgoraLeader, selectedScope, setMode, setValue, visibilityOptions])
+
+    if (scope.startsWith('agora_') && getValues('mode') !== 'online') {
+      setValue('mode', 'online', { shouldValidate: true })
+    }
+  }, [edit, getValues, isAgoraLeader, selectedScope, setValue, visibilityOptions])
   const agoraUuid = useMemo(() => {
     return scopes.data?.list.find((x) => x.code === selectedScope)?.attributes?.agoras?.[0]?.uuid ?? null
   }, [selectedScope, scopes.data])
@@ -335,8 +344,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     isUploadDeletePending,
     scopeOptions,
     catOptions,
-    mode,
-    setMode,
+    mode: mode ?? (isAgoraScope ? 'online' : 'meeting'),
     visibilityOptions,
     navigation,
     editMode,
@@ -348,6 +356,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     handleOnChangeBeginAt,
     ConfirmAlert,
     isAgoraLeader,
+    isAgoraScope,
   }
 }
 
