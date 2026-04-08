@@ -8,7 +8,6 @@ import { PublicSans } from './PublicSans'
 export enum ToolbarContext {
   Main,
   Link,
-  Heading,
 }
 
 export const HEADING_LAYOUT = {
@@ -20,7 +19,42 @@ export const HEADING_LAYOUT = {
   6: { fontSize: 14, marginTop: 16, marginBottom: 8 },
 } as const
 
-export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] => {
+type GetToolbarItemsParams = {
+  onVariablesPress?: () => void
+  showHeadingOptions?: boolean
+  onHeadingPress?: () => void
+  onHeadingClose?: () => void
+}
+
+export const getToolbarItems = ({
+  onVariablesPress,
+  showHeadingOptions = false,
+  onHeadingPress,
+  onHeadingClose,
+}: GetToolbarItemsParams = {}): ToolbarItem[] => {
+  if (showHeadingOptions) {
+    const headingImages = [Images.h1, Images.h2, Images.h3, Images.h4] as const
+    return [
+      {
+        onPress: () => () => onHeadingClose?.(),
+        active: () => false,
+        disabled: () => false,
+        image: () => Images.close,
+      },
+      ...([1, 2, 3, 4] as const).map<ToolbarItem>((level) => ({
+        onPress:
+          ({ editor }) =>
+          () => {
+            editor.toggleHeading(level)
+            onHeadingClose?.()
+          },
+        active: ({ editorState }) => editorState.headingLevel === level,
+        disabled: ({ editorState }) => !editorState.canToggleHeading,
+        image: () => headingImages[level - 1],
+      })),
+    ]
+  }
+
   const baseItems: ToolbarItem[] = [
     {
       onPress:
@@ -78,14 +112,14 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     },
     {
       onPress:
-        ({ setToolbarContext, editorState, editor }) =>
+        ({ editorState, editor }) =>
         () => {
           if (Platform.OS === 'android') {
             setTimeout(() => {
               editor.setSelection(editorState.selection.from, editorState.selection.to)
             })
           }
-          setToolbarContext(ToolbarContext.Heading)
+          onHeadingPress?.()
         },
       active: () => false,
       disabled: ({ editorState }) => !editorState.canToggleHeading,
@@ -119,8 +153,6 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
 
   return baseItems
 }
-
-export const TOOLBAR_ITEMS: ToolbarItem[] = getToolbarItems()
 
 const customFontBase = (primary?: boolean) => `
 ${PublicSans}
