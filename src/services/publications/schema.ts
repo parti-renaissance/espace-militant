@@ -42,6 +42,13 @@ export type RestGetMessageContentResponse = z.infer<typeof RestGetMessageContent
 
 export type RestPostMessageResponse = z.infer<typeof RestPostMessageResponseSchema>
 
+/** Réponse du POST `/api/v3/adherent_messages/:uuid/duplicate` */
+export const RestDuplicateMessageResponseSchema = z.object({
+  uuid: z.string(),
+})
+
+export type RestDuplicateMessageResponse = z.infer<typeof RestDuplicateMessageResponseSchema>
+
 export const RestAvailableSenderThemeSchema = z.object({
   primary: z.string(),
   soft: z.string(),
@@ -202,7 +209,7 @@ export const RestGetMessageFiltersResponseSchema = z
     is_certified: z.boolean().nullable(),
     zone: RestMessageFilterZoneSchema.nullable(),
     is_committee_member: z.boolean().nullable(),
-    mandate_type: z.string().nullable(),
+    mandate_type: z.string().nullable().optional(),
     declared_mandate: z.string().nullable(),
     is_campus_registered: z.boolean().nullable(),
     donator_status: z.string().nullable(),

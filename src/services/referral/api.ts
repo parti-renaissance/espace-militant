@@ -1,8 +1,15 @@
+import z from 'zod'
+
 import { createRestPaginationSchema } from '@/services/common/schema'
 import { ReferralFormErrorThrower } from '@/services/referral/error'
-import { ReferralInviteRequestSchema, ReferralPreRegisterRequestSchema, ReferralSchema, ReferralStatisticsSchema, ReferralScoreboardSchema } from '@/services/referral/schema'
+import {
+  ReferralInviteRequestSchema,
+  ReferralPreRegisterRequestSchema,
+  ReferralSchema,
+  ReferralScoreboardSchema,
+  ReferralStatisticsSchema,
+} from '@/services/referral/schema'
 import { api } from '@/utils/api'
-import z from 'zod'
 
 export const referralServiceKey = 'referral'
 const base = '/api/v3/referrals'

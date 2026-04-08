@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { RefreshControl } from 'react-native'
-import { useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import { Eye, PieChart, Sparkle } from '@tamagui/lucide-icons'
 
@@ -31,11 +31,10 @@ interface PublicationContentProps {
 export function PublicationContent({ data, stats, filters, onRefreshStats, isRefreshingStats }: PublicationContentProps) {
   const params = useLocalSearchParams<{ congratulations?: string; section?: string }>()
   const media = useMedia()
-  const [showCongratulations, setShowCongratulations] = useState(false)
   const [activeSection, setActiveSection] = useState<'read' | 'stats'>('read')
   const statsSectionRef = useRef<HTMLDivElement>(null)
 
-  if (params.congratulations && !showCongratulations) setShowCongratulations(true)
+  const showCongratulations = Boolean(params.congratulations)
 
   if (params.section === 'stats' && stats && activeSection !== 'stats') {
     setActiveSection('stats')
@@ -58,7 +57,9 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
   }, [params.section, stats])
 
   const handleCloseCongratulations = () => {
-    setShowCongratulations(false)
+    if (params.congratulations) {
+      router.setParams({ congratulations: undefined })
+    }
   }
 
   return (

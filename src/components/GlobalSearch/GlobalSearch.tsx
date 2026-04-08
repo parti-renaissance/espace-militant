@@ -3,6 +3,7 @@ import { useDebounceValue, YStack } from 'tamagui'
 import { Search } from '@tamagui/lucide-icons'
 
 import Select from '@/components/base/Select/SelectV3'
+import { renderInlineHtml } from '@/utils/renderInlineHtml'
 
 import { GlobalSearchProps, SearchResult } from './types'
 
@@ -22,7 +23,7 @@ function GlobalSearch({
   nullable = false,
   helpText,
   ...rest
-}: Readonly<GlobalSearchProps>): JSX.Element {
+}: Readonly<GlobalSearchProps>): React.ReactElement {
   const [value, setValue] = useState<string>(() => {
     if (typeof defaultValue === 'string') return defaultValue
     if (defaultValue && typeof defaultValue === 'object') return defaultValue.value || ''
@@ -193,6 +194,7 @@ function GlobalSearch({
     }
     return undefined
   }, [value, nullable, defaultValue])
+  const renderedHelpText = useMemo(() => renderInlineHtml(helpText), [helpText])
 
   return (
     <YStack minWidth={minWidth} maxWidth={maxWidth}>
@@ -210,7 +212,7 @@ function GlobalSearch({
           noResults: debouncedShowNoResults ? 'Aucun résultat trouvé' : undefined,
         }}
         noValuePlaceholder="Choisir"
-        helpText={helpText}
+        helpText={renderedHelpText}
         disabled={disabled}
         size={size}
         {...rest}

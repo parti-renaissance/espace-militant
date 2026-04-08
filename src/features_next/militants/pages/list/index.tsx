@@ -5,11 +5,11 @@ import { useDebouncedCallback } from 'use-debounce'
 
 import { Layout, LayoutFlatList } from '@/components/AppStructure'
 import Text from '@/components/base/Text'
+import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import EmptyStateWithFilters from '@/components/EmptyStates/EmptyStateWithFilters'
 import type { FilterValues } from '@/components/Filters/FilterCollectionBuilder'
-import { getActiveFilterChips } from '@/components/Filters/filterCollectionUtils'
-import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
+import { getActiveFilterChips, normalizeFiltersForApi } from '@/components/Filters/filterCollectionUtils'
 import PanelModal from '@/components/PanelModal/PanelModal'
 import { MilitantCadreItem } from '@/features_next/militants/components/MilitantCadreItem'
 import { MilitantDetailsPanel } from '@/features_next/militants/components/MilitantDetailsPanel'
@@ -50,12 +50,13 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
     featureKey: FILTERS_FEATURE_KEY,
     scope,
   })
+  const apiFilters = useMemo(() => normalizeFiltersForApi(filters), [filters])
   const { data, isLoading, isFetching, isPlaceholderData, refetch, isError, error } = useAdherentsPage({
     scope,
     page: currentPage,
     pageSize: PAGE_SIZE,
     searchTerm: apiSearchTerm || undefined,
-    filters,
+    filters: apiFilters,
   })
 
   const { hasFeature } = useGetExecutiveScopes()

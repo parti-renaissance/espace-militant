@@ -8,6 +8,7 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { SenderView } from '@/features_next/publications/components/SenderView'
 
+import { useDuplicatePublication } from '@/services/publications/hook'
 import { RestMessageListItem } from '@/services/publications/schema'
 import { relativeDateFormatter } from '@/utils/DateFormatter'
 
@@ -22,6 +23,26 @@ interface PublicationCadreItemProps {
 export function PublicationCadreItem({ item, onDeletePress, scope }: PublicationCadreItemProps) {
   const media = useMedia()
   const router = useRouter()
+  const { mutate: duplicatePublication, isPending: isDuplicatePending } = useDuplicatePublication()
+
+  const handleDuplicate = useCallback(() => {
+    if (!scope) return
+    duplicatePublication(
+      { uuid: item.uuid, scope },
+      {
+        onSuccess: (data) => {
+          const navigationParams: { id: string; scope?: string } = { id: data.uuid }
+          if (scope) {
+            navigationParams.scope = scope
+          }
+          router.push({
+            pathname: '/publications/creer',
+            params: navigationParams,
+          })
+        },
+      },
+    )
+  }, [duplicatePublication, item.uuid, router, scope])
 
   const handleDeletePress = useCallback(() => {
     if (onDeletePress) {
@@ -129,6 +150,18 @@ export function PublicationCadreItem({ item, onDeletePress, scope }: Publication
               <VoxButton variant="text" theme="orange" iconLeft={Trash2} size="md" onPress={handleDeletePress} shrink={media.md}>
                 Supprimer
               </VoxButton>
+              <VoxButton
+                variant="text"
+                theme="gray"
+                iconLeft={Copy}
+                size="md"
+                onPress={handleDuplicate}
+                shrink={media.md}
+                loading={isDuplicatePending}
+                disabled={!scope || isDuplicatePending}
+              >
+                Dupliquer
+              </VoxButton>
             </XStack>
           </XStack>
         ) : (
@@ -141,11 +174,17 @@ export function PublicationCadreItem({ item, onDeletePress, scope }: Publication
                 Stats
               </VoxButton>
             </XStack>
-            <XStack gap="$small" display="none">
-              <VoxButton variant="text" theme="gray" iconLeft={Pen} size="md" onPress={handleEdit} shrink={media.md}>
-                Modifier
-              </VoxButton>
-              <VoxButton variant="text" theme="gray" iconLeft={Copy} size="md" onPress={() => {}} shrink={media.md}>
+            <XStack gap="$small">
+              <VoxButton
+                variant="text"
+                theme="gray"
+                iconLeft={Copy}
+                size="md"
+                onPress={handleDuplicate}
+                shrink={media.md}
+                loading={isDuplicatePending}
+                disabled={!scope || isDuplicatePending}
+              >
                 Dupliquer
               </VoxButton>
             </XStack>

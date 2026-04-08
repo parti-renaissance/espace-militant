@@ -1,10 +1,11 @@
 import React, { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 import { Modal, Platform, Pressable, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ScrollView, useMedia, View } from 'tamagui'
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
+
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { Spacing } from '@/styles'
-import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
-import { ScrollView, useMedia, View } from 'tamagui'
 
 interface ModalOrPageBaseProps extends PropsWithChildren {
   onClose?: () => void
@@ -46,11 +47,7 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContainer}
-            bounces={false}
-            showsVerticalScrollIndicator={false}
-          >
+          <ScrollView contentContainerStyle={styles.scrollContainer} bounces={false} showsVerticalScrollIndicator={false}>
             <View style={styles.modalView}>{children}</View>
           </ScrollView>
         </Pressable>
@@ -113,5 +110,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
 })

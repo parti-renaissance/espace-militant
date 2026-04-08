@@ -1,21 +1,66 @@
-import { Images } from '@/assets/editor-icons'
-import { ToolbarItem } from '@10play/tentap-editor'
 import { Platform } from 'react-native'
+import { ToolbarItem } from '@10play/tentap-editor'
+
+import { Images } from '@/assets/editor-icons'
+
 import { PublicSans } from './PublicSans'
 
 export enum ToolbarContext {
   Main,
   Link,
-  Heading,
 }
 
-export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] => {
+export const HEADING_LAYOUT = {
+  1: { fontSize: 24, marginTop: 0, marginBottom: 12 },
+  2: { fontSize: 22, marginTop: 24, marginBottom: 12 },
+  3: { fontSize: 18, marginTop: 24, marginBottom: 8 },
+  4: { fontSize: 16, marginTop: 20, marginBottom: 8 },
+  5: { fontSize: 15, marginTop: 16, marginBottom: 8 },
+  6: { fontSize: 14, marginTop: 16, marginBottom: 8 },
+} as const
+
+type GetToolbarItemsParams = {
+  onVariablesPress?: () => void
+  showHeadingOptions?: boolean
+  onHeadingPress?: () => void
+  onHeadingClose?: () => void
+}
+
+export const getToolbarItems = ({
+  onVariablesPress,
+  showHeadingOptions = false,
+  onHeadingPress,
+  onHeadingClose,
+}: GetToolbarItemsParams = {}): ToolbarItem[] => {
+  if (showHeadingOptions) {
+    const headingImages = [Images.h1, Images.h2, Images.h3, Images.h4] as const
+    return [
+      {
+        onPress: () => () => onHeadingClose?.(),
+        active: () => false,
+        disabled: () => false,
+        image: () => Images.close,
+      },
+      ...([1, 2, 3, 4] as const).map<ToolbarItem>((level) => ({
+        onPress:
+          ({ editor }) =>
+          () => {
+            editor.toggleHeading(level)
+            onHeadingClose?.()
+          },
+        active: ({ editorState }) => editorState.headingLevel === level,
+        disabled: ({ editorState }) => !editorState.canToggleHeading,
+        image: () => headingImages[level - 1],
+      })),
+    ]
+  }
+
   const baseItems: ToolbarItem[] = [
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.undo(),
+        () =>
+          editor.undo(),
       active: () => false,
       disabled: ({ editorState }) => !editorState.canUndo,
       image: () => Images.undo,
@@ -23,8 +68,8 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.redo(),
+        () =>
+          editor.redo(),
       active: () => false,
       disabled: ({ editorState }) => !editorState.canRedo,
       image: () => Images.redo,
@@ -32,8 +77,8 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.toggleBold(),
+        () =>
+          editor.toggleBold(),
       active: ({ editorState }) => editorState.isBoldActive,
       disabled: ({ editorState }) => !editorState.canToggleBold,
       image: () => Images.bold,
@@ -41,8 +86,8 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.toggleItalic(),
+        () =>
+          editor.toggleItalic(),
       active: ({ editorState }) => editorState.isItalicActive,
       disabled: ({ editorState }) => !editorState.canToggleItalic,
       image: () => Images.italic,
@@ -50,8 +95,8 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.toggleBulletList(),
+        () =>
+          editor.toggleBulletList(),
       active: ({ editorState }) => editorState.isBulletListActive,
       disabled: ({ editorState }) => !editorState.canToggleBulletList,
       image: () => Images.bulletList,
@@ -59,26 +104,38 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
     {
       onPress:
         ({ editor }) =>
-          () =>
-            editor.toggleOrderedList(),
+        () =>
+          editor.toggleOrderedList(),
       active: ({ editorState }) => editorState.isOrderedListActive,
       disabled: ({ editorState }) => !editorState.canToggleOrderedList,
       image: () => Images.orderedList,
     },
     {
       onPress:
+        ({ editorState, editor }) =>
+        () => {
+          if (Platform.OS === 'android') {
+            setTimeout(() => {
+              editor.setSelection(editorState.selection.from, editorState.selection.to)
+            })
+          }
+          onHeadingPress?.()
+        },
+      active: () => false,
+      disabled: ({ editorState }) => !editorState.canToggleHeading,
+      image: () => Images.Aa,
+    },
+    {
+      onPress:
         ({ setToolbarContext, editorState, editor }) =>
-          () => {
-            if (Platform.OS === 'android') {
-              setTimeout(() => {
-                editor.setSelection(
-                  editorState.selection.from,
-                  editorState.selection.to
-                )
-              })
-            }
-            setToolbarContext(ToolbarContext.Link)
-          },
+        () => {
+          if (Platform.OS === 'android') {
+            setTimeout(() => {
+              editor.setSelection(editorState.selection.from, editorState.selection.to)
+            })
+          }
+          setToolbarContext(ToolbarContext.Link)
+        },
       active: ({ editorState }) => editorState.isLinkActive,
       disabled: ({ editorState }) => !editorState.isLinkActive && !editorState.canSetLink,
       image: () => Images.link,
@@ -96,8 +153,6 @@ export const getToolbarItems = (onVariablesPress?: () => void): ToolbarItem[] =>
 
   return baseItems
 }
-
-export const TOOLBAR_ITEMS: ToolbarItem[] = getToolbarItems()
 
 const customFontBase = (primary?: boolean) => `
 ${PublicSans}
@@ -121,48 +176,56 @@ a {
   text-decoration: underline;
 }
 
-h1, h1 * {
-  font-size: 20px !important;
-  font-weight: 600;
-  margin: 0;
-}
-
 h1 strong, h1 b, h2 strong, h2 b, h3 strong, h3 b, h4 strong, h4 b, h5 strong, h5 b, h6 strong, h6 b {
   font-weight: bolder !important;
 }
 
-h2, h2 * {
-  font-size: 18px !important;
+h1, h1 * {
+  font-size: 24px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 0px 0 16px 0 !important;
+}
+
+h2, h2 * {
+  font-size: 22px !important;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 24px 0 12px 0 !important;
 }
 
 h3, h3 * {
-  font-size: 17px !important;
+  font-size: 18px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 24px 0 8px 0 !important;
 }
 
 h4, h4 * {
   font-size: 16px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 20px 0 8px 0 !important;
 }
 
 h5, h5 * {
   font-size: 15px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 16px 0 8px 0 !important;
 }
 
 h6, h6 * {
   font-size: 14px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 16px 0 8px 0 !important;
 }
 `
 
-export const CUSTOM_FONT_VIEW = (primary?: boolean) => customFontBase(primary) + `
+export const CUSTOM_FONT_VIEW = (primary?: boolean) =>
+  customFontBase(primary) +
+  `
 #root div .ProseMirror {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -198,38 +261,44 @@ h1 strong, h1 b, h2 strong, h2 b, h3 strong, h3 b, h4 strong, h4 b, h5 strong, h
 }
 
 h1, h1 * {
-  font-size: 20px !important;
+  font-size: 24px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 0px 0 16px 0 !important;
 }
 
 h2, h2 * {
-  font-size: 18px !important;
+  font-size: 22px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 24px 0 12px 0 !important;
 }
 
 h3, h3 * {
-  font-size: 17px !important;
+  font-size: 18px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 24px 0 8px 0 !important;
 }
 
 h4, h4 * {
   font-size: 16px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 20px 0 8px 0 !important;
 }
 
 h5, h5 * {
   font-size: 15px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 16px 0 8px 0 !important;
 }
 
 h6, h6 * {
   font-size: 14px !important;
   font-weight: 600;
-  margin: 0;
+  line-height: 1.35;
+  margin: 16px 0 8px 0 !important;
 }
 `

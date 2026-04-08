@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import { usePathname } from 'expo-router'
-import { styled, XStack, YStack } from 'tamagui'
-import { BellOff, ChevronRight, CircleCheckBig, Ellipsis, Sparkle } from '@tamagui/lucide-icons'
+import * as WebBrowser from 'expo-web-browser'
+import { isWeb, styled, XStack, YStack } from 'tamagui'
+import { BellOff, ChevronRight, CircleCheckBig, Ellipsis, Globe, Haze, Sparkle } from '@tamagui/lucide-icons'
 
 import { useVisibleNavItems } from '@/components/AppStructure/hooks/useVisibleNavItems'
 import { isNavItemActive } from '@/components/AppStructure/utils'
@@ -352,9 +353,37 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
         <MenuFooterContainer collapsed={displayNavCadre}>
           {isAuth ? (
             <>
-              {/** TODO: Add back when we have email subscription
-              <NavItem iconLeft={BellOff} text="Abonnement emails" dangerAccent collapsed={displayNavCadre} />
-              */}
+              <NavItem
+                iconLeft={Globe}
+                text="parti-renaissance.fr"
+                externalLink
+                collapsed={displayNavCadre}
+                onPress={() => {
+                  const url = 'https://parti-renaissance.fr/'
+                  if (isWeb) {
+                    window.open(url, '_blank')
+                  } else {
+                    void WebBrowser.openBrowserAsync(url)
+                  }
+                }}
+              />
+              <NavItem
+                iconLeft={Haze}
+                text="nouvellerepublique.fr"
+                externalLink
+                collapsed={displayNavCadre}
+                onPress={() => {
+                  const url = 'https://nouvellerepublique.fr/'
+                  if (isWeb) {
+                    window.open(url, '_blank')
+                  } else {
+                    void WebBrowser.openBrowserAsync(url)
+                  }
+                }}
+              />
+              {!user?.email_subscribed && (
+                <NavItem iconLeft={BellOff} text="Abonnement emails" href="/profil/communications" dangerAccent collapsed={displayNavCadre} />
+              )}
               {notificationGranted === false && (
                 <NavItem iconLeft={BellOff} text="Notifications" dangerAccent collapsed={displayNavCadre} onPress={triggerNotificationRequest} />
               )}
