@@ -131,6 +131,7 @@ type VoxRichTextEditorProps = {
 export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
   ({ value, placeholder = 'Décrivez votre contenu...', enableVariables = false }, ref) => {
     const [variablesModalOpen, setVariablesModalOpen] = useState(false)
+    const [headingOptionsOpen, setHeadingOptionsOpen] = useState(false)
 
     const { data: availableVariables = [] } = useGetAvailableVariables({
       enabled: enableVariables,
@@ -162,6 +163,14 @@ export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
 
     const handleVariablesPress = useCallback(() => {
       setVariablesModalOpen(true)
+    }, [])
+
+    const handleHeadingPress = useCallback(() => {
+      setHeadingOptionsOpen(true)
+    }, [])
+
+    const handleHeadingClose = useCallback(() => {
+      setHeadingOptionsOpen(false)
     }, [])
 
     const handleVariableSelect = (code: string) => {
@@ -211,7 +220,16 @@ export const VoxRichTextEditor = forwardRef<EditorRef, VoxRichTextEditorProps>(
       }, 100)
     }
 
-    const toolbarItems = useMemo(() => getToolbarItems(enableVariables ? handleVariablesPress : undefined), [enableVariables, handleVariablesPress])
+    const toolbarItems = useMemo(
+      () =>
+        getToolbarItems({
+          onVariablesPress: enableVariables ? handleVariablesPress : undefined,
+          showHeadingOptions: headingOptionsOpen,
+          onHeadingPress: handleHeadingPress,
+          onHeadingClose: handleHeadingClose,
+        }),
+      [enableVariables, handleHeadingClose, handleHeadingPress, handleVariablesPress, headingOptionsOpen],
+    )
 
     useImperativeHandle(ref, () => {
       return {

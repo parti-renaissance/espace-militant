@@ -25,9 +25,11 @@ import { useToastController } from '@tamagui/toast'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { getNationalityLabel } from '@/components/NationalitySelect/NationalitySelect'
+import { PANEL_MODAL_TOAST_VIEWPORT } from '@/components/PanelModal/PanelModal'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 
 import { Chip } from '@/components'
+import { ForbiddenError } from '@/core/errors'
 import type { IconComponent } from '@/models/common.model'
 import { useAdherentAddress, useAdherentDonations, useAdherentEmail, useAdherentPhone } from '@/services/adherents/hook'
 import type {
@@ -173,29 +175,39 @@ function InformationsPersonnellesSection({
 
   const { data: addressData, isFetching: isFetchingAddress, refetch: refetchAddress } = useAdherentAddress(uuid, scope)
 
+  const showSensitiveDataErrorToast = React.useCallback(
+    (error: unknown, fallbackMessage: string) => {
+      const isForbidden = error instanceof ForbiddenError || (error instanceof Error && (error as Error & { code?: string }).code === '403')
+      const message = isForbidden ? "Vous n'avez pas accès à cette donnée." : fallbackMessage
+
+      toast.show('Erreur', { message, type: 'error', viewportName: PANEL_MODAL_TOAST_VIEWPORT })
+    },
+    [toast],
+  )
+
   const handleSeePhone = React.useCallback(async () => {
     if (!uuid || !scope) return
     const result = await refetchPhone()
     if (result.isError) {
-      toast.show('Erreur', { message: 'Impossible de récupérer le numéro.', type: 'error' })
+      showSensitiveDataErrorToast(result.error, 'Impossible de récupérer le numéro.')
     }
-  }, [refetchPhone, scope, toast, uuid])
+  }, [refetchPhone, scope, showSensitiveDataErrorToast, uuid])
 
   const handleSeeEmail = React.useCallback(async () => {
     if (!uuid || !scope) return
     const result = await refetchEmail()
     if (result.isError) {
-      toast.show('Erreur', { message: "Impossible de récupérer l'adresse email.", type: 'error' })
+      showSensitiveDataErrorToast(result.error, "Impossible de récupérer l'adresse email.")
     }
-  }, [refetchEmail, scope, toast, uuid])
+  }, [refetchEmail, scope, showSensitiveDataErrorToast, uuid])
 
   const handleSeeAddress = React.useCallback(async () => {
     if (!uuid || !scope) return
     const result = await refetchAddress()
     if (result.isError) {
-      toast.show('Erreur', { message: "Impossible de récupérer l'adresse postale.", type: 'error' })
+      showSensitiveDataErrorToast(result.error, "Impossible de récupérer l'adresse postale.")
     }
-  }, [refetchAddress, scope, toast, uuid])
+  }, [refetchAddress, scope, showSensitiveDataErrorToast, uuid])
 
   if (isLoading) {
     return (

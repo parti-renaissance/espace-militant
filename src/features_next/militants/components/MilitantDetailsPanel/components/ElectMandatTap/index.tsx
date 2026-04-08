@@ -5,6 +5,7 @@ import { CircleAlert, CircleCheck, CircleHelp, MapPin, Pencil, Plus, Trash2 } fr
 import Switch from '@/components/base/SwitchV2/SwitchV2'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import { PANEL_MODAL_TOAST_VIEWPORT } from '@/components/PanelModal/PanelModal'
 
 import { Chip } from '@/components'
 import { declarationsValues } from '@/services/adherents/constants'
@@ -408,9 +409,13 @@ export function ElectMandatTab({
 
   const { data, isError, isLoading: isElectLoading } = useAdherentElect(uuid, scope, canSeeElectedRepresentative)
   const isLoading = isElectLoading || isScopesLoading
-  const { mutate: toggleExempt, isPending: isTogglingExempt } = useMutationToggleAdherentElectExemptFromCotisation({
+  const {
+    mutate: toggleExempt,
+    isPending: isTogglingExempt,
+  } = useMutationToggleAdherentElectExemptFromCotisation({
     adherentUuid: uuid,
     scope,
+    toastViewportName: PANEL_MODAL_TOAST_VIEWPORT,
   })
 
   if (!uuid || !scope) return null
