@@ -1,3 +1,4 @@
+import { formErrorThrower } from '@/services/common/errors/form-errors'
 import * as schemas from '@/services/adherents/schema'
 import { api } from '@/utils/api'
 import { z } from 'zod'
@@ -56,6 +57,7 @@ export const putAdherentElectExemptFromCotisation = (props: {
     path: `/api/v3/adherents/${props.uuid}/elect?scope=${props.scope}`,
     requestSchema: schemas.RestAdherentElectToggleExemptPayloadSchema,
     responseSchema: schemas.RestAdherentElectResponseSchema,
+    errorThrowers: [(error: unknown) => formErrorThrower(error)],
     type: 'private',
   })(props.payload)
 

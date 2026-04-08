@@ -4,12 +4,15 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { Easing, Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { ScrollView, useMedia, YStack } from 'tamagui'
+import { ToastViewport } from '@tamagui/toast'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 
 interface PanelModalProps extends PropsWithChildren {
   isOpen: boolean
   onClose: () => void
 }
+
+export const PANEL_MODAL_TOAST_VIEWPORT = 'panel-modal'
 
 const PANEL_WIDTH_LG = 390
 const PANEL_WIDTH_BELOW_LG = 340
@@ -103,6 +106,16 @@ export default function PanelModal({ isOpen, onClose, children }: PanelModalProp
                 {children}
               </ScrollView>
             </BottomSheetModalProvider>
+
+            <ToastViewport
+              name={PANEL_MODAL_TOAST_VIEWPORT}
+              flexDirection="column-reverse"
+              position="absolute"
+              top={16}
+              right={16}
+              zIndex={1000}
+              pointerEvents="box-none"
+            />
           </YStack>
         </Animated.View>
       </GestureDetector>

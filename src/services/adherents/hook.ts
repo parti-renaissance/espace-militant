@@ -1,3 +1,4 @@
+import { useToastController } from '@tamagui/toast'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -16,6 +17,8 @@ import type {
   RestAdherentSensitiveData,
   RestAdherentSensitiveRequest,
 } from '@/services/adherents/schema'
+
+import { FormError } from '../common/errors/form-errors'
 
 const DEFAULT_PAGE_SIZE = 25
 
@@ -36,8 +39,7 @@ export const adherentKeys = {
   elect: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'elect', uuid, scope] as const,
 }
 
-const getMandateTypeLabel = (mandateType: string): string =>
-  declarationsValues.find((d) => d.value === mandateType)?.label ?? mandateType
+const getMandateTypeLabel = (mandateType: string): string => declarationsValues.find((d) => d.value === mandateType)?.label ?? mandateType
 
 const responseToElectMandate = (response: RestAdherentElectMandateUpsertResponse): RestAdherentElectMandate => ({
   mandate_type: response.mandate_type,
@@ -186,6 +188,7 @@ export const useAdherentElect = (uuid: string | undefined, scope: string | undef
 type UseMutationAdherentElectMandateParams = {
   adherentUuid?: string
   scope?: string
+  toastViewportName?: string
 }
 
 type CreateAdherentElectMandateVariables = {
@@ -229,9 +232,7 @@ export const useMutationUpdateAdherentElectMandate = ({ adherentUuid, scope }: U
       return api.putAdherentElectMandate({ mandateUuid, scope: safeScope, payload })
     },
     onSuccess: (data, { mandateUuid }) => {
-      syncAdherentListMandates(queryClient, adherentUuid, scope, (current) =>
-        current.map((m) => (m.uuid === mandateUuid ? responseToElectMandate(data) : m)),
-      )
+      syncAdherentListMandates(queryClient, adherentUuid, scope, (current) => current.map((m) => (m.uuid === mandateUuid ? responseToElectMandate(data) : m)))
       queryClient.invalidateQueries({ queryKey: adherentKeys.elect(adherentUuid, scope) })
     },
   })
@@ -251,8 +252,10 @@ export const useMutationDeleteAdherentElectMandate = ({ adherentUuid, scope }: U
   })
 }
 
-export const useMutationToggleAdherentElectExemptFromCotisation = ({ adherentUuid, scope }: UseMutationAdherentElectMandateParams) => {
+export const useMutationToggleAdherentElectExemptFromCotisation = ({ adherentUuid, scope, toastViewportName }: UseMutationAdherentElectMandateParams) => {
   const queryClient = useQueryClient()
+  const toast = useToastController()
+
   return useMutation<RestAdherentElectResponse, Error, ToggleAdherentElectExemptFromCotisationVariables, ToggleAdherentElectExemptFromCotisationContext>({
     onMutate: async (payload) => {
       const safeUuid = requireParam(adherentUuid, 'adherentUuid')
@@ -281,6 +284,8 @@ export const useMutationToggleAdherentElectExemptFromCotisation = ({ adherentUui
       })
     },
     onError: (_error, _variables, context) => {
+      const message = _error instanceof FormError ? _error.violations.map((v) => v.message).join('\n') : (_error as Error).message || 'Une erreur est survenue.'
+      toast.show('Erreur', { message, type: 'error', viewportName: toastViewportName })
       if (context?.previousElect && context?.electKey) {
         queryClient.setQueryData(context.electKey, context.previousElect)
       }
