@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
 import Head from 'expo-router/head'
+import { Keyboard } from 'react-native'
 import { useMedia, YStack } from 'tamagui'
 import { Menu } from '@tamagui/lucide-icons'
 
@@ -20,6 +21,10 @@ function ChatbotScreen() {
 
   const threads = data?.pages.flatMap((p) => p.items) ?? []
   const activeThreadTitle = activeDiscussionId ? threads.find((t) => t.uuid === activeDiscussionId)?.title : null
+  const openSheet = () => {
+    Keyboard.dismiss()
+    sheetRef.current?.expand()
+  }
 
   return (
     <>
@@ -31,7 +36,7 @@ function ChatbotScreen() {
         rightComponent={
           media.sm ? (
             <YStack height="100%" justifyContent="flex-start" alignItems="flex-end" paddingTop={8} paddingRight={8}>
-              <VoxButton iconLeft={Menu} size="lg" shrink variant="soft" onPress={() => sheetRef.current?.expand()} />
+              <VoxButton iconLeft={Menu} size="lg" shrink variant="soft" onPress={openSheet} />
             </YStack>
           ) : null
         }
