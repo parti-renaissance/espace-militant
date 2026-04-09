@@ -92,6 +92,13 @@ const LeftButtonFrame = styled(ThemeableStack, {
   },
 })
 
+const SideSlot = styled(XStack, {
+  alignItems: 'center',
+  minWidth: 36,
+  height: '100%',
+  zIndex: 1,
+})
+
 const useBackNavigation = (config: NavigationConfig) => {
   const router = useRouter()
   const navigation = useNavigation()
@@ -148,28 +155,40 @@ const Header = ({ title, icon, navigation: navigationConfig = {}, style: styleCo
       <HeaderInner>
         <HeaderFrame>
           {children ?? (
-            <YStack flex={1} position="relative" minHeight={48} maxHeight={58}>
-              <XStack position="absolute" left={0} top={0} bottom={0} zIndex={1}>
-                {navigationSettings.showBackButton && (
-                  <LeftButtonFrame onPress={handleBack} height="100%">
-                    <ArrowLeft size={24} color="$textPrimary" />
-                    {backButtonLabel ? <Text.LG semibold>{backButtonLabel}</Text.LG> : null}
-                  </LeftButtonFrame>
-                )}
-              </XStack>
+            <YStack flex={1} minHeight={48} maxHeight={58}>
+              <XStack flex={1} alignItems="center" gap={8}>
+                <SideSlot justifyContent="flex-start">
+                  {navigationSettings.showBackButton && (
+                    <LeftButtonFrame onPress={handleBack} height="100%">
+                      <ArrowLeft size={24} color="$textPrimary" />
+                      {backButtonLabel ? <Text.LG semibold>{backButtonLabel}</Text.LG> : null}
+                    </LeftButtonFrame>
+                  )}
+                </SideSlot>
 
-              <XStack flex={1} justifyContent={rightComponent && !navigationSettings.showBackButton ? 'flex-start' : 'center'} alignItems="center">
-                <XStack alignItems="center" gap={10}>
-                  {icon && React.createElement(icon, { size: 20, color: '$textPrimary' })}
-                  <Text.LG semibold>{title}</Text.LG>
+                <XStack
+                  flex={1}
+                  minWidth={0}
+                  justifyContent={rightComponent && !navigationSettings.showBackButton ? 'flex-start' : 'center'}
+                  alignItems="center"
+                  paddingHorizontal={4}
+                >
+                  <XStack alignItems="center" gap={10} minWidth={0} flex={1} justifyContent="center">
+                    {icon && React.createElement(icon, { size: 20, color: '$textPrimary' })}
+                    <Text.LG semibold numberOfLines={1} ellipsizeMode="tail" minWidth={0} flexShrink={1}>
+                      {title}
+                    </Text.LG>
+                  </XStack>
                 </XStack>
-              </XStack>
 
-              {rightComponent && (
-                <YStack position="absolute" right={0} top={0} bottom={0} zIndex={1} alignItems="center" justifyContent="center" height="100%">
-                  {rightComponent}
-                </YStack>
-              )}
+                <SideSlot justifyContent="flex-end">
+                  {rightComponent && (
+                    <YStack alignItems="center" justifyContent="center" height="100%">
+                      {rightComponent}
+                    </YStack>
+                  )}
+                </SideSlot>
+              </XStack>
             </YStack>
           )}
         </HeaderFrame>

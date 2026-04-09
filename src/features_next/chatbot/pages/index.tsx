@@ -1,11 +1,11 @@
-import { ComponentRef, useCallback, useEffect, useRef } from 'react'
-import { NativeSyntheticEvent, ScrollView } from 'react-native'
+import { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
+import { Keyboard, NativeScrollEvent, NativeSyntheticEvent, Platform } from 'react-native'
 import { Input, isWeb, Spinner, useMedia, View, YStack } from 'tamagui'
-import { ArrowUpRight } from '@tamagui/lucide-icons'
+import { ArrowDown, ArrowUpRight } from '@tamagui/lucide-icons'
 import { useQueryClient } from '@tanstack/react-query'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import LayoutScrollView, { type LayoutScrollViewRef } from '@/components/AppStructure/Layout/LayoutScrollView'
 import { VoxButton } from '@/components/Button/Button'
 import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
 
@@ -27,9 +27,10 @@ type ChatbotPageProps = {
 export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChange }: ChatbotPageProps) {
   const media = useMedia()
   const queryClient = useQueryClient()
-  const scrollViewRef = useRef<ScrollView>(null)
+  const scrollViewRef = useRef<LayoutScrollViewRef>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
   const keyboardHeight = useKeyboardHeight()
+  const [isAtBottom, setIsAtBottom] = useState(true)
 
   const onThreadCreated = useCallback(
     (threadId: string) => {
@@ -39,19 +40,50 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
     [queryClient, onActiveDiscussionChange],
   )
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, stop, streamedContent, error } = useCustomChat({
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit: rawHandleSubmit,
+    isLoading,
+    stop,
+    streamedContent,
+    error,
+  } = useCustomChat({
     threadId: activeDiscussionId,
     onThreadCreated,
   })
   const canStop = isLoading
 
-  const scrollToBottom = () => {
-    setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100)
-  }
+  const scrollToBottom = useCallback((animated = true) => {
+    requestAnimationFrame(() => {
+      scrollViewRef.current?.scrollToEnd({ animated })
+    })
+  }, [])
 
+  // Scroll to bottom when history loads for the first time in a given thread (initial load or switch)
+  const prevScrolledThreadRef = useRef<string | null | undefined>(undefined)
   useEffect(() => {
-    scrollToBottom()
-  }, [messages, streamedContent])
+    if (messages.length === 0) return
+    if (prevScrolledThreadRef.current !== activeDiscussionId) {
+      prevScrolledThreadRef.current = activeDiscussionId
+      scrollToBottom(false)
+    }
+  }, [activeDiscussionId, messages.length, scrollToBottom])
+
+  // Track scroll position to show/hide "go to bottom" button
+  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
+    const distanceFromBottom = contentSize.height - contentOffset.y - layoutMeasurement.height
+    setIsAtBottom(distanceFromBottom < 80)
+  }, [])
+
+  const handleSubmit = useCallback(() => {
+    if (!input.trim() || isLoading) return
+    if (!isWeb) Keyboard.dismiss()
+    rawHandleSubmit()
+    scrollToBottom(true)
+  }, [input, isLoading, rawHandleSubmit, scrollToBottom])
 
   useEffect(() => {
     if (!isWeb || !inputRef.current) return
@@ -96,20 +128,21 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
             style={{ flex: 1 }}
             contentContainerStyle={{
               gap: 10,
-              paddingBottom: isWeb ? 160 : 160 + keyboardHeight,
+              paddingBottom: isWeb ? 200 : 200 + keyboardHeight,
               minHeight: '100%',
               ...(isWeb ? { flex: 1 } : {}),
             }}
-            onContentSizeChange={scrollToBottom}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
           >
             {error && (
               <View padding="$medium" backgroundColor="$red3" borderRadius="$medium" marginHorizontal="$medium">
                 <VoxMarkdown content={error.message} />
               </View>
             )}
-            {messages.map((m, i) => (
+            {messages.map((m) => (
               <View
-                key={i}
+                key={m.id}
                 alignSelf={m.role === 'user' ? 'flex-end' : 'flex-start'}
                 maxWidth={m.role === 'user' ? '80%' : '100%'}
                 minWidth={0}
@@ -131,9 +164,19 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
             )}
             {!error && !activeDiscussionId && messages.length === 0 && !isLoading ? <NewChat /> : null}
           </LayoutScrollView>
+          {!isAtBottom && (
+            <View
+              position={isWeb ? 'fixed' : 'absolute'}
+              bottom={isWeb ? 160 : 120 + keyboardHeight + (Platform.OS === 'android' ? 16 : 0)}
+              alignSelf="center"
+              zIndex={101}
+            >
+              <VoxButton variant="contained" theme="gray" iconLeft={ArrowDown} size="md" shrink onPress={() => scrollToBottom(true)} />
+            </View>
+          )}
           <YStack
             position={isWeb ? 'fixed' : 'absolute'}
-            bottom={isWeb ? 0 : keyboardHeight}
+            bottom={isWeb ? 0 : keyboardHeight + (Platform.OS === 'android' ? 16 : 0)}
             width="100%"
             maxWidth={media.gtSm ? 520 : '100%'}
             alignSelf="center"
