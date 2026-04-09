@@ -1,12 +1,13 @@
-import React, { memo, useCallback, useState } from 'react'
-import { ActivityIndicator } from 'react-native'
+import React, { memo, useCallback, useEffect, useState } from 'react'
+import { ActivityIndicator, LayoutChangeEvent } from 'react-native'
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { Image } from 'expo-image'
 import { View, XStack, YStack } from 'tamagui'
-import { Activity, CircleAlert } from '@tamagui/lucide-icons'
+import { Activity, CircleAlert, Maximize2, Minimize2 } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import PanelModal from '@/components/PanelModal/PanelModal'
-import ProfilePicture from '@/components/ProfilePicture'
 
 import { Chip } from '@/components'
 import { useAdherentDetail } from '@/services/adherents/hook'
@@ -20,52 +21,109 @@ import { MilitantActionButtons } from './components/MilitantActionButtons'
 
 export type FicheMilitantTabId = 'identite' | 'notes' | 'historique' | 'mandats'
 
+const PROFILE_PHOTO_COLLAPSED_HEIGHT = 200
+const PROFILE_PHOTO_EXPAND_TIMING = { duration: 280, easing: Easing.inOut(Easing.cubic) }
+
+function MilitantProfilePicture({ imageUrl, displayName }: { imageUrl: string | null; displayName: string }) {
+  const [open, setOpen] = useState(false)
+  const [rowWidth, setRowWidth] = useState(0)
+  const animatedHeight = useSharedValue(PROFILE_PHOTO_COLLAPSED_HEIGHT)
+
+  const initials = displayName
+    .split(' ')
+    .slice(0, 2)
+    .map(([letter]) => letter?.toUpperCase())
+    .join('')
+
+  useEffect(() => {
+    if (rowWidth <= 0) return
+    const target = open ? rowWidth : PROFILE_PHOTO_COLLAPSED_HEIGHT
+    animatedHeight.value = withTiming(target, PROFILE_PHOTO_EXPAND_TIMING)
+  }, [open, rowWidth, animatedHeight])
+
+  const onPhotoRowLayout = useCallback((e: LayoutChangeEvent) => {
+    const w = e.nativeEvent.layout.width
+    setRowWidth((prev) => (prev === w ? prev : w))
+  }, [])
+
+  const photoFrameStyle = useAnimatedStyle(() => ({
+    height: animatedHeight.value,
+    width: '100%' as const,
+    overflow: 'hidden' as const,
+  }))
+
+  const toggleExpand = useCallback(() => setOpen((v) => !v), [])
+
+  if (!imageUrl) {
+    return (
+      <YStack alignItems="center" justifyContent="center" flex={1} height={200} bg="$gray8" pt="$large">
+        <Text fontSize={128} medium color="$textDisabled">
+          {initials}
+        </Text>
+      </YStack>
+    )
+  }
+
+  return (
+    <YStack flex={1} bg="$gray8" onLayout={onPhotoRowLayout}>
+      <Animated.View style={photoFrameStyle}>
+        <Image source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" alt={displayName} />
+        <View position="absolute" right="$small" bottom={12} opacity={0.6}>
+          <VoxButton theme="gray" size="sm" variant="soft" shrink iconLeft={open ? Minimize2 : Maximize2} onPress={toggleExpand} iconSize={14} />
+        </View>
+      </Animated.View>
+    </YStack>
+  )
+}
+
 function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdherentDetail | RestAdherentListItem; engagementScore?: number | null }) {
-  const { first_name, last_name, image_url, age, public_id, last_activity_at, adherent_tags } = data
+  const { first_name, last_name, age, public_id, last_activity_at, adherent_tags } = data
   const displayName = [first_name, last_name].filter(Boolean).join(' ') || '—'
   const adherentLabel = adherent_tags?.[0]?.label ?? null
   const activityLabel = getRelativeActivityLabel(last_activity_at)
 
   return (
-    <YStack paddingHorizontal="$medium" paddingTop="$medium" gap="$medium">
-      <XStack gap="$medium" alignItems="center" flexWrap="wrap">
-        <ProfilePicture size={40} rounded src={image_url ?? undefined} fullName={displayName} alt={displayName} />
-        <XStack gap={4} flex={1}>
-          <YStack flex={1} minWidth={120} gap={2}>
-            <Text.SM semibold>{displayName}</Text.SM>
-            {age != null && <Text.SM secondary>{age} ans</Text.SM>}
-            {engagementScore != null && (
-              <XStack alignItems="center" gap={8} marginTop={4}>
-                <View flex={1} h={8} backgroundColor="$gray4" borderRadius={4} overflow="hidden">
-                  <View width={`${Math.min(100, engagementScore)}%`} h="100%" backgroundColor="$green9" borderRadius={4} />
-                </View>
-                <Text.SM semibold>{engagementScore}</Text.SM>
+    <>
+      <MilitantProfilePicture imageUrl={data.image_url} displayName={displayName} />
+      <YStack paddingHorizontal="$medium" paddingTop="$medium" gap="$medium">
+        <XStack gap="$medium" alignItems="center" flexWrap="wrap">
+          <XStack gap={4} flex={1}>
+            <YStack flex={1} minWidth={120} gap={2}>
+              <Text.SM semibold>{displayName}</Text.SM>
+              {age != null && <Text.SM secondary>{age} ans</Text.SM>}
+              {engagementScore != null && (
+                <XStack alignItems="center" gap={8} marginTop={4}>
+                  <View flex={1} h={8} backgroundColor="$gray4" borderRadius={4} overflow="hidden">
+                    <View width={`${Math.min(100, engagementScore)}%`} h="100%" backgroundColor="$green9" borderRadius={4} />
+                  </View>
+                  <Text.SM semibold>{engagementScore}</Text.SM>
+                </XStack>
+              )}
+            </YStack>
+            {public_id && (
+              <XStack alignSelf="flex-start" alignItems="center" gap={4}>
+                <Text.SM secondary>{public_id}</Text.SM>
               </XStack>
             )}
-          </YStack>
-          {public_id && (
-            <XStack alignSelf="flex-start" alignItems="center" gap={4}>
-              <Text.SM secondary>{public_id}</Text.SM>
+          </XStack>
+        </XStack>
+        <XStack alignItems="center" justifyContent="space-between" gap="$medium">
+          {adherentLabel && (
+            <Chip theme="yellow" flexShrink={1}>
+              <Text.SM semibold color={'$color5'} numberOfLines={1} ellipsizeMode="tail">
+                {adherentLabel}
+              </Text.SM>
+            </Chip>
+          )}
+          {activityLabel && (
+            <XStack alignItems="center" gap={4}>
+              <Activity size={12} color="$green5" />
+              <Text.XSM secondary>{activityLabel}</Text.XSM>
             </XStack>
           )}
         </XStack>
-      </XStack>
-      <XStack alignItems="center" justifyContent="space-between" gap="$medium">
-        {adherentLabel && (
-          <Chip theme="yellow" flexShrink={1}>
-            <Text.SM semibold color={'$color5'} numberOfLines={1} ellipsizeMode="tail">
-              {adherentLabel}
-            </Text.SM>
-          </Chip>
-        )}
-        {activityLabel && (
-          <XStack alignItems="center" gap={4}>
-            <Activity size={12} color="$green5" />
-            <Text.XSM secondary>{activityLabel}</Text.XSM>
-          </XStack>
-        )}
-      </XStack>
-    </YStack>
+      </YStack>
+    </>
   )
 }
 
