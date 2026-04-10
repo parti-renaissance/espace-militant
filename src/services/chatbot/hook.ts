@@ -7,7 +7,7 @@ import { useUserStore } from '@/store/user-store'
 import * as chatbotApi from './api'
 import type { RestChatbotChatRequest } from './schema'
 
-export type ChatMessage = { role: 'user' | 'assistant'; content: string }
+export type ChatMessage = { id: string; role: 'user' | 'assistant'; content: string }
 
 export type UseCustomChatOptions = {
   /** Thread sélectionné dans la navigation : réinitialise le chat et envoie les prochains messages dans ce thread */
@@ -57,13 +57,14 @@ function parseSSEChunk(line: string): string | null {
  * Flush le message streamé vers l'historique une seule fois (fin de stream propre).
  */
 function flushStreamToMessages(
+  id: string,
   streamBuffer: string,
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setStreamedContent: React.Dispatch<React.SetStateAction<string>>,
   isMounted: () => boolean,
 ) {
   if (!streamBuffer || !isMounted()) return
-  setMessages((m) => [...m, { role: 'assistant', content: streamBuffer }])
+  setMessages((m) => [...m, { id, role: 'assistant', content: streamBuffer }])
   setStreamedContent('')
 }
 
@@ -97,26 +98,32 @@ export function useCustomChat(options: UseCustomChatOptions = {}): UseCustomChat
     enabled: !!threadIdProp,
   })
 
+  /** Tracks which threadId has already been hydrated to avoid re-applying history */
+  const hydratedThreadRef = useRef<string | null>(null)
+
   // Synchroniser le thread sélectionné : réinitialiser le chat quand l'utilisateur change de discussion (pas quand on reçoit le nouveau thread créé)
   useEffect(() => {
     const next = threadIdProp ?? null
     if (next === threadIdRef.current) return
     threadIdRef.current = next
+    hydratedThreadRef.current = null
     setMessages([])
     setStreamedContent('')
     setError(null)
   }, [threadIdProp])
 
-  // Appliquer l'historique quand on a des messages pour le thread courant et que la liste est vide (changement de thread)
+  // Appliquer l'historique quand React Query a chargé les messages du thread courant
   useEffect(() => {
-    if (!threadIdProp || !threadMessagesQuery.data || messages.length > 0) return
+    if (!threadIdProp || !threadMessagesQuery.data) return
+    if (hydratedThreadRef.current === threadIdProp) return
+    hydratedThreadRef.current = threadIdProp
     const items = threadMessagesQuery.data.items
     const history: ChatMessage[] = [...items]
       .reverse()
       .filter((m): m is typeof m & { role: 'user' | 'assistant' } => m.role === 'user' || m.role === 'assistant')
-      .map((m) => ({ role: m.role, content: m.content }))
+      .map((m) => ({ id: m.uuid, role: m.role, content: m.content }))
     setMessages(history)
-  }, [threadIdProp, threadMessagesQuery.data, messages.length])
+  }, [threadIdProp, threadMessagesQuery.data])
 
   useEffect(() => {
     isMountedRef.current = true
@@ -155,7 +162,7 @@ export function useCustomChat(options: UseCustomChatOptions = {}): UseCustomChat
     if (!trimmed || isLoading) return
 
     abortedByUserRef.current = false
-    const userMessage: ChatMessage = { role: 'user', content: trimmed }
+    const userMessage: ChatMessage = { id: `local-${Date.now()}`, role: 'user', content: trimmed }
     setMessages((prev) => [...prev, userMessage])
     setInput('')
     setError(null)
@@ -181,10 +188,13 @@ export function useCustomChat(options: UseCustomChatOptions = {}): UseCustomChat
       xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
     }
 
+    let threadNotified = false
+
     xhr.onreadystatechange = () => {
-      if (xhr.readyState >= 2) {
+      if (xhr.readyState >= 2 && !threadNotified) {
         const threadUuid = xhr.getResponseHeader(THREAD_HEADER)
         if (threadUuid) {
+          threadNotified = true
           threadIdRef.current = threadUuid
           onThreadCreatedRef.current?.(threadUuid)
         }
@@ -221,7 +231,7 @@ export function useCustomChat(options: UseCustomChatOptions = {}): UseCustomChat
         safeSetLoading(false)
 
         if (xhr.status >= 200 && xhr.status < 300) {
-          flushStreamToMessages(streamBufferRef.current, setMessages, setStreamedContent, () => isMountedRef.current)
+          flushStreamToMessages(`stream-${Date.now()}`, streamBufferRef.current, setMessages, setStreamedContent, () => isMountedRef.current)
           streamBufferRef.current = ''
         } else if (xhr.status !== 0) {
           safeSetError(new Error(xhr.responseText || `HTTP ${xhr.status}`))
@@ -241,7 +251,7 @@ export function useCustomChat(options: UseCustomChatOptions = {}): UseCustomChat
       xhrRef.current = null
       safeSetLoading(false)
       abortedByUserRef.current = true
-      flushStreamToMessages(streamBufferRef.current, setMessages, setStreamedContent, () => isMountedRef.current)
+      flushStreamToMessages(`stream-${Date.now()}`, streamBufferRef.current, setMessages, setStreamedContent, () => isMountedRef.current)
       streamBufferRef.current = ''
     }
 

@@ -141,6 +141,7 @@ export const AVAILABLE_FILTERS: RestFilterCollectionResponse = [
             conseiller_communautaire: 'Conseiller communautaire',
             maire: 'Maire',
             conseiller_municipal: 'Conseiller municipal',
+            conseiller_municipal_opposition: "Conseiller municipal d'opposition",
             conseiller_arrondissement: "Conseiller d'arrondissement",
             membre_assemblee_fde: "Membre de l'Assemblée des Français de l'étranger",
             conseiller_fde: 'Conseiller FDE',

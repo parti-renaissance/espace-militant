@@ -1,21 +1,31 @@
-import { useToastController } from '@tamagui/toast'
+import { Alert, Linking } from 'react-native'
 import { CalendarDialogResultActions, createEventInCalendarAsync, getCalendarPermissionsAsync, requestCalendarPermissionsAsync } from 'expo-calendar'
-import * as Linking from 'expo-linking'
+import { useToastController } from '@tamagui/toast'
+
 import { UseCreateEvent } from './CalendarTypes'
 import { isAllday as getIsAllDay, handleCreateEventError, successToast } from './utils'
 
 const useCreateEvent: UseCreateEvent = () => {
   const toast = useToastController()
 
-  const manualRequest = async () => {
-    toast.show('Authorisation requis', {
-      message: "Touchez ici pour activer l'accès à votre calendrier, et réessayez",
-      type: 'info',
-      action: {
-        altText: 'Ouvrir les paramètres',
-        onPress: () => Linking.openSettings(),
+  const showCalendarPermissionAlert = () => {
+    Alert.alert(
+      'Accès au calendrier requis',
+      "Veuillez autoriser l'accès au calendrier dans les paramètres pour continuer.",
+      [
+        {
+          text: 'Ouvrir les réglages',
+          onPress: () => Linking.openSettings(),
+        },
+        {
+          text: 'Plus tard',
+          style: 'destructive',
+        },
+      ],
+      {
+        cancelable: true,
       },
-    })
+    )
   }
   return async (event) => {
     const isAllday = getIsAllDay(event)
@@ -25,11 +35,11 @@ const useCreateEvent: UseCreateEvent = () => {
       if (canAskAgain) {
         await requestCalendarPermissionsAsync().then((permi) => {
           if (permi.status !== 'granted') {
-            manualRequest()
+            showCalendarPermissionAlert()
           }
         })
       } else {
-        manualRequest()
+        showCalendarPermissionAlert()
       }
       return
     }
