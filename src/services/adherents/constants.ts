@@ -48,6 +48,10 @@ export const declarationsValues: { label: string; value: string }[] = [
     value: 'conseiller_municipal',
   },
   {
+    label: "Conseiller municipal d'opposition",
+    value: 'conseiller_municipal_opposition',
+  },
+  {
     label: "Conseiller d'arrondissement",
     value: 'conseiller_arrondissement',
   },
