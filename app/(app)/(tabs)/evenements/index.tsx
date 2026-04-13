@@ -7,6 +7,7 @@ import { Sparkle } from '@tamagui/lucide-icons'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { VoxButton } from '@/components/Button'
 import EventFeed from '@/features_next/events/pages/feed'
+import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/PinnedEventBanner'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
@@ -40,6 +41,11 @@ export default function EvenementsPage() {
         <title>{metatags.createTitle('Nos événements')}</title>
       </Head>
       <Layout.Container
+        banner={
+          <Suspense fallback={null}>
+            <PinnedEventBanner />
+          </Suspense>
+        }
         floatingContent={
           <Suspense fallback={null}>
             <CreateEventFloatingButton />

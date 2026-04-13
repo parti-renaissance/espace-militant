@@ -148,6 +148,7 @@ export const RestGetEventsRequestSchema = z
     'order[beginAt]': z.string(),
     zipCode: z.string(),
     subscribedOnly: z.boolean(),
+    pinned: z.boolean(),
   })
   .partial()
   .merge(z.object({ page: z.number() }))

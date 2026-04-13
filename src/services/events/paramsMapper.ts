@@ -33,6 +33,7 @@ const paramsCollection = {
   zone: (x: string) => ({ zone: x }),
   page: (x: number) => ({ page: x }),
   subscribedOnly: (x: boolean) => ({ subscribedOnly: x }),
+  pinned: (x: boolean) => ({ pinned: x }),
 } as const
 
 export const mapParams = ({ page, filters, orderByBeginAt, orderBySubscriptions }: GetEventsSearchParametersMapperProps): RestGetEventsRequest => {
@@ -41,9 +42,13 @@ export const mapParams = ({ page, filters, orderByBeginAt, orderBySubscriptions 
     if (key === 'zone' && value === 'all') {
       return acc
     }
-    if (value) {
-      return { ...acc, ...paramsCollection[key](value) }
+    if (value === null || value === undefined) {
+      return acc
     }
-    return acc
-  }, {})
+    if (value === '') {
+      return acc
+    }
+    const map = paramsCollection[key as keyof typeof paramsCollection]
+    return map ? { ...acc, ...map(value as never) } : acc
+  }, {} as RestGetEventsRequest)
 }

@@ -1,5 +1,5 @@
 import { useToastController } from '@tamagui/toast'
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 
 import { EventFilters } from '@/core/entities/Event'
@@ -26,6 +26,14 @@ const fetchEventPublicList = async (pageParam: number, opts: FetchShortEventsOpt
   return await api.getPublicEvents({ page: pageParam, filters: opts.filters, zoneCode: opts.zoneCode, orderByBeginAt: true })
 }
 
+const buildEventsFiltersQueryKey = (filters: EventFilters | undefined) =>
+  filters
+    ? JSON.stringify({
+        ...filters,
+        finishAfter: filters.finishAfter ? format(filters.finishAfter, 'yyyy-MM-dd') : '',
+      })
+    : ''
+
 export const useSuspensePaginatedEvents = (opts: {
   filters?: EventFilters
   postalCode?: string
@@ -34,12 +42,7 @@ export const useSuspensePaginatedEvents = (opts: {
 }) => {
   const { isAuth } = useSession()
   const { enabled = true, ...queryOpts } = opts
-  const filtersKey = queryOpts.filters
-    ? JSON.stringify({
-        ...queryOpts.filters,
-        finishAfter: queryOpts.filters.finishAfter ? format(queryOpts.filters.finishAfter, 'yyyy-MM-dd') : '',
-      })
-    : ''
+  const filtersKey = buildEventsFiltersQueryKey(queryOpts.filters)
 
   return useInfiniteQuery({
     queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', filtersKey],
@@ -49,6 +52,23 @@ export const useSuspensePaginatedEvents = (opts: {
     getPreviousPageParam: (firstPage) => (firstPage ? firstPage.metadata.current_page - 1 : null),
     initialPageParam: 1,
     enabled,
+  })
+}
+
+const pinnedEventsQueryOpts = { filters: { pinned: true } as const }
+
+export const useSuspensePinnedEvents = () => {
+  const { isAuth } = useSession()
+  const filtersKey = buildEventsFiltersQueryKey(pinnedEventsQueryOpts.filters)
+
+  return useSuspenseInfiniteQuery({
+    queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', 'pinned', filtersKey],
+    queryFn: ({ pageParam }) =>
+      isAuth ? fetchEventList(pageParam, pinnedEventsQueryOpts) : fetchEventPublicList(pageParam, pinnedEventsQueryOpts),
+    getNextPageParam: (lastPage) =>
+      lastPage ? (lastPage.metadata.last_page > lastPage.metadata.current_page ? lastPage.metadata.current_page + 1 : null) : null,
+    getPreviousPageParam: (firstPage) => (firstPage ? firstPage.metadata.current_page - 1 : null),
+    initialPageParam: 1,
   })
 }
 
