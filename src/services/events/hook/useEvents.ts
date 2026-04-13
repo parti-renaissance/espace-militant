@@ -34,12 +34,7 @@ const buildEventsFiltersQueryKey = (filters: EventFilters | undefined) =>
       })
     : ''
 
-export const useSuspensePaginatedEvents = (opts: {
-  filters?: EventFilters
-  postalCode?: string
-  zoneCode?: string
-  enabled?: boolean
-}) => {
+export const useSuspensePaginatedEvents = (opts: { filters?: EventFilters; postalCode?: string; zoneCode?: string; enabled?: boolean }) => {
   const { isAuth } = useSession()
   const { enabled = true, ...queryOpts } = opts
   const filtersKey = buildEventsFiltersQueryKey(queryOpts.filters)
@@ -57,19 +52,28 @@ export const useSuspensePaginatedEvents = (opts: {
 
 const pinnedEventsQueryOpts = { filters: { pinned: true } as const }
 
+const getPinnedEventsInfiniteQueryOptions = (isAuth: boolean) => {
+  const filtersKey = buildEventsFiltersQueryKey(pinnedEventsQueryOpts.filters)
+  return {
+    queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', 'pinned', filtersKey] as const,
+    queryFn: ({ pageParam }: { pageParam: number }) =>
+      isAuth ? fetchEventList(pageParam, pinnedEventsQueryOpts) : fetchEventPublicList(pageParam, pinnedEventsQueryOpts),
+    getNextPageParam: (lastPage: Awaited<ReturnType<typeof fetchEventList>> | undefined) =>
+      lastPage ? (lastPage.metadata.last_page > lastPage.metadata.current_page ? lastPage.metadata.current_page + 1 : null) : null,
+    getPreviousPageParam: (firstPage: Awaited<ReturnType<typeof fetchEventList>> | undefined) => (firstPage ? firstPage.metadata.current_page - 1 : null),
+    initialPageParam: 1,
+  }
+}
+
+/** Même cache que `useSuspensePinnedEvents`, sans suspendre */
+export const usePinnedEventsInfiniteQuery = () => {
+  const { isAuth } = useSession()
+  return useInfiniteQuery(getPinnedEventsInfiniteQueryOptions(isAuth))
+}
+
 export const useSuspensePinnedEvents = () => {
   const { isAuth } = useSession()
-  const filtersKey = buildEventsFiltersQueryKey(pinnedEventsQueryOpts.filters)
-
-  return useSuspenseInfiniteQuery({
-    queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', 'pinned', filtersKey],
-    queryFn: ({ pageParam }) =>
-      isAuth ? fetchEventList(pageParam, pinnedEventsQueryOpts) : fetchEventPublicList(pageParam, pinnedEventsQueryOpts),
-    getNextPageParam: (lastPage) =>
-      lastPage ? (lastPage.metadata.last_page > lastPage.metadata.current_page ? lastPage.metadata.current_page + 1 : null) : null,
-    getPreviousPageParam: (firstPage) => (firstPage ? firstPage.metadata.current_page - 1 : null),
-    initialPageParam: 1,
-  })
+  return useSuspenseInfiniteQuery(getPinnedEventsInfiniteQueryOptions(isAuth))
 }
 
 export const useSubscribeEvent = ({ id: eventId, slug }: { id: string; slug?: string }) => {

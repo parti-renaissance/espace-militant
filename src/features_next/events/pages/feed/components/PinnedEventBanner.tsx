@@ -143,13 +143,7 @@ function PinnedEventCardWrapper({ sizeMode, isMobile, children }: { sizeMode: Ca
   }
 
   return (
-    <YStack
-      flexShrink={0}
-      maxWidth={520}
-      minWidth={isMobile ? undefined : 320}
-      width={isMobile ? Dimensions.get('window').width * 0.8 : 350}
-      height={90}
-    >
+    <YStack flexShrink={0} maxWidth={520} minWidth={isMobile ? undefined : 320} width={isMobile ? Dimensions.get('window').width * 0.8 : 350} height={90}>
       {children}
     </YStack>
   )
@@ -170,6 +164,12 @@ const PinnedEventCard = memo(
             width={sizeMode === 'split' ? '100%' : undefined}
             onPress={showAuthOverlay ? undefined : () => router.push(href)}
             borderRadius="$medium"
+            hoverStyle={{
+              backgroundColor: '$textSurface',
+            }}
+            pressStyle={{
+              backgroundColor: '$textSurface',
+            }}
           >
             <VoxCard.Content gap="$small" padding={12}>
               <PinnedEventCardContent event={event} />
@@ -190,7 +190,7 @@ export function PinnedEventBanner() {
   const { data: userData } = useGetProfil({ enabled: Boolean(session) })
   const userUuid = userData?.uuid
   const { data } = useSuspensePinnedEvents()
-  const events = useMemo(() => data.pages.flatMap((p) => p.items), [data.pages])
+  const events = useMemo(() => data.pages.flatMap((p) => p?.items ?? []), [data.pages])
   const isMobile = Boolean(media.sm)
   const { paddingTop } = useLayoutSpacing({ top: true, left: false, right: false, bottom: false })
 
