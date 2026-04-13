@@ -190,7 +190,7 @@ export function PinnedEventBanner() {
   const { data: userData } = useGetProfil({ enabled: Boolean(session) })
   const userUuid = userData?.uuid
   const { data } = useSuspensePinnedEvents()
-  const events = useMemo(() => data.pages.flatMap((p) => p.items), [data.pages])
+  const events = useMemo(() => data.pages.flatMap((p) => p?.items ?? []), [data.pages])
   const isMobile = Boolean(media.sm)
   const { paddingTop } = useLayoutSpacing({ top: true, left: false, right: false, bottom: false })
 

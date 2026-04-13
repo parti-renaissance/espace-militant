@@ -5,6 +5,7 @@ import { getToken, Spinner, useMedia, YStack } from 'tamagui'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
+import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
@@ -14,7 +15,7 @@ import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection } from '@/features_next/events/utils'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { useSuspensePaginatedEvents } from '@/services/events/hook'
+import { usePinnedEventsInfiniteQuery, useSuspensePaginatedEvents } from '@/services/events/hook'
 import { QUERY_KEY_PAGINATED_SHORT_EVENTS } from '@/services/events/hook/queryKeys'
 import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useHits } from '@/services/hits/hook'
@@ -72,6 +73,22 @@ const EventFeed = () => {
   useEffect(() => {
     trackImpressionRef.current = trackImpression
   }, [trackImpression])
+
+  const listSpacing = useLayoutSpacing('left')
+  const { data: pinnedFeed } = usePinnedEventsInfiniteQuery()
+
+  const hasPinnedBannerContent = useMemo(() => {
+    const items = pinnedFeed?.pages.flatMap((p) => p?.items ?? []) ?? []
+    return items.length > 0
+  }, [pinnedFeed?.pages])
+
+  const feedContentContainerStyle = useMemo(
+    () => ({
+      gap: getToken('$medium', 'space'),
+      paddingTop: hasPinnedBannerContent ? 8 : Platform.OS === 'ios' ? 8 : listSpacing.paddingTop,
+    }),
+    [hasPinnedBannerContent, listSpacing.paddingTop],
+  )
 
   const {
     data: paginatedFeed,
@@ -233,7 +250,7 @@ const EventFeed = () => {
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
           hasMore={hasNextPage ?? false}
-          contentContainerStyle={{ gap: getToken('$medium', 'space') }}
+          contentContainerStyle={feedContentContainerStyle}
           removeClippedSubviews={Platform.OS === 'android'}
           windowSize={21}
           initialNumToRender={10}
