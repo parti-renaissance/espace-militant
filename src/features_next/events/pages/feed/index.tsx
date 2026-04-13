@@ -1,8 +1,8 @@
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
+import { useQueryClient } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
@@ -81,7 +81,7 @@ const EventFeed = () => {
     isFetching,
     refetch,
   } = useSuspensePaginatedEvents({
-    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents', pinned: false },
+    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents' ? true : undefined, pinned: false },
     enabled: filtersReady,
   })
 
@@ -90,10 +90,9 @@ const EventFeed = () => {
   const handleManualRefresh = useCallback(() => {
     setIsManualRefreshing(true)
     const scope = isAuth ? 'private' : 'public'
-    void Promise.all([
-      refetch(),
-      queryClient.refetchQueries({ queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, scope, 'pinned'] }),
-    ]).finally(() => setIsManualRefreshing(false))
+    void Promise.all([refetch(), queryClient.refetchQueries({ queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, scope, 'pinned'] })]).finally(() =>
+      setIsManualRefreshing(false),
+    )
   }, [refetch, queryClient, isAuth])
 
   const loadMore = useDebouncedCallback(
