@@ -1,10 +1,20 @@
 import React, { useCallback, useEffect } from 'react'
 import { LayoutChangeEvent } from 'react-native'
-import { scheduleOnUI } from 'react-native-worklets'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-import { Text, View, XStack } from 'tamagui'
+import { scheduleOnUI } from 'react-native-worklets'
+import { Text, useTheme, View, XStack } from 'tamagui'
 
-type Option = { label: string; value: string | undefined }
+import type { IconComponent } from '@/models/common.model'
+
+type Option = {
+  label: string
+  value: string | undefined
+  iconLeft?: IconComponent
+  activeTheme?: {
+    backgroundColor?: string
+    textColor?: string
+  }
+}
 export type OptionsArray = [Option, Option] | [Option, Option, Option] | [Option, Option, Option, Option] | [Option, Option, Option, Option, Option]
 
 type Props = {
@@ -17,17 +27,39 @@ const HEIGHT = 44
 const PADDING = 4
 
 const BigSwitch = ({ options, value, onChange }: Props) => {
-  const selectedIndex = options.findIndex((opt) => opt.value === value)
+  const theme = useTheme()
+  const selectedIndex = Math.max(
+    0,
+    options.findIndex((opt) => opt.value === value),
+  )
+  const selectedOption = options[selectedIndex]
+  const resolveThemeColor = useCallback(
+    (color?: string) => {
+      if (!color) return undefined
+      if (!color.startsWith('$')) return color
+      const token = color.slice(1)
+      const tokenEntry = (theme as Record<string, { val?: string }>)[token]
+      return tokenEntry?.val ?? color
+    },
+    [theme],
+  )
+  const activeBackgroundColor = resolveThemeColor(selectedOption?.activeTheme?.backgroundColor) ?? resolveThemeColor('$textOutline20') ?? '#E5E7EB'
+  const activeTextColor = selectedOption?.activeTheme?.textColor ?? '$textPrimary'
 
   // 1. SharedValues pour la géométrie (évite les re-renders via setState)
   const segmentWidth = useSharedValue(0)
   const translateX = useSharedValue(0)
+  const backgroundColor = useSharedValue(activeBackgroundColor)
 
   // 2. Animation UI pure
   const animatedStyle = useAnimatedStyle(() => ({
     width: segmentWidth.value,
     transform: [{ translateX: translateX.value }],
     opacity: segmentWidth.value > 0 ? 1 : 0, // Cache tant que le layout n'est pas prêt
+  }))
+
+  const backgroundAnimatedStyle = useAnimatedStyle(() => ({
+    backgroundColor: backgroundColor.value,
   }))
 
   // Fonction d'animation exportée vers le thread UI
@@ -43,17 +75,25 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
     (e: LayoutChangeEvent) => {
       const w = e.nativeEvent.layout.width
       const sW = (w - PADDING * 2) / options.length
+      const isFirstMeasure = segmentWidth.value === 0
       segmentWidth.value = sW
-      // Position initiale sans animation
-      translateX.value = selectedIndex >= 0 ? selectedIndex * sW : 0
+      // Position initiale sans animation uniquement au premier layout.
+      // Sinon, on laisse les animations piloter translateX.
+      if (isFirstMeasure) {
+        translateX.value = selectedIndex * sW
+      }
     },
-    [options.length, selectedIndex],
+    [options.length, selectedIndex, segmentWidth, translateX],
   )
 
   // 4. Synchronisation externe (ex: reset des filtres)
   useEffect(() => {
-    scheduleOnUI(animateToIndex, selectedIndex >= 0 ? selectedIndex : 0)
+    scheduleOnUI(animateToIndex, selectedIndex)
   }, [selectedIndex, animateToIndex])
+
+  useEffect(() => {
+    backgroundColor.value = withTiming(activeBackgroundColor, { duration: 250 })
+  }, [activeBackgroundColor, backgroundColor])
 
   // 5. Handler de clic optimisé
   const handlePress = (val: string | undefined, index: number) => {
@@ -82,6 +122,20 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
       role="tablist"
       aria-label="Big switch"
     >
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          {
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            borderRadius: 999,
+          },
+          backgroundAnimatedStyle,
+        ]}
+      />
       <Animated.View
         style={[
           {
@@ -114,9 +168,12 @@ const BigSwitch = ({ options, value, onChange }: Props) => {
           zIndex={1}
           cursor={index === selectedIndex ? 'default' : 'pointer'}
         >
-          <Text fontWeight="600" fontSize={14} color={selectedIndex === index ? '$textPrimary' : '$textSecondary'} numberOfLines={1}>
-            {option.label}
-          </Text>
+          <XStack alignItems="flex-end" gap="$small">
+            {option.iconLeft ? <option.iconLeft size={16} color={selectedIndex === index ? activeTextColor : '$textPrimary'} /> : null}
+            <Text fontWeight="600" fontSize={14} color={selectedIndex === index ? activeTextColor : '$textPrimary'} numberOfLines={1}>
+              {option.label}
+            </Text>
+          </XStack>
         </View>
       ))}
     </XStack>

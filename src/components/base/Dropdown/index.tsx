@@ -48,7 +48,7 @@ export const DropdownItemFrame = styled(ThemeableStack, {
         minHeight: 44,
       },
       md: {
-        minHeight: 48,
+        minHeight: 53,
       },
       lg: {
         minHeight: 56,

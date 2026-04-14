@@ -42,6 +42,7 @@ export interface ActiveFilterChip {
   key: string
   label: string
   value_label: string
+  isNegation?: boolean
 }
 
 export function getActiveFilterChips(filters: FilterValues, collection: FiltersCollectionResponse | undefined): ActiveFilterChip[] {
@@ -60,7 +61,10 @@ export function getActiveFilterChips(filters: FilterValues, collection: FiltersC
     const definition = byCode.get(code)
     const label = definition?.label ?? code
     const value_label = formatFilterValueLabel(value, definition)
-    chips.push({ key: code, label, value_label })
+    const isNegation =
+      (typeof value === 'string' && value.includes('!')) ||
+      (Array.isArray(value) && value.some((item) => typeof item === 'string' && item.includes('!')))
+    chips.push({ key: code, label, value_label, isNegation })
   }
   return chips
 }
@@ -69,11 +73,12 @@ function formatFilterValueLabel(value: FilterValue, definition: FilterDefinition
   if (value === undefined || value === null) return ''
 
   if (typeof value === 'string') {
+    const sanitizedValue = value.startsWith('!') ? value.slice(1) : value
     if (definition?.type === 'select' && definition?.options && 'choices' in definition.options) {
       const choices = (definition.options as FilterOptionSelect).choices as Record<string, string> | undefined
-      return (choices && choices[value]) ?? value
+      return (choices && choices[sanitizedValue]) ?? sanitizedValue
     }
-    return value
+    return sanitizedValue
   }
 
   if (typeof value === 'number' || typeof value === 'boolean') return String(value)
@@ -82,11 +87,12 @@ function formatFilterValueLabel(value: FilterValue, definition: FilterDefinition
     if (value.length === 0) return ''
     const first = value[0]
     if (typeof first === 'string') {
+      const sanitizedValues = value.map((v) => (v.startsWith('!') ? v.slice(1) : v))
       if (definition?.type === 'select' && definition?.options && 'choices' in definition.options) {
         const choices = (definition.options as FilterOptionSelect).choices as Record<string, string> | undefined
-        return value.map((v) => (choices && choices[v]) ?? v).join(', ')
+        return sanitizedValues.map((v) => (choices && choices[v]) ?? v).join(', ')
       }
-      return value.join(', ')
+      return sanitizedValues.join(', ')
     }
     if (first != null && typeof first === 'object' && 'name' in first) {
       return value.map((z) => (z as { name?: string; code?: string }).name ?? (z as { code?: string }).code ?? '').join(', ')

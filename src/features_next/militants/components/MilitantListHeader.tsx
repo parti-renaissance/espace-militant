@@ -1,6 +1,6 @@
 import React from 'react'
 import { useMedia, XStack, YStack } from 'tamagui'
-import { ChevronLeft, ChevronRight, CircleX, Filter, RotateCcw, Search } from '@tamagui/lucide-icons'
+import { ChevronLeft, ChevronRight, CircleX, EqualNot, Filter, RotateCcw, Search } from '@tamagui/lucide-icons'
 
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
@@ -23,8 +23,9 @@ function ActiveFilterChipsRow({
         <VoxButton
           key={chip.key}
           size="xxs"
-          theme="blue"
+          theme={chip.isNegation ? 'orange' : 'blue'}
           variant="contained"
+          iconLeft={chip.isNegation ? EqualNot : undefined}
           iconRight={CircleX}
           onPress={() => onRemoveFilter(chip.key)}
           testID={`filter-chip-${chip.key}`}
@@ -82,14 +83,7 @@ export function MilitantHeaderTop() {
   )
 }
 
-export function MilitantHeaderPagination({
-  page,
-  pageSize,
-  totalItems,
-  onPageChange,
-  disabled = false,
-  rightSlot,
-}: MilitantHeaderPaginationProps) {
+export function MilitantHeaderPagination({ page, pageSize, totalItems, onPageChange, disabled = false, rightSlot }: MilitantHeaderPaginationProps) {
   const media = useMedia()
   const lastPage = totalItems != null ? Math.ceil(totalItems / pageSize) : undefined
   const isPrevDisabled = disabled || page <= 1

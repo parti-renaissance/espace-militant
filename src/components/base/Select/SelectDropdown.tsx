@@ -2,12 +2,15 @@ import React, { ComponentRef, forwardRef, ReactNode, RefObject, useCallback, use
 import { FlatList, GestureResponderEvent, Modal, Platform, TouchableOpacity } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { YStack } from 'tamagui'
+import { Equal, EqualNot } from '@tamagui/lucide-icons'
+
+import BigSwitch from '../BigSwitch'
 import { DropdownFrame, DropdownItem, DropdownItemFrame } from '../Dropdown'
 import Input from '../Input/Input'
+import Text from '../Text'
 import { ModalDropDownRef, SelectProps } from './types'
 import useSelectSearch from './useSelectSearch'
 import { reactTextNodeChildrenToString } from './utils'
-import Text from '../Text'
 
 type ModalDropDownProps = {
   children: ReactNode
@@ -16,6 +19,7 @@ type ModalDropDownProps = {
 }
 
 const MemoItem = React.memo(DropdownItem)
+const EqualNotOrange = (iconProps: { color?: string; size?: number }) => <EqualNot {...iconProps} color="$orange5" />
 
 const ModalDropDown = forwardRef<ModalDropDownRef, ModalDropDownProps>((props, ref) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -52,7 +56,7 @@ const ModalDropDown = forwardRef<ModalDropDownRef, ModalDropDownProps>((props, r
 })
 
 type DropDownLogicProps = {
-  frameRef: RefObject<ComponentRef<typeof TouchableOpacity>>
+  frameRef: RefObject<ComponentRef<typeof TouchableOpacity> | null>
 } & SelectProps<string>
 
 const MIN_WIDTH = 200
@@ -61,168 +65,183 @@ export type SelectDropdownRef = ModalDropDownRef & {
   setModalPosition: () => void
 }
 
-const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(({ frameRef, options, searchableOptions, resetable, openAbove, searchable, nullableOption, ...props }, ref) => {
-  const modalRef = useRef<ModalDropDownRef>(null)
-  const dropdownTop = useSharedValue(0)
-  const dropdownX = useSharedValue(0)
-  const dropdownWidth = useSharedValue(0)
-  const { setQuery, filteredItems, queryInputRef, searchableIcon, query } = useSelectSearch({ options, searchableOptions })
+const SelectDropdown = forwardRef<SelectDropdownRef, DropDownLogicProps>(
+  ({ frameRef, options, searchableOptions, resetable, openAbove, searchable, nullableOption, allowInverseSelection, ...props }, ref) => {
+    const modalRef = useRef<ModalDropDownRef>(null)
+    const dropdownTop = useSharedValue(0)
+    const dropdownX = useSharedValue(0)
+    const dropdownWidth = useSharedValue(0)
+    const { setQuery, filteredItems, queryInputRef, searchableIcon, query } = useSelectSearch({ options, searchableOptions })
+    const [isInverseSelectionActive, setIsInverseSelectionActive] = useState(Boolean(props.value?.startsWith('!')))
 
-  const setModalPosition = useCallback(() => {
-    frameRef.current?.measure((_fx, _fy, _w, h, _px, py) => {
-      const isMinWidth = _w < MIN_WIDTH
-      const x = isMinWidth ? _px - (MIN_WIDTH - _w) / 2 : _px
-      const w = isMinWidth ? MIN_WIDTH : _w
+    const setModalPosition = useCallback(() => {
+      frameRef.current?.measure((_fx, _fy, _w, h, _px, py) => {
+        const isMinWidth = _w < MIN_WIDTH
+        const x = isMinWidth ? _px - (MIN_WIDTH - _w) / 2 : _px
+        const w = isMinWidth ? MIN_WIDTH : _w
 
-      // Calculer la hauteur du dropdown en fonction du nombre d'options
-      const itemHeight = 48 // Hauteur approximative de chaque option
-      const headerHeight = searchable ? 56 : 0 // Hauteur de la barre de recherche si activée
-      const maxVisibleItems = 7 // Nombre maximum d'items visibles
-      const dropdownHeight = Math.min(
-        headerHeight + (Math.min(options.length, maxVisibleItems) * itemHeight),
-        325 // Hauteur maximale du dropdown
-      )
+        // Calculer la hauteur du dropdown en fonction du nombre d'options
+        const itemHeight = 48 // Hauteur approximative de chaque option
+        const headerHeight = searchable ? 56 : 0 // Hauteur de la barre de recherche si activée
+        const maxVisibleItems = 7 // Nombre maximum d'items visibles
+        const dropdownHeight = Math.min(
+          headerHeight + Math.min(options.length, maxVisibleItems) * itemHeight,
+          325, // Hauteur maximale du dropdown
+        )
 
-      // Si openAbove est true, positionner le dropdown au-dessus du select
-      if (openAbove) {
-        if (Platform.OS === 'web') {
-          dropdownTop.value = Math.max(1, py - dropdownHeight)
+        // Si openAbove est true, positionner le dropdown au-dessus du select
+        if (openAbove) {
+          if (Platform.OS === 'web') {
+            dropdownTop.value = Math.max(1, py - dropdownHeight)
+          } else {
+            dropdownTop.value = py - dropdownHeight
+          }
         } else {
-          dropdownTop.value = py - dropdownHeight
+          dropdownTop.value = Math.max(1, py + h)
         }
-      } else {
-        dropdownTop.value = Math.max(1, py + h)
-      }
 
-      dropdownX.value = x
-      dropdownWidth.value = w
-    })
-  }, [openAbove, searchable, options.length, frameRef, dropdownTop, dropdownX, dropdownWidth])
+        dropdownX.value = x
+        dropdownWidth.value = w
+      })
+    }, [openAbove, searchable, options.length, frameRef, dropdownTop, dropdownX, dropdownWidth])
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      open: () => {
-        if (frameRef.current) {
-          setModalPosition()
-          modalRef.current?.open()
-          props.onOpen?.()
-        }
-        setTimeout(() => queryInputRef.current?.focus(), 100)
-      },
-      close: () => {
-        modalRef.current?.close()
-        props.onBlur?.()
-      },
-      setModalPosition,
-    }),
-    [props.onOpen],
-  )
+    useImperativeHandle(
+      ref,
+      () => ({
+        open: () => {
+          if (frameRef.current) {
+            setModalPosition()
+            modalRef.current?.open()
+            props.onOpen?.()
+          }
+          setTimeout(() => queryInputRef.current?.focus(), 100)
+        },
+        close: () => {
+          modalRef.current?.close()
+          props.onBlur?.()
+        },
+        setModalPosition,
+      }),
+      [props.onOpen],
+    )
 
-  const handleClose = () => {
-    props.onBlur?.()
-    setQuery('')
-  }
-
-  const handleSelect = (payload: (typeof filteredItems)[number]) => () => {
-    props.onChange?.(payload.id)
-    props.onDetailChange?.({
-      value: payload.id,
-      label: reactTextNodeChildrenToString(payload.title),
-      subLabel: payload.subtitle,
-    })
-    modalRef.current?.close()
-    props.onBlur?.()
-    setQuery('')
-  }
-
-  const dropDownAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      top: dropdownTop.value,
-      left: dropdownX.value,
-      width: dropdownWidth.value,
-      position: Platform.OS === 'web' && openAbove ? 'fixed' : 'absolute',
-      maxHeight: 325,
+    const handleClose = () => {
+      props.onBlur?.()
+      setQuery('')
     }
-  })
 
-  return (
-    <>
-      <ModalDropDown onClose={handleClose} ref={modalRef}>
-        <Animated.View style={[dropDownAnimatedStyle]}>
-          <DropdownFrame width="100%">
-            <FlatList
-              stickyHeaderHiddenOnScroll={searchable}
-              stickyHeaderIndices={searchable ? [0] : undefined}
-              contentContainerStyle={{
-                maxHeight: 325,
-              }}
-              ListHeaderComponent={
-                <YStack>
-                  {searchable ? (
-                    <YStack padding={8} bg="white" borderBottomColor="$textOutline" borderBottomWidth={1}>
-                      <Input
-                        ref={queryInputRef}
-                        size="sm"
-                        color="gray"
-                        onChangeText={setQuery}
-                        placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
-                        iconRight={searchableIcon}
-                        loading={searchableOptions?.isFetching}
-                      />
-                    </YStack>
-                  ) : null}
-                  {props.helpText ? (
-                    <YStack p="$medium" bg="$textSurface" borderBottomColor="$textOutline" borderBottomWidth={1}>
-                      {typeof props.helpText === 'string' ? (
-                        <Text.SM secondary>{props.helpText}</Text.SM>
-                      ) : (
-                        props.helpText
-                      )}
-                    </YStack>
-                  ) : null}
-                  {
-                    searchableOptions?.noResults && searchableOptions?.isFetching === false ? (
+    const handleInverseSelectionChange = useCallback((value: string | undefined) => {
+      setIsInverseSelectionActive(value === 'inverse')
+    }, [])
+
+    const handleSelect = (payload: (typeof filteredItems)[number]) => () => {
+      const nextValue = allowInverseSelection && isInverseSelectionActive ? `!${payload.id}` : payload.id
+      props.onChange?.(nextValue)
+      props.onDetailChange?.({
+        value: nextValue,
+        label: reactTextNodeChildrenToString(payload.title),
+        subLabel: payload.subtitle,
+      })
+      modalRef.current?.close()
+      props.onBlur?.()
+      setQuery('')
+    }
+
+    const dropDownAnimatedStyle = useAnimatedStyle(() => {
+      return {
+        top: dropdownTop.value,
+        left: dropdownX.value,
+        width: dropdownWidth.value,
+        position: Platform.OS === 'web' && openAbove ? 'fixed' : 'absolute',
+        maxHeight: 325,
+      }
+    })
+
+    return (
+      <>
+        <ModalDropDown onClose={handleClose} ref={modalRef}>
+          <Animated.View style={[dropDownAnimatedStyle]}>
+            <DropdownFrame width="100%">
+              <FlatList
+                stickyHeaderHiddenOnScroll={searchable || allowInverseSelection}
+                stickyHeaderIndices={searchable || allowInverseSelection ? [0] : undefined}
+                contentContainerStyle={{
+                  maxHeight: 325,
+                }}
+                ListHeaderComponent={
+                  <YStack>
+                    {allowInverseSelection ? (
+                      <YStack p="$small" bg="$white1" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                        <BigSwitch
+                          options={[
+                            { label: 'Inclure', value: 'normal', iconLeft: Equal },
+                            { label: 'Exclure', value: 'inverse', iconLeft: EqualNot, activeTheme: { textColor: '$orange8', backgroundColor: '$orange1' } },
+                          ]}
+                          value={isInverseSelectionActive ? 'inverse' : 'normal'}
+                          onChange={handleInverseSelectionChange}
+                        />
+                      </YStack>
+                    ) : null}
+                    {searchable ? (
+                      <YStack padding={8} bg="white" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                        <Input
+                          ref={queryInputRef}
+                          size="sm"
+                          color="gray"
+                          onChangeText={setQuery}
+                          placeholder={searchableOptions?.placeholder ?? 'Rechercher'}
+                          iconRight={searchableIcon}
+                          loading={searchableOptions?.isFetching}
+                        />
+                      </YStack>
+                    ) : null}
+                    {props.helpText ? (
+                      <YStack p="$medium" bg="$textSurface" borderBottomColor="$textOutline" borderBottomWidth={1}>
+                        {typeof props.helpText === 'string' ? <Text.SM secondary>{props.helpText}</Text.SM> : props.helpText}
+                      </YStack>
+                    ) : null}
+                    {searchableOptions?.noResults && searchableOptions?.isFetching === false ? (
                       <DropdownItemFrame>
                         <Text.MD secondary>{searchableOptions?.noResults}</Text.MD>
                       </DropdownItemFrame>
-                    ) : null
-                  }
-                  {
-                    nullableOption && (
-                      <DropdownItemFrame onPress={() => {
-                        props.onChange?.(null)
-                        props.onDetailChange?.({
-                          value: '',
-                          label: '',
-                          subLabel: '',
-                        })
-                        handleClose()
-                        modalRef.current?.close()
-                      }}>
+                    ) : null}
+                    {nullableOption && (
+                      <DropdownItemFrame
+                        onPress={() => {
+                          props.onChange?.(null)
+                          props.onDetailChange?.({
+                            value: '',
+                            label: '',
+                            subLabel: '',
+                          })
+                          handleClose()
+                          modalRef.current?.close()
+                        }}
+                      >
                         <Text.MD secondary>{nullableOption}</Text.MD>
                       </DropdownItemFrame>
-                    )
-                  }
-                </YStack>
-              }
-              data={filteredItems}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item, index }) => (
-                <MemoItem
-                  {...item}
-                  onPress={handleSelect(item)}
-                  size={props.size ?? 'lg'}
-                  selected={item.id === props.value}
-                  last={filteredItems.length - 1 === index}
-                />
-              )}
-            />
-          </DropdownFrame>
-        </Animated.View>
-      </ModalDropDown>
-    </>
-  )
-})
+                    )}
+                  </YStack>
+                }
+                data={filteredItems}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item, index }) => (
+                  <MemoItem
+                    {...item}
+                    icon={allowInverseSelection ? (isInverseSelectionActive ? EqualNotOrange : Equal) : item.icon}
+                    onPress={handleSelect(item)}
+                    size={props.size ?? 'lg'}
+                    selected={isInverseSelectionActive ? props.value === `!${item.id}` : props.value === item.id}
+                    last={filteredItems.length - 1 === index}
+                  />
+                )}
+              />
+            </DropdownFrame>
+          </Animated.View>
+        </ModalDropDown>
+      </>
+    )
+  },
+)
 
 export default SelectDropdown
