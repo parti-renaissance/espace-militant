@@ -56,7 +56,7 @@ function MilitantProfilePicture({ imageUrl, displayName }: { imageUrl: string | 
 
   if (!imageUrl) {
     return (
-      <YStack alignItems="center" justifyContent="center" flex={1} height={200} bg="$gray8" pt="$large">
+      <YStack alignItems="center" justifyContent="center" height={200} bg="$gray8" pt="$large">
         <Text fontSize={128} medium color="$textDisabled">
           {initials}
         </Text>
@@ -65,7 +65,7 @@ function MilitantProfilePicture({ imageUrl, displayName }: { imageUrl: string | 
   }
 
   return (
-    <YStack flex={1} bg="$gray8" onLayout={onPhotoRowLayout}>
+    <YStack bg="$gray8" onLayout={onPhotoRowLayout}>
       <Animated.View style={photoFrameStyle}>
         <Image source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" alt={displayName} />
         <View position="absolute" right="$small" bottom={12} opacity={0.6}>
@@ -89,7 +89,7 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
         <XStack gap="$medium" alignItems="center" flexWrap="wrap">
           <XStack gap={4} flex={1}>
             <YStack flex={1} minWidth={120} gap={2}>
-              <Text.SM semibold>{displayName}</Text.SM>
+              <Text.MD semibold>{displayName}</Text.MD>
               {age != null && <Text.SM secondary>{age} ans</Text.SM>}
               {engagementScore != null && (
                 <XStack alignItems="center" gap={8} marginTop={4}>
@@ -136,7 +136,7 @@ const TABS: { id: FicheMilitantTabId; label: string }[] = [
 
 function MilitantDetailTabs({ activeTab, onTabChange }: { activeTab: FicheMilitantTabId; onTabChange: (tab: FicheMilitantTabId) => void }) {
   return (
-    <XStack borderBottomWidth={2} borderTopWidth={1} borderColor="$borderColor" paddingHorizontal="$medium" mt="$medium">
+    <XStack borderBottomWidth={2} borderColor="$borderColor" paddingHorizontal="$medium" mt="$xsmall">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id
         return (
