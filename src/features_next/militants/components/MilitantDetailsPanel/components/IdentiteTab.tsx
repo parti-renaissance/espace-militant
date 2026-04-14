@@ -86,7 +86,7 @@ function InfoRow({
   seeSecureDataLoading?: boolean
 }) {
   return (
-    <YStack gap={12} bg="$textSurface" justifyContent="center" py="$small" pl={12} pr="$small" borderRadius="$small" minHeight={status ? 50 : 40}>
+    <YStack gap={12} bg="$textSurface" justifyContent="center" py="$small" pl={12} pr="$small" borderRadius="$xsmall" minHeight={status ? 50 : 40}>
       <XStack gap={12} alignItems="center">
         <Icon size={12} color={desactivated ? '$textDisabled' : '$textPrimary'} />
         <YStack flex={1} minWidth={0} gap={6}>
@@ -531,7 +531,7 @@ export function IdentiteTabContent({
   const staticTags = Array.isArray(summaryData.static_tags) ? summaryData.static_tags : []
 
   return (
-    <YStack padding="$medium" gap="$large" paddingBottom={80}>
+    <YStack px="$medium" py={24} gap="$large" paddingBottom={80}>
       <InformationsPersonnellesSection isLoading={isLoading} data={summaryData} uuid={uuid} scope={scope} />
       {(detailData || isLoading) && <SessionsSection isLoading={isLoading} data={detailData ?? null} />}
       <RolesSection roles={roles} />

@@ -160,9 +160,9 @@ function MilitantCadreItemInner({
 
   const isMobileLayout = media.md || media.sm
   const col1Width = isMobileLayout ? '100%' : '25%'
-  const col2Width = isMobileLayout ? '100%' : '36%'
-  const col3Width = isMobileLayout ? '50%' : '22%'
-  const col4Width = isMobileLayout ? '50%' : '17%'
+  const col2Width = isMobileLayout ? '100%' : '35%'
+  const col3Width = isMobileLayout ? '50%' : '24%'
+  const col4Width = isMobileLayout ? '50%' : '16%'
 
   const circonscription = instances?.find((i) => i.type === 'circonscription')
   const assembly = instances?.find((i) => i.type === 'assembly')
@@ -216,15 +216,13 @@ function MilitantCadreItemInner({
             {elect_mandates.length > 0 && (
               <XStack gap={4}>
                 <TagChipRow tags={elect_mandates} theme="orange" />
-                {elect_tags && (
-                  <Chip theme="orange">
-                    <XStack gap={4} alignItems="center">
-                      {elect_tags.map((t, idx) => (
-                        <CotisationIconByCode key={`${t.code}-${idx}`} code={t.code} />
-                      ))}
-                    </XStack>
-                  </Chip>
-                )}
+                {elect_tags
+                  ? elect_tags.map((t, idx) => (
+                      <Chip key={`${t.code}-${idx}`} theme="orange" p="$xsmall" minWidth={22} justifyContent="center">
+                        <CotisationIconByCode code={t.code} />
+                      </Chip>
+                    ))
+                  : null}
               </XStack>
             )}
             {static_tags && <TagChipRow tags={static_tags} theme="gray" />}

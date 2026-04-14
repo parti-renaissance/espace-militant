@@ -94,11 +94,15 @@ export function MilitantHeaderPagination({ page, pageSize, totalItems, onPageCha
 
   return (
     <XStack justifyContent={media.sm ? 'space-between' : 'flex-end'} alignItems="center" gap={rightSlot ? 0 : '$medium'}>
-      <Text.SM>
-        <Text.SM secondary>{rangeText} sur </Text.SM>
-        <Text.SM semibold>{totalItems ?? '–'}</Text.SM>
-      </Text.SM>
-      {rightSlot ? <YStack>{rightSlot}</YStack> : null}
+      <Text.MD>
+        <Text.MD secondary>{rangeText} sur </Text.MD>
+        <Text.MD semibold>{totalItems ?? '–'}</Text.MD>
+      </Text.MD>
+      {rightSlot ? (
+        <YStack px="$small" ml="auto">
+          {rightSlot}
+        </YStack>
+      ) : null}
       <XStack gap={4}>
         <VoxButton
           variant="outlined"
