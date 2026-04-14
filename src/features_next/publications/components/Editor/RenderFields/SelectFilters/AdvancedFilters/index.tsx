@@ -232,6 +232,7 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
                       value={getFilterValue(filter.code)}
                       options={options}
                       onChange={(value) => handleFilterChange(filter.code, value === '' || value === null ? null : value)}
+                      allowInverseSelection={Boolean(filter.options.advanced)}
                       noValuePlaceholder={filter.options.placeholder || 'Choisir'}
                       nullableOption={!hasEmptyOption ? 'Aucune sélection' : undefined}
                       size="md"

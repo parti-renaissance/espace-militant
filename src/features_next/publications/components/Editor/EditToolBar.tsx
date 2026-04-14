@@ -1,10 +1,11 @@
-import React, { forwardRef, RefObject, useCallback, useImperativeHandle } from 'react'
+import React, { forwardRef, RefObject, useImperativeHandle } from 'react'
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
 import { styled, ThemeableStack } from 'tamagui'
 import { ArrowDownToLine, ArrowUpToLine, Pencil, Trash2, X } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+import { withCleanAnimated } from '@/utils/withCleanAnimated'
 
 import { EditorMethods } from './types'
 
@@ -26,7 +27,7 @@ const ToolBarPositioner = styled(ThemeableStack, {
   alignItems: 'center',
 })
 
-const AnimatedToolBarPositioner = Animated.createAnimatedComponent(ToolBarPositioner)
+const AnimatedToolBarPositioner = withCleanAnimated(ToolBarPositioner)
 
 const ToolBarFrame = styled(ThemeableStack, {
   padding: 12,
@@ -43,7 +44,7 @@ const ToolBarFrame = styled(ThemeableStack, {
   },
 })
 
-const AnimatedToolBarFrame = Animated.createAnimatedComponent(ToolBarFrame)
+const AnimatedToolBarFrame = withCleanAnimated(ToolBarFrame)
 
 type MessageEditorToolBarProps = {
   editorMethods: RefObject<EditorMethods>
@@ -56,6 +57,8 @@ export type MessageEditorToolBarRef = {
 }
 
 const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEditorToolBarProps>((props, ref) => {
+  const { editorMethods, selected, selectedField } = props
+
   useImperativeHandle(ref, () => ({
     toggleAddBar: (_show: boolean) => {
       // EditToolbar ne gère pas l'add bar - délégation au parent si nécessaire
@@ -106,43 +109,43 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
     }
   })
 
-  const currentField = props.selectedField?.field
+  const currentField = selectedField?.field
 
-  const handleUnSelect = useCallback(() => {
-    props.editorMethods.current?.unSelect()
-  }, [props.editorMethods])
+  const handleUnSelect = () => {
+    editorMethods.current?.unSelect()
+  }
 
-  const handleEditField = useCallback(() => {
+  const handleEditField = () => {
     if (!currentField) return
-    props.editorMethods.current?.editField(currentField)
-  }, [currentField, props.editorMethods])
+    editorMethods.current?.editField(currentField)
+  }
 
-  const handleMoveUp = useCallback(() => {
+  const handleMoveUp = () => {
     if (!currentField) return
-    props.editorMethods.current?.moveField(currentField, -1)
-    setTimeout(() => props.editorMethods.current?.scrollToField(currentField))
-  }, [currentField, props.editorMethods])
+    editorMethods.current?.moveField(currentField, -1)
+    setTimeout(() => editorMethods.current?.scrollToField(currentField))
+  }
 
-  const handleMoveDown = useCallback(() => {
+  const handleMoveDown = () => {
     if (!currentField) return
-    props.editorMethods.current?.moveField(currentField, +1)
-    setTimeout(() => props.editorMethods.current?.scrollToField(currentField))
-  }, [currentField, props.editorMethods])
+    editorMethods.current?.moveField(currentField, +1)
+    setTimeout(() => editorMethods.current?.scrollToField(currentField))
+  }
 
-  const handleDeleteField = useCallback(() => {
+  const handleDeleteField = () => {
     if (!currentField) return
-    props.editorMethods.current?.removeField(currentField)
-  }, [currentField, props.editorMethods])
+    editorMethods.current?.removeField(currentField)
+  }
 
   React.useEffect(() => {
-    if (props.selected && currentField) {
+    if (selected && currentField) {
       animatedToolBarOpacity.value = 1
       animatedToolBarWidth.value = TOOLBAR_WIDTH_EXPANDED
       animatedOpacity.value = withTiming(0.8, {
         duration: ANIMATION_DURATION + ANIMATION_DELAY,
         easing: Easing.out(Easing.quad),
       })
-    } else if (!props.selected) {
+    } else if (!selected) {
       animatedToolBarOpacity.value = 0
       animatedToolBarWidth.value = TOOLBAR_WIDTH_COLLAPSED
       animatedOpacity.value = withTiming(0, {
@@ -150,10 +153,10 @@ const MessageEditorEditToolbar = forwardRef<MessageEditorToolBarRef, MessageEdit
         easing: Easing.out(Easing.quad),
       })
     }
-  }, [props.selected, currentField, animatedToolBarOpacity, animatedToolBarWidth, animatedOpacity])
+  }, [selected, currentField, animatedToolBarOpacity, animatedToolBarWidth, animatedOpacity])
 
   return (
-    <AnimatedToolBarPositioner onPress={(e) => e.stopPropagation()} style={[animatedStyle, { pointerEvents: props.selected ? 'auto' : 'none' }]}>
+    <AnimatedToolBarPositioner onPress={(e) => e.stopPropagation()} style={[animatedStyle, { pointerEvents: selected ? 'auto' : 'none' }]}>
       {currentField && (
         <AnimatedToolBarFrame style={animatedToolBarStyle}>
           <Animated.View style={animatedButtonStyle}>

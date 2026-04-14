@@ -1,11 +1,12 @@
 import React, { memo, ReactNode, RefObject, useCallback, useMemo } from 'react'
 import { GestureResponderEvent } from 'react-native'
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { createStyledContext, styled, ThemeableStack, withStaticProperties } from 'tamagui'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import Text from '@/components/base/Text'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+import { withCleanAnimated } from '@/utils/withCleanAnimated'
 
 import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 
@@ -52,7 +53,7 @@ const WrapperFrame = styled(ThemeableStack, {
   } as const,
 })
 
-const AnimatedWrapperFrame = Animated.createAnimatedComponent(WrapperFrame)
+const AnimatedWrapperFrame = withCleanAnimated(WrapperFrame)
 
 const SelectOverlay = styled(ThemeableStack, {
   context: wrapperContext,

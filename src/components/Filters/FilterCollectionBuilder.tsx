@@ -238,6 +238,7 @@ function FilterField({ filter, values, getFilterValue, getFilterValueForSelect, 
             onChange(code, isMultiple ? [value] : value)
           }
         }}
+        allowInverseSelection={Boolean(selectOpts.advanced)}
         noValuePlaceholder={selectOpts.placeholder ?? 'Choisir'}
         nullableOption={!hasEmptyOption ? 'Aucune sélection' : undefined}
         size="md"
