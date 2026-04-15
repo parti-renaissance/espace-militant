@@ -31,7 +31,7 @@ const EventManagementSection = ({ event }: EventItemProps) => {
   const handlePress = () =>
     handleDownload({
       url: getEventParticipantsFileEndpoint({ eventId: event.uuid }),
-      fileName: `liste_des_participants_${event.slug}`,
+      fileName: `liste_des_participants_${event.slug}.xlsx`,
       mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       UTI: 'org.openxmlformats.spreadsheetml.sheet',
       publicDownload: false,
