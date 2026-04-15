@@ -25,6 +25,8 @@ export type FiltersChipsProps = {
 }
 
 const getFilterLabel = (key: string, value: FilterValue, filterCollection: RestFilterCollectionResponse | null | undefined): string => {
+  const sanitizedStringValue = typeof value === 'string' && value.startsWith('!') ? value.slice(1) : value
+
   // Exception pour le filtre zone : afficher zone.name (zone.code)
   if (key === 'zone' && typeof value === 'object' && value !== null && 'name' in value && 'code' in value) {
     return `${value.name} (${value.code})`
@@ -36,15 +38,15 @@ const getFilterLabel = (key: string, value: FilterValue, filterCollection: RestF
   }
 
   // Exception pour le filtre adherent_tags : labels personnalisés
-  if (key === 'adherent_tags' && typeof value === 'string') {
+  if (key === 'adherent_tags' && typeof sanitizedStringValue === 'string') {
     const adherentLabels: Record<string, string> = {
       'adherent:a_jour_2025': 'À jour de cotisation',
       'adherent:a_jour_2025:primo': 'Primos',
       'adherent:plus_a_jour': 'Non à jour de cotisation',
     }
 
-    if (adherentLabels[value]) {
-      return adherentLabels[value]
+    if (adherentLabels[sanitizedStringValue]) {
+      return adherentLabels[sanitizedStringValue]
     }
   }
 
@@ -65,18 +67,18 @@ const getFilterLabel = (key: string, value: FilterValue, filterCollection: RestF
         const options = filter.options as { choices?: Record<string, string> | string[] }
         if (options.choices && typeof options.choices === 'object') {
           if (!Array.isArray(options.choices)) {
-            const choiceLabel = typeof value === 'string' ? options.choices[value] : undefined
+            const choiceLabel = typeof sanitizedStringValue === 'string' ? options.choices[sanitizedStringValue] : undefined
             if (choiceLabel) {
               return choiceLabel
             }
           } else {
             // choices est un tableau (ex. isCommitteeMember : ["Non", "Oui"]) → afficher "Label : Valeur"
-            const idx = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : -1
+            const idx = typeof value === 'number' ? value : typeof sanitizedStringValue === 'string' ? Number(sanitizedStringValue) : -1
             const choiceLabel =
               Number.isInteger(idx) && idx >= 0 && idx < options.choices.length
                 ? options.choices[idx]
-                : typeof value === 'string' && options.choices.includes(value)
-                  ? value
+                : typeof sanitizedStringValue === 'string' && options.choices.includes(sanitizedStringValue)
+                  ? sanitizedStringValue
                   : undefined
             if (choiceLabel) {
               return `${filter.label} : ${choiceLabel}`
