@@ -7,7 +7,6 @@ import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { SelectOption, SF } from '@/components/base/Select/SelectV3'
-import { getFormatedScope as getFormatedScopeData } from '@/services/profile/utils'
 
 import { isPathExist } from '@/services/common/errors/utils'
 import { eventPostFormError } from '@/services/events/error'
@@ -15,7 +14,9 @@ import { useCreateEvent, useDeleteEventImage, useMutationEventImage, useSuspense
 import { EventCategory, RestFullEvent } from '@/services/events/schema'
 import { useGetExecutiveScopes, useGetSuspenseProfil } from '@/services/profile/hook'
 import { RestUserScopesResponse, UserScopesEnum } from '@/services/profile/schema'
+import { getFormatedScope as getFormatedScopeData } from '@/services/profile/utils'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { FEATURES } from '@/utils/Scopes'
 
 import { useConfirmAlert } from './components/ConfirmAlert'
 import { createEventSchema, EventFormData } from './schema'
@@ -72,7 +73,7 @@ const roundMinutesToNextDecimal = (date: Date) => {
 }
 const useEventFormData = ({ edit }: EventFormProps) => {
   const scopes = useGetExecutiveScopes()
-  const scopeOptions = useMemo(() => scopes.data?.list?.filter((x) => x.features.includes('events')).map(getFormatedScope) ?? [], [scopes.data])
+  const scopeOptions = useMemo(() => scopes.data?.list?.filter((x) => x.features.includes(FEATURES.EVENTS)).map(getFormatedScope) ?? [], [scopes.data])
   const { data } = useGetSuspenseProfil({ enabled: true })
 
   const isAuthor = useMemo(() => {
@@ -99,8 +100,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const editEventScope = edit?.organizer?.scope ?? 'national'
 
   const initialScopeCode = edit ? (edit.organizer?.scope ?? 'national') : (scopes.data?.default?.code ?? 'national')
-  const defaultVisibilityForScope =
-    edit?.visibility ?? (String(initialScopeCode).startsWith('agora_') ? 'invitation_agora' : 'public')
+  const defaultVisibilityForScope = edit?.visibility ?? (String(initialScopeCode).startsWith('agora_') ? 'invitation_agora' : 'public')
   /** Portée Agora : événements toujours « en ligne » (produit). */
   const defaultModeForScope = String(initialScopeCode).startsWith('agora_') ? 'online' : (edit?.mode ?? 'meeting')
 

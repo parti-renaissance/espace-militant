@@ -2,6 +2,7 @@ import { ScrollView, YStack } from 'tamagui'
 import type { Meta, StoryObj } from '@storybook/react'
 
 import type { FilterDefinition, FiltersCollectionResponse } from '@/services/filters-collection/schema'
+import { FEATURES } from '@/utils/Scopes'
 
 import FilterCollectionBuilder from './FilterCollectionBuilder'
 import type { FilterValues } from './FilterCollectionBuilder'
@@ -74,7 +75,7 @@ type Story = StoryObj<typeof meta>
 
 export const WithMockAllFieldTypes: Story = {
   args: {
-    featureKey: 'contacts',
+    featureKey: FEATURES.CONTACTS,
     onChangeFilter: (values: FilterValues) => {
       // eslint-disable-next-line no-console
       console.log('onChangeFilter', values)
@@ -91,7 +92,7 @@ export const WithMockAllFieldTypes: Story = {
 
 export const WithInitialValues: Story = {
   args: {
-    featureKey: 'contacts',
+    featureKey: FEATURES.CONTACTS,
     initialValues: {
       field_text: 'exemple',
       field_select: 'b',

@@ -8,6 +8,7 @@ import { VoxButton } from '@/components/Button'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import type { IconComponent } from '@/models/common.model'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { FEATURES } from '@/utils/Scopes'
 
 import { NavItem } from './NavItem'
 
@@ -33,7 +34,7 @@ export const FeaturebaseFooterItems = ({ variant, collapsed }: FeaturebaseFooter
   const openExternalContentHook = useOpenExternalContent({ slug: 'cadre' })
   const { data: executiveScopes } = useGetExecutiveScopes()
 
-  if (!executiveScopes?.default?.features?.includes('featurebase')) {
+  if (!executiveScopes?.default?.features?.includes(FEATURES.FEATUREBASE)) {
     return null
   }
 

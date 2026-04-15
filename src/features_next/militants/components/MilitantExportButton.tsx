@@ -2,14 +2,16 @@ import React, { useCallback } from 'react'
 import { Share } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
+
 import { useFileDownload } from '@/hooks/useFileDownload'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { FEATURES } from '@/utils/Scopes'
 
 export function MilitantExportButton({ scope }: { scope: string }) {
   const { handleDownload, isPending } = useFileDownload()
   const { hasFeature } = useGetExecutiveScopes()
 
-  const canExport = hasFeature('contacts_export', scope)
+  const canExport = hasFeature(FEATURES.CONTACTS_EXPORT, scope)
 
   const handleExport = useCallback(() => {
     if (!scope || isPending) return
@@ -32,4 +34,3 @@ export function MilitantExportButton({ scope }: { scope: string }) {
     </VoxButton>
   )
 }
-

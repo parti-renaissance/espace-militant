@@ -12,11 +12,12 @@ import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { FEATURES } from '@/utils/Scopes'
 
 const CreateEventFloatingButton = () => {
   const { isAuth } = useSession()
   const { hasFeature } = useGetExecutiveScopes()
-  const canCreate = isAuth && hasFeature ? hasFeature('events') : false
+  const canCreate = isAuth && hasFeature ? hasFeature(FEATURES.EVENTS) : false
 
   const floatingContent = useMemo(() => {
     if (!canCreate) return null

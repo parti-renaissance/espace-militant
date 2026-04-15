@@ -8,10 +8,11 @@ import EventFilterForm from '@/features_next/events/components/EventFilterForm/E
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { FEATURES } from '@/utils/Scopes'
 
 const NewEventBtn = ({ children, ...props }: YStackProps & { children: string }) => {
   const { hasFeature } = useGetExecutiveScopes()
-  if (!hasFeature('events')) return null
+  if (!hasFeature(FEATURES.EVENTS)) return null
   return (
     <YStack {...props}>
       <Link href="/evenements/creer" asChild={!isWeb}>
@@ -26,7 +27,7 @@ const NewEventBtn = ({ children, ...props }: YStackProps & { children: string })
 const EventsSideContent = () => {
   const { isAuth } = useSession()
   const { hasFeature } = useGetExecutiveScopes()
-  const canCreate = isAuth && hasFeature ? hasFeature('events') : false
+  const canCreate = isAuth && hasFeature ? hasFeature(FEATURES.EVENTS) : false
   const media = useMedia()
 
   return (
