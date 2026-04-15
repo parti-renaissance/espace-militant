@@ -10,11 +10,12 @@ import MessagePageIndex from '@/features_next/publications/pages/index'
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { FEATURES } from '@/utils/Scopes'
 
 export default function PublicationsPage() {
   const { isAuth } = useSession()
   const { hasFeature, isLoading } = useGetExecutiveScopes()
-  const isFeatureEnabled = useMemo(() => hasFeature('publications'), [hasFeature])
+  const isFeatureEnabled = useMemo(() => hasFeature(FEATURES.PUBLICATIONS), [hasFeature])
 
   if (!isAuth) {
     return <Redirect href={'/evenements'} />

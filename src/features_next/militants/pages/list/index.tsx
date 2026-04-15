@@ -21,11 +21,10 @@ import { useAdherentsPage } from '@/services/adherents/hook'
 import { RestAdherentListItem } from '@/services/adherents/schema'
 import { useGetFiltersCollection } from '@/services/filters-collection/hook'
 import { useGetExecutiveScopes, useMutateExecutiveScope } from '@/services/profile/hook'
+import { FEATURES } from '@/utils/Scopes'
 
 import { ListSkeleton } from './components/ListSkeleton'
 import { PAGE_SIZE } from './constants'
-
-const FILTERS_FEATURE_KEY = 'contacts'
 
 function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scope: string; accessDenyButton?: React.ReactNode }) {
   const media = useMedia()
@@ -47,7 +46,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
   }, [searchInput, debouncedSetApiSearchTerm])
 
   const { data: collection } = useGetFiltersCollection({
-    featureKey: FILTERS_FEATURE_KEY,
+    featureKey: FEATURES.CONTACTS,
     scope,
   })
   const apiFilters = useMemo(() => normalizeFiltersForApi(filters), [filters])
@@ -60,7 +59,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
   })
 
   const { hasFeature } = useGetExecutiveScopes()
-  const canExport = hasFeature('contacts_export', scope)
+  const canExport = hasFeature(FEATURES.CONTACTS_EXPORT, scope)
 
   useEffect(() => {
     setCurrentPage(1)

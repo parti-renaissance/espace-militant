@@ -8,6 +8,7 @@ import DraftPage from '@/features_next/publications/pages/draft'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { FEATURES } from '@/utils/Scopes'
 
 export default function PublicationsDraftPage() {
   const { isAuth } = useSession()
@@ -17,7 +18,7 @@ export default function PublicationsDraftPage() {
     return <Redirect href={'/evenements'} />
   }
 
-  if (!hasFeature('publications') && !isLoading) {
+  if (!hasFeature(FEATURES.PUBLICATIONS) && !isLoading) {
     return <AccessDeny />
   }
 
