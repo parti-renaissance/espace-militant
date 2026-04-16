@@ -8,13 +8,14 @@ import MessageEditorPage from '@/features_next/publications/pages/create-update'
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { useUserStore } from '@/store/user-store'
+import { FEATURES } from '@/utils/Scopes'
 
 export default function PublicationsCreatePage() {
   const params = useLocalSearchParams<{ id?: string; scope?: string }>()
   const { isAuth } = useSession()
   const { hasFeature, isLoading } = useGetExecutiveScopes()
   const { defaultScope } = useUserStore()
-  const isFeatureEnabled = useMemo(() => hasFeature('publications'), [hasFeature])
+  const isFeatureEnabled = useMemo(() => hasFeature(FEATURES.PUBLICATIONS), [hasFeature])
 
   if (!isAuth) {
     return <Redirect href={'/evenements'} />

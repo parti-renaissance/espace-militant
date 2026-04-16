@@ -87,7 +87,7 @@ function MandateItem({ mandate, onEdit, onDelete }: MandateItemProps) {
       gap={12}
       backgroundColor={mandate.finish_at ? '$textSurface' : '$white1'}
       borderWidth={1}
-      borderColor={mandate.finish_at ? '$textOutline32' : '$textOutline'}
+      borderColor={mandate.finish_at ? '$textOutline20' : '$white1'}
       p="$medium"
       borderRadius="$small"
     >
@@ -409,10 +409,7 @@ export function ElectMandatTab({
 
   const { data, isError, isLoading: isElectLoading } = useAdherentElect(uuid, scope, canSeeElectedRepresentative)
   const isLoading = isElectLoading || isScopesLoading
-  const {
-    mutate: toggleExempt,
-    isPending: isTogglingExempt,
-  } = useMutationToggleAdherentElectExemptFromCotisation({
+  const { mutate: toggleExempt, isPending: isTogglingExempt } = useMutationToggleAdherentElectExemptFromCotisation({
     adherentUuid: uuid,
     scope,
     toastViewportName: PANEL_MODAL_TOAST_VIEWPORT,
@@ -437,7 +434,7 @@ export function ElectMandatTab({
   const declaredMandates = data?.declared_mandates || []
 
   return (
-    <YStack padding="$medium" gap="$medium" paddingBottom={80}>
+    <YStack px="$medium" py={24} gap="$medium" paddingBottom={80}>
       <Text semibold primary fontSize={16}>
         Mandats
       </Text>

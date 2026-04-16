@@ -8,6 +8,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import useResetFilters from '@/features_next/events/hooks/useResetFilters'
 
 import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { FEATURES } from '@/utils/Scopes'
 
 export type EmptyStateReason =
   | { kind: 'zone_no_upcoming'; zoneLabel: string }
@@ -39,7 +40,7 @@ export const EmptyStateSection = ({ reason, onSwitchToAllEvents, showResetButton
     generic: 'Aucun événement à venir',
   }
 
-  const canOrganize = hasFeature('events')
+  const canOrganize = hasFeature(FEATURES.EVENTS)
   const isSearch = reason.kind.startsWith('search')
   const isSub = reason.kind.startsWith('subscriptions')
 

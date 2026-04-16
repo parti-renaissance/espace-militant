@@ -1,6 +1,7 @@
 import React, { ComponentRef, useCallback, useMemo, useRef } from 'react'
 import { GestureResponderEvent, Platform, TouchableOpacity } from 'react-native'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
+import { Equal, EqualNot } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 
@@ -13,7 +14,7 @@ export { SelectOption, SF }
 
 const Select = <A extends string>(props: SelectProps<A>) => {
   const media = useMedia()
-  const frameRef = useRef<ComponentRef<typeof TouchableOpacity>>(null)
+  const frameRef = useRef<ComponentRef<typeof TouchableOpacity> | null>(null)
   const modalRef = useRef<SelectDropdownRef>(null)
   const bottomSheetRef = useRef<ModalDropDownRef>(null)
 
@@ -23,13 +24,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
     bottomSheetRef.current?.open()
   }, [props.disabled, props.searchable, props.options.length])
 
-  const Selector = useMemo(() => {
-    return media.gtSm && isWeb ? SelectDropdown : SelectBottomSheet
-  }, [media])
-
-  const selectorRef = useMemo(() => {
-    return media.gtSm ? modalRef : bottomSheetRef
-  }, [media])
+  const isDropdown = useMemo(() => media.gtSm && isWeb, [media.gtSm])
   const handleResetPress = useCallback(
     (e: GestureResponderEvent) => {
       e.stopPropagation()
@@ -41,7 +36,14 @@ const Select = <A extends string>(props: SelectProps<A>) => {
     [props.resetable, props.onChange, props.onDetailChange],
   )
 
-  const fullValue = props.options.find((option) => option.value === props.value)
+  const isInverseSelectionActive = Boolean(props.allowInverseSelection && typeof props.value === 'string' && props.value.startsWith('!'))
+  const fullValue = useMemo(() => {
+    const exactValue = props.options.find((option) => option.value === props.value)
+    if (exactValue) return exactValue
+    const rawValue = props.value
+    if (typeof rawValue !== 'string' || !rawValue.startsWith('!')) return undefined
+    return props.options.find((option) => option.value === (rawValue.slice(1) as A))
+  }, [props.options, props.value])
 
   const parseFullValueLabel = (x: typeof fullValue) => {
     if (!x) return props.noValuePlaceholder ?? '___'
@@ -54,7 +56,11 @@ const Select = <A extends string>(props: SelectProps<A>) => {
 
   return (
     <YStack>
-      <Selector ref={selectorRef} frameRef={frameRef} {...props} openAbove={props.openAbove} />
+      {isDropdown ? (
+        <SelectDropdown ref={modalRef} frameRef={frameRef} {...props} openAbove={props.openAbove} />
+      ) : (
+        <SelectBottomSheet ref={bottomSheetRef} frameRef={frameRef} {...props} openAbove={props.openAbove} />
+      )}
 
       <SF.Props themedText={props.matchTextWithTheme ?? false}>
         <SF
@@ -75,6 +81,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
               {props.label || props.placeholder ? <SF.Label numberOfLines={1}>{props.label || props.placeholder}</SF.Label> : null}
             </Text>
             <SF.ValueContainer theme={fullValue?.theme}>
+              {props.allowInverseSelection ? isInverseSelectionActive ? <EqualNot size={16} color="$orange5" /> : null : null}
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}
               <SF.Text themedText={Boolean(fullValue?.theme)} placeholder={!fullValue}>
                 {parseFullValueLabel(fullValue)}

@@ -88,7 +88,7 @@ export function MilitantActionButtons({ uuid, scope, smsAvailable = true }: Mili
   const isGlobalLoading = loadingAction !== null
 
   return (
-    <XStack px="$medium" mt="$medium" gap="$small">
+    <XStack px="$medium" mt={24} gap="$small">
       <ActionButton
         Icon={MessageCircle}
         label={loadingAction === 'sms' ? 'SMS…' : 'SMS'}

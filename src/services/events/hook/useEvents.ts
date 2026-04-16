@@ -1,5 +1,5 @@
 import { useToastController } from '@tamagui/toast'
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 
 import { EventFilters } from '@/core/entities/Event'
@@ -26,20 +26,18 @@ const fetchEventPublicList = async (pageParam: number, opts: FetchShortEventsOpt
   return await api.getPublicEvents({ page: pageParam, filters: opts.filters, zoneCode: opts.zoneCode, orderByBeginAt: true })
 }
 
-export const useSuspensePaginatedEvents = (opts: {
-  filters?: EventFilters
-  postalCode?: string
-  zoneCode?: string
-  enabled?: boolean
-}) => {
-  const { isAuth } = useSession()
-  const { enabled = true, ...queryOpts } = opts
-  const filtersKey = queryOpts.filters
+const buildEventsFiltersQueryKey = (filters: EventFilters | undefined) =>
+  filters
     ? JSON.stringify({
-        ...queryOpts.filters,
-        finishAfter: queryOpts.filters.finishAfter ? format(queryOpts.filters.finishAfter, 'yyyy-MM-dd') : '',
+        ...filters,
+        finishAfter: filters.finishAfter ? format(filters.finishAfter, 'yyyy-MM-dd') : '',
       })
     : ''
+
+export const useSuspensePaginatedEvents = (opts: { filters?: EventFilters; postalCode?: string; zoneCode?: string; enabled?: boolean }) => {
+  const { isAuth } = useSession()
+  const { enabled = true, ...queryOpts } = opts
+  const filtersKey = buildEventsFiltersQueryKey(queryOpts.filters)
 
   return useInfiniteQuery({
     queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', filtersKey],
@@ -50,6 +48,32 @@ export const useSuspensePaginatedEvents = (opts: {
     initialPageParam: 1,
     enabled,
   })
+}
+
+const pinnedEventsQueryOpts = { filters: { pinned: true } as const }
+
+const getPinnedEventsInfiniteQueryOptions = (isAuth: boolean) => {
+  const filtersKey = buildEventsFiltersQueryKey(pinnedEventsQueryOpts.filters)
+  return {
+    queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', 'pinned', filtersKey] as const,
+    queryFn: ({ pageParam }: { pageParam: number }) =>
+      isAuth ? fetchEventList(pageParam, pinnedEventsQueryOpts) : fetchEventPublicList(pageParam, pinnedEventsQueryOpts),
+    getNextPageParam: (lastPage: Awaited<ReturnType<typeof fetchEventList>> | undefined) =>
+      lastPage ? (lastPage.metadata.last_page > lastPage.metadata.current_page ? lastPage.metadata.current_page + 1 : null) : null,
+    getPreviousPageParam: (firstPage: Awaited<ReturnType<typeof fetchEventList>> | undefined) => (firstPage ? firstPage.metadata.current_page - 1 : null),
+    initialPageParam: 1,
+  }
+}
+
+/** Même cache que `useSuspensePinnedEvents`, sans suspendre */
+export const usePinnedEventsInfiniteQuery = () => {
+  const { isAuth } = useSession()
+  return useInfiniteQuery(getPinnedEventsInfiniteQueryOptions(isAuth))
+}
+
+export const useSuspensePinnedEvents = () => {
+  const { isAuth } = useSession()
+  return useSuspenseInfiniteQuery(getPinnedEventsInfiniteQueryOptions(isAuth))
 }
 
 export const useSubscribeEvent = ({ id: eventId, slug }: { id: string; slug?: string }) => {

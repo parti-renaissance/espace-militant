@@ -50,4 +50,5 @@ export type SelectProps<A extends string> = {
   resetable?: boolean
   openAbove?: boolean
   nullableOption?: string
+  allowInverseSelection?: boolean
 }

@@ -2,8 +2,10 @@ import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useSta
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
-import { useDebounce, useDebouncedCallback } from 'use-debounce'
+import { useQueryClient } from '@tanstack/react-query'
+import { useDebouncedCallback } from 'use-debounce'
 
+import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
@@ -13,7 +15,8 @@ import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection } from '@/features_next/events/utils'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { useSuspensePaginatedEvents } from '@/services/events/hook'
+import { usePinnedEventsInfiniteQuery, useSuspensePaginatedEvents } from '@/services/events/hook'
+import { QUERY_KEY_PAGINATED_SHORT_EVENTS } from '@/services/events/hook/queryKeys'
 import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useHits } from '@/services/hits/hook'
 import { useGetProfil } from '@/services/profile/hook'
@@ -54,6 +57,7 @@ const EventCard = memo(({ event, userUuid, source }: { event: RestItemEvent | Re
 
 const EventFeed = () => {
   const media = useMedia()
+  const queryClient = useQueryClient()
   const { session, isAuth } = useSession()
   const { data: userData } = useGetProfil({ enabled: Boolean(session) })
   const { trackImpression } = useHits()
@@ -70,6 +74,22 @@ const EventFeed = () => {
     trackImpressionRef.current = trackImpression
   }, [trackImpression])
 
+  const listSpacing = useLayoutSpacing('left')
+  const { data: pinnedFeed } = usePinnedEventsInfiniteQuery()
+
+  const hasPinnedBannerContent = useMemo(() => {
+    const items = pinnedFeed?.pages.flatMap((p) => p?.items ?? []) ?? []
+    return items.length > 0
+  }, [pinnedFeed?.pages])
+
+  const feedContentContainerStyle = useMemo(
+    () => ({
+      gap: getToken('$medium', 'space'),
+      paddingTop: hasPinnedBannerContent ? 8 : Platform.OS === 'ios' ? 8 : listSpacing.paddingTop,
+    }),
+    [hasPinnedBannerContent, listSpacing.paddingTop],
+  )
+
   const {
     data: paginatedFeed,
     fetchNextPage,
@@ -78,22 +98,19 @@ const EventFeed = () => {
     isFetching,
     refetch,
   } = useSuspensePaginatedEvents({
-    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents' },
+    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents' ? true : undefined, pinned: false },
     enabled: filtersReady,
   })
 
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
 
-  useEffect(() => {
-    if (!isRefetching && isManualRefreshing) {
-      setIsManualRefreshing(false)
-    }
-  }, [isRefetching, isManualRefreshing])
-
   const handleManualRefresh = useCallback(() => {
     setIsManualRefreshing(true)
-    refetch()
-  }, [refetch])
+    const scope = isAuth ? 'private' : 'public'
+    void Promise.all([refetch(), queryClient.refetchQueries({ queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, scope, 'pinned'] })]).finally(() =>
+      setIsManualRefreshing(false),
+    )
+  }, [refetch, queryClient, isAuth])
 
   const loadMore = useDebouncedCallback(
     () => {
@@ -233,7 +250,7 @@ const EventFeed = () => {
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
           hasMore={hasNextPage ?? false}
-          contentContainerStyle={{ gap: getToken('$medium', 'space') }}
+          contentContainerStyle={feedContentContainerStyle}
           removeClippedSubviews={Platform.OS === 'android'}
           windowSize={21}
           initialNumToRender={10}

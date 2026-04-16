@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect } from 'expo-router'
 import { isWeb, styled, useMedia, View, ViewProps, withStaticProperties, XStack, YStack } from 'tamagui'
@@ -73,6 +73,10 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
   )
 }
 
+/** Align with `Main` / `SideBar` default max widths and `ContentContainer` gaps. */
+const LAYOUT_MAIN_MAX_WIDTH = 520
+const LAYOUT_SIDEBAR_MAX_WIDTH = 320
+
 const ContentContainer = styled(XStack, {
   flex: 1,
   justifyContent: 'center',
@@ -88,6 +92,8 @@ const ContentContainer = styled(XStack, {
 
 interface ContainerProps extends ViewProps {
   children: React.ReactNode
+  /** Full-width block above the main + sidebar row (same horizontal padding as content). */
+  banner?: React.ReactNode
   hideSideBar?: boolean
   hideTabBar?: boolean
   sidebarState?: SideBarState
@@ -98,6 +104,7 @@ interface ContainerProps extends ViewProps {
 
 const Container = ({
   children,
+  banner,
   hideSideBar,
   hideTabBar,
   sidebarState,
@@ -123,6 +130,18 @@ const Container = ({
 
   const scrollBehavior = alwaysShowScrollbar ? 'scroll' : 'auto'
 
+  const horizontalContentStyle = safeHorizontalPadding
+    ? {
+        paddingLeft: spacingValues.paddingLeft,
+        paddingRight: spacingValues.paddingRight,
+      }
+    : undefined
+
+  const mainPlusSidebarMaxWidth = useMemo(() => {
+    const rowGap = media.gtXl ? 24 : media.gtLg ? 16 : 32
+    return media.gtMd ? LAYOUT_MAIN_MAX_WIDTH + rowGap + LAYOUT_SIDEBAR_MAX_WIDTH : LAYOUT_MAIN_MAX_WIDTH
+  }, [media.gtLg, media.gtMd, media.gtXl])
+
   return (
     <YStack
       alignItems="center"
@@ -136,18 +155,22 @@ const Container = ({
     >
       <YStack width="100%" flexGrow={1}>
         <ScrollContext.Provider value={{ layoutRef: layoutRef as React.RefObject<HTMLDivElement>, scrollActive: Boolean(isWeb) }}>
-          <ContentContainer
-            style={
-              safeHorizontalPadding
-                ? {
-                    paddingLeft: spacingValues.paddingLeft,
-                    paddingRight: spacingValues.paddingRight,
-                  }
-                : undefined
-            }
-          >
-            {children}
-          </ContentContainer>
+          <YStack width="100%" flex={1}>
+            {banner != null ? (
+              <YStack width="100%" flex={1} alignItems="center" style={horizontalContentStyle}>
+                <YStack width="100%" flex={1} maxWidth={mainPlusSidebarMaxWidth}>
+                  <YStack width="100%">{banner}</YStack>
+                  <ContentContainer flex={1} width="100%">
+                    {children}
+                  </ContentContainer>
+                </YStack>
+              </YStack>
+            ) : (
+              <ContentContainer style={horizontalContentStyle} flex={1}>
+                {children}
+              </ContentContainer>
+            )}
+          </YStack>
         </ScrollContext.Provider>
       </YStack>
     </YStack>
@@ -156,13 +179,13 @@ const Container = ({
 
 const MainContainer = styled(View, {
   flex: 2,
-  maxWidth: 520,
+  maxWidth: LAYOUT_MAIN_MAX_WIDTH,
   $sm: {
     maxWidth: '100%',
   },
 })
 
-const Main = ({ children, maxWidth = 520, ...props }: ViewProps & { children: React.ReactNode; maxWidth?: number | string }) => {
+const Main = ({ children, maxWidth = LAYOUT_MAIN_MAX_WIDTH, ...props }: ViewProps & { children: React.ReactNode; maxWidth?: number | string }) => {
   return (
     <MainContainer maxWidth={maxWidth} {...props}>
       {children}
@@ -177,7 +200,7 @@ interface SideBarProps extends Omit<ViewProps, 'padding'> {
   padding?: UseLayoutSpacingOptions
 }
 
-const SideBarComponent = ({ children, isSticky, maxWidth = 320, minWidth = 280, padding = 'right', ...props }: SideBarProps) => {
+const SideBarComponent = ({ children, isSticky, maxWidth = LAYOUT_SIDEBAR_MAX_WIDTH, minWidth = 280, padding = 'right', ...props }: SideBarProps) => {
   const spacingValues = useLayoutSpacing(padding)
   return (
     <LayoutSideBar isSticky={isSticky} maxWidth={maxWidth} minWidth={minWidth} pt={spacingValues.paddingTop} pb={spacingValues.paddingBottom} {...props}>

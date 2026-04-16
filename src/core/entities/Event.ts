@@ -60,4 +60,5 @@ export interface EventFilters {
   zone?: string
   searchText?: string
   mode?: EventMode
+  pinned?: boolean
 }

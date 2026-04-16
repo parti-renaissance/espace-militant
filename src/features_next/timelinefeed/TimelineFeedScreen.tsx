@@ -24,10 +24,11 @@ import { useHits } from '@/services/hits/hook'
 import { useGetSuspenseExecutiveScopes } from '@/services/profile/hook'
 import { useGetPaginatedFeed } from '@/services/timeline-feed/hook'
 import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
+import { FEATURES } from '@/utils/Scopes'
 
 import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
-import { OnboardConditional } from './components/OnboardConditional'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
+import { OnboardConditional } from './components/OnboardConditional'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
@@ -86,7 +87,7 @@ const TimelineFeedMain = () => {
   }, [])
 
   const hasAlerts = useMemo(() => alerts.length > 0, [alerts.length])
-  const hasPublications = useMemo(() => hasFeature('publications'), [hasFeature])
+  const hasPublications = useMemo(() => hasFeature(FEATURES.PUBLICATIONS), [hasFeature])
   const shouldShowHeader = useMemo(() => hasAlerts || shouldShowNotificationCard || hasPublications, [hasAlerts, shouldShowNotificationCard, hasPublications])
 
   const header = useMemo(
