@@ -92,7 +92,14 @@ function InfoRow({
         <YStack flex={1} minWidth={0} gap={6}>
           {status != null && status !== '' && (
             <XStack gap="$xsmall" alignItems="center">
-              <View w={6} h={6} borderRadius={3} backgroundColor={statusColor === 'green' ? '$green9' : statusColor === 'orange' ? '$orange9' : '$gray9'} />
+              <View
+                w={8}
+                h={8}
+                borderRadius={4}
+                backgroundColor={statusColor === 'green' ? '$green9' : statusColor === 'orange' ? '$orange9' : '$gray9'}
+                borderWidth={1}
+                borderColor="$white1"
+              />
               <Text.XSM color="$gray4" semibold>
                 {status}
               </Text.XSM>
@@ -137,7 +144,7 @@ function InfoRowSkeleton({ showStatusLine = true }: { showStatusLine?: boolean }
         <YStack flex={1} minWidth={0} gap={6}>
           {showStatusLine && (
             <XStack gap="$xsmall" alignItems="center">
-              <View w={6} h={6} borderRadius={3} backgroundColor="$gray2" />
+              <View w={8} h={8} borderRadius={4} backgroundColor="$gray2" borderWidth={1} borderColor="$white1" />
               <View w={80} h={10} borderRadius={4} backgroundColor="$textOutline20" />
             </XStack>
           )}
@@ -362,7 +369,7 @@ function RolesSection({ roles }: { roles: RestAdherentRole[] }) {
   return (
     <DetailSection title="Rôle(s)" subSection={true}>
       <YStack gap="$small">
-        <XStack flexWrap="wrap" gap={4}>
+        <XStack flexWrap="wrap" gap={6}>
           {roles.length === 0 ? (
             <Text.SM color="$textDisabled">Ce militant ne dispose d’aucun rôle.</Text.SM>
           ) : (
@@ -389,7 +396,7 @@ function LabelsNationauxSection({ labels }: { labels: RestAdherentTag[] | null |
       {list.length === 0 ? (
         <Text.SM color="$textDisabled">Ce militant ne dispose d’aucun label national.</Text.SM>
       ) : (
-        <XStack flexWrap="wrap" gap="$small">
+        <XStack flexWrap="wrap" gap={6}>
           {list.map((l, index) => (
             <Chip key={l.code ?? `${l.label}-${index}`} theme="gray">
               <Text.SM color="$color5" semibold numberOfLines={1} ellipsizeMode="tail">
@@ -413,7 +420,7 @@ function PreferencesNotificationSection({ subscriptionTypes }: { subscriptionTyp
         ) : (
           list.map((st) => (
             <XStack key={st.code} alignItems="center" gap="$small">
-              <View w={8} h={8} borderRadius={4} backgroundColor={st.subscribed === true ? '$green9' : '$orange9'} />
+              <View w={8} h={8} borderRadius={4} backgroundColor={st.subscribed === true ? '$green9' : '$orange9'} borderWidth={1} borderColor="$white1" />
               <Text.SM color="$gray5" numberOfLines={1} ellipsizeMode="tail">
                 {st.label}
               </Text.SM>

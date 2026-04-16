@@ -88,7 +88,7 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
       <YStack paddingHorizontal="$medium" paddingTop="$medium" gap="$medium">
         <XStack gap="$medium" alignItems="center" flexWrap="wrap">
           <XStack gap={4} flex={1}>
-            <YStack flex={1} minWidth={120} gap={2}>
+            <YStack flex={1} minWidth={120} gap={6}>
               <Text.MD semibold>{displayName}</Text.MD>
               {age != null && <Text.SM secondary>{age} ans</Text.SM>}
               {engagementScore != null && (

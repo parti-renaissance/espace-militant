@@ -159,10 +159,10 @@ function MilitantCadreItemInner({
   const media = useMedia()
 
   const isMobileLayout = media.md || media.sm
-  const col1Width = isMobileLayout ? '100%' : '25%'
-  const col2Width = isMobileLayout ? '100%' : '35%'
-  const col3Width = isMobileLayout ? '50%' : '24%'
-  const col4Width = isMobileLayout ? '50%' : '16%'
+  const col1Width = media.xs ? '100%' : media.md ? '50%' : '25%'
+  const col2Width = media.xs ? '100%' : media.md ? '50%' : '35%'
+  const col3Width = isMobileLayout ? '50%' : '25%'
+  const col4Width = isMobileLayout ? '50%' : '15%'
 
   const circonscription = instances?.find((i) => i.type === 'circonscription')
   const assembly = instances?.find((i) => i.type === 'assembly')
@@ -191,10 +191,10 @@ function MilitantCadreItemInner({
     >
       <VoxCard.Content minHeight={122} justifyContent="center">
         <XStack flexWrap="wrap" width="100%" rowGap={isMobileLayout ? 16 : 0}>
-          <XStack width={col1Width} pr="$medium" alignItems="center" gap={12} overflow="hidden">
+          <XStack width={col1Width} pr={24} alignItems="center" gap={12} overflow="hidden">
             <ProfilePicture size={40} rounded src={image_url ?? undefined} fullName={displayName} alt={displayName} />
-            <YStack flex={1} overflow="hidden">
-              <Text.SM medium numberOfLines={1}>
+            <YStack flex={1} gap={4} overflow="hidden">
+              <Text.SM semibold numberOfLines={1}>
                 {first_name} {last_name}
               </Text.SM>
               {age != null && (
@@ -210,7 +210,7 @@ function MilitantCadreItemInner({
             </YStack>
           </XStack>
 
-          <YStack width={col2Width} pr="$medium" gap={6} overflow="hidden" minWidth={0} justifyContent="center">
+          <YStack width={col2Width} pr="$xlarge" gap={6} overflow="hidden" minWidth={0} justifyContent="center">
             {adherent_tags && <TagChipRow tags={adherent_tags} theme={getAdherentTagChipStyle(adherent_tags?.[0]?.code)} />}
             {roles && <TagChipRow tags={roles} theme="purple" />}
             {elect_mandates.length > 0 && (
@@ -228,7 +228,7 @@ function MilitantCadreItemInner({
             {static_tags && <TagChipRow tags={static_tags} theme="gray" />}
           </YStack>
 
-          <YStack width={col3Width} pr="$medium" gap={20} overflow="hidden" justifyContent="center">
+          <YStack width={col3Width} pr={24} gap={20} overflow="hidden" justifyContent="center">
             <YStack gap={2}>
               {circonscription && (
                 <Text.SM semibold numberOfLines={1}>
