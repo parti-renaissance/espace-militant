@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Image } from 'expo-image'
 import { getToken, useMedia, YStack } from 'tamagui'
 import { ArrowLeft, CircleAlert } from '@tamagui/lucide-icons'
 import { useDebouncedCallback } from 'use-debounce'
@@ -17,6 +18,7 @@ import { MilitantExportButton } from '@/features_next/militants/components/Milit
 import { MilitantFilterPanel } from '@/features_next/militants/components/MilitantFilterPanel'
 import { MilitantHeaderPagination, MilitantListHeader } from '@/features_next/militants/components/MilitantListHeader'
 
+import EmptyStateMilitant from '@/assets/illustrations/empty_state_militants.png'
 import { useAdherentsPage } from '@/services/adherents/hook'
 import { RestAdherentListItem } from '@/services/adherents/schema'
 import { useGetFiltersCollection } from '@/services/filters-collection/hook'
@@ -196,6 +198,7 @@ function MilitantsContent({ scope, accessDenyButton: _accessDenyButton }: { scop
           title="Aucun militant trouvé"
           subtitle={activeFilterChips && activeFilterChips.length > 0 ? 'Aucun militant ne correspond à vos filtres actifs' : undefined}
           onResetFilters={activeFilterChips && activeFilterChips.length > 0 ? handleResetAllFilters : undefined}
+          illustration={<Image source={EmptyStateMilitant} style={{ width: 165, height: 198 }} contentFit="contain" />}
         />
       </YStack>
     )

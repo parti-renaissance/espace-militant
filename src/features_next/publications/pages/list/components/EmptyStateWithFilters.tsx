@@ -1,6 +1,9 @@
 import React from 'react'
+import { Image } from 'expo-image'
 
 import EmptyStateWithFilters from '@/components/EmptyStates/EmptyStateWithFilters'
+
+import EmptyStateImage from '@/assets/illustrations/empty_state_publications.png'
 
 import { PublicationsFilters } from '../index'
 
@@ -20,5 +23,12 @@ export default function PublicationsEmptyStateWithFilters({ filters, onResetFilt
   const title = filterLabel ? `Aucune publication "${filterLabel}" trouvée` : 'Aucune publication trouvée'
   const subtitle = 'Aucune publication ne correspond à vos filtres actifs.'
 
-  return <EmptyStateWithFilters title={title} subtitle={subtitle} onResetFilters={onResetFilters} />
+  return (
+    <EmptyStateWithFilters
+      title={title}
+      subtitle={subtitle}
+      onResetFilters={onResetFilters}
+      illustration={<Image source={EmptyStateImage} style={{ width: 179, height: 190 }} contentFit="contain" />}
+    />
+  )
 }
