@@ -3,7 +3,6 @@ import { parse, useURL } from 'expo-linking'
 import { Href, router, useGlobalSearchParams } from 'expo-router'
 import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
-
 import { useQueryClient } from '@tanstack/react-query'
 
 import useLogin, { useRegister } from '@/hooks/useLogin'
@@ -15,6 +14,17 @@ import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { AuthContext, type AuthContextType } from './AuthContext'
 
 export { useSession } from './AuthContext'
+
+const normalizeStateRedirect = (state?: string) => {
+  if (!state) return undefined
+
+  try {
+    const path = decodeURIComponent(state)
+    return path.startsWith('/') && !path.startsWith('//') ? path : undefined
+  } catch {
+    return undefined
+  }
+}
 
 export function SessionProvider(props: React.PropsWithChildren) {
   const { user: existingSession, setCredentials: setSession, removeCredentials, _hasHydrated } = useUserStore()
@@ -38,10 +48,9 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   React.useEffect(() => {
     const { state } = params
-    if (existingSession && [state].some(Boolean) && !isGlobalLoading) {
-      if (state?.startsWith('/')) {
-        router.replace({ pathname: state } as Href)
-      }
+    const redirectState = normalizeStateRedirect(state)
+    if (existingSession && redirectState && !isGlobalLoading) {
+      router.replace({ pathname: redirectState } as Href)
     }
   }, [existingSession, params, isGlobalLoading])
 
@@ -79,7 +88,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
           removeCredentials()
         }
         setOneShotParams({})
-        const hadState = Boolean(stateParam?.startsWith('/'))
+        const hadState = Boolean(normalizeStateRedirect(stateParam))
         handleSignIn({ code, isAdmin: _switch_user === 'true' }).then(() => {
           if (isWeb && !hadState) {
             router.replace('/' as Href)
