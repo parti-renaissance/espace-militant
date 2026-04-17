@@ -129,11 +129,9 @@ export const getToolbarItems = ({
       onPress:
         ({ setToolbarContext, editorState, editor }) =>
         () => {
-          if (Platform.OS === 'android') {
-            setTimeout(() => {
-              editor.setSelection(editorState.selection.from, editorState.selection.to)
-            })
-          }
+          setTimeout(() => {
+            editor.setSelection(editorState.selection.from, editorState.selection.to)
+          })
           setToolbarContext(ToolbarContext.Link)
         },
       active: ({ editorState }) => editorState.isLinkActive,
