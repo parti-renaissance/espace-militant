@@ -21,6 +21,7 @@ import EventHandleActions from '../../../components/EventHandleActions'
 import { useEventFormContext } from '../context'
 import DescriptionInput from './DescriptionInput'
 import EventDatesField from './EventDatesField'
+import EventHiddenField from './EventHiddenField'
 import EventScopeSelect from './EventScopeSelect'
 
 const EventFormAside = () => {
@@ -42,24 +43,34 @@ const EventFormAside = () => {
   return (
     <YStack gap="$medium">
       <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} />
-      <Controller
-        render={({ field, fieldState }) => {
-          return (
-            <Select
-              error={fieldState.error?.message}
-              size="sm"
-              color="gray"
-              label="Accès"
-              value={field.value}
-              options={visibilityOptions}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-            />
-          )
-        }}
-        control={control}
-        name="visibility"
-      />
+      <YStack gap="$xsmall">
+        <Controller
+          render={({ field, fieldState }) => {
+            return (
+              <Select
+                error={fieldState.error?.message}
+                size="sm"
+                color="gray"
+                label="Accès"
+                value={field.value}
+                options={visibilityOptions}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )
+          }}
+          control={control}
+          name="visibility"
+        />
+
+        <Controller
+          render={({ field }) => {
+            return <EventHiddenField value={field.value} onChange={field.onChange} />
+          }}
+          control={control}
+          name="hidden"
+        />
+      </YStack>
 
       <Controller
         render={({ field, fieldState }) => {
