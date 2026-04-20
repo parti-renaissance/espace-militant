@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { parse, useURL } from 'expo-linking'
-import { Href, router, useGlobalSearchParams } from 'expo-router'
+import { Href, router } from 'expo-router'
 import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import { useQueryClient } from '@tanstack/react-query'
@@ -28,8 +28,21 @@ const normalizeStateRedirect = (state?: string) => {
 
 export function SessionProvider(props: React.PropsWithChildren) {
   const { user: existingSession, setCredentials: setSession, removeCredentials, _hasHydrated } = useUserStore()
-  const params = useGlobalSearchParams<{ code?: string; _switch_user?: string; redirect?: string; state?: string }>()
-  const [onShotParams, setOneShotParams] = React.useState(params)
+
+  const bootParams = React.useMemo<{ code?: string; state?: string; _switch_user?: string }>(() => {
+    if (isWeb && typeof window !== 'undefined') {
+      const search = new URLSearchParams(window.location.search)
+      return {
+        code: search.get('code') ?? undefined,
+        state: search.get('state') ?? undefined,
+        _switch_user: search.get('_switch_user') ?? undefined,
+      }
+    }
+    return {}
+  }, [])
+
+  const pendingRedirectRef = React.useRef<string | undefined>(normalizeStateRedirect(bootParams.state))
+  const hasRedirectedRef = React.useRef(false)
 
   const url = useURL()
 
@@ -47,12 +60,14 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const isAuth = Boolean(existingSession && !isGlobalLoading)
 
   React.useEffect(() => {
-    const { state } = params
-    const redirectState = normalizeStateRedirect(state)
+    if (hasRedirectedRef.current) return
+    const redirectState = pendingRedirectRef.current
     if (existingSession && redirectState && !isGlobalLoading) {
-      router.replace({ pathname: redirectState } as Href)
+      hasRedirectedRef.current = true
+      pendingRedirectRef.current = undefined
+      router.replace(redirectState as Href)
     }
-  }, [existingSession, params, isGlobalLoading])
+  }, [existingSession, isGlobalLoading])
 
   const handleSignIn: AuthContextType['signIn'] = React.useCallback(
     async (props) => {
@@ -78,33 +93,44 @@ export function SessionProvider(props: React.PropsWithChildren) {
     [isLoginInProgress, login, queryClient],
   )
 
+  // Web boot: captures SSO `code`/`state` from the initial URL exactly once at mount.
+  // `bootParams` is memoized with [] and the other values are stable refs from hooks,
+  // so re-running the effect would only risk re-triggering signIn. Deps are intentionally empty.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => {
-    const { code, state: stateParam, _switch_user } = onShotParams
-    if (code || url) {
-      if (isWeb && code) {
-        if (_switch_user) {
-          queryClient.cancelQueries()
-          queryClient.clear()
-          removeCredentials()
-        }
-        setOneShotParams({})
-        const hadState = Boolean(normalizeStateRedirect(stateParam))
-        handleSignIn({ code, isAdmin: _switch_user === 'true' }).then(() => {
-          if (isWeb && !hadState) {
-            router.replace('/' as Href)
-          }
-        })
-      }
-      if (url && !isWeb) {
-        const { queryParams } = parse(url)
-        const code = queryParams?.code as string | undefined
-
-        if (code) {
-          handleSignIn({ code })
-        }
-      }
+    if (!isWeb) return
+    const { code, _switch_user } = bootParams
+    if (!code) return
+    if (_switch_user) {
+      queryClient.cancelQueries()
+      queryClient.clear()
+      removeCredentials()
     }
+    const hadState = Boolean(pendingRedirectRef.current)
+    handleSignIn({ code, isAdmin: _switch_user === 'true' }).then(() => {
+      if (!hadState) {
+        router.replace('/' as Href)
+      }
+    })
   }, [])
+
+  const processedCodeRef = React.useRef<string | undefined>(undefined)
+  React.useEffect(() => {
+    if (isWeb || !url) return
+    const { queryParams } = parse(url)
+    const code = queryParams?.code as string | undefined
+    if (!code || processedCodeRef.current === code) return
+    processedCodeRef.current = code
+
+    const stateParam = queryParams?.state as string | undefined
+    const redirectState = normalizeStateRedirect(stateParam)
+    if (redirectState) {
+      pendingRedirectRef.current = redirectState
+      hasRedirectedRef.current = false
+    }
+
+    handleSignIn({ code })
+  }, [url, handleSignIn])
 
   const handleRegister = React.useCallback(
     async (props?: { utm_campaign?: string }) => {
