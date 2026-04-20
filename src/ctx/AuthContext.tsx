@@ -1,7 +1,8 @@
 import React from 'react'
 import type { UseQueryResult } from '@tanstack/react-query'
-import type { User } from '@/store/user-store'
+
 import type { RestProfilResponse } from '@/services/profile/schema'
+import type { User } from '@/store/user-store'
 
 export type AuthContextType = {
   signIn: (props?: { code?: string; isAdmin?: boolean; state?: string }) => Promise<void>
