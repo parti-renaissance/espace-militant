@@ -229,8 +229,8 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
       {hasScopeTargetFilter && (
         <Tabs
           tabs={[
-            { id: 'all', label: 'Tous' },
-            { id: 'cadres', label: 'Filtres cadres' },
+            { id: 'all', label: 'Militants' },
+            { id: 'cadres', label: 'Cadres' },
           ]}
           activeTab={activeTab}
           onTabChange={(tab) => setActiveTab(tab as 'all' | 'cadres')}
