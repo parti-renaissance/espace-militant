@@ -50,9 +50,8 @@ export const useSuspensePaginatedEvents = (opts: { filters?: EventFilters; posta
   })
 }
 
-const pinnedEventsQueryOpts = { filters: { pinned: true } as const }
-
 const getPinnedEventsInfiniteQueryOptions = (isAuth: boolean) => {
+  const pinnedEventsQueryOpts = { filters: { pinned: true, finishAfter: new Date() } as const }
   const filtersKey = buildEventsFiltersQueryKey(pinnedEventsQueryOpts.filters)
   return {
     queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', 'pinned', filtersKey] as const,

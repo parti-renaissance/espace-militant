@@ -85,9 +85,9 @@ const EventFeed = () => {
   const feedContentContainerStyle = useMemo(
     () => ({
       gap: getToken('$medium', 'space'),
-      paddingTop: hasPinnedBannerContent ? 8 : Platform.OS === 'ios' ? 8 : listSpacing.paddingTop,
+      paddingTop: hasPinnedBannerContent && media.sm ? 8 : Platform.OS === 'ios' ? 8 : listSpacing.paddingTop,
     }),
-    [hasPinnedBannerContent, listSpacing.paddingTop],
+    [hasPinnedBannerContent, listSpacing.paddingTop, media.sm],
   )
 
   const {
@@ -98,7 +98,7 @@ const EventFeed = () => {
     isFetching,
     refetch,
   } = useSuspensePaginatedEvents({
-    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents' ? true : undefined, pinned: false },
+    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents' ? true : undefined },
     enabled: filtersReady,
   })
 
@@ -122,7 +122,16 @@ const EventFeed = () => {
 
   const handleSwitchToAllEvents = useCallback(() => setActiveTab('events'), [])
 
-  const feedData = useMemo(() => paginatedFeed?.pages.flatMap((page) => page.items) ?? [], [paginatedFeed])
+  const upcomingPinnedUuids = useMemo(() => {
+    const items = pinnedFeed?.pages.flatMap((p) => p?.items ?? []) ?? []
+    return new Set(items.map((item) => item.uuid))
+  }, [pinnedFeed?.pages])
+
+  const feedData = useMemo(() => {
+    const items = paginatedFeed?.pages.flatMap((page) => page.items) ?? []
+    if (upcomingPinnedUuids.size === 0) return items
+    return items.filter((event) => !upcomingPinnedUuids.has(event.uuid))
+  }, [paginatedFeed, upcomingPinnedUuids])
 
   const hasActiveFilters = useMemo(
     () => Boolean(filters.search.trim() || (filters.zone && filters.zone !== userData?.instances?.assembly?.code)),

@@ -152,7 +152,7 @@ function PinnedEventCardWrapper({ sizeMode, isMobile, children }: { sizeMode: Ca
 const PinnedEventCard = memo(
   ({ event, sizeMode, isMobile, userUuid }: { event: PinnedEventItem; sizeMode: CardSizeMode; isMobile: boolean; userUuid?: string }) => {
     const router = useRouter()
-    const href = `/evenements/${event.uuid}?source=page_events_pinned` as Href
+    const href = `/evenements/${event.slug}?source=page_events_pinned` as Href
     const showAuthOverlay = isEventPartial(event) && !userUuid
 
     return (
