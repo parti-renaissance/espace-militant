@@ -1,7 +1,7 @@
-import React, { ComponentRef, forwardRef, memo, useImperativeHandle, useRef } from 'react'
+import React, { ComponentRef, forwardRef, memo, useEffect, useImperativeHandle, useRef } from 'react'
 import { Theme, useMedia, XStack, YStack } from 'tamagui'
-import { BellDot, Mail } from '@tamagui/lucide-icons'
-import { Control, Controller, useWatch } from 'react-hook-form'
+import { BellDot, EyeOff, Mail } from '@tamagui/lucide-icons'
+import { Control, Controller, UseFormSetValue, useWatch } from 'react-hook-form'
 
 import { FormFrame } from '@/components/base/FormFrames'
 import SwitchGroup from '@/components/base/SwitchGroup/SwitchGroup'
@@ -22,6 +22,7 @@ type ConfirmAlertProps = {
   isPending?: boolean
   title: string
   control: Control<EventFormData>
+  setValue: UseFormSetValue<EventFormData>
   isAgoraLeader?: boolean
   agoraUuid?: string | null
   scope?: string | null
@@ -88,6 +89,13 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
   const media = useMedia()
 
   const visibility = useWatch({ control: props.control, name: 'visibility' })
+  const hidden = useWatch({ control: props.control, name: 'hidden' })
+
+  useEffect(() => {
+    if (hidden) {
+      props.setValue('send_invitation_email', false, { shouldDirty: true, shouldValidate: true })
+    }
+  }, [hidden, props.setValue])
 
   useImperativeHandle(ref, () => ({
     present: () => {
@@ -112,15 +120,32 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
         <YStack gap="$medium">
           <Text.LG semibold>{props.title}</Text.LG>
           <VisibilityReview visibility={visibility} />
-          <XStack gap="$small" alignItems="center">
-            <XStack paddingHorizontal="$medium">
-              <BellDot size={20} color="$textPrimary" />
+          {!hidden ? (
+            <XStack gap="$small" alignItems="center">
+              <XStack paddingHorizontal="$medium">
+                <BellDot size={20} color="$textPrimary" />
+              </XStack>
+              <YStack flexShrink={1}>
+                <Text.MD color="$textPrimary">Vos militants possédant l’app mobile recevront une notification automatique.</Text.MD>
+              </YStack>
             </XStack>
-            <YStack flexShrink={1}>
-              <Text.MD color="$textPrimary">Vos militants possédant l’app mobile recevront une notification automatique.</Text.MD>
-            </YStack>
-          </XStack>
-          {visibility === 'invitation_agora' ? (
+          ) : null}
+          {hidden ? (
+            <XStack gap="$small" alignItems="center">
+              <XStack paddingHorizontal="$medium">
+                <EyeOff size={20} color="$textPrimary" />
+              </XStack>
+              <YStack flexShrink={1}>
+                <Text.MD color="$textPrimary">
+                  <Text.MD bold color="$textPrimary">
+                    Non répertorié.{' '}
+                  </Text.MD>
+                  Cet événement n&apos;est accessible que par son lien direct et ne peut pas être retrouvé via la plateforme.
+                </Text.MD>
+              </YStack>
+            </XStack>
+          ) : null}
+          {!hidden && visibility === 'invitation_agora' ? (
             <XStack gap="$small" alignItems="center">
               <XStack paddingHorizontal="$medium">
                 <Mail size={20} color="$textPrimary" />
@@ -129,7 +154,7 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
                 <Text.MD color="$textPrimary">Tous les invités recevront un email automatique.</Text.MD>
               </YStack>
             </XStack>
-          ) : (
+          ) : !hidden ? (
             <Controller
               name="send_invitation_email"
               control={props.control}
@@ -158,13 +183,13 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
                 </FormFrame>
               )}
             />
-          )}
-          {visibility === 'invitation_agora' ? <CountInvitation visibility={visibility} agoraUuid={props.agoraUuid} scope={props.scope} /> : null}
+          ) : null}
+          {!hidden && visibility === 'invitation_agora' ? <CountInvitation visibility={visibility} agoraUuid={props.agoraUuid} scope={props.scope} /> : null}
         </YStack>
         <XStack gap="$medium">
           <VoxButton variant="outlined" flex={3} children="Annuler" onPress={handleCancel} theme="gray" />
           <VoxButton
-            children={visibility === 'invitation_agora' ? 'Envoyer les invitations' : 'Créer'}
+            children={!hidden && visibility === 'invitation_agora' ? 'Envoyer les invitations' : 'Créer'}
             loading={props.isPending}
             flex={1}
             onPress={handleAccept}

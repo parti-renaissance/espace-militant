@@ -131,6 +131,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
         }
       : undefined,
     visibility: defaultVisibilityForScope,
+    hidden: edit?.hidden ?? false,
     live_url: edit?.live_url ?? undefined,
     send_invitation_email: edit ? undefined : true,
   } as const
@@ -327,6 +328,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     title: 'Créer l’événement ?',
     onAccept: finalOnSubmit,
     control,
+    setValue,
     isAgoraLeader,
     agoraUuid,
     scope: selectedScope,

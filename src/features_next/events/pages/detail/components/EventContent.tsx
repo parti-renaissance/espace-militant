@@ -2,10 +2,11 @@ import React, { Children, isValidElement } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Href, useRouter } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
-import { ArrowLeft } from '@tamagui/lucide-icons'
+import { ArrowLeft, EyeOff } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { ContentBackButton } from '@/components/ContentBackButton'
 import { TipTapRenderer } from '@/components/TipTapRenderer'
@@ -116,10 +117,28 @@ const EventInfo = ({ event }: EventItemProps) => {
     <>
       {fallbackImage ? <VoxCard.Image large={media.sm} image={fallbackImage} imageData={event.image} /> : null}
       <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
-        <XStack justifyContent="space-between" alignItems="flex-start" gap={8} flexWrap="wrap">
+        <XStack justifyContent="space-between" alignItems="flex-start" gap="$small" flexWrap="wrap">
           <CategoryChip>{event.category?.name}</CategoryChip>
           <EventPremiumChip event={event} />
         </XStack>
+        {event.hidden ? (
+          <VoxCard backgroundColor="$textSurface" inside>
+            <VoxCard.Content>
+              <XStack gap="$medium" alignItems="center">
+                <YStack w={16}>
+                  <EyeOff size={16} color="$textPrimary" />
+                </YStack>
+
+                <Text.SM color="$textPrimary">
+                  <Text.SM bold color="$textPrimary">
+                    Non répertorié.{' '}
+                  </Text.SM>
+                  Cet événement n'est accessible que par son lien direct et ne peut pas être retrouvé via la plateforme.
+                </Text.SM>
+              </XStack>
+            </VoxCard.Content>
+          </VoxCard>
+        ) : null}
         {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
         {isFull && event.description ? <TipTapRenderer content={event.json_description ?? ''} /> : null}
       </YStack>

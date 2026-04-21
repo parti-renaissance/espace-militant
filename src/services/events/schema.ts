@@ -79,6 +79,7 @@ export const RestBaseEventSchema = z.object({
   participants_count: z.number().nullish(),
   visio_url: z.string().nullish(),
   region: RestEventRegionSchema.nullish(),
+  hidden: z.boolean().optional(),
 })
 
 export const RestFullEventSchema = z
@@ -257,6 +258,7 @@ export const RestPostEventRequestSchema = z.object({
   time_zone: z.string(),
   electoral: z.boolean().optional(),
   visibility: EventVisibilitySchema,
+  hidden: z.boolean().optional(),
   live_url: z.string().optional(),
 })
 
@@ -280,6 +282,7 @@ export const propertyPathPostEventSchema = z.enum([
   'visio_url',
   'electoral',
   'visibility',
+  'hidden',
   'live_url',
 ])
 
