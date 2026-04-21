@@ -15,7 +15,7 @@ interface QuickFilterProps {
 
 export default function QuickFilter({ quickFilters, selectedQuickFilterId, onItemSelection }: QuickFilterProps) {
   return (
-    <YStack gap="$medium">
+    <YStack gap="$medium" mx="$medium">
       <XStack alignItems="center" gap="$small">
         <Text.MD secondary>Filtres militants</Text.MD>
         <YStack h={1} flexGrow={1} mt={2} bg="$textOutline" />
