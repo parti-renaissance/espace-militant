@@ -12,27 +12,12 @@ interface PublicationGlobalStatsCardsProps {
   stats: RestPublicationStatsResponse
 }
 
-export const StatCard: React.FC<{ value: string | number; label: string; small?: boolean; theme?: ThemeName }> = ({
-  value,
-  label,
-  small = false,
-  theme = 'purple',
-}) => (
-  <YStack
-    theme={theme}
-    backgroundColor="$gray1"
-    borderRadius="$4"
-    padding="$medium"
-    alignItems="center"
-    justifyContent="center"
-    flex={1}
-    width="100%"
-    minHeight={80}
-  >
-    <Text fontSize={small ? 16 : 24} textAlign="center" fontWeight="600" color="$color5">
+export const StatCard: React.FC<{ value: string | number; label: string; theme?: ThemeName }> = ({ value, label, theme = 'purple' }) => (
+  <YStack theme={theme} backgroundColor="$gray1" borderRadius="$small" padding={12} flex={1} width="100%" minHeight={56} gap={2}>
+    <Text fontSize={14} fontWeight="600" color={theme === 'gray' ? '$textPrimary' : '$color5'}>
       {value}
     </Text>
-    <Text.SM color="$gray10" textAlign="center" fontWeight="500" numberOfLines={1} ellipsizeMode="tail" width="100%">
+    <Text.SM color="$gray6" fontWeight="500" numberOfLines={1} ellipsizeMode="tail" width="100%">
       {label}
     </Text.SM>
   </YStack>
@@ -118,7 +103,7 @@ const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ st
             {/* First row */}
             <XStack gap="$small">
               <StatCard value={stats.unique_notifications} label="Notifications" />
-              <StatCard value={stats.unique_emails === null ? 'En cours d‘envoi' : stats.unique_emails} label="Emails" small={stats.unique_emails === null} />
+              <StatCard value={stats.unique_emails === null ? 'En cours d‘envoi' : stats.unique_emails} label="Emails" />
               <StatCard value={stats.unique_impressions.total} label="Impressions" />
             </XStack>
 
@@ -126,6 +111,7 @@ const GlobalStatsCard: React.FC<{ stats: RestPublicationStatsResponse }> = ({ st
             <XStack gap="$small">
               <StatCard value={`${NumberFormatter.formatStatsPercent(openRate, true)}%`} label="Ouvertures" />
               <StatCard value={`${NumberFormatter.formatStatsPercent(clickRate, true)}%`} label="Clics" />
+              <StatCard value={stats.unsubscribed.total ?? 0} label="Désabonnements" />
             </XStack>
           </YStack>
         </YStack>
