@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef, ComponentRef, forwardRef } from 'react'
 import { createStyledContext, styled } from '@tamagui/core'
-import { Check } from '@tamagui/lucide-icons'
+import { Check, Minus } from '@tamagui/lucide-icons'
 import { ThemeableStack } from '@tamagui/stacks'
 
 export const CheckboxContext = createStyledContext({
@@ -82,16 +82,19 @@ export const CheckboxGroupIndicatorFrame = styled(ThemeableStack, {
   } as const,
 })
 
-export default forwardRef<ComponentRef<typeof CheckboxGroupZone>, ComponentPropsWithoutRef<typeof CheckboxGroupZone> & { color?: 'blue' | 'gray' }>(function (
-  { color = 'blue', ...props },
-  ref,
-) {
+type CheckboxProps = ComponentPropsWithoutRef<typeof CheckboxGroupZone> & {
+  color?: 'blue' | 'gray'
+  indeterminate?: boolean
+}
+
+export default forwardRef<ComponentRef<typeof CheckboxGroupZone>, CheckboxProps>(function ({ color = 'blue', indeterminate = false, ...props }, ref) {
   const hintColor = color === 'gray' ? '$gray7' : '$blue9'
+  const isActive = !!props.checked || indeterminate
   return (
-    <CheckboxGroupZone {...props} ref={ref}>
-      <CheckboxGroupItemFrame borderColor={props.checked ? hintColor : '$textSecondary'}>
-        <CheckboxGroupIndicatorFrame backgroundColor={props.checked ? hintColor : undefined}>
-          <Check size={14} color="$white2" />
+    <CheckboxGroupZone {...props} checked={isActive} ref={ref}>
+      <CheckboxGroupItemFrame borderColor={isActive ? hintColor : '$textSecondary'}>
+        <CheckboxGroupIndicatorFrame backgroundColor={isActive ? hintColor : undefined}>
+          {indeterminate && !props.checked ? <Minus size={14} color="$white2" /> : <Check size={14} color="$white2" />}
         </CheckboxGroupIndicatorFrame>
       </CheckboxGroupItemFrame>
     </CheckboxGroupZone>

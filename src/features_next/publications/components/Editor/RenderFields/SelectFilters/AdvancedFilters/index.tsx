@@ -11,6 +11,7 @@ import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/pub
 
 import { FilterValue, SelectedFiltersType } from '../type'
 import DateInterval, { type DateIntervalValue } from './DateInterval'
+import ScopeTarget, { deserializeScopeTargets, type ScopeTargetInstance } from './ScopeTarget'
 
 /** Codes de filtre à ne pas afficher dans les filtres avancés (déjà gérés dans le parent, ex. zone) */
 const ADVANCED_FILTERS_BLACKLIST = ['zone'] as const
@@ -280,6 +281,19 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
                     size="md"
                     color="gray"
                     resetable
+                  />
+                )
+              }
+
+              if (filter.type === 'scope_target') {
+                const instances = (filter.options && 'instances' in filter.options ? filter.options.instances : []) as ScopeTargetInstance[]
+                const currentValue = deserializeScopeTargets(selectedFilters[filter.code])
+                return (
+                  <ScopeTarget
+                    key={filterIndex}
+                    options={instances}
+                    value={currentValue}
+                    onChange={(next) => handleFilterChange(filter.code, next.length > 0 ? next : null)}
                   />
                 )
               }

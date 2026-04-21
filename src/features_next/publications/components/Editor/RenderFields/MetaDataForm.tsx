@@ -13,6 +13,7 @@ import { useEditorStore } from '@/features_next/publications/components/Editor/s
 import SenderView from '../../SenderView'
 import { useAutoSaveFilters } from '../hooks/useAutoSaveFilters'
 import SelectFilters from './SelectFilters'
+import { deserializeScopeTargets } from './SelectFilters/AdvancedFilters/ScopeTarget'
 import { FilterValue } from './SelectFilters/type'
 import type { SelectedFiltersType } from './SelectFilters/type'
 
@@ -42,7 +43,11 @@ export const MetaDataForm = memo(
     useEffect(() => {
       if (messageFilters) {
         const { uuid: _uuid, ...filtersWithoutUuid } = messageFilters as SelectedFiltersType & { uuid?: string }
-        const normalized = filtersWithoutUuid as SelectedFiltersType
+        const normalized: SelectedFiltersType = { ...filtersWithoutUuid }
+        if ('scope_targets' in normalized) {
+          const grouped = deserializeScopeTargets(normalized.scope_targets)
+          normalized.scope_targets = grouped.length > 0 ? grouped : null
+        }
         setValue('filters.data', normalized, { shouldDirty: false, shouldTouch: false })
       } else if (!messageId) {
         // Nouvelle publication : réinitialiser les filtres par défaut (évite de garder ceux de la publication précédente)
