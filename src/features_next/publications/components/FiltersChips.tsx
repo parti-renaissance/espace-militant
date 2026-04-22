@@ -56,7 +56,7 @@ const getFilterLabel = (key: string, value: FilterValue, filterCollection: RestF
     }
     if (value.length === 1) {
       const inst = instances.find((i) => i.code === value[0].role)
-      return inst?.name ?? value[0].role
+      return inst?.name ?? '1 Filtre cadres'
     }
     return `${value.length} Filtres cadres`
   }

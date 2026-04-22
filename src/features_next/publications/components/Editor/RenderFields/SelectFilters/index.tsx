@@ -159,8 +159,8 @@ function SelectFiltersInner({
 
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false)
-    queryClient.refetchQueries({
-      queryKey: ['message-count-recipients-partial', messageId],
+    queryClient.invalidateQueries({
+      queryKey: ['message-count-recipients', messageId],
     })
   }, [messageId, queryClient])
 

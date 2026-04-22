@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { XStack, YStack } from 'tamagui'
 import { isEqual } from 'lodash'
 import { useDebouncedCallback } from 'use-debounce'
@@ -119,7 +119,7 @@ const emptyEntry = (code: string): ScopeTargetEntry => ({
 
 export default function ScopeTarget({ options, value, onChange, debounceMs = 500 }: ScopeTargetProps) {
   const [localValue, setLocalValue] = useState<ScopeTargetValue>(() => normalizeValue(value, options))
-  const lastEmittedRef = useRef<ScopeTargetValue>(localValue)
+  const [lastEmitted, setLastEmitted] = useState<ScopeTargetValue>(() => normalizeValue(value, options))
   const [prevValue, setPrevValue] = useState<ScopeTargetProps['value']>(value)
   const [prevOptions, setPrevOptions] = useState<ScopeTargetInstance[]>(options)
 
@@ -127,14 +127,14 @@ export default function ScopeTarget({ options, value, onChange, debounceMs = 500
     setPrevValue(value)
     setPrevOptions(options)
     const incoming = normalizeValue(value, options)
-    if (!isEqual(incoming, lastEmittedRef.current)) {
-      lastEmittedRef.current = incoming
+    if (!isEqual(incoming, lastEmitted)) {
+      setLastEmitted(incoming)
       setLocalValue(incoming)
     }
   }
 
   const debouncedEmit = useDebouncedCallback((next: ScopeTargetValue) => {
-    lastEmittedRef.current = next
+    setLastEmitted(next)
     onChange(next)
   }, debounceMs)
 
