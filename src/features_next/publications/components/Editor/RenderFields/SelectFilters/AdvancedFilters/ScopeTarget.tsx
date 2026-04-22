@@ -80,7 +80,7 @@ export const deserializeScopeTargets = (raw: unknown): ScopeTargetEntry[] => {
 
 /** Normalise une entrée : promeut team_roles complet en include_team, retourne null si rien n'est sélectionné */
 const normalizeEntry = (entry: ScopeTargetEntry, instance: ScopeTargetInstance | undefined): ScopeTargetEntry | null => {
-  let include_role = !!entry.include_role
+  const include_role = !!entry.include_role
   let include_team = !!entry.include_team
   let team_roles = Array.isArray(entry.team_roles) ? [...new Set(entry.team_roles)] : []
 
@@ -119,15 +119,19 @@ const emptyEntry = (code: string): ScopeTargetEntry => ({
 
 export default function ScopeTarget({ options, value, onChange, debounceMs = 500 }: ScopeTargetProps) {
   const [localValue, setLocalValue] = useState<ScopeTargetValue>(() => normalizeValue(value, options))
-  const lastEmittedRef = useRef<ScopeTargetValue>(normalizeValue(value, options))
+  const lastEmittedRef = useRef<ScopeTargetValue>(localValue)
+  const [prevValue, setPrevValue] = useState<ScopeTargetProps['value']>(value)
+  const [prevOptions, setPrevOptions] = useState<ScopeTargetInstance[]>(options)
 
-  useEffect(() => {
+  if (value !== prevValue || options !== prevOptions) {
+    setPrevValue(value)
+    setPrevOptions(options)
     const incoming = normalizeValue(value, options)
     if (!isEqual(incoming, lastEmittedRef.current)) {
       lastEmittedRef.current = incoming
       setLocalValue(incoming)
     }
-  }, [value, options])
+  }
 
   const debouncedEmit = useDebouncedCallback((next: ScopeTargetValue) => {
     lastEmittedRef.current = next
