@@ -1,29 +1,30 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native'
+import { BlurView } from 'expo-blur'
+import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import { isWeb, TamaguiProvider, ViewProps } from 'tamagui'
+import config from 'tamagui.config'
+import { ToastProvider } from '@tamagui/toast'
+import { isSupported } from '@firebase/messaging'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+import { PortalLayout } from '@/components/layouts/PortalLayout'
 import WaitingScreen from '@/components/WaitingScreen'
-import { SessionProvider, useSession } from '@/ctx/SessionProvider'
-import { useInitMatomo } from '@/services/matomo/hook'
 import { useInitPushNotification } from '@/features/push-notification/hook'
 import initRootAppNotification from '@/features/push-notification/logic/initRootAppNotification'
 import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks/useAppUpdate'
 import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen'
+
+import { SessionProvider, useSession } from '@/ctx/SessionProvider'
 import useDeepLinkHandler from '@/hooks/useDeepLinkHandler'
 import useImportFont from '@/hooks/useImportFont'
-import { TamaguiProvider } from 'tamagui'
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
-import { isSupported } from '@firebase/messaging'
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import { DefaultTheme, ThemeProvider } from '@react-navigation/native'
-import { ToastProvider } from '@tamagui/toast'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BlurView } from 'expo-blur'
-import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
-import { isWeb, ViewProps } from 'tamagui'
 import { useHits } from '@/services/hits/hook'
-import config from 'tamagui.config'
-import { PortalLayout } from '@/components/layouts/PortalLayout'
+import { useInitMatomo } from '@/services/matomo/hook'
+import { ErrorMonitor } from '@/utils/ErrorMonitor'
 
 if (isWeb) {
   require('@tamagui/core/reset.css')
@@ -109,15 +110,18 @@ export const unstable_settings = {
 }
 
 function Root() {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        retry: false,
-      },
-    },
-  })
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            retry: false,
+          },
+        },
+      }),
+  )
   const [isFontsLoaded] = useImportFont()
   useRegisterRoutingInstrumentation()
 

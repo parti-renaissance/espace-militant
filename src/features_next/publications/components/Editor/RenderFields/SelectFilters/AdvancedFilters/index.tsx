@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Spinner, XStack, YStack } from 'tamagui'
 
 import DateInput from '@/components/base/DateInput'
 import SelectV3 from '@/components/base/Select/SelectV3'
+import Tabs from '@/components/base/Tabs/Tabs'
 import Text from '@/components/base/Text'
 import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 
@@ -11,6 +12,7 @@ import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/pub
 
 import { FilterValue, SelectedFiltersType } from '../type'
 import DateInterval, { type DateIntervalValue } from './DateInterval'
+import ScopeTarget, { deserializeScopeTargets, type ScopeTargetInstance } from './ScopeTarget'
 
 /** Codes de filtre à ne pas afficher dans les filtres avancés (déjà gérés dans le parent, ex. zone) */
 const ADVANCED_FILTERS_BLACKLIST = ['zone'] as const
@@ -160,6 +162,7 @@ interface AdvancedFiltersProps {
 }
 
 function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: AdvancedFiltersProps) {
+  const [activeTab, setActiveTab] = useState<'all' | 'cadres'>('all')
   const scope = useEditorStore((s) => s.scope) ?? ''
   const { data: filterCollection, isLoading } = useGetFilterCollection({
     scope,
@@ -172,6 +175,23 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
     () => displayFilters.filter((category) => category.filters.some((filter) => !(ADVANCED_FILTERS_BLACKLIST as readonly string[]).includes(filter.code))),
     [displayFilters],
   )
+
+  const hasScopeTargetFilter = useMemo(
+    () => visibleCategories.some((category) => category.filters.some((filter) => filter.type === 'scope_target')),
+    [visibleCategories],
+  )
+
+  const categoriesToRender = useMemo(() => {
+    if (!hasScopeTargetFilter) return visibleCategories
+
+    const keepScopeTargetOnly = activeTab === 'cadres'
+    return visibleCategories
+      .map((category) => ({
+        ...category,
+        filters: category.filters.filter((filter) => (keepScopeTargetOnly ? filter.type === 'scope_target' : filter.type !== 'scope_target')),
+      }))
+      .filter((category) => category.filters.length > 0)
+  }, [visibleCategories, hasScopeTargetFilter, activeTab])
 
   const handleFilterChange = useCallback(
     (filterCode: string, value: FilterValue) => {
@@ -206,8 +226,18 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
 
   return (
     <YStack gap="$medium">
-      {visibleCategories.map((category: RestFilterCategory, categoryIndex: number) => (
-        <YStack key={categoryIndex} gap="$small">
+      {hasScopeTargetFilter && (
+        <Tabs
+          tabs={[
+            { id: 'all', label: 'Militants' },
+            { id: 'cadres', label: 'Cadres' },
+          ]}
+          activeTab={activeTab}
+          onTabChange={(tab) => setActiveTab(tab as 'all' | 'cadres')}
+        />
+      )}
+      {categoriesToRender.map((category: RestFilterCategory, categoryIndex: number) => (
+        <YStack key={categoryIndex} gap="$small" mx="$medium">
           <XStack alignItems="center" gap="$small">
             <Text.MD secondary>{category.label}</Text.MD>
             <YStack h={1} flexGrow={1} mt={2} bg="$textOutline" />
@@ -221,7 +251,7 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
                 const choices = filter.options.choices
                 if (typeof choices === 'object' && choices !== null) {
                   const options = getSelectOptions(choices as Record<string, string> | string[])
-                  const isLastCategory = categoryIndex === visibleCategories.length - 1
+                  const isLastCategory = categoryIndex === categoriesToRender.length - 1
                   const isLastTwoInLastCategory = isLastCategory && filterIndex >= category.filters.length - 2
                   const hasEmptyOption = options.some((option) => option.value === '' || option.value === null)
 
@@ -280,6 +310,19 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
                     size="md"
                     color="gray"
                     resetable
+                  />
+                )
+              }
+
+              if (filter.type === 'scope_target') {
+                const instances = (filter.options && 'instances' in filter.options ? filter.options.instances : []) as ScopeTargetInstance[]
+                const currentValue = deserializeScopeTargets(selectedFilters[filter.code])
+                return (
+                  <ScopeTarget
+                    key={filterIndex}
+                    options={instances}
+                    value={currentValue}
+                    onChange={(next) => handleFilterChange(filter.code, next.length > 0 ? next : null)}
                   />
                 )
               }

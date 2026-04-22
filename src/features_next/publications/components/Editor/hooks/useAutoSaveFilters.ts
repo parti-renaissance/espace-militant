@@ -8,6 +8,7 @@ import { useEditorStore } from '@/features_next/publications/components/Editor/s
 
 import { usePutMessageFilters } from '@/services/publications/hook'
 
+import { deserializeScopeTargets } from '../RenderFields/SelectFilters/AdvancedFilters/ScopeTarget'
 import type { SelectedFiltersType } from '../RenderFields/SelectFilters/type'
 import * as S from '../schemas/messageBuilderSchema'
 
@@ -26,6 +27,11 @@ const temporaryMapFiltersForApi = (filters: SelectedFiltersType): SelectedFilter
     if (typeof mappedFilters.committee === 'object' && 'uuid' in mappedFilters.committee) {
       mappedFilters.committee = (mappedFilters.committee as { uuid: string }).uuid
     }
+  }
+
+  if ('scope_targets' in mappedFilters) {
+    const grouped = deserializeScopeTargets(mappedFilters.scope_targets)
+    mappedFilters.scope_targets = grouped.length > 0 ? grouped : null
   }
 
   delete mappedFilters.uuid
@@ -61,15 +67,16 @@ export function useAutoSaveFilters(options?: { enabled?: boolean }) {
   const { control, setValue } = useFormContext<S.GlobalForm>()
   const filtersData = useWatch({ control, name: 'filters.data' }) as SelectedFiltersType | undefined
   const previousValueRef = useRef<SelectedFiltersType | undefined>(undefined)
-  const isInitialMount = useRef(true)
 
   const { mutate: putMessageFilters, isPending } = usePutMessageFilters({ messageId, scope })
 
   const debouncedSave = useDebouncedCallback(
     (filters: SelectedFiltersType) => {
       if (!messageId || !scope || !enabled) return
-      const mapped = temporaryMapFiltersForApi(filters)
       const backendFromCache = queryClient.getQueryData<SelectedFiltersType>(['message-filters', messageId])
+      // Tant que le backend n'a pas répondu au moins une fois, on ne peut rien comparer → on n'envoie pas de PUT.
+      if (backendFromCache === undefined) return
+      const mapped = temporaryMapFiltersForApi(filters)
       const backendSnapshot = previousValueRef.current ?? backendFromCache
       if (areFiltersEqualToBackend(mapped, backendSnapshot)) {
         return
@@ -92,16 +99,8 @@ export function useAutoSaveFilters(options?: { enabled?: boolean }) {
 
   useEffect(() => {
     if (!enabled) return
-
-    const currentFilters = filtersData ?? { adherent_tags: 'adherent' }
-
-    if (isInitialMount.current) {
-      isInitialMount.current = false
-      previousValueRef.current = currentFilters
-      return
-    }
-
-    debouncedSave(currentFilters)
+    if (filtersData === undefined) return
+    debouncedSave(filtersData)
   }, [filtersData, enabled, debouncedSave])
 
   return { isPending, lastError: null }

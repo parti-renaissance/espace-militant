@@ -291,11 +291,33 @@ export const RestFilterOptionSelectSchema = z.object({
   placeholder: z.string().optional(),
 })
 
+export const RestFilterOptionScopeTargetRoleSchema = z.object({
+  code: z.string(),
+  label: z.string(),
+})
+
+export const RestFilterOptionScopeTargetInstanceSchema = z.object({
+  name: z.string(),
+  code: z.string(),
+  main_role: z.string(),
+  team_roles: z.array(RestFilterOptionScopeTargetRoleSchema),
+})
+
+export const RestFilterOptionScopeTargetSchema = z.object({
+  instances: z.array(RestFilterOptionScopeTargetInstanceSchema),
+})
+
 export const RestFilterSchema = z.object({
   code: z.string(),
   label: z.string(),
-  options: z.union([RestFilterOptionSelectSchema, RestFilterOptionIntegerIntervalSchema, RestFilterOptionZoneAutocompleteSchema, z.null()]),
-  type: z.enum(['select', 'text', 'integer_interval', 'date_interval', 'date', 'zone_autocomplete']),
+  options: z.union([
+    RestFilterOptionSelectSchema,
+    RestFilterOptionIntegerIntervalSchema,
+    RestFilterOptionZoneAutocompleteSchema,
+    RestFilterOptionScopeTargetSchema,
+    z.null(),
+  ]),
+  type: z.enum(['select', 'text', 'integer_interval', 'date_interval', 'date', 'zone_autocomplete', 'scope_target']),
 })
 
 export const RestFilterCategorySchema = z.object({
@@ -310,6 +332,9 @@ export type RestFilterOptionChoices = z.infer<typeof RestFilterOptionChoicesSche
 export type RestFilterOptionIntegerInterval = z.infer<typeof RestFilterOptionIntegerIntervalSchema>
 export type RestFilterOptionZoneAutocomplete = z.infer<typeof RestFilterOptionZoneAutocompleteSchema>
 export type RestFilterOptionSelect = z.infer<typeof RestFilterOptionSelectSchema>
+export type RestFilterOptionScopeTarget = z.infer<typeof RestFilterOptionScopeTargetSchema>
+export type RestFilterOptionScopeTargetInstance = z.infer<typeof RestFilterOptionScopeTargetInstanceSchema>
+export type RestFilterOptionScopeTargetRole = z.infer<typeof RestFilterOptionScopeTargetRoleSchema>
 export type RestFilter = z.infer<typeof RestFilterSchema>
 export type RestFilterCategory = z.infer<typeof RestFilterCategorySchema>
 export type RestFilterCollectionResponse = z.infer<typeof RestFilterCollectionResponseSchema>

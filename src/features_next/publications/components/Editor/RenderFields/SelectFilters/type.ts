@@ -1,3 +1,11 @@
+export type ScopeTargetEntry = {
+  role: string
+  include_role: boolean
+  include_team: boolean
+  team_roles: string[]
+}
+export type ScopeTargetValue = ScopeTargetEntry[]
+
 export type FilterValue =
   | string
   | number
@@ -10,6 +18,7 @@ export type FilterValue =
   | Record<string, string>[]
   | { uuid: string; type: string; code: string; name: string }
   | { uuid: string; type: string; code: string; name: string }[]
+  | ScopeTargetValue
   | undefined
   | null
 
