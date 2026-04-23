@@ -9,14 +9,12 @@ import { fr } from 'date-fns/locale'
 
 import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 import Text from '@/components/base/Text'
-import { SignInButton, SignUpButton } from '@/components/Buttons/AuthButton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { getEventItemImageFallback, isEventPartial } from '@/features_next/events/utils'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useSuspensePinnedEvents } from '@/services/events/hook'
 import type { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
-import { useGetProfil } from '@/services/profile/hook'
 
 import { FadingScrollView } from './FadingScrollView'
 
@@ -89,42 +87,6 @@ function PinnedEventCardContent({ event }: { event: PinnedEventItem }) {
   )
 }
 
-function PinnedEventAuthOverlay({ eventUuid }: { eventUuid: string }) {
-  const redirectUri = `/evenements/${eventUuid}?source=page_events_pinned`
-
-  return (
-    <YStack
-      position="absolute"
-      top={0}
-      left={0}
-      right={0}
-      bottom={0}
-      zIndex={10}
-      backgroundColor="$gray/16"
-      justifyContent="center"
-      alignItems="center"
-      paddingHorizontal={8}
-      paddingVertical={6}
-    >
-      <XStack
-        flexWrap="wrap"
-        justifyContent="center"
-        alignItems="center"
-        gap="$xsmall"
-        rowGap={6}
-        bg="$white1"
-        p="$medium"
-        borderRadius="$medium"
-        borderColor="$textOutline"
-        borderWidth={4}
-      >
-        <SignInButton redirectUri={redirectUri} size="sm" />
-        <SignUpButton size="sm" />
-      </XStack>
-    </YStack>
-  )
-}
-
 function PinnedEventCardWrapper({ sizeMode, isMobile, children }: { sizeMode: CardSizeMode; isMobile: boolean; children: ReactNode }) {
   if (sizeMode === 'split') {
     return (
@@ -150,19 +112,18 @@ function PinnedEventCardWrapper({ sizeMode, isMobile, children }: { sizeMode: Ca
 }
 
 const PinnedEventCard = memo(
-  ({ event, sizeMode, isMobile, userUuid }: { event: PinnedEventItem; sizeMode: CardSizeMode; isMobile: boolean; userUuid?: string }) => {
+  ({ event, sizeMode, isMobile }: { event: PinnedEventItem; sizeMode: CardSizeMode; isMobile: boolean }) => {
     const router = useRouter()
     const href = `/evenements/${event.slug}?source=page_events_pinned` as Href
-    const showAuthOverlay = isEventPartial(event) && !userUuid
 
     return (
       <PinnedEventCardWrapper sizeMode={sizeMode} isMobile={isMobile}>
         <YStack position="relative" flex={1} borderRadius="$medium" overflow="hidden">
           <VoxCard
-            cursor={showAuthOverlay ? 'default' : 'pointer'}
+            cursor="pointer"
             flex={1}
             width={sizeMode === 'split' ? '100%' : undefined}
-            onPress={showAuthOverlay ? undefined : () => router.push(href)}
+            onPress={() => router.push(href)}
             borderRadius="$medium"
             hoverStyle={{
               backgroundColor: '$textSurface',
@@ -175,7 +136,6 @@ const PinnedEventCard = memo(
               <PinnedEventCardContent event={event} />
             </VoxCard.Content>
           </VoxCard>
-          {showAuthOverlay ? <PinnedEventAuthOverlay eventUuid={event.uuid} /> : null}
         </YStack>
       </PinnedEventCardWrapper>
     )
@@ -184,15 +144,28 @@ const PinnedEventCard = memo(
 
 PinnedEventCard.displayName = 'PinnedEventCard'
 
-export function PinnedEventBanner() {
+type PinnedEventBannerProps = {
+  /**
+   * Applique le safe area top (défaut `true`).
+   * À désactiver (`false`) lorsque le banner est rendu dans un ScrollView/FlatList qui
+   * gère déjà le safe area (ex. iOS avec `contentInsetAdjustmentBehavior='automatic'`)
+   * pour éviter un double padding.
+   */
+  safeAreaTop?: boolean
+}
+
+export function PinnedEventBanner({ safeAreaTop = true }: PinnedEventBannerProps = {}) {
   const media = useMedia()
   const { session } = useSession()
-  const { data: userData } = useGetProfil({ enabled: Boolean(session) })
-  const userUuid = userData?.uuid
+  const isAuthenticated = Boolean(session)
   const { data } = useSuspensePinnedEvents()
-  const events = useMemo(() => data.pages.flatMap((p) => p?.items ?? []), [data.pages])
+  const events = useMemo(() => {
+    const allEvents = data.pages.flatMap((p) => p?.items ?? [])
+    if (isAuthenticated) return allEvents
+    return allEvents.filter((event) => !isEventPartial(event))
+  }, [data.pages, isAuthenticated])
   const isMobile = Boolean(media.sm)
-  const { paddingTop } = useLayoutSpacing({ top: true, left: false, right: false, bottom: false })
+  const { paddingTop } = useLayoutSpacing({ top: true, safeAreaTop, left: false, right: false, bottom: false })
 
   if (events.length === 0) return null
 
@@ -201,7 +174,7 @@ export function PinnedEventBanner() {
       <YStack width="100%" paddingTop={paddingTop}>
         <XStack width="100%" gap="$medium" alignItems="stretch" flexWrap="nowrap">
           {events.map((event) => (
-            <PinnedEventCard key={event.uuid} event={event} sizeMode="split" isMobile={isMobile} userUuid={userUuid} />
+            <PinnedEventCard key={event.uuid} event={event} sizeMode="split" isMobile={isMobile} />
           ))}
         </XStack>
       </YStack>
@@ -211,7 +184,7 @@ export function PinnedEventBanner() {
   if (events.length === 1) {
     return (
       <YStack width="100%" paddingTop={paddingTop} paddingHorizontal={isMobile ? 16 : 0} paddingBottom={isMobile ? 16 : 0}>
-        <PinnedEventCard event={events[0]} sizeMode="single" isMobile={isMobile} userUuid={userUuid} />
+        <PinnedEventCard event={events[0]} sizeMode="single" isMobile={isMobile} />
       </YStack>
     )
   }
@@ -228,7 +201,7 @@ export function PinnedEventBanner() {
       >
         <XStack flexDirection="row" alignItems="stretch" gap={16} paddingBottom={isMobile ? 16 : 0}>
           {events.map((event) => (
-            <PinnedEventCard key={event.uuid} event={event} sizeMode="scroll" isMobile={isMobile} userUuid={userUuid} />
+            <PinnedEventCard key={event.uuid} event={event} sizeMode="scroll" isMobile={isMobile} />
           ))}
         </XStack>
       </FadingScrollView>
