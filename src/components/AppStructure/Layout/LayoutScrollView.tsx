@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react'
-import { NativeScrollEvent, NativeSyntheticEvent, Platform, RefreshControl, ScrollView, ScrollViewProps } from 'react-native'
+import { KeyboardAvoidingView, NativeScrollEvent, NativeSyntheticEvent, Platform, RefreshControl, ScrollView, ScrollViewProps } from 'react-native'
 import { isWeb, YStack } from 'tamagui'
 
 import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
@@ -15,6 +15,7 @@ type LayoutScrollViewProps = Omit<ScrollViewProps, 'onEndReached'> & {
   refreshControl?: React.ReactElement
   refreshing?: boolean
   onRefresh?: () => void
+  keyboardAvoiding?: boolean
 }
 
 export type LayoutScrollViewRef = {
@@ -36,6 +37,8 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
       onRefresh,
       contentContainerStyle,
       onScroll,
+      keyboardAvoiding = true,
+      keyboardShouldPersistTaps,
       ...rest
     },
     ref,
@@ -127,13 +130,14 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
       )
     }
 
-    return (
+    const scrollView = (
       <ScrollView
         ref={scrollViewRef}
         onScroll={handleNativeScroll}
         scrollEventThrottle={16}
         refreshControl={refreshControlElement}
         contentInsetAdjustmentBehavior={Platform.OS === 'ios' ? 'automatic' : undefined}
+        keyboardShouldPersistTaps={keyboardShouldPersistTaps ?? 'handled'}
         contentContainerStyle={[
           !disablePadding && {
             paddingTop: Platform.OS === 'ios' ? 0 : spacingValues.paddingTop,
@@ -145,6 +149,16 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
       >
         {children}
       </ScrollView>
+    )
+
+    if (!keyboardAvoiding) {
+      return scrollView
+    }
+
+    return (
+      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }}>
+        {scrollView}
+      </KeyboardAvoidingView>
     )
   },
 )

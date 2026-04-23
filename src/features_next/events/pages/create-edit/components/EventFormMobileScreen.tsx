@@ -84,7 +84,7 @@ export default function EventFormMobileScreen() {
           </XStack>
         </VoxHeader>
 
-        <LayoutScrollView padding={false}>
+        <LayoutScrollView padding={false} keyboardShouldPersistTaps="handled">
           <YStack paddingBottom={100}>
             <VoxCard borderWidth={0}>
               {editMode ? null : (

@@ -1,5 +1,4 @@
 import React from 'react'
-import { KeyboardAvoidingView, Platform } from 'react-native'
 import { useMedia, YStack } from 'tamagui'
 
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
@@ -26,17 +25,15 @@ const EluContent = () => {
   const media = useMedia()
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-      <LayoutScrollView>
-        <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
-          <ForceBirthdateModal />
-          <InfoEluCard profil={profile} />
-          <DeclaEluCard declaration={profile.last_revenue_declaration?.amount} cotisation={profile.contribution_amount ?? undefined} />
-          <DeclaMandateEluCard profil={profile} />
-          <CotisationHistoryEluCard payments={profile.payments} />
-        </YStack>
-      </LayoutScrollView>
-    </KeyboardAvoidingView>
+    <LayoutScrollView>
+      <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
+        <ForceBirthdateModal />
+        <InfoEluCard profil={profile} />
+        <DeclaEluCard declaration={profile.last_revenue_declaration?.amount} cotisation={profile.contribution_amount ?? undefined} />
+        <DeclaMandateEluCard profil={profile} />
+        <CotisationHistoryEluCard payments={profile.payments} />
+      </YStack>
+    </LayoutScrollView>
   )
 }
 
