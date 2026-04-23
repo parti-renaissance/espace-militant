@@ -39,7 +39,7 @@ const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 
   )
 }
 
-const FloatingBackButton = () => {
+const FloatingBackButton = ({ withSafeArea = true }: { withSafeArea?: boolean }) => {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const fallbackPath: Href = '/'
@@ -53,7 +53,7 @@ const FloatingBackButton = () => {
   }
 
   return (
-    <YStack position="absolute" top={insets.top + 16} left={16} zIndex={100}>
+    <YStack position="absolute" top={(withSafeArea ? insets.top : 0) + 16} left={16} zIndex={100}>
       <VoxButton variant="contained" theme="gray" iconLeft={ArrowLeft} size="md" shrink onPress={handleBack} />
     </YStack>
   )
@@ -192,7 +192,7 @@ const MobileLayout = (props: EventItemProps) => {
           </YStack>
         </LayoutScrollView>
       </Layout.Main>
-      <FloatingBackButton />
+      <FloatingBackButton withSafeArea={Boolean(props.userUuid)} />
       <MobileBottomCTA {...props} />
     </>
   )
