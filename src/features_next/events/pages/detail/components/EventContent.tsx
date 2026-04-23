@@ -128,13 +128,14 @@ const EventInfo = ({ event }: EventItemProps) => {
                 <YStack w={16}>
                   <EyeOff size={16} color="$textPrimary" />
                 </YStack>
-
-                <Text.SM color="$textPrimary">
-                  <Text.SM bold color="$textPrimary">
-                    Non répertorié.{' '}
+                <YStack flexShrink={1}>
+                  <Text.SM color="$textPrimary">
+                    <Text.SM bold color="$textPrimary">
+                      Non répertorié.{' '}
+                    </Text.SM>
+                    Cet événement n'est accessible que par son lien direct et ne peut pas être retrouvé via la plateforme.
                   </Text.SM>
-                  Cet événement n'est accessible que par son lien direct et ne peut pas être retrouvé via la plateforme.
-                </Text.SM>
+                </YStack>
               </XStack>
             </VoxCard.Content>
           </VoxCard>
