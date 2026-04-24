@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import clientEnv from '@/config/clientEnv'
-import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
 import * as AuthSession from 'expo-auth-session'
 import { DiscoveryDocument } from 'expo-auth-session'
 import * as WebBrowser from 'expo-web-browser'
 import { maybeCompleteAuthSession } from 'expo-web-browser'
 import { isWeb } from 'tamagui'
+
+import clientEnv from '@/config/clientEnv'
+import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
+
 import useBrowserWarmUp from './useBrowserWarmUp'
 
 maybeCompleteAuthSession()
@@ -57,7 +59,11 @@ export const useLogin = () => {
   const [req, , promptAsync] = useCodeAuthRequest() ?? []
   return async (payload?: { code?: string; sessionId?: string; state?: string }) => {
     if (payload?.code) {
-      WebBrowser.dismissAuthSession()
+      try {
+        WebBrowser.dismissAuthSession()
+      } catch {
+        // No auth session to dismiss (e.g. return from external mail app flow).
+      }
       return exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId })
     }
 
