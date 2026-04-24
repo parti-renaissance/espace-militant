@@ -117,7 +117,7 @@ const emptyEntry = (code: string): ScopeTargetEntry => ({
   team_roles: [],
 })
 
-export default function ScopeTarget({ options, value, onChange, debounceMs = 2000 }: ScopeTargetProps) {
+export default function ScopeTarget({ options, value, onChange, debounceMs = 1600 }: ScopeTargetProps) {
   const [localValue, setLocalValue] = useState<ScopeTargetValue>(() => normalizeValue(value, options))
 
   const debouncedEmit = useDebouncedCallback((next: ScopeTargetValue) => {

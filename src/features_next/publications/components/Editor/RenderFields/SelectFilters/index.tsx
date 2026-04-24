@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useState } from 'react'
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia, XStack, YStack } from 'tamagui'
@@ -41,6 +41,7 @@ function SelectFiltersInner({
   messageCountRecipients,
   isFetchingMessageCountRecipients = false,
 }: SelectFiltersProps) {
+  const initialScopeTargetsState = useRef(false)
   const messageId = useEditorStore((s) => s.messageId)
   const scope = useEditorStore((s) => s.scope)
   const insets = useSafeAreaInsets()
@@ -129,11 +130,12 @@ function SelectFiltersInner({
 
   // Calculer les valeurs par défaut en fonction de messageId et des zones disponibles
   const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), [selectedFilters])
-  const hasScopeTargets = selectedFilters.scope_targets != null
   const excludedFilters = useMemo(
     () => [...getProtectedFilterKeys(selectedFilters, filterCollection ?? undefined), 'uuid'],
     [selectedFilters, filterCollection],
   )
+
+  const isScopeTargetsFilled = selectedFilters.scope_targets != null
 
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
@@ -161,21 +163,22 @@ function SelectFiltersInner({
   }, [selectedQuickFilterId, quickFilters, selectedFilters, isAdvancedFilters, excludedFilters])
 
   const handleOpenModal = useCallback(() => {
+    initialScopeTargetsState.current = isScopeTargetsFilled
     setIsModalOpen(true)
     setIsAdvancedFilters(selectedQuickFilterId ? false : true)
-  }, [selectedQuickFilterId])
+  }, [selectedQuickFilterId, isScopeTargetsFilled])
 
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false)
     queryClient.invalidateQueries({
       queryKey: ['message-count-recipients', messageId],
     })
-    if (hasScopeTargets) {
+    if (isScopeTargetsFilled !== initialScopeTargetsState.current) {
       queryClient.invalidateQueries({
         queryKey: ['message', messageId],
       })
     }
-  }, [messageId, queryClient, hasScopeTargets])
+  }, [messageId, queryClient, isScopeTargetsFilled])
 
   const handleQuickFilterSelection = useCallback(
     (itemId: string) => {
