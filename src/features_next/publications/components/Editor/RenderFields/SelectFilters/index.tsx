@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, Platform } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { Save } from '@tamagui/lucide-icons'
 import { useQueryClient } from '@tanstack/react-query'
@@ -43,6 +43,11 @@ function SelectFiltersInner({
 }: SelectFiltersProps) {
   const messageId = useEditorStore((s) => s.messageId)
   const scope = useEditorStore((s) => s.scope)
+  const insets = useSafeAreaInsets()
+  const headerTopInset = useMemo(() => {
+    if (insets.top > 0) return insets.top
+    return Platform.OS === 'android' ? 20 : 0
+  }, [insets.top])
   const { data: filterCollection } = useGetFilterCollection({ scope: scope ?? '', enabled: !!scope })
 
   const selectedQuickFilterId = useMemo(() => identifyQuickFilter(selectedFilters, filterCollection ?? undefined), [selectedFilters, filterCollection])
@@ -120,10 +125,15 @@ function SelectFiltersInner({
     }
 
     return undefined
-  }, [selectedFilters.zone, selectedFilters.zones, messageId]) // update when zone changes
+  }, [selectedFilters.zone, selectedFilters.zones]) // update when zone changes
 
   // Calculer les valeurs par défaut en fonction de messageId et des zones disponibles
   const defaultFiltersValues = useMemo(() => calculateDefaultValues(selectedFilters), [selectedFilters])
+  const hasScopeTargets = selectedFilters.scope_targets != null
+  const excludedFilters = useMemo(
+    () => [...getProtectedFilterKeys(selectedFilters, filterCollection ?? undefined), 'uuid'],
+    [selectedFilters, filterCollection],
+  )
 
   const displayText = useMemo(() => {
     if (selectedQuickFilterId && !isAdvancedFilters) {
@@ -144,13 +154,11 @@ function SelectFiltersInner({
       return baseLabel
     }
 
-    const excludedFilters = [...getProtectedFilterKeys(selectedFilters, filterCollection ?? undefined), 'uuid']
-
     const nonNullFilters = Object.entries(selectedFilters).filter(([key, value]) => !excludedFilters.includes(key) && isFilterValueFilled(value))
     return nonNullFilters.length > 0
       ? `${nonNullFilters.length} filtre${nonNullFilters.length > 1 ? 's' : ''} avancé${nonNullFilters.length > 1 ? 's' : ''}`
       : 'Sélectionner'
-  }, [selectedQuickFilterId, quickFilters, selectedFilters, isAdvancedFilters, filterCollection])
+  }, [selectedQuickFilterId, quickFilters, selectedFilters, isAdvancedFilters, excludedFilters])
 
   const handleOpenModal = useCallback(() => {
     setIsModalOpen(true)
@@ -162,7 +170,12 @@ function SelectFiltersInner({
     queryClient.invalidateQueries({
       queryKey: ['message-count-recipients', messageId],
     })
-  }, [messageId, queryClient])
+    if (hasScopeTargets) {
+      queryClient.invalidateQueries({
+        queryKey: ['message', messageId],
+      })
+    }
+  }, [messageId, queryClient, hasScopeTargets])
 
   const handleQuickFilterSelection = useCallback(
     (itemId: string) => {
@@ -232,8 +245,8 @@ function SelectFiltersInner({
     [updateFilter, defaultFiltersValues],
   )
 
-  const Header = useCallback(() => {
-    return (
+  const headerContent = useMemo(
+    () => (
       <XStack h={64} justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderColor="$gray1" padding="$medium">
         <Text.LG semibold>Destinataires</Text.LG>
         <XStack gap="$small">
@@ -242,8 +255,9 @@ function SelectFiltersInner({
           </VoxButton>
         </XStack>
       </XStack>
-    )
-  }, [handleCloseModal])
+    ),
+    [handleCloseModal],
+  )
 
   return (
     <>
@@ -272,14 +286,14 @@ function SelectFiltersInner({
         onClose={handleCloseModal}
         header={
           <>
-            <SafeAreaView style={{ height: Platform.OS === 'android' ? 20 : undefined }} />
-            <Header />
+            {headerTopInset > 0 ? <YStack height={headerTopInset} backgroundColor="$white1" /> : null}
+            {headerContent}
           </>
         }
         withKeyboard={false}
       >
         <YStack width={media.gtMd ? 500 : undefined}>
-          {media.gtMd ? <Header /> : null}
+          {media.gtMd ? headerContent : null}
           <YStack gap="$medium" py="$medium">
             <YStack px="$medium" gap="$medium">
               {/* Affichage des filtres actifs sous forme de chips */}

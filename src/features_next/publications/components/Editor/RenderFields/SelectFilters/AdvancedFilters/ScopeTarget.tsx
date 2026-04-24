@@ -117,24 +117,10 @@ const emptyEntry = (code: string): ScopeTargetEntry => ({
   team_roles: [],
 })
 
-export default function ScopeTarget({ options, value, onChange, debounceMs = 500 }: ScopeTargetProps) {
+export default function ScopeTarget({ options, value, onChange, debounceMs = 2000 }: ScopeTargetProps) {
   const [localValue, setLocalValue] = useState<ScopeTargetValue>(() => normalizeValue(value, options))
-  const [lastEmitted, setLastEmitted] = useState<ScopeTargetValue>(() => normalizeValue(value, options))
-  const [prevValue, setPrevValue] = useState<ScopeTargetProps['value']>(value)
-  const [prevOptions, setPrevOptions] = useState<ScopeTargetInstance[]>(options)
-
-  if (value !== prevValue || options !== prevOptions) {
-    setPrevValue(value)
-    setPrevOptions(options)
-    const incoming = normalizeValue(value, options)
-    if (!isEqual(incoming, lastEmitted)) {
-      setLastEmitted(incoming)
-      setLocalValue(incoming)
-    }
-  }
 
   const debouncedEmit = useDebouncedCallback((next: ScopeTargetValue) => {
-    setLastEmitted(next)
     onChange(next)
   }, debounceMs)
 
@@ -147,6 +133,21 @@ export default function ScopeTarget({ options, value, onChange, debounceMs = 500
   )
 
   useEffect(() => () => debouncedEmit.flush(), [debouncedEmit])
+
+  /**
+   * Synchronise `value`/`options` entrants vers `localValue` sans `setState` dans un effect.
+   * Pattern recommandé par React : « stocker les valeurs du rendu précédent » pour adapter
+   * l'état en fonction des props sans provoquer de rendus en cascade.
+   * @see https://react.dev/reference/react/useState#storing-information-from-previous-renders
+   */
+  const [prevValue, setPrevValue] = useState(value)
+  const [prevOptions, setPrevOptions] = useState(options)
+  if (value !== prevValue || options !== prevOptions) {
+    setPrevValue(value)
+    setPrevOptions(options)
+    const incoming = normalizeValue(value, options)
+    if (!isEqual(incoming, localValue)) setLocalValue(incoming)
+  }
 
   const entryByScope = useMemo(() => {
     const map: Record<string, ScopeTargetEntry> = {}
