@@ -1,6 +1,6 @@
 import React, { memo, useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, Platform } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { Save } from '@tamagui/lucide-icons'
 import { useQueryClient } from '@tanstack/react-query'
@@ -43,6 +43,11 @@ function SelectFiltersInner({
 }: SelectFiltersProps) {
   const messageId = useEditorStore((s) => s.messageId)
   const scope = useEditorStore((s) => s.scope)
+  const insets = useSafeAreaInsets()
+  const headerTopInset = useMemo(() => {
+    if (insets.top > 0) return insets.top
+    return Platform.OS === 'android' ? 20 : 0
+  }, [insets.top])
   const { data: filterCollection } = useGetFilterCollection({ scope: scope ?? '', enabled: !!scope })
 
   const selectedQuickFilterId = useMemo(() => identifyQuickFilter(selectedFilters, filterCollection ?? undefined), [selectedFilters, filterCollection])
@@ -272,7 +277,7 @@ function SelectFiltersInner({
         onClose={handleCloseModal}
         header={
           <>
-            <SafeAreaView style={{ height: Platform.OS === 'android' ? 20 : undefined }} />
+            {headerTopInset > 0 ? <YStack height={headerTopInset} backgroundColor="$white1" /> : null}
             <Header />
           </>
         }

@@ -10,7 +10,7 @@ import { useEditorStore } from '@/features_next/publications/components/Editor/s
 import { useGetFilterCollection } from '@/services/publications/hook'
 import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/publications/schema'
 
-import { FilterValue, SelectedFiltersType } from '../type'
+import { FilterValue, ScopeTargetValue, SelectedFiltersType } from '../type'
 import DateInterval, { type DateIntervalValue } from './DateInterval'
 import ScopeTarget, { deserializeScopeTargets, type ScopeTargetInstance } from './ScopeTarget'
 
@@ -181,6 +181,17 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
     [visibleCategories],
   )
 
+  const scopeTargetValuesByCode = useMemo(() => {
+    const values: Record<string, ScopeTargetValue> = {}
+    for (const category of visibleCategories) {
+      for (const filter of category.filters) {
+        if (filter.type !== 'scope_target') continue
+        values[filter.code] = deserializeScopeTargets(selectedFilters[filter.code])
+      }
+    }
+    return values
+  }, [selectedFilters, visibleCategories])
+
   const categoriesToRender = useMemo(() => {
     if (!hasScopeTargetFilter) return visibleCategories
 
@@ -316,7 +327,7 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
 
               if (filter.type === 'scope_target') {
                 const instances = (filter.options && 'instances' in filter.options ? filter.options.instances : []) as ScopeTargetInstance[]
-                const currentValue = deserializeScopeTargets(selectedFilters[filter.code])
+                const currentValue = scopeTargetValuesByCode[filter.code] ?? []
                 return (
                   <ScopeTarget
                     key={filterIndex}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { XStack, YStack } from 'tamagui'
 import { isEqual } from 'lodash'
 import { useDebouncedCallback } from 'use-debounce'
@@ -117,24 +117,13 @@ const emptyEntry = (code: string): ScopeTargetEntry => ({
   team_roles: [],
 })
 
-export default function ScopeTarget({ options, value, onChange, debounceMs = 500 }: ScopeTargetProps) {
+export default function ScopeTarget({ options, value, onChange, debounceMs = 2000 }: ScopeTargetProps) {
   const [localValue, setLocalValue] = useState<ScopeTargetValue>(() => normalizeValue(value, options))
-  const [lastEmitted, setLastEmitted] = useState<ScopeTargetValue>(() => normalizeValue(value, options))
-  const [prevValue, setPrevValue] = useState<ScopeTargetProps['value']>(value)
-  const [prevOptions, setPrevOptions] = useState<ScopeTargetInstance[]>(options)
-
-  if (value !== prevValue || options !== prevOptions) {
-    setPrevValue(value)
-    setPrevOptions(options)
-    const incoming = normalizeValue(value, options)
-    if (!isEqual(incoming, lastEmitted)) {
-      setLastEmitted(incoming)
-      setLocalValue(incoming)
-    }
-  }
+  const lastEmittedRef = useRef<ScopeTargetValue>(localValue)
 
   const debouncedEmit = useDebouncedCallback((next: ScopeTargetValue) => {
-    setLastEmitted(next)
+    lastEmittedRef.current = next
+    console.log('debouncedEmit', new Date().toISOString())
     onChange(next)
   }, debounceMs)
 
@@ -147,6 +136,14 @@ export default function ScopeTarget({ options, value, onChange, debounceMs = 500
   )
 
   useEffect(() => () => debouncedEmit.flush(), [debouncedEmit])
+
+  useEffect(() => {
+    const incoming = normalizeValue(value, options)
+    if (isEqual(incoming, localValue)) return
+    if (isEqual(incoming, lastEmittedRef.current)) return
+    setLocalValue(incoming)
+    lastEmittedRef.current = incoming
+  }, [value, options, localValue])
 
   const entryByScope = useMemo(() => {
     const map: Record<string, ScopeTargetEntry> = {}
