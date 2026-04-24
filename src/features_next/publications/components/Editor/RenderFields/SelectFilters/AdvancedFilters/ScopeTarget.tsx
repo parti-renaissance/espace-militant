@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { XStack, YStack } from 'tamagui'
 import { isEqual } from 'lodash'
 import { useDebouncedCallback } from 'use-debounce'
@@ -119,11 +119,8 @@ const emptyEntry = (code: string): ScopeTargetEntry => ({
 
 export default function ScopeTarget({ options, value, onChange, debounceMs = 2000 }: ScopeTargetProps) {
   const [localValue, setLocalValue] = useState<ScopeTargetValue>(() => normalizeValue(value, options))
-  const lastEmittedRef = useRef<ScopeTargetValue>(localValue)
 
   const debouncedEmit = useDebouncedCallback((next: ScopeTargetValue) => {
-    lastEmittedRef.current = next
-    console.log('debouncedEmit', new Date().toISOString())
     onChange(next)
   }, debounceMs)
 
@@ -137,13 +134,20 @@ export default function ScopeTarget({ options, value, onChange, debounceMs = 200
 
   useEffect(() => () => debouncedEmit.flush(), [debouncedEmit])
 
-  useEffect(() => {
+  /**
+   * Synchronise `value`/`options` entrants vers `localValue` sans `setState` dans un effect.
+   * Pattern recommandé par React : « stocker les valeurs du rendu précédent » pour adapter
+   * l'état en fonction des props sans provoquer de rendus en cascade.
+   * @see https://react.dev/reference/react/useState#storing-information-from-previous-renders
+   */
+  const [prevValue, setPrevValue] = useState(value)
+  const [prevOptions, setPrevOptions] = useState(options)
+  if (value !== prevValue || options !== prevOptions) {
+    setPrevValue(value)
+    setPrevOptions(options)
     const incoming = normalizeValue(value, options)
-    if (isEqual(incoming, localValue)) return
-    if (isEqual(incoming, lastEmittedRef.current)) return
-    setLocalValue(incoming)
-    lastEmittedRef.current = incoming
-  }, [value, options, localValue])
+    if (!isEqual(incoming, localValue)) setLocalValue(incoming)
+  }
 
   const entryByScope = useMemo(() => {
     const map: Record<string, ScopeTargetEntry> = {}
