@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Pressable } from 'react-native'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { EyeOff, Info } from '@tamagui/lucide-icons'
 
@@ -20,12 +21,14 @@ const EventHiddenField = ({ value, onChange }: EventHiddenFieldProps) => {
       <XStack alignItems="center" justifyContent="space-between" gap="$small" px="$medium">
         <XStack gap="$small">
           <Text.MD secondary>Événement non répertorié ?</Text.MD>
-          <Info size={16} color="$blue5" onPress={() => setOpen(true)} />
+          <Pressable onPress={() => setOpen(true)}>
+            <Info size={16} color="$blue5" />
+          </Pressable>
         </XStack>
         <SwitchV2 checked={value} onPress={() => onChange(!value)} />
       </XStack>
       <ModalOrBottomSheet open={open} onClose={() => setOpen(false)}>
-        <VoxCard maxWidth={media.sm ? undefined : 500} borderWidth={media.sm ? 0 : 1}>
+        <VoxCard maxWidth={media.sm ? undefined : 500} borderWidth={media.sm ? 0 : 1} paddingBottom={media.sm ? '$large' : undefined}>
           <VoxCard.Content gap="$medium">
             <Text.LG>Événement non répertorié</Text.LG>
             <XStack gap="$medium" flex={1} alignItems="center">
@@ -38,8 +41,11 @@ const EventHiddenField = ({ value, onChange }: EventHiddenFieldProps) => {
                   plateforme.
                 </Text.MD>
                 <Text.MD color="$orange9">
-                  N’utilisez cette option que si il est <Text.MD bold>absolument nécessaire</Text.MD> de cacher cet événement et ne le partager que via email ou
-                  Telegram.
+                  N’utilisez cette option que si il est{' '}
+                  <Text.MD bold color="$orange9">
+                    absolument nécessaire
+                  </Text.MD>{' '}
+                  de cacher cet événement et ne le partager que via email ou Telegram.
                 </Text.MD>
               </YStack>
             </XStack>

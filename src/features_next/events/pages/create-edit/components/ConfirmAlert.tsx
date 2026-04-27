@@ -56,7 +56,7 @@ const VisibilityReview = (props: { visibility: string }) => {
 }
 
 const CountInvitation = (props: { visibility: string; agoraUuid?: string | null; scope?: string | null }) => {
-  const shouldCount = props.visibility === 'invitation_agora' && !!props.agoraUuid && !!props.scope
+  const shouldCount = props.visibility === 'invitation' && !!props.agoraUuid && !!props.scope
 
   const { data, isLoading } = useCountInvitationsEvent({
     roles: undefined,
@@ -83,6 +83,8 @@ const CountInvitation = (props: { visibility: string; agoraUuid?: string | null;
     )
   )
 }
+
+const isInvitationVisibility = (visibility?: string) => visibility === 'invitation'
 
 const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
   const insideRef = useRef<ModalRef>(null)
@@ -145,7 +147,7 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
               </YStack>
             </XStack>
           ) : null}
-          {!hidden && visibility === 'invitation_agora' ? (
+          {!hidden && isInvitationVisibility(visibility) ? (
             <XStack gap="$small" alignItems="center">
               <XStack paddingHorizontal="$medium">
                 <Mail size={20} color="$textPrimary" />
@@ -184,12 +186,12 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
               )}
             />
           ) : null}
-          {!hidden && visibility === 'invitation_agora' ? <CountInvitation visibility={visibility} agoraUuid={props.agoraUuid} scope={props.scope} /> : null}
+          {!hidden && visibility === 'invitation' ? <CountInvitation visibility={visibility} agoraUuid={props.agoraUuid} scope={props.scope} /> : null}
         </YStack>
         <XStack gap="$medium">
           <VoxButton variant="outlined" flex={3} children="Annuler" onPress={handleCancel} theme="gray" />
           <VoxButton
-            children={!hidden && visibility === 'invitation_agora' ? 'Envoyer les invitations' : 'Créer'}
+            children={!hidden && isInvitationVisibility(visibility) ? 'Envoyer les invitations' : 'Créer'}
             loading={props.isPending}
             flex={1}
             onPress={handleAccept}

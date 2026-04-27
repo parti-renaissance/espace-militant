@@ -4,7 +4,7 @@ import { createRestPaginationSchema } from '../common/schema'
 
 // ------- Event Schemas ----------
 
-export const EventVisibilitySchema = z.enum(['public', 'private', 'adherent', 'adherent_dues', 'invitation_agora'])
+export const EventVisibilitySchema = z.enum(['public', 'private', 'adherent', 'adherent_dues', 'invitation'])
 
 export const RestEventParentCategorySchema = z.object({
   name: z.string(),

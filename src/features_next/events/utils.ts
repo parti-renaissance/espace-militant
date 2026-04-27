@@ -1,9 +1,9 @@
 import { isAfter, isBefore, subHours } from 'date-fns'
 
-import { RestFullEvent, RestItemEvent, RestPartialEvent, RestPublicItemEvent } from '@/services/events/schema'
-
 import eventFallbackPrivateLock from '@/features_next/events/assets/images/event-fallback-private-lock.png'
 import eventFallback from '@/features_next/events/assets/images/event-fallback.png'
+
+import { RestFullEvent, RestItemEvent, RestPartialEvent, RestPublicItemEvent } from '@/services/events/schema'
 
 export type EventSectionId = 'national' | 'zone' | 'region' | 'past'
 
@@ -139,8 +139,8 @@ export const isEventPrivate = (event: Partial<RestItemEvent>) => {
   return event.visibility === 'private'
 }
 
-export const isEventInvitationAgora = (event: Partial<RestItemEvent>) => {
-  return event.visibility === 'invitation_agora'
+export const isEventInvitation = (event: Partial<RestItemEvent>) => {
+  return event.visibility === 'invitation'
 }
 
 export const isAdherentLock = (event: Partial<RestItemEvent>) => isEventPartial(event) && isEventAdherentReserved(event)

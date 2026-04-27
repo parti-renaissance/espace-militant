@@ -298,20 +298,20 @@ const VoxCardSection = ({ title, ...props }: StackProps & { title: string }) => 
 
 const VoxCardSeparator = (props: StackProps) => <Separator {...props} borderColor={props.backgroundColor ?? '$textOutline32'} borderRadius={1} />
 
-const VoxCardAdhLock = (props?: { lock?: boolean; due?: boolean; isPrivate?: boolean; isInvitationAgora?: boolean }) => {
-  const { lock = true, due = false, isPrivate = false, isInvitationAgora = false } = props ?? {}
+const VoxCardAdhLock = (props?: { lock?: boolean; due?: boolean; isPrivate?: boolean; isInvitation?: boolean }) => {
+  const { lock = true, due = false, isPrivate = false, isInvitation = false } = props ?? {}
 
-  const color = isInvitationAgora ? '$orange5' : isPrivate ? '$gray5' : '$yellow5'
+  const color = isInvitation ? '$orange5' : isPrivate ? '$gray5' : '$yellow5'
 
   const text = (() => {
-    if (isInvitationAgora) return 'Réservé aux membres de l’agora'
+    if (isInvitation) return 'Réservé aux invités'
     if (isPrivate) return 'Réservé aux militants'
     if (due) return 'Réservé aux adhérents à jour'
     return 'Réservé aux adhérents'
   })()
 
   const Icon = (() => {
-    if (isInvitationAgora) return Ticket
+    if (isInvitation) return Ticket
     return lock ? LockKeyhole : CheckCircle
   })()
 
