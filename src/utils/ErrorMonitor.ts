@@ -1,6 +1,7 @@
-import clientEnv from '@/config/clientEnv'
-import * as Sentry from '@sentry/react-native'
 import { isRunningInExpoGo } from 'expo'
+import * as Sentry from '@sentry/react-native'
+
+import clientEnv from '@/config/clientEnv'
 
 export const ErrorMonitor = {
   configure: () => {
