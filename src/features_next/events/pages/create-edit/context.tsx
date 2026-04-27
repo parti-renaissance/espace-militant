@@ -100,7 +100,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const editEventScope = edit?.organizer?.scope ?? 'national'
 
   const initialScopeCode = edit ? (edit.organizer?.scope ?? 'national') : (scopes.data?.default?.code ?? 'national')
-  const defaultVisibilityForScope = edit?.visibility ?? (String(initialScopeCode).startsWith('agora_') ? 'invitation_agora' : 'public')
+  const defaultVisibilityForScope = edit?.visibility ?? (String(initialScopeCode).startsWith('agora_') ? 'invitation' : 'public')
   /** Portée Agora : événements toujours « en ligne » (produit). */
   const defaultModeForScope = String(initialScopeCode).startsWith('agora_') ? 'online' : (edit?.mode ?? 'meeting')
 
@@ -177,8 +177,10 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     name: 'scope',
   })
 
+  const selectedScopeData = useMemo(() => scopes.data?.list?.find((x) => x.code === selectedScope), [scopes.data, selectedScope])
+
   /** Mémoïsé une fois par `selectedScope` : réutilisé pour le select et pour l’effet de cohérence (pas d’appels redondés à `getVisibilityOptions` dans l’effet). */
-  const visibilityOptions = useMemo(() => getVisibilityOptions(selectedScope), [selectedScope])
+  const visibilityOptions = useMemo(() => getVisibilityOptions(selectedScopeData), [selectedScopeData])
 
   const catOptions: SelectOption<string>[] = useMemo(() => {
     if (!selectedScope?.startsWith('agora_')) {
@@ -215,11 +217,11 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
     if (isAgoraLeader && !prevIsAgoraLeaderRef.current) {
       setValue('category', AGORA_EVENT_CATEGORY_SLUG)
-      setValue('visibility', 'invitation_agora')
+      setValue('visibility', 'invitation')
     }
     prevIsAgoraLeaderRef.current = isAgoraLeader
 
-    if (!isAgoraLeader && edit?.visibility === 'invitation_agora' && allowedVisibility.includes('public')) {
+    if (!isAgoraLeader && edit?.visibility === 'invitation' && allowedVisibility.includes('public')) {
       setValue('visibility', 'public', { shouldValidate: true })
     }
 
