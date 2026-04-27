@@ -5,11 +5,15 @@ import * as WebBrowser from 'expo-web-browser'
 const useBrowserWarmUp = () => {
   if (Platform.OS === 'web') return
   useEffect(() => {
-    WebBrowser.warmUpAsync()
+    void WebBrowser.warmUpAsync().catch(() => {
+      // Ignore warmup failures; browser flow can still proceed.
+    })
     return () => {
-      WebBrowser.coolDownAsync()
+      void WebBrowser.coolDownAsync().catch(() => {
+        // Ignore cooldown failures during teardown.
+      })
     }
-  })
+  }, [])
 }
 
 export default useBrowserWarmUp
