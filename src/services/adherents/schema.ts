@@ -328,3 +328,23 @@ export type RestAdherentElectToggleExemptRequest = z.infer<typeof RestAdherentEl
 export type RestAdherentElectMandateUpsertPayload = z.infer<typeof RestAdherentElectMandateUpsertPayloadSchema>
 export type RestAdherentElectMandateUpsertRequest = z.infer<typeof RestAdherentElectMandateUpsertRequestSchema>
 export type RestAdherentElectMandateUpsertResponse = z.infer<typeof RestAdherentElectMandateUpsertResponseSchema>
+
+export const RestAdherentActivityItemSchema = z.object({
+  uuid: z.string(),
+  source_type: z.string(),
+  event_type: z.string(),
+  occurred_at: z.string(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
+})
+
+export const RestAdherentActivityRequestSchema = z.object({
+  scope: z.string(),
+  page: z.number().optional(),
+  page_size: z.number().optional(),
+})
+
+export const RestAdherentActivityResponseSchema = createRestPaginationSchema(RestAdherentActivityItemSchema)
+
+export type RestAdherentActivityItem = z.infer<typeof RestAdherentActivityItemSchema>
+export type RestAdherentActivityRequest = z.infer<typeof RestAdherentActivityRequestSchema>
+export type RestAdherentActivityResponse = z.infer<typeof RestAdherentActivityResponseSchema>

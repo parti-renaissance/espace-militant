@@ -5,6 +5,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import * as api from '@/services/adherents/api'
 import { declarationsValues } from '@/services/adherents/constants'
 import type {
+  RestAdherentActivityResponse,
   RestAdherentDetail,
   RestAdherentDonation,
   RestAdherentElectMandate,
@@ -37,6 +38,7 @@ export const adherentKeys = {
   sensitive: (type: RestAdherentSensitiveRequest['type'], uuid: string | undefined) => [...adherentKeys.all, 'sensitive', type, uuid] as const,
   donations: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'donations', uuid, scope] as const,
   elect: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'elect', uuid, scope] as const,
+  activity: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'activity', uuid, scope] as const,
 }
 
 const getMandateTypeLabel = (mandateType: string): string => declarationsValues.find((d) => d.value === mandateType)?.label ?? mandateType
@@ -166,6 +168,19 @@ export const useAdherentDonations = (uuid: string | undefined, scope: string | u
       const safeUuid = requireParam(uuid, 'uuid')
       const safeScope = requireParam(scope, 'scope')
       return api.getAdherentDonations(safeUuid)({ scope: safeScope })
+    },
+    enabled: Boolean(uuid && scope),
+    staleTime: 60 * 1000,
+  })
+}
+
+export const useAdherentActivity = (uuid: string | undefined, scope: string | undefined) => {
+  return useQuery<RestAdherentActivityResponse>({
+    queryKey: adherentKeys.activity(uuid, scope),
+    queryFn: () => {
+      const safeUuid = requireParam(uuid, 'uuid')
+      const safeScope = requireParam(scope, 'scope')
+      return api.getAdherentActivity(safeUuid)({ scope: safeScope })
     },
     enabled: Boolean(uuid && scope),
     staleTime: 60 * 1000,

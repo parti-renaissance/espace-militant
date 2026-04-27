@@ -17,6 +17,7 @@ import { getRelativeActivityLabel } from '@/utils/DateFormatter'
 
 import { ElectMandatTab } from './components/ElectMandatTap'
 import { FicheMilitantHeader } from './components/FicheMilitantHeader'
+import { HistoriqueTabContent } from './components/HistoriqueTab'
 import { IdentiteTabContent } from './components/IdentiteTab'
 import { MilitantActionButtons } from './components/MilitantActionButtons'
 
@@ -131,7 +132,7 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
 const TABS: { id: FicheMilitantTabId; label: string }[] = [
   { id: 'identite', label: 'Identité' },
   { id: 'notes', label: 'Notes' },
-  { id: 'historique', label: 'Historique' },
+  { id: 'historique', label: 'Activité' },
   { id: 'mandats', label: 'Mandats' },
 ]
 
@@ -217,7 +218,15 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
             <ElectMandatTab uuid={uuid} scope={scope} electTags={displayData.elect_tags} electMandates={displayData.elect_mandates} />
           )}
 
-          {activeTab !== 'identite' && activeTab !== 'mandats' && (
+          {activeTab === 'historique' && (
+            <HistoriqueTabContent
+              uuid={uuid}
+              scope={scope}
+              displayName={[displayData.first_name, displayData.last_name].filter(Boolean).join(' ') || 'Le militant'}
+            />
+          )}
+
+          {activeTab === 'notes' && (
             <YStack padding="$medium" flex={1}>
               <Text.SM secondary>Bientôt disponible</Text.SM>
             </YStack>
