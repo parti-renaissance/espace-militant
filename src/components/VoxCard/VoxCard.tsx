@@ -13,6 +13,7 @@ import { getFormatedVoxCardDate } from '../utils'
 
 export const CardFrame = styled(YStack, {
   backgroundColor: '$white1',
+  gap: '$medium',
   $gtSm: {
     borderRadius: 16,
   },
@@ -41,9 +42,7 @@ export type VoxCardFrameProps = ComponentProps<typeof CardFrame>
 export const VoxCardFrame = CardFrame.styleable(({ children, ...props }: VoxCardFrameProps, ref) => {
   return (
     <CardFrame {...props} ref={ref}>
-      <YStack gap="$medium" flex={1}>
-        {children}
-      </YStack>
+      {children}
     </CardFrame>
   )
 })
