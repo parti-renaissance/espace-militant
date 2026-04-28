@@ -25,6 +25,7 @@ type ConfirmAlertProps = {
   setValue: UseFormSetValue<EventFormData>
   isAgoraLeader?: boolean
   agoraUuid?: string | null
+  committeeUuid?: string | null
   scope?: string | null
 }
 
@@ -55,12 +56,13 @@ const VisibilityReview = (props: { visibility: string }) => {
   ) : null
 }
 
-const CountInvitation = (props: { visibility: string; agoraUuid?: string | null; scope?: string | null }) => {
-  const shouldCount = props.visibility === 'invitation' && !!props.agoraUuid && !!props.scope
+const CountInvitation = (props: { visibility: string; agoraUuid?: string | null; committeeUuid?: string | null; scope?: string | null }) => {
+  const shouldCount = props.visibility === 'invitation' && (!!props.agoraUuid || !!props.committeeUuid) && !!props.scope
 
   const { data, isLoading } = useCountInvitationsEvent({
     roles: undefined,
     agora: shouldCount ? props.agoraUuid! : undefined,
+    committee: shouldCount ? props.committeeUuid! : undefined,
     scope: shouldCount ? props.scope! : '',
   })
 
@@ -186,7 +188,9 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
               )}
             />
           ) : null}
-          {!hidden && visibility === 'invitation' ? <CountInvitation visibility={visibility} agoraUuid={props.agoraUuid} scope={props.scope} /> : null}
+          {!hidden && visibility === 'invitation' ? (
+            <CountInvitation visibility={visibility} agoraUuid={props.agoraUuid} committeeUuid={props.committeeUuid} scope={props.scope} />
+          ) : null}
         </YStack>
         <XStack gap="$medium">
           <VoxButton variant="outlined" flex={3} children="Annuler" onPress={handleCancel} theme="gray" />
