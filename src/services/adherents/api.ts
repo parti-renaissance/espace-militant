@@ -97,6 +97,14 @@ export const getAdherentActivity = (uuid: string) =>
     type: 'private',
   })
 
+export const getAdherentActivityFilters = api({
+  method: 'get',
+  path: `/api/v3/adherent-activity-filters`,
+  requestSchema: z.object({ scope: z.string() }),
+  responseSchema: schemas.RestAdherentActivityFilterSchema,
+  type: 'private',
+})
+
 export const deleteAdherentElectMandate = (props: { mandateUuid: string; scope: string }) =>
   api({
     method: 'delete',

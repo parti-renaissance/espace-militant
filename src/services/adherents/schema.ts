@@ -333,18 +333,32 @@ export const RestAdherentActivityItemSchema = z.object({
   uuid: z.string(),
   source_type: z.string(),
   event_type: z.string(),
+  event_label: z.string(),
+  description: z.string().nullable(),
   occurred_at: z.string(),
-  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
 })
 
 export const RestAdherentActivityRequestSchema = z.object({
   scope: z.string(),
+  source_type: z.string().optional(),
+  event_type: z.string().optional(),
   page: z.number().optional(),
   page_size: z.number().optional(),
 })
 
 export const RestAdherentActivityResponseSchema = createRestPaginationSchema(RestAdherentActivityItemSchema)
 
+const RestAdherentActivityFilterOptionSchema = z.object({ value: z.string(), label: z.string() })
+
+export const RestAdherentActivityFilterSchema = z.object({
+  source_types: z.array(RestAdherentActivityFilterOptionSchema),
+  event_types: z.object({
+    hit: z.array(RestAdherentActivityFilterOptionSchema),
+    action_history: z.array(RestAdherentActivityFilterOptionSchema),
+  }),
+})
+
 export type RestAdherentActivityItem = z.infer<typeof RestAdherentActivityItemSchema>
 export type RestAdherentActivityRequest = z.infer<typeof RestAdherentActivityRequestSchema>
 export type RestAdherentActivityResponse = z.infer<typeof RestAdherentActivityResponseSchema>
+export type RestAdherentActivityFilter = z.infer<typeof RestAdherentActivityFilterSchema>

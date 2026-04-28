@@ -17,11 +17,11 @@ import { getRelativeActivityLabel } from '@/utils/DateFormatter'
 
 import { ElectMandatTab } from './components/ElectMandatTap'
 import { FicheMilitantHeader } from './components/FicheMilitantHeader'
-import { HistoriqueTabContent } from './components/HistoriqueTab'
+import { ActivityTabContent } from './components/ActivityTab'
 import { IdentiteTabContent } from './components/IdentiteTab'
 import { MilitantActionButtons } from './components/MilitantActionButtons'
 
-export type FicheMilitantTabId = 'identite' | 'notes' | 'historique' | 'mandats'
+export type FicheMilitantTabId = 'identite' | 'notes' | 'activite' | 'mandats'
 
 const PROFILE_PHOTO_COLLAPSED_HEIGHT = 200
 const PROFILE_PHOTO_EXPAND_TIMING = { duration: 280, easing: Easing.inOut(Easing.cubic) }
@@ -132,7 +132,7 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
 const TABS: { id: FicheMilitantTabId; label: string }[] = [
   { id: 'identite', label: 'Identité' },
   { id: 'notes', label: 'Notes' },
-  { id: 'historique', label: 'Activité' },
+  { id: 'activite', label: 'Activité' },
   { id: 'mandats', label: 'Mandats' },
 ]
 
@@ -218,13 +218,7 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
             <ElectMandatTab uuid={uuid} scope={scope} electTags={displayData.elect_tags} electMandates={displayData.elect_mandates} />
           )}
 
-          {activeTab === 'historique' && (
-            <HistoriqueTabContent
-              uuid={uuid}
-              scope={scope}
-              displayName={[displayData.first_name, displayData.last_name].filter(Boolean).join(' ') || 'Le militant'}
-            />
-          )}
+          {activeTab === 'activite' && <ActivityTabContent uuid={uuid} scope={scope} />}
 
           {activeTab === 'notes' && (
             <YStack padding="$medium" flex={1}>
