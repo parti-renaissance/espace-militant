@@ -1,5 +1,7 @@
-import { EventFilters } from '@/core/entities/Event'
 import { format } from 'date-fns'
+
+import { EventFilters } from '@/core/entities/Event'
+
 import { RestGetEventsRequest } from './schema'
 
 type GetEventsSearchParametersMapperPropsBase = {
@@ -24,7 +26,7 @@ export type GetEventsSearchParametersMapperProps =
     } & GetEventsSearchParametersMapperPropsBase)
 
 const paramsCollection = {
-  finishAfter: (x: Date) => ({ 'finishAt[strictly_after]': format(x, 'yyyy-MM-dd') }),
+  finishAfter: (x: Date) => ({ 'finishAt[strictly_after]': format(x, 'yyyy-MM-dd HH:mm') }),
   searchText: (x: string) => ({ name: x }),
   eventMode: (x: string) => ({ mode: x }),
   orderBySubscriptions: (x: boolean) => ({ 'order[subscriptions]': x ? 'desc' : 'asc' }),

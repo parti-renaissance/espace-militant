@@ -292,6 +292,7 @@ export type RestPostCountInvitationsEventRequest = z.infer<typeof RestPostCountI
 export const RestPostCountInvitationsEventRequestSchema = z.object({
   roles: z.array(z.enum(['agora_president', 'animator', 'deputy', 'communication_manager', 'treasurer'])).nullish(),
   agora: z.string().nullish(),
+  committee: z.string().nullish(),
 })
 
 export const RestPostCountInvitationsEventResponseSchema = z.object({

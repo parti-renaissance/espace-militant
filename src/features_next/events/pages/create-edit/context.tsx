@@ -242,6 +242,10 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     return scopes.data?.list.find((x) => x.code === selectedScope)?.attributes?.agoras?.[0]?.uuid ?? null
   }, [selectedScope, scopes.data])
 
+  const committeeUuid = useMemo(() => {
+    return scopes.data?.list.find((x) => x.code === selectedScope)?.attributes?.committees?.[0]?.uuid ?? null
+  }, [selectedScope, scopes.data])
+
   const finalSubmit: SubmitHandler<EventFormData> = async (data) => {
     const { scope, image, mode, visio_url, post_address, ...payload } = data
     const fullScope = scopes.data?.list?.find((x) => x.code === scope) ?? { attributes: { committees: edit?.committee, agoras: edit?.agoras } }
@@ -333,6 +337,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     setValue,
     isAgoraLeader,
     agoraUuid,
+    committeeUuid,
     scope: selectedScope,
   })
 

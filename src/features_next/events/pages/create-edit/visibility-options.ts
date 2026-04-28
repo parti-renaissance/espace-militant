@@ -56,6 +56,10 @@ const isCommitteeScope = (selectedScopeData?: SelectedScopeData) => {
 export const getVisibilityOptions = (selectedScopeData?: SelectedScopeData): SelectOption<EventFormData['visibility']>[] => {
   const scope = selectedScopeData?.code ?? ''
 
+  if (!scope) {
+    return ALL_VISIBILITY_OPTIONS
+  }
+
   if (scope?.startsWith('agora_')) {
     return ALL_VISIBILITY_OPTIONS
   }
