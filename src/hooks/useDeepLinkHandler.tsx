@@ -14,9 +14,15 @@ export default function useDeepLinkHandler() {
     if (Platform.OS === 'web') return
 
     const onDeepLink: Linking.URLListener = ({ url }) => {
-      const path = Linking.parse(url)?.path
-      // Don't route if already on the requested page
-      if (path && pathname !== path) {
+      const parsed = Linking.parse(url)
+      const path = parsed.path?.replace(/^\/+/, '')
+      const queryParams = parsed.queryParams ?? {}
+
+      if ('code' in queryParams || 'state' in queryParams || '_switch_user' in queryParams) {
+        return
+      }
+
+      if (path && pathname !== `/${path}`) {
         router.push(`/${path}`)
       }
     }

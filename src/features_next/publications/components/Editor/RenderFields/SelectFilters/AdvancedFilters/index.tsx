@@ -1,16 +1,18 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Spinner, XStack, YStack } from 'tamagui'
 
 import DateInput from '@/components/base/DateInput'
 import SelectV3 from '@/components/base/Select/SelectV3'
+import Tabs from '@/components/base/Tabs/Tabs'
 import Text from '@/components/base/Text'
 import { useEditorStore } from '@/features_next/publications/components/Editor/store/editorStore'
 
 import { useGetFilterCollection } from '@/services/publications/hook'
-import { RestFilterCategory, RestFilterCollectionResponse } from '@/services/publications/schema'
+import { RestFilter, RestFilterCategory, RestFilterCollectionResponse } from '@/services/publications/schema'
 
-import { FilterValue, SelectedFiltersType } from '../type'
+import { FilterValue, ScopeTargetValue, SelectedFiltersType } from '../type'
 import DateInterval, { type DateIntervalValue } from './DateInterval'
+import ScopeTarget, { deserializeScopeTargets, type ScopeTargetInstance } from './ScopeTarget'
 
 /** Codes de filtre à ne pas afficher dans les filtres avancés (déjà gérés dans le parent, ex. zone) */
 const ADVANCED_FILTERS_BLACKLIST = ['zone'] as const
@@ -159,7 +161,122 @@ interface AdvancedFiltersProps {
   onFilterChange?: (filterCode: string, value: FilterValue) => void
 }
 
+type FilterItemProps = {
+  filter: RestFilter
+  selectedFilters: SelectedFiltersType
+  scopeTargetValuesByCode: Record<string, ScopeTargetValue>
+  onFilterChange: (filterCode: string, value: FilterValue) => void
+  getFilterValue: (filterCode: string) => string
+  openAbove: boolean
+}
+
+/** Rendu d'un filtre de type `select` (liste de choix). */
+function SelectFilterItem({ filter, getFilterValue, onFilterChange, openAbove }: FilterItemProps) {
+  if (!filter.options || !('choices' in filter.options)) return null
+  const choices = filter.options.choices
+  if (typeof choices !== 'object' || choices === null) return null
+
+  const options = getSelectOptions(choices as Record<string, string> | string[])
+  const hasEmptyOption = options.some((option) => option.value === '' || option.value === null)
+
+  return (
+    <SelectV3
+      label={filter.label}
+      value={getFilterValue(filter.code)}
+      options={options}
+      onChange={(value) => onFilterChange(filter.code, value === '' || value === null ? null : value)}
+      allowInverseSelection={Boolean(filter.options.advanced)}
+      noValuePlaceholder={filter.options.placeholder || 'Choisir'}
+      nullableOption={!hasEmptyOption ? 'Aucune sélection' : undefined}
+      size="md"
+      color="gray"
+      openAbove={openAbove}
+    />
+  )
+}
+
+/** Rendu d'un filtre de type `date` (date unique). */
+function DateFilterItem({ filter, selectedFilters, onFilterChange }: FilterItemProps) {
+  return (
+    <DateInput
+      label={filter.label}
+      value={(selectedFilters[filter.code] as string) || null}
+      onChange={(value) => onFilterChange(filter.code, value)}
+      placeholder={`Sélectionner ${filter.label.toLowerCase()}`}
+      size="md"
+      color="gray"
+      resetable
+    />
+  )
+}
+
+/** Rendu d'un filtre de type `date_interval` (intervalle start/end). */
+function DateIntervalFilterItem({ filter, selectedFilters, onFilterChange }: FilterItemProps) {
+  const raw = selectedFilters[filter.code]
+  const intervalValue: DateIntervalValue =
+    raw && typeof raw === 'object' && 'start' in raw && 'end' in raw
+      ? {
+          start: (raw as DateIntervalValue).start ?? null,
+          end: (raw as DateIntervalValue).end ?? null,
+        }
+      : { start: null, end: null }
+  return (
+    <DateInterval
+      labelFrom={`${filter.label} après le`}
+      labelTo={`${filter.label} avant le`}
+      value={intervalValue}
+      onChange={(value) => onFilterChange(filter.code, value)}
+      size="md"
+      color="gray"
+      resetable
+    />
+  )
+}
+
+/** Rendu d'un filtre de type `scope_target` (cadres/militants scope). */
+function ScopeTargetFilterItem({ filter, scopeTargetValuesByCode, onFilterChange }: FilterItemProps) {
+  const instances = (filter.options && 'instances' in filter.options ? filter.options.instances : []) as ScopeTargetInstance[]
+  const currentValue = scopeTargetValuesByCode[filter.code] ?? []
+  return (
+    <ScopeTarget
+      options={instances}
+      value={currentValue}
+      onChange={(next) => onFilterChange(filter.code, next.length > 0 ? next : null)}
+    />
+  )
+}
+
+/** Rendu de repli pour les types de filtres non encore implémentés. */
+function PlaceholderFilterItem({ filter }: { filter: RestFilter }) {
+  return (
+    <SelectV3
+      label={filter.label}
+      value=""
+      options={[{ value: '', label: 'En cours de développement' }]}
+      onChange={() => {}}
+      placeholder="En cours de développement"
+      size="sm"
+      color="gray"
+      disabled={true}
+    />
+  )
+}
+
+/** Dispatcher : choisit le composant de rendu en fonction du type de filtre. */
+function AdvancedFilterItem(props: FilterItemProps) {
+  const { filter } = props
+  if (ADVANCED_FILTERS_BLACKLIST.includes(filter.code as (typeof ADVANCED_FILTERS_BLACKLIST)[number])) {
+    return null
+  }
+  if (filter.type === 'select') return <SelectFilterItem {...props} />
+  if (filter.type === 'date') return <DateFilterItem {...props} />
+  if (filter.type === 'date_interval') return <DateIntervalFilterItem {...props} />
+  if (filter.type === 'scope_target') return <ScopeTargetFilterItem {...props} />
+  return <PlaceholderFilterItem filter={filter} />
+}
+
 function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: AdvancedFiltersProps) {
+  const [activeTab, setActiveTab] = useState<'all' | 'cadres'>('all')
   const scope = useEditorStore((s) => s.scope) ?? ''
   const { data: filterCollection, isLoading } = useGetFilterCollection({
     scope,
@@ -172,6 +289,34 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
     () => displayFilters.filter((category) => category.filters.some((filter) => !(ADVANCED_FILTERS_BLACKLIST as readonly string[]).includes(filter.code))),
     [displayFilters],
   )
+
+  const hasScopeTargetFilter = useMemo(
+    () => visibleCategories.some((category) => category.filters.some((filter) => filter.type === 'scope_target')),
+    [visibleCategories],
+  )
+
+  const scopeTargetValuesByCode = useMemo(() => {
+    const values: Record<string, ScopeTargetValue> = {}
+    for (const category of visibleCategories) {
+      for (const filter of category.filters) {
+        if (filter.type !== 'scope_target') continue
+        values[filter.code] = deserializeScopeTargets(selectedFilters[filter.code])
+      }
+    }
+    return values
+  }, [selectedFilters, visibleCategories])
+
+  const categoriesToRender = useMemo(() => {
+    if (!hasScopeTargetFilter) return visibleCategories
+
+    const keepScopeTargetOnly = activeTab === 'cadres'
+    return visibleCategories
+      .map((category) => ({
+        ...category,
+        filters: category.filters.filter((filter) => (keepScopeTargetOnly ? filter.type === 'scope_target' : filter.type !== 'scope_target')),
+      }))
+      .filter((category) => category.filters.length > 0)
+  }, [visibleCategories, hasScopeTargetFilter, activeTab])
 
   const handleFilterChange = useCallback(
     (filterCode: string, value: FilterValue) => {
@@ -206,102 +351,40 @@ function AdvancedFiltersInner({ selectedFilters = {}, onFilterChange }: Advanced
 
   return (
     <YStack gap="$medium">
-      {visibleCategories.map((category: RestFilterCategory, categoryIndex: number) => (
-        <YStack key={categoryIndex} gap="$small">
-          <XStack alignItems="center" gap="$small">
-            <Text.MD secondary>{category.label}</Text.MD>
-            <YStack h={1} flexGrow={1} mt={2} bg="$textOutline" />
-          </XStack>
-          <YStack gap="$small">
-            {category.filters.map((filter, filterIndex: number) => {
-              if (ADVANCED_FILTERS_BLACKLIST.includes(filter.code as (typeof ADVANCED_FILTERS_BLACKLIST)[number])) {
-                return null
-              }
-              if (filter.type === 'select' && filter.options && 'choices' in filter.options) {
-                const choices = filter.options.choices
-                if (typeof choices === 'object' && choices !== null) {
-                  const options = getSelectOptions(choices as Record<string, string> | string[])
-                  const isLastCategory = categoryIndex === visibleCategories.length - 1
-                  const isLastTwoInLastCategory = isLastCategory && filterIndex >= category.filters.length - 2
-                  const hasEmptyOption = options.some((option) => option.value === '' || option.value === null)
-
-                  return (
-                    <SelectV3
-                      key={filterIndex}
-                      label={filter.label}
-                      value={getFilterValue(filter.code)}
-                      options={options}
-                      onChange={(value) => handleFilterChange(filter.code, value === '' || value === null ? null : value)}
-                      allowInverseSelection={Boolean(filter.options.advanced)}
-                      noValuePlaceholder={filter.options.placeholder || 'Choisir'}
-                      nullableOption={!hasEmptyOption ? 'Aucune sélection' : undefined}
-                      size="md"
-                      color="gray"
-                      openAbove={isLastTwoInLastCategory}
-                      // searchable={true}
-                    />
-                  )
-                }
-              }
-
-              if (filter.type === 'date') {
-                return (
-                  <DateInput
-                    key={filterIndex}
-                    label={filter.label}
-                    value={(selectedFilters[filter.code] as string) || null}
-                    onChange={(value: string | null) => {
-                      handleFilterChange(filter.code, value)
-                    }}
-                    placeholder={`Sélectionner ${filter.label.toLowerCase()}`}
-                    size="md"
-                    color="gray"
-                    resetable
-                  />
-                )
-              }
-
-              if (filter.type === 'date_interval') {
-                const raw = selectedFilters[filter.code]
-                const intervalValue: DateIntervalValue =
-                  raw && typeof raw === 'object' && 'start' in raw && 'end' in raw
-                    ? {
-                        start: (raw as DateIntervalValue).start ?? null,
-                        end: (raw as DateIntervalValue).end ?? null,
-                      }
-                    : { start: null, end: null }
-                return (
-                  <DateInterval
-                    key={filterIndex}
-                    labelFrom={`${filter.label} après le`}
-                    labelTo={`${filter.label} avant le`}
-                    value={intervalValue}
-                    onChange={(value) => handleFilterChange(filter.code, value)}
-                    size="md"
-                    color="gray"
-                    resetable
-                  />
-                )
-              }
-
-              // Pour les autres types de filtres, afficher juste le label et le type
-              return (
-                <SelectV3
+      {hasScopeTargetFilter && (
+        <Tabs
+          tabs={[
+            { id: 'all', label: 'Militants' },
+            { id: 'cadres', label: 'Cadres' },
+          ]}
+          activeTab={activeTab}
+          onTabChange={(tab) => setActiveTab(tab as 'all' | 'cadres')}
+        />
+      )}
+      {categoriesToRender.map((category: RestFilterCategory, categoryIndex: number) => {
+        const isLastCategory = categoryIndex === categoriesToRender.length - 1
+        return (
+          <YStack key={categoryIndex} gap="$small" mx="$medium">
+            <XStack alignItems="center" gap="$small">
+              <Text.MD secondary>{category.label}</Text.MD>
+              <YStack h={1} flexGrow={1} mt={2} bg="$textOutline" />
+            </XStack>
+            <YStack gap="$small">
+              {category.filters.map((filter, filterIndex: number) => (
+                <AdvancedFilterItem
                   key={filterIndex}
-                  label={filter.label}
-                  value=""
-                  options={[{ value: '', label: 'En cours de développement' }]}
-                  onChange={() => {}}
-                  placeholder="En cours de développement"
-                  size="sm"
-                  color="gray"
-                  disabled={true}
+                  filter={filter}
+                  selectedFilters={selectedFilters}
+                  scopeTargetValuesByCode={scopeTargetValuesByCode}
+                  onFilterChange={handleFilterChange}
+                  getFilterValue={getFilterValue}
+                  openAbove={isLastCategory && filterIndex >= category.filters.length - 2}
                 />
-              )
-            })}
+              ))}
+            </YStack>
           </YStack>
-        </YStack>
-      ))}
+        )
+      })}
     </YStack>
   )
 }

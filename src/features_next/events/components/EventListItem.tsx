@@ -1,6 +1,6 @@
 import { Href, useRouter } from 'expo-router'
-import { XStack } from 'tamagui'
-import { Eye } from '@tamagui/lucide-icons'
+import { useMedia, View, XStack } from 'tamagui'
+import { Eye, EyeOff } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
@@ -49,6 +49,7 @@ const GoToButton = ({ eventUuid, source }: { eventUuid: string; source?: string 
 }
 
 export const BaseEventListItem = ({ event, userUuid, source }: EventItemProps) => {
+  const media = useMedia()
   const fallbackImage = getEventItemImageFallback(event)
   const isFull = isEventFull(event)
   const participantsCount = event?.participants_count
@@ -56,9 +57,16 @@ export const BaseEventListItem = ({ event, userUuid, source }: EventItemProps) =
   return (
     <VoxCard>
       <VoxCard.Content>
-        <XStack justifyContent="space-between" alignItems="flex-start" gap={8}>
+        <XStack justifyContent="space-between" alignItems="flex-start" gap="$small">
           <XStack gap="$small" flexWrap="wrap" flexShrink={1}>
-            <CategoryChip>{event.category?.name}</CategoryChip>
+            <View gap="$small" flexWrap="wrap" flex={1} flexBasis="50%" flexDirection={media.xs ? 'column' : 'row'}>
+              <CategoryChip>{event.category?.name}</CategoryChip>
+              {event.hidden ? (
+                <VoxCard.Chip theme="gray" icon={EyeOff}>
+                  Non répertorié
+                </VoxCard.Chip>
+              ) : null}
+            </View>
             <EventListItemLiveBadge event={event} />
           </XStack>
           <EventPremiumChip event={event} />

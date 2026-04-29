@@ -6,13 +6,9 @@ import { VoxButton } from '@/components/Button'
 import type { RestFilterCollectionResponse } from '@/services/publications/schema'
 
 import { AVAILABLE_FILTERS } from './Editor/RenderFields/SelectFilters/AdvancedFilters'
+import { deserializeScopeTargets } from './Editor/RenderFields/SelectFilters/AdvancedFilters/ScopeTarget'
 import { getProtectedFilterKeys } from './Editor/RenderFields/SelectFilters/helpers'
-import {
-  type FilterValue,
-  type SelectedFiltersType,
-  isIntervalObject,
-  isEmptyInterval,
-} from './Editor/RenderFields/SelectFilters/type'
+import { isEmptyInterval, isIntervalObject, type FilterValue, type SelectedFiltersType } from './Editor/RenderFields/SelectFilters/type'
 
 export type { FilterValue, SelectedFiltersType }
 
@@ -23,6 +19,16 @@ export type FiltersChipsProps = {
   /** Collection de filtres depuis l’API (si fournie, utilisée pour les libellés ; sinon fallback sur AVAILABLE_FILTERS) */
   filterCollection?: RestFilterCollectionResponse | null
 }
+
+type ScopeTargetChipEntry = {
+  role: string
+  include_role?: boolean
+  include_team?: boolean
+  team_roles?: string[]
+}
+
+const isScopeTargetArray = (value: unknown): value is ScopeTargetChipEntry[] =>
+  Array.isArray(value) && value.length > 0 && value.every((v) => !!v && typeof v === 'object' && 'role' in (v as Record<string, unknown>))
 
 const getFilterLabel = (key: string, value: FilterValue, filterCollection: RestFilterCollectionResponse | null | undefined): string => {
   const sanitizedStringValue = typeof value === 'string' && value.startsWith('!') ? value.slice(1) : value
@@ -35,6 +41,24 @@ const getFilterLabel = (key: string, value: FilterValue, filterCollection: RestF
   // Exception pour le filtre committee : afficher committee.name
   if (key === 'committee' && typeof value === 'object' && value !== null && 'name' in value) {
     return value.name
+  }
+
+  // Exception pour les filtres scope_target : afficher le nom de l'instance si unique, sinon un compte
+  if (isScopeTargetArray(value)) {
+    const collection = filterCollection && filterCollection.length > 0 ? filterCollection : AVAILABLE_FILTERS
+    let instances: Array<{ name: string; code: string }> = []
+    for (const category of collection) {
+      const filter = category.filters.find((f) => f.code === key)
+      if (filter && filter.type === 'scope_target' && filter.options && 'instances' in filter.options) {
+        instances = filter.options.instances as typeof instances
+        break
+      }
+    }
+    if (value.length === 1) {
+      const inst = instances.find((i) => i.code === value[0].role)
+      return inst?.name ?? '1 Filtre cadres'
+    }
+    return `${value.length} Filtres cadres`
   }
 
   // Exception pour le filtre adherent_tags : labels personnalisés
@@ -140,7 +164,16 @@ export const calculateDefaultValues = (selectedFilters: Record<string, FilterVal
   return defaults
 }
 
-export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false, filterCollection }: FiltersChipsProps) => {
+export const FiltersChips = ({ selectedFilters: rawSelectedFilters, onFilterChange, isStatic = false, filterCollection }: FiltersChipsProps) => {
+  // Normalise les scope_targets (forme plate backend → groupée) pour un comptage/affichage corrects
+  const selectedFilters: Record<string, FilterValue> =
+    'scope_targets' in rawSelectedFilters
+      ? (() => {
+          const grouped = deserializeScopeTargets(rawSelectedFilters.scope_targets)
+          return { ...rawSelectedFilters, scope_targets: grouped.length > 0 ? grouped : null }
+        })()
+      : rawSelectedFilters
+
   // Calculer automatiquement les valeurs par défaut
   const defaultValues = calculateDefaultValues(selectedFilters)
   const protectedKeys = getProtectedFilterKeys(selectedFilters, filterCollection ?? undefined)
@@ -198,14 +231,14 @@ export const FiltersChips = ({ selectedFilters, onFilterChange, isStatic = false
 
           // Détecter si la valeur commence par "!" (négation)
           const isNegation = typeof value === 'string' && value.startsWith('!')
-          const theme = isNegation ? 'orange' : 'gray'
+          const isScopeTarget = isScopeTargetArray(value)
+          const theme = isNegation ? 'orange' : isScopeTarget ? 'purple' : 'gray'
           const iconLeft = isNegation ? EqualNot : undefined
 
           // Si le filtre a une valeur par défaut ou est protégé (affichage "par défaut")
           const isProtected = protectedKeys.includes(key)
           const hasDefault = hasDefaultValue(key, defaultValues)
-          const zonesNotEmpty =
-            selectedFilters.zones && Array.isArray(selectedFilters.zones) && selectedFilters.zones.length > 0
+          const zonesNotEmpty = selectedFilters.zones && Array.isArray(selectedFilters.zones) && selectedFilters.zones.length > 0
           if (hasDefault || isProtected) {
             const isDefaultRaw = isProtected ? true : isValueDefault(key, value, defaultValues[key])
             const isDefault = key === 'zone' ? isDefaultRaw && !!zonesNotEmpty : isDefaultRaw

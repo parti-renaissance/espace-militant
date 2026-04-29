@@ -4,7 +4,7 @@ import { createRestPaginationSchema } from '../common/schema'
 
 // ------- Event Schemas ----------
 
-export const EventVisibilitySchema = z.enum(['public', 'private', 'adherent', 'adherent_dues', 'invitation_agora'])
+export const EventVisibilitySchema = z.enum(['public', 'private', 'adherent', 'adherent_dues', 'invitation'])
 
 export const RestEventParentCategorySchema = z.object({
   name: z.string(),
@@ -79,6 +79,7 @@ export const RestBaseEventSchema = z.object({
   participants_count: z.number().nullish(),
   visio_url: z.string().nullish(),
   region: RestEventRegionSchema.nullish(),
+  hidden: z.boolean().optional(),
 })
 
 export const RestFullEventSchema = z
@@ -257,6 +258,7 @@ export const RestPostEventRequestSchema = z.object({
   time_zone: z.string(),
   electoral: z.boolean().optional(),
   visibility: EventVisibilitySchema,
+  hidden: z.boolean().optional(),
   live_url: z.string().optional(),
 })
 
@@ -280,6 +282,7 @@ export const propertyPathPostEventSchema = z.enum([
   'visio_url',
   'electoral',
   'visibility',
+  'hidden',
   'live_url',
 ])
 
@@ -289,6 +292,7 @@ export type RestPostCountInvitationsEventRequest = z.infer<typeof RestPostCountI
 export const RestPostCountInvitationsEventRequestSchema = z.object({
   roles: z.array(z.enum(['agora_president', 'animator', 'deputy', 'communication_manager', 'treasurer'])).nullish(),
   agora: z.string().nullish(),
+  committee: z.string().nullish(),
 })
 
 export const RestPostCountInvitationsEventResponseSchema = z.object({

@@ -30,7 +30,7 @@ const buildEventsFiltersQueryKey = (filters: EventFilters | undefined) =>
   filters
     ? JSON.stringify({
         ...filters,
-        finishAfter: filters.finishAfter ? format(filters.finishAfter, 'yyyy-MM-dd') : '',
+        finishAfter: filters.finishAfter ? format(filters.finishAfter, 'yyyy-MM-dd HH:mm') : '',
       })
     : ''
 
@@ -50,9 +50,8 @@ export const useSuspensePaginatedEvents = (opts: { filters?: EventFilters; posta
   })
 }
 
-const pinnedEventsQueryOpts = { filters: { pinned: true } as const }
-
 const getPinnedEventsInfiniteQueryOptions = (isAuth: boolean) => {
+  const pinnedEventsQueryOpts = { filters: { pinned: true, finishAfter: new Date() } as const }
   const filtersKey = buildEventsFiltersQueryKey(pinnedEventsQueryOpts.filters)
   return {
     queryKey: [QUERY_KEY_PAGINATED_SHORT_EVENTS, isAuth ? 'private' : 'public', 'pinned', filtersKey] as const,
@@ -315,12 +314,12 @@ export const useCancelEvent = () => {
   })
 }
 
-export const useCountInvitationsEvent = ({ roles, agora, scope }: RestPostCountInvitationsEventRequest & { scope: string }) => {
+export const useCountInvitationsEvent = ({ roles, agora, committee, scope }: RestPostCountInvitationsEventRequest & { scope: string }) => {
   return useQuery({
-    queryKey: [QUERY_KEY_SINGLE_EVENT, roles, agora, scope],
+    queryKey: [QUERY_KEY_SINGLE_EVENT, roles, agora, committee, scope],
     queryFn: () =>
       api.countInvitationsEvent({
-        payload: { roles, agora },
+        payload: { roles, agora, committee },
         scope,
       }),
     refetchOnMount: true,

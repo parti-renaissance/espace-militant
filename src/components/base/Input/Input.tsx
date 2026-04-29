@@ -7,7 +7,8 @@ import Text from '@/components/base/Text'
 
 import { useForwardRef } from '@/hooks/useForwardRef'
 
-// Contexte pour indiquer si on est dans un vrai BottomSheet
+const KEYBOARD_BREATHING_SPACE = 24
+
 const BottomSheetContext = createContext<boolean>(false)
 
 export const BottomSheetProvider = ({ children }: { children: React.ReactNode }) => {
@@ -162,9 +163,13 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
     ...inputProps
   } = _props
   const [isFocused, setIsFocused] = useState(false)
+  const [errorLayoutHeight, setErrorLayoutHeight] = useState(0)
   const inputRef = useForwardRef(ref)
   const isFailed = !!error
   const hasLabel = !!label && label !== ''
+
+  const shouldApplyBreathing = !isWeb && !fake
+  const breathingSpace = shouldApplyBreathing ? KEYBOARD_BREATHING_SPACE + (isFailed ? errorLayoutHeight : 0) : 0
   const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setIsFocused(true)
     onFocus?.(e)
@@ -273,8 +278,10 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
               style={{
                 color: theme.textPrimary.val,
                 padding: 0,
+                paddingBottom: breathingSpace,
+                marginBottom: -breathingSpace,
                 fontSize: 14,
-                height: Platform.OS === 'android' ? 18 : 'auto',
+                height: Platform.OS === 'android' && !inputProps.multiline ? 18 + breathingSpace : 'auto',
                 width: '100%',
                 fontWeight: isWeb ? (inputProps.value ? 500 : 400) : undefined,
               }}
@@ -284,7 +291,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
               onChangeText={handleValueChange}
               placeholderTextColor={theme.textDisabled.val}
               placeholder={placeholder}
-              textAlignVertical={inputProps.multiline ? 'top' : 'center'}
+              textAlignVertical={inputProps.multiline || (shouldApplyBreathing && Platform.OS === 'android') ? 'top' : 'center'}
               numberOfLines={inputProps.multiline ? undefined : 1}
               onFocus={handleFocus}
               onBlur={handleBlur}
@@ -300,7 +307,15 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
         {loading ? <Spinner color="$blue7" /> : null}
       </InputFrame>
       {error && (
-        <XStack gap="$small" alignItems="center" pl="$medium">
+        <XStack
+          gap="$small"
+          alignItems="center"
+          pl="$medium"
+          onLayout={(e) => {
+            const h = e.nativeEvent.layout.height
+            if (h && h !== errorLayoutHeight) setErrorLayoutHeight(h)
+          }}
+        >
           <Text.XSM color="$orange5">{error}</Text.XSM>
         </XStack>
       )}

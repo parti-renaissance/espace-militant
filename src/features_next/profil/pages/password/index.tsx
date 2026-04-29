@@ -1,4 +1,3 @@
-import { KeyboardAvoidingView, Platform } from 'react-native'
 import { XStack, YStack } from 'tamagui'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
@@ -64,8 +63,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <ProfilLayout>
-      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-        <LayoutScrollView>
+      <LayoutScrollView>
           <VoxCard>
             <VoxCard.Content>
               <Text.LG>Modifier mon mot de passe</Text.LG>
@@ -155,8 +153,7 @@ export default function ChangePasswordScreen() {
               </XStack>
             </VoxCard.Content>
           </VoxCard>
-        </LayoutScrollView>
-      </KeyboardAvoidingView>
+      </LayoutScrollView>
     </ProfilLayout>
   )
 }

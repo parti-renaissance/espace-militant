@@ -1,4 +1,4 @@
-import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
@@ -13,6 +13,7 @@ import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import EventListItem from '@/features_next/events/components/EventListItem'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection } from '@/features_next/events/utils'
+import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/PinnedEventBanner'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { usePinnedEventsInfiniteQuery, useSuspensePaginatedEvents } from '@/services/events/hook'
@@ -85,9 +86,12 @@ const EventFeed = () => {
   const feedContentContainerStyle = useMemo(
     () => ({
       gap: getToken('$medium', 'space'),
-      paddingTop: hasPinnedBannerContent ? 8 : Platform.OS === 'ios' ? 8 : listSpacing.paddingTop,
+      // En mobile avec banner pinned, celui-ci est rendu dans `ListHeaderComponent` et
+      // fournit déjà son propre paddingTop (safe area). On neutralise donc le paddingTop
+      // du container pour éviter un double espacement.
+      paddingTop: hasPinnedBannerContent && media.sm ? 0 : Platform.OS === 'ios' ? 8 : listSpacing.paddingTop,
     }),
-    [hasPinnedBannerContent, listSpacing.paddingTop],
+    [hasPinnedBannerContent, listSpacing.paddingTop, media.sm],
   )
 
   const {
@@ -98,7 +102,7 @@ const EventFeed = () => {
     isFetching,
     refetch,
   } = useSuspensePaginatedEvents({
-    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents' ? true : undefined, pinned: false },
+    filters: { searchText: filters.search, zone, subscribedOnly: activeTab === 'myEvents' ? true : undefined },
     enabled: filtersReady,
   })
 
@@ -122,7 +126,16 @@ const EventFeed = () => {
 
   const handleSwitchToAllEvents = useCallback(() => setActiveTab('events'), [])
 
-  const feedData = useMemo(() => paginatedFeed?.pages.flatMap((page) => page.items) ?? [], [paginatedFeed])
+  const upcomingPinnedUuids = useMemo(() => {
+    const items = pinnedFeed?.pages.flatMap((p) => p?.items ?? []) ?? []
+    return new Set(items.map((item) => item.uuid))
+  }, [pinnedFeed?.pages])
+
+  const feedData = useMemo(() => {
+    const items = paginatedFeed?.pages.flatMap((page) => page.items) ?? []
+    if (upcomingPinnedUuids.size === 0) return items
+    return items.filter((event) => !upcomingPinnedUuids.has(event.uuid))
+  }, [paginatedFeed, upcomingPinnedUuids])
 
   const hasActiveFilters = useMemo(
     () => Boolean(filters.search.trim() || (filters.zone && filters.zone !== userData?.instances?.assembly?.code)),
@@ -217,14 +230,31 @@ const EventFeed = () => {
     if (value === 'events' || value === 'myEvents') setActiveTab(value)
   }, [])
 
+  const bannerSafeAreaTop = useMemo(() => {
+    // - Non authentifié : Layout rend un Header en mobile qui applique déjà `insets.top`
+    //   (voir `src/components/AppStructure/Layout/Layout.tsx` + `Header/index.tsx`).
+    // - Authentifié sur iOS : la FlatList applique le safe area via
+    //   `contentInsetAdjustmentBehavior='automatic'`.
+    // - Authentifié sur Android : rien n'applique le safe area en amont, le banner s'en charge.
+    if (!isAuth) return false
+    return Platform.OS === 'android'
+  }, [isAuth])
+
   const listHeader = useMemo(
     () => (
-      <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
-        {isAuth && <BigSwitch options={EVENTS_SWITCH_OPTIONS} value={activeTab} onChange={handleSwitchChange} />}
-        {!media.gtMd && <EventsSideContent />}
+      <YStack>
+        {media.sm ? (
+          <Suspense fallback={null}>
+            <PinnedEventBanner safeAreaTop={bannerSafeAreaTop} />
+          </Suspense>
+        ) : null}
+        <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
+          {isAuth && <BigSwitch options={EVENTS_SWITCH_OPTIONS} value={activeTab} onChange={handleSwitchChange} />}
+          {!media.gtMd && <EventsSideContent />}
+        </YStack>
       </YStack>
     ),
-    [activeTab, media.gtMd, media.sm, isAuth, handleSwitchChange],
+    [activeTab, media.gtMd, media.sm, isAuth, handleSwitchChange, bannerSafeAreaTop],
   )
 
   return (

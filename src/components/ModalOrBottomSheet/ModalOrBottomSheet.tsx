@@ -46,11 +46,13 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
   if (viewport.gtSm) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
-        <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
+        <View style={styles.centeredView}>
           <ScrollView contentContainerStyle={styles.scrollContainer} bounces={false} showsVerticalScrollIndicator={false}>
-            <View style={styles.modalView}>{children}</View>
+            <Pressable style={styles.backdrop} onPress={(event) => event.target === event.currentTarget && onClose?.()}>
+              <View style={styles.modalView}>{children}</View>
+            </Pressable>
           </ScrollView>
-        </Pressable>
+        </View>
       </Modal>
     )
   }
@@ -84,9 +86,13 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  backdrop: {
+    flexGrow: 1,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
     cursor: 'pointer',
   },
   modalView: {
@@ -107,7 +113,5 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 })

@@ -220,7 +220,6 @@ export const usePutMessageFilters = (props: { messageId?: string; scope?: string
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['message-count-recipients-partial', props.messageId] })
-      queryClient.invalidateQueries({ queryKey: ['message-count-recipients', props.messageId] })
       queryClient.invalidateQueries({ queryKey: ['message-filters', props.messageId] })
     },
     onError: (error) => {

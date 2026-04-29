@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react'
-import { KeyboardAvoidingView, Platform } from 'react-native'
 import { Link } from 'expo-router'
 import { isWeb, Separator, useMedia, View, XStack, YStack } from 'tamagui'
 import { Info, UserPlus } from '@tamagui/lucide-icons'
@@ -241,9 +240,8 @@ const InstancesContent = () => {
         open={openChangeAgora}
         onClose={() => setOpenChangeAgora(false)}
       />
-      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-        <LayoutScrollView>
-          <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
+      <LayoutScrollView>
+        <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
             <InstanceCard
               title="Mon assemblée"
               icon={DoubleCircle}
@@ -346,10 +344,9 @@ const InstancesContent = () => {
               }
             >
               {agorasContent.content}
-            </InstanceCard>
-          </YStack>
-        </LayoutScrollView>
-      </KeyboardAvoidingView>
+          </InstanceCard>
+        </YStack>
+      </LayoutScrollView>
     </>
   )
 }

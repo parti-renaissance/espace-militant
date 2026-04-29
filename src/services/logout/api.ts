@@ -26,10 +26,15 @@ export function useLogOut() {
         return
       }
 
-      const lol = Linking.addEventListener('url', async (event) => {
+      const urlListener = Linking.addEventListener('url', async (event) => {
         if (event.url.startsWith(REDIRECT_URI)) {
-          WebBrowser.dismissBrowser()
-          lol.remove()
+          try {
+            await WebBrowser.dismissBrowser()
+          } catch {
+            // Browser can already be closed depending on iOS hand-off timing.
+          } finally {
+            urlListener.remove()
+          }
         }
       })
 

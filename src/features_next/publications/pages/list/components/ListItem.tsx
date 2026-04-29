@@ -128,14 +128,14 @@ export function PublicationCadreItem({ item, onDeletePress, scope }: Publication
         {item.statistics && item.status === 'sent' && (
           <XStack gap="$small" flexWrap="wrap">
             <XStack gap="$small" flexGrow={1} width={media.md ? '100%' : undefined}>
-              <StatCard value={item.statistics.unique_notifications ?? 'N/A'} label="Notifications" small theme="gray" />
-              <StatCard value={item.statistics.unique_emails ?? 'N/A'} label="Emails" small theme="gray" />
-              <StatCard value={item.statistics.unique_impressions.total ?? 'N/A'} label="Impressions" small theme="gray" />
+              <StatCard value={item.statistics.unique_notifications ?? 'N/A'} label="Notifications" theme="gray" />
+              <StatCard value={item.statistics.unique_emails ?? 'N/A'} label="Emails" theme="gray" />
+              <StatCard value={item.statistics.unique_impressions.total ?? 'N/A'} label="Impressions" theme="gray" />
             </XStack>
             <XStack gap="$small" flexGrow={1} width={media.md ? '100%' : undefined}>
-              <StatCard value={item.statistics.unique_opens.total ?? 'N/A'} label="Ouvertures" small theme="gray" />
-              <StatCard value={item.statistics.unique_clicks.total ?? 'N/A'} label="Clics" small theme="gray" />
-              <StatCard value={item.statistics.unsubscribed.total ?? 'N/A'} label="Désabonnements" small theme="gray" />
+              <StatCard value={item.statistics.unique_opens.total ?? 'N/A'} label="Ouvertures" theme="gray" />
+              <StatCard value={item.statistics.unique_clicks.total ?? 'N/A'} label="Clics" theme="gray" />
+              <StatCard value={item.statistics.unsubscribed.total ?? 'N/A'} label="Désabonnements" theme="gray" />
             </XStack>
           </XStack>
         )}

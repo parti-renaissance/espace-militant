@@ -1,7 +1,7 @@
 import React, { Suspense, useMemo } from 'react'
 import { Link } from 'expo-router'
 import Head from 'expo-router/head'
-import { isWeb, YStack } from 'tamagui'
+import { isWeb, useMedia, YStack } from 'tamagui'
 import { Sparkle } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
@@ -36,17 +36,20 @@ const CreateEventFloatingButton = () => {
 }
 
 export default function EvenementsPage() {
+  const media = useMedia()
+  const banner = media.sm ? undefined : (
+    <Suspense fallback={null}>
+      <PinnedEventBanner />
+    </Suspense>
+  )
+
   return (
     <>
       <Head>
         <title>{metatags.createTitle('Nos événements')}</title>
       </Head>
       <Layout.Container
-        banner={
-          <Suspense fallback={null}>
-            <PinnedEventBanner />
-          </Suspense>
-        }
+        banner={banner}
         floatingContent={
           <Suspense fallback={null}>
             <CreateEventFloatingButton />

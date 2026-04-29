@@ -1,5 +1,4 @@
 import React from 'react'
-import { KeyboardAvoidingView, Platform } from 'react-native'
 import { useMedia, YStack } from 'tamagui'
 
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
@@ -18,16 +17,14 @@ const DonationsContent = () => {
   const media = useMedia()
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'height' : 'padding'} style={{ flex: 1 }} keyboardVerticalOffset={100}>
-      <LayoutScrollView>
-        <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
-          <MembershipCard full other_party_membership={profile.other_party_membership} last_membership_donation={profile.last_membership_donation} />
-          <DonationCard full />
-          <DonationTaxReceiptCard />
-          <DonationHistoryCard />
-        </YStack>
-      </LayoutScrollView>
-    </KeyboardAvoidingView>
+    <LayoutScrollView>
+      <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
+        <MembershipCard full other_party_membership={profile.other_party_membership} last_membership_donation={profile.last_membership_donation} />
+        <DonationCard full />
+        <DonationTaxReceiptCard />
+        <DonationHistoryCard />
+      </YStack>
+    </LayoutScrollView>
   )
 }
 

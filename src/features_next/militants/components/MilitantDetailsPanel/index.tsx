@@ -6,6 +6,7 @@ import { View, XStack, YStack } from 'tamagui'
 import { Activity, CircleAlert, Maximize2, Minimize2 } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
+import Tabs from '@/components/base/Tabs/Tabs'
 import { VoxButton } from '@/components/Button'
 import PanelModal from '@/components/PanelModal/PanelModal'
 
@@ -134,46 +135,6 @@ const TABS: { id: FicheMilitantTabId; label: string }[] = [
   { id: 'mandats', label: 'Mandats' },
 ]
 
-function MilitantDetailTabs({ activeTab, onTabChange }: { activeTab: FicheMilitantTabId; onTabChange: (tab: FicheMilitantTabId) => void }) {
-  return (
-    <XStack borderBottomWidth={2} borderColor="$borderColor" paddingHorizontal="$medium" mt="$xsmall">
-      {TABS.map((tab) => {
-        const isActive = activeTab === tab.id
-        return (
-          <YStack
-            key={tab.id}
-            onPress={() => onTabChange(tab.id)}
-            paddingVertical={12}
-            marginBottom={-1}
-            flex={1}
-            flexShrink={0}
-            cursor="pointer"
-            group
-            backgroundColor="transparent"
-            hoverStyle={{ backgroundColor: 'transparent' }}
-            pressStyle={{ backgroundColor: 'transparent' }}
-            role="tab"
-            aria-selected={isActive}
-          >
-            <YStack position="relative">
-              <Text.MD
-                semibold
-                textAlign="center"
-                color={isActive ? '$blue5' : '$textPrimary'}
-                $group-hover={!isActive ? { color: '$blue4' } : undefined}
-                $group-press={!isActive ? { color: '$blue4' } : undefined}
-              >
-                {tab.label}
-              </Text.MD>
-            </YStack>
-            {isActive && <XStack position="absolute" bottom={-1} left={1} right={1} height={2} backgroundColor="$blue5" borderRadius={1} />}
-          </YStack>
-        )
-      })}
-    </XStack>
-  )
-}
-
 export interface MilitantDetailsPanelProps {
   uuid: string | undefined
   scope: string | undefined
@@ -238,7 +199,7 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
           <FicheMilitantHeader onClose={onClose} />
           <MilitantSummaryCard data={displayData} />
           <MilitantActionButtons uuid={uuid} scope={scope} smsAvailable={smsAvailable} />
-          <MilitantDetailTabs activeTab={activeTab} onTabChange={handleTabChange} />
+          <Tabs tabs={TABS} activeTab={activeTab} onTabChange={handleTabChange} />
 
           {activeTab === 'identite' && (
             <IdentiteTabContent

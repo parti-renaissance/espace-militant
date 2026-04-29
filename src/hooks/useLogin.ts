@@ -1,14 +1,44 @@
 import { useEffect, useState } from 'react'
-import clientEnv from '@/config/clientEnv'
-import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
+import { Platform } from 'react-native'
 import * as AuthSession from 'expo-auth-session'
 import { DiscoveryDocument } from 'expo-auth-session'
 import * as WebBrowser from 'expo-web-browser'
 import { maybeCompleteAuthSession } from 'expo-web-browser'
 import { isWeb } from 'tamagui'
+
+import clientEnv from '@/config/clientEnv'
+import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
+
 import useBrowserWarmUp from './useBrowserWarmUp'
 
-maybeCompleteAuthSession()
+const STABILIZATION_DELAY_MS = 75
+
+const waitForUiStabilization = () => new Promise((resolve) => setTimeout(resolve, STABILIZATION_DELAY_MS))
+
+const safelyDismissAuthSession = async () => {
+  try {
+    await WebBrowser.dismissAuthSession()
+    await waitForUiStabilization()
+  } catch {
+    // No auth session to dismiss or already closed by native browser hand-off.
+  }
+}
+
+class AuthFlowError extends Error {
+  details?: unknown
+
+  constructor(message: string, details?: unknown) {
+    super(message)
+    this.name = 'AuthFlowError'
+    this.details = details
+  }
+}
+
+try {
+  maybeCompleteAuthSession()
+} catch {
+  // Can throw on native when there is no browser session to complete.
+}
 
 export const REDIRECT_URI = AuthSession.makeRedirectUri()
 const BASE_REQUEST_CONFIG = { clientId: clientEnv.OAUTH_CLIENT_ID, redirectUri: REDIRECT_URI }
@@ -57,7 +87,7 @@ export const useLogin = () => {
   const [req, , promptAsync] = useCodeAuthRequest() ?? []
   return async (payload?: { code?: string; sessionId?: string; state?: string }) => {
     if (payload?.code) {
-      WebBrowser.dismissAuthSession()
+      await safelyDismissAuthSession()
       return exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId })
     }
 
@@ -75,22 +105,34 @@ export const useLogin = () => {
       return null
     }
 
-    return promptAsync({
-      presentationStyle: WebBrowser.WebBrowserPresentationStyle.CURRENT_CONTEXT,
-      createTask: false,
-    }).then((codeResult) => {
+    try {
+      const codeResult = await promptAsync({
+        presentationStyle: WebBrowser.WebBrowserPresentationStyle.CURRENT_CONTEXT,
+        createTask: false,
+      })
+
       if (codeResult.type === 'success') {
-        return exchangeCodeAsync({ code: codeResult.params.code })
+        const session = await exchangeCodeAsync({ code: codeResult.params.code })
+        await waitForUiStabilization()
+        return session
       }
-      throw new Error('Error during login', { cause: JSON.stringify(codeResult) })
-    })
+
+      if (codeResult.type === 'cancel' || codeResult.type === 'dismiss') {
+        await waitForUiStabilization()
+        return null
+      }
+
+      throw new AuthFlowError('Unexpected login auth result', codeResult)
+    } catch (error) {
+      throw new AuthFlowError('Technical login failure', error)
+    }
   }
 }
 
 export const useRegister = () => {
   useBrowserWarmUp()
   const [, , promptAsync] = useCodeAuthRequest({ register: true }) ?? []
-  return ({ utm_campaign }: { utm_campaign?: string } = {}) => {
+  return async ({ utm_campaign }: { utm_campaign?: string } = {}) => {
     if (isWeb) {
       let url = REGISTRATION_ENDPOINT + `?redirect_uri=${REDIRECT_URI}&utm_source=app`
       if (utm_campaign) {
@@ -100,13 +142,24 @@ export const useRegister = () => {
       return null
     }
 
-    return promptAsync({ createTask: false }).then((codeResult) => {
+    const codeResult = await promptAsync({ createTask: false })
+
+    try {
       if (codeResult.type === 'success') {
-        return exchangeCodeAsync({ code: codeResult.params.code })
+        const session = await exchangeCodeAsync({ code: codeResult.params.code })
+        await waitForUiStabilization()
+        return session
       }
 
-      throw new Error('Error during registration', { cause: JSON.stringify(codeResult) })
-    })
+      if (codeResult.type === 'cancel' || codeResult.type === 'dismiss') {
+        await waitForUiStabilization()
+        return null
+      }
+
+      throw new AuthFlowError('Unexpected registration auth result', codeResult)
+    } catch (error) {
+      throw new AuthFlowError('Technical registration failure', error)
+    }
   }
 }
 
