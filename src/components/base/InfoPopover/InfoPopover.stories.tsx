@@ -1,5 +1,7 @@
 import { Button, Popover, Text, XStack, YStack } from 'tamagui'
 
+import { VoxButton } from '@/components/Button'
+
 import { InfoPopover, InfoPopoverContent, InfoPopoverTrigger } from './InfoPopover'
 
 export default {
@@ -25,8 +27,10 @@ export function Showcase() {
               </InfoPopoverTrigger>
               <InfoPopoverContent offset={6}>
                 <YStack maxWidth={240} gap="$2">
-                  <Text fontWeight="700">Aide</Text>
-                  <Text>{`Popover ouvert vers ${direction}.`}</Text>
+                  <Text color="$white1" fontWeight="700">
+                    Aide
+                  </Text>
+                  <Text color="$white1">{`Popover ouvert vers ${direction}.`}</Text>
                 </YStack>
               </InfoPopoverContent>
             </InfoPopover>
@@ -46,8 +50,10 @@ export function Showcase() {
               </InfoPopoverTrigger>
               <InfoPopoverContent offset={10}>
                 <YStack maxWidth={260} gap="$2">
-                  <Text fontWeight="700">Alignement</Text>
-                  <Text>{`Placement: bottom-${align}`}</Text>
+                  <Text color="$white1" fontWeight="700">
+                    Alignement
+                  </Text>
+                  <Text color="$white1">{`Placement: bottom-${align}`}</Text>
                 </YStack>
               </InfoPopoverContent>
             </InfoPopover>
@@ -65,22 +71,22 @@ export function Showcase() {
           </InfoPopoverTrigger>
           <InfoPopoverContent offset={8}>
             <YStack maxWidth={320} gap="$3">
-              <Text fontWeight="700">Configurer une publication</Text>
-              <Text>Utilisez les filtres pour cibler une audience et validez l'aperçu avant envoi.</Text>
-              <Text color="$color10">Astuce: vous pouvez enregistrer votre brouillon à tout moment.</Text>
+              <Text color="$white1" fontWeight="700">
+                Configurer une publication
+              </Text>
+              <Text color="$white1">Utilisez les filtres pour cibler une audience et validez l'aperçu avant envoi.</Text>
+              <Text color="$white1">Astuce: vous pouvez enregistrer votre brouillon à tout moment.</Text>
               <XStack justifyContent="flex-end">
                 <Popover.Close asChild>
-                  <Button size="$2">Compris</Button>
+                  <VoxButton variant="soft" size="xs" theme="gray">
+                    Compris
+                  </VoxButton>
                 </Popover.Close>
               </XStack>
             </YStack>
           </InfoPopoverContent>
         </InfoPopover>
       </YStack>
-
-      <Text color="$color10" maxWidth={700}>
-        Réduisez la largeur de la fenêtre Storybook sous le breakpoint &quot;sm&quot; pour voir la bascule automatique en Bottom Sheet.
-      </Text>
     </YStack>
   )
 }

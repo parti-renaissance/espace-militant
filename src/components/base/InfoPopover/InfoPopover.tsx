@@ -36,9 +36,10 @@ export function InfoPopoverContent({ children, ...props }: PropsWithChildren<Inf
       enterStyle={{ opacity: 0, scale: 0.98 }}
       exitStyle={{ opacity: 0, scale: 0.98 }}
       borderWidth={1}
-      borderColor="$borderColor"
+      borderColor="$gray8"
+      backgroundColor="$gray7"
       m="$xsmall"
-      p="$small"
+      p="$medium"
       {...props}
     >
       {children}
