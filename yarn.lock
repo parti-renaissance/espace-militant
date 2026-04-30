@@ -19577,6 +19577,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash@npm:^4.18.1":
+  version: 4.18.1
+  resolution: "lodash@npm:4.18.1"
+  checksum: 10c0/757228fc68805c59789e82185135cf85f05d0b2d3d54631d680ca79ec21944ec8314d4533639a14b8bcfbd97a517e78960933041a5af17ecb693ec6eecb99a27
+  languageName: node
+  linkType: hard
+
 "log-symbols@npm:^2.2.0":
   version: 2.2.0
   resolution: "log-symbols@npm:2.2.0"
@@ -26501,7 +26508,7 @@ __metadata:
     i18next: "npm:^23.7.16"
     intl-pluralrules: "npm:^2.0.1"
     knip: "npm:^5.63.0"
-    lodash: "npm:^4.17.21"
+    lodash: "npm:^4.18.1"
     mapbox-gl: "npm:^2.9.0"
     onchange: "npm:^7.1.0"
     prettier: "npm:^3.1.1"
