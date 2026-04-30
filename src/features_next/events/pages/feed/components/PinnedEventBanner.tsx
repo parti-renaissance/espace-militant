@@ -41,7 +41,7 @@ function PinnedEventCardContent({ event }: { event: PinnedEventItem }) {
   const fallbackImage = getEventItemImageFallback(event)
 
   return (
-    <XStack gap="$small" alignItems="flex-start">
+    <XStack gap="$medium" alignItems="flex-start">
       {fallbackImage ? (
         <Image
           source={typeof fallbackImage === 'string' ? { uri: fallbackImage } : fallbackImage}
@@ -53,10 +53,10 @@ function PinnedEventCardContent({ event }: { event: PinnedEventItem }) {
           <Pin size={24} color="$blue6" />
         </YStack>
       )}
-      <YStack gap={8} flex={1} minWidth={0} pt={4}>
-        <Text.LG semibold numberOfLines={1}>
+      <YStack gap={8} flex={1} minWidth={0} py={4}>
+        <Text.MD semibold numberOfLines={1}>
           {event.name}
-        </Text.LG>
+        </Text.MD>
         <YStack gap={4}>
           {event.begin_at ? (
             <XStack gap="$small" alignItems="center">
@@ -111,36 +111,34 @@ function PinnedEventCardWrapper({ sizeMode, isMobile, children }: { sizeMode: Ca
   )
 }
 
-const PinnedEventCard = memo(
-  ({ event, sizeMode, isMobile }: { event: PinnedEventItem; sizeMode: CardSizeMode; isMobile: boolean }) => {
-    const router = useRouter()
-    const href = `/evenements/${event.slug}?source=page_events_pinned` as Href
+const PinnedEventCard = memo(({ event, sizeMode, isMobile }: { event: PinnedEventItem; sizeMode: CardSizeMode; isMobile: boolean }) => {
+  const router = useRouter()
+  const href = `/evenements/${event.slug}?source=page_events_pinned` as Href
 
-    return (
-      <PinnedEventCardWrapper sizeMode={sizeMode} isMobile={isMobile}>
-        <YStack position="relative" flex={1} borderRadius="$medium" overflow="hidden">
-          <VoxCard
-            cursor="pointer"
-            flex={1}
-            width={sizeMode === 'split' ? '100%' : undefined}
-            onPress={() => router.push(href)}
-            borderRadius="$medium"
-            hoverStyle={{
-              backgroundColor: '$textSurface',
-            }}
-            pressStyle={{
-              backgroundColor: '$textSurface',
-            }}
-          >
-            <VoxCard.Content gap="$small" padding={12}>
-              <PinnedEventCardContent event={event} />
-            </VoxCard.Content>
-          </VoxCard>
-        </YStack>
-      </PinnedEventCardWrapper>
-    )
-  },
-)
+  return (
+    <PinnedEventCardWrapper sizeMode={sizeMode} isMobile={isMobile}>
+      <YStack position="relative" flex={1} borderRadius="$medium" overflow="hidden">
+        <VoxCard
+          cursor="pointer"
+          flex={1}
+          width={sizeMode === 'split' ? '100%' : undefined}
+          onPress={() => router.push(href)}
+          borderRadius="$medium"
+          hoverStyle={{
+            backgroundColor: '$textSurface',
+          }}
+          pressStyle={{
+            backgroundColor: '$textSurface',
+          }}
+        >
+          <VoxCard.Content gap="$small" py={12} pl={12} pr={16}>
+            <PinnedEventCardContent event={event} />
+          </VoxCard.Content>
+        </VoxCard>
+      </YStack>
+    </PinnedEventCardWrapper>
+  )
+})
 
 PinnedEventCard.displayName = 'PinnedEventCard'
 
