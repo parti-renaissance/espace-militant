@@ -11045,7 +11045,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:^4.14.167":
+"@types/lodash@npm:^4.14.167, @types/lodash@npm:^4.17.0":
   version: 4.17.24
   resolution: "@types/lodash@npm:4.17.24"
   checksum: 10c0/b72f60d4daacdad1fa643edb3faba204c02a01eb1ac00a83ff73496a6d236fc55e459c06106e8ced42277dba932d087d8fc090f8de4ef590d3f91e6d6f7ce85a
@@ -19577,7 +19577,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.10, lodash@npm:^4.17.11, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21":
+"lodash@npm:^4.17.10, lodash@npm:^4.17.11, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.18.1":
   version: 4.18.1
   resolution: "lodash@npm:4.18.1"
   checksum: 10c0/757228fc68805c59789e82185135cf85f05d0b2d3d54631d680ca79ec21944ec8314d4533639a14b8bcfbd97a517e78960933041a5af17ecb693ec6eecb99a27
@@ -26448,6 +26448,7 @@ __metadata:
     "@types/add": "npm:^2"
     "@types/eslint__js": "npm:^8.42.3"
     "@types/google.maps": "npm:^3.55.7"
+    "@types/lodash": "npm:^4.17.0"
     "@types/mapbox-gl": "npm:^3.1.0"
     "@types/node": "npm:^20.14.11"
     "@types/qs": "npm:^6.9.15"
@@ -26507,6 +26508,7 @@ __metadata:
     i18next: "npm:^23.7.16"
     intl-pluralrules: "npm:^2.0.1"
     knip: "npm:^5.63.0"
+    lodash: "npm:^4.18.1"
     mapbox-gl: "npm:^2.9.0"
     onchange: "npm:^7.1.0"
     prettier: "npm:^3.1.1"
