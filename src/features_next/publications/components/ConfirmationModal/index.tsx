@@ -143,9 +143,9 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
               </VoxCard>
             </YStack>
           ) : null}
-          <View gap="$small" flexDirection={media.gtSm ? 'row' : undefined}>
+          <View gap="$small" flexDirection={media.gtSm ? 'row' : 'column'}>
             <VoxCard inside backgroundColor="$gray1" justifyContent="center" alignItems="center" minWidth={140}>
-              <VoxCard.Content justifyContent="center" alignItems="center" gap="$small" h="100%">
+              <VoxCard.Content justifyContent="center" alignItems="center" gap="$small" h={112}>
                 {isLoadingNumbers ? (
                   <View alignItems="center" justifyContent="center" height={52}>
                     <Spinner color="$purple5" />
