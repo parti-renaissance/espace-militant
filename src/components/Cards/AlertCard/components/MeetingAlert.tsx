@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
+import { Image, useMedia, XStack, YStack } from 'tamagui'
+import { AlertTriangle, Check, ExternalLink, QrCode, Share2, Ticket } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import type { AlertVoxCardProps } from '@/components/Cards'
 import { createOnShow } from '@/components/Cards/AlertCard/utils'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import VoxCard from '@/components/VoxCard/VoxCard'
+
 import type { RestAlertsResponse } from '@/services/alerts/schema'
-import { AlertTriangle, Check, ExternalLink, QrCode, Share2, Ticket } from '@tamagui/lucide-icons'
-import { Image, useMedia, XStack, YStack } from 'tamagui'
 
 export type MeetingAlertCollapsedProps = {
   payload: RestAlertsResponse[0]
@@ -54,7 +56,7 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
             <Text.LG numberOfLines={2} pt={6} flexShrink={1}>
               {payload.title}
             </Text.LG>
-            <YStack animation="quick" enterStyle={{ opacity: 0, scaleY: 0.8 }} exitStyle={{ opacity: 0, scaleY: 0.8 }} animateOnly={['opacity', 'scaleY']}>
+            <YStack>
               {alreadySubscribed ? (
                 <VoxCard.Chip icon={Check} theme="green">
                   Inscrit
@@ -67,13 +69,7 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
             </YStack>
           </YStack>
         </XStack>
-        <YStack
-          key="desc"
-          animation="quick"
-          enterStyle={{ opacity: 0, scaleY: 0.8 }}
-          exitStyle={{ opacity: 0, scaleY: 0.8 }}
-          animateOnly={['opacity', 'scaleY']}
-        >
+        <YStack key="desc">
           {alreadySubscribed ? (
             <Text.SM my="$medium">Donnez de la visibilité à l'événement et contribuez à son succès en le partageant autour&nbsp;de&nbsp;vous&nbsp;!</Text.SM>
           ) : (
@@ -93,24 +89,22 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
                 Partager
               </VoxButton>
             ) : null}
-            {
-              hasTicket ? (
-                <VoxButton
-                  variant={'contained'}
-                  theme={'blue'}
-                  size="sm"
-                  iconLeft={QrCode}
-                  onPress={() => {
-                    setIsTicketOpen(true)
-                  }}
-                >
-                  Mon billet
-                </VoxButton>
-              ) : null
-            }
+            {hasTicket ? (
+              <VoxButton
+                variant={'contained'}
+                theme={'blue'}
+                size="sm"
+                iconLeft={QrCode}
+                onPress={() => {
+                  setIsTicketOpen(true)
+                }}
+              >
+                Mon billet
+              </VoxButton>
+            ) : null}
             {payload.cta_label ? (
               <VoxButton
-                variant={hasTicket ? 'outlined' : (alreadySubscribed ? 'soft' : 'contained')}
+                variant={hasTicket ? 'outlined' : alreadySubscribed ? 'soft' : 'contained'}
                 size="sm"
                 disabled={!payload.cta_url}
                 iconLeft={hasTicket ? undefined : Ticket}
