@@ -2,7 +2,7 @@ import { Button, Popover, Text, XStack, YStack } from 'tamagui'
 
 import { VoxButton } from '@/components/Button'
 
-import { InfoPopover, InfoPopoverContent, InfoPopoverTrigger } from './InfoPopover'
+import { InfoPopover, InfoPopoverContent, InfoPopoverText, InfoPopoverTrigger } from './InfoPopover'
 
 export default {
   title: 'InfoPopover',
@@ -27,10 +27,8 @@ export function Showcase() {
               </InfoPopoverTrigger>
               <InfoPopoverContent offset={6}>
                 <YStack maxWidth={240} gap="$2">
-                  <Text color="$white1" fontWeight="700">
-                    Aide
-                  </Text>
-                  <Text color="$white1">{`Popover ouvert vers ${direction}.`}</Text>
+                  <InfoPopoverText fontWeight="700">Aide</InfoPopoverText>
+                  <InfoPopoverText>{`Popover ouvert vers ${direction}.`}</InfoPopoverText>
                 </YStack>
               </InfoPopoverContent>
             </InfoPopover>
@@ -50,10 +48,8 @@ export function Showcase() {
               </InfoPopoverTrigger>
               <InfoPopoverContent offset={10}>
                 <YStack maxWidth={260} gap="$2">
-                  <Text color="$white1" fontWeight="700">
-                    Alignement
-                  </Text>
-                  <Text color="$white1">{`Placement: bottom-${align}`}</Text>
+                  <InfoPopoverText fontWeight="700">Alignement</InfoPopoverText>
+                  <InfoPopoverText>{`Placement: bottom-${align}`}</InfoPopoverText>
                 </YStack>
               </InfoPopoverContent>
             </InfoPopover>
@@ -71,11 +67,9 @@ export function Showcase() {
           </InfoPopoverTrigger>
           <InfoPopoverContent offset={8}>
             <YStack maxWidth={320} gap="$3">
-              <Text color="$white1" fontWeight="700">
-                Configurer une publication
-              </Text>
-              <Text color="$white1">Utilisez les filtres pour cibler une audience et validez l'aperçu avant envoi.</Text>
-              <Text color="$white1">Astuce: vous pouvez enregistrer votre brouillon à tout moment.</Text>
+              <InfoPopoverText fontWeight="700">Configurer une publication</InfoPopoverText>
+              <InfoPopoverText>Utilisez les filtres pour cibler une audience et validez l'aperçu avant envoi.</InfoPopoverText>
+              <InfoPopoverText>Astuce: vous pouvez enregistrer votre brouillon à tout moment.</InfoPopoverText>
               <XStack justifyContent="flex-end">
                 <Popover.Close asChild>
                   <VoxButton variant="soft" size="xs" theme="gray">
