@@ -38,6 +38,7 @@ const EventFormAside = () => {
     handleOnChangeFinishAt,
     isAgoraLeader,
     isAgoraScope,
+    visibility,
   } = useEventFormContext()
 
   return (
@@ -65,7 +66,7 @@ const EventFormAside = () => {
 
         <Controller
           render={({ field }) => {
-            return <EventHiddenField value={field.value} onChange={field.onChange} />
+            return <EventHiddenField value={field.value} onChange={field.onChange} disabled={visibility === 'invitation'} />
           }}
           control={control}
           name="hidden"

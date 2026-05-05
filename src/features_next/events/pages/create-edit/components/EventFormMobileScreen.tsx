@@ -46,6 +46,7 @@ export default function EventFormMobileScreen() {
     ConfirmAlert,
     isAgoraLeader,
     isAgoraScope,
+    visibility,
   } = useEventFormContext()
 
   const globalPending = isPending || isUploadImagePending || isUploadDeletePending
@@ -135,7 +136,7 @@ export default function EventFormMobileScreen() {
                   />
                   <Controller
                     render={({ field }) => {
-                      return <EventHiddenField value={field.value} onChange={field.onChange} />
+                      return <EventHiddenField value={field.value} onChange={field.onChange} disabled={visibility === 'invitation'} />
                     }}
                     control={control}
                     name="hidden"

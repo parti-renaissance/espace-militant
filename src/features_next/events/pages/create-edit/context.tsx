@@ -145,6 +145,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   /** Dérivé du formulaire : évite un `useState` dupliqué et un `setMode` dans l’effet (règle set-state-in-effect). */
   const mode = useWatch({ control, name: 'mode' })
+  const visibility = useWatch({ control, name: 'visibility' })
 
   const handleOnChangeBeginAt = useCallback(
     (onChange: (y: Date) => void) => (x: Date) => {
@@ -238,6 +239,12 @@ const useEventFormData = ({ edit }: EventFormProps) => {
       setValue('mode', 'online', { shouldValidate: true })
     }
   }, [edit, getValues, isAgoraLeader, selectedScope, setValue, visibilityOptions])
+
+  useEffect(() => {
+    if (visibility === 'invitation' && getValues('hidden')) {
+      setValue('hidden', false, { shouldValidate: true })
+    }
+  }, [getValues, setValue, visibility])
   const agoraUuid = useMemo(() => {
     return scopes.data?.list.find((x) => x.code === selectedScope)?.attributes?.agoras?.[0]?.uuid ?? null
   }, [selectedScope, scopes.data])
@@ -354,6 +361,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     scopeOptions,
     catOptions,
     mode: mode ?? (isAgoraScope ? 'online' : 'meeting'),
+    visibility: visibility ?? defaultVisibilityForScope,
     visibilityOptions,
     navigation,
     editMode,
