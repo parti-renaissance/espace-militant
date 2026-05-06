@@ -7,7 +7,6 @@ import { CalendarDays, MapPin, Pin, Video } from '@tamagui/lucide-icons'
 import { formatInTimeZone } from 'date-fns-tz'
 import { fr } from 'date-fns/locale'
 
-import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 import Text from '@/components/base/Text'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { getEventItemImageFallback, isEventPartial } from '@/features_next/events/utils'
@@ -87,7 +86,9 @@ function PinnedEventCardContent({ event }: { event: PinnedEventItem }) {
   )
 }
 
-function PinnedEventCardWrapper({ sizeMode, isMobile, children }: { sizeMode: CardSizeMode; isMobile: boolean; children: ReactNode }) {
+function PinnedEventCardWrapper({ sizeMode, isSmallContainer, children }: { sizeMode: CardSizeMode; isSmallContainer: boolean; children: ReactNode }) {
+  const media = useMedia()
+
   if (sizeMode === 'split') {
     return (
       <YStack flex={1} flexBasis={0} minWidth={0} height={90}>
@@ -105,18 +106,24 @@ function PinnedEventCardWrapper({ sizeMode, isMobile, children }: { sizeMode: Ca
   }
 
   return (
-    <YStack flexShrink={0} maxWidth={520} minWidth={isMobile ? undefined : 320} width={isMobile ? Dimensions.get('window').width * 0.8 : 350} height={90}>
+    <YStack
+      flexShrink={0}
+      maxWidth={520}
+      minWidth={isSmallContainer ? undefined : 320}
+      width={isSmallContainer && media.sm ? Dimensions.get('window').width * 0.8 : 330}
+      height={90}
+    >
       {children}
     </YStack>
   )
 }
 
-const PinnedEventCard = memo(({ event, sizeMode, isMobile }: { event: PinnedEventItem; sizeMode: CardSizeMode; isMobile: boolean }) => {
+const PinnedEventCard = memo(({ event, sizeMode, isSmallContainer }: { event: PinnedEventItem; sizeMode: CardSizeMode; isSmallContainer: boolean }) => {
   const router = useRouter()
   const href = `/evenements/${event.slug}?source=page_events_pinned` as Href
 
   return (
-    <PinnedEventCardWrapper sizeMode={sizeMode} isMobile={isMobile}>
+    <PinnedEventCardWrapper sizeMode={sizeMode} isSmallContainer={isSmallContainer}>
       <YStack position="relative" flex={1} borderRadius="$medium" overflow="hidden">
         <VoxCard
           cursor="pointer"
@@ -143,16 +150,12 @@ const PinnedEventCard = memo(({ event, sizeMode, isMobile }: { event: PinnedEven
 PinnedEventCard.displayName = 'PinnedEventCard'
 
 type PinnedEventBannerProps = {
-  /**
-   * Applique le safe area top (défaut `true`).
-   * À désactiver (`false`) lorsque le banner est rendu dans un ScrollView/FlatList qui
-   * gère déjà le safe area (ex. iOS avec `contentInsetAdjustmentBehavior='automatic'`)
-   * pour éviter un double padding.
-   */
-  safeAreaTop?: boolean
+  /** Réduit les largeurs et les marges (ex. flux hub étroit). */
+  small?: boolean
 }
 
-export function PinnedEventBanner({ safeAreaTop = true }: PinnedEventBannerProps = {}) {
+/** Marges hors contenu (haut/bas suivant contexte, safe-area) : responsabilité du parent. */
+export function PinnedEventBanner({ small = false }: PinnedEventBannerProps = {}) {
   const media = useMedia()
   const { session } = useSession()
   const isAuthenticated = Boolean(session)
@@ -162,17 +165,16 @@ export function PinnedEventBanner({ safeAreaTop = true }: PinnedEventBannerProps
     if (isAuthenticated) return allEvents
     return allEvents.filter((event) => !isEventPartial(event))
   }, [data.pages, isAuthenticated])
-  const isMobile = Boolean(media.sm)
-  const { paddingTop } = useLayoutSpacing({ top: true, safeAreaTop, left: false, right: false, bottom: false })
+  const isSmallContainer = small ? true : Boolean(media.sm)
 
   if (events.length === 0) return null
 
-  if (events.length === 2 && !isMobile) {
+  if (events.length === 2 && !isSmallContainer) {
     return (
-      <YStack width="100%" paddingTop={paddingTop}>
+      <YStack width="100%">
         <XStack width="100%" gap="$medium" alignItems="stretch" flexWrap="nowrap">
           {events.map((event) => (
-            <PinnedEventCard key={event.uuid} event={event} sizeMode="split" isMobile={isMobile} />
+            <PinnedEventCard key={event.uuid} event={event} sizeMode="split" isSmallContainer={isSmallContainer} />
           ))}
         </XStack>
       </YStack>
@@ -181,25 +183,25 @@ export function PinnedEventBanner({ safeAreaTop = true }: PinnedEventBannerProps
 
   if (events.length === 1) {
     return (
-      <YStack width="100%" paddingTop={paddingTop} paddingHorizontal={isMobile ? 16 : 0} paddingBottom={isMobile ? 16 : 0}>
-        <PinnedEventCard event={events[0]} sizeMode="single" isMobile={isMobile} />
+      <YStack width="100%" paddingHorizontal={isSmallContainer ? 16 : 0}>
+        <PinnedEventCard event={events[0]} sizeMode="single" isSmallContainer={isSmallContainer} />
       </YStack>
     )
   }
 
   return (
-    <YStack width="100%" paddingTop={paddingTop}>
+    <YStack width="100%">
       <FadingScrollView
-        showGradients={!isMobile}
+        showGradients={!isSmallContainer}
         gradientColors={['#fafafb', '#fafafb00']}
         contentContainerStyle={{
-          paddingRight: isMobile ? 16 : 32,
-          paddingLeft: isMobile ? 16 : 0,
+          paddingRight: isSmallContainer ? 16 : 32,
+          paddingLeft: isSmallContainer ? 16 : 0,
         }}
       >
-        <XStack flexDirection="row" alignItems="stretch" gap={16} paddingBottom={isMobile ? 16 : 0}>
+        <XStack flexDirection="row" alignItems="stretch" gap={16}>
           {events.map((event) => (
-            <PinnedEventCard key={event.uuid} event={event} sizeMode="scroll" isMobile={isMobile} />
+            <PinnedEventCard key={event.uuid} event={event} sizeMode="scroll" isSmallContainer={isSmallContainer} />
           ))}
         </XStack>
       </FadingScrollView>
