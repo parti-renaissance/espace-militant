@@ -1,6 +1,6 @@
 import { Href, Link, usePathname } from 'expo-router'
 import { isWeb, useMedia, YStack } from 'tamagui'
-import { Bot, Globe, LogOut, PenLine } from '@tamagui/lucide-icons'
+import { Bot, Globe, LogOut, MapPin, PenLine } from '@tamagui/lucide-icons'
 
 import Menu from '@/components/menu/Menu'
 
@@ -53,13 +53,18 @@ const ProfilMenu = () => {
             </Menu.Item>
           </Link>
           <Link href="/tools/storybook" asChild={!isWeb}>
-            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={PenLine} last>
+            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={PenLine}>
               StoryBook
             </Menu.Item>
           </Link>
           <Link href="/webview" asChild={!isWeb}>
             <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Globe}>
               Webview
+            </Menu.Item>
+          </Link>
+          <Link href="/evenements/map" asChild={!isWeb}>
+            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={MapPin} last>
+              Carte événements
             </Menu.Item>
           </Link>
         </Menu>
