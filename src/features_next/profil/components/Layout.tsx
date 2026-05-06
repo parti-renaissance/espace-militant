@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { usePathname } from 'expo-router'
 import { useMedia, XStack } from 'tamagui'
-import { Bot, DoorOpen, Globe, GraduationCap, LogOut, PenLine, QrCode, Wrench, X, Zap } from '@tamagui/lucide-icons'
+import { Bot, DoorOpen, Globe, GraduationCap, LogOut, MapPin, PenLine, QrCode, Wrench, X, Zap } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
@@ -97,6 +97,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                 </XStack>
                 <NavItem text="Chatbot" iconLeft={Bot} href="/chatbot" />
                 <NavItem text="Webview" iconLeft={Globe} href="/webview" />
+                <NavItem text="Carte événements" iconLeft={MapPin} href="/evenements/map" />
                 <NavItem text="StoryBook" iconLeft={PenLine} href="/tools/storybook" />
                 <Text.SM semibold secondary mx="$small" mt="$medium">
                   Anciens outils
