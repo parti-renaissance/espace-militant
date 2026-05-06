@@ -141,7 +141,11 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
     }
   }, [])
 
-  const { children, styleURL, pitchEnabled } = props
+  const { children, styleURL, pitchEnabled, scrollEnabled, zoomEnabled, rotateEnabled } = props
+
+  const dragPan = scrollEnabled !== false
+  const scrollZoom = zoomEnabled !== false
+  const dragRotate = rotateEnabled !== false
 
   return (
     <ReactMapGL
@@ -149,6 +153,12 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
       mapboxAccessToken={staticStore.accessToken}
       mapStyle={styleURL}
       pitchWithRotate={pitchEnabled}
+      dragPan={dragPan}
+      scrollZoom={scrollZoom}
+      doubleClickZoom={scrollZoom}
+      touchZoomRotate={scrollZoom}
+      dragRotate={dragRotate}
+      keyboard={dragPan || scrollZoom}
       onClick={handleMapClick}
       interactiveLayerIds={interactiveLayerIds.length > 0 ? interactiveLayerIds : undefined}
     >

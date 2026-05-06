@@ -2,6 +2,8 @@ import React, { Suspense, useMemo } from 'react'
 import { Link } from 'expo-router'
 import Head from 'expo-router/head'
 import { isWeb, useMedia, YStack } from 'tamagui'
+
+import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 import { Sparkle } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
@@ -11,6 +13,7 @@ import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
+import { usePinnedEventsInfiniteQuery } from '@/services/events/hook'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { FEATURES } from '@/utils/Scopes'
 
@@ -37,9 +40,17 @@ const CreateEventFloatingButton = () => {
 
 export default function EvenementsPage() {
   const media = useMedia()
+  const { data: pinnedFeed } = usePinnedEventsInfiniteQuery()
+  const hasPinnedBannerContent = useMemo(() => {
+    const items = pinnedFeed?.pages.flatMap((p) => p?.items ?? []) ?? []
+    return items.length > 0
+  }, [pinnedFeed?.pages])
+  const pinnedBannerOuterSpacing = useLayoutSpacing({ top: true, left: false, right: false, bottom: false })
   const banner = media.sm ? undefined : (
     <Suspense fallback={null}>
-      <PinnedEventBanner />
+      <YStack paddingTop={hasPinnedBannerContent ? pinnedBannerOuterSpacing.paddingTop : 0}>
+        <PinnedEventBanner />
+      </YStack>
     </Suspense>
   )
 

@@ -1,7 +1,8 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia } from 'tamagui'
 
-const TABBAR_HEIGHT_SM = 64
+/** Hauteur fixe du `TabBarFrame` (ConfigurableTabBar) — même valeur pour le padding sous le contenu. */
+export const TABBAR_HEIGHT_SM = 64
 
 type SpacingConfig = {
   /** Active l'espacement de base et le safe spacing en haut */

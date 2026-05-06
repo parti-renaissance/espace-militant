@@ -11,9 +11,9 @@ import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import EventListItem from '@/features_next/events/components/EventListItem'
+import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/PinnedEventBanner'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection } from '@/features_next/events/utils'
-import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/PinnedEventBanner'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { usePinnedEventsInfiniteQuery, useSuspensePaginatedEvents } from '@/services/events/hook'
@@ -86,9 +86,9 @@ const EventFeed = () => {
   const feedContentContainerStyle = useMemo(
     () => ({
       gap: getToken('$medium', 'space'),
-      // En mobile avec banner pinned, celui-ci est rendu dans `ListHeaderComponent` et
-      // fournit déjà son propre paddingTop (safe area). On neutralise donc le paddingTop
-      // du container pour éviter un double espacement.
+      // En mobile avec banner pinned, le `ListHeaderComponent` applique déjà le paddingTop
+      // (safe area) au-dessus du banner. On neutralise donc le paddingTop du container pour
+      // éviter un double espacement.
       paddingTop: hasPinnedBannerContent && media.sm ? 0 : Platform.OS === 'ios' ? 8 : listSpacing.paddingTop,
     }),
     [hasPinnedBannerContent, listSpacing.paddingTop, media.sm],
@@ -203,7 +203,11 @@ const EventFeed = () => {
         case 'header':
           return <EventSectionHeader title={item.title} />
         case 'empty_state':
-          return <EmptyStateSection reason={item.reason} onSwitchToAllEvents={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
+          return (
+            <YStack py="$large">
+              <EmptyStateSection reason={item.reason} onSwitchToAllEvents={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
+            </YStack>
+          )
         case 'event':
           return <EventCard event={item.event} userUuid={userData?.uuid} source="page_events" />
         default:
@@ -235,18 +239,28 @@ const EventFeed = () => {
     //   (voir `src/components/AppStructure/Layout/Layout.tsx` + `Header/index.tsx`).
     // - Authentifié sur iOS : la FlatList applique le safe area via
     //   `contentInsetAdjustmentBehavior='automatic'`.
-    // - Authentifié sur Android : rien n'applique le safe area en amont, le banner s'en charge.
+    // - Authentifié sur Android : rien n'applique le safe area en amont → padding sur le bloc header au-dessus du banner.
     if (!isAuth) return false
     return Platform.OS === 'android'
   }, [isAuth])
+
+  const pinnedBannerOuterSpacing = useLayoutSpacing({
+    top: true,
+    safeAreaTop: bannerSafeAreaTop,
+    left: false,
+    right: false,
+    bottom: false,
+  })
 
   const listHeader = useMemo(
     () => (
       <YStack>
         {media.sm ? (
-          <Suspense fallback={null}>
-            <PinnedEventBanner safeAreaTop={bannerSafeAreaTop} />
-          </Suspense>
+          <YStack paddingTop={hasPinnedBannerContent ? pinnedBannerOuterSpacing.paddingTop : 0} paddingBottom={hasPinnedBannerContent && media.sm ? 16 : 0}>
+            <Suspense fallback={null}>
+              <PinnedEventBanner />
+            </Suspense>
+          </YStack>
         ) : null}
         <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
           {isAuth && <BigSwitch options={EVENTS_SWITCH_OPTIONS} value={activeTab} onChange={handleSwitchChange} />}
@@ -254,7 +268,7 @@ const EventFeed = () => {
         </YStack>
       </YStack>
     ),
-    [activeTab, media.gtMd, media.sm, isAuth, handleSwitchChange, bannerSafeAreaTop],
+    [activeTab, media.gtMd, media.sm, isAuth, handleSwitchChange, hasPinnedBannerContent, pinnedBannerOuterSpacing.paddingTop],
   )
 
   return (
@@ -289,7 +303,9 @@ const EventFeed = () => {
             showSkeleton ? (
               <EventsListSkeleton />
             ) : (
-              <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllEvents={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
+              <YStack py="$large">
+                <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllEvents={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
+              </YStack>
             )
           }
           ListFooterComponent={

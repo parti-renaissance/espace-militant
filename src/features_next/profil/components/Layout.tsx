@@ -97,7 +97,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                 </XStack>
                 <NavItem text="Chatbot" iconLeft={Bot} href="/chatbot" />
                 <NavItem text="Webview" iconLeft={Globe} href="/webview" />
-                <NavItem text="Carte événements" iconLeft={MapPin} href="/evenements/map" />
+                <NavItem text="Hub événements" iconLeft={MapPin} href="/evenements/hub" />
                 <NavItem text="StoryBook" iconLeft={PenLine} href="/tools/storybook" />
                 <Text.SM semibold secondary mx="$small" mt="$medium">
                   Anciens outils

@@ -62,9 +62,9 @@ const ProfilMenu = () => {
               Webview
             </Menu.Item>
           </Link>
-          <Link href="/evenements/map" asChild={!isWeb}>
+          <Link href="/evenements/hub" asChild={!isWeb}>
             <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={MapPin} last>
-              Carte événements
+              Hub événements
             </Menu.Item>
           </Link>
         </Menu>
