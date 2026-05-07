@@ -69,7 +69,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
   ({ events, isInteractive = true, clusterEvents = false, onEventPress, centerCoordinate, zoomLevel, padding, onCenterOnUserLocationStateChange }, ref) => {
     const cameraRef = useRef<React.ComponentRef<typeof MapboxGl.Camera>>(null)
 
-    // Sur RN, UserLocation se démonte au blur avant la vue carte pour éviter la course LocationManager / Animated (#rnmapbox)
+    // Blur: évite des mises à jour pendant le démontage. UserLocation animated={false}: sans AnimatedPoint (@rnmapbox + RN AnimatedValueXY.flattenOffset).
     const [mountUserLocation, setMountUserLocation] = useState(!isNativePlatform)
 
     useFocusEffect(
@@ -190,7 +190,14 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
           padding={padding}
         />
         {mountUserLocation ? (
-          <MapboxGl.UserLocation key="main-events-map-user-location" visible autoTrigger preventAutoCenterOnAutoTrigger hideNativeGeolocateButton />
+          <MapboxGl.UserLocation
+            key="main-events-map-user-location"
+            visible
+            animated={false}
+            autoTrigger
+            preventAutoCenterOnAutoTrigger
+            hideNativeGeolocateButton
+          />
         ) : null}
         {clusterEvents ? (
           <MapboxGl.ShapeSource
