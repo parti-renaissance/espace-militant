@@ -7,8 +7,55 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import { FeatureCollection, Point } from 'geojson'
 
 import MapboxGl from '@/components/Mapbox/Mapbox'
+import type { RestItemEvent } from '@/services/events/schema'
 
 const EVENTS_MAP_STYLE_URL = 'mapbox://styles/larem/clwaph1m1008501pg1cspgbj2'
+
+const EVENT_PIN_MARKERS_IMAGES = {
+  'pin-event-past': require('./assets/event-past.png'),
+  'pin-event-militants': require('./assets/event-militants.png'),
+  'pin-event-adherents': require('./assets/event-adherents.png'),
+  'pin-event-invitation': require('./assets/event-invitation.png'),
+} as const
+
+export type EventMapPinImageKey = keyof typeof EVENT_PIN_MARKERS_IMAGES
+
+type EventPinResolverInput = {
+  visibility: RestItemEvent['visibility']
+  isPast: boolean
+}
+
+const resolveEventMapPinImageKey = (item: EventPinResolverInput): EventMapPinImageKey => {
+  if (item.isPast) {
+    return 'pin-event-past'
+  }
+
+  switch (item.visibility) {
+    case 'invitation':
+      return 'pin-event-invitation'
+    case 'adherent':
+    case 'adherent_dues':
+      return 'pin-event-adherents'
+    default:
+      return 'pin-event-militants'
+  }
+}
+
+/** Raster réel des PNG (points) pour caler une cible UI ~48×53 px sous `iconSize` homogène. */
+const EVENT_PIN_IMAGE_RASTER_WIDTH = 104
+const EVENT_PIN_IMAGE_RASTER_HEIGHT = 114
+const EVENT_PIN_ICON_SIZE = Math.min(
+  48 / EVENT_PIN_IMAGE_RASTER_WIDTH,
+  53 / EVENT_PIN_IMAGE_RASTER_HEIGHT,
+)
+
+const EVENT_POINT_SYMBOL_STYLE = {
+  iconImage: ['get', 'pinImageId'],
+  iconSize: EVENT_PIN_ICON_SIZE,
+  iconAllowOverlap: true,
+  iconIgnorePlacement: true,
+  iconAnchor: 'bottom' as const,
+} as const
 
 const toRadians = (x: number) => (x * Math.PI) / 180
 
@@ -38,12 +85,15 @@ export type EventMapItem = {
   slug: string
   latitude: number
   longitude: number
+  visibility: RestItemEvent['visibility']
+  isPast: boolean
 }
 
 export type EventMapFeatureProperties = {
   uuid: string
   name: string
   slug: string
+  pinImageId: EventMapPinImageKey
 }
 
 export type EventMapHandle = {
@@ -154,6 +204,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
             uuid: event.uuid,
             name: event.name,
             slug: event.slug,
+            pinImageId: resolveEventMapPinImageKey(event),
           },
           geometry: {
             type: 'Point',
@@ -163,13 +214,6 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       }),
       [events],
     )
-
-    const pointStyle = {
-      circleRadius: 8,
-      circleColor: '#2A7FFF',
-      circleStrokeColor: '#FFFFFF',
-      circleStrokeWidth: 2,
-    } as const
 
     return (
       <MapboxGl.MapView
@@ -199,6 +243,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
             hideNativeGeolocateButton
           />
         ) : null}
+        <MapboxGl.Images images={EVENT_PIN_MARKERS_IMAGES} />
         {clusterEvents ? (
           <MapboxGl.ShapeSource
             id="events-map-source"
@@ -207,7 +252,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
             cluster
             clusterRadius={40}
             clusterMaxZoomLevel={18}
-            hitbox={{ width: 24, height: 24 }}
+            hitbox={{ width: 52, height: 58 }}
           >
             <MapboxGl.CircleLayer
               id="events-map-clusters"
@@ -229,7 +274,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
                 textColor: '#FFFFFF',
               }}
             />
-            <MapboxGl.CircleLayer id="events-map-points" filter={['!', ['has', 'point_count']]} style={pointStyle} />
+            <MapboxGl.SymbolLayer id="events-map-points" filter={['!', ['has', 'point_count']]} style={EVENT_POINT_SYMBOL_STYLE} />
           </MapboxGl.ShapeSource>
         ) : (
           <MapboxGl.ShapeSource
@@ -238,9 +283,9 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
             onPress={onEventPress}
             cluster={false}
             clusterRadius={40}
-            hitbox={{ width: 24, height: 24 }}
+            hitbox={{ width: 52, height: 58 }}
           >
-            <MapboxGl.CircleLayer id="events-map-points" filter={['all']} style={pointStyle} />
+            <MapboxGl.SymbolLayer id="events-map-points" filter={['all']} style={EVENT_POINT_SYMBOL_STYLE} />
           </MapboxGl.ShapeSource>
         )}
       </MapboxGl.MapView>

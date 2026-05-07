@@ -10,6 +10,8 @@ import { SideBarArea } from '@/components/AppStructure/Navigation/SideBar'
 import { VoxButton } from '@/components/Button'
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
 
+import { isEventPast } from '../../utils'
+
 import EventMap, { EventMapHandle, EventMapItem } from './EventMap'
 
 const DEFAULT_CENTER: [number, number] = [2.45, 46.55]
@@ -52,6 +54,8 @@ const EventsMapPage = () => {
         slug: event.slug,
         latitude: event.post_address!.latitude!,
         longitude: event.post_address!.longitude!,
+        visibility: event.visibility,
+        isPast: isEventPast(event),
       }))
   }, [data?.pages])
 
