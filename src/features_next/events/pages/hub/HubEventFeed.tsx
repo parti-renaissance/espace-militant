@@ -153,18 +153,12 @@ const HubEventFeed = (props: HubEventFeedProps) => {
 
   const futureEventsThreshold = useMemo(() => new Date(), [])
 
-  const { data, fetchNextPage, hasNextPage, isRefetching, isFetching, refetch } = useSuspensePaginatedEvents({
+  const { data, fetchNextPage, hasNextPage, isRefetching, isFetching } = useSuspensePaginatedEvents({
     filters: { subscribedOnly: true, finishAfter: futureEventsThreshold },
     enabled: filtersReady && isAuth,
   })
 
   const events = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data?.pages])
-
-  const [refreshing, setRefreshing] = useState(false)
-  const onRefresh = useCallback(() => {
-    setRefreshing(true)
-    void refetch().finally(() => setRefreshing(false))
-  }, [refetch])
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isRefetching) void fetchNextPage()
@@ -216,8 +210,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
         renderItem={({ item }) => <EventRow event={item} userUuid={userData?.uuid} />}
         ListHeaderComponent={listHeaderComponent}
         contentContainerStyle={contentContainerStyleMerged}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
+        removeClippedSubviews={embeddedMapHeader != null && Platform.OS !== 'web' ? false : undefined}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         hasMore={hasNextPage ?? false}
