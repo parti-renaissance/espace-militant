@@ -9,4 +9,5 @@ export const getRefreshToken = (x: Instances) =>
     requestSchema: schema.RestRefreshTokenRequestSchema,
     responseSchema: schema.RestRefreshTokenResponseSchema,
     type: 'public',
+    formUrlEncoded: true,
   })
