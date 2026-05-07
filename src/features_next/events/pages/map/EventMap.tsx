@@ -1,5 +1,7 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
+import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
 import * as Location from 'expo-location'
+import { Platform } from 'react-native'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import { FeatureCollection, Point } from 'geojson'
@@ -61,9 +63,24 @@ export type EventMapProps = {
   onCenterOnUserLocationStateChange?: (isLocating: boolean) => void
 }
 
+const isNativePlatform = Platform.OS !== 'web'
+
 const EventMap = forwardRef<EventMapHandle, EventMapProps>(
   ({ events, isInteractive = true, clusterEvents = false, onEventPress, centerCoordinate, zoomLevel, padding, onCenterOnUserLocationStateChange }, ref) => {
     const cameraRef = useRef<React.ComponentRef<typeof MapboxGl.Camera>>(null)
+
+    // Sur RN, UserLocation se démonte au blur avant la vue carte pour éviter la course LocationManager / Animated (#rnmapbox)
+    const [mountUserLocation, setMountUserLocation] = useState(!isNativePlatform)
+
+    useFocusEffect(
+      useCallback(() => {
+        if (!isNativePlatform) {
+          return undefined
+        }
+        setMountUserLocation(true)
+        return () => setMountUserLocation(false)
+      }, []),
+    )
 
     const animateCameraTo = useCallback((coord: [number, number], z: number) => {
       cameraRef.current?.setCamera({
@@ -172,7 +189,9 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
           zoomLevel={zoomLevel}
           padding={padding}
         />
-        {/* <MapboxGl.UserLocation key="main-events-map-user-location" visible autoTrigger preventAutoCenterOnAutoTrigger hideNativeGeolocateButton /> */}
+        {mountUserLocation ? (
+          <MapboxGl.UserLocation key="main-events-map-user-location" visible autoTrigger preventAutoCenterOnAutoTrigger hideNativeGeolocateButton />
+        ) : null}
         {clusterEvents ? (
           <MapboxGl.ShapeSource
             id="events-map-source"
