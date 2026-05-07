@@ -13,6 +13,8 @@ interface APICallPayload<Request, Response> {
   errorThrowers?: ErrorThrower[]
   axiosConfig?: AxiosRequestConfig
   type?: 'private' | 'public'
+  /** OAuth2 et APIs “classiques” : corps en application/x-www-form-urlencoded au lieu de JSON */
+  formUrlEncoded?: boolean
 }
 
 export interface Instances {
@@ -31,6 +33,7 @@ export const createApi =
     useParams,
     errorThrowers,
     axiosConfig,
+    formUrlEncoded,
   }: APICallPayload<Request, Response>) => {
     return async (requestData: Request) => {
       try {
@@ -38,7 +41,7 @@ export const createApi =
         requestSchema.parse(requestData)
 
         // Prepare API call
-        let data: Request | null = null
+        let data: Request | URLSearchParams | null = null
         let params: Request | null = null
 
         if (requestData) {
@@ -46,6 +49,10 @@ export const createApi =
             params = requestData
           } else {
             data = requestData
+            if (formUrlEncoded && data !== null && typeof data === 'object' && !(data instanceof URLSearchParams)) {
+              const record = data as Record<string, string>
+              data = new URLSearchParams(record)
+            }
           }
         }
 
@@ -55,6 +62,15 @@ export const createApi =
           data,
           params,
           ...axiosConfig,
+        }
+
+        if (formUrlEncoded) {
+          config.headers = {
+            ...(typeof config.headers === 'object' && config.headers !== null && !Array.isArray(config.headers)
+              ? { ...config.headers }
+              : {}),
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
         }
 
         // Make API call base on the type of request
