@@ -9,6 +9,8 @@ import { TABBAR_HEIGHT_SM } from '@/components/AppStructure/hooks/useLayoutSpaci
 
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
 
+import { isEventPast } from '../../utils'
+
 import { EventMapHandle, EventMapItem } from '../map/EventMap'
 import { EventsHubDesktop } from './EventsHubDesktop'
 import { EventsHubMobile } from './EventsHubMobile'
@@ -59,6 +61,8 @@ const EventsHubPage = () => {
         slug: event.slug,
         latitude: event.post_address!.latitude!,
         longitude: event.post_address!.longitude!,
+        visibility: event.visibility,
+        isPast: isEventPast(event),
       }))
   }, [data?.pages])
 
