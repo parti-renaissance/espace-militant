@@ -8,14 +8,9 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { SideBarArea } from '@/components/AppStructure/Navigation/SideBar'
 import { VoxButton } from '@/components/Button'
-import MapboxGl from '@/components/Mapbox/Mapbox'
-
-import clientEnv from '@/config/clientEnv'
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
 
 import EventMap, { EventMapHandle, EventMapItem } from './EventMap'
-
-MapboxGl.setAccessToken(clientEnv.MAP_BOX_ACCESS_TOKEN)
 
 const DEFAULT_CENTER: [number, number] = [2.45, 46.55]
 const isFiniteCoordinate = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)

@@ -1,10 +1,10 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
-import { FeatureCollection, Point } from 'geojson'
 import * as Location from 'expo-location'
-
-import MapboxGl from '@/components/Mapbox/Mapbox'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
+import { FeatureCollection, Point } from 'geojson'
+
+import MapboxGl from '@/components/Mapbox/Mapbox'
 
 const EVENTS_MAP_STYLE_URL = 'mapbox://styles/larem/clwaph1m1008501pg1cspgbj2'
 
@@ -62,19 +62,7 @@ export type EventMapProps = {
 }
 
 const EventMap = forwardRef<EventMapHandle, EventMapProps>(
-  (
-    {
-      events,
-      isInteractive = true,
-      clusterEvents = false,
-      onEventPress,
-      centerCoordinate,
-      zoomLevel,
-      padding,
-      onCenterOnUserLocationStateChange,
-    },
-    ref,
-  ) => {
+  ({ events, isInteractive = true, clusterEvents = false, onEventPress, centerCoordinate, zoomLevel, padding, onCenterOnUserLocationStateChange }, ref) => {
     const cameraRef = useRef<React.ComponentRef<typeof MapboxGl.Camera>>(null)
 
     const animateCameraTo = useCallback((coord: [number, number], z: number) => {
@@ -120,9 +108,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
         )
 
         const nextCenter: [number, number] =
-          nearestEvent.distanceKm > 10
-            ? [(userCoords[0] + nearestEvent.coords[0]) / 2, (userCoords[1] + nearestEvent.coords[1]) / 2]
-            : userCoords
+          nearestEvent.distanceKm > 10 ? [(userCoords[0] + nearestEvent.coords[0]) / 2, (userCoords[1] + nearestEvent.coords[1]) / 2] : userCoords
 
         const zoom = getZoomForNearestDistance(nearestEvent.distanceKm)
         animateCameraTo(nextCenter, zoom)
@@ -186,7 +172,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
           zoomLevel={zoomLevel}
           padding={padding}
         />
-        <MapboxGl.UserLocation key="main-events-map-user-location" visible autoTrigger preventAutoCenterOnAutoTrigger hideNativeGeolocateButton />
+        {/* <MapboxGl.UserLocation key="main-events-map-user-location" visible autoTrigger preventAutoCenterOnAutoTrigger hideNativeGeolocateButton /> */}
         {clusterEvents ? (
           <MapboxGl.ShapeSource
             id="events-map-source"
@@ -217,11 +203,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
                 textColor: '#FFFFFF',
               }}
             />
-            <MapboxGl.CircleLayer
-              id="events-map-points"
-              filter={['!', ['has', 'point_count']]}
-              style={pointStyle}
-            />
+            <MapboxGl.CircleLayer id="events-map-points" filter={['!', ['has', 'point_count']]} style={pointStyle} />
           </MapboxGl.ShapeSource>
         ) : (
           <MapboxGl.ShapeSource
