@@ -3,7 +3,6 @@ import { Dimensions, Pressable, StyleSheet, View } from 'react-native'
 import Container from '@/components/layouts/Container'
 import MapboxGl from '@/components/Mapbox/Mapbox'
 import { LatLng, Region } from '@/components/Maps/Maps'
-import clientEnv from '@/config/clientEnv'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import { Feature, Point } from 'geojson'
 import { isWeb, useTheme } from 'tamagui'
@@ -19,8 +18,6 @@ import { PoiAddressCardViewModelMapper } from './PoiAddressCardViewModelMapper'
 
 import loopArrowImg from './../../assets/images/loopArrow.png'
 import gpsPositionImg from './../../assets/images/gpsPosition.png'
-
-MapboxGl.setAccessToken(clientEnv.MAP_BOX_ACCESS_TOKEN)
 
 const DEFAULT_DELTA = 0.01
 const prio1 = ['==', ['get', 'score'], 1]

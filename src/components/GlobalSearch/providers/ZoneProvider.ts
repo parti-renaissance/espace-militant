@@ -53,12 +53,21 @@ export class ZoneProvider implements SearchProvider {
         const labelParam = options.label_param!
         return data.map((item: Record<string, unknown>) => {
           const id = String(item[valueParam] ?? '')
-          const label = String(item[labelParam] ?? '')
+          const name = typeof item.name === 'string' ? item.name : undefined
+          const rawCode = item.code
+          const codeStr =
+            typeof rawCode === 'string' ? rawCode : typeof rawCode === 'number' ? String(rawCode) : undefined
+          const fallbackLabel = String(item[labelParam] ?? '')
+          const zoneType = typeof item.type === 'string' ? item.type : undefined
+          const label =
+            name !== undefined && codeStr !== undefined ? `${name} (${codeStr})` : fallbackLabel
+          const subLabel = zoneType !== undefined ? ZONE_TYPE_LABELS[zoneType] || zoneType : undefined
           return {
             id,
             label,
+            ...(subLabel !== undefined ? { subLabel } : {}),
             type: 'zone' as const,
-            metadata: { zone: item, zoneType: item.type, zoneCode: item.code },
+            metadata: { zone: item, zoneType, zoneCode: codeStr },
           }
         })
       }
