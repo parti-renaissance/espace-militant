@@ -11,6 +11,7 @@ import { VoxButton } from '@/components/Button'
 
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
 
+import { MapListToggle } from '../../components/MapListToggle'
 import { isEventPast } from '../../utils'
 import EventMap, { EventMapHandle, EventMapItem, FRANCE_METRO_CAMERA_BOUNDS } from './EventMap'
 
@@ -62,15 +63,16 @@ const EventsMapPage = () => {
 
   const handleBack = () => {
     if (isWeb) {
-      router.push('/evenements')
+      router.push('/evenements/hub')
     } else if (router.canGoBack()) {
       router.back()
     } else {
-      router.replace('/evenements')
+      router.replace('/evenements/hub')
     }
   }
 
   const handleLogVisibleBounds = () => {
+    // TODO: Implement this
     void eventMapRef.current?.getVisibleBounds().then(
       (bounds) => console.log('[EventsMap] visibleBounds [ne, sw]', bounds),
       (err) => console.warn('[EventsMap] getVisibleBounds', err),
@@ -84,10 +86,10 @@ const EventsMapPage = () => {
           {media.gtSm ? <SideBarArea state="militant" /> : null}
           <VoxButton variant="soft" size="lg" shrink iconLeft={ArrowLeft} theme="gray" bg="$white1" onPress={handleBack} aria-label="Retour " />
         </XStack>
-        <YStack position="absolute" top="$medium" pt={insets.top} right="$medium" zIndex={20} gap="$xsmall">
+        <XStack position="absolute" top="$medium" pt={insets.top} right="$medium" zIndex={20} gap="$small">
           <VoxButton
             variant="soft"
-            size="lg"
+            size="xl"
             iconLeft={Crosshair}
             theme="gray"
             bg="$white1"
@@ -97,17 +99,8 @@ const EventsMapPage = () => {
           >
             Recentrer
           </VoxButton>
-          <VoxButton
-            variant="soft"
-            size="sm"
-            theme="gray"
-            bg="$white1"
-            onPress={handleLogVisibleBounds}
-            aria-label="Exemple: afficher la zone visible dans la console"
-          >
-            Log zone visible
-          </VoxButton>
-        </YStack>
+          <MapListToggle activeView="map" mapHref="/evenements/map" listHref="/evenements/list" />
+        </XStack>
         <EventMap
           ref={eventMapRef}
           events={mapEvents}
