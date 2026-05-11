@@ -257,13 +257,13 @@ const EventFeed = () => {
     bottom: false,
   })
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     if (router.canGoBack()) {
       router.back()
     } else {
       router.push('/evenements/hub')
     }
-  }
+  }, [router])
 
   const listHeader = useMemo(
     () => (
@@ -285,7 +285,7 @@ const EventFeed = () => {
         </YStack>
       </YStack>
     ),
-    [activeTab, media.gtMd, media.sm, isAuth, handleSwitchChange, hasPinnedBannerContent, pinnedBannerOuterSpacing.paddingTop],
+    [activeTab, media.gtMd, media.sm, isAuth, handleBack, handleSwitchChange, pinnedBannerOuterSpacing.paddingTop],
   )
 
   return (

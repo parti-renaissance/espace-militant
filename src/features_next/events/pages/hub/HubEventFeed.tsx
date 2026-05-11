@@ -2,11 +2,10 @@
  * Liste minimaliste du hub : bannière épinglée + inscriptions à venir uniquement.
  */
 import type { ReactNode } from 'react'
-import { memo, Suspense, useCallback, useMemo, useRef, useState } from 'react'
+import { memo, Suspense, useCallback, useMemo, useRef } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import type { Href } from 'expo-router'
-import { useRouter } from 'expo-router'
 import { getToken, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { Calendar, CalendarCheck2, ChevronRight, ClipboardCheck, DoorOpen, Zap } from '@tamagui/lucide-icons'
 
@@ -21,7 +20,6 @@ import { useSuspensePaginatedEvents } from '@/services/events/hook'
 import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useGetProfil } from '@/services/profile/hook'
 
-import { EmptyStateSection } from '../feed/components/EmptyStateSection'
 import EventsListSkeleton from '../feed/components/Skeleton'
 import { ButtonCard } from './ButtonCard'
 
@@ -117,10 +115,15 @@ const HubEventFeed = (props: HubEventFeedProps) => {
         <PinnedEventBanner small={true} />
       </Suspense>
       <HubOrganizePromptCards />
-      <XStack gap="$small" px="$medium">
-        <CalendarCheck2 size={16} color="$blue5" />
-        <Text.MD semibold>Mon agenda</Text.MD>
-      </XStack>
+      <YStack px="$medium" gap="$medium">
+        <XStack gap="$small">
+          <CalendarCheck2 size={16} color="$blue5" />
+          <Text.MD semibold>Mon agenda</Text.MD>
+        </XStack>
+        <Text.MD secondary semibold>
+          Vous êtes inscrits à {events.length} événement{events.length > 1 ? 's' : ''} à venir.
+        </Text.MD>
+      </YStack>
     </YStack>
   )
 
@@ -142,6 +145,16 @@ const HubEventFeed = (props: HubEventFeedProps) => {
     [listContentInsetBottom],
   )
 
+  const listEmptyComponent = useMemo(() => {
+    return (
+      <YStack px="$medium">
+        <Text.MD secondary semibold lineHeight={22}>
+          Votre agenda est vide. Vous retrouverez ici tous les événements à venir auxquels vous vous inscrirez.
+        </Text.MD>
+      </YStack>
+    )
+  }, [])
+
   return (
     <YStack flex={1} width="100%" minHeight={0} bg="$textSurface">
       <LayoutFlatList<HubEventRow>
@@ -156,7 +169,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         hasMore={hasNextPage ?? false}
-        ListEmptyComponent={showSkeleton ? <EventsListSkeleton /> : <EmptyStateSection reason={{ kind: 'agenda_empty' }} showResetButton={false} />}
+        ListEmptyComponent={showSkeleton ? <EventsListSkeleton /> : listEmptyComponent}
         ListFooterComponent={
           <YStack>
             {hasNextPage ? (

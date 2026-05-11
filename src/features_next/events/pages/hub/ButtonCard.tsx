@@ -1,5 +1,5 @@
-import React, { memo, ReactNode, useCallback } from 'react'
-import { useRouter } from 'expo-router'
+import React, { memo, useCallback } from 'react'
+import { type Href, useRouter } from 'expo-router'
 import { ThemeName, XStack, YStack } from 'tamagui'
 
 import Text from '@/components/base/Text'
@@ -14,7 +14,7 @@ export type ButtonCardProps = {
   theme?: ThemeName
   horizontal?: boolean
   disabled?: boolean
-  href?: string
+  href?: Href
   onPress?: () => void
 }
 
@@ -34,7 +34,7 @@ export const ButtonCard = memo(function ButtonCard({
   const handlePress = useCallback(() => {
     if (disabled) return
     if (customOnPress) customOnPress()
-    else if (href) router.push(href as any)
+    else if (href) router.push(href)
   }, [disabled, customOnPress, href, router])
 
   const bg = theme ? '$color2' : '$textOutline'

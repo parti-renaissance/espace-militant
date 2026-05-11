@@ -16,7 +16,6 @@ export type EmptyStateReason =
   | { kind: 'search_no_upcoming'; search?: string }
   | { kind: 'subscriptions_empty' }
   | { kind: 'subscriptions_no_upcoming' }
-  | { kind: 'agenda_empty' }
   | { kind: 'generic' }
 
 type Props = {
@@ -38,7 +37,6 @@ export const EmptyStateSection = ({ reason, onSwitchToAllEvents, showResetButton
     search_no_upcoming: searchTerm ? `Aucun événement à venir pour\n "${searchTerm}"` : 'Aucun événement à venir pour votre recherche',
     subscriptions_empty: 'Vous ne vous êtes inscrit à aucun événement',
     subscriptions_no_upcoming: 'Vous ne vous êtes inscrit à aucun événement à venir',
-    agenda_empty: 'Votre agenda est vide. Vous retrouverez ici tous les événements à venir auxquels vous vous inscrirez.',
     generic: 'Aucun événement à venir',
   }
 

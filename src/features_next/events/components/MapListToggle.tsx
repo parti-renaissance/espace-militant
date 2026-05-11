@@ -1,31 +1,24 @@
 import React, { memo } from 'react'
-import { useRouter } from 'expo-router'
+import { type Href, useRouter } from 'expo-router'
 import { XStack, YStack } from 'tamagui'
-import { List, Map } from '@tamagui/lucide-icons' // Assure-toi d'avoir ces icônes ou utilise tes propres IconComponent
+import { List, Map } from '@tamagui/lucide-icons'
+
+import type { IconComponent } from '@/models/common.model'
 
 export type MapListToggleProps = {
   activeView: 'map' | 'list'
-  mapHref: string
-  listHref: string
+  mapHref: Href
+  listHref: Href
 }
 
-export const MapListToggle = memo(function MapListToggle({ activeView, mapHref, listHref }: MapListToggleProps) {
-  const router = useRouter()
+type ToggleButtonProps = {
+  icon: IconComponent
+  isActive: boolean
+  onPress: () => void
+}
 
-  const onMapPress = () => {
-    if (activeView !== 'map') {
-      router.replace(mapHref as any)
-    }
-  }
-
-  const onListPress = () => {
-    if (activeView !== 'list') {
-      router.replace(listHref as any)
-    }
-  }
-
-  // Sous-composant pour éviter la répétition du style des boutons
-  const ToggleButton = ({ icon: Icon, isActive, onPress }: { icon: any; isActive: boolean; onPress: () => void }) => (
+function ToggleButton({ icon: Icon, isActive, onPress }: ToggleButtonProps) {
+  return (
     <YStack
       width={36}
       height={36}
@@ -42,6 +35,22 @@ export const MapListToggle = memo(function MapListToggle({ activeView, mapHref, 
       <Icon size={16} color="$textPrimary" />
     </YStack>
   )
+}
+
+export const MapListToggle = memo(function MapListToggle({ activeView, mapHref, listHref }: MapListToggleProps) {
+  const router = useRouter()
+
+  const onMapPress = () => {
+    if (activeView !== 'map') {
+      router.replace(mapHref)
+    }
+  }
+
+  const onListPress = () => {
+    if (activeView !== 'list') {
+      router.replace(listHref)
+    }
+  }
 
   return (
     <XStack bg="$background" borderRadius={99} p="$xsmall" gap={2} alignItems="center">

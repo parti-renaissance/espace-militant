@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo } from 'react'
+import React, { Suspense } from 'react'
 import { useRouter } from 'expo-router'
 import Head from 'expo-router/head'
 import { useMedia, XStack, YStack } from 'tamagui'
@@ -12,16 +12,10 @@ import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/
 import EventsListPage from '@/features_next/events/pages/list'
 
 import * as metatags from '@/config/metatags'
-import { usePinnedEventsInfiniteQuery } from '@/services/events/hook'
 
 const EventsListRoute = () => {
   const media = useMedia()
   const router = useRouter()
-  const { data: pinnedFeed } = usePinnedEventsInfiniteQuery()
-  const hasPinnedBannerContent = useMemo(() => {
-    const items = pinnedFeed?.pages.flatMap((p) => p?.items ?? []) ?? []
-    return items.length > 0
-  }, [pinnedFeed?.pages])
   const pinnedBannerOuterSpacing = useLayoutSpacing({ top: true, left: false, right: false, bottom: false })
 
   const handleBack = () => {
