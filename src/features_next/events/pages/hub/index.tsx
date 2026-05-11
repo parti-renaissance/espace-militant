@@ -16,7 +16,6 @@ import { EventsHubDesktop } from './EventsHubDesktop'
 import { EventsHubMobile } from './EventsHubMobile'
 import { HubMapBlock } from './HubMapBlock'
 
-const DEFAULT_CENTER: [number, number] = [2.45, 46.55]
 const isFiniteCoordinate = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
 
 const EventsHubPage = () => {
@@ -37,12 +36,6 @@ const EventsHubPage = () => {
         : { paddingTop: 0, paddingRight: 0, paddingBottom: 0, paddingLeft: 0 },
     [media.gtSm, media.sm],
   )
-
-  const cameraZoomLevel = useMemo(() => {
-    if (media.xs) return 4.3
-    if (media.sm) return 4.6
-    return 5.5
-  }, [media.sm, media.xs])
 
   const tabBarSafeBottom = useMemo(() => (!media.gtSm ? insets.bottom + TABBAR_HEIGHT_SM : 0), [media.gtSm, insets.bottom])
 
@@ -88,8 +81,6 @@ const EventsHubPage = () => {
     mapEvents,
     onEventPress: handleEventPress,
     onRecenterPress: handleRecenterPress,
-    centerCoordinate: DEFAULT_CENTER,
-    zoomLevel: cameraZoomLevel,
     padding: cameraPadding,
     isLocating,
     onCenterOnUserLocationStateChange: setIsLocating,

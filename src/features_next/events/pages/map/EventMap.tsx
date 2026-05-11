@@ -1,15 +1,27 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { Platform } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
 import * as Location from 'expo-location'
-import { Platform } from 'react-native'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
-import { FeatureCollection, Point } from 'geojson'
+import { FeatureCollection, Point, type Position as GeoPosition } from 'geojson'
 
 import MapboxGl from '@/components/Mapbox/Mapbox'
+
 import type { RestItemEvent } from '@/services/events/schema'
 
+export type EventMapInitialBounds = { ne: [number, number]; sw: [number, number] }
+
+/** Cadre caméra initial (source de vérité). */
+export const FRANCE_METRO_CAMERA_BOUNDS: EventMapInitialBounds = {
+  ne: [9.7, 51.6],
+  sw: [-6.2, 40.3],
+}
+
 const EVENTS_MAP_STYLE_URL = 'mapbox://styles/larem/clwaph1m1008501pg1cspgbj2'
+
+/** Fallback caméra si `centerCoordinate` / `zoomLevel` absents (ex. props partielles). */
+const DEFAULT_CENTER: [number, number] = [2.45, 46.55]
 
 const EVENT_PIN_MARKERS_IMAGES = {
   'pin-event-past': require('./assets/event-past.png'),
@@ -44,10 +56,7 @@ const resolveEventMapPinImageKey = (item: EventPinResolverInput): EventMapPinIma
 /** Raster réel des PNG (points) pour caler une cible UI ~48×53 px sous `iconSize` homogène. */
 const EVENT_PIN_IMAGE_RASTER_WIDTH = 104
 const EVENT_PIN_IMAGE_RASTER_HEIGHT = 114
-const EVENT_PIN_ICON_SIZE = Math.min(
-  48 / EVENT_PIN_IMAGE_RASTER_WIDTH,
-  53 / EVENT_PIN_IMAGE_RASTER_HEIGHT,
-)
+const EVENT_PIN_ICON_SIZE = Math.min(48 / EVENT_PIN_IMAGE_RASTER_WIDTH, 53 / EVENT_PIN_IMAGE_RASTER_HEIGHT)
 
 const EVENT_POINT_SYMBOL_STYLE = {
   iconImage: ['get', 'pinImageId'],
@@ -79,6 +88,14 @@ const getZoomForNearestDistance = (distanceKm: number) => {
   return 6.5
 }
 
+/** ~11 m à l’équateur ; suffisant pour clés requête / stabilité cache. */
+const VISIBLE_BOUNDS_LNGLAT_DECIMALS = 4
+
+const roundLngLat = (p: GeoPosition): GeoPosition => {
+  const f = 10 ** VISIBLE_BOUNDS_LNGLAT_DECIMALS
+  return [Math.round(p[0] * f) / f, Math.round(p[1] * f) / f] as GeoPosition
+}
+
 export type EventMapItem = {
   uuid: string
   name: string
@@ -99,25 +116,51 @@ export type EventMapFeatureProperties = {
 export type EventMapHandle = {
   animateCameraTo: (centerCoordinate: [number, number], zoomLevel: number) => void
   centerOnMyPosition: () => Promise<void>
+  getVisibleBounds: () => Promise<[GeoPosition, GeoPosition]>
 }
 
-export type EventMapProps = {
+type EventMapSharedProps = {
   events: EventMapItem[]
   isInteractive?: boolean
   clusterEvents?: boolean
   onEventPress: (event: OnPressEvent) => void
-  centerCoordinate: [number, number]
-  zoomLevel: number
   padding?: CameraPadding
   /** Pour désactiver un bouton / afficher un chargement pendant la demande de géoloc. */
   onCenterOnUserLocationStateChange?: (isLocating: boolean) => void
 }
 
+export type EventMapProps =
+  | (EventMapSharedProps & {
+      /** Vue de départ : cadrer ce rectangle (remplace center + zoom). */
+      initialBounds: EventMapInitialBounds
+      centerCoordinate?: [number, number]
+      zoomLevel?: number
+    })
+  | (EventMapSharedProps & {
+      initialBounds?: undefined
+      centerCoordinate: [number, number]
+      zoomLevel: number
+    })
+
 const isNativePlatform = Platform.OS !== 'web'
 
 const EventMap = forwardRef<EventMapHandle, EventMapProps>(
-  ({ events, isInteractive = true, clusterEvents = false, onEventPress, centerCoordinate, zoomLevel, padding, onCenterOnUserLocationStateChange }, ref) => {
+  (
+    {
+      events,
+      isInteractive = true,
+      clusterEvents = false,
+      onEventPress,
+      initialBounds,
+      centerCoordinate,
+      zoomLevel,
+      padding,
+      onCenterOnUserLocationStateChange,
+    },
+    ref,
+  ) => {
     const cameraRef = useRef<React.ComponentRef<typeof MapboxGl.Camera>>(null)
+    const mapViewRef = useRef<React.ComponentRef<typeof MapboxGl.MapView>>(null)
 
     // Blur: évite des mises à jour pendant le démontage. UserLocation animated={false}: sans AnimatedPoint (@rnmapbox + RN AnimatedValueXY.flattenOffset).
     const [mountUserLocation, setMountUserLocation] = useState(!isNativePlatform)
@@ -186,13 +229,22 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       }
     }, [animateCameraTo, events, onCenterOnUserLocationStateChange])
 
+    const getVisibleBounds = useCallback(() => {
+      const map = mapViewRef.current
+      if (!map) {
+        return Promise.reject(new Error('EventMap: MapView is not mounted'))
+      }
+      return map.getVisibleBounds().then(([ne, sw]) => [roundLngLat(ne), roundLngLat(sw)] as [GeoPosition, GeoPosition])
+    }, [])
+
     useImperativeHandle(
       ref,
       () => ({
         animateCameraTo,
         centerOnMyPosition,
+        getVisibleBounds,
       }),
-      [animateCameraTo, centerOnMyPosition],
+      [animateCameraTo, centerOnMyPosition, getVisibleBounds],
     )
 
     const shape = useMemo<FeatureCollection<Point, EventMapFeatureProperties>>(
@@ -215,9 +267,12 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       [events],
     )
 
+    const cameraProps = initialBounds ? { bounds: initialBounds } : { centerCoordinate: centerCoordinate ?? DEFAULT_CENTER, zoomLevel: zoomLevel ?? 10 }
+
     return (
       <MapboxGl.MapView
         key="main-events-map"
+        ref={mapViewRef}
         style={{ flex: 1 }}
         styleURL={EVENTS_MAP_STYLE_URL}
         scaleBarEnabled={false}
@@ -225,14 +280,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
         zoomEnabled={isInteractive}
         rotateEnabled={isInteractive}
       >
-        <MapboxGl.Camera
-          key="main-events-map-camera"
-          ref={cameraRef}
-          followUserLocation={false}
-          centerCoordinate={centerCoordinate}
-          zoomLevel={zoomLevel}
-          padding={padding}
-        />
+        <MapboxGl.Camera ref={cameraRef} followUserLocation={false} padding={padding} {...cameraProps} />
         {mountUserLocation ? (
           <MapboxGl.UserLocation
             key="main-events-map-user-location"

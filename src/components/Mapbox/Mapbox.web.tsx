@@ -3,6 +3,7 @@ import {
   CameraStop,
   type Camera as C,
   type CircleLayer as CL,
+  type FillLayer as FL,
   type Images as Img,
   type MapView as MV,
   type ShapeSource as SS,
@@ -34,6 +35,7 @@ type ShapeSourceRef = {
 
 type MapViewRef = {
   getCenter: () => Promise<[number, number]>
+  getVisibleBounds: () => Promise<[[number, number], [number, number]]>
 }
 
 const mapPadding = (padding?: CameraPadding): PaddingOptions | undefined => {
@@ -119,11 +121,23 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
   }, [])
 
   useImperativeHandle(ref, () => {
-    const map = mapRef.current
     return {
       getCenter: async () => {
-        const region = map?.getCenter()
+        const region = mapRef.current?.getCenter()
         return region ? [region.lng, region.lat] : [0, 0]
+      },
+      getVisibleBounds: async () => {
+        const map = mapRef.current
+        if (!map) {
+          throw new Error('MapView is not ready')
+        }
+        const bounds = map.getBounds()
+        const ne = bounds.getNorthEast()
+        const sw = bounds.getSouthWest()
+        return [
+          [ne.lng, ne.lat],
+          [sw.lng, sw.lat],
+        ]
       },
     }
   }, [])
@@ -214,14 +228,19 @@ export const ShapeSource = forwardRef<ShapeSourceRef, ComponentProps<typeof SS>>
     [map, props.id],
   )
 
+  const clusterEnabled = props.cluster ?? false
+  const clusterRadius = props.clusterRadius ?? 40
+
   return (
     <Source
       id={props.id}
-      cluster={props.cluster}
-      clusterRadius={props.clusterRadius}
+      cluster={clusterEnabled}
+      clusterRadius={clusterRadius}
       type="geojson"
       data={props.shape as GeoJSON.FeatureCollection | GeoJSON.Feature | string}
-      clusterProperties={props.clusterProperties as Record<string, unknown>}
+      {...(clusterEnabled && props.clusterProperties != null
+        ? { clusterProperties: props.clusterProperties as Record<string, unknown> }
+        : {})}
     >
       {props.children}
     </Source>
@@ -240,10 +259,13 @@ const useRegisterLayer = (id?: string) => {
   }, [id, addInteractiveLayer, removeInteractiveLayer])
 }
 
+/** Mapbox GL web : ne pas passer `filter` si ce n'est pas un tableau valide. */
+const filterProps = (filter: unknown) => (Array.isArray(filter) && filter.length > 0 ? { filter } : {})
+
 const CircleLayer = (props: ComponentProps<typeof CL> & { source?: string }) => {
   useRegisterLayer(props.id)
   const paint = useMemo(() => _.mapKeys(props.style, (_, k) => toKebabCase(k)), [props.style])
-  return <Layer id={props.id} type="circle" source={props.source} filter={props.filter} paint={paint} />
+  return <Layer id={props.id} type="circle" source={props.source} paint={paint} {...filterProps(props.filter)} />
 }
 
 const SymbolLayer = (props: ComponentProps<typeof CL> & { source?: string }) => {
@@ -252,7 +274,14 @@ const SymbolLayer = (props: ComponentProps<typeof CL> & { source?: string }) => 
   const paint = useMemo(() => _.mapKeys(textColor ? { textColor } : {}, (_, k) => toKebabCase(k)), [textColor])
   const layout = useMemo(() => _.mapKeys(rest, (_, k) => toKebabCase(k)), [rest])
 
-  return <Layer id={props.id} type="symbol" source={props.source} filter={props.filter} layout={layout} paint={paint} />
+  return (
+    <Layer id={props.id} type="symbol" source={props.source} layout={layout} paint={paint} {...filterProps(props.filter)} />
+  )
+}
+
+const FillLayer = (props: ComponentProps<typeof FL> & { source?: string }) => {
+  const paint = useMemo(() => _.mapKeys(props.style ?? {}, (_, k) => toKebabCase(k)), [props.style])
+  return <Layer id={props.id} type="fill" source={props.source} paint={paint} {...filterProps(props.filter)} />
 }
 
 export const Images = (props: ComponentProps<typeof Img>) => {
@@ -314,14 +343,23 @@ const Camera = forwardRef<React.ComponentRef<typeof C>, ComponentProps<typeof C>
   // Initialisation de la vue (Se lance UNE SEULE FOIS)
   useEffect(() => {
     const map = getActiveMap()
+    if (!map || hasAppliedInitialViewRef.current) return
+
+    const b = props.bounds
+    if (b?.ne && b?.sw) {
+      // Le padding caméra est déjà appliqué via map.setPadding ; ne pas le repasser à fitBounds (double comptage).
+      map.fitBounds([b.sw, b.ne] as [mapboxgl.LngLatLike, mapboxgl.LngLatLike], { duration: 0 })
+      hasAppliedInitialViewRef.current = true
+      return
+    }
+
     const center = props.centerCoordinate as [number, number] | undefined
     const zoom = props.zoomLevel
-
-    if (!map || !center || hasAppliedInitialViewRef.current) return
+    if (!center) return
 
     map.jumpTo({ center, zoom })
     hasAppliedInitialViewRef.current = true
-  }, [getActiveMap, props.centerCoordinate, props.zoomLevel])
+  }, [getActiveMap, props.bounds, props.centerCoordinate, props.zoomLevel])
 
   useImperativeHandle(
     ref,
@@ -331,6 +369,12 @@ const Camera = forwardRef<React.ComponentRef<typeof C>, ComponentProps<typeof C>
         if (!map) return
 
         const duration = opt.animationDuration ?? 2000
+
+        if (opt.bounds?.ne && opt.bounds?.sw) {
+          map.fitBounds([opt.bounds.sw, opt.bounds.ne] as [mapboxgl.LngLatLike, mapboxgl.LngLatLike], { duration })
+          return
+        }
+
         const padding = mapPadding(opt.padding as CameraPadding)
 
         // 1. On construit l'objet de base sans aucune valeur undefined
@@ -471,6 +515,7 @@ export default {
   MapView,
   ShapeSource,
   CircleLayer,
+  FillLayer,
   SymbolLayer,
   Camera,
   UserLocation,
