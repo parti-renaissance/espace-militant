@@ -23,6 +23,7 @@ import { useGetProfil } from '@/services/profile/hook'
 
 import { EmptyStateSection } from '../feed/components/EmptyStateSection'
 import EventsListSkeleton from '../feed/components/Skeleton'
+import { ButtonCard } from './ButtonCard'
 
 type HubEventRow = RestItemEvent | RestPublicItemEvent
 
@@ -43,96 +44,37 @@ const EventRow = memo(({ event, userUuid }: { event: HubEventRow; userUuid?: str
 
 const CREER_EVENEMENT_HREF = '/evenements/creer' as const satisfies Href
 
-const HubOrganizePromptCard = memo(function HubOrganizePromptCard(props: {
-  bg: '$green2' | '$blue2'
-  iconBubbleBg: '$green3' | '$blue3'
-  icon: ReactNode
-  title: string
-}) {
-  const { bg, iconBubbleBg, icon, title } = props
-  const router = useRouter()
-  const onPress = useCallback(() => {
-    router.push(CREER_EVENEMENT_HREF)
-  }, [router])
-
-  return (
-    <YStack
-      gap="$small"
-      bg={bg}
-      p="$medium"
-      borderRadius="$medium"
-      flex={1}
-      width="50%"
-      cursor="pointer"
-      onPress={onPress}
-      hoverStyle={{ opacity: 0.94 }}
-      pressStyle={{ opacity: 0.9 }}
-    >
-      <YStack bg={iconBubbleBg} borderRadius={99} height={44} width={44} alignItems="center" justifyContent="center">
-        {icon}
-      </YStack>
-      <Text.MD semibold>{title}</Text.MD>
-    </YStack>
-  )
-})
-
 const HubOrganizePromptCards = memo(function HubOrganizePromptCards() {
   return (
     <XStack gap="$medium" px="$medium">
-      <HubOrganizePromptCard bg="$green2" iconBubbleBg="$green3" icon={<Zap size={20} color="$green6" />} title="Organisez une action près de chez vous !" />
-      <HubOrganizePromptCard bg="$blue2" iconBubbleBg="$blue3" icon={<Calendar size={20} color="$blue6" />} title="Organisez un événement !" />
+      <YStack width="50%" flex={1}>
+        <ButtonCard theme="green" icon={Zap} label="Organisez une action près de chez vous" href={CREER_EVENEMENT_HREF} />
+      </YStack>
+      <YStack width="50%" flex={1}>
+        <ButtonCard theme="blue" icon={Calendar} label="Organisez un événement" href={CREER_EVENEMENT_HREF} />
+      </YStack>
     </XStack>
-  )
-})
-
-const HubFooterResourceRow = memo(function HubFooterResourceRow(props: { href: Href; icon: ReactNode; title: string; description: string }) {
-  const { href, icon, title, description } = props
-  const router = useRouter()
-  const onPress = useCallback(() => {
-    router.push(href)
-  }, [href, router])
-
-  return (
-    <YStack
-      borderRadius="$medium"
-      bg="$textOutline"
-      p="$medium"
-      width="100%"
-      cursor="pointer"
-      onPress={onPress}
-      hoverStyle={{ opacity: 0.94 }}
-      pressStyle={{ opacity: 0.9 }}
-    >
-      <XStack alignItems="center" gap="$medium">
-        <YStack bg="$gray2" borderRadius={99} height={44} width={44} alignItems="center" justifyContent="center">
-          {icon}
-        </YStack>
-        <YStack flex={1} gap="$small">
-          <Text.MD semibold>{title}</Text.MD>
-          <Text.SM secondary>{description}</Text.SM>
-        </YStack>
-        <YStack justifyContent="center">
-          <ChevronRight size={24} color="$textSecondary" />
-        </YStack>
-      </XStack>
-    </YStack>
   )
 })
 
 const HubFooterResourceCards = memo(function HubFooterResourceCards() {
   return (
     <>
-      <HubFooterResourceRow
+      <ButtonCard
+        horizontal
+        icon={ClipboardCheck}
+        rightIcon={ChevronRight}
+        label="Questionnaires de terrain"
+        description="Allez à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à porte."
         href="/questionnaires"
-        icon={<ClipboardCheck size={20} color="$gray5" />}
-        title="Questionnaires de terrain"
-        description="Allez à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à porte. "
       />
-      <HubFooterResourceRow
-        href="/old/porte-a-porte"
-        icon={<DoorOpen size={20} color="$gray5" />}
-        title="Porte-à-porte"
+      <ButtonCard
+        horizontal
+        icon={DoorOpen}
+        rightIcon={ChevronRight}
+        label="Porte-à-porte"
         description="Consultez la carte des adresses prioritaires pour organiser votre porte-à-porte."
+        href="/old/porte-a-porte"
       />
     </>
   )
