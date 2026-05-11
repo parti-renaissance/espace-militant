@@ -155,6 +155,19 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
     }
   }, [])
 
+  const resetMapCursor = useCallback(() => {
+    const map = mapRef.current?.getMap()
+    if (!map) return
+    map.getCanvas().style.cursor = ''
+  }, [])
+
+  const handleInteractiveLayersMouseMove = useCallback((e: mapboxgl.MapLayerMouseEvent) => {
+    const map = mapRef.current?.getMap()
+    if (!map) return
+    const features = e.features
+    map.getCanvas().style.cursor = features && features.length > 0 ? 'pointer' : ''
+  }, [])
+
   const { children, styleURL, pitchEnabled, scrollEnabled, zoomEnabled, rotateEnabled } = props
 
   const dragPan = scrollEnabled !== false
@@ -174,6 +187,9 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
       dragRotate={dragRotate}
       keyboard={dragPan || scrollZoom}
       onClick={handleMapClick}
+      onMouseMove={handleInteractiveLayersMouseMove}
+      onMouseLeave={resetMapCursor}
+      onMouseOut={resetMapCursor}
       interactiveLayerIds={interactiveLayerIds.length > 0 ? interactiveLayerIds : undefined}
     >
       {children}
