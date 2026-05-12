@@ -5,7 +5,7 @@ import { Ghost, Sparkle } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import useResetFilters from '@/features_next/events/hooks/useResetFilters'
+import useResetFilters from '@/features_next/events/pages/feed/hooks/useResetFilters'
 
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { FEATURES } from '@/utils/Scopes'

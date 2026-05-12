@@ -9,7 +9,7 @@ import Select from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import DatePickerField from '@/components/DatePickerV2'
 
-import { EventFormContext } from '../context'
+import { EventFormContext } from '../helpers/context'
 
 function getTimezoneOffsetLabel(timeZone: string) {
   const offset = getTimezoneOffset(timeZone)

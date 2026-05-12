@@ -10,7 +10,7 @@ import {
   type UserLocation as UL,
 } from '@rnmapbox/maps'
 import type mapboxgl from 'mapbox-gl'
-import ReactMapGL, { GeolocateControl, Layer, MapRef, PaddingOptions, Source, useMap } from 'react-map-gl'
+import ReactMapGL, { Layer, MapRef, PaddingOptions, Source, useMap } from 'react-map-gl'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
@@ -459,73 +459,8 @@ const Camera = forwardRef<React.ComponentRef<typeof C>, ComponentProps<typeof C>
   return null
 })
 
-const UserLocation = forwardRef<ComponentRef<typeof UL>, UserLocationProps>((props, ref) => {
-  const geoControlRef = useRef<mapboxgl.GeolocateControl>(null)
-  const { current: map } = useMap()
-  const followUserLocation = useStore((s) => s.followUserLocation)
-
-  const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
-  const shouldAutoTrigger = props.autoTrigger ?? true
-  const shouldPreventAutoCenterOnAutoTrigger = props.preventAutoCenterOnAutoTrigger ?? false
-  const autoTriggerCameraRef = useRef<{ center: [number, number]; zoom?: number } | null>(null)
-
-  useEffect(() => {
-    if (!shouldAutoTrigger) return
-    if (shouldPreventAutoCenterOnAutoTrigger && map) {
-      const center = map.getCenter()
-      const zoom = map.getZoom()
-      if (isFiniteNumber(center.lng) && isFiniteNumber(center.lat)) {
-        autoTriggerCameraRef.current = {
-          center: [center.lng, center.lat],
-          zoom: isFiniteNumber(zoom) ? zoom : undefined,
-        }
-      }
-    }
-
-    const timeout = setTimeout(() => {
-      geoControlRef.current?.trigger()
-    }, 1000)
-
-    return () => clearTimeout(timeout)
-  }, [map, shouldAutoTrigger, shouldPreventAutoCenterOnAutoTrigger])
-
-  return (
-    <GeolocateControl
-      ref={geoControlRef as unknown as React.LegacyRef<mapboxgl.GeolocateControl>}
-      style={props.hideNativeGeolocateButton ? { display: 'none' } : undefined}
-      showUserLocation
-      showAccuracyCircle={false}
-      showUserHeading={followUserLocation}
-      fitBoundsOptions={isFiniteNumber(staticStore.followZoomLevel) ? { maxZoom: staticStore.followZoomLevel } : undefined}
-      trackUserLocation={followUserLocation}
-      onGeolocate={(e: GeolocationPosition) => {
-        if (!isFiniteNumber(e.coords.latitude) || !isFiniteNumber(e.coords.longitude)) return
-
-        if (shouldPreventAutoCenterOnAutoTrigger && autoTriggerCameraRef.current) {
-          map?.jumpTo(autoTriggerCameraRef.current)
-          autoTriggerCameraRef.current = null
-        }
-
-        if (props.onUpdate) {
-          props.onUpdate({
-            coords: {
-              latitude: e.coords.latitude,
-              longitude: e.coords.longitude,
-              altitude: e.coords.altitude || 0,
-              accuracy: e.coords.accuracy,
-              heading: e.coords.heading || 0,
-              speed: e.coords.speed || 0,
-            },
-            timestamp: e.timestamp,
-          })
-        }
-      }}
-      positionOptions={{
-        enableHighAccuracy: true,
-      }}
-    />
-  )
-})
+const UserLocation = forwardRef<ComponentRef<typeof UL>, UserLocationProps>((_props, _ref) => null)
+UserLocation.displayName = 'UserLocation'
 
 export default {
   MapView,

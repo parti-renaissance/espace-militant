@@ -50,7 +50,12 @@ export const ButtonCard = memo(function ButtonCard({
   )
 
   const Content = (
-    <YStack flex={horizontal ? 1 : undefined} gap="$small" justifyContent="center">
+    <YStack
+      flex={horizontal ? 1 : undefined}
+      minWidth={horizontal ? 0 : undefined}
+      gap="$small"
+      justifyContent="center"
+    >
       <Text.MD semibold>{label}</Text.MD>
       {!!description && <Text.SM secondary>{description}</Text.SM>}
     </YStack>
@@ -58,6 +63,7 @@ export const ButtonCard = memo(function ButtonCard({
 
   return (
     <YStack
+      width="100%"
       theme={theme || null}
       bg={bg}
       p="$medium"
@@ -69,7 +75,7 @@ export const ButtonCard = memo(function ButtonCard({
       pressStyle={!disabled ? { bg: hoverBg, opacity: 0.9 } : undefined}
     >
       {horizontal ? (
-        <XStack alignItems="center" gap="$medium">
+        <XStack width="100%" alignItems="center" gap="$medium">
           {IconBubble}
           {Content}
           {!!RightIcon && (

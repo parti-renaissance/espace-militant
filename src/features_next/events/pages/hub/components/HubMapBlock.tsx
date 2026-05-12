@@ -6,7 +6,7 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 
 import { VoxButton } from '@/components/Button'
 
-import EventMap, { EventMapHandle, EventMapItem, FRANCE_METRO_CAMERA_BOUNDS } from '../map/EventMap'
+import EventMap, { EventMapHandle, EventMapItem, FRANCE_METRO_CAMERA_BOUNDS } from '../../map/components/EventMap'
 import { HubMapPromoOverlay } from './HubMapPromoOverlay'
 
 export type HubMapBlockProps = {
@@ -16,8 +16,7 @@ export type HubMapBlockProps = {
   onRecenterPress: () => void
   padding: CameraPadding
   isLocating: boolean
-  onCenterOnUserLocationStateChange: (locating: boolean) => void
-  onUserLocationResolved?: (coords: { lat: number; lng: number }) => void
+  userLocationLngLat?: [number, number] | null
   showLoadingSpinner: boolean
   /** Refetch discret (pas le chargement initial plein écran). */
   showFetchingIndicator?: boolean
@@ -33,8 +32,7 @@ export function HubMapBlock({
   onRecenterPress,
   padding,
   isLocating,
-  onCenterOnUserLocationStateChange,
-  onUserLocationResolved,
+  userLocationLngLat,
   showLoadingSpinner,
   showFetchingIndicator = false,
   topInset,
@@ -65,15 +63,9 @@ export function HubMapBlock({
         onEventPress={onEventPress}
         initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
         padding={padding}
-        onCenterOnUserLocationStateChange={onCenterOnUserLocationStateChange}
-        onUserLocationResolved={onUserLocationResolved}
+        userLocationLngLat={userLocationLngLat}
       />
       <HubMapPromoOverlay leadingAccessory={promoLeadingAccessory} />
-      {showFetchingIndicator && (
-        <YStack position="absolute" top={topInset === 0 ? '$medium' : 0} pt={topInset} left={0} right={0} alignItems="center" pointerEvents="none" zIndex={15}>
-          <Spinner size="small" />
-        </YStack>
-      )}
       {showLoadingSpinner && (
         <YStack position="absolute" right={0} bottom={0} pointerEvents="none">
           <Spinner size="large" />

@@ -18,7 +18,7 @@ import { getFormatedScope as getFormatedScopeData } from '@/services/profile/uti
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { FEATURES } from '@/utils/Scopes'
 
-import { useConfirmAlert } from './components/ConfirmAlert'
+import { useConfirmAlert } from '../components/ConfirmAlert'
 import { createEventSchema, EventFormData } from './schema'
 import getVisibilityOptions from './visibility-options'
 

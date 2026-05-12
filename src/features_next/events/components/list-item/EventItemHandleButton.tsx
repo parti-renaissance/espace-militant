@@ -6,7 +6,7 @@ import HandleButton from '@/components/Buttons/HandleButton'
 
 import { RestEvent } from '@/services/events/schema'
 
-import { isEventEditable, isEventToggleRegisterHided } from '../utils'
+import { isEventEditable, isEventToggleRegisterHided } from '../../utils'
 
 type EventItemHandleButtonProps = {
   event: Partial<RestEvent>

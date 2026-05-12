@@ -13,8 +13,8 @@ import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import { VoxButton } from '@/components/Button'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
-import EventListItem from '@/features_next/events/components/EventListItem'
-import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/PinnedEventBanner'
+import EventListItem from '@/features_next/events/components/list-item/EventListItem'
+import { PinnedEventBanner } from '@/features_next/events/components/feed-layout/PinnedEventBanner'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection } from '@/features_next/events/utils'
 
@@ -25,12 +25,12 @@ import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useHits } from '@/services/hits/hook'
 import { useGetProfil } from '@/services/profile/hook'
 
-import { MapListToggle } from '../../components/MapListToggle'
-import type { EmptyStateReason } from '../feed/components/EmptyStateSection'
-import { EmptyStateSection } from '../feed/components/EmptyStateSection'
-import { EventSectionHeader } from '../feed/components/SectionHeader'
-import EventsSideContent from '../feed/components/SideContent'
-import EventsListSkeleton from '../feed/components/Skeleton'
+import { MapListToggle } from '../../components/feed-layout/MapListToggle'
+import type { EmptyStateReason } from '@/features_next/events/components/feed-layout/EmptyStateSection'
+import { EmptyStateSection } from '@/features_next/events/components/feed-layout/EmptyStateSection'
+import { EventSectionHeader } from '@/features_next/events/components/feed-layout/SectionHeader'
+import EventsSideContent from '@/features_next/events/components/feed-layout/SideContent'
+import EventsListSkeleton from '@/features_next/events/components/feed-layout/EventsListSkeleton'
 
 const EVENTS_SWITCH_OPTIONS: OptionsArray = [
   { label: 'Tous', value: 'events' },
@@ -270,7 +270,7 @@ const EventFeed = () => {
       <YStack>
         {media.sm ? (
           <YStack paddingTop={pinnedBannerOuterSpacing.paddingTop} paddingBottom={16} gap="$medium">
-            <XStack alignItems="center" justifyContent="space-between" gap="$small">
+            <XStack alignItems="center" justifyContent="space-between" gap="$small" px="$medium">
               <VoxButton variant="soft" size="lg" shrink iconLeft={ArrowLeft} theme="gray" bg="$white1" onPress={handleBack} aria-label="Retour " />
               <MapListToggle activeView="list" mapHref="/evenements/map" listHref="/evenements/list" />
             </XStack>

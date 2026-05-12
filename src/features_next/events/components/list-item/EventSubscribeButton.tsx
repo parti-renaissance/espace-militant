@@ -13,7 +13,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { useSubscribeEvent } from '@/services/events/hook'
 import { RestItemEvent } from '@/services/events/schema'
 
-import EventRegisterForm from './EventRegisterForm/EventRegisterForm'
+import EventRegisterForm from '../forms/EventRegisterForm/EventRegisterForm'
 
 type ButtonProps = ComponentPropsWithoutRef<typeof VoxButton> &
   Pick<RestItemEvent, 'uuid' | 'slug'> & {

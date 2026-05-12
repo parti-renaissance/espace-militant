@@ -11,7 +11,7 @@ import { useDestructiveAlert } from '@/components/DestructiveAlert'
 import { useCancelEvent, useDeleteEvent } from '@/services/events/hook'
 import { RestFullEvent } from '@/services/events/schema'
 
-import { isEventCancelled } from '../utils'
+import { isEventCancelled } from '../../utils'
 
 type EventHandleButtonProps = {
   eventId: string

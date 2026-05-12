@@ -7,10 +7,10 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { RestItemEvent } from '@/services/events/schema'
 
-import { EventItemProps } from '../types'
-import { getEventItemImageFallback, isEventFull, isEventPrivate } from '../utils'
+import { EventItemProps } from '../../types'
+import { getEventItemImageFallback, isEventFull, isEventPrivate } from '../../utils'
+import { EventAuthDialog } from '../detail/EventAuthComponent'
 import { CategoryChip } from './CategoryChip'
-import { EventAuthDialog } from './EventAuthComponent'
 import { EventItemActions } from './EventItemActions'
 import { EventItemHandleButton } from './EventItemHandleButton'
 import { EventListItemLiveBadge } from './EventListItemLiveBadge'

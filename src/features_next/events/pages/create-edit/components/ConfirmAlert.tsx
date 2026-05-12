@@ -13,8 +13,8 @@ import VoxSimpleModal from '@/components/VoxSimpleModal'
 import LoaderView from '@/screens/shared/LoaderView'
 import { useCountInvitationsEvent } from '@/services/events/hook'
 
-import { EventFormData } from '../schema'
-import getVisibilityOptions from '../visibility-options'
+import { EventFormData } from '../helpers/schema'
+import getVisibilityOptions from '../helpers/visibility-options'
 
 type ConfirmAlertProps = {
   onAccept: () => void | Promise<unknown>

@@ -9,7 +9,7 @@ import { Sparkle } from '@tamagui/lucide-icons'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { VoxButton } from '@/components/Button'
 import EventFeed from '@/features_next/events/pages/feed'
-import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/PinnedEventBanner'
+import { PinnedEventBanner } from '@/features_next/events/components/feed-layout/PinnedEventBanner'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
