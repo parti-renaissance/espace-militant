@@ -1,17 +1,22 @@
+import { useMemo } from 'react'
+
 import { useToastController } from '@tamagui/toast'
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 
+import type { EventMapItem } from '@/features_next/events/pages/map/EventMap'
+import { isEventPast } from '@/features_next/events/utils'
 import { EventFilters } from '@/core/entities/Event'
 import { useSession } from '@/ctx/SessionProvider'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/events/api'
 import { eventPostFormError } from '@/services/events/error'
+import { FRANCE_METRO_EVENTS_BBOX } from '@/services/events/franceMetroBounds'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook'
 
-import { RestPostCountInvitationsEventRequest, RestPostEventRequest, RestPostEventSubsciptionRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
+import { RestItemEvent, RestPostCountInvitationsEventRequest, RestPostEventRequest, RestPostEventSubsciptionRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
 import { optimisticToggleSubscribe, optimisticUpdate } from './helpers'
-import { QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
+import { QUERY_KEY_MAP_EVENTS, QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
 
 type FetchShortEventsOptions = {
   filters?: EventFilters
@@ -33,6 +38,48 @@ const buildEventsFiltersQueryKey = (filters: EventFilters | undefined) =>
         finishAfter: filters.finishAfter ? format(filters.finishAfter, 'yyyy-MM-dd HH:mm') : '',
       })
     : ''
+
+const fetchMapEvents = (sortAround: { lat: number; lng: number } | null, isAuth: boolean) => {
+  const common = {
+    page: 1,
+    filters: undefined,
+    pageSize: sortAround ? 50 : 100,
+    bbox: FRANCE_METRO_EVENTS_BBOX,
+    upcomingOnly: true,
+    ...(sortAround ? { sortAround } : {}),
+  }
+  return isAuth ? api.getEvents(common) : api.getPublicEvents(common)
+}
+
+const isFiniteCoordinate = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+
+/** Formate la liste API carte → marqueurs `EventMapItem` (coords valides + état passé). */
+export const useMapEventsFormatter = (items: RestItemEvent[] | undefined): EventMapItem[] =>
+  useMemo(() => {
+    const list = items ?? []
+    return list
+      .filter((event) => isFiniteCoordinate(event.post_address?.latitude) && isFiniteCoordinate(event.post_address?.longitude))
+      .map((event) => ({
+        uuid: event.uuid,
+        name: event.name,
+        slug: event.slug,
+        latitude: event.post_address!.latitude!,
+        longitude: event.post_address!.longitude!,
+        visibility: event.visibility,
+        isPast: isEventPast(event),
+      }))
+  }, [items])
+
+/** Carte : uniquement événements à venir (`upcomingOnly`) ; 100 sur la France puis 50 après « Recentrer ». */
+export const useEventsMapQuery = (opts: { sortAround: { lat: number; lng: number } | null }) => {
+  const { isAuth } = useSession()
+  const { sortAround } = opts
+
+  return useQuery({
+    queryKey: [QUERY_KEY_MAP_EVENTS, isAuth ? 'private' : 'public', sortAround?.lat ?? null, sortAround?.lng ?? null],
+    queryFn: () => fetchMapEvents(sortAround, isAuth),
+  })
+}
 
 export const useSuspensePaginatedEvents = (opts: { filters?: EventFilters; postalCode?: string; zoneCode?: string; enabled?: boolean }) => {
   const { isAuth } = useSession()

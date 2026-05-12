@@ -1,7 +1,6 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { Platform } from 'react-native'
-import { useFocusEffect } from '@react-navigation/native'
+import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
 import * as Location from 'expo-location'
+import { useToastController } from '@tamagui/toast'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import { FeatureCollection, Point, type Position as GeoPosition } from 'geojson'
@@ -91,6 +90,14 @@ const getZoomForNearestDistance = (distanceKm: number) => {
 /** ~11 m à l’équateur ; suffisant pour clés requête / stabilité cache. */
 const VISIBLE_BOUNDS_LNGLAT_DECIMALS = 4
 
+/** Arrondi position utilisateur avant `onUserLocationResolved` → clés React Query stables, moins d’appels API si le GPS fluctue. */
+const USER_LOCATION_COORD_DECIMALS = 4
+
+const roundUserCoordinate = (value: number) => {
+  const f = 10 ** USER_LOCATION_COORD_DECIMALS
+  return Math.round(value * f) / f
+}
+
 const roundLngLat = (p: GeoPosition): GeoPosition => {
   const f = 10 ** VISIBLE_BOUNDS_LNGLAT_DECIMALS
   return [Math.round(p[0] * f) / f, Math.round(p[1] * f) / f] as GeoPosition
@@ -127,6 +134,8 @@ type EventMapSharedProps = {
   padding?: CameraPadding
   /** Pour désactiver un bouton / afficher un chargement pendant la demande de géoloc. */
   onCenterOnUserLocationStateChange?: (isLocating: boolean) => void
+  /** Après obtention de la position (permission accordée) — ex. requête API avec `lat`/`lng`. */
+  onUserLocationResolved?: (coords: { lat: number; lng: number }) => void
 }
 
 export type EventMapProps =
@@ -142,8 +151,6 @@ export type EventMapProps =
       zoomLevel: number
     })
 
-const isNativePlatform = Platform.OS !== 'web'
-
 const EventMap = forwardRef<EventMapHandle, EventMapProps>(
   (
     {
@@ -156,24 +163,13 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       zoomLevel,
       padding,
       onCenterOnUserLocationStateChange,
+      onUserLocationResolved,
     },
     ref,
   ) => {
+    const toast = useToastController()
     const cameraRef = useRef<React.ComponentRef<typeof MapboxGl.Camera>>(null)
     const mapViewRef = useRef<React.ComponentRef<typeof MapboxGl.MapView>>(null)
-
-    // Blur: évite des mises à jour pendant le démontage. UserLocation animated={false}: sans AnimatedPoint (@rnmapbox + RN AnimatedValueXY.flattenOffset).
-    const [mountUserLocation, setMountUserLocation] = useState(!isNativePlatform)
-
-    useFocusEffect(
-      useCallback(() => {
-        if (!isNativePlatform) {
-          return undefined
-        }
-        setMountUserLocation(true)
-        return () => setMountUserLocation(false)
-      }, []),
-    )
 
     const animateCameraTo = useCallback((coord: [number, number], z: number) => {
       cameraRef.current?.setCamera({
@@ -190,7 +186,10 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
 
         const { status } = await Location.requestForegroundPermissionsAsync()
         if (status !== 'granted') {
-          console.warn("Permission de géolocalisation refusée par l'utilisateur.")
+          toast.show('Géolocalisation', {
+            message: 'Autorisez l’accès à la position pour utiliser « Recentrer ».',
+            type: 'warning',
+          })
           return
         }
 
@@ -199,6 +198,11 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
         })
 
         const userCoords: [number, number] = [position.coords.longitude, position.coords.latitude]
+
+        onUserLocationResolved?.({
+          lat: roundUserCoordinate(position.coords.latitude),
+          lng: roundUserCoordinate(position.coords.longitude),
+        })
 
         if (events.length === 0) {
           animateCameraTo(userCoords, 12)
@@ -224,10 +228,14 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
         animateCameraTo(nextCenter, zoom)
       } catch (error) {
         console.error('Erreur lors de la récupération de la position :', error)
+        toast.show('Géolocalisation', {
+          message: 'Impossible d’obtenir votre position. Réessayez dans un instant.',
+          type: 'error',
+        })
       } finally {
         onCenterOnUserLocationStateChange?.(false)
       }
-    }, [animateCameraTo, events, onCenterOnUserLocationStateChange])
+    }, [animateCameraTo, events, onCenterOnUserLocationStateChange, onUserLocationResolved, toast])
 
     const getVisibleBounds = useCallback(() => {
       const map = mapViewRef.current
@@ -271,7 +279,6 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
 
     return (
       <MapboxGl.MapView
-        key="main-events-map"
         ref={mapViewRef}
         style={{ flex: 1 }}
         styleURL={EVENTS_MAP_STYLE_URL}
@@ -281,16 +288,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
         rotateEnabled={isInteractive}
       >
         <MapboxGl.Camera ref={cameraRef} followUserLocation={false} padding={padding} {...cameraProps} />
-        {mountUserLocation ? (
-          <MapboxGl.UserLocation
-            key="main-events-map-user-location"
-            visible
-            animated={false}
-            autoTrigger
-            preventAutoCenterOnAutoTrigger
-            hideNativeGeolocateButton
-          />
-        ) : null}
+        <MapboxGl.UserLocation visible animated={false} autoTrigger preventAutoCenterOnAutoTrigger hideNativeGeolocateButton />
         <MapboxGl.Images images={EVENT_PIN_MARKERS_IMAGES} />
         {clusterEvents ? (
           <MapboxGl.ShapeSource

@@ -9,18 +9,16 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import { SideBarArea } from '@/components/AppStructure/Navigation/SideBar'
 import { VoxButton } from '@/components/Button'
 
-import { useSuspensePaginatedEvents } from '@/services/events/hook'
+import { useEventsMapQuery, useMapEventsFormatter } from '@/services/events/hook'
 
 import { MapListToggle } from '../../components/MapListToggle'
-import { isEventPast } from '../../utils'
-import EventMap, { EventMapHandle, EventMapItem, FRANCE_METRO_CAMERA_BOUNDS } from './EventMap'
-
-const isFiniteCoordinate = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
+import EventMap, { EventMapHandle, FRANCE_METRO_CAMERA_BOUNDS } from './EventMap'
 
 const EventsMapPage = () => {
   const router = useRouter()
   const eventMapRef = useRef<EventMapHandle>(null)
   const [isLocating, setIsLocating] = useState(false)
+  const [sortAround, setSortAround] = useState<{ lat: number; lng: number } | null>(null)
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const cameraPadding = useMemo(
@@ -33,25 +31,9 @@ const EventsMapPage = () => {
     [media.sm],
   )
 
-  const { data, isLoading, isFetching } = useSuspensePaginatedEvents({
-    filters: {},
-  })
+  const { data, isLoading, isFetching } = useEventsMapQuery({ sortAround })
 
-  const mapEvents = useMemo<EventMapItem[]>(() => {
-    const items = data?.pages.flatMap((page) => page.items) ?? []
-    return items
-      .filter((event) => isFiniteCoordinate(event.post_address?.latitude) && isFiniteCoordinate(event.post_address?.longitude))
-      .slice(0, 20)
-      .map((event) => ({
-        uuid: event.uuid,
-        name: event.name,
-        slug: event.slug,
-        latitude: event.post_address!.latitude!,
-        longitude: event.post_address!.longitude!,
-        visibility: event.visibility,
-        isPast: isEventPast(event),
-      }))
-  }, [data?.pages])
+  const mapEvents = useMapEventsFormatter(data?.items)
 
   const handleEventPress = (event: OnPressEvent) => {
     const firstFeature = event.features?.[0]
@@ -69,14 +51,6 @@ const EventsMapPage = () => {
     } else {
       router.replace('/evenements/hub')
     }
-  }
-
-  const handleLogVisibleBounds = () => {
-    // TODO: Implement this
-    void eventMapRef.current?.getVisibleBounds().then(
-      (bounds) => console.log('[EventsMap] visibleBounds [ne, sw]', bounds),
-      (err) => console.warn('[EventsMap] getVisibleBounds', err),
-    )
   }
 
   return (
@@ -110,10 +84,16 @@ const EventsMapPage = () => {
           initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
           padding={cameraPadding}
           onCenterOnUserLocationStateChange={setIsLocating}
+          onUserLocationResolved={setSortAround}
         />
-        {(isLoading || isFetching) && (
+        {isLoading && (
           <YStack position="absolute" right={0} bottom={0} pointerEvents="none">
             <Spinner size="large" />
+          </YStack>
+        )}
+        {isFetching && !isLoading && (
+          <YStack position="absolute" top={0} left={0} right={0} pt={insets.top} alignItems="center" pointerEvents="none" zIndex={15}>
+            <Spinner size="small" />
           </YStack>
         )}
       </YStack>
