@@ -1,6 +1,5 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
 import { Platform } from 'react-native'
-import { useFocusEffect } from '@react-navigation/native'
 import * as Location from 'expo-location'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
@@ -162,19 +161,6 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
     const cameraRef = useRef<React.ComponentRef<typeof MapboxGl.Camera>>(null)
     const mapViewRef = useRef<React.ComponentRef<typeof MapboxGl.MapView>>(null)
 
-    // Blur: évite des mises à jour pendant le démontage. UserLocation animated={false}: sans AnimatedPoint (@rnmapbox + RN AnimatedValueXY.flattenOffset).
-    const [mountUserLocation, setMountUserLocation] = useState(!isNativePlatform)
-
-    useFocusEffect(
-      useCallback(() => {
-        if (!isNativePlatform) {
-          return undefined
-        }
-        setMountUserLocation(true)
-        return () => setMountUserLocation(false)
-      }, []),
-    )
-
     const animateCameraTo = useCallback((coord: [number, number], z: number) => {
       cameraRef.current?.setCamera({
         centerCoordinate: coord,
@@ -271,7 +257,6 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
 
     return (
       <MapboxGl.MapView
-        key="main-events-map"
         ref={mapViewRef}
         style={{ flex: 1 }}
         styleURL={EVENTS_MAP_STYLE_URL}
@@ -281,9 +266,8 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
         rotateEnabled={isInteractive}
       >
         <MapboxGl.Camera ref={cameraRef} followUserLocation={false} padding={padding} {...cameraProps} />
-        {mountUserLocation ? (
+        {isNativePlatform ? (
           <MapboxGl.UserLocation
-            key="main-events-map-user-location"
             visible
             animated={false}
             autoTrigger
