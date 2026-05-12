@@ -5,7 +5,6 @@ import { EyeOff, Info } from '@tamagui/lucide-icons'
 
 import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
 import Text from '@/components/base/Text'
-import { VoxButton } from '@/components/Button'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import VoxCard from '@/components/VoxCard/VoxCard'
 

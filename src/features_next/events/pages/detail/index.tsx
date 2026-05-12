@@ -1,7 +1,7 @@
 import React from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
 
-import { GreetingCreateModal } from '@/features_next/events/components/GreetingModals/GreetingCreateModal'
+import { GreetingCreateModal } from './components/GreetingCreateModal'
 
 import { DetailedAPIErrorPayload } from '@/core/errors'
 import { useSession } from '@/ctx/SessionProvider'

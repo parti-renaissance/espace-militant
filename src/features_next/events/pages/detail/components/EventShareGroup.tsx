@@ -15,7 +15,7 @@ import * as eventTypes from '@/services/events/schema'
 import { RestEvent } from '@/services/events/schema'
 import { useGetProfil } from '@/services/profile/hook'
 
-import { isEventFull } from '../utils'
+import { isEventFull } from '@/features_next/events/utils'
 
 type Props = {
   event: Partial<RestEvent> & Pick<RestEvent, 'uuid' | 'slug'>

@@ -8,7 +8,7 @@ import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomShe
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { EventItemProps } from '@/features_next/events/types'
 
-import { useEventSharing } from '../EventShareGroup'
+import { useEventSharing } from './EventShareGroup'
 
 import EventIllustration from '@/features_next/events/assets/images/event_illustration.png'
 

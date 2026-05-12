@@ -11,9 +11,9 @@ import { VoxButton } from '@/components/Button'
 
 import { useEventsMapQuery, useMapEventsFormatter } from '@/services/events/hook'
 
-import { MapListToggle } from '../../components/MapListToggle'
-import EventMap, { EventMapHandle, FRANCE_METRO_CAMERA_BOUNDS, roundCoordinateForMapSortAround } from './EventMap'
-import { useUserLocation } from './useUserLocation'
+import { MapListToggle } from '../../components/feed-layout/MapListToggle'
+import EventMap, { EventMapHandle, FRANCE_METRO_CAMERA_BOUNDS, roundCoordinateForMapSortAround } from './components/EventMap'
+import { useUserLocation } from './hooks/useUserLocation'
 
 const EventsMapPage = () => {
   const router = useRouter()
@@ -118,11 +118,6 @@ const EventsMapPage = () => {
         {isLoading && (
           <YStack position="absolute" right={0} bottom={0} pointerEvents="none">
             <Spinner size="large" />
-          </YStack>
-        )}
-        {isFetching && !isLoading && (
-          <YStack position="absolute" top={0} left={0} right={0} pt={insets.top} alignItems="center" pointerEvents="none" zIndex={15}>
-            <Spinner size="small" />
           </YStack>
         )}
       </YStack>

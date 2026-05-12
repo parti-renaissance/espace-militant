@@ -10,8 +10,8 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
-import EventListItem from '@/features_next/events/components/EventListItem'
-import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/PinnedEventBanner'
+import EventListItem from '@/features_next/events/components/list-item/EventListItem'
+import { PinnedEventBanner } from '@/features_next/events/components/feed-layout/PinnedEventBanner'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection } from '@/features_next/events/utils'
 
@@ -22,11 +22,11 @@ import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useHits } from '@/services/hits/hook'
 import { useGetProfil } from '@/services/profile/hook'
 
-import type { EmptyStateReason } from './components/EmptyStateSection'
-import { EmptyStateSection } from './components/EmptyStateSection'
-import { EventSectionHeader } from './components/SectionHeader'
-import EventsSideContent from './components/SideContent'
-import EventsListSkeleton from './components/Skeleton'
+import type { EmptyStateReason } from '@/features_next/events/components/feed-layout/EmptyStateSection'
+import { EmptyStateSection } from '@/features_next/events/components/feed-layout/EmptyStateSection'
+import { EventSectionHeader } from '@/features_next/events/components/feed-layout/SectionHeader'
+import EventsSideContent from '@/features_next/events/components/feed-layout/SideContent'
+import EventsListSkeleton from '@/features_next/events/components/feed-layout/EventsListSkeleton'
 
 const EVENTS_SWITCH_OPTIONS: OptionsArray = [
   { label: 'Tous', value: 'events' },

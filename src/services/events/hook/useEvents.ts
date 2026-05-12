@@ -4,7 +4,7 @@ import { useToastController } from '@tamagui/toast'
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 
-import type { EventMapItem } from '@/features_next/events/pages/map/EventMap'
+import type { EventMapItem } from '@/features_next/events/pages/map/components/EventMap'
 import { isEventPast } from '@/features_next/events/utils'
 import { EventFilters } from '@/core/entities/Event'
 import { useSession } from '@/ctx/SessionProvider'

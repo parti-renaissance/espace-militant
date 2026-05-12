@@ -5,6 +5,11 @@ import { Feature, FeatureCollection, Point, type Position as GeoPosition } from 
 
 import MapboxGl from '@/components/Mapbox/Mapbox'
 
+import pinEventAdherents from '@/features_next/events/assets/images/map/event-adherents.png'
+import pinEventInvitation from '@/features_next/events/assets/images/map/event-invitation.png'
+import pinEventMilitants from '@/features_next/events/assets/images/map/event-militants.png'
+import pinEventPast from '@/features_next/events/assets/images/map/event-past.png'
+
 import type { RestItemEvent } from '@/services/events/schema'
 
 export type EventMapInitialBounds = { ne: [number, number]; sw: [number, number] }
@@ -21,10 +26,10 @@ const EVENTS_MAP_STYLE_URL = 'mapbox://styles/larem/clwaph1m1008501pg1cspgbj2'
 const DEFAULT_CENTER: [number, number] = [2.45, 46.55]
 
 const EVENT_PIN_MARKERS_IMAGES = {
-  'pin-event-past': require('./assets/event-past.png'),
-  'pin-event-militants': require('./assets/event-militants.png'),
-  'pin-event-adherents': require('./assets/event-adherents.png'),
-  'pin-event-invitation': require('./assets/event-invitation.png'),
+  'pin-event-past': pinEventPast,
+  'pin-event-militants': pinEventMilitants,
+  'pin-event-adherents': pinEventAdherents,
+  'pin-event-invitation': pinEventInvitation,
 } as const
 
 export type EventMapPinImageKey = keyof typeof EVENT_PIN_MARKERS_IMAGES

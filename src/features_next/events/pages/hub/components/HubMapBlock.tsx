@@ -6,7 +6,7 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 
 import { VoxButton } from '@/components/Button'
 
-import EventMap, { EventMapHandle, EventMapItem, FRANCE_METRO_CAMERA_BOUNDS } from '../map/EventMap'
+import EventMap, { EventMapHandle, EventMapItem, FRANCE_METRO_CAMERA_BOUNDS } from '../../map/components/EventMap'
 import { HubMapPromoOverlay } from './HubMapPromoOverlay'
 
 export type HubMapBlockProps = {
@@ -66,11 +66,6 @@ export function HubMapBlock({
         userLocationLngLat={userLocationLngLat}
       />
       <HubMapPromoOverlay leadingAccessory={promoLeadingAccessory} />
-      {showFetchingIndicator && (
-        <YStack position="absolute" top={topInset === 0 ? '$medium' : 0} pt={topInset} left={0} right={0} alignItems="center" pointerEvents="none" zIndex={15}>
-          <Spinner size="small" />
-        </YStack>
-      )}
       {showLoadingSpinner && (
         <YStack position="absolute" right={0} bottom={0} pointerEvents="none">
           <Spinner size="large" />

@@ -12,15 +12,15 @@ import { Calendar, CalendarCheck2, ChevronRight, ClipboardCheck, DoorOpen, Zap }
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import Text from '@/components/base/Text'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
-import EventListItem from '@/features_next/events/components/EventListItem'
-import { PinnedEventBanner } from '@/features_next/events/pages/feed/components/PinnedEventBanner'
+import EventListItem from '@/features_next/events/components/list-item/EventListItem'
+import { PinnedEventBanner } from '@/features_next/events/components/feed-layout/PinnedEventBanner'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
 import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useGetProfil } from '@/services/profile/hook'
 
-import EventsListSkeleton from '../feed/components/Skeleton'
+import EventsListSkeleton from '@/features_next/events/components/feed-layout/EventsListSkeleton'
 import { ButtonCard } from './ButtonCard'
 
 type HubEventRow = RestItemEvent | RestPublicItemEvent

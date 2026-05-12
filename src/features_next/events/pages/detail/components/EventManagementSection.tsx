@@ -11,9 +11,10 @@ import { getEventParticipantsFileEndpoint } from '@/services/events/api'
 import { UserScopesEnum } from '@/services/profile/schema'
 import { useEventStats } from '@/services/stats/hook'
 
-import { EventParticipantsTable } from '../components/EventParticipantsTable'
-import { isEventFull } from '../utils'
-import EventHandleActions from './EventHandleActions'
+import EventHandleActions from '@/features_next/events/components/detail/EventHandleActions'
+import { isEventFull } from '@/features_next/events/utils'
+
+import { EventParticipantsTable } from './EventParticipantsTable'
 import EventStatsCard from './EventStatsCard'
 
 const EventManagementSection = ({ event }: EventItemProps) => {

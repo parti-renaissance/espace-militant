@@ -4,7 +4,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { RestItemEvent } from '@/services/events/schema'
 
-import { isEventAdherentDuesReserved, isEventAdherentReserved, isEventInvitation, isEventPartial, isEventPrivate } from '../utils'
+import { isEventAdherentDuesReserved, isEventAdherentReserved, isEventInvitation, isEventPartial, isEventPrivate } from '../../utils'
 
 export const EventPremiumChip = ({ event }: { event: Partial<RestItemEvent> }) => {
   const isAdh = isEventAdherentReserved(event)

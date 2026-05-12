@@ -9,11 +9,11 @@ import { TABBAR_HEIGHT_SM } from '@/components/AppStructure/hooks/useLayoutSpaci
 
 import { useEventsMapQuery, useMapEventsFormatter } from '@/services/events/hook'
 
-import { EventMapHandle, roundCoordinateForMapSortAround } from '../map/EventMap'
-import { useUserLocation } from '../map/useUserLocation'
-import { EventsHubDesktop } from './EventsHubDesktop'
-import { EventsHubMobile } from './EventsHubMobile'
-import { HubMapBlock } from './HubMapBlock'
+import { EventMapHandle, roundCoordinateForMapSortAround } from '../map/components/EventMap'
+import { useUserLocation } from '../map/hooks/useUserLocation'
+import { EventsHubDesktop } from './components/EventsHubDesktop'
+import { EventsHubMobile } from './components/EventsHubMobile'
+import { HubMapBlock } from './components/HubMapBlock'
 
 const EventsHubPage = () => {
   const router = useRouter()
