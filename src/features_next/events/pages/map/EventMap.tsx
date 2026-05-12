@@ -1,9 +1,7 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
-import * as Location from 'expo-location'
-import { useToastController } from '@tamagui/toast'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
-import { FeatureCollection, Point, type Position as GeoPosition } from 'geojson'
+import { Feature, FeatureCollection, Point, type Position as GeoPosition } from 'geojson'
 
 import MapboxGl from '@/components/Mapbox/Mapbox'
 
@@ -65,6 +63,19 @@ const EVENT_POINT_SYMBOL_STYLE = {
   iconAnchor: 'bottom' as const,
 } as const
 
+/** Halo + point bleu style Maps, en `CircleLayer` (web + natif). */
+const USER_LOCATION_OUTER_STYLE = {
+  circleRadius: 12,
+  circleColor: 'rgba(66, 133, 244, 0.35)',
+} as const
+
+const USER_LOCATION_INNER_STYLE = {
+  circleRadius: 6,
+  circleColor: '#4285F4',
+  circleStrokeColor: '#FFFFFF',
+  circleStrokeWidth: 2,
+} as const
+
 const toRadians = (x: number) => (x * Math.PI) / 180
 
 const distanceInKm = (from: [number, number], to: [number, number]) => {
@@ -90,10 +101,10 @@ const getZoomForNearestDistance = (distanceKm: number) => {
 /** ~11 m à l’équateur ; suffisant pour clés requête / stabilité cache. */
 const VISIBLE_BOUNDS_LNGLAT_DECIMALS = 4
 
-/** Arrondi position utilisateur avant `onUserLocationResolved` → clés React Query stables, moins d’appels API si le GPS fluctue. */
 const USER_LOCATION_COORD_DECIMALS = 4
 
-const roundUserCoordinate = (value: number) => {
+/** Arrondi position utilisateur pour les clés `useEventsMapQuery`. */
+export const roundCoordinateForMapSortAround = (value: number) => {
   const f = 10 ** USER_LOCATION_COORD_DECIMALS
   return Math.round(value * f) / f
 }
@@ -113,6 +124,31 @@ export type EventMapItem = {
   isPast: boolean
 }
 
+const computeUserCenterCamera = (
+  userCoords: [number, number],
+  eventList: EventMapItem[],
+): { center: [number, number]; zoom: number } => {
+  if (eventList.length === 0) {
+    return { center: userCoords, zoom: 12 }
+  }
+  const eventCoordinates = eventList.map((event) => [event.longitude, event.latitude] as [number, number])
+  const nearestEvent = eventCoordinates.reduce(
+    (acc, coords) => {
+      const km = distanceInKm(userCoords, coords)
+      if (km < acc.distanceKm) {
+        return { coords, distanceKm: km }
+      }
+      return acc
+    },
+    { coords: eventCoordinates[0], distanceKm: Number.POSITIVE_INFINITY },
+  )
+
+  const nextCenter: [number, number] =
+    nearestEvent.distanceKm > 10 ? [(userCoords[0] + nearestEvent.coords[0]) / 2, (userCoords[1] + nearestEvent.coords[1]) / 2] : userCoords
+
+  return { center: nextCenter, zoom: getZoomForNearestDistance(nearestEvent.distanceKm) }
+}
+
 export type EventMapFeatureProperties = {
   uuid: string
   name: string
@@ -122,7 +158,7 @@ export type EventMapFeatureProperties = {
 
 export type EventMapHandle = {
   animateCameraTo: (centerCoordinate: [number, number], zoomLevel: number) => void
-  centerOnMyPosition: () => Promise<void>
+  flyToUserWithEventsZoom: (userCoords: [number, number]) => void
   getVisibleBounds: () => Promise<[GeoPosition, GeoPosition]>
 }
 
@@ -132,10 +168,8 @@ type EventMapSharedProps = {
   clusterEvents?: boolean
   onEventPress: (event: OnPressEvent) => void
   padding?: CameraPadding
-  /** Pour désactiver un bouton / afficher un chargement pendant la demande de géoloc. */
-  onCenterOnUserLocationStateChange?: (isLocating: boolean) => void
-  /** Après obtention de la position (permission accordée) — ex. requête API avec `lat`/`lng`. */
-  onUserLocationResolved?: (coords: { lat: number; lng: number }) => void
+  /** `[lng, lat]` — affichée via marqueur custom (source : page / `expo-location`). */
+  userLocationLngLat?: [number, number] | null
 }
 
 export type EventMapProps =
@@ -162,12 +196,10 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       centerCoordinate,
       zoomLevel,
       padding,
-      onCenterOnUserLocationStateChange,
-      onUserLocationResolved,
+      userLocationLngLat,
     },
     ref,
   ) => {
-    const toast = useToastController()
     const cameraRef = useRef<React.ComponentRef<typeof MapboxGl.Camera>>(null)
     const mapViewRef = useRef<React.ComponentRef<typeof MapboxGl.MapView>>(null)
 
@@ -180,62 +212,13 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       })
     }, [])
 
-    const centerOnMyPosition = useCallback(async () => {
-      try {
-        onCenterOnUserLocationStateChange?.(true)
-
-        const { status } = await Location.requestForegroundPermissionsAsync()
-        if (status !== 'granted') {
-          toast.show('Géolocalisation', {
-            message: 'Autorisez l’accès à la position pour utiliser « Recentrer ».',
-            type: 'warning',
-          })
-          return
-        }
-
-        const position = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        })
-
-        const userCoords: [number, number] = [position.coords.longitude, position.coords.latitude]
-
-        onUserLocationResolved?.({
-          lat: roundUserCoordinate(position.coords.latitude),
-          lng: roundUserCoordinate(position.coords.longitude),
-        })
-
-        if (events.length === 0) {
-          animateCameraTo(userCoords, 12)
-          return
-        }
-
-        const eventCoordinates = events.map((event) => [event.longitude, event.latitude] as [number, number])
-        const nearestEvent = eventCoordinates.reduce(
-          (acc, coords) => {
-            const km = distanceInKm(userCoords, coords)
-            if (km < acc.distanceKm) {
-              return { coords, distanceKm: km }
-            }
-            return acc
-          },
-          { coords: eventCoordinates[0], distanceKm: Number.POSITIVE_INFINITY },
-        )
-
-        const nextCenter: [number, number] =
-          nearestEvent.distanceKm > 10 ? [(userCoords[0] + nearestEvent.coords[0]) / 2, (userCoords[1] + nearestEvent.coords[1]) / 2] : userCoords
-
-        const zoom = getZoomForNearestDistance(nearestEvent.distanceKm)
-        animateCameraTo(nextCenter, zoom)
-      } catch (error) {
-        console.error('Erreur lors de la récupération de la position :', error)
-        toast.show('Géolocalisation', {
-          message: 'Impossible d’obtenir votre position. Réessayez dans un instant.',
-          type: 'error',
-        })
-      } finally {
-        onCenterOnUserLocationStateChange?.(false)
-      }
-    }, [animateCameraTo, events, onCenterOnUserLocationStateChange, onUserLocationResolved, toast])
+    const flyToUserWithEventsZoom = useCallback(
+      (userCoords: [number, number]) => {
+        const { center, zoom } = computeUserCenterCamera(userCoords, events)
+        animateCameraTo(center, zoom)
+      },
+      [animateCameraTo, events],
+    )
 
     const getVisibleBounds = useCallback(() => {
       const map = mapViewRef.current
@@ -249,10 +232,10 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       ref,
       () => ({
         animateCameraTo,
-        centerOnMyPosition,
+        flyToUserWithEventsZoom,
         getVisibleBounds,
       }),
-      [animateCameraTo, centerOnMyPosition, getVisibleBounds],
+      [animateCameraTo, flyToUserWithEventsZoom, getVisibleBounds],
     )
 
     const shape = useMemo<FeatureCollection<Point, EventMapFeatureProperties>>(
@@ -275,6 +258,17 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       [events],
     )
 
+    const userLocationFeature = useMemo((): Feature<Point> | null => {
+      if (!userLocationLngLat) {
+        return null
+      }
+      return {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: userLocationLngLat },
+        properties: {},
+      }
+    }, [userLocationLngLat])
+
     const cameraProps = initialBounds ? { bounds: initialBounds } : { centerCoordinate: centerCoordinate ?? DEFAULT_CENTER, zoomLevel: zoomLevel ?? 10 }
 
     return (
@@ -288,7 +282,6 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
         rotateEnabled={isInteractive}
       >
         <MapboxGl.Camera ref={cameraRef} followUserLocation={false} padding={padding} {...cameraProps} />
-        <MapboxGl.UserLocation visible animated={false} autoTrigger preventAutoCenterOnAutoTrigger hideNativeGeolocateButton />
         <MapboxGl.Images images={EVENT_PIN_MARKERS_IMAGES} />
         {clusterEvents ? (
           <MapboxGl.ShapeSource
@@ -334,6 +327,12 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
             <MapboxGl.SymbolLayer id="events-map-points" filter={['all']} style={EVENT_POINT_SYMBOL_STYLE} />
           </MapboxGl.ShapeSource>
         )}
+        {userLocationFeature ? (
+          <MapboxGl.ShapeSource id="events-map-user-location" shape={userLocationFeature} cluster={false}>
+            <MapboxGl.CircleLayer id="events-map-user-location-outer" style={USER_LOCATION_OUTER_STYLE} />
+            <MapboxGl.CircleLayer id="events-map-user-location-inner" style={USER_LOCATION_INNER_STYLE} />
+          </MapboxGl.ShapeSource>
+        ) : null}
       </MapboxGl.MapView>
     )
   },

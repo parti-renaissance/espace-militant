@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { Spinner, useMedia, YStack } from 'tamagui'
@@ -9,7 +9,8 @@ import { TABBAR_HEIGHT_SM } from '@/components/AppStructure/hooks/useLayoutSpaci
 
 import { useEventsMapQuery, useMapEventsFormatter } from '@/services/events/hook'
 
-import { EventMapHandle } from '../map/EventMap'
+import { EventMapHandle, roundCoordinateForMapSortAround } from '../map/EventMap'
+import { useUserLocation } from '../map/useUserLocation'
 import { EventsHubDesktop } from './EventsHubDesktop'
 import { EventsHubMobile } from './EventsHubMobile'
 import { HubMapBlock } from './HubMapBlock'
@@ -17,8 +18,18 @@ import { HubMapBlock } from './HubMapBlock'
 const EventsHubPage = () => {
   const router = useRouter()
   const eventMapRef = useRef<EventMapHandle>(null)
-  const [isLocating, setIsLocating] = useState(false)
-  const [sortAround, setSortAround] = useState<{ lat: number; lng: number } | null>(null)
+  const { coords, isLocating, requestLocation } = useUserLocation()
+
+  const sortAround = useMemo(
+    () =>
+      coords
+        ? {
+            lat: roundCoordinateForMapSortAround(coords[1]),
+            lng: roundCoordinateForMapSortAround(coords[0]),
+          }
+        : null,
+    [coords],
+  )
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const cameraPadding = useMemo(
@@ -52,8 +63,13 @@ const EventsHubPage = () => {
   )
 
   const handleRecenterPress = useCallback(() => {
-    void eventMapRef.current?.centerOnMyPosition()
-  }, [])
+    void (async () => {
+      const next = await requestLocation()
+      if (next) {
+        eventMapRef.current?.flyToUserWithEventsZoom(next)
+      }
+    })()
+  }, [requestLocation])
 
   const mapBlockCommonProps = {
     eventMapRef,
@@ -62,8 +78,7 @@ const EventsHubPage = () => {
     onRecenterPress: handleRecenterPress,
     padding: cameraPadding,
     isLocating,
-    onCenterOnUserLocationStateChange: setIsLocating,
-    onUserLocationResolved: setSortAround,
+    userLocationLngLat: coords,
     showLoadingSpinner: isLoading,
     showFetchingIndicator: isFetching && !isLoading,
     topInset: insets.top,

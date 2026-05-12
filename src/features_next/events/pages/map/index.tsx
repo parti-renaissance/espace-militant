@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
@@ -12,13 +12,26 @@ import { VoxButton } from '@/components/Button'
 import { useEventsMapQuery, useMapEventsFormatter } from '@/services/events/hook'
 
 import { MapListToggle } from '../../components/MapListToggle'
-import EventMap, { EventMapHandle, FRANCE_METRO_CAMERA_BOUNDS } from './EventMap'
+import EventMap, { EventMapHandle, FRANCE_METRO_CAMERA_BOUNDS, roundCoordinateForMapSortAround } from './EventMap'
+import { useUserLocation } from './useUserLocation'
 
 const EventsMapPage = () => {
   const router = useRouter()
   const eventMapRef = useRef<EventMapHandle>(null)
-  const [isLocating, setIsLocating] = useState(false)
-  const [sortAround, setSortAround] = useState<{ lat: number; lng: number } | null>(null)
+  const hasAutoFlownToUserRef = useRef(false)
+  const { coords, isLocating, requestLocation } = useUserLocation()
+
+  const sortAround = useMemo(
+    () =>
+      coords
+        ? {
+            lat: roundCoordinateForMapSortAround(coords[1]),
+            lng: roundCoordinateForMapSortAround(coords[0]),
+          }
+        : null,
+    [coords],
+  )
+
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const cameraPadding = useMemo(
@@ -34,6 +47,23 @@ const EventsMapPage = () => {
   const { data, isLoading, isFetching } = useEventsMapQuery({ sortAround })
 
   const mapEvents = useMapEventsFormatter(data?.items)
+
+  useEffect(() => {
+    if (hasAutoFlownToUserRef.current || coords == null || isLoading || isFetching) {
+      return
+    }
+    hasAutoFlownToUserRef.current = true
+    eventMapRef.current?.flyToUserWithEventsZoom(coords)
+  }, [coords, isLoading, isFetching])
+
+  const handleRecenterPress = useCallback(() => {
+    void (async () => {
+      const next = await requestLocation()
+      if (next) {
+        eventMapRef.current?.flyToUserWithEventsZoom(next)
+      }
+    })()
+  }, [requestLocation])
 
   const handleEventPress = (event: OnPressEvent) => {
     const firstFeature = event.features?.[0]
@@ -69,7 +99,7 @@ const EventsMapPage = () => {
             bg="$white1"
             aria-label="Centrer sur ma position"
             disabled={isLocating}
-            onPress={() => void eventMapRef.current?.centerOnMyPosition()}
+            onPress={handleRecenterPress}
           >
             Recentrer
           </VoxButton>
@@ -83,8 +113,7 @@ const EventsMapPage = () => {
           onEventPress={handleEventPress}
           initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
           padding={cameraPadding}
-          onCenterOnUserLocationStateChange={setIsLocating}
-          onUserLocationResolved={setSortAround}
+          userLocationLngLat={coords}
         />
         {isLoading && (
           <YStack position="absolute" right={0} bottom={0} pointerEvents="none">

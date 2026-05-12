@@ -16,8 +16,7 @@ export type HubMapBlockProps = {
   onRecenterPress: () => void
   padding: CameraPadding
   isLocating: boolean
-  onCenterOnUserLocationStateChange: (locating: boolean) => void
-  onUserLocationResolved?: (coords: { lat: number; lng: number }) => void
+  userLocationLngLat?: [number, number] | null
   showLoadingSpinner: boolean
   /** Refetch discret (pas le chargement initial plein écran). */
   showFetchingIndicator?: boolean
@@ -33,8 +32,7 @@ export function HubMapBlock({
   onRecenterPress,
   padding,
   isLocating,
-  onCenterOnUserLocationStateChange,
-  onUserLocationResolved,
+  userLocationLngLat,
   showLoadingSpinner,
   showFetchingIndicator = false,
   topInset,
@@ -65,8 +63,7 @@ export function HubMapBlock({
         onEventPress={onEventPress}
         initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
         padding={padding}
-        onCenterOnUserLocationStateChange={onCenterOnUserLocationStateChange}
-        onUserLocationResolved={onUserLocationResolved}
+        userLocationLngLat={userLocationLngLat}
       />
       <HubMapPromoOverlay leadingAccessory={promoLeadingAccessory} />
       {showFetchingIndicator && (

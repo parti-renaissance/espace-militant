@@ -1,5 +1,4 @@
-import React from 'react'
-import type { ComponentProps, ComponentType } from 'react'
+import React, { type ComponentProps, type ComponentType } from 'react'
 import * as MapboxGl from '@rnmapbox/maps'
 
 export type UserLocationProps = ComponentProps<typeof MapboxGl.UserLocation> & {
@@ -14,7 +13,7 @@ type ExtendedMapboxGl = typeof MapboxGl & {
 
 const UserLocation: ComponentType<UserLocationProps> = (props) => {
   // React-native: on ne transmet pas les props "web-only"/custom.
-  // Elles servent uniquement dans `Mapbox.web.tsx`.
+  // Sur le web, `UserLocation` est un stub dans `Mapbox.web.tsx` (géoloc = `expo-location` côté app).
   const {
     autoTrigger: _autoTrigger,
     preventAutoCenterOnAutoTrigger: _preventAutoCenterOnAutoTrigger,
