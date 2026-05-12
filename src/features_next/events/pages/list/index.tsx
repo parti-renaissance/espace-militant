@@ -270,7 +270,7 @@ const EventFeed = () => {
       <YStack>
         {media.sm ? (
           <YStack paddingTop={pinnedBannerOuterSpacing.paddingTop} paddingBottom={16} gap="$medium">
-            <XStack alignItems="center" justifyContent="space-between" gap="$small">
+            <XStack alignItems="center" justifyContent="space-between" gap="$small" px="$medium">
               <VoxButton variant="soft" size="lg" shrink iconLeft={ArrowLeft} theme="gray" bg="$white1" onPress={handleBack} aria-label="Retour " />
               <MapListToggle activeView="list" mapHref="/evenements/map" listHref="/evenements/list" />
             </XStack>
