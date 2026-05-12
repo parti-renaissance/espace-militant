@@ -17,7 +17,10 @@ export type HubMapBlockProps = {
   padding: CameraPadding
   isLocating: boolean
   onCenterOnUserLocationStateChange: (locating: boolean) => void
+  onUserLocationResolved?: (coords: { lat: number; lng: number }) => void
   showLoadingSpinner: boolean
+  /** Refetch discret (pas le chargement initial plein écran). */
+  showFetchingIndicator?: boolean
   topInset: number
   promoLeadingAccessory?: ReactNode
   variant: 'fullscreen' | 'embedded'
@@ -31,7 +34,9 @@ export function HubMapBlock({
   padding,
   isLocating,
   onCenterOnUserLocationStateChange,
+  onUserLocationResolved,
   showLoadingSpinner,
+  showFetchingIndicator = false,
   topInset,
   promoLeadingAccessory,
   variant,
@@ -61,8 +66,14 @@ export function HubMapBlock({
         initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
         padding={padding}
         onCenterOnUserLocationStateChange={onCenterOnUserLocationStateChange}
+        onUserLocationResolved={onUserLocationResolved}
       />
       <HubMapPromoOverlay leadingAccessory={promoLeadingAccessory} />
+      {showFetchingIndicator && (
+        <YStack position="absolute" top={topInset === 0 ? '$medium' : 0} pt={topInset} left={0} right={0} alignItems="center" pointerEvents="none" zIndex={15}>
+          <Spinner size="small" />
+        </YStack>
+      )}
       {showLoadingSpinner && (
         <YStack position="absolute" right={0} bottom={0} pointerEvents="none">
           <Spinner size="large" />

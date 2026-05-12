@@ -150,6 +150,14 @@ export const RestGetEventsRequestSchema = z
     zipCode: z.string(),
     subscribedOnly: z.boolean(),
     pinned: z.boolean(),
+    upcomingOnly: z.boolean(),
+    page_size: z.number(),
+    lat: z.number(),
+    lng: z.number(),
+    'bbox[ne][lat]': z.number(),
+    'bbox[ne][lng]': z.number(),
+    'bbox[sw][lat]': z.number(),
+    'bbox[sw][lng]': z.number(),
   })
   .partial()
   .merge(z.object({ page: z.number() }))
