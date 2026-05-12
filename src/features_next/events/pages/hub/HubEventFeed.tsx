@@ -177,7 +177,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
                 <Spinner size="large" />
               </YStack>
             ) : null}
-            <YStack px="$medium" pb="$medium" pt="$small" alignItems="center" gap="$medium">
+            <YStack width="100%" px="$medium" pb="$medium" pt="$small" alignItems="stretch" gap="$medium">
               <HubFooterResourceCards />
             </YStack>
           </YStack>
