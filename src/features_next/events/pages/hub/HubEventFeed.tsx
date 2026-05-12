@@ -2,11 +2,10 @@
  * Liste minimaliste du hub : bannière épinglée + inscriptions à venir uniquement.
  */
 import type { ReactNode } from 'react'
-import { memo, Suspense, useCallback, useMemo, useRef, useState } from 'react'
+import { memo, Suspense, useCallback, useMemo, useRef } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import type { Href } from 'expo-router'
-import { useRouter } from 'expo-router'
 import { getToken, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { Calendar, CalendarCheck2, ChevronRight, ClipboardCheck, DoorOpen, Zap } from '@tamagui/lucide-icons'
 
@@ -21,8 +20,8 @@ import { useSuspensePaginatedEvents } from '@/services/events/hook'
 import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useGetProfil } from '@/services/profile/hook'
 
-import { EmptyStateSection } from '../feed/components/EmptyStateSection'
 import EventsListSkeleton from '../feed/components/Skeleton'
+import { ButtonCard } from './ButtonCard'
 
 type HubEventRow = RestItemEvent | RestPublicItemEvent
 
@@ -43,96 +42,37 @@ const EventRow = memo(({ event, userUuid }: { event: HubEventRow; userUuid?: str
 
 const CREER_EVENEMENT_HREF = '/evenements/creer' as const satisfies Href
 
-const HubOrganizePromptCard = memo(function HubOrganizePromptCard(props: {
-  bg: '$green2' | '$blue2'
-  iconBubbleBg: '$green3' | '$blue3'
-  icon: ReactNode
-  title: string
-}) {
-  const { bg, iconBubbleBg, icon, title } = props
-  const router = useRouter()
-  const onPress = useCallback(() => {
-    router.push(CREER_EVENEMENT_HREF)
-  }, [router])
-
-  return (
-    <YStack
-      gap="$small"
-      bg={bg}
-      p="$medium"
-      borderRadius="$medium"
-      flex={1}
-      width="50%"
-      cursor="pointer"
-      onPress={onPress}
-      hoverStyle={{ opacity: 0.94 }}
-      pressStyle={{ opacity: 0.9 }}
-    >
-      <YStack bg={iconBubbleBg} borderRadius={99} height={44} width={44} alignItems="center" justifyContent="center">
-        {icon}
-      </YStack>
-      <Text.MD semibold>{title}</Text.MD>
-    </YStack>
-  )
-})
-
 const HubOrganizePromptCards = memo(function HubOrganizePromptCards() {
   return (
     <XStack gap="$medium" px="$medium">
-      <HubOrganizePromptCard bg="$green2" iconBubbleBg="$green3" icon={<Zap size={20} color="$green6" />} title="Organisez une action près de chez vous !" />
-      <HubOrganizePromptCard bg="$blue2" iconBubbleBg="$blue3" icon={<Calendar size={20} color="$blue6" />} title="Organisez un événement !" />
+      <YStack width="50%" flex={1}>
+        <ButtonCard theme="green" icon={Zap} label="Organisez une action près de chez vous" href={CREER_EVENEMENT_HREF} />
+      </YStack>
+      <YStack width="50%" flex={1}>
+        <ButtonCard theme="blue" icon={Calendar} label="Organisez un événement" href={CREER_EVENEMENT_HREF} />
+      </YStack>
     </XStack>
-  )
-})
-
-const HubFooterResourceRow = memo(function HubFooterResourceRow(props: { href: Href; icon: ReactNode; title: string; description: string }) {
-  const { href, icon, title, description } = props
-  const router = useRouter()
-  const onPress = useCallback(() => {
-    router.push(href)
-  }, [href, router])
-
-  return (
-    <YStack
-      borderRadius="$medium"
-      bg="$textOutline"
-      p="$medium"
-      width="100%"
-      cursor="pointer"
-      onPress={onPress}
-      hoverStyle={{ opacity: 0.94 }}
-      pressStyle={{ opacity: 0.9 }}
-    >
-      <XStack alignItems="center" gap="$medium">
-        <YStack bg="$gray2" borderRadius={99} height={44} width={44} alignItems="center" justifyContent="center">
-          {icon}
-        </YStack>
-        <YStack flex={1} gap="$small">
-          <Text.MD semibold>{title}</Text.MD>
-          <Text.SM secondary>{description}</Text.SM>
-        </YStack>
-        <YStack justifyContent="center">
-          <ChevronRight size={24} color="$textSecondary" />
-        </YStack>
-      </XStack>
-    </YStack>
   )
 })
 
 const HubFooterResourceCards = memo(function HubFooterResourceCards() {
   return (
     <>
-      <HubFooterResourceRow
+      <ButtonCard
+        horizontal
+        icon={ClipboardCheck}
+        rightIcon={ChevronRight}
+        label="Questionnaires de terrain"
+        description="Allez à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à porte."
         href="/questionnaires"
-        icon={<ClipboardCheck size={20} color="$gray5" />}
-        title="Questionnaires de terrain"
-        description="Allez à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à porte. "
       />
-      <HubFooterResourceRow
-        href="/old/porte-a-porte"
-        icon={<DoorOpen size={20} color="$gray5" />}
-        title="Porte-à-porte"
+      <ButtonCard
+        horizontal
+        icon={DoorOpen}
+        rightIcon={ChevronRight}
+        label="Porte-à-porte"
         description="Consultez la carte des adresses prioritaires pour organiser votre porte-à-porte."
+        href="/old/porte-a-porte"
       />
     </>
   )
@@ -175,10 +115,15 @@ const HubEventFeed = (props: HubEventFeedProps) => {
         <PinnedEventBanner small={true} />
       </Suspense>
       <HubOrganizePromptCards />
-      <XStack gap="$small" px="$medium">
-        <CalendarCheck2 size={16} color="$blue5" />
-        <Text.MD semibold>Mon agenda</Text.MD>
-      </XStack>
+      <YStack px="$medium" gap="$medium">
+        <XStack gap="$small">
+          <CalendarCheck2 size={16} color="$blue5" />
+          <Text.MD semibold>Mon agenda</Text.MD>
+        </XStack>
+        <Text.MD secondary semibold>
+          Vous êtes inscrits à {events.length} événement{events.length > 1 ? 's' : ''} à venir.
+        </Text.MD>
+      </YStack>
     </YStack>
   )
 
@@ -200,6 +145,16 @@ const HubEventFeed = (props: HubEventFeedProps) => {
     [listContentInsetBottom],
   )
 
+  const listEmptyComponent = useMemo(() => {
+    return (
+      <YStack px="$medium">
+        <Text.MD secondary semibold lineHeight={22}>
+          Votre agenda est vide. Vous retrouverez ici tous les événements à venir auxquels vous vous inscrirez.
+        </Text.MD>
+      </YStack>
+    )
+  }, [])
+
   return (
     <YStack flex={1} width="100%" minHeight={0} bg="$textSurface">
       <LayoutFlatList<HubEventRow>
@@ -214,7 +169,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         hasMore={hasNextPage ?? false}
-        ListEmptyComponent={showSkeleton ? <EventsListSkeleton /> : <EmptyStateSection reason={{ kind: 'agenda_empty' }} showResetButton={false} />}
+        ListEmptyComponent={showSkeleton ? <EventsListSkeleton /> : listEmptyComponent}
         ListFooterComponent={
           <YStack>
             {hasNextPage ? (

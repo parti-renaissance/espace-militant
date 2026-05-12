@@ -19,7 +19,7 @@ export const HubMapPromoOverlay = memo(function HubMapPromoOverlay({ leadingAcce
     router.push('/evenements/map')
   }, [router])
   const onOpenList = useCallback(() => {
-    router.push('/evenements')
+    router.push('/evenements/list')
   }, [router])
 
   return (

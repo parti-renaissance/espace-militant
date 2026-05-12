@@ -8,13 +8,13 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { SideBarArea } from '@/components/AppStructure/Navigation/SideBar'
 import { VoxButton } from '@/components/Button'
+
 import { useSuspensePaginatedEvents } from '@/services/events/hook'
 
+import { MapListToggle } from '../../components/MapListToggle'
 import { isEventPast } from '../../utils'
+import EventMap, { EventMapHandle, EventMapItem, FRANCE_METRO_CAMERA_BOUNDS } from './EventMap'
 
-import EventMap, { EventMapHandle, EventMapItem } from './EventMap'
-
-const DEFAULT_CENTER: [number, number] = [2.45, 46.55]
 const isFiniteCoordinate = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
 
 const EventsMapPage = () => {
@@ -32,12 +32,6 @@ const EventsMapPage = () => {
     }),
     [media.sm],
   )
-
-  const cameraZoomLevel = useMemo(() => {
-    if (media.xs) return 4.3
-    if (media.sm) return 4.6
-    return 5.5
-  }, [media.sm, media.xs])
 
   const { data, isLoading, isFetching } = useSuspensePaginatedEvents({
     filters: {},
@@ -69,12 +63,20 @@ const EventsMapPage = () => {
 
   const handleBack = () => {
     if (isWeb) {
-      router.push('/evenements')
+      router.push('/evenements/hub')
     } else if (router.canGoBack()) {
       router.back()
     } else {
-      router.replace('/evenements')
+      router.replace('/evenements/hub')
     }
+  }
+
+  const handleLogVisibleBounds = () => {
+    // TODO: Implement this
+    void eventMapRef.current?.getVisibleBounds().then(
+      (bounds) => console.log('[EventsMap] visibleBounds [ne, sw]', bounds),
+      (err) => console.warn('[EventsMap] getVisibleBounds', err),
+    )
   }
 
   return (
@@ -84,29 +86,28 @@ const EventsMapPage = () => {
           {media.gtSm ? <SideBarArea state="militant" /> : null}
           <VoxButton variant="soft" size="lg" shrink iconLeft={ArrowLeft} theme="gray" bg="$white1" onPress={handleBack} aria-label="Retour " />
         </XStack>
-        <YStack position="absolute" top="$medium" pt={insets.top} right="$medium" zIndex={20}>
+        <XStack position="absolute" top="$medium" pt={insets.top} right="$medium" zIndex={20} gap="$small">
           <VoxButton
             variant="soft"
-            size="lg"
-            shrink
+            size="xl"
             iconLeft={Crosshair}
             theme="gray"
             bg="$white1"
-            onPress={() => void eventMapRef.current?.centerOnMyPosition()}
             aria-label="Centrer sur ma position"
             disabled={isLocating}
+            onPress={() => void eventMapRef.current?.centerOnMyPosition()}
           >
             Recentrer
           </VoxButton>
-        </YStack>
+          <MapListToggle activeView="map" mapHref="/evenements/map" listHref="/evenements/list" />
+        </XStack>
         <EventMap
           ref={eventMapRef}
           events={mapEvents}
           isInteractive
           clusterEvents={false}
           onEventPress={handleEventPress}
-          centerCoordinate={DEFAULT_CENTER}
-          zoomLevel={cameraZoomLevel}
+          initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
           padding={cameraPadding}
           onCenterOnUserLocationStateChange={setIsLocating}
         />

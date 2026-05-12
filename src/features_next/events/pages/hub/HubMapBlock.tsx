@@ -6,7 +6,7 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 
 import { VoxButton } from '@/components/Button'
 
-import EventMap, { EventMapHandle, EventMapItem } from '../map/EventMap'
+import EventMap, { EventMapHandle, EventMapItem, FRANCE_METRO_CAMERA_BOUNDS } from '../map/EventMap'
 import { HubMapPromoOverlay } from './HubMapPromoOverlay'
 
 export type HubMapBlockProps = {
@@ -14,8 +14,6 @@ export type HubMapBlockProps = {
   mapEvents: EventMapItem[]
   onEventPress: (event: OnPressEvent) => void
   onRecenterPress: () => void
-  centerCoordinate: [number, number]
-  zoomLevel: number
   padding: CameraPadding
   isLocating: boolean
   onCenterOnUserLocationStateChange: (locating: boolean) => void
@@ -30,8 +28,6 @@ export function HubMapBlock({
   mapEvents,
   onEventPress,
   onRecenterPress,
-  centerCoordinate,
-  zoomLevel,
   padding,
   isLocating,
   onCenterOnUserLocationStateChange,
@@ -62,8 +58,7 @@ export function HubMapBlock({
         isInteractive
         clusterEvents={false}
         onEventPress={onEventPress}
-        centerCoordinate={centerCoordinate}
-        zoomLevel={zoomLevel}
+        initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
         padding={padding}
         onCenterOnUserLocationStateChange={onCenterOnUserLocationStateChange}
       />
