@@ -5,12 +5,10 @@ import { Copy, Share2, X } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
+import { useEventSharing } from '@/components/ShareGroup/DetailShareGroup'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { EventItemProps } from '@/features_next/events/types'
-
-import { useEventSharing } from './EventShareGroup'
-
 import EventIllustration from '@/features_next/events/assets/images/event_illustration.png'
+import { EventItemProps } from '@/features_next/events/types'
 
 export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof ModalOrBottomSheet> } & EventItemProps) => {
   const { copyUrl, isShareAvailable, openShareDialog } = useEventSharing({ event: props.event })
@@ -26,7 +24,7 @@ export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof M
       <VoxCard borderColor="$colorTransparent">
         <VoxCard.Content padding="$xlarge">
           <YStack gap="$medium" alignItems="center">
-            <Image src={EventIllustration} />
+            <Image source={EventIllustration} />
             <Text.LG textAlign="center">Nouvel événement créé </Text.LG>
           </YStack>
         </VoxCard.Content>
