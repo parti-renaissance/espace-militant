@@ -5,19 +5,20 @@ import { Image } from 'expo-image'
 import { View, XStack, YStack } from 'tamagui'
 import { Activity, CircleAlert, Maximize2, Minimize2 } from '@tamagui/lucide-icons'
 
-import Text from '@/components/base/Text'
 import Tabs from '@/components/base/Tabs/Tabs'
+import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import PanelModal from '@/components/PanelModal/PanelModal'
 
 import { Chip } from '@/components'
+import { useSession } from '@/ctx/AuthContext'
 import { useAdherentDetail } from '@/services/adherents/hook'
 import type { RestAdherentDetail, RestAdherentListItem } from '@/services/adherents/schema'
 import { getRelativeActivityLabel } from '@/utils/DateFormatter'
 
+import { ActivityTabContent } from './components/ActivityTab'
 import { ElectMandatTab } from './components/ElectMandatTap'
 import { FicheMilitantHeader } from './components/FicheMilitantHeader'
-import { ActivityTabContent } from './components/ActivityTab'
 import { IdentiteTabContent } from './components/IdentiteTab'
 import { MilitantActionButtons } from './components/MilitantActionButtons'
 
@@ -146,10 +147,18 @@ export interface MilitantDetailsPanelProps {
 
 function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }: MilitantDetailsPanelProps) {
   const [activeTab, setActiveTab] = useState<FicheMilitantTabId>('identite')
+  const [canaryActivityPreview, setCanaryActivityPreview] = useState(false)
+  const { user: profileQuery } = useSession()
+  const isCanaryTester = profileQuery.data?.canary_tester === true
 
   const { data, isLoading, isFetching, isError, error, refetch } = useAdherentDetail(uuid, scope, {
     initialData: initialData ?? undefined,
   })
+
+  useEffect(() => {
+    if (isOpen) return
+    setCanaryActivityPreview(false)
+  }, [isOpen])
 
   const displayData = data ?? (initialData as RestAdherentDetail | undefined)
   const hasSummary = displayData != null
@@ -218,7 +227,19 @@ function MilitantDetailsPanelInner({ uuid, scope, isOpen, onClose, initialData }
             <ElectMandatTab uuid={uuid} scope={scope} electTags={displayData.elect_tags} electMandates={displayData.elect_mandates} />
           )}
 
-          {activeTab === 'activite' && <ActivityTabContent uuid={uuid} scope={scope} />}
+          {activeTab === 'activite' &&
+            (isCanaryTester && canaryActivityPreview ? (
+              <ActivityTabContent uuid={uuid} scope={scope} />
+            ) : (
+              <YStack padding="$medium" flex={1} gap="$medium">
+                <Text.SM secondary>Bientôt disponible</Text.SM>
+                {isCanaryTester && (
+                  <VoxButton theme="gray" size="sm" variant="outlined" alignSelf="flex-start" onPress={() => setCanaryActivityPreview(true)}>
+                    Afficher l’activité (bêta)
+                  </VoxButton>
+                )}
+              </YStack>
+            ))}
 
           {activeTab === 'notes' && (
             <YStack padding="$medium" flex={1}>
