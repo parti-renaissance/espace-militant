@@ -14,13 +14,13 @@ import { SubscribeButton } from '@/components/Cards'
 import { ContentBackButton } from '@/components/ContentBackButton'
 import { DetailShareGroup } from '@/components/ShareGroup/DetailShareGroup'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import { formatActionDetailTitle } from '@/features_next/actions/utils/formatActionDetailTitle'
 
 import ParticipantAvatar from '@/screens/actions/ActionParticipants'
 import { mapPayload } from '@/screens/actions/utils'
 import { ActionStatus, RestActionFull } from '@/services/actions/schema'
 
 import { ActionDetailMapBlock } from './ActionDetailMap'
-import { formatActionDetailTitle } from '@/features_next/actions/utils/formatActionDetailTitle'
 
 export type ActionContentProps = {
   data: RestActionFull
@@ -110,19 +110,13 @@ const ActionInfo = ({
   )
 }
 
-const ActionMeta = ({ data, payload }: Pick<ActionInnerProps, 'data' | 'payload'>) => {
+const ActionMeta = ({ payload }: Pick<ActionInnerProps, 'payload'>) => {
   const media = useMedia()
 
   return (
     <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
       <VoxCard.Date {...payload.date} />
       <VoxCard.Location location={payload.location} />
-      <VoxCard.Attendees
-        attendees={{
-          count: data.participants.length,
-          pictures: data.participants.slice(0, 8).map((p) => p.adherent),
-        }}
-      />
     </YStack>
   )
 }
@@ -176,10 +170,10 @@ const MobileLayout = (props: ActionInnerProps) => {
       <Layout.Main maxWidth={892}>
         <LayoutScrollView padding={false}>
           <YStack paddingBottom={100}>
-            <VoxCard overflow="hidden" pb={66} borderWidth={0}>
+            <VoxCard overflow="visible" pb={66} borderWidth={0}>
               <ActionInfo {...props} />
               <VoxCard.Separator />
-              <ActionMeta data={props.data} payload={props.payload} />
+              <ActionMeta payload={props.payload} />
               <VoxCard.Separator />
               <YStack px="$medium" gap="$medium">
                 <ActionParticipantsSection data={props.data} />
@@ -209,7 +203,7 @@ const DesktopLayout = (props: ActionInnerProps) => {
               <YStack maxWidth={320} px="$medium" gap="$medium">
                 <ActionButtons {...props} />
                 <VoxCard.Separator />
-                <ActionMeta data={props.data} payload={props.payload} />
+                <ActionMeta payload={props.payload} />
                 <DetailShareGroup action={props.data} />
               </YStack>
             </XStack>

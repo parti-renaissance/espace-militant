@@ -1,4 +1,6 @@
 import React from 'react'
+import { useRouter } from 'expo-router'
+
 import Text from '@/components/base/Text'
 import { ActionCard } from '@/components/Cards'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
@@ -17,6 +19,7 @@ type ActionListProps = {
 }
 
 export const ActionList = (props: ActionListProps) => {
+  const router = useRouter()
   const user = useGetProfil()
   const isMyAction = (action: RestAction) => action?.author?.uuid === user?.data?.uuid
   if (props.loading) {
@@ -39,7 +42,7 @@ export const ActionList = (props: ActionListProps) => {
         key={action.uuid}
         isMyAction={isMyAction(action)}
         payload={mapPayload(action)}
-        onShow={() => props.setActiveAction(action)}
+        onShow={() => router.push({ pathname: '/actions/[id]', params: { id: action.uuid } })}
         onEdit={() => props?.onEdit(action)}
       />
     ))

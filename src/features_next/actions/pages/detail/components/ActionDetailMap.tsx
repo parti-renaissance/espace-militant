@@ -1,4 +1,6 @@
 import React, { useMemo } from 'react'
+import type { CameraPadding } from '@rnmapbox/maps'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia, YStack } from 'tamagui'
 import { isBefore } from 'date-fns'
 
@@ -36,11 +38,22 @@ const detailPinIconImage = [
 
 type ActionDetailMapProps = {
   action: RestAction | RestActionFull
+  cameraPadding?: CameraPadding
 }
 
-export function ActionDetailMap({ action }: ActionDetailMapProps) {
+type ActionDetailMapBlockProps = {
+  action: RestAction | RestActionFull
+}
+
+export function ActionDetailMap({ action, cameraPadding }: ActionDetailMapProps) {
+  const media = useMedia()
   const shape = useMemo(() => createSource([action as RestAction], action.uuid), [action])
   const center: [number, number] = [action.post_address.longitude, action.post_address.latitude]
+
+  /** Mobile : évite le flyTo depuis le zoom monde (animation très longue). */
+  const mobileSnapCamera = media.sm
+    ? ({ animationMode: 'moveTo' as const, animationDuration: 0 } as const)
+    : undefined
 
   return (
     <MapboxGl.MapView
@@ -52,7 +65,13 @@ export function ActionDetailMap({ action }: ActionDetailMapProps) {
       rotateEnabled={false}
       pitchEnabled={false}
     >
-      <MapboxGl.Camera followUserLocation={false} centerCoordinate={center} zoomLevel={15} />
+      <MapboxGl.Camera
+        followUserLocation={false}
+        centerCoordinate={center}
+        zoomLevel={15}
+        padding={cameraPadding}
+        {...mobileSnapCamera}
+      />
       <MapboxGl.Images images={ACTION_DETAIL_MAP_IMAGES} />
       <MapboxGl.ShapeSource id="action-detail" shape={shape} cluster={false} onPress={() => {}} hitbox={{ width: 20, height: 20 }}>
         <MapboxGl.SymbolLayer
@@ -71,12 +90,37 @@ export function ActionDetailMap({ action }: ActionDetailMapProps) {
   )
 }
 
-export function ActionDetailMapBlock({ action }: ActionDetailMapProps) {
+export function ActionDetailMapBlock({ action }: ActionDetailMapBlockProps) {
   const media = useMedia()
-  const height = media.sm ? 250 : 300
+  const insets = useSafeAreaInsets()
+  const baseHeight = media.sm ? 250 : 300
+
+  if (media.sm) {
+    const top = insets.top
+    const cameraPadding: CameraPadding = {
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingTop: top,
+      paddingBottom: 0,
+    }
+
+    return (
+      <YStack
+        height={baseHeight + top}
+        width="100%"
+        flexShrink={0}
+        overflow="hidden"
+        position="relative"
+        borderRadius={0}
+        marginTop={-top}
+      >
+        <ActionDetailMap action={action} cameraPadding={cameraPadding} />
+      </YStack>
+    )
+  }
 
   return (
-    <YStack height={height} width="100%" flexShrink={0} overflow="hidden" position="relative" borderRadius={0}>
+    <YStack height={baseHeight} width="100%" flexShrink={0} overflow="hidden" position="relative" borderRadius={0}>
       <ActionDetailMap action={action} />
     </YStack>
   )
