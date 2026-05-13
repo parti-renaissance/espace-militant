@@ -4,7 +4,7 @@ import { Controller } from 'react-hook-form'
 import Select from '@/components/base/Select/SelectV3'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
-import { EventFormContext } from '../context'
+import { EventFormContext } from '../helpers/context'
 
 const _EventScopeSelect = (props: Pick<EventFormContext, 'control' | 'isAuthor' | 'editMode' | 'scopeOptions'>) => {
   return props.editMode ? null : (

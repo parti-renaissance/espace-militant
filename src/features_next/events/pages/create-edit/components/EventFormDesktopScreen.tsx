@@ -17,8 +17,8 @@ import { VoxHeader } from '@/components/Header/Header'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
-import EventHandleActions from '../../../components/EventHandleActions'
-import { useEventFormContext } from '../context'
+import EventHandleActions from '../../../components/detail/EventHandleActions'
+import { useEventFormContext } from '../helpers/context'
 import DescriptionInput from './DescriptionInput'
 import EventDatesField from './EventDatesField'
 import EventHiddenField from './EventHiddenField'
@@ -38,6 +38,7 @@ const EventFormAside = () => {
     handleOnChangeFinishAt,
     isAgoraLeader,
     isAgoraScope,
+    visibility,
   } = useEventFormContext()
 
   return (
@@ -65,7 +66,7 @@ const EventFormAside = () => {
 
         <Controller
           render={({ field }) => {
-            return <EventHiddenField value={field.value} onChange={field.onChange} />
+            return <EventHiddenField value={field.value} onChange={field.onChange} disabled={visibility === 'invitation'} />
           }}
           control={control}
           name="hidden"

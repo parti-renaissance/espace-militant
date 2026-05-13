@@ -5,27 +5,27 @@ import { EyeOff, Info } from '@tamagui/lucide-icons'
 
 import SwitchV2 from '@/components/base/SwitchV2/SwitchV2'
 import Text from '@/components/base/Text'
-import { VoxButton } from '@/components/Button'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 type EventHiddenFieldProps = {
   value: boolean
   onChange: (value: boolean) => void
+  disabled?: boolean
 }
-const EventHiddenField = ({ value, onChange }: EventHiddenFieldProps) => {
+const EventHiddenField = ({ value, onChange, disabled = false }: EventHiddenFieldProps) => {
   const [open, setOpen] = useState(false)
   const media = useMedia()
   return (
     <>
       <XStack alignItems="center" justifyContent="space-between" gap="$small" px="$medium">
         <XStack gap="$small">
-          <Text.MD secondary>Événement non répertorié ?</Text.MD>
+          <Text.MD color={disabled ? '$textDisabled' : '$textSecondary'}>Événement non répertorié ?</Text.MD>
           <Pressable onPress={() => setOpen(true)}>
             <Info size={16} color="$blue5" />
           </Pressable>
         </XStack>
-        <SwitchV2 checked={value} onPress={() => onChange(!value)} />
+        <SwitchV2 checked={value} disabled={disabled} onPress={() => !disabled && onChange(!value)} />
       </XStack>
       <ModalOrBottomSheet open={open} onClose={() => setOpen(false)}>
         <VoxCard maxWidth={media.sm ? undefined : 500} borderWidth={media.sm ? 0 : 1} paddingBottom={media.sm ? '$large' : undefined}>

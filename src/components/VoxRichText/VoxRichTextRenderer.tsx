@@ -1,26 +1,26 @@
 import React from 'react'
-import { 
-  BoldBridge,
-  CodeBridge,
-  ItalicBridge,
-  HistoryBridge,
-  StrikeBridge,
-  OrderedListBridge,
-  HeadingBridge,
-  ListItemBridge,
-  BulletListBridge,
+import {
   BlockquoteBridge,
-  UnderlineBridge,
-  TaskListBridge,
-  LinkBridge,
-  ColorBridge,
-  HighlightBridge,
+  BoldBridge,
+  BulletListBridge,
+  CodeBridge,
   CoreBridge,
-  PlaceholderBridge,
   HardBreakBridge,
+  HeadingBridge,
+  HighlightBridge,
+  HistoryBridge,
+  ItalicBridge,
+  LinkBridge,
+  ListItemBridge,
+  OrderedListBridge,
+  PlaceholderBridge,
   RichText,
-  useEditorBridge 
+  StrikeBridge,
+  TaskListBridge,
+  UnderlineBridge,
+  useEditorBridge,
 } from '@10play/tentap-editor'
+
 import { CUSTOM_FONT_VIEW } from './constants'
 
 const editorExtensions = [
@@ -36,7 +36,6 @@ const editorExtensions = [
   BlockquoteBridge,
   TaskListBridge,
   LinkBridge,
-  ColorBridge,
   HighlightBridge,
   ListItemBridge,
   HardBreakBridge,
@@ -57,11 +56,11 @@ type VoxRichTextRendererProps = {
   placeholder?: string
 }
 
-export const VoxRichTextRenderer: React.FC<VoxRichTextRendererProps> = ({ 
-  value, 
-  matchContent = false, 
+export const VoxRichTextRenderer: React.FC<VoxRichTextRendererProps> = ({
+  value,
+  matchContent = false,
   primary = false,
-  placeholder = 'Décrivez votre contenu...'
+  placeholder = 'Décrivez votre contenu...',
 }) => {
   const editor = useEditorBridge({
     editable: false,
@@ -85,4 +84,3 @@ export const VoxRichTextRenderer: React.FC<VoxRichTextRendererProps> = ({
     />
   )
 }
-

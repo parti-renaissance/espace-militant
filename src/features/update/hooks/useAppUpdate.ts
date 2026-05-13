@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AppState, AppStateStatus, Platform } from 'react-native'
 import { checkVersion } from 'react-native-check-version'
 import NetInfo from '@react-native-community/netinfo'
@@ -53,7 +53,7 @@ export const useCheckStoreUpdate = () => {
   const [isBuildUpdateAvailable, setIsBuildUpdateAvailable] = useState(false)
   const [isError, setIsError] = useState<Error | null>(null)
 
-  useAppStateOnChange(async () => {
+  const runStoreUpdateCheck = useCallback(async () => {
     try {
       setIsPending(true)
       setIsError(null)
@@ -67,7 +67,9 @@ export const useCheckStoreUpdate = () => {
       setIsError(error)
       setIsBuildUpdateAvailable(false)
     }
-  })
+  }, [])
+
+  useAppStateOnChange(runStoreUpdateCheck)
 
   return {
     isAvailable: isBuildUpdateAvailable,
@@ -81,13 +83,28 @@ export const useCheckExpoUpdate = () => {
   const [isProcessing, setIsProcessing] = useState(false)
   const { isConnected } = NetInfo.useNetInfo()
   const updatesState = useUpdates()
-  useAppStateOnChange(async () => {
+  const isExpoCheckRunningRef = useRef(false)
+  const didSkipExpoCheckDueToOfflineRef = useRef(false)
+  const latestUpdateIdRef = useRef<string | undefined>(undefined)
+
+  useEffect(() => {
+    latestUpdateIdRef.current = updatesState.availableUpdate?.updateId
+  }, [updatesState.availableUpdate?.updateId])
+
+  const runExpoUpdateCheck = useCallback(async () => {
+    if (isExpoCheckRunningRef.current) {
+      return
+    }
     try {
       setIsError(null)
-      if (!isConnected) {
+      // NetInfo can be null on cold start; only skip when explicitly offline.
+      if (isConnected === false) {
+        didSkipExpoCheckDueToOfflineRef.current = true
         setIsProcessing(false)
         return
       }
+      didSkipExpoCheckDueToOfflineRef.current = false
+      isExpoCheckRunningRef.current = true
       const { isAvailable } = await checkForUpdateAsync()
       if (isAvailable) {
         setIsProcessing(true)
@@ -102,11 +119,22 @@ export const useCheckExpoUpdate = () => {
         ErrorMonitor.log('ErrorWhileUpdatingApp', {
           message: error.message,
           stack: error.stack,
-          updateId: updatesState.availableUpdate?.updateId,
+          updateId: latestUpdateIdRef.current,
         })
       }
+    } finally {
+      isExpoCheckRunningRef.current = false
     }
-  })
+  }, [isConnected])
+
+  useAppStateOnChange(runExpoUpdateCheck)
+
+  useEffect(() => {
+    // Rerun only when we explicitly skipped because we were offline.
+    if (isConnected === true && didSkipExpoCheckDueToOfflineRef.current && !isExpoCheckRunningRef.current) {
+      handleCallback(runExpoUpdateCheck)
+    }
+  }, [isConnected, runExpoUpdateCheck])
 
   return {
     isAvailable: updatesState.isUpdateAvailable,

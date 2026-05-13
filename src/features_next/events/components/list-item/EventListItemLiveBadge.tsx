@@ -7,7 +7,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { RestItemEvent } from '@/services/events/schema'
 import { getHumanFormattedTime } from '@/utils/date'
 
-import { isEventHasNationalLive, isEventStarted } from '../utils'
+import { isEventHasNationalLive, isEventStarted } from '../../utils'
 
 export const EventListItemLiveBadge = ({ event }: { event: Partial<RestItemEvent> }) => {
   const startDate = event.begin_at ? new Date(event.begin_at) : null

@@ -12,6 +12,7 @@ import { isSupported } from '@firebase/messaging'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
+import MapboxGl from '@/components/Mapbox/Mapbox'
 import { PortalLayout } from '@/components/layouts/PortalLayout'
 import WaitingScreen from '@/components/WaitingScreen'
 import { useInitPushNotification } from '@/features/push-notification/hook'
@@ -19,12 +20,15 @@ import initRootAppNotification from '@/features/push-notification/logic/initRoot
 import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks/useAppUpdate'
 import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen'
 
+import clientEnv from '@/config/clientEnv'
 import { SessionProvider, useSession } from '@/ctx/SessionProvider'
 import useDeepLinkHandler from '@/hooks/useDeepLinkHandler'
 import useImportFont from '@/hooks/useImportFont'
 import { useHits } from '@/services/hits/hook'
 import { useInitMatomo } from '@/services/matomo/hook'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+
+MapboxGl.setAccessToken(clientEnv.MAP_BOX_ACCESS_TOKEN)
 
 if (isWeb) {
   require('@tamagui/core/reset.css')

@@ -8,7 +8,7 @@ import { EventItemProps } from '@/features_next/events/types'
 import clientEnv from '@/config/clientEnv'
 import { useSession } from '@/ctx/SessionProvider'
 
-import { isEventHasNationalLive, isEventStarted } from '../utils'
+import { isEventHasNationalLive, isEventStarted } from '../../utils'
 import EventLiveCountDown from './EventLiveCountDown'
 
 export const EventLive = ({ event }: EventItemProps) => {

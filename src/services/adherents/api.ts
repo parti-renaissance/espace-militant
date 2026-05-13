@@ -88,6 +88,23 @@ export const putAdherentElectMandate = (props: PutAdherentElectMandateProps) =>
     type: 'private',
   })(props.payload)
 
+export const getAdherentActivity = (uuid: string) =>
+  api({
+    method: 'get',
+    path: `/api/v3/adherents/${uuid}/activity`,
+    requestSchema: schemas.RestAdherentActivityRequestSchema,
+    responseSchema: schemas.RestAdherentActivityResponseSchema,
+    type: 'private',
+  })
+
+export const getAdherentActivityFilters = api({
+  method: 'get',
+  path: `/api/v3/adherent-activity-filters`,
+  requestSchema: z.object({ scope: z.string() }),
+  responseSchema: schemas.RestAdherentActivityFilterSchema,
+  type: 'private',
+})
+
 export const deleteAdherentElectMandate = (props: { mandateUuid: string; scope: string }) =>
   api({
     method: 'delete',

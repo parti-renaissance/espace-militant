@@ -1,6 +1,5 @@
 import React, { forwardRef, useImperativeHandle } from 'react'
 import MapboxGl from '@/components/Mapbox/Mapbox'
-import clientEnv from '@/config/clientEnv'
 import { ActionStatus, ActionType } from '@/services/actions/schema'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import * as turf from '@turf/turf'
@@ -29,8 +28,6 @@ const getDynamicMarkerIcon = [
   ['case', ...Object.values(ActionType).flatMap(getActiveMarketIcon), ActionType.TRACTAGE],
   ['case', ...Object.values(ActionType).flatMap(getMarkerIcon), ActionType.TRACTAGE],
 ]
-
-MapboxGl.setAccessToken(clientEnv.MAP_BOX_ACCESS_TOKEN)
 
 export type MapViewRef = {
   camera: MapboxGl.Camera | null

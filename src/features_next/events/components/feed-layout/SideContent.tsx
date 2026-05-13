@@ -4,7 +4,7 @@ import { isWeb, useMedia, YStack, YStackProps } from 'tamagui'
 import { Sparkle } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
-import EventFilterForm from '@/features_next/events/components/EventFilterForm/EventFilterForm'
+import EventFilterForm from '@/features_next/events/components/forms/EventFilterForm/EventFilterForm'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'

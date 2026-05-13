@@ -105,6 +105,7 @@ export default function ModalOrPageBase({
               backgroundColor={'white'}
               contentContainerStyle={{
                 flexGrow: 1,
+                paddingBottom: insets.bottom,
               }}
             >
               {modalContent}

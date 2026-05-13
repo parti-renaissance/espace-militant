@@ -1,10 +1,12 @@
 import { useToastController } from '@tamagui/toast'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { QueryClient } from '@tanstack/react-query'
 
 import * as api from '@/services/adherents/api'
 import { declarationsValues } from '@/services/adherents/constants'
 import type {
+  RestAdherentActivityFilter,
+  RestAdherentActivityResponse,
   RestAdherentDetail,
   RestAdherentDonation,
   RestAdherentElectMandate,
@@ -37,6 +39,9 @@ export const adherentKeys = {
   sensitive: (type: RestAdherentSensitiveRequest['type'], uuid: string | undefined) => [...adherentKeys.all, 'sensitive', type, uuid] as const,
   donations: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'donations', uuid, scope] as const,
   elect: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'elect', uuid, scope] as const,
+  activity: (uuid: string | undefined, scope: string | undefined, sourceType?: string, eventType?: string) =>
+    [...adherentKeys.all, 'activity', uuid, scope, sourceType ?? null, eventType ?? null] as const,
+  activityFilters: (scope: string | undefined) => [...adherentKeys.all, 'activity-filters', scope] as const,
 }
 
 const getMandateTypeLabel = (mandateType: string): string => declarationsValues.find((d) => d.value === mandateType)?.label ?? mandateType
@@ -167,6 +172,41 @@ export const useAdherentDonations = (uuid: string | undefined, scope: string | u
       const safeScope = requireParam(scope, 'scope')
       return api.getAdherentDonations(safeUuid)({ scope: safeScope })
     },
+    enabled: Boolean(uuid && scope),
+    staleTime: 60 * 1000,
+  })
+}
+
+export type UseAdherentActivityFilters = {
+  sourceType?: string
+  eventType?: string
+}
+
+export const useAdherentActivityFilters = (scope: string | undefined) => {
+  return useQuery<RestAdherentActivityFilter>({
+    queryKey: adherentKeys.activityFilters(scope),
+    queryFn: () => api.getAdherentActivityFilters({ scope: requireParam(scope, 'scope') }),
+    enabled: Boolean(scope),
+    staleTime: Infinity,
+    gcTime: Infinity,
+  })
+}
+
+export const useAdherentActivity = (uuid: string | undefined, scope: string | undefined, filters?: UseAdherentActivityFilters) => {
+  return useInfiniteQuery<RestAdherentActivityResponse>({
+    queryKey: adherentKeys.activity(uuid, scope, filters?.sourceType, filters?.eventType),
+    queryFn: ({ pageParam = 1 }) => {
+      const safeUuid = requireParam(uuid, 'uuid')
+      const safeScope = requireParam(scope, 'scope')
+      return api.getAdherentActivity(safeUuid)({
+        scope: safeScope,
+        page: pageParam as number,
+        ...(filters?.sourceType && { source_type: filters.sourceType }),
+        ...(filters?.eventType && { event_type: filters.eventType }),
+      })
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => (lastPage.metadata.current_page < lastPage.metadata.last_page ? lastPage.metadata.current_page + 1 : undefined),
     enabled: Boolean(uuid && scope),
     staleTime: 60 * 1000,
   })
