@@ -45,26 +45,30 @@ const ProfilMenu = () => {
         ))}
       </Menu>
 
-      {clientEnv.ENVIRONMENT === 'staging' && (
+      {(clientEnv.ENVIRONMENT === 'staging' || profile?.canary_tester === true) && (
         <Menu>
-          <Link href="/chatbot" asChild={!isWeb}>
-            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Bot}>
-              Chatbot
-            </Menu.Item>
-          </Link>
-          <Link href="/tools/storybook" asChild={!isWeb}>
-            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={PenLine}>
-              StoryBook
-            </Menu.Item>
-          </Link>
-          <Link href="/webview" asChild={!isWeb}>
-            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Globe}>
-              Webview
-            </Menu.Item>
-          </Link>
+          {clientEnv.ENVIRONMENT === 'staging' && (
+            <>
+              <Link href="/chatbot" asChild={!isWeb}>
+                <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Bot}>
+                  Chatbot
+                </Menu.Item>
+              </Link>
+              <Link href="/tools/storybook" asChild={!isWeb}>
+                <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={PenLine}>
+                  StoryBook
+                </Menu.Item>
+              </Link>
+              <Link href="/webview" asChild={!isWeb}>
+                <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Globe}>
+                  Webview
+                </Menu.Item>
+              </Link>
+            </>
+          )}
           <Link href="/evenements/hub" asChild={!isWeb}>
             <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={MapPin} last>
-              Hub événements
+              Hub événements (Bêta)
             </Menu.Item>
           </Link>
         </Menu>
