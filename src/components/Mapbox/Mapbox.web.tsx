@@ -142,6 +142,8 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
     }
   }, [])
 
+  const { children, styleURL, pitchEnabled, scrollEnabled, zoomEnabled, rotateEnabled } = props
+
   const handleMapClick = useCallback((e: mapboxgl.MapLayerMouseEvent) => {
     if (!e.features || e.features.length === 0) return
 
@@ -158,17 +160,22 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
   const resetMapCursor = useCallback(() => {
     const map = mapRef.current?.getMap()
     if (!map) return
-    map.getCanvas().style.cursor = ''
-  }, [])
+    map.getCanvas().style.cursor = pitchEnabled === false ? 'default' : ''
+  }, [pitchEnabled])
 
-  const handleInteractiveLayersMouseMove = useCallback((e: mapboxgl.MapLayerMouseEvent) => {
-    const map = mapRef.current?.getMap()
-    if (!map) return
-    const features = e.features
-    map.getCanvas().style.cursor = features && features.length > 0 ? 'pointer' : ''
-  }, [])
-
-  const { children, styleURL, pitchEnabled, scrollEnabled, zoomEnabled, rotateEnabled } = props
+  const handleInteractiveLayersMouseMove = useCallback(
+    (e: mapboxgl.MapLayerMouseEvent) => {
+      const map = mapRef.current?.getMap()
+      if (!map) return
+      if (pitchEnabled === false) {
+        map.getCanvas().style.cursor = 'default'
+        return
+      }
+      const features = e.features
+      map.getCanvas().style.cursor = features && features.length > 0 ? 'pointer' : ''
+    },
+    [pitchEnabled],
+  )
 
   const dragPan = scrollEnabled !== false
   const scrollZoom = zoomEnabled !== false

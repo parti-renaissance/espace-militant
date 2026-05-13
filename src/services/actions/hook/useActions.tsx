@@ -5,7 +5,7 @@ import { Action, RestActionFull, RestActionRequestParams, RestActions, SelectPer
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
 import { useToastController } from '@tamagui/toast'
-import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { optimisticToggleSubscribe, QUERY_KEY_ACTIONS, QUERY_KEY_PAGINATED_ACTIONS } from './helpers'
 
 type ParamsEnabled = Omit<RestActionRequestParams, 'page'> & {
@@ -61,6 +61,17 @@ export const useAction = (id?: string, paginatedParams?: Params) => {
     enabled: !!id,
     staleTime: 10_000,
     placeholderData,
+  })
+}
+
+export const useGetAction = ({ id }: { id: string }) => {
+  const { scope } = useSession()
+  const myScope = scope?.data?.find((x) => x.features.includes('actions'))
+
+  return useSuspenseQuery({
+    queryKey: [QUERY_KEY_ACTIONS, id, myScope?.code],
+    queryFn: () => api.getAction(id, myScope?.code),
+    staleTime: 10_000,
   })
 }
 

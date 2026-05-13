@@ -1,12 +1,14 @@
-import { VoxButton } from '@/components/Button'
-import VoxCard, { VoxCardAttendeesProps, VoxCardAuthorProps, VoxCardDateProps, VoxCardFrameProps, VoxCardLocationProps } from '@/components/VoxCard/VoxCard'
-import { useSubscribeAction, useUnsubscribeAction } from '@/services/actions/hook/useActions'
-import { ActionStatus } from '@/services/actions/schema'
+import { XStack } from 'tamagui'
 import { Clock9, Eye, Sparkle, XCircle, Zap, ZapOff } from '@tamagui/lucide-icons'
 import { isBefore } from 'date-fns'
 import { capitalize } from 'lodash'
-import { XStack } from 'tamagui'
 import { useDebouncedCallback } from 'use-debounce'
+
+import { VoxButton } from '@/components/Button'
+import VoxCard, { VoxCardAttendeesProps, VoxCardAuthorProps, VoxCardDateProps, VoxCardFrameProps, VoxCardLocationProps } from '@/components/VoxCard/VoxCard'
+
+import { useSubscribeAction, useUnsubscribeAction } from '@/services/actions/hook/useActions'
+import { ActionStatus } from '@/services/actions/schema'
 
 export type ActionVoxCardProps = {
   onShow?: () => void
@@ -85,7 +87,7 @@ export function SubscribeButton({ isRegister, id, large, ...props }: { isRegiste
       variant={'outlined'}
       theme="green"
       animation="quick"
-      size={large ? 'lg' : 'md'}
+      size={large ? 'xl' : 'md'}
       full={large}
       onPress={() => handleOnSubscribe(isRegister)}
       iconLeft={isRegister ? ZapOff : Zap}

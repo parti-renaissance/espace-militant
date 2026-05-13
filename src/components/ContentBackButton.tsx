@@ -22,7 +22,7 @@ export const ContentBackButton = ({ fallbackPath = '/' as Href, label = 'Retour'
   }
 
   return (
-    <XStack alignItems="flex-start" alignSelf="flex-start" display="none" $gtSm={{ display: 'flex' }}>
+    <XStack alignItems="flex-start" alignSelf="flex-start" display="none" pb={0} $gtSm={{ display: 'flex', pb: '$medium' }}>
       <VoxButton variant="text" iconLeft={ArrowLeft} borderRadius={16} onPress={handleBack}>
         {label}
       </VoxButton>
