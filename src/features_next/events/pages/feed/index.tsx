@@ -1,4 +1,4 @@
-import { memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
@@ -12,6 +12,7 @@ import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import EventListItem from '@/features_next/events/components/list-item/EventListItem'
 import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
+import { QueryBoundary } from '@/components/QueryBoundary'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection } from '@/features_next/events/utils'
 
@@ -257,9 +258,9 @@ const EventFeed = () => {
       <YStack>
         {media.sm ? (
           <YStack paddingTop={hasPinnedBannerContent ? pinnedBannerOuterSpacing.paddingTop : 0} paddingBottom={hasPinnedBannerContent && media.sm ? 16 : 0}>
-            <Suspense fallback={null}>
+            <QueryBoundary>
               <PinnedItemBanner />
-            </Suspense>
+            </QueryBoundary>
           </YStack>
         ) : null}
         <YStack gap="$medium" px={media.sm ? '$medium' : 0}>

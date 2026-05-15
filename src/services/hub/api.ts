@@ -10,3 +10,12 @@ export const getHubItems = (params: GetHubItemsParametersMapperProps) =>
     responseSchema: schemas.RestGetHubItemsResponseSchema,
     type: 'private',
   })(mapParams(params))
+
+export const getPublicHubItems = (params: GetHubItemsParametersMapperProps) =>
+  api({
+    method: 'get',
+    path: '/api/hub-item',
+    requestSchema: schemas.RestGetHubItemsRequestSchema,
+    responseSchema: schemas.RestGetHubItemsResponseSchema,
+    type: 'public',
+  })(mapParams(params))

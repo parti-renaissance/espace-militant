@@ -8,7 +8,6 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { SideBarArea } from '@/components/AppStructure/Navigation/SideBar'
 import { VoxButton } from '@/components/Button'
-
 import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
 import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 

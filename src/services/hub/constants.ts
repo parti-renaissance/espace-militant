@@ -2,9 +2,12 @@ import type { HubItemsRequestParams } from './paramsMapper'
 
 // ---------- Query keys ----------
 
+export type HubItemsQueryScope = 'private' | 'public'
+
 export const hubKeys = {
   all: ['hub'] as const,
-  items: (params: HubItemsRequestParams & { page?: number }) => [...hubKeys.all, 'items', params] as const,
+  items: (params: HubItemsRequestParams & { page?: number }, scope: HubItemsQueryScope) =>
+    [...hubKeys.all, 'items', scope, params] as const,
 }
 
 // ---------- Bbox géographique ----------

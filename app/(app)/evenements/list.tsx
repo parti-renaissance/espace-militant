@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import { useRouter } from 'expo-router'
 import Head from 'expo-router/head'
 import { useMedia, XStack, YStack } from 'tamagui'
@@ -9,6 +9,7 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import { VoxButton } from '@/components/Button'
 import { MapListToggle } from '@/features_next/events/components/feed-layout/MapListToggle'
 import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
+import { QueryBoundary } from '@/components/QueryBoundary'
 import HubFeed from '@/features_next/events/pages/list'
 
 import * as metatags from '@/config/metatags'
@@ -32,9 +33,9 @@ const EventsListRoute = () => {
         <VoxButton variant="soft" size="lg" shrink iconLeft={ArrowLeft} theme="gray" bg="$white1" onPress={handleBack} aria-label="Retour " />
         <MapListToggle activeView="list" mapHref="/evenements/map" listHref="/evenements/list" />
       </XStack>
-      <Suspense fallback={null}>
+      <QueryBoundary>
         <PinnedItemBanner />
-      </Suspense>
+      </QueryBoundary>
     </YStack>
   )
 

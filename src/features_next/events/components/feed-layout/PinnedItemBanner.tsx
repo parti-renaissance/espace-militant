@@ -13,7 +13,7 @@ import { getEventItemImageFallback, isEventPartial } from '@/features_next/event
 
 import { useSession } from '@/ctx/SessionProvider'
 import type { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
-import { usePinnedHubItemsSuspenseInfiniteQuery } from '@/services/hub/hook'
+import { usePinnedHubItemsInfiniteQuery } from '@/services/hub/hook'
 import { mapHubItemsToPinnedEvents } from '@/services/hub/mapper'
 
 import { FadingScrollView } from './FadingScrollView'
@@ -160,15 +160,16 @@ export function PinnedItemBanner({ small = false }: PinnedItemBannerProps = {}) 
   const media = useMedia()
   const { session } = useSession()
   const isAuthenticated = Boolean(session)
-  const { data } = usePinnedHubItemsSuspenseInfiniteQuery()
+  const { data, isError } = usePinnedHubItemsInfiniteQuery()
+
   const events = useMemo(() => {
-    const allEvents = mapHubItemsToPinnedEvents(data.pages.flatMap((page) => page?.items ?? []))
+    const allEvents = mapHubItemsToPinnedEvents(data?.pages.flatMap((page) => page?.items ?? []) ?? [])
     if (isAuthenticated) return allEvents
     return allEvents.filter((event) => !isEventPartial(event))
-  }, [data.pages, isAuthenticated])
+  }, [data?.pages, isAuthenticated])
   const isSmallContainer = small ? true : Boolean(media.sm)
 
-  if (events.length === 0) return null
+  if (isError || events.length === 0) return null
 
   if (events.length === 2 && !isSmallContainer) {
     return (

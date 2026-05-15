@@ -1,4 +1,4 @@
-import { memo, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { useRouter } from 'expo-router'
@@ -13,7 +13,7 @@ import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import { assemblies } from '@/components/AssemblySelect/assemblies'
 import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import { VoxButton } from '@/components/Button'
-import TrackImpressionWeb from '@/components/TrackImpressionWeb'
+import { QueryBoundary } from '@/components/QueryBoundary'
 import type { EmptyStateReason } from '@/features_next/events/components/feed-layout/EmptyStateSection'
 import { EmptyStateSection } from '@/features_next/events/components/feed-layout/EmptyStateSection'
 import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
@@ -373,9 +373,9 @@ const HubFeed = () => {
               <VoxButton variant="soft" size="lg" shrink iconLeft={ArrowLeft} theme="gray" bg="$white1" onPress={handleBack} aria-label="Retour " />
               <MapListToggle activeView="list" mapHref="/evenements/map" listHref="/evenements/list" />
             </XStack>
-            <Suspense fallback={null}>
+            <QueryBoundary>
               <PinnedItemBanner />
-            </Suspense>
+            </QueryBoundary>
           </YStack>
         ) : null}
         <YStack gap="$medium" px={media.sm ? '$medium' : 0}>

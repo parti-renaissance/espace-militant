@@ -2,7 +2,7 @@
  * Liste minimaliste du hub : bannière épinglée + inscriptions à venir uniquement.
  */
 import type { ReactNode } from 'react'
-import { memo, Suspense, useCallback, useMemo, useRef } from 'react'
+import { memo, useCallback, useMemo, useRef } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import type { Href } from 'expo-router'
@@ -16,6 +16,7 @@ import HubListSkeleton from '@/features_next/events/components/feed-layout/HubLi
 import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
 import EventListItem from '@/features_next/events/components/list-item/EventListItem'
 
+import { QueryBoundary } from '@/components/QueryBoundary'
 import { useSession } from '@/ctx/SessionProvider'
 import type { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
@@ -117,9 +118,9 @@ const HubEventFeed = (props: HubEventFeedProps) => {
 
   const listHeader = (
     <YStack pt="$medium" gap={24}>
-      <Suspense fallback={null}>
-        <PinnedItemBanner small={true} />
-      </Suspense>
+      <QueryBoundary>
+        <PinnedItemBanner small />
+      </QueryBoundary>
       <HubOrganizePromptCards />
       <YStack px="$medium" gap="$medium">
         <XStack gap="$small">

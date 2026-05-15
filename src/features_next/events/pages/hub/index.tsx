@@ -6,7 +6,6 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 
 import { SideBarArea } from '@/components/AppStructure'
 import { TABBAR_HEIGHT_SM } from '@/components/AppStructure/hooks/useLayoutSpacing'
-
 import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
 import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
