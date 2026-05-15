@@ -1,7 +1,7 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
-import { useRouter } from 'expo-router'
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { getToken, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { useQueryClient } from '@tanstack/react-query'
@@ -21,7 +21,7 @@ import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/
 import { FeedSectionHeader } from '@/features_next/events/components/feed-layout/SectionHeader'
 import HubSideContent from '@/features_next/events/components/feed-layout/SideContent'
 import { HubFeedRow } from '@/features_next/events/components/list-item/HubFeedRow'
-import { eventFiltersState } from '@/features_next/events/store/filterStore'
+import { eventFiltersState, type HubItemTypeFilter } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection, isEventPast } from '@/features_next/events/utils'
 
 import { useSession } from '@/ctx/SessionProvider'
@@ -64,6 +64,11 @@ const filterHubItemsBySearch = (items: RestHubItem[], searchText?: string) => {
 const excludeHubItemsByUuid = (items: RestHubItem[], uuids: Set<string>) => (uuids.size === 0 ? items : items.filter((item) => !uuids.has(item.uuid)))
 
 const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.map(mapHubItemToFeedRow).filter((row): row is HubFeedRowType => row !== null)
+
+const filterRowsByItemType = (rows: HubFeedRowType[], itemType: HubItemTypeFilter): HubFeedRowType[] => {
+  if (itemType === 'all') return rows
+  return rows.filter((row) => row.type === itemType)
+}
 
 const getRowBeginAt = (row: HubFeedRowType): string => (row.type === 'event' ? row.event.begin_at : row.payload.date.start.toISOString())
 
@@ -145,6 +150,17 @@ const HubFeed = () => {
   const [activeTab, setActiveTab] = useState<HubFeedTab>('all')
   const filters = eventFiltersState((s) => s.value)
   const setFiltersValue = eventFiltersState((s) => s.setValue)
+  const { itemType: itemTypeParam } = useLocalSearchParams<{ itemType?: string }>()
+
+  useFocusEffect(
+    useCallback(() => {
+      if (itemTypeParam === 'action' || itemTypeParam === 'event') {
+        setFiltersValue((prev) => ({ ...prev, itemType: itemTypeParam }))
+      } else {
+        setFiltersValue((prev) => ({ ...prev, itemType: 'all' }))
+      }
+    }, [itemTypeParam, setFiltersValue]),
+  )
 
   const userAssembly = userData?.instances?.assembly?.code
   const zone = filters.zone ?? (activeTab === 'subscribed' ? 'all' : userAssembly)
@@ -217,8 +233,8 @@ const HubFeed = () => {
     const items = paginatedFeed?.pages.flatMap((page) => page?.items ?? []) ?? []
     const withoutPinned = excludeHubItemsByUuid(items, pinnedItemsUuids)
     const searched = filterHubItemsBySearch(withoutPinned, filters.search)
-    return mapHubItemsToFeedRows(searched)
-  }, [paginatedFeed?.pages, pinnedItemsUuids, filters.search])
+    return filterRowsByItemType(mapHubItemsToFeedRows(searched), filters.itemType ?? 'all')
+  }, [paginatedFeed?.pages, pinnedItemsUuids, filters.search, filters.itemType])
 
   const hasActiveFilters = useMemo(() => {
     if (filters.search.trim()) return true

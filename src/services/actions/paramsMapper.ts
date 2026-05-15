@@ -1,38 +1,34 @@
-import { addDays, endOfDay, startOfDay } from 'date-fns'
-import * as schema from './schema'
+import { formatISO } from 'date-fns'
 
-const calcPeriod = (period?: schema.SelectPeriod) => {
-  switch (period) {
-    case 'past':
-      return {
-        before: startOfDay(new Date()).toISOString(),
-      }
-    case 'today':
-      return {
-        after: startOfDay(new Date()).toISOString(),
-        before: endOfDay(new Date()).toISOString(),
-      }
-    case 'tomorow':
-      return {
-        after: startOfDay(addDays(new Date(), 1)).toISOString(),
-        before: endOfDay(addDays(new Date(), 1)).toISOString(),
-      }
-    case 'to-come':
-    default:
-      return {
-        after: new Date().toISOString(),
-      }
-  }
+import type { RestActionFull, RestPostActionRequest } from './schema'
+
+export type ActionFormValues = {
+  type: RestPostActionRequest['type']
+  date: Date
+  description: string
+  post_address: RestPostActionRequest['post_address']
 }
 
-export const mapParams = ({ subscribeOnly, longitude, latitude, type, period }: schema.RestActionRequestParams) => {
-  const periodDate = calcPeriod(period as schema.SelectPeriod)
+export const mapActionFormToPostRequest = (form: ActionFormValues): RestPostActionRequest => ({
+  type: form.type,
+  date: formatISO(form.date),
+  description: form.description ?? '',
+  post_address: {
+    address: form.post_address.address,
+    postal_code: form.post_address.postal_code,
+    city_name: form.post_address.city_name,
+    country: form.post_address.country,
+  },
+})
 
-  return {
-    ...(type !== schema.FilterActionType.ALL ? { type } : {}),
-    ...(period && periodDate ? { 'date[after]': periodDate.after, 'date[before]': periodDate.before } : {}),
-    ...(subscribeOnly ? { subscribeOnly: true } : {}),
-    longitude,
-    latitude,
-  }
-}
+export const mapRestActionFullToFormDefaults = (action: RestActionFull): ActionFormValues => ({
+  type: action.type,
+  date: action.date,
+  description: action.description ?? '',
+  post_address: {
+    address: action.post_address.address,
+    postal_code: action.post_address.postal_code,
+    city_name: action.post_address.city_name,
+    country: action.post_address.country,
+  },
+})

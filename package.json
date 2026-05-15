@@ -15,7 +15,6 @@
     "prettier-watch": "onchange '**/*.ts' '**/*.tsx' '**/*.cjs' '**/*.js' '**/*.json' --exclude-path .gitignore -- prettier --write {{changed}}",
     "ts:check": "tsc --noEmit",
     "prepare:env": "tsx ./scripts/prepare-client-env.ts",
-    "prepare-markers": "tsx ./scripts/prepare-action-markers.ts",
     "postinstall": "tsx ./scripts/postinstall.ts",
     "build:worker": "npx vite build --config vite.worker.config.js",
     "storybook-generate": "sb-rn-get-stories -js",
