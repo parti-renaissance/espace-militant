@@ -7,7 +7,7 @@ type Props = {
   title: string
 }
 
-export const EventSectionHeader = ({ title }: Props) => (
+export const FeedSectionHeader = ({ title }: Props) => (
   <XStack justifyContent="center" alignItems="center" gap="$small" pt="$small">
     <Text.MD semibold color="$gray4" textTransform="uppercase" textAlign="center">
       {title}

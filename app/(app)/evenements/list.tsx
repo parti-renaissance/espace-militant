@@ -8,8 +8,8 @@ import { useLayoutSpacing } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { VoxButton } from '@/components/Button'
 import { MapListToggle } from '@/features_next/events/components/feed-layout/MapListToggle'
-import { PinnedEventBanner } from '@/features_next/events/components/feed-layout/PinnedEventBanner'
-import EventsListPage from '@/features_next/events/pages/list'
+import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
+import HubFeed from '@/features_next/events/pages/list'
 
 import * as metatags from '@/config/metatags'
 
@@ -33,7 +33,7 @@ const EventsListRoute = () => {
         <MapListToggle activeView="list" mapHref="/evenements/map" listHref="/evenements/list" />
       </XStack>
       <Suspense fallback={null}>
-        <PinnedEventBanner />
+        <PinnedItemBanner />
       </Suspense>
     </YStack>
   )
@@ -44,7 +44,7 @@ const EventsListRoute = () => {
         <title>{metatags.createTitle('Événements - Liste')}</title>
       </Head>
       <Layout.Container banner={banner} safeHorizontalPadding={false} hideTabBar>
-        <EventsListPage />
+        <HubFeed />
       </Layout.Container>
     </>
   )

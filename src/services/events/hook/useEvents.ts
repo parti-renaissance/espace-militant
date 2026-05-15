@@ -4,7 +4,7 @@ import { useToastController } from '@tamagui/toast'
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 
-import type { EventMapItem } from '@/features_next/events/pages/map/components/EventMap'
+import type { HubItemMapItem } from '@/features_next/events/pages/map/components/HubItemMap'
 import { isEventPast } from '@/features_next/events/utils'
 import { EventFilters } from '@/core/entities/Event'
 import { useSession } from '@/ctx/SessionProvider'
@@ -53,8 +53,8 @@ const fetchMapEvents = (sortAround: { lat: number; lng: number } | null, isAuth:
 
 const isFiniteCoordinate = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
 
-/** Formate la liste API carte → marqueurs `EventMapItem` (coords valides + état passé). */
-export const useMapEventsFormatter = (items: RestItemEvent[] | undefined): EventMapItem[] =>
+/** Formate la liste API carte → marqueurs `HubItemMapItem` (coords valides + état passé). */
+export const useMapEventsFormatter = (items: RestItemEvent[] | undefined): HubItemMapItem[] =>
   useMemo(() => {
     const list = items ?? []
     return list
@@ -63,6 +63,7 @@ export const useMapEventsFormatter = (items: RestItemEvent[] | undefined): Event
         uuid: event.uuid,
         name: event.name,
         slug: event.slug,
+        itemType: 'event' as const,
         latitude: event.post_address!.latitude!,
         longitude: event.post_address!.longitude!,
         visibility: event.visibility,

@@ -11,7 +11,7 @@ import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import EventListItem from '@/features_next/events/components/list-item/EventListItem'
-import { PinnedEventBanner } from '@/features_next/events/components/feed-layout/PinnedEventBanner'
+import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection } from '@/features_next/events/utils'
 
@@ -24,9 +24,9 @@ import { useGetProfil } from '@/services/profile/hook'
 
 import type { EmptyStateReason } from '@/features_next/events/components/feed-layout/EmptyStateSection'
 import { EmptyStateSection } from '@/features_next/events/components/feed-layout/EmptyStateSection'
-import { EventSectionHeader } from '@/features_next/events/components/feed-layout/SectionHeader'
-import EventsSideContent from '@/features_next/events/components/feed-layout/SideContent'
-import EventsListSkeleton from '@/features_next/events/components/feed-layout/EventsListSkeleton'
+import { FeedSectionHeader } from '@/features_next/events/components/feed-layout/SectionHeader'
+import HubSideContent from '@/features_next/events/components/feed-layout/SideContent'
+import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
 
 const EVENTS_SWITCH_OPTIONS: OptionsArray = [
   { label: 'Tous', value: 'events' },
@@ -201,11 +201,11 @@ const EventFeed = () => {
     ({ item }: { item: FeedListItem }) => {
       switch (item.type) {
         case 'header':
-          return <EventSectionHeader title={item.title} />
+          return <FeedSectionHeader title={item.title} />
         case 'empty_state':
           return (
             <YStack py="$large">
-              <EmptyStateSection reason={item.reason} onSwitchToAllEvents={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
+              <EmptyStateSection reason={item.reason} onSwitchToAllItems={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
             </YStack>
           )
         case 'event':
@@ -258,13 +258,13 @@ const EventFeed = () => {
         {media.sm ? (
           <YStack paddingTop={hasPinnedBannerContent ? pinnedBannerOuterSpacing.paddingTop : 0} paddingBottom={hasPinnedBannerContent && media.sm ? 16 : 0}>
             <Suspense fallback={null}>
-              <PinnedEventBanner />
+              <PinnedItemBanner />
             </Suspense>
           </YStack>
         ) : null}
         <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
           {isAuth && <BigSwitch options={EVENTS_SWITCH_OPTIONS} value={activeTab} onChange={handleSwitchChange} />}
-          {!media.gtMd && <EventsSideContent />}
+          {!media.gtMd && <HubSideContent />}
         </YStack>
       </YStack>
     ),
@@ -301,10 +301,10 @@ const EventFeed = () => {
           maxToRenderPerBatch={10}
           ListEmptyComponent={
             showSkeleton ? (
-              <EventsListSkeleton />
+              <HubListSkeleton />
             ) : (
               <YStack py="$large">
-                <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllEvents={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
+                <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllItems={handleSwitchToAllEvents} showResetButton={hasActiveFilters} />
               </YStack>
             )
           }
@@ -320,7 +320,7 @@ const EventFeed = () => {
       {media.gtMd ? (
         <Layout.SideBar isSticky padding="right">
           <YStack>
-            <EventsSideContent />
+            <HubSideContent />
           </YStack>
         </Layout.SideBar>
       ) : null}
