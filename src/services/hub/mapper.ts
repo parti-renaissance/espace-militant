@@ -130,7 +130,7 @@ export const mapHubItemToActionCardPayload = (item: RestHubItem): ActionVoxCardP
 
 export type HubFeedRow =
   | { type: 'event'; event: RestItemEvent }
-  | { type: 'action'; payload: ActionVoxCardProps['payload'] }
+  | { type: 'action'; payload: ActionVoxCardProps['payload']; editable: boolean }
 
 export const mapHubItemToFeedRow = (item: RestHubItem): HubFeedRow | null => {
   const event = mapHubItemToRestItemEvent(item)
@@ -140,7 +140,7 @@ export const mapHubItemToFeedRow = (item: RestHubItem): HubFeedRow | null => {
 
   const payload = mapHubItemToActionCardPayload(item)
   if (payload) {
-    return { type: 'action', payload }
+    return { type: 'action', payload, editable: item.editable }
   }
 
   return null

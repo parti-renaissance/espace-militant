@@ -1,9 +1,10 @@
-import { ActionType } from '@/services/actions/schema'
 import { z } from 'zod'
+
+import { ActionType } from '@/services/actions/schema'
 
 const requiredString = (start: string) => z.string().min(1, `${start} est obligatoire.`)
 
-export const validateActionFormSchema = z.object({
+export const actionFormSchema = z.object({
   type: z.nativeEnum(ActionType),
   date: z.date().min(new Date(), 'La date ne peut pas être dans le passé.'),
   post_address: z
@@ -24,3 +25,5 @@ export const validateActionFormSchema = z.object({
     }),
   description: z.string().max(1000).optional(),
 })
+
+export type ActionFormSchemaValues = z.infer<typeof actionFormSchema>

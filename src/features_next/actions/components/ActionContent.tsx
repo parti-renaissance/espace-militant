@@ -15,16 +15,14 @@ import { ContentBackButton } from '@/components/ContentBackButton'
 import { DetailShareGroup } from '@/components/ShareGroup/DetailShareGroup'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { formatActionDetailTitle } from '@/features_next/actions/utils/formatActionDetailTitle'
-
-import ParticipantAvatar from '@/screens/actions/ActionParticipants'
-import { mapPayload } from '@/screens/actions/utils'
 import { ActionStatus, RestActionFull } from '@/services/actions/schema'
 
 import { ActionDetailMapBlock } from './ActionDetailMap'
+import ParticipantAvatar from './ParticipantAvatar'
+import { mapPayload } from '../utils/mapPayload'
 
 export type ActionContentProps = {
   data: RestActionFull
-  onEdit?: () => void
 }
 
 const FloatingBackButton = () => {
@@ -47,11 +45,13 @@ const FloatingBackButton = () => {
   )
 }
 
-type ActionInnerProps = ActionContentProps & {
+type ActionInnerProps = {
+  data: RestActionFull
   payload: ReturnType<typeof mapPayload>
   isPassed: boolean
   isCancelled: boolean
   isMyAction: boolean
+  onEdit: () => void
 }
 
 const ActionParticipantsSection = ({ data }: Pick<ActionInnerProps, 'data'>) => (
@@ -79,7 +79,6 @@ const ActionInfo = ({
   includeParticipants = false,
 }: Pick<ActionInnerProps, 'data' | 'payload' | 'isPassed' | 'isCancelled'> & { includeParticipants?: boolean }) => {
   const media = useMedia()
-
   const detailTitle = useMemo(() => formatActionDetailTitle({ date: data.date, type: data.type }), [data.date, data.type])
 
   return (
@@ -126,7 +125,7 @@ const ActionButtons = ({ data, isPassed, isMyAction, onEdit }: Pick<ActionInnerP
 
   if (isPassed) return null
 
-  if (isMyAction && onEdit) {
+  if (isMyAction) {
     return (
       <XStack gap={8} width="100%">
         <YStack flex={1}>
@@ -138,17 +137,13 @@ const ActionButtons = ({ data, isPassed, isMyAction, onEdit }: Pick<ActionInnerP
     )
   }
 
-  if (!isMyAction) {
-    return (
-      <XStack gap={8} width="100%">
-        <YStack flex={1}>
-          <SubscribeButton disabled={data.status === ActionStatus.CANCELLED} large isRegister={Boolean(data.user_registered_at)} id={data.uuid} />
-        </YStack>
-      </XStack>
-    )
-  }
-
-  return null
+  return (
+    <XStack gap={8} width="100%">
+      <YStack flex={1}>
+        <SubscribeButton disabled={data.status === ActionStatus.CANCELLED} large isRegister={Boolean(data.user_registered_at)} id={data.uuid} />
+      </YStack>
+    </XStack>
+  )
 }
 
 const MobileBottomCTA = (props: ActionInnerProps) => {
@@ -164,70 +159,71 @@ const MobileBottomCTA = (props: ActionInnerProps) => {
   )
 }
 
-const MobileLayout = (props: ActionInnerProps) => {
-  return (
-    <>
-      <Layout.Main maxWidth={892}>
-        <LayoutScrollView padding={false}>
-          <YStack paddingBottom={100}>
-            <VoxCard overflow="visible" pb={66} borderWidth={0}>
-              <ActionInfo {...props} />
-              <VoxCard.Separator />
-              <ActionMeta payload={props.payload} />
-              <VoxCard.Separator />
-              <YStack px="$medium" gap="$medium">
-                <ActionParticipantsSection data={props.data} />
-                <DetailShareGroup action={props.data} />
-              </YStack>
-            </VoxCard>
-          </YStack>
-        </LayoutScrollView>
-      </Layout.Main>
-      <FloatingBackButton />
-      <MobileBottomCTA {...props} />
-    </>
-  )
-}
-
-const DesktopLayout = (props: ActionInnerProps) => {
-  return (
+const MobileLayout = (props: ActionInnerProps) => (
+  <>
     <Layout.Main maxWidth={892}>
-      <LayoutScrollView>
-        <ContentBackButton fallbackPath="/" />
-        <YStack gap="$medium">
-          <VoxCard>
-            <XStack alignItems="flex-start" py="$medium">
-              <YStack flex={1} flexShrink={1} gap="$medium" px="$medium" borderRightColor="$textOutline32" borderRightWidth={1}>
-                <ActionInfo {...props} includeParticipants />
-              </YStack>
-              <YStack maxWidth={320} px="$medium" gap="$medium">
-                <ActionButtons {...props} />
-                <VoxCard.Separator />
-                <ActionMeta payload={props.payload} />
-                <DetailShareGroup action={props.data} />
-              </YStack>
-            </XStack>
+      <LayoutScrollView padding={false}>
+        <YStack paddingBottom={100}>
+          <VoxCard overflow="visible" pb={66} borderWidth={0}>
+            <ActionInfo {...props} />
+            <VoxCard.Separator />
+            <ActionMeta payload={props.payload} />
+            <VoxCard.Separator />
+            <YStack px="$medium" gap="$medium">
+              <ActionParticipantsSection data={props.data} />
+              <DetailShareGroup action={props.data} />
+            </YStack>
           </VoxCard>
         </YStack>
       </LayoutScrollView>
     </Layout.Main>
-  )
-}
+    <FloatingBackButton />
+    <MobileBottomCTA {...props} />
+  </>
+)
 
-export function ActionContent({ data, onEdit }: ActionContentProps) {
+const DesktopLayout = (props: ActionInnerProps) => (
+  <Layout.Main maxWidth={892}>
+    <LayoutScrollView>
+      <ContentBackButton fallbackPath="/" />
+      <YStack gap="$medium">
+        <VoxCard>
+          <XStack alignItems="flex-start" py="$medium">
+            <YStack flex={1} flexShrink={1} gap="$medium" px="$medium" borderRightColor="$textOutline32" borderRightWidth={1}>
+              <ActionInfo {...props} includeParticipants />
+            </YStack>
+            <YStack maxWidth={320} px="$medium" gap="$medium">
+              <ActionButtons {...props} />
+              <VoxCard.Separator />
+              <ActionMeta payload={props.payload} />
+              <DetailShareGroup action={props.data} />
+            </YStack>
+          </XStack>
+        </VoxCard>
+      </YStack>
+    </LayoutScrollView>
+  </Layout.Main>
+)
+
+export function ActionContent({ data }: ActionContentProps) {
   const media = useMedia()
+  const router = useRouter()
   const payload = useMemo(() => mapPayload(data), [data])
   const isPassed = isBefore(data.date, new Date())
   const isCancelled = data.status === ActionStatus.CANCELLED
   const isMyAction = data.editable
 
+  const onEdit = () => {
+    router.push(`/actions/${data.uuid}/modifier`)
+  }
+
   const innerProps: ActionInnerProps = {
     data,
-    onEdit,
     payload,
     isPassed,
     isCancelled,
     isMyAction,
+    onEdit,
   }
 
   return media.sm ? <MobileLayout {...innerProps} /> : <DesktopLayout {...innerProps} />

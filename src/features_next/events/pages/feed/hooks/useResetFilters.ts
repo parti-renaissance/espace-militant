@@ -20,6 +20,7 @@ export default function useResetFilters() {
       zone: defaultAssembly,
       detailZone,
       search: '',
+      itemType: 'all',
     }))
   }, [defaultAssembly])
 

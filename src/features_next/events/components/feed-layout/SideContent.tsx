@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 import { Link } from 'expo-router'
 import { isWeb, useMedia, YStack, YStackProps } from 'tamagui'
-import { Sparkle } from '@tamagui/lucide-icons'
+import { Sparkle, Zap } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
 import EventFilterForm from '@/features_next/events/components/forms/EventFilterForm/EventFilterForm'
@@ -24,6 +24,16 @@ const NewEventBtn = ({ children, ...props }: YStackProps & { children: string })
   )
 }
 
+const NewActionBtn = ({ children, ...props }: YStackProps & { children: string }) => (
+  <YStack {...props}>
+    <Link href="/actions/creer" asChild={!isWeb}>
+      <VoxButton variant="soft" size="xl" theme="green" iconLeft={Zap}>
+        {children}
+      </VoxButton>
+    </Link>
+  </YStack>
+)
+
 const HubSideContent = () => {
   const { isAuth } = useSession()
   const { hasFeature } = useGetExecutiveScopes()
@@ -32,9 +42,10 @@ const HubSideContent = () => {
 
   return (
     <YStack gap="$medium">
-      {canCreate && media.gtSm && (
+      {media.gtSm && (
         <Suspense>
-          <NewEventBtn>Organiser un événement</NewEventBtn>
+          {canCreate ? <NewEventBtn>Organiser un événement</NewEventBtn> : null}
+          {isAuth ? <NewActionBtn>Créer une action</NewActionBtn> : null}
         </Suspense>
       )}
       <YStack>

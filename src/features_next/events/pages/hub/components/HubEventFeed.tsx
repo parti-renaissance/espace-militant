@@ -50,12 +50,13 @@ const EventRow = memo(({ event, userUuid }: { event: HubAgendaEvent; userUuid?: 
 })
 
 const CREER_EVENEMENT_HREF = '/evenements/creer' as const satisfies Href
+const CREER_ACTION_HREF = '/actions/creer' as const satisfies Href
 
 const HubOrganizePromptCards = memo(function HubOrganizePromptCards() {
   return (
     <XStack gap="$medium" px="$medium">
       <YStack width="50%" flex={1}>
-        <ButtonCard theme="green" icon={Zap} label="Organisez une action près de chez vous" href={CREER_EVENEMENT_HREF} />
+        <ButtonCard theme="green" icon={Zap} label="Organisez une action près de chez vous" href={CREER_ACTION_HREF} />
       </YStack>
       <YStack width="50%" flex={1}>
         <ButtonCard theme="blue" icon={Calendar} label="Organisez un événement" href={CREER_EVENEMENT_HREF} />

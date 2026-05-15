@@ -90,10 +90,7 @@ export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardPr
           router.push({ pathname: '/actions/[id]', params: { id: feed.objectID } })
         },
         onEdit: () => {
-          router.push({
-            pathname: '/old/actions',
-            params: { uuid: feed.objectID, action: 'edit' },
-          })
+          router.push(`/actions/${feed.objectID}/modifier`)
         },
         isMyAction: feed.editable ?? undefined,
         payload: {

@@ -2,19 +2,16 @@ import React, { useMemo } from 'react'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia, YStack } from 'tamagui'
-import { isBefore } from 'date-fns'
 
 import MapboxGl from '@/components/Mapbox/Mapbox'
-
-import { createSource } from '@/screens/actions/utils'
 import { ActionType, RestAction, RestActionFull } from '@/services/actions/schema'
 
-import pinBoitage from '../../../assets/map/action-boitage.png'
-import pinCollage from '../../../assets/map/action-collage.png'
-import pinPap from '../../../assets/map/action-porte-a-porte.png'
-import pinTractage from '../../../assets/map/action-tractage.png'
+import { createActionMapSource } from '../utils/mapSource'
+import pinBoitage from '../assets/map/action-boitage.png'
+import pinCollage from '../assets/map/action-collage.png'
+import pinPap from '../assets/map/action-porte-a-porte.png'
+import pinTractage from '../assets/map/action-tractage.png'
 
-/** Clés Mapbox — alignées sur `ActionType` côté GeoJSON (`createSource`). */
 const ACTION_DETAIL_MAP_IMAGES = {
   'action-detail-pap': pinPap,
   'action-detail-boitage': pinBoitage,
@@ -47,13 +44,10 @@ type ActionDetailMapBlockProps = {
 
 export function ActionDetailMap({ action, cameraPadding }: ActionDetailMapProps) {
   const media = useMedia()
-  const shape = useMemo(() => createSource([action as RestAction], action.uuid), [action])
+  const shape = useMemo(() => createActionMapSource([action as RestAction], action.uuid), [action])
   const center: [number, number] = [action.post_address.longitude, action.post_address.latitude]
 
-  /** Mobile : évite le flyTo depuis le zoom monde (animation très longue). */
-  const mobileSnapCamera = media.sm
-    ? ({ animationMode: 'moveTo' as const, animationDuration: 0 } as const)
-    : undefined
+  const mobileSnapCamera = media.sm ? ({ animationMode: 'moveTo' as const, animationDuration: 0 } as const) : undefined
 
   return (
     <MapboxGl.MapView
@@ -105,15 +99,7 @@ export function ActionDetailMapBlock({ action }: ActionDetailMapBlockProps) {
     }
 
     return (
-      <YStack
-        height={baseHeight + top}
-        width="100%"
-        flexShrink={0}
-        overflow="hidden"
-        position="relative"
-        borderRadius={0}
-        marginTop={-top}
-      >
+      <YStack height={baseHeight + top} width="100%" flexShrink={0} overflow="hidden" position="relative" borderRadius={0} marginTop={-top}>
         <ActionDetailMap action={action} cameraPadding={cameraPadding} />
       </YStack>
     )

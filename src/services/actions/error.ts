@@ -1,8 +1,10 @@
 import { z } from 'zod'
-import { createFormErrorResponseSchema, createFormErrorThrower } from '../common/errors/form-errors'
-import { propertyPathSchema } from './schema'
 
-const actionFormErrorSchema = createFormErrorResponseSchema(propertyPathSchema)
+import { createFormErrorResponseSchema, createFormErrorThrower } from '../common/errors/form-errors'
+
+import { propertyPathPostActionSchema } from './schema'
+
+const actionFormErrorSchema = createFormErrorResponseSchema(propertyPathPostActionSchema)
 
 export class ActionFormError extends Error {
   violations: z.infer<typeof actionFormErrorSchema>['violations']

@@ -7,7 +7,7 @@ import { useDebouncedCallback } from 'use-debounce'
 import { VoxButton } from '@/components/Button'
 import VoxCard, { VoxCardAttendeesProps, VoxCardAuthorProps, VoxCardDateProps, VoxCardFrameProps, VoxCardLocationProps } from '@/components/VoxCard/VoxCard'
 
-import { useSubscribeAction, useUnsubscribeAction } from '@/services/actions/hook/useActions'
+import { useSubscribeAction, useUnsubscribeAction } from '@/services/actions/hook'
 import { ActionStatus } from '@/services/actions/schema'
 
 export type ActionVoxCardProps = {
