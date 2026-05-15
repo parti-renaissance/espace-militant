@@ -24,7 +24,7 @@ const NewEventBtn = ({ children, ...props }: YStackProps & { children: string })
   )
 }
 
-const EventsSideContent = () => {
+const HubSideContent = () => {
   const { isAuth } = useSession()
   const { hasFeature } = useGetExecutiveScopes()
   const canCreate = isAuth && hasFeature ? hasFeature(FEATURES.EVENTS) : false
@@ -44,4 +44,4 @@ const EventsSideContent = () => {
   )
 }
 
-export default EventsSideContent
+export default HubSideContent

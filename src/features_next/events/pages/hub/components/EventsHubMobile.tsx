@@ -1,5 +1,4 @@
-import type { ReactNode } from 'react'
-import { Suspense } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { YStack } from 'tamagui'
 
 import HubEventFeed from './HubEventFeed'

@@ -12,8 +12,9 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { getEventItemImageFallback, isEventPartial } from '@/features_next/events/utils'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { useSuspensePinnedEvents } from '@/services/events/hook'
 import type { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
+import { usePinnedHubItemsInfiniteQuery } from '@/services/hub/hook'
+import { mapHubItemsToPinnedEvents } from '@/services/hub/mapper'
 
 import { FadingScrollView } from './FadingScrollView'
 
@@ -149,25 +150,26 @@ const PinnedEventCard = memo(({ event, sizeMode, isSmallContainer }: { event: Pi
 
 PinnedEventCard.displayName = 'PinnedEventCard'
 
-type PinnedEventBannerProps = {
+type PinnedItemBannerProps = {
   /** Réduit les largeurs et les marges (ex. flux hub étroit). */
   small?: boolean
 }
 
 /** Marges hors contenu (haut/bas suivant contexte, safe-area) : responsabilité du parent. */
-export function PinnedEventBanner({ small = false }: PinnedEventBannerProps = {}) {
+export function PinnedItemBanner({ small = false }: PinnedItemBannerProps = {}) {
   const media = useMedia()
   const { session } = useSession()
   const isAuthenticated = Boolean(session)
-  const { data } = useSuspensePinnedEvents()
+  const { data, isError } = usePinnedHubItemsInfiniteQuery()
+
   const events = useMemo(() => {
-    const allEvents = data.pages.flatMap((p) => p?.items ?? [])
+    const allEvents = mapHubItemsToPinnedEvents(data?.pages.flatMap((page) => page?.items ?? []) ?? [])
     if (isAuthenticated) return allEvents
     return allEvents.filter((event) => !isEventPartial(event))
-  }, [data.pages, isAuthenticated])
+  }, [data?.pages, isAuthenticated])
   const isSmallContainer = small ? true : Boolean(media.sm)
 
-  if (events.length === 0) return null
+  if (isError || events.length === 0) return null
 
   if (events.length === 2 && !isSmallContainer) {
     return (

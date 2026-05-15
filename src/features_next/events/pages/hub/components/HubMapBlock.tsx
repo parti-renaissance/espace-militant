@@ -6,13 +6,13 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 
 import { VoxButton } from '@/components/Button'
 
-import EventMap, { EventMapHandle, EventMapItem, FRANCE_METRO_CAMERA_BOUNDS } from '../../map/components/EventMap'
+import HubItemMap, { FRANCE_METRO_CAMERA_BOUNDS, HubItemMapHandle, HubItemMapItem } from '../../map/components/HubItemMap'
 import { HubMapPromoOverlay } from './HubMapPromoOverlay'
 
 export type HubMapBlockProps = {
-  eventMapRef: Ref<EventMapHandle>
-  mapEvents: EventMapItem[]
-  onEventPress: (event: OnPressEvent) => void
+  hubItemMapRef: Ref<HubItemMapHandle>
+  mapItems: HubItemMapItem[]
+  onItemPress: (event: OnPressEvent) => void
   onRecenterPress: () => void
   padding: CameraPadding
   isLocating: boolean
@@ -26,15 +26,14 @@ export type HubMapBlockProps = {
 }
 
 export function HubMapBlock({
-  eventMapRef,
-  mapEvents,
-  onEventPress,
+  hubItemMapRef,
+  mapItems,
+  onItemPress,
   onRecenterPress,
   padding,
   isLocating,
   userLocationLngLat,
   showLoadingSpinner,
-  showFetchingIndicator = false,
   topInset,
   promoLeadingAccessory,
   variant,
@@ -55,12 +54,12 @@ export function HubMapBlock({
           Recentrer
         </VoxButton>
       </YStack>
-      <EventMap
-        ref={eventMapRef}
-        events={mapEvents}
+      <HubItemMap
+        ref={hubItemMapRef}
+        items={mapItems}
         isInteractive
-        clusterEvents={false}
-        onEventPress={onEventPress}
+        clusterItems={false}
+        onItemPress={onItemPress}
         initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
         padding={padding}
         userLocationLngLat={userLocationLngLat}

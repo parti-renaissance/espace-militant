@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
@@ -8,29 +8,20 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { SideBarArea } from '@/components/AppStructure/Navigation/SideBar'
 import { VoxButton } from '@/components/Button'
-
-import { useEventsMapQuery, useMapEventsFormatter } from '@/services/events/hook'
+import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
+import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
 import { MapListToggle } from '../../components/feed-layout/MapListToggle'
-import EventMap, { EventMapHandle, FRANCE_METRO_CAMERA_BOUNDS, roundCoordinateForMapSortAround } from './components/EventMap'
+import HubItemMap, { FRANCE_METRO_CAMERA_BOUNDS, HubItemMapHandle, roundCoordinateForMapSortAround } from './components/HubItemMap'
 import { useUserLocation } from './hooks/useUserLocation'
 
 const EventsMapPage = () => {
   const router = useRouter()
-  const eventMapRef = useRef<EventMapHandle>(null)
+  const hubItemMapRef = useRef<HubItemMapHandle>(null)
   const hasAutoFlownToUserRef = useRef(false)
   const { coords, isLocating, requestLocation } = useUserLocation()
 
-  const sortAround = useMemo(
-    () =>
-      coords
-        ? {
-            lat: roundCoordinateForMapSortAround(coords[1]),
-            lng: roundCoordinateForMapSortAround(coords[0]),
-          }
-        : null,
-    [coords],
-  )
+  const [sortAround, setSortAround] = useState<{ lat: number; lng: number } | null>(null)
 
   const media = useMedia()
   const insets = useSafeAreaInsets()
@@ -44,30 +35,51 @@ const EventsMapPage = () => {
     [media.sm],
   )
 
-  const { data, isLoading, isFetching } = useEventsMapQuery({ sortAround })
+  const { data, isLoading, isFetching } = useHubItemsQuery({
+    params: {
+      page: 1,
+      pageSize: 300,
+      bbox: FRANCE_METRO_HUB_BBOX,
+      upcomingOnly: true,
+      ...(sortAround ? { sortAround } : {}),
+    },
+  })
 
-  const mapEvents = useMapEventsFormatter(data?.items)
+  const mapItems = useMemo(() => mapHubItemsToMapMarkers(data?.items ?? []), [data?.items])
 
   useEffect(() => {
     if (hasAutoFlownToUserRef.current || coords == null || isLoading || isFetching) {
       return
     }
     hasAutoFlownToUserRef.current = true
-    eventMapRef.current?.flyToUserWithEventsZoom(coords)
+    hubItemMapRef.current?.flyToUserWithItemsZoom(coords)
   }, [coords, isLoading, isFetching])
 
   const handleRecenterPress = useCallback(() => {
     void (async () => {
       const next = await requestLocation()
       if (next) {
-        eventMapRef.current?.flyToUserWithEventsZoom(next)
+        setSortAround({
+          lat: roundCoordinateForMapSortAround(next[1]),
+          lng: roundCoordinateForMapSortAround(next[0]),
+        })
+        hubItemMapRef.current?.flyToUserWithItemsZoom(next)
       }
     })()
   }, [requestLocation])
 
-  const handleEventPress = (event: OnPressEvent) => {
-    const firstFeature = event.features?.[0]
-    const slug = firstFeature?.properties?.slug
+  const handleItemPress = (event: OnPressEvent) => {
+    const properties = event.features?.[0]?.properties as { itemType?: string; uuid?: string; slug?: string | null } | undefined
+    if (!properties) {
+      return
+    }
+
+    if (properties.itemType === 'action' && typeof properties.uuid === 'string' && properties.uuid.length > 0) {
+      router.push({ pathname: '/actions/[id]', params: { id: properties.uuid } })
+      return
+    }
+
+    const slug = properties.slug
     if (typeof slug === 'string' && slug.length > 0) {
       router.push(`/evenements/${slug}`)
     }
@@ -105,12 +117,12 @@ const EventsMapPage = () => {
           </VoxButton>
           <MapListToggle activeView="map" mapHref="/evenements/map" listHref="/evenements/list" />
         </XStack>
-        <EventMap
-          ref={eventMapRef}
-          events={mapEvents}
+        <HubItemMap
+          ref={hubItemMapRef}
+          items={mapItems}
           isInteractive
-          clusterEvents={false}
-          onEventPress={handleEventPress}
+          clusterItems={false}
+          onItemPress={handleItemPress}
           initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
           padding={cameraPadding}
           userLocationLngLat={coords}

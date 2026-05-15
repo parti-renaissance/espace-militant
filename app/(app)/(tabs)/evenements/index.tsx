@@ -9,7 +9,8 @@ import { Sparkle } from '@tamagui/lucide-icons'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { VoxButton } from '@/components/Button'
 import EventFeed from '@/features_next/events/pages/feed'
-import { PinnedEventBanner } from '@/features_next/events/components/feed-layout/PinnedEventBanner'
+import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
+import { QueryBoundary } from '@/components/QueryBoundary'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
@@ -47,11 +48,11 @@ export default function EvenementsPage() {
   }, [pinnedFeed?.pages])
   const pinnedBannerOuterSpacing = useLayoutSpacing({ top: true, left: false, right: false, bottom: false })
   const banner = media.sm ? undefined : (
-    <Suspense fallback={null}>
-      <YStack paddingTop={hasPinnedBannerContent ? pinnedBannerOuterSpacing.paddingTop : 0}>
-        <PinnedEventBanner />
-      </YStack>
-    </Suspense>
+    <YStack paddingTop={hasPinnedBannerContent ? pinnedBannerOuterSpacing.paddingTop : 0}>
+      <QueryBoundary>
+        <PinnedItemBanner />
+      </QueryBoundary>
+    </YStack>
   )
 
   return (

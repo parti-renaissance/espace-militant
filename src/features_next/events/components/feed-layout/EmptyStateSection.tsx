@@ -20,11 +20,11 @@ export type EmptyStateReason =
 
 type Props = {
   reason: EmptyStateReason
-  onSwitchToAllEvents?: () => void
+  onSwitchToAllItems?: () => void
   showResetButton?: boolean
 }
 
-export const EmptyStateSection = ({ reason, onSwitchToAllEvents, showResetButton }: Props) => {
+export const EmptyStateSection = ({ reason, onSwitchToAllItems, showResetButton }: Props) => {
   const { hasFeature } = useGetExecutiveScopes()
   const { handleReset } = useResetFilters()
 
@@ -61,7 +61,7 @@ export const EmptyStateSection = ({ reason, onSwitchToAllEvents, showResetButton
               theme="blue"
               onPress={() => {
                 handleReset()
-                onSwitchToAllEvents?.()
+                onSwitchToAllItems?.()
               }}
             >
               Réinitialiser les filtres

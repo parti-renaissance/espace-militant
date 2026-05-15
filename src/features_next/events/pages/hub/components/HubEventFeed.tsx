@@ -2,7 +2,7 @@
  * Liste minimaliste du hub : bannière épinglée + inscriptions à venir uniquement.
  */
 import type { ReactNode } from 'react'
-import { memo, Suspense, useCallback, useMemo, useRef } from 'react'
+import { memo, useCallback, useMemo, useRef } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import type { Href } from 'expo-router'
@@ -12,26 +12,35 @@ import { Calendar, CalendarCheck2, ChevronRight, ClipboardCheck, DoorOpen, Zap }
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import Text from '@/components/base/Text'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
+import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
+import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
 import EventListItem from '@/features_next/events/components/list-item/EventListItem'
-import { PinnedEventBanner } from '@/features_next/events/components/feed-layout/PinnedEventBanner'
 
+import { QueryBoundary } from '@/components/QueryBoundary'
 import { useSession } from '@/ctx/SessionProvider'
-import { useSuspensePaginatedEvents } from '@/services/events/hook'
-import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
+import type { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
+import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
+import { mapHubItemToRestItemEvent } from '@/services/hub/mapper'
+import { isHubEventItem, type RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
 
-import EventsListSkeleton from '@/features_next/events/components/feed-layout/EventsListSkeleton'
 import { ButtonCard } from './ButtonCard'
 
-type HubEventRow = RestItemEvent | RestPublicItemEvent
+type HubAgendaEvent = RestItemEvent | RestPublicItemEvent
 
-const EventRow = memo(({ event, userUuid }: { event: HubEventRow; userUuid?: string }) => {
+const mapHubItemsToAgendaEvents = (items: RestHubItem[]): HubAgendaEvent[] =>
+  items
+    .filter(isHubEventItem)
+    .map(mapHubItemToRestItemEvent)
+    .filter((event): event is HubAgendaEvent => event !== null)
+
+const EventRow = memo(({ event, userUuid }: { event: HubAgendaEvent; userUuid?: string }) => {
   const media = useMedia()
-  const row = <EventListItem event={event} userUuid={userUuid} source="page_events" />
+  const row = <EventListItem event={event} userUuid={userUuid} source="page_events_hub" />
   if (Platform.OS === 'web') {
     return (
       <YStack px={media.gtSm ? '$medium' : 0}>
-        <TrackImpressionWeb objectType="event" objectId={event.uuid} source="page_events">
+        <TrackImpressionWeb objectType="event" objectId={event.uuid} source="page_events_hub">
           {row}
         </TrackImpressionWeb>
       </YStack>
@@ -91,14 +100,12 @@ const HubEventFeed = (props: HubEventFeedProps) => {
   const { data: userData } = useGetProfil({ enabled: Boolean(session) })
   const filtersReady = !isAuth || userData !== undefined
 
-  const futureEventsThreshold = useMemo(() => new Date(), [])
-
-  const { data, fetchNextPage, hasNextPage, isRefetching, isFetching } = useSuspensePaginatedEvents({
-    filters: { subscribedOnly: true, finishAfter: futureEventsThreshold },
+  const { data, fetchNextPage, hasNextPage, isRefetching, isFetching } = useHubItemsInfiniteQuery({
+    params: { subscribedOnly: true, upcomingOnly: true },
     enabled: filtersReady && isAuth,
   })
 
-  const events = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data?.pages])
+  const events = useMemo(() => mapHubItemsToAgendaEvents(data?.pages.flatMap((page) => page?.items ?? []) ?? []), [data?.pages])
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isRefetching) void fetchNextPage()
@@ -106,14 +113,14 @@ const HubEventFeed = (props: HubEventFeedProps) => {
 
   const showSkeleton = !filtersReady || (isFetching && events.length === 0)
 
-  const listRef = useRef<FlatList<HubEventRow>>(null)
+  const listRef = useRef<FlatList<HubAgendaEvent>>(null)
   useScrollToTop(listRef)
 
   const listHeader = (
     <YStack pt="$medium" gap={24}>
-      <Suspense fallback={null}>
-        <PinnedEventBanner small={true} />
-      </Suspense>
+      <QueryBoundary>
+        <PinnedItemBanner small />
+      </QueryBoundary>
       <HubOrganizePromptCards />
       <YStack px="$medium" gap="$medium">
         <XStack gap="$small">
@@ -157,11 +164,11 @@ const HubEventFeed = (props: HubEventFeedProps) => {
 
   return (
     <YStack flex={1} width="100%" minHeight={0} bg="$textSurface">
-      <LayoutFlatList<HubEventRow>
+      <LayoutFlatList<HubAgendaEvent>
         ref={listRef}
         padding={false}
         data={events}
-        keyExtractor={(e) => e.uuid}
+        keyExtractor={(event) => event.uuid}
         renderItem={({ item }) => <EventRow event={item} userUuid={userData?.uuid} />}
         ListHeaderComponent={listHeaderComponent}
         contentContainerStyle={contentContainerStyleMerged}
@@ -169,7 +176,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         hasMore={hasNextPage ?? false}
-        ListEmptyComponent={showSkeleton ? <EventsListSkeleton /> : listEmptyComponent}
+        ListEmptyComponent={showSkeleton ? <HubListSkeleton /> : listEmptyComponent}
         ListFooterComponent={
           <YStack>
             {hasNextPage ? (

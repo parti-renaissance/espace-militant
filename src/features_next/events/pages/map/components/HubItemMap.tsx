@@ -5,22 +5,27 @@ import { Feature, FeatureCollection, Point, type Position as GeoPosition } from 
 
 import MapboxGl from '@/components/Mapbox/Mapbox'
 
+import pinBoitage from '@/features_next/actions/assets/map/action-boitage.png'
+import pinCollage from '@/features_next/actions/assets/map/action-collage.png'
+import pinPap from '@/features_next/actions/assets/map/action-porte-a-porte.png'
+import pinTractage from '@/features_next/actions/assets/map/action-tractage.png'
 import pinEventAdherents from '@/features_next/events/assets/images/map/event-adherents.png'
 import pinEventInvitation from '@/features_next/events/assets/images/map/event-invitation.png'
 import pinEventMilitants from '@/features_next/events/assets/images/map/event-militants.png'
 import pinEventPast from '@/features_next/events/assets/images/map/event-past.png'
 
+import { ActionType } from '@/services/actions/schema'
 import type { RestItemEvent } from '@/services/events/schema'
 
-export type EventMapInitialBounds = { ne: [number, number]; sw: [number, number] }
+export type HubItemMapInitialBounds = { ne: [number, number]; sw: [number, number] }
 
 /** Cadre caméra initial (source de vérité). */
-export const FRANCE_METRO_CAMERA_BOUNDS: EventMapInitialBounds = {
+export const FRANCE_METRO_CAMERA_BOUNDS: HubItemMapInitialBounds = {
   ne: [9.7, 51.6],
   sw: [-6.2, 40.3],
 }
 
-const EVENTS_MAP_STYLE_URL = 'mapbox://styles/larem/clwaph1m1008501pg1cspgbj2'
+const HUB_ITEM_MAP_STYLE_URL = 'mapbox://styles/larem/clwaph1m1008501pg1cspgbj2'
 
 /** Fallback caméra si `centerCoordinate` / `zoomLevel` absents (ex. props partielles). */
 const DEFAULT_CENTER: [number, number] = [2.45, 46.55]
@@ -32,14 +37,26 @@ const EVENT_PIN_MARKERS_IMAGES = {
   'pin-event-invitation': pinEventInvitation,
 } as const
 
-export type EventMapPinImageKey = keyof typeof EVENT_PIN_MARKERS_IMAGES
+const HUB_ACTION_PIN_MARKERS_IMAGES = {
+  'hub-action-pap': pinPap,
+  'hub-action-boitage': pinBoitage,
+  'hub-action-tractage': pinTractage,
+  'hub-action-collage': pinCollage,
+} as const
+
+const MAP_PIN_MARKERS_IMAGES = {
+  ...EVENT_PIN_MARKERS_IMAGES,
+  ...HUB_ACTION_PIN_MARKERS_IMAGES,
+} as const
+
+export type HubItemMapPinImageKey = keyof typeof MAP_PIN_MARKERS_IMAGES
 
 type EventPinResolverInput = {
   visibility: RestItemEvent['visibility']
   isPast: boolean
 }
 
-const resolveEventMapPinImageKey = (item: EventPinResolverInput): EventMapPinImageKey => {
+const resolveEventPinImageKey = (item: EventPinResolverInput): HubItemMapPinImageKey => {
   if (item.isPast) {
     return 'pin-event-past'
   }
@@ -55,12 +72,39 @@ const resolveEventMapPinImageKey = (item: EventPinResolverInput): EventMapPinIma
   }
 }
 
+const resolveActionPinImageKey = (actionType: ActionType, isPast: boolean, isCancelled: boolean): HubItemMapPinImageKey => {
+  if (isPast || isCancelled) {
+    return 'pin-event-past'
+  }
+
+  switch (actionType) {
+    case ActionType.PAP:
+      return 'hub-action-pap'
+    case ActionType.BOITAGE:
+      return 'hub-action-boitage'
+    case ActionType.TRACTAGE:
+      return 'hub-action-tractage'
+    case ActionType.COLLAGE:
+      return 'hub-action-collage'
+    default:
+      return 'hub-action-tractage'
+  }
+}
+
+const resolveMapPinImageKey = (item: HubItemMapItem): HubItemMapPinImageKey => {
+  if (item.itemType === 'action' && item.actionType) {
+    return resolveActionPinImageKey(item.actionType, item.isPast, item.isCancelled ?? false)
+  }
+
+  return resolveEventPinImageKey({ visibility: item.visibility, isPast: item.isPast })
+}
+
 /** Raster réel des PNG (points) pour caler une cible UI ~48×53 px sous `iconSize` homogène. */
 const EVENT_PIN_IMAGE_RASTER_WIDTH = 104
 const EVENT_PIN_IMAGE_RASTER_HEIGHT = 114
 const EVENT_PIN_ICON_SIZE = Math.min(48 / EVENT_PIN_IMAGE_RASTER_WIDTH, 53 / EVENT_PIN_IMAGE_RASTER_HEIGHT)
 
-const EVENT_POINT_SYMBOL_STYLE = {
+const HUB_ITEM_POINT_SYMBOL_STYLE = {
   iconImage: ['get', 'pinImageId'],
   iconSize: EVENT_PIN_ICON_SIZE,
   iconAllowOverlap: true,
@@ -108,7 +152,7 @@ const VISIBLE_BOUNDS_LNGLAT_DECIMALS = 4
 
 const USER_LOCATION_COORD_DECIMALS = 4
 
-/** Arrondi position utilisateur pour les clés `useEventsMapQuery`. */
+/** Arrondi position utilisateur pour stabiliser les clés de requête carte hub. */
 export const roundCoordinateForMapSortAround = (value: number) => {
   const f = 10 ** USER_LOCATION_COORD_DECIMALS
   return Math.round(value * f) / f
@@ -119,25 +163,28 @@ const roundLngLat = (p: GeoPosition): GeoPosition => {
   return [Math.round(p[0] * f) / f, Math.round(p[1] * f) / f] as GeoPosition
 }
 
-export type EventMapItem = {
+export type HubItemMapItem = {
   uuid: string
   name: string
-  slug: string
+  slug: string | null
+  itemType: 'event' | 'action'
+  actionType?: ActionType
   latitude: number
   longitude: number
   visibility: RestItemEvent['visibility']
   isPast: boolean
+  isCancelled?: boolean
 }
 
 const computeUserCenterCamera = (
   userCoords: [number, number],
-  eventList: EventMapItem[],
+  items: HubItemMapItem[],
 ): { center: [number, number]; zoom: number } => {
-  if (eventList.length === 0) {
+  if (items.length === 0) {
     return { center: userCoords, zoom: 12 }
   }
-  const eventCoordinates = eventList.map((event) => [event.longitude, event.latitude] as [number, number])
-  const nearestEvent = eventCoordinates.reduce(
+  const itemCoordinates = items.map((item) => [item.longitude, item.latitude] as [number, number])
+  const nearestItem = itemCoordinates.reduce(
     (acc, coords) => {
       const km = distanceInKm(userCoords, coords)
       if (km < acc.distanceKm) {
@@ -145,58 +192,59 @@ const computeUserCenterCamera = (
       }
       return acc
     },
-    { coords: eventCoordinates[0], distanceKm: Number.POSITIVE_INFINITY },
+    { coords: itemCoordinates[0], distanceKm: Number.POSITIVE_INFINITY },
   )
 
   const nextCenter: [number, number] =
-    nearestEvent.distanceKm > 10 ? [(userCoords[0] + nearestEvent.coords[0]) / 2, (userCoords[1] + nearestEvent.coords[1]) / 2] : userCoords
+    nearestItem.distanceKm > 10 ? [(userCoords[0] + nearestItem.coords[0]) / 2, (userCoords[1] + nearestItem.coords[1]) / 2] : userCoords
 
-  return { center: nextCenter, zoom: getZoomForNearestDistance(nearestEvent.distanceKm) }
+  return { center: nextCenter, zoom: getZoomForNearestDistance(nearestItem.distanceKm) }
 }
 
-export type EventMapFeatureProperties = {
+export type HubItemMapFeatureProperties = {
   uuid: string
   name: string
-  slug: string
-  pinImageId: EventMapPinImageKey
+  slug: string | null
+  itemType: 'event' | 'action'
+  pinImageId: HubItemMapPinImageKey
 }
 
-export type EventMapHandle = {
+export type HubItemMapHandle = {
   animateCameraTo: (centerCoordinate: [number, number], zoomLevel: number) => void
-  flyToUserWithEventsZoom: (userCoords: [number, number]) => void
+  flyToUserWithItemsZoom: (userCoords: [number, number]) => void
   getVisibleBounds: () => Promise<[GeoPosition, GeoPosition]>
 }
 
-type EventMapSharedProps = {
-  events: EventMapItem[]
+type HubItemMapSharedProps = {
+  items: HubItemMapItem[]
   isInteractive?: boolean
-  clusterEvents?: boolean
-  onEventPress: (event: OnPressEvent) => void
+  clusterItems?: boolean
+  onItemPress: (event: OnPressEvent) => void
   padding?: CameraPadding
   /** `[lng, lat]` — affichée via marqueur custom (source : page / `expo-location`). */
   userLocationLngLat?: [number, number] | null
 }
 
-export type EventMapProps =
-  | (EventMapSharedProps & {
+export type HubItemMapProps =
+  | (HubItemMapSharedProps & {
       /** Vue de départ : cadrer ce rectangle (remplace center + zoom). */
-      initialBounds: EventMapInitialBounds
+      initialBounds: HubItemMapInitialBounds
       centerCoordinate?: [number, number]
       zoomLevel?: number
     })
-  | (EventMapSharedProps & {
+  | (HubItemMapSharedProps & {
       initialBounds?: undefined
       centerCoordinate: [number, number]
       zoomLevel: number
     })
 
-const EventMap = forwardRef<EventMapHandle, EventMapProps>(
+const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
   (
     {
-      events,
+      items,
       isInteractive = true,
-      clusterEvents = false,
-      onEventPress,
+      clusterItems = false,
+      onItemPress,
       initialBounds,
       centerCoordinate,
       zoomLevel,
@@ -217,18 +265,18 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       })
     }, [])
 
-    const flyToUserWithEventsZoom = useCallback(
+    const flyToUserWithItemsZoom = useCallback(
       (userCoords: [number, number]) => {
-        const { center, zoom } = computeUserCenterCamera(userCoords, events)
+        const { center, zoom } = computeUserCenterCamera(userCoords, items)
         animateCameraTo(center, zoom)
       },
-      [animateCameraTo, events],
+      [animateCameraTo, items],
     )
 
     const getVisibleBounds = useCallback(() => {
       const map = mapViewRef.current
       if (!map) {
-        return Promise.reject(new Error('EventMap: MapView is not mounted'))
+        return Promise.reject(new Error('HubItemMap: MapView is not mounted'))
       }
       return map.getVisibleBounds().then(([ne, sw]) => [roundLngLat(ne), roundLngLat(sw)] as [GeoPosition, GeoPosition])
     }, [])
@@ -237,30 +285,31 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       ref,
       () => ({
         animateCameraTo,
-        flyToUserWithEventsZoom,
+        flyToUserWithItemsZoom,
         getVisibleBounds,
       }),
-      [animateCameraTo, flyToUserWithEventsZoom, getVisibleBounds],
+      [animateCameraTo, flyToUserWithItemsZoom, getVisibleBounds],
     )
 
-    const shape = useMemo<FeatureCollection<Point, EventMapFeatureProperties>>(
+    const shape = useMemo<FeatureCollection<Point, HubItemMapFeatureProperties>>(
       () => ({
         type: 'FeatureCollection',
-        features: events.map((event) => ({
+        features: items.map((item) => ({
           type: 'Feature',
           properties: {
-            uuid: event.uuid,
-            name: event.name,
-            slug: event.slug,
-            pinImageId: resolveEventMapPinImageKey(event),
+            uuid: item.uuid,
+            name: item.name,
+            slug: item.slug,
+            itemType: item.itemType,
+            pinImageId: resolveMapPinImageKey(item),
           },
           geometry: {
             type: 'Point',
-            coordinates: [event.longitude, event.latitude],
+            coordinates: [item.longitude, item.latitude],
           },
         })),
       }),
-      [events],
+      [items],
     )
 
     const userLocationFeature = useMemo((): Feature<Point> | null => {
@@ -280,26 +329,26 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
       <MapboxGl.MapView
         ref={mapViewRef}
         style={{ flex: 1 }}
-        styleURL={EVENTS_MAP_STYLE_URL}
+        styleURL={HUB_ITEM_MAP_STYLE_URL}
         scaleBarEnabled={false}
         scrollEnabled={isInteractive}
         zoomEnabled={isInteractive}
         rotateEnabled={isInteractive}
       >
         <MapboxGl.Camera ref={cameraRef} followUserLocation={false} padding={padding} {...cameraProps} />
-        <MapboxGl.Images images={EVENT_PIN_MARKERS_IMAGES} />
-        {clusterEvents ? (
+        <MapboxGl.Images images={MAP_PIN_MARKERS_IMAGES} />
+        {clusterItems ? (
           <MapboxGl.ShapeSource
-            id="events-map-source"
+            id="hub-item-map-source"
             shape={shape}
-            onPress={onEventPress}
+            onPress={onItemPress}
             cluster
             clusterRadius={40}
             clusterMaxZoomLevel={18}
             hitbox={{ width: 52, height: 58 }}
           >
             <MapboxGl.CircleLayer
-              id="events-map-clusters"
+              id="hub-item-map-clusters"
               filter={['has', 'point_count']}
               style={{
                 circleRadius: ['step', ['get', 'point_count'], 18, 10, 22, 50, 28],
@@ -310,7 +359,7 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
               }}
             />
             <MapboxGl.SymbolLayer
-              id="events-map-cluster-count"
+              id="hub-item-map-cluster-count"
               filter={['has', 'point_count']}
               style={{
                 textField: ['to-string', ['get', 'point_count']],
@@ -318,24 +367,24 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
                 textColor: '#FFFFFF',
               }}
             />
-            <MapboxGl.SymbolLayer id="events-map-points" filter={['!', ['has', 'point_count']]} style={EVENT_POINT_SYMBOL_STYLE} />
+            <MapboxGl.SymbolLayer id="hub-item-map-points" filter={['!', ['has', 'point_count']]} style={HUB_ITEM_POINT_SYMBOL_STYLE} />
           </MapboxGl.ShapeSource>
         ) : (
           <MapboxGl.ShapeSource
-            id="events-map-source"
+            id="hub-item-map-source"
             shape={shape}
-            onPress={onEventPress}
+            onPress={onItemPress}
             cluster={false}
             clusterRadius={40}
             hitbox={{ width: 52, height: 58 }}
           >
-            <MapboxGl.SymbolLayer id="events-map-points" filter={['all']} style={EVENT_POINT_SYMBOL_STYLE} />
+            <MapboxGl.SymbolLayer id="hub-item-map-points" filter={['all']} style={HUB_ITEM_POINT_SYMBOL_STYLE} />
           </MapboxGl.ShapeSource>
         )}
         {userLocationFeature ? (
-          <MapboxGl.ShapeSource id="events-map-user-location" shape={userLocationFeature} cluster={false}>
-            <MapboxGl.CircleLayer id="events-map-user-location-outer" style={USER_LOCATION_OUTER_STYLE} />
-            <MapboxGl.CircleLayer id="events-map-user-location-inner" style={USER_LOCATION_INNER_STYLE} />
+          <MapboxGl.ShapeSource id="hub-item-map-user-location" shape={userLocationFeature} cluster={false}>
+            <MapboxGl.CircleLayer id="hub-item-map-user-location-outer" style={USER_LOCATION_OUTER_STYLE} />
+            <MapboxGl.CircleLayer id="hub-item-map-user-location-inner" style={USER_LOCATION_INNER_STYLE} />
           </MapboxGl.ShapeSource>
         ) : null}
       </MapboxGl.MapView>
@@ -343,6 +392,6 @@ const EventMap = forwardRef<EventMapHandle, EventMapProps>(
   },
 )
 
-EventMap.displayName = 'EventMap'
+HubItemMap.displayName = 'HubItemMap'
 
-export default EventMap
+export default HubItemMap

@@ -3,7 +3,7 @@ import { useMedia, YStack } from 'tamagui'
 
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 
-const EventsListSkeleton: React.FC = () => {
+const HubListSkeleton: React.FC = () => {
   const media = useMedia()
 
   return (
@@ -54,4 +54,4 @@ const EventsListSkeleton: React.FC = () => {
   )
 }
 
-export default EventsListSkeleton
+export default HubListSkeleton
