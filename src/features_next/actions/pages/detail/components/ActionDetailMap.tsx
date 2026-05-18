@@ -6,11 +6,11 @@ import { useMedia, YStack } from 'tamagui'
 import MapboxGl from '@/components/Mapbox/Mapbox'
 import { ActionType, RestAction, RestActionFull } from '@/services/actions/schema'
 
-import { createActionMapSource } from '../utils/mapSource'
-import pinBoitage from '../assets/map/action-boitage.png'
-import pinCollage from '../assets/map/action-collage.png'
-import pinPap from '../assets/map/action-porte-a-porte.png'
-import pinTractage from '../assets/map/action-tractage.png'
+import { createActionMapSource } from '../../../utils/mapSource'
+import pinBoitage from '../../../assets/map/action-boitage.png'
+import pinCollage from '../../../assets/map/action-collage.png'
+import pinPap from '../../../assets/map/action-porte-a-porte.png'
+import pinTractage from '../../../assets/map/action-tractage.png'
 
 const ACTION_DETAIL_MAP_IMAGES = {
   'action-detail-pap': pinPap,

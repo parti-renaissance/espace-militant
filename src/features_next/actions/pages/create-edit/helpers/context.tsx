@@ -11,7 +11,7 @@ import { logActionMutation, logActionMutationError } from '@/services/actions/lo
 import { mapActionFormToPostRequest, mapRestActionFullToFormDefaults, type ActionFormValues } from '@/services/actions/paramsMapper'
 import { ActionType, RestActionFull } from '@/services/actions/schema'
 
-import { actionFormSchema } from '../../components/actionFormSchema'
+import { actionFormSchema } from './schema'
 
 export type ActionFormProps = {
   edit?: RestActionFull

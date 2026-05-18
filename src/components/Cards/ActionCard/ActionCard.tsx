@@ -59,7 +59,7 @@ const ActionCard = ({
               Voir
             </VoxButton>
             {isMyAction ? (
-              <VoxButton disabled={isCancelled || isPassed} variant="outlined" theme="purple" pop iconLeft={Sparkle} onPress={onEdit}>
+              <VoxButton disabled={isCancelled || isPassed} variant="outlined" theme="purple" iconLeft={Sparkle} onPress={onEdit}>
                 Gérer
               </VoxButton>
             ) : (
@@ -73,7 +73,7 @@ const ActionCard = ({
   )
 }
 
-export function SubscribeButton({ isRegister, id, large, ...props }: { isRegister: boolean; id?: string; large?: boolean; disabled?: boolean }) {
+export function SubscribeButton({ isRegister, id, large, disabled }: { isRegister: boolean; id?: string; large?: boolean; disabled?: boolean }) {
   const subscribe = useSubscribeAction(id)
   const unsubscribe = useUnsubscribeAction(id)
   const isloaderSub = subscribe.isPending || unsubscribe.isPending
@@ -83,8 +83,8 @@ export function SubscribeButton({ isRegister, id, large, ...props }: { isRegiste
   }, 300)
   return (
     <VoxButton
-      disabled={props.disabled}
-      variant={'outlined'}
+      disabled={disabled}
+      variant={isRegister || disabled ? 'outlined' : 'contained'}
       theme="green"
       animation="quick"
       size={large ? 'xl' : 'md'}
@@ -93,7 +93,7 @@ export function SubscribeButton({ isRegister, id, large, ...props }: { isRegiste
       iconLeft={isRegister ? ZapOff : Zap}
       loading={isloaderSub}
     >
-      {isRegister ? 'Me désinscrire' : "M'inscrire"}
+      {isRegister ? 'Me désinscrire' : 'Participer'}
     </VoxButton>
   )
 }

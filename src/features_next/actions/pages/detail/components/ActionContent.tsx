@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Href, useRouter } from 'expo-router'
-import { useMedia, XStack, YStack } from 'tamagui'
+import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft, Clock9, PenLine, XCircle, Zap } from '@tamagui/lucide-icons'
 import { isBefore } from 'date-fns'
 import { capitalize } from 'lodash'
@@ -15,11 +15,12 @@ import { ContentBackButton } from '@/components/ContentBackButton'
 import { DetailShareGroup } from '@/components/ShareGroup/DetailShareGroup'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { formatActionDetailTitle } from '@/features_next/actions/utils/formatActionDetailTitle'
+
 import { ActionStatus, RestActionFull } from '@/services/actions/schema'
 
+import { mapPayload } from '../../../utils/mapPayload'
 import { ActionDetailMapBlock } from './ActionDetailMap'
 import ParticipantAvatar from './ParticipantAvatar'
-import { mapPayload } from '../utils/mapPayload'
 
 export type ActionContentProps = {
   data: RestActionFull
@@ -56,7 +57,9 @@ type ActionInnerProps = {
 
 const ActionParticipantsSection = ({ data }: Pick<ActionInnerProps, 'data'>) => (
   <YStack gap="$medium" pb="$medium">
-    <Text fontWeight="$5">{data.participants.length} inscrits :</Text>
+    <Text.MD secondary>
+      {data.participants.length ?? 1} {`Participant${data.participants.length > 1 ? 's' : ''}`} :
+    </Text.MD>
     <XStack flexWrap="wrap" gap="$medium" justifyContent="flex-start">
       {data.author ? <ParticipantAvatar participant={data.author} /> : null}
       {data.participants
@@ -120,16 +123,20 @@ const ActionMeta = ({ payload }: Pick<ActionInnerProps, 'payload'>) => {
   )
 }
 
-const ActionButtons = ({ data, isPassed, isMyAction, onEdit }: Pick<ActionInnerProps, 'data' | 'isPassed' | 'isMyAction' | 'onEdit'>) => {
+const ActionButtons = ({
+  data,
+  isPassed,
+  isCancelled,
+  isMyAction,
+  onEdit,
+}: Pick<ActionInnerProps, 'data' | 'isPassed' | 'isCancelled' | 'isMyAction' | 'onEdit'>) => {
   const buttonProps = { variant: 'contained' as const, full: true, flex: 1, width: '100%' as const, size: 'xl' as const, shrink: false as const }
 
-  if (isPassed) return null
-
-  if (isMyAction) {
+  if (isMyAction && !isPassed) {
     return (
       <XStack gap={8} width="100%">
         <YStack flex={1}>
-          <VoxButton theme="purple" {...buttonProps} variant="soft" iconLeft={PenLine} pop onPress={onEdit}>
+          <VoxButton theme="purple" {...buttonProps} variant="soft" iconLeft={PenLine} onPress={onEdit}>
             Éditer
           </VoxButton>
         </YStack>
@@ -140,7 +147,13 @@ const ActionButtons = ({ data, isPassed, isMyAction, onEdit }: Pick<ActionInnerP
   return (
     <XStack gap={8} width="100%">
       <YStack flex={1}>
-        <SubscribeButton disabled={data.status === ActionStatus.CANCELLED} large isRegister={Boolean(data.user_registered_at)} id={data.uuid} />
+        {!isCancelled && isPassed ? (
+          <VoxButton variant="contained" theme="gray" iconLeft={Clock9} size="xl" full>
+            Terminé
+          </VoxButton>
+        ) : (
+          <SubscribeButton disabled={data.status === ActionStatus.CANCELLED} large isRegister={Boolean(data.user_registered_at)} id={data.uuid} />
+        )}
       </YStack>
     </XStack>
   )
@@ -153,7 +166,16 @@ const MobileBottomCTA = (props: ActionInnerProps) => {
   if (!content) return null
 
   return (
-    <YStack position="absolute" bg="$white1" bottom={0} left="$0" width="100%" elevation="$1" p={16} pb={insets.bottom}>
+    <YStack
+      position={isWeb ? 'fixed' : 'absolute'}
+      bg="$white1"
+      bottom={0}
+      left="$0"
+      width="100%"
+      elevation="$1"
+      p={16}
+      pb={insets.bottom > 0 ? insets.bottom : 16}
+    >
       {content}
     </YStack>
   )
@@ -166,9 +188,9 @@ const MobileLayout = (props: ActionInnerProps) => (
         <YStack paddingBottom={100}>
           <VoxCard overflow="visible" pb={66} borderWidth={0}>
             <ActionInfo {...props} />
-            <VoxCard.Separator />
+            <VoxCard.Separator mx={'$medium'} />
             <ActionMeta payload={props.payload} />
-            <VoxCard.Separator />
+            <VoxCard.Separator mx={'$medium'} />
             <YStack px="$medium" gap="$medium">
               <ActionParticipantsSection data={props.data} />
               <DetailShareGroup action={props.data} />

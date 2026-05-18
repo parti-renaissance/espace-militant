@@ -1,12 +1,11 @@
-import Text from '@/components/base/Text'
-import ProfilePicture from '@/components/ProfilePicture'
-import type { RestActionAuthor, RestActionParticipant } from '@/services/actions/schema'
 import { YStack, type YStackProps } from 'tamagui'
 
-export default function ParticipantAvatar({
-  participant,
-  ...props
-}: Readonly<{ participant: RestActionParticipant | RestActionAuthor }> & YStackProps) {
+import Text from '@/components/base/Text'
+import ProfilePicture from '@/components/ProfilePicture'
+
+import type { RestActionAuthor, RestActionParticipant } from '@/services/actions/schema'
+
+export default function ParticipantAvatar({ participant, ...props }: Readonly<{ participant: RestActionParticipant | RestActionAuthor }> & YStackProps) {
   const getIsAuthor = (guy: RestActionParticipant | RestActionAuthor): guy is RestActionAuthor => 'first_name' in guy
   const isAuthor = getIsAuthor(participant)
   const namesContainer = isAuthor ? participant : participant.adherent
@@ -20,13 +19,13 @@ export default function ParticipantAvatar({
           fullName={fullName}
           alt={`Photo de ${fullName}`}
           rounded
-          borderBlockColor="$textPrimary"
+          borderBlockColor="$gray5"
           borderWidth={isAuthor ? 1 : 0}
         />
         {isAuthor ? (
           <YStack position="absolute" bottom={0} width="100%" justifyContent="center" alignContent="center" alignItems="center">
             <YStack
-              borderBlockColor="$textPrimary"
+              borderBlockColor="$gray5"
               borderWidth={1}
               borderRadius="$4"
               justifyContent="center"
@@ -35,18 +34,18 @@ export default function ParticipantAvatar({
               p={2}
               paddingHorizontal="$small"
             >
-              <Text fontSize="$1" color="$textPrimary" textAlign="center" fontWeight="$5">
+              <Text fontSize="$1" color="$gray5" textAlign="center" fontWeight="$5">
                 Auteur
               </Text>
             </YStack>
           </YStack>
         ) : null}
       </YStack>
-      <YStack justifyContent="center" alignItems="center" gap="$small">
-        <Text numberOfLines={1} color={isAuthor ? '$textPrimary' : '$textSecondary'}>
+      <YStack justifyContent="center" alignItems="center">
+        <Text numberOfLines={1} color="$textSecondary">
           {namesContainer.first_name}
         </Text>
-        <Text numberOfLines={1} color={isAuthor ? '$textPrimary' : '$textSecondary'}>
+        <Text numberOfLines={1} color="$textSecondary">
           {namesContainer.last_name}
         </Text>
       </YStack>
