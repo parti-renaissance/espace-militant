@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
-import { ArrowLeft, Crosshair } from '@tamagui/lucide-icons'
+import { ArrowLeft, CirclePlus, Crosshair } from '@tamagui/lucide-icons'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { SideBarArea } from '@/components/AppStructure/Navigation/SideBar'
 import { VoxButton } from '@/components/Button'
+
 import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
 import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
@@ -57,7 +58,7 @@ const EventsMapPage = () => {
 
   const handleRecenterPress = useCallback(() => {
     void (async () => {
-      const next = await requestLocation()
+      const next = await requestLocation({ showAlertOnFailure: true })
       if (next) {
         setSortAround({
           lat: roundCoordinateForMapSortAround(next[1]),
@@ -132,6 +133,11 @@ const EventsMapPage = () => {
             <Spinner size="large" />
           </YStack>
         )}
+        <XStack position="absolute" bottom="$medium" right="$medium" zIndex={20} gap="$small">
+          <VoxButton variant="contained" size="lg" iconLeft={CirclePlus} theme="purple" onPress={() => router.push('/evenements/creer')}>
+            Organiser un événement
+          </VoxButton>
+        </XStack>
       </YStack>
     </Layout.Main>
   )

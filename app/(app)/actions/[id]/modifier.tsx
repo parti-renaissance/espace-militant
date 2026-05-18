@@ -5,7 +5,7 @@ import Head from 'expo-router/head'
 import Error404 from '@/components/404/Error404'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
-import { ActionForm, ActionFormScreenSkeleton } from '@/features_next/actions'
+import ActionForm, { ActionFormScreenSkeleton } from '@/features_next/actions/pages/create-edit'
 
 import * as metatags from '@/config/metatags'
 import { useAction } from '@/services/actions/hook'

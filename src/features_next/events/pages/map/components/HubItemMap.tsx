@@ -1,10 +1,11 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
+import { YStack } from 'tamagui'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import { Feature, FeatureCollection, Point, type Position as GeoPosition } from 'geojson'
 
 import MapboxGl from '@/components/Mapbox/Mapbox'
-
+import { spreadMapCoordinates } from '@/components/Mapbox/spreadMapCoordinates'
 import pinBoitage from '@/features_next/actions/assets/map/action-boitage.png'
 import pinCollage from '@/features_next/actions/assets/map/action-collage.png'
 import pinPap from '@/features_next/actions/assets/map/action-porte-a-porte.png'
@@ -110,6 +111,7 @@ const HUB_ITEM_POINT_SYMBOL_STYLE = {
   iconAllowOverlap: true,
   iconIgnorePlacement: true,
   iconAnchor: 'bottom' as const,
+  symbolSortKey: ['get', 'sortOrder'],
 } as const
 
 /** Halo + point bleu style Maps, en `CircleLayer` (web + natif). */
@@ -138,6 +140,7 @@ const distanceInKm = (from: [number, number], to: [number, number]) => {
 }
 
 const getZoomForNearestDistance = (distanceKm: number) => {
+  if (distanceKm <= 0.4) return 16
   if (distanceKm <= 1.5) return 14
   if (distanceKm <= 3) return 13
   if (distanceKm <= 6) return 12
@@ -176,10 +179,7 @@ export type HubItemMapItem = {
   isCancelled?: boolean
 }
 
-const computeUserCenterCamera = (
-  userCoords: [number, number],
-  items: HubItemMapItem[],
-): { center: [number, number]; zoom: number } => {
+const computeUserCenterCamera = (userCoords: [number, number], items: HubItemMapItem[]): { center: [number, number]; zoom: number } => {
   if (items.length === 0) {
     return { center: userCoords, zoom: 12 }
   }
@@ -239,20 +239,7 @@ export type HubItemMapProps =
     })
 
 const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
-  (
-    {
-      items,
-      isInteractive = true,
-      clusterItems = false,
-      onItemPress,
-      initialBounds,
-      centerCoordinate,
-      zoomLevel,
-      padding,
-      userLocationLngLat,
-    },
-    ref,
-  ) => {
+  ({ items, isInteractive = true, clusterItems = false, onItemPress, initialBounds, centerCoordinate, zoomLevel, padding, userLocationLngLat }, ref) => {
     const cameraRef = useRef<React.ComponentRef<typeof MapboxGl.Camera>>(null)
     const mapViewRef = useRef<React.ComponentRef<typeof MapboxGl.MapView>>(null)
 
@@ -291,10 +278,14 @@ const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
       [animateCameraTo, flyToUserWithItemsZoom, getVisibleBounds],
     )
 
-    const shape = useMemo<FeatureCollection<Point, HubItemMapFeatureProperties>>(
-      () => ({
+    const shape = useMemo<FeatureCollection<Point, HubItemMapFeatureProperties>>(() => {
+      const spreadById = spreadMapCoordinates(
+        items.map((item) => ({ id: item.uuid, longitude: item.longitude, latitude: item.latitude })),
+        { radiusMeters: 5 },
+      )
+      return {
         type: 'FeatureCollection',
-        features: items.map((item) => ({
+        features: items.map((item, index) => ({
           type: 'Feature',
           properties: {
             uuid: item.uuid,
@@ -302,15 +293,15 @@ const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
             slug: item.slug,
             itemType: item.itemType,
             pinImageId: resolveMapPinImageKey(item),
+            sortOrder: index,
           },
           geometry: {
             type: 'Point',
-            coordinates: [item.longitude, item.latitude],
+            coordinates: spreadById.get(item.uuid) ?? [item.longitude, item.latitude],
           },
         })),
-      }),
-      [items],
-    )
+      }
+    }, [items])
 
     const userLocationFeature = useMemo((): Feature<Point> | null => {
       if (!userLocationLngLat) {
@@ -333,7 +324,8 @@ const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
         scaleBarEnabled={false}
         scrollEnabled={isInteractive}
         zoomEnabled={isInteractive}
-        rotateEnabled={isInteractive}
+        rotateEnabled={false}
+        pitchEnabled={false}
       >
         <MapboxGl.Camera ref={cameraRef} followUserLocation={false} padding={padding} {...cameraProps} />
         <MapboxGl.Images images={MAP_PIN_MARKERS_IMAGES} />

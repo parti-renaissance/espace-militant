@@ -72,7 +72,7 @@ const EventsHubPage = () => {
 
   const handleRecenterPress = useCallback(() => {
     void (async () => {
-      const next = await requestLocation()
+      const next = await requestLocation({ showAlertOnFailure: true })
       if (next) {
         setSortAround({
           lat: roundCoordinateForMapSortAround(next[1]),

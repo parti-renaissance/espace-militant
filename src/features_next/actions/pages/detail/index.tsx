@@ -1,5 +1,3 @@
-import type { ComponentProps } from 'react'
-
 import { ActionContent } from './components/ActionContent'
 import { ActionDenyScreen } from './components/ActionDenyScreen'
 import { ActionSkeleton } from './components/ActionSkeleton'
@@ -17,5 +15,3 @@ export function ActionDetailsScreenSkeleton() {
 export function ActionDetailsScreenDeny({ error }: { error: DetailedAPIErrorPayload }) {
   return <ActionDenyScreen error={error} />
 }
-
-export { default as ActionForm, ActionFormScreenSkeleton } from './components/ActionForm'
