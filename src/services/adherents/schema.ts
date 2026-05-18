@@ -340,7 +340,6 @@ export const RestAdherentActivityItemSchema = z.object({
 
 export const RestAdherentActivityRequestSchema = z.object({
   scope: z.string(),
-  source_type: z.string().optional(),
   event_type: z.string().optional(),
   page: z.number().optional(),
   page_size: z.number().optional(),
@@ -351,7 +350,6 @@ export const RestAdherentActivityResponseSchema = createRestPaginationSchema(Res
 const RestAdherentActivityFilterOptionSchema = z.object({ value: z.string(), label: z.string() })
 
 export const RestAdherentActivityFilterSchema = z.object({
-  source_types: z.array(RestAdherentActivityFilterOptionSchema),
   event_types: z.object({
     hit: z.array(RestAdherentActivityFilterOptionSchema),
     action_history: z.array(RestAdherentActivityFilterOptionSchema),
