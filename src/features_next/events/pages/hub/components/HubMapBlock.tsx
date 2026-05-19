@@ -63,6 +63,7 @@ export function HubMapBlock({
         initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
         padding={padding}
         userLocationLngLat={userLocationLngLat}
+        embeddedInScrollView={variant === 'embedded'}
       />
       <HubMapPromoOverlay leadingAccessory={promoLeadingAccessory} />
       {showLoadingSpinner && (
