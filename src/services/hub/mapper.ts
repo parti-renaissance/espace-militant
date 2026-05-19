@@ -1,7 +1,7 @@
-import type { HubItemMapItem } from '@/features_next/events/pages/map/components/HubItemMap'
 import type { ActionVoxCardProps } from '@/components/Cards/ActionCard'
-
+import type { HubItemMapItem } from '@/features_next/events/pages/map/components/HubItemMap'
 import { isEventPast } from '@/features_next/events/utils'
+
 import { ActionStatus, ActionType } from '@/services/actions/schema'
 import type { RestItemEvent, RestPartialEvent } from '@/services/events/schema'
 
@@ -90,8 +90,7 @@ export const mapHubItemToActionCardPayload = (item: RestHubItem): ActionVoxCardP
     return null
   }
 
-  const status =
-    item.status === ActionStatus.CANCELLED || item.status === 'CANCELLED' ? ActionStatus.CANCELLED : ActionStatus.SCHEDULED
+  const status = item.status === ActionStatus.CANCELLED || item.status === 'CANCELLED' ? ActionStatus.CANCELLED : ActionStatus.SCHEDULED
 
   const address = item.post_address
 
@@ -128,22 +127,16 @@ export const mapHubItemToActionCardPayload = (item: RestHubItem): ActionVoxCardP
   }
 }
 
-export type HubFeedRow =
-  | { type: 'event'; event: RestItemEvent }
-  | { type: 'action'; payload: ActionVoxCardProps['payload']; editable: boolean }
+export type HubFeedRow = { type: 'event'; event: RestItemEvent } | { type: 'action'; payload: ActionVoxCardProps['payload']; editable: boolean }
 
 export const mapHubItemToFeedRow = (item: RestHubItem): HubFeedRow | null => {
+  if (isHubActionItem(item)) {
+    const payload = mapHubItemToActionCardPayload(item)
+    return payload ? { type: 'action', payload, editable: item.editable } : null
+  }
+
   const event = mapHubItemToRestItemEvent(item)
-  if (event) {
-    return { type: 'event', event }
-  }
-
-  const payload = mapHubItemToActionCardPayload(item)
-  if (payload) {
-    return { type: 'action', payload, editable: item.editable }
-  }
-
-  return null
+  return event ? { type: 'event', event } : null
 }
 
 const isFiniteCoordinate = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
