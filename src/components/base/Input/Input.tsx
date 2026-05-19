@@ -40,6 +40,8 @@ export type InputProps = {
     multiline?: boolean
     customTextComponent?: (props: ComponentProps<typeof Text>) => React.ReactNode
   }
+  /** Remplit la hauteur du conteneur parent (multiline uniquement). */
+  fill?: boolean
 } & Omit<TextInputProps, 'placeholder' | 'onChange'>
 
 const InputFrame = styled(XStack, {
@@ -129,6 +131,7 @@ const InputFrame = styled(XStack, {
         height: 'auto',
         minHeight: 56 + 40,
         borderRadius: 28,
+        minWidth: 0,
       },
     },
     withoutLabel: {
@@ -160,7 +163,10 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
     frameRef,
     fakeProps,
     bottomSheetInput,
-    ...inputProps
+    multiline,
+    fill,
+    numberOfLines: _numberOfLines,
+    ...textInputProps
   } = _props
   const [isFocused, setIsFocused] = useState(false)
   const [errorLayoutHeight, setErrorLayoutHeight] = useState(0)
@@ -185,11 +191,11 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
   }
 
   const handleChange = (evt: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    if (inputProps.multiline && isWeb) adjustTextInputSize(evt)
+    if (multiline && isWeb && !fill) adjustTextInputSize(evt)
   }
 
   const handleLayoutChange = (evt: LayoutChangeEvent) => {
-    if (inputProps.multiline && isWeb) adjustTextInputSize(evt)
+    if (multiline && isWeb && !fill) adjustTextInputSize(evt)
   }
 
   const adjustTextInputSize = (evt) => {
@@ -214,7 +220,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
       if (isWeb) e.preventDefault()
       return
     }
-    inputProps.onPress?.(e)
+    textInputProps.onPress?.(e)
     inputRef.current?.focus()
   }
 
@@ -228,11 +234,11 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
   const theme = useTheme()
 
   const defaultFakeTextProps = {
-    color: inputProps.value ? (color !== 'purple' ? '$textPrimary' : '$purple6') : '$textSecondary',
-    semibold: !!inputProps.value,
+    color: textInputProps.value ? (color !== 'purple' ? '$textPrimary' : '$purple6') : '$textSecondary',
+    semibold: !!textInputProps.value,
     numberOfLines: fakeProps?.multiline ? undefined : 1,
     borderBottomWidth: 0,
-    children: inputProps.value || placeholder,
+    children: textInputProps.value || placeholder,
   }
 
   const FakeTextComponent = fakeProps?.customTextComponent ?? Text.MD
@@ -241,14 +247,17 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
   const DynInput = useMemo(() => (bottomSheetInput && isInBottomSheet ? BottomSheetTextInput : TextInput), [bottomSheetInput, isInBottomSheet])
 
   return (
-    <YStack gap="$xsmall" ref={frameRef}>
+    <YStack gap="$xsmall" ref={frameRef} flex={fill ? 1 : undefined} height={fill ? '100%' : undefined} minHeight={fill ? 0 : undefined}>
       <InputFrame
         disabled={disabled}
         color={color ?? 'white'}
         error={isFailed}
         fake={fake}
-        multiline={inputProps.multiline}
-        size={inputProps.multiline ? undefined : (size ?? 'lg')}
+        multiline={multiline}
+        flex={fill ? 1 : undefined}
+        height={fill ? '100%' : undefined}
+        minHeight={fill ? 0 : undefined}
+        size={multiline ? undefined : (size ?? 'lg')}
         forceStyle={isFocused ? 'focus' : undefined}
         onPress={handlePress}
         withoutLabel={!hasLabel}
@@ -258,12 +267,12 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
             {iconLeft}
           </YStack>
         )}
-        <YStack height="auto" flex={1} paddingTop={inputProps.multiline ? '$medium' : 0}>
+        <YStack flex={1} height={fill ? '100%' : 'auto'} minWidth={0} minHeight={fill ? 0 : undefined} paddingTop={multiline ? '$medium' : 0}>
           <AnimatePresence>
             {hasLabel &&
               (label ||
-                (placeholder && inputProps.value && inputProps.value.length > 0) ||
-                (placeholder && inputProps.defaultValue && inputProps.defaultValue.length > 0)) && (
+                (placeholder && textInputProps.value && textInputProps.value.length > 0) ||
+                (placeholder && textInputProps.defaultValue && textInputProps.defaultValue.length > 0)) && (
                 <XStack alignSelf="flex-start" width="100%">
                   <Text.XSM flex={1} color={error ? '$orange5' : '$textPrimary'} numberOfLines={1}>
                     {label ?? placeholder}
@@ -281,24 +290,42 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
                 paddingBottom: breathingSpace,
                 marginBottom: -breathingSpace,
                 fontSize: 14,
-                height: Platform.OS === 'android' && !inputProps.multiline ? 18 + breathingSpace : 'auto',
+                height:
+                  fill && multiline
+                    ? '100%'
+                    : Platform.OS === 'android' && !multiline
+                      ? 18 + breathingSpace
+                      : 'auto',
+                flex: fill && multiline ? 1 : undefined,
                 width: '100%',
-                fontWeight: isWeb ? (inputProps.value ? 500 : 400) : undefined,
+                minWidth: 0,
+                fontWeight: isWeb ? (textInputProps.value ? 500 : 400) : undefined,
+                ...(multiline && isWeb
+                  ? {
+                      wordBreak: 'break-word',
+                      overflowWrap: 'break-word',
+                      whiteSpace: 'pre-wrap',
+                      resize: 'none',
+                      overflowY: 'auto',
+                      ...(fill ? {} : { maxHeight: 200 }),
+                    }
+                  : {}),
               }}
               editable={!disabled}
               ref={inputRef}
-              value={inputProps.value}
+              multiline={multiline}
+              value={textInputProps.value}
               onChangeText={handleValueChange}
               placeholderTextColor={theme.textDisabled.val}
               placeholder={placeholder}
-              textAlignVertical={inputProps.multiline || (shouldApplyBreathing && Platform.OS === 'android') ? 'top' : 'center'}
-              numberOfLines={inputProps.multiline ? undefined : 1}
+              textAlignVertical={multiline || (shouldApplyBreathing && Platform.OS === 'android') ? 'top' : 'center'}
+              numberOfLines={multiline ? undefined : 1}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              {...inputProps}
+              {...textInputProps}
               onChange={handleChange}
               onLayout={handleLayoutChange}
-              onPress={disabled ? undefined : inputProps.onPress}
+              onPress={disabled ? undefined : textInputProps.onPress}
             />
           )}
         </YStack>

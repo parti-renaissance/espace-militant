@@ -3,8 +3,9 @@ import { Keyboard, Platform } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { FormFrame } from '@/components/base/FormFrames'
 import Text from '@/components/base/Text'
-import { getFormattedDate, getFormattedTime } from '@/utils/date'
-import { isValid } from 'date-fns'
+import { dateTimeFormat, getFormattedDate, getFormattedTime } from '@/utils/date'
+import { format, isValid } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import { Input, isWeb } from 'tamagui'
 
 interface DatePickerFieldProps {
@@ -15,7 +16,12 @@ interface DatePickerFieldProps {
   label?: string
   placeholder?: string
   disabled?: boolean
-  type?: 'date' | 'time'
+  type?: 'date' | 'time' | 'datetime'
+}
+
+const toDatetimeLocalValue = (date: Date) => {
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
 const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabled, onChange, error, type = 'date', onBlur }, ref) => {
@@ -46,15 +52,26 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabl
     newDate.setSeconds(0)
     onChange?.(newDate)
   }
+
+  const handleDatetimeChange = (input: string) => {
+    const newDate = new Date(input)
+    if (!isNaN(newDate.getTime())) {
+      onChange?.(newDate)
+    }
+  }
+
   const formattedDate = value && isValid(value) ? value.toISOString().split('T')[0] : ''
   const formattedTime = value && isValid(value) ? `${value?.getHours().toString().padStart(2, '0')}:${value?.getMinutes().toString().padStart(2, '0')}` : ''
+  const formattedDatetime = value && isValid(value) ? toDatetimeLocalValue(value) : ''
 
-  const webInputValue = type === 'date' ? formattedDate : formattedTime
+  const webInputValue = type === 'date' ? formattedDate : type === 'time' ? formattedTime : formattedDatetime
+  const webInputType = type === 'datetime' ? 'datetime-local' : type
 
   // In case of web component
   const handleChange = (input: string) => {
     if (type === 'date') handleDateChange(input)
-    else handleTimeChange(input)
+    else if (type === 'time') handleTimeChange(input)
+    else handleDatetimeChange(input)
   }
 
   const onHide = () => {
@@ -70,12 +87,19 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabl
       setIsDatePickerVisible(true)
     }
   }
-  const placeholder = type === 'date' ? 'JJ/MM/AAAA' : 'HH:MM'
+  const placeholder = type === 'date' ? 'JJ/MM/AAAA' : type === 'time' ? 'HH:MM' : 'JJ/MM/AAAA HH:MM'
 
-  const formatedValue = (type: 'date' | 'time', value: Date) => (type === 'date' ? getFormattedDate(value) : getFormattedTime(value))
+  const formatedValue = (pickerType: 'date' | 'time' | 'datetime', dateValue: Date) => {
+    if (pickerType === 'date') return getFormattedDate(dateValue)
+    if (pickerType === 'time') return getFormattedTime(dateValue)
+    return format(dateValue, dateTimeFormat, { locale: fr })
+  }
+
+  const pickerMode = type === 'datetime' ? 'datetime' : type
+
   return Platform.OS === 'web' ? (
     <input
-      type={type}
+      type={webInputType}
       value={webInputValue}
       onChange={(e) => handleChange(e.target.value)}
       onBlur={() => onBlur?.()}
@@ -111,7 +135,7 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabl
         cancelTextIOS="Annuler"
         isVisible={isDatePickerVisible}
         accentColor="blue"
-        mode={type}
+        mode={pickerMode}
         onConfirm={handleConfirm}
         onCancel={onHide}
       />

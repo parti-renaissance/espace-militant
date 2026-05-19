@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, useNavigation } from 'expo-router'
+import { Link, useNavigation, type Href } from 'expo-router'
 import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 import { ArrowLeft, Ban, Info, Sparkle, Zap } from '@tamagui/lucide-icons'
 import { Controller } from 'react-hook-form'
@@ -13,38 +13,24 @@ import { VoxHeader } from '@/components/Header/Header'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
+import { useActionFormContext } from '../helpers/context'
 import ActionAddressField from './ActionAddressField'
 import ActionDateField from './ActionDateField'
 import ActionTypeField from './ActionTypeField'
-import { useActionFormContext } from '../helpers/context'
 
 const ActionFormMain = () => {
   const { control } = useActionFormContext()
 
   return (
     <YStack gap="$medium">
+      <XStack gap="$medium" alignContent="center" alignItems="center">
+        <Text.MD secondary>Catégorie</Text.MD>
+        <VoxCard.Separator />
+      </XStack>
       <ActionTypeField />
-      <Controller
-        render={({ field, fieldState }) => (
-          <YStack minHeight={100} maxHeight={400}>
-            <Input
-              size="sm"
-              color="gray"
-              label="Description (optionnelle)"
-              placeholder="Ajoutez une description"
-              multiline
-              numberOfLines={8}
-              error={fieldState.error?.message}
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-            />
-          </YStack>
-        )}
-        control={control}
-        name="description"
-      />
-      <Text.XSM secondary>1000 caractères maximum</Text.XSM>
+      <VoxCard.Separator />
+      <ActionDateField control={control} />
+      <ActionAddressField />
     </YStack>
   )
 }
@@ -53,9 +39,30 @@ const ActionFormAside = () => {
   const { control } = useActionFormContext()
 
   return (
-    <YStack gap="$medium">
-      <ActionDateField control={control} />
-      <ActionAddressField />
+    <YStack flex={1} gap="$medium" height="100%" minHeight={0}>
+      <XStack gap="$medium" alignContent="center" alignItems="center">
+        <Text.MD secondary>Optionnel</Text.MD>
+        <VoxCard.Separator />
+      </XStack>
+      <YStack flex={1} minHeight={0} minWidth={0}>
+        <Controller
+          render={({ field, fieldState }) => (
+            <Input
+              fill
+              size="sm"
+              color="gray"
+              placeholder="Ajoutez une description"
+              multiline
+              error={fieldState.error?.message}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            />
+          )}
+          control={control}
+          name="description"
+        />
+      </YStack>
     </YStack>
   )
 }
@@ -71,7 +78,7 @@ const ActionFormActions = () => {
         </VoxButton>
       ) : null}
       <YStack ml="auto">
-        <VoxButton onPress={onSubmit} size="md" variant="contained" theme="green" loading={isPending} iconLeft={Sparkle}>
+        <VoxButton onPress={onSubmit} size="md" variant="contained" theme="purple" loading={isPending} iconLeft={Sparkle}>
           {isPending ? `${editMode ? 'Modification' : 'Création'}...` : `${editMode ? 'Modifier' : 'Créer'} l’action`}
         </VoxButton>
       </YStack>
@@ -79,7 +86,7 @@ const ActionFormActions = () => {
   )
 }
 
-const BackButton = (props: { href: string; children?: React.ReactNode }) => {
+const BackButton = (props: { href: Href; children?: React.ReactNode }) => {
   const { canGoBack } = useNavigation()
   return (
     <Link href={canGoBack() ? '../' : props.href} asChild={!isWeb}>
@@ -102,20 +109,20 @@ export default function ActionFormDesktopScreen() {
         <YStack gap="$medium">
           <VoxCard opacity={isPending ? 0.5 : 1} style={{ pointerEvents: isPending ? 'none' : 'auto' }} cursor={isPending ? 'progress' : 'auto'}>
             <VoxCard.Content paddingBottom={0} justifyContent="center" alignItems="center">
-              <VoxHeader.Title icon={Zap}>{`${editMode ? 'Modifier' : 'Créer'} l’action`}</VoxHeader.Title>
+              <VoxHeader.Title icon={Zap}>{`${editMode ? 'Modifier l’action' : 'Nouvelle action'}`}</VoxHeader.Title>
             </VoxCard.Content>
             {editMode ? null : (
               <VoxCard.Content paddingBottom={0} paddingTop={0}>
                 <MessageCard theme="gray" iconLeft={Info}>
-                  Organisez une <Text.MD bold>action militante sur le terrain</Text.MD> pour mobiliser vos militants autour de vous.
+                  Créez un événement pour faire campagne, rassembler vos militants ou récompenser vos adhérents.
                 </MessageCard>
               </VoxCard.Content>
             )}
-            <XStack alignItems="flex-start" paddingVertical="$medium">
-              <YStack flex={1} flexShrink={1} gap="$medium" paddingHorizontal="$medium">
+            <XStack alignItems="stretch" paddingVertical="$medium">
+              <YStack flex={1} flexShrink={1} minWidth={0} maxWidth={450} gap="$medium" paddingHorizontal="$medium">
                 <ActionFormMain />
               </YStack>
-              <YStack maxWidth={400} paddingHorizontal="$medium" gap="$medium">
+              <YStack flex={1} flexShrink={1} minWidth={0} maxWidth={450} paddingHorizontal="$medium">
                 <ActionFormAside />
               </YStack>
             </XStack>
@@ -125,7 +132,7 @@ export default function ActionFormDesktopScreen() {
           </VoxCard>
           {isPending ? (
             <YStack top={0} bottom={0} left={0} right={0} position="absolute" justifyContent="center" alignItems="center">
-              <Spinner size="large" color="$green6" />
+              <Spinner size="large" color="$purple6" />
             </YStack>
           ) : null}
         </YStack>

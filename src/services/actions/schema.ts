@@ -1,5 +1,5 @@
 import type { IconComponent } from '@/models/common.model'
-import { DoorOpen, Layers3, Mailbox, Paintbrush } from '@tamagui/lucide-icons'
+import { ClipboardCheck, DoorOpen, Layers3, Mailbox, Paintbrush } from '@tamagui/lucide-icons'
 import { z } from 'zod'
 
 // ---------- Enums & labels ----------
@@ -9,6 +9,7 @@ export enum ActionType {
   BOITAGE = 'boitage',
   TRACTAGE = 'tractage',
   COLLAGE = 'collage',
+  QUESTIONNAIRE = 'questionnaire',
 }
 
 export enum ActionStatus {
@@ -21,6 +22,7 @@ export const ReadableActionType: Record<ActionType, string> = {
   [ActionType.BOITAGE]: 'Boîtage',
   [ActionType.TRACTAGE]: 'Tractage',
   [ActionType.COLLAGE]: 'Collage',
+  [ActionType.QUESTIONNAIRE]: 'Questionnaire de terrain',
 }
 
 export const ActionTypeIcon: Record<ActionType, IconComponent> = {
@@ -28,6 +30,7 @@ export const ActionTypeIcon: Record<ActionType, IconComponent> = {
   [ActionType.BOITAGE]: Mailbox,
   [ActionType.TRACTAGE]: Layers3,
   [ActionType.COLLAGE]: Paintbrush,
+  [ActionType.QUESTIONNAIRE]: ClipboardCheck,
 }
 
 // ---------- Shared fragments ----------
