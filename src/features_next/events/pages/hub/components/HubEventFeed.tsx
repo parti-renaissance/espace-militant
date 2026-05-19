@@ -174,6 +174,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
         ListHeaderComponent={listHeaderComponent}
         contentContainerStyle={contentContainerStyleMerged}
         removeClippedSubviews={embeddedMapHeader != null && Platform.OS !== 'web' ? false : undefined}
+        nestedScrollEnabled={embeddedMapHeader != null && Platform.OS === 'android'}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         hasMore={hasNextPage ?? false}

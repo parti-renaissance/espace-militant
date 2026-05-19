@@ -1,4 +1,5 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
+import { Platform } from 'react-native'
 import { YStack } from 'tamagui'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
@@ -223,6 +224,8 @@ type HubItemMapSharedProps = {
   padding?: CameraPadding
   /** `[lng, lat]` — affichée via marqueur custom (source : page / `expo-location`). */
   userLocationLngLat?: [number, number] | null
+  /** Carte dans un scroll parent (ex. header FlatList hub mobile) — active `requestDisallowInterceptTouchEvent` sur Android. */
+  embeddedInScrollView?: boolean
 }
 
 export type HubItemMapProps =
@@ -239,7 +242,21 @@ export type HubItemMapProps =
     })
 
 const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
-  ({ items, isInteractive = true, clusterItems = false, onItemPress, initialBounds, centerCoordinate, zoomLevel, padding, userLocationLngLat }, ref) => {
+  (
+    {
+      items,
+      isInteractive = true,
+      clusterItems = false,
+      onItemPress,
+      initialBounds,
+      centerCoordinate,
+      zoomLevel,
+      padding,
+      userLocationLngLat,
+      embeddedInScrollView = false,
+    },
+    ref,
+  ) => {
     const cameraRef = useRef<React.ComponentRef<typeof MapboxGl.Camera>>(null)
     const mapViewRef = useRef<React.ComponentRef<typeof MapboxGl.MapView>>(null)
 
@@ -326,6 +343,9 @@ const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
         zoomEnabled={isInteractive}
         rotateEnabled={false}
         pitchEnabled={false}
+        {...(Platform.OS === 'android' && embeddedInScrollView && isInteractive
+          ? { requestDisallowInterceptTouchEvent: true }
+          : {})}
       >
         <MapboxGl.Camera ref={cameraRef} followUserLocation={false} padding={padding} {...cameraProps} />
         <MapboxGl.Images images={MAP_PIN_MARKERS_IMAGES} />
