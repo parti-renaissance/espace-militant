@@ -23,23 +23,40 @@ type BottomsheetLogicProps = {
 const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(
   ({ options, searchableOptions, frameRef, resetable, nullableOption, allowInverseSelection, ...props }, ref) => {
     const bottomSheetRef = useRef<BottomSheetModal>(null)
+    const shouldAutoFocusSearchRef = useRef(false)
     const { setQuery, filteredItems, queryInputRef, searchableIcon } = useSelectSearch({ options, searchableOptions })
     const [isInverseSelectionActive, setIsInverseSelectionActive] = useState(Boolean(props.value?.startsWith('!')))
     const insets = useSafeAreaInsets()
+
+    const focusSearchInput = useCallback(() => {
+      queryInputRef.current?.focus()
+    }, [queryInputRef])
+
+    const handleSheetChange = useCallback(
+      (index: number) => {
+        if (index < 0 || !shouldAutoFocusSearchRef.current) return
+        shouldAutoFocusSearchRef.current = false
+        const delay = Platform.OS === 'android' ? 200 : 50
+        setTimeout(focusSearchInput, delay)
+      },
+      [focusSearchInput],
+    )
 
     useImperativeHandle(
       ref,
       () => ({
         open: () => {
+          if (props.searchable) {
+            shouldAutoFocusSearchRef.current = true
+          }
           bottomSheetRef.current?.present()
           props.onOpen?.()
-          setTimeout(() => queryInputRef.current?.focus(), 200)
         },
         close: () => {
           bottomSheetRef.current?.close()
         },
       }),
-      [props.onOpen],
+      [props.onOpen, props.searchable],
     )
 
     const handleClose = () => {
@@ -72,11 +89,13 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(
           backdropComponent={renderBackdrop}
           enablePanDownToClose
           onDismiss={handleClose}
+          onChange={handleSheetChange}
           topInset={insets.top}
           handleIndicatorStyle={{
             backgroundColor: '#D2DCE5',
             width: 48,
           }}
+          snapPoints={props.searchable ? ['90%'] : undefined}
         >
           <BottomSheetProvider>
             <BottomSheetFlatList
@@ -101,7 +120,7 @@ const SelectBottomSheet = forwardRef<ModalDropDownRef, BottomsheetLogicProps>(
                   {props.searchable ? (
                     <YStack padding={16} bg="white">
                       <Input
-                        bottomSheetInput={Platform.OS === 'ios'}
+                        bottomSheetInput={Platform.OS === 'ios' || Platform.OS === 'android'}
                         color="gray"
                         ref={queryInputRef}
                         onChangeText={setQuery}
