@@ -6,6 +6,10 @@ import { MapPin, Search } from '@tamagui/lucide-icons'
 import { useDebounceValue, YStack } from 'tamagui'
 import Select from '../base/Select/SelectV3'
 
+const STREET_TYPES = new Set(['street_address', 'premise', 'subpremise', 'route', 'establishment'])
+
+const hasStreetType = (types: string[] = []) => types.some((t) => STREET_TYPES.has(t))
+
 export interface AddressAutocompleteProps {
   defaultValue?: string
   setAddressComponents?: (addressComponents: {
@@ -27,6 +31,7 @@ export interface AddressAutocompleteProps {
   placeholder?: string
   onReset?: () => void
   enableFallback?: boolean
+  addressOnly?: boolean
 }
 
 function AddressAutocomplete({
@@ -38,6 +43,7 @@ function AddressAutocomplete({
   onBlur,
   onReset,
   enableFallback = false,
+  addressOnly = false,
   ...rest
 }: Readonly<AddressAutocompleteProps> & Omit<ComponentProps<typeof Select>, 'handleQuery' | 'options' | 'value' | 'onChange'>): JSX.Element {
   const [value, setValue] = useState<string>('default')
@@ -48,12 +54,10 @@ function AddressAutocomplete({
   const { data: autocompleteResults, isFetching } = usePlaceAutocomplete({ address, keepPreviousData: true })
   const { mutateAsync } = usePlaceDetails()
 
-  // On input notify that user is interacting with component
   const onInput = useCallback((text: string) => {
     setQuery(text)
   }, [])
 
-  // When place is selected, setPlaceId and trigger results close.
   const onPlaceSelect = (id: string) => {
     if (id.length === 0) {
       onReset?.()
@@ -61,17 +65,14 @@ function AddressAutocomplete({
       return
     }
     setValue(id)
-  
-    // Trouver la prédiction sélectionnée dans les résultats autocomplete
-    const selectedPrediction = autocompleteResults?.find(x => x.place_id === id)
-  
+
+    const selectedPrediction = autocompleteResults?.find((x) => x.place_id === id)
+
     mutateAsync(id)
       .then((placeDetails) => {
         if (placeDetails?.formatted && placeDetails.details && placeDetails.geometry) {
-          const fallback = enableFallback && selectedPrediction ? !isProbablyAddress(selectedPrediction) : false
-          setAddressComponents?.(
-            googleAddressMapper({ placeDetails, addressFallback: fallback })
-          )
+          const fallback = enableFallback && selectedPrediction ? !hasStreetType(selectedPrediction.types) : false
+          setAddressComponents?.(googleAddressMapper({ placeDetails, addressFallback: fallback }))
         }
       })
       .finally(() => {
@@ -79,21 +80,9 @@ function AddressAutocomplete({
       })
   }
 
-  const isProbablyAddress = (prediction: google.maps.places.AutocompletePrediction): boolean => {
-    const types = prediction.types || [];
-    const mainText = prediction.structured_formatting?.main_text || '';
-    const secondaryText = prediction.structured_formatting?.secondary_text || '';
-  
-    const hasAddressLikeType = types.some(t =>
-      ['street_address', 'premise', 'subpremise', 'route', 'establishment'].includes(t)
-    );
-  
-    const containsStreetInSecondary = /(rue|avenue|boulevard|chemin|impasse|route|place)/i.test(secondaryText);
-  
-    const startsWithNumber = /^\d+/.test(mainText);
-  
-    return hasAddressLikeType || containsStreetInSecondary || startsWithNumber;
-  };  
+  const predictions = addressOnly
+    ? (autocompleteResults?.filter((p) => hasStreetType(p.types)) ?? [])
+    : (autocompleteResults ?? [])
 
   return (
     <YStack minWidth={minWidth} maxWidth={maxWidth}>
@@ -110,10 +99,10 @@ function AddressAutocomplete({
         }}
         {...rest}
         options={[
-          ...(autocompleteResults?.map((x) => ({
+          ...predictions.map((x) => ({
             value: x.place_id,
-            label: enableFallback && !isProbablyAddress(x) ? `🔜 Lieu communiqué bientôt, ${x.description}` : x.description,
-          })) ?? []),
+            label: enableFallback && !hasStreetType(x.types) ? `🔜 Lieu communiqué bientôt, ${x.description}` : x.description,
+          })),
           ...(defaultValue ? [{ value: 'default', label: defaultValue }] : []),
         ]}
         error={error}

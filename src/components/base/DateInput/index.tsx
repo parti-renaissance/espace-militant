@@ -1,10 +1,11 @@
 import React from 'react'
 import { XStack } from 'tamagui'
-import Text from '@/components/base/Text'
-import DatePickerField from '@/components/DatePickerV2'
-import { FormFrame } from '@/components/base/FormFrames'
 import { X } from '@tamagui/lucide-icons'
+
+import { FormFrame } from '@/components/base/FormFrames'
+import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import DatePickerField from '@/components/DatePickerV2'
 
 interface DateInputProps {
   label: string
@@ -22,14 +23,13 @@ export default function DateInput({
   label,
   value,
   onChange,
-  placeholder = "Sélectionner une date",
+  placeholder = 'Sélectionner une date',
   size = 'sm',
   color = 'gray',
   disabled = false,
   error,
-  resetable = false
+  resetable = false,
 }: DateInputProps) {
-  
   // Convertir la value en Date pour le DatePickerField
   const getDateValue = (): Date | undefined => {
     if (!value) return undefined
@@ -54,48 +54,31 @@ export default function DateInput({
   }
 
   return (
-    <FormFrame 
-      height="auto" 
+    <FormFrame
+      height="auto"
       flexDirection="row"
-      pl="$medium" 
+      pl="$medium"
       pr="$xsmall"
-      pt="$xsmall" 
+      pt="$xsmall"
       pb="$xsmall"
-      overflow="hidden" 
+      overflow="hidden"
       theme={color}
       alignItems="center"
       justifyContent="space-between"
       size={size}
     >
       <FormFrame.Label>{label}</FormFrame.Label>
-      
-      <XStack alignItems="center" >
+
+      <XStack alignItems="center">
         <XStack mr="$xsmall">
-        <DatePickerField
-          disabled={disabled}
-          type="date"
-          value={getDateValue()}
-          onChange={handleDateChange}
-          placeholder={placeholder}
-        />
+          <DatePickerField disabled={disabled} type="date" value={getDateValue()} onChange={handleDateChange} placeholder={placeholder} />
         </XStack>
-        
-        
+
         {resetable && value && (
-          <VoxButton
-            size="md"
-            variant="text"
-            onPress={handleReset}
-            disabled={disabled}
-            iconSize={20}
-            shrink
-            iconLeft={X}
-            textColor="$gray5"
-            theme={color}
-          />
+          <VoxButton size="md" variant="text" onPress={handleReset} disabled={disabled} iconSize={20} shrink iconLeft={X} textColor="$gray5" theme={color} />
         )}
       </XStack>
-      
+
       {error && (
         <Text.XSM color="$orange5" textAlign="left">
           {error}
@@ -103,4 +86,4 @@ export default function DateInput({
       )}
     </FormFrame>
   )
-} 
+}

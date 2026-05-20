@@ -10,6 +10,7 @@ import { spreadMapCoordinates } from '@/components/Mapbox/spreadMapCoordinates'
 import pinBoitage from '@/features_next/actions/assets/map/action-boitage.png'
 import pinCollage from '@/features_next/actions/assets/map/action-collage.png'
 import pinPap from '@/features_next/actions/assets/map/action-porte-a-porte.png'
+import pinQuestionnaire from '@/features_next/actions/assets/map/action-questionnaire.png'
 import pinTractage from '@/features_next/actions/assets/map/action-tractage.png'
 import pinEventAdherents from '@/features_next/events/assets/images/map/event-adherents.png'
 import pinEventInvitation from '@/features_next/events/assets/images/map/event-invitation.png'
@@ -44,6 +45,7 @@ const HUB_ACTION_PIN_MARKERS_IMAGES = {
   'hub-action-boitage': pinBoitage,
   'hub-action-tractage': pinTractage,
   'hub-action-collage': pinCollage,
+  'hub-action-questionnaire': pinQuestionnaire,
 } as const
 
 const MAP_PIN_MARKERS_IMAGES = {
@@ -88,6 +90,8 @@ const resolveActionPinImageKey = (actionType: ActionType, isPast: boolean, isCan
       return 'hub-action-tractage'
     case ActionType.COLLAGE:
       return 'hub-action-collage'
+    case ActionType.QUESTIONNAIRE:
+      return 'hub-action-questionnaire'
     default:
       return 'hub-action-tractage'
   }
@@ -343,9 +347,7 @@ const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
         zoomEnabled={isInteractive}
         rotateEnabled={false}
         pitchEnabled={false}
-        {...(Platform.OS === 'android' && embeddedInScrollView && isInteractive
-          ? { requestDisallowInterceptTouchEvent: true }
-          : {})}
+        {...(Platform.OS === 'android' && embeddedInScrollView && isInteractive ? { requestDisallowInterceptTouchEvent: true } : {})}
       >
         <MapboxGl.Camera ref={cameraRef} followUserLocation={false} padding={padding} {...cameraProps} />
         <MapboxGl.Images images={MAP_PIN_MARKERS_IMAGES} />

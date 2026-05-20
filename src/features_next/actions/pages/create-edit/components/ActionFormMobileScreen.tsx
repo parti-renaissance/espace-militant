@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'expo-router'
+import { Link, useNavigation } from 'expo-router'
 import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 import { Ban, Info, Sparkle } from '@tamagui/lucide-icons'
 import { Controller } from 'react-hook-form'
@@ -12,20 +12,21 @@ import { VoxHeader } from '@/components/Header/Header'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
+import { useActionFormContext } from '../helpers/context'
 import ActionAddressField from './ActionAddressField'
 import ActionDateField from './ActionDateField'
 import ActionTypeField from './ActionTypeField'
-import { useActionFormContext } from '../helpers/context'
 
 export default function ActionFormMobileScreen() {
-  const { navigation, onSubmit, control, isPending, editMode, cancelHref, cancelModalRef } = useActionFormContext()
+  const { canGoBack } = useNavigation()
+  const { onSubmit, control, isPending, editMode, cancelHref, cancelModalRef } = useActionFormContext()
 
   return (
     <YStack flex={1} opacity={isPending ? 0.5 : 1} style={{ pointerEvents: isPending ? 'none' : 'auto' }} cursor={isPending ? 'progress' : 'auto'}>
       <VoxHeader>
         <XStack alignItems="center" flex={1} width="100%">
           <XStack alignContent="flex-start">
-            <Link href={navigation.canGoBack() ? '../' : cancelHref} replace asChild={!isWeb}>
+            <Link href={canGoBack() ? '../' : cancelHref} replace asChild={!isWeb}>
               {isPending ? null : (
                 <VoxButton size="lg" variant="text" theme="orange">
                   Annuler
@@ -37,7 +38,7 @@ export default function ActionFormMobileScreen() {
             <VoxHeader.Title>{`${editMode ? 'Modifier' : 'Créer'} l’action`}</VoxHeader.Title>
           </XStack>
           <XStack>
-            <VoxButton onPress={onSubmit} size="md" theme="green" loading={isPending} iconLeft={editMode ? undefined : Sparkle}>
+            <VoxButton onPress={onSubmit} size="md" theme="purple" loading={isPending} iconLeft={editMode ? undefined : Sparkle}>
               {isPending ? `${editMode ? 'Modification' : 'Création'}...` : editMode ? 'Modifier' : 'Créer'}
             </VoxButton>
           </XStack>
@@ -49,27 +50,31 @@ export default function ActionFormMobileScreen() {
           <VoxCard borderWidth={0}>
             {editMode ? null : (
               <MessageCard theme="gray" iconLeft={Info}>
-                Organisez une <Text.MD bold>action militante sur le terrain</Text.MD> pour mobiliser vos militants autour de vous.
+                Créez un événement pour faire campagne, rassembler vos militants ou récompenser vos adhérents.
               </MessageCard>
             )}
             <VoxCard.Content>
+              <XStack gap="$medium" alignContent="center" alignItems="center">
+                <Text.MD secondary>Catégorie</Text.MD>
+                <VoxCard.Separator />
+              </XStack>
               <ActionTypeField />
               <VoxCard.Separator />
               <ActionDateField control={control} />
-              <VoxCard.Separator />
               <ActionAddressField />
-              <VoxCard.Separator />
+              <XStack gap="$medium" alignContent="center" alignItems="center">
+                <Text.MD secondary>Optionnel</Text.MD>
+                <VoxCard.Separator />
+              </XStack>
               <YStack>
                 <Controller
                   render={({ field, fieldState }) => (
-                    <YStack minHeight={100} maxHeight={300}>
+                    <YStack minHeight={200} maxHeight={300}>
                       <Input
                         size="sm"
                         color="gray"
-                        label="Description (optionnelle)"
-                        placeholder="Ajoutez une description"
+                        placeholder="Description"
                         multiline
-                        numberOfLines={5}
                         error={fieldState.error?.message}
                         value={field.value}
                         onChange={field.onChange}
@@ -80,9 +85,6 @@ export default function ActionFormMobileScreen() {
                   control={control}
                   name="description"
                 />
-                <Text.XSM secondary mt="$xsmall">
-                  1000 caractères maximum
-                </Text.XSM>
               </YStack>
             </VoxCard.Content>
             {editMode ? (

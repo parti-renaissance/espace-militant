@@ -1,9 +1,10 @@
 import React, { memo } from 'react'
-import { YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
 import { Controller, type Control } from 'react-hook-form'
 
-import DatePicker from '@/components/DatePicker'
+import { FormFrame } from '@/components/base/FormFrames'
 import Text from '@/components/base/Text'
+import DatePickerField from '@/components/DatePickerV2'
 
 import type { ActionFormValues } from '@/services/actions/paramsMapper'
 
@@ -13,43 +14,30 @@ type ActionDateFieldProps = {
 
 function ActionDateField({ control }: ActionDateFieldProps) {
   return (
-    <YStack gap="$medium">
-      <Text fontSize={14} fontWeight="$6">
-        Fixez un rendez-vous
-      </Text>
-      <YStack gap="$medium">
-        <Controller
-          control={control}
-          name="date"
-          render={({ field, fieldState }) => (
-            <DatePicker
-              label="Date"
-              type="date"
-              color="gray"
-              error={fieldState.error?.message}
-              onBlur={field.onBlur}
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="date"
-          render={({ field, fieldState }) => (
-            <DatePicker
-              label="Heure"
-              type="time"
-              color="gray"
-              error={fieldState.error?.message ? ' ' : undefined}
-              onBlur={field.onBlur}
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
-      </YStack>
-    </YStack>
+    <Controller
+      control={control}
+      name="date"
+      render={({ field, fieldState }) => (
+        <YStack>
+          <FormFrame height="auto" flexDirection="column" paddingHorizontal={0} py="$small" overflow="hidden" theme="gray" size="lg">
+            <XStack paddingHorizontal="$medium" alignItems="center" alignContent="center" justifyContent="space-between">
+              <XStack flex={1}>
+                <FormFrame.Label>Date</FormFrame.Label>
+              </XStack>
+              <XStack gap="$small" flex={1} justifyContent="flex-end">
+                <DatePickerField error={fieldState.error?.message} type="date" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+                <DatePickerField error={fieldState.error?.message} type="time" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+              </XStack>
+            </XStack>
+          </FormFrame>
+          {fieldState.error ? (
+            <XStack paddingHorizontal="$medium" alignSelf="flex-start" pt="$xsmall">
+              <Text.XSM color="$orange5">{fieldState.error.message}</Text.XSM>
+            </XStack>
+          ) : null}
+        </YStack>
+      )}
+    />
   )
 }
 

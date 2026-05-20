@@ -1,22 +1,25 @@
 import React, { useMemo } from 'react'
-import type { CameraPadding } from '@rnmapbox/maps'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia, YStack } from 'tamagui'
+import type { CameraPadding } from '@rnmapbox/maps'
 
 import MapboxGl from '@/components/Mapbox/Mapbox'
+
 import { ActionType, RestAction, RestActionFull } from '@/services/actions/schema'
 
-import { createActionMapSource } from '../../../utils/mapSource'
 import pinBoitage from '../../../assets/map/action-boitage.png'
 import pinCollage from '../../../assets/map/action-collage.png'
 import pinPap from '../../../assets/map/action-porte-a-porte.png'
+import pinQuestionnaire from '../../../assets/map/action-questionnaire.png'
 import pinTractage from '../../../assets/map/action-tractage.png'
+import { createActionMapSource } from '../../../utils/mapSource'
 
 const ACTION_DETAIL_MAP_IMAGES = {
   'action-detail-pap': pinPap,
   'action-detail-boitage': pinBoitage,
   'action-detail-tractage': pinTractage,
   'action-detail-collage': pinCollage,
+  'action-detail-questionnaire': pinQuestionnaire,
 } as const
 
 const detailPinIconImage = [
@@ -30,6 +33,8 @@ const detailPinIconImage = [
   'action-detail-tractage',
   ActionType.COLLAGE,
   'action-detail-collage',
+  ActionType.QUESTIONNAIRE,
+  'action-detail-questionnaire',
   'action-detail-tractage',
 ] as const
 
@@ -59,13 +64,7 @@ export function ActionDetailMap({ action, cameraPadding }: ActionDetailMapProps)
       rotateEnabled={false}
       pitchEnabled={false}
     >
-      <MapboxGl.Camera
-        followUserLocation={false}
-        centerCoordinate={center}
-        zoomLevel={15}
-        padding={cameraPadding}
-        {...mobileSnapCamera}
-      />
+      <MapboxGl.Camera followUserLocation={false} centerCoordinate={center} zoomLevel={15} padding={cameraPadding} {...mobileSnapCamera} />
       <MapboxGl.Images images={ACTION_DETAIL_MAP_IMAGES} />
       <MapboxGl.ShapeSource id="action-detail" shape={shape} cluster={false} onPress={() => {}} hitbox={{ width: 20, height: 20 }}>
         <MapboxGl.SymbolLayer

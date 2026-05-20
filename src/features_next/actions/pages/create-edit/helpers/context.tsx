@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { useNavigation, useRouter } from 'expo-router'
+import { createContext, useContext, useRef } from 'react'
+import { type Href, useRouter } from 'expo-router'
 import { addHours } from 'date-fns'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type Control, type FieldPath, useForm } from 'react-hook-form'
@@ -24,11 +24,8 @@ type ActionFormContextValue = {
   isPending: boolean
   isCancelPending: boolean
   onSubmit: () => void
-  navigation: ReturnType<typeof useNavigation>
-  cancelHref: string
+  cancelHref: Href
   cancelModalRef: React.RefObject<React.ComponentRef<typeof VoxSimpleModal> | null>
-  manualAddress: boolean
-  onManualAddressToggle: () => void
   onConfirmCancel: () => void
 }
 
@@ -44,11 +41,9 @@ export function useActionFormContext() {
 
 export function ActionFormContextProvider({ edit, children }: ActionFormProps & { children: React.ReactNode }) {
   const router = useRouter()
-  const navigation = useNavigation()
   const cancelModalRef = useRef<React.ComponentRef<typeof VoxSimpleModal>>(null)
-  const [manualAddress, setManualAddress] = useState(false)
 
-  const { control, handleSubmit, formState, reset, setError } = useForm<ActionFormValues>({
+  const { control, handleSubmit, reset, setError } = useForm<ActionFormValues>({
     resolver: zodResolver(actionFormSchema),
     defaultValues: edit
       ? mapRestActionFullToFormDefaults(edit)
@@ -63,16 +58,6 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
   const actionMutation = useActionMutation({ actionId: edit?.uuid })
   const cancelMutation = useCancelAction()
   const editMode = Boolean(edit)
-
-  useEffect(() => {
-    if (formState.errors.post_address) {
-      setManualAddress(true)
-    }
-  }, [formState.errors.post_address])
-
-  const onManualAddressToggle = useCallback(() => {
-    setManualAddress((v) => !v)
-  }, [])
 
   const onSubmit = handleSubmit(
     (values) => {
@@ -93,7 +78,10 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
           logActionMutationError('form submit — catch', e)
           if (e instanceof ActionFormError) {
             e.violations.forEach((violation) => {
-              setError(violation.propertyPath as FieldPath<ActionFormValues>, { message: violation.message })
+              const path = violation.propertyPath as FieldPath<ActionFormValues>
+              const fieldPath =
+                typeof path === 'string' && path.startsWith('post_address.') ? 'post_address' : path
+              setError(fieldPath, { message: violation.message })
             })
           }
         })
@@ -111,7 +99,7 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
     })
   }
 
-  const cancelHref = edit ? `/actions/${edit.uuid}` : '/evenements/list?itemType=action'
+  const cancelHref = (edit ? `/actions/${edit.uuid}` : '/evenements/list?itemType=action') as Href
 
   return (
     <ActionFormContext.Provider
@@ -122,11 +110,8 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
         isPending: actionMutation.isPending,
         isCancelPending: cancelMutation.isPending,
         onSubmit,
-        navigation,
         cancelHref,
         cancelModalRef,
-        manualAddress,
-        onManualAddressToggle,
         onConfirmCancel,
       }}
     >
