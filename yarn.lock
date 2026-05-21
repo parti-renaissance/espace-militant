@@ -5933,9 +5933,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rnmapbox/maps@npm:10.1.42":
-  version: 10.1.42
-  resolution: "@rnmapbox/maps@npm:10.1.42"
+"@rnmapbox/maps@npm:~10.3.1":
+  version: 10.3.1
+  resolution: "@rnmapbox/maps@npm:10.3.1"
   dependencies:
     "@turf/along": "npm:6.5.0"
     "@turf/distance": "npm:6.5.0"
@@ -5943,13 +5943,13 @@ __metadata:
     "@turf/length": "npm:6.5.0"
     "@turf/nearest-point-on-line": "npm:6.5.0"
     "@types/geojson": "npm:^7946.0.7"
-    debounce: "npm:^1.2.0"
+    debounce: "npm:^2.2.0"
   peerDependencies:
     expo: ">=47.0.0"
     mapbox-gl: ^2.9.0
-    react: ">=16.6.1"
+    react: ">=17.0.0"
     react-dom: ">= 17.0.0"
-    react-native: ">=0.59.9"
+    react-native: ">=0.79"
   peerDependenciesMeta:
     expo:
       optional: true
@@ -5957,7 +5957,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/367d66fc99b2745bc606813eedd98632dff5571376dec018c485b5e365df63fd8c1fae07a25e287f2fe99d2d6f9dceb95a0928af97dbf95d88143abff5623a01
+  checksum: 10c0/f679d2facb0aa9c8f96663e849faa69792b2db10eb797c22e357edc8f99a52e55fe76b61c77535e38ea29d2a24217a6e72ede3595a9e32cb5852a7f02cc9a446
   languageName: node
   linkType: hard
 
@@ -14102,10 +14102,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debounce@npm:^1.2.0":
-  version: 1.2.1
-  resolution: "debounce@npm:1.2.1"
-  checksum: 10c0/6c9320aa0973fc42050814621a7a8a78146c1975799b5b3cc1becf1f77ba9a5aa583987884230da0842a03f385def452fad5d60db97c3d1c8b824e38a8edf500
+"debounce@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "debounce@npm:2.2.0"
+  checksum: 10c0/684536fe9a04c9eea46cf02f119f69aa4071813ba25b9b43370e1503ea60b34fd38d694c7145fa2be504f9d40e7e39354cb9ed155c70954a0eefa391aefe271c
   languageName: node
   linkType: hard
 
@@ -26450,7 +26450,7 @@ __metadata:
     "@react-native-community/slider": "npm:5.0.1"
     "@react-native-firebase/app": "npm:^23.2.1"
     "@react-native-firebase/messaging": "npm:^23.2.1"
-    "@rnmapbox/maps": "npm:10.1.42"
+    "@rnmapbox/maps": "npm:~10.3.1"
     "@sentry/react-native": "npm:~7.11.0"
     "@shopify/react-native-skia": "npm:2.4.18"
     "@storybook/addon-ondevice-actions": "npm:^7.6.16"
