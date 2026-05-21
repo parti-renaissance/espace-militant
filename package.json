@@ -89,6 +89,7 @@
     "expo-splash-screen": "~55.0.10",
     "expo-status-bar": "~55.0.4",
     "expo-updates": "~55.0.12",
+    "expo-video": "~55.0.17",
     "expo-web-browser": "~55.0.9",
     "firebase": "^12.2.1",
     "formik": "^2.4.5",

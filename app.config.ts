@@ -75,6 +75,7 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
     plugins.push(['expo-notifications', { icon: notificationIcon }])
     plugins.push('@react-native-community/datetimepicker')
     plugins.push('@sentry/react-native')
+    plugins.push('expo-video')
   }
   config.plugins = plugins
   setAssociatedDomain(config, process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN)
