@@ -16110,6 +16110,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-video@npm:~55.0.17":
+  version: 55.0.17
+  resolution: "expo-video@npm:55.0.17"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/e5d0f2f29a62d10c1c8e0393d81d008efa4fcafccf6d384bbf6df1c78acbd18767b035bee9cd7c2871fa85ca083118f75db9cc95eb730359f2b553b01aebcd8f
+  languageName: node
+  linkType: hard
+
 "expo-web-browser@npm:~55.0.9":
   version: 55.0.9
   resolution: "expo-web-browser@npm:55.0.9"
@@ -26507,6 +26518,7 @@ __metadata:
     expo-splash-screen: "npm:~55.0.10"
     expo-status-bar: "npm:~55.0.4"
     expo-updates: "npm:~55.0.12"
+    expo-video: "npm:~55.0.17"
     expo-web-browser: "npm:~55.0.9"
     firebase: "npm:^12.2.1"
     firebase-tools: "npm:^13.7.1"

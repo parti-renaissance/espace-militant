@@ -1,49 +1,44 @@
-// TODO: Installer expo-video (npx expo install expo-video) et remplacer la WebView + HTML HLS
-// par VideoView pour la lecture native du flux hlsUrl sur iOS/Android.
-import { useCallback, useMemo, useState } from 'react'
-import { WebView } from 'react-native-webview'
+import { useCallback, useEffect, useState } from 'react'
+import { StyleSheet } from 'react-native'
+import { useVideoPlayer, VideoView } from 'expo-video'
 import { Image } from 'expo-image'
 import { Circle, YStack } from 'tamagui'
 import { Play } from '@tamagui/lucide-icons'
 
 import { getVideoAspectRatio, type VideoPlayerProps } from './VideoPlayer.types'
 
-const buildHlsVideoHtml = (hlsUrl: string, loop = true) => `<!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { width: 100%; height: 100%; background: #000; }
-      video { width: 100%; height: 100%; object-fit: contain; }
-    </style>
-  </head>
-  <body>
-    <video id="v" controls playsinline autoplay${loop ? ' loop' : ''}></video>
-    <script>
-      (function () {
-        var src = ${JSON.stringify(hlsUrl)};
-        var video = document.getElementById('v');
-        if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = src;
-          return;
-        }
-        if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-          var hls = new Hls();
-          hls.loadSource(src);
-          hls.attachMedia(video);
-        }
-      })();
-    </script>
-  </body>
-</html>`
+type NativeVideoContentProps = {
+  hlsUrl: string
+  loop: boolean
+  shouldPlay: boolean
+}
+
+function NativeVideoContent({ hlsUrl, loop, shouldPlay }: NativeVideoContentProps) {
+  const player = useVideoPlayer(hlsUrl, (p) => {
+    p.loop = loop
+  })
+
+  useEffect(() => {
+    if (shouldPlay) {
+      player.play()
+    }
+  }, [player, shouldPlay])
+
+  return (
+    <VideoView
+      style={styles.video}
+      player={player}
+      nativeControls
+      contentFit="contain"
+    />
+  )
+}
 
 export default function VideoPlayer({ hlsUrl, thumbnailUrl, width, height, autoPlay = false, loop = true }: VideoPlayerProps) {
   const [playedHlsUrl, setPlayedHlsUrl] = useState<string | null>(autoPlay ? hlsUrl : null)
   const aspectRatio = getVideoAspectRatio(width, height)
   const showPoster = !autoPlay && playedHlsUrl !== hlsUrl
-  const videoHtml = useMemo(() => buildHlsVideoHtml(hlsUrl, loop), [hlsUrl, loop])
+  const shouldPlay = autoPlay || playedHlsUrl === hlsUrl
 
   const handlePlay = useCallback(() => {
     setPlayedHlsUrl(hlsUrl)
@@ -74,14 +69,17 @@ export default function VideoPlayer({ hlsUrl, thumbnailUrl, width, height, autoP
           </YStack>
         </YStack>
       ) : (
-        <WebView
-          source={{ html: videoHtml }}
-          style={{ flex: 1, backgroundColor: '#000' }}
-          allowsInlineMediaPlayback
-          mediaPlaybackRequiresUserAction={false}
-          scrollEnabled={false}
-        />
+        <NativeVideoContent hlsUrl={hlsUrl} loop={loop} shouldPlay={shouldPlay} />
       )}
     </YStack>
   )
 }
+
+const styles = StyleSheet.create({
+  video: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#000',
+  },
+})
