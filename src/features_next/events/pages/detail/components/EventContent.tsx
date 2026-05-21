@@ -18,7 +18,7 @@ import { EventLive } from '@/features_next/events/components/list-item/EventLive
 import { EventLocation } from '@/features_next/events/components/list-item/EventLocation'
 import { EventPremiumChip } from '@/features_next/events/components/list-item/EventPremiumChip'
 import EventManagementSection from './EventManagementSection'
-import { EventShareGroup } from './EventShareGroup'
+import { DetailShareGroup } from '@/components/ShareGroup/DetailShareGroup'
 import { EventToggleSubscribeButton } from '@/features_next/events/components/list-item/EventToggleSubscribeButton'
 import { EventItemProps } from '@/features_next/events/types'
 
@@ -170,7 +170,7 @@ const EventMeta = ({ event, userUuid }: EventItemProps) => {
           />
         </VoxCard.Section>
       ) : null}
-      <EventShareGroup event={event} />
+      <DetailShareGroup event={event} />
     </YStack>
   )
 }

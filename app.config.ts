@@ -53,6 +53,11 @@ const applyConfig = (config: Partial<ExpoConfig>, options: ConfigOptions) => {
 }
 
 export default (payload: ConfigContext): Partial<ExpoConfig> => {
+  // @rnmapbox/maps 10.2+ : token de téléchargement SDK natif (pas le token public carte)
+  if (!process.env.RNMAPBOX_MAPS_DOWNLOAD_TOKEN && process.env.MAP_BOX_SECRET_KEY) {
+    process.env.RNMAPBOX_MAPS_DOWNLOAD_TOKEN = process.env.MAP_BOX_SECRET_KEY
+  }
+
   const config = { ...payload.config }
   const profile = process.env.EAS_BUILD_PROFILE
 
@@ -66,7 +71,7 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
   const plugins = (config.plugins || []).filter((p: unknown) => (typeof p === 'string' ? p : Array.isArray(p) ? p[0] : null) !== 'expo-notifications')
   if (plugins) {
     plugins.push(['expo-font', { fonts: FontLib }])
-    plugins.push(['@rnmapbox/maps', { RNMapboxMapsDownloadToken: process.env.MAP_BOX_SECRET_KEY }])
+    plugins.push('@rnmapbox/maps')
     plugins.push(['expo-router', { origin: `https://${process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN}` }])
     plugins.push('expo-web-browser')
     plugins.push('expo-image')
@@ -75,6 +80,7 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
     plugins.push(['expo-notifications', { icon: notificationIcon }])
     plugins.push('@react-native-community/datetimepicker')
     plugins.push('@sentry/react-native')
+    plugins.push('expo-video')
   }
   config.plugins = plugins
   setAssociatedDomain(config, process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN)

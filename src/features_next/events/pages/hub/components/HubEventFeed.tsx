@@ -2,51 +2,41 @@
  * Liste minimaliste du hub : bannière épinglée + inscriptions à venir uniquement.
  */
 import type { ReactNode } from 'react'
-import { memo, Suspense, useCallback, useMemo, useRef } from 'react'
+import { memo, useCallback, useMemo, useRef } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import type { Href } from 'expo-router'
-import { getToken, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { getToken, Spinner, XStack, YStack } from 'tamagui'
 import { Calendar, CalendarCheck2, ChevronRight, ClipboardCheck, DoorOpen, Zap } from '@tamagui/lucide-icons'
 
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import Text from '@/components/base/Text'
-import TrackImpressionWeb from '@/components/TrackImpressionWeb'
-import EventListItem from '@/features_next/events/components/list-item/EventListItem'
-import { PinnedEventBanner } from '@/features_next/events/components/feed-layout/PinnedEventBanner'
+import { QueryBoundary } from '@/components/QueryBoundary'
+import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
+import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
+import { HubFeedRow } from '@/features_next/events/components/list-item/HubFeedRow'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { useSuspensePaginatedEvents } from '@/services/events/hook'
-import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
+import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
+import { mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
+import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
 
-import EventsListSkeleton from '@/features_next/events/components/feed-layout/EventsListSkeleton'
 import { ButtonCard } from './ButtonCard'
 
-type HubEventRow = RestItemEvent | RestPublicItemEvent
+const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.map(mapHubItemToFeedRow).filter((row): row is HubFeedRowType => row !== null)
 
-const EventRow = memo(({ event, userUuid }: { event: HubEventRow; userUuid?: string }) => {
-  const media = useMedia()
-  const row = <EventListItem event={event} userUuid={userUuid} source="page_events" />
-  if (Platform.OS === 'web') {
-    return (
-      <YStack px={media.gtSm ? '$medium' : 0}>
-        <TrackImpressionWeb objectType="event" objectId={event.uuid} source="page_events">
-          {row}
-        </TrackImpressionWeb>
-      </YStack>
-    )
-  }
-  return <YStack px={media.gtSm ? '$medium' : 0}>{row}</YStack>
-})
+const getFeedRowKey = (row: HubFeedRowType): string =>
+  row.type === 'event' ? row.event.uuid : (row.payload.id ?? `action-${row.payload.date.start.toISOString()}`)
 
 const CREER_EVENEMENT_HREF = '/evenements/creer' as const satisfies Href
+const CREER_ACTION_HREF = '/actions/creer' as const satisfies Href
 
 const HubOrganizePromptCards = memo(function HubOrganizePromptCards() {
   return (
     <XStack gap="$medium" px="$medium">
       <YStack width="50%" flex={1}>
-        <ButtonCard theme="green" icon={Zap} label="Organisez une action près de chez vous" href={CREER_EVENEMENT_HREF} />
+        <ButtonCard theme="green" icon={Zap} label="Organisez une action près de chez vous" href={CREER_ACTION_HREF} />
       </YStack>
       <YStack width="50%" flex={1}>
         <ButtonCard theme="blue" icon={Calendar} label="Organisez un événement" href={CREER_EVENEMENT_HREF} />
@@ -91,38 +81,39 @@ const HubEventFeed = (props: HubEventFeedProps) => {
   const { data: userData } = useGetProfil({ enabled: Boolean(session) })
   const filtersReady = !isAuth || userData !== undefined
 
-  const futureEventsThreshold = useMemo(() => new Date(), [])
-
-  const { data, fetchNextPage, hasNextPage, isRefetching, isFetching } = useSuspensePaginatedEvents({
-    filters: { subscribedOnly: true, finishAfter: futureEventsThreshold },
+  const { data, fetchNextPage, hasNextPage, isRefetching, isFetching } = useHubItemsInfiniteQuery({
+    params: { subscribedOnly: true, upcomingOnly: true },
     enabled: filtersReady && isAuth,
   })
 
-  const events = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data?.pages])
+  const hubItems = useMemo(() => data?.pages.flatMap((page) => page?.items ?? []) ?? [], [data?.pages])
+  const feedRows = useMemo(() => mapHubItemsToFeedRows(hubItems), [hubItems])
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isRefetching) void fetchNextPage()
   }, [fetchNextPage, hasNextPage, isRefetching])
 
-  const showSkeleton = !filtersReady || (isFetching && events.length === 0)
+  const showSkeleton = !filtersReady || (isFetching && feedRows.length === 0)
 
-  const listRef = useRef<FlatList<HubEventRow>>(null)
+  const listRef = useRef<FlatList<HubFeedRowType>>(null)
   useScrollToTop(listRef)
 
   const listHeader = (
     <YStack pt="$medium" gap={24}>
-      <Suspense fallback={null}>
-        <PinnedEventBanner small={true} />
-      </Suspense>
+      <QueryBoundary>
+        <PinnedItemBanner small />
+      </QueryBoundary>
       <HubOrganizePromptCards />
       <YStack px="$medium" gap="$medium">
         <XStack gap="$small">
           <CalendarCheck2 size={16} color="$blue5" />
           <Text.MD semibold>Mon agenda</Text.MD>
         </XStack>
-        <Text.MD secondary semibold>
-          Vous êtes inscrits à {events.length} événement{events.length > 1 ? 's' : ''} à venir.
-        </Text.MD>
+        {hubItems.length > 0 ? (
+          <Text.MD secondary semibold>
+            Vous avez {hubItems.length} inscription{hubItems.length > 1 ? 's' : ''} à venir.
+          </Text.MD>
+        ) : null}
       </YStack>
     </YStack>
   )
@@ -149,7 +140,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
     return (
       <YStack px="$medium">
         <Text.MD secondary semibold lineHeight={22}>
-          Votre agenda est vide. Vous retrouverez ici tous les événements à venir auxquels vous vous inscrirez.
+          Votre agenda est vide. Vous retrouverez ici vos événements et actions à venir auxquels vous participez.
         </Text.MD>
       </YStack>
     )
@@ -157,19 +148,20 @@ const HubEventFeed = (props: HubEventFeedProps) => {
 
   return (
     <YStack flex={1} width="100%" minHeight={0} bg="$textSurface">
-      <LayoutFlatList<HubEventRow>
+      <LayoutFlatList<HubFeedRowType>
         ref={listRef}
         padding={false}
-        data={events}
-        keyExtractor={(e) => e.uuid}
-        renderItem={({ item }) => <EventRow event={item} userUuid={userData?.uuid} />}
+        data={feedRows}
+        keyExtractor={getFeedRowKey}
+        renderItem={({ item }) => <HubFeedRow row={item} userUuid={userData?.uuid} source="page_events_hub" />}
         ListHeaderComponent={listHeaderComponent}
         contentContainerStyle={contentContainerStyleMerged}
         removeClippedSubviews={embeddedMapHeader != null && Platform.OS !== 'web' ? false : undefined}
+        nestedScrollEnabled={embeddedMapHeader != null && Platform.OS === 'android'}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         hasMore={hasNextPage ?? false}
-        ListEmptyComponent={showSkeleton ? <EventsListSkeleton /> : listEmptyComponent}
+        ListEmptyComponent={showSkeleton ? <HubListSkeleton /> : listEmptyComponent}
         ListFooterComponent={
           <YStack>
             {hasNextPage ? (

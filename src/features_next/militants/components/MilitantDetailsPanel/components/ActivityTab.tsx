@@ -13,13 +13,10 @@ import { formatShortDate } from '@/utils/DateFormatter'
 type FilterOption = { value: string; label: string }
 type EventTypes = { hit: FilterOption[]; action_history: FilterOption[] }
 
-const SOURCE_DEFAULT: FilterOption = { value: '', label: 'Toutes' }
 const EVENT_DEFAULT: FilterOption = { value: '', label: 'Tous' }
 
-const filterEventTypes = (eventTypes: EventTypes | undefined, source: string): FilterOption[] => {
+const flattenEventTypes = (eventTypes: EventTypes | undefined): FilterOption[] => {
   if (!eventTypes) return []
-  if (source === 'hit') return eventTypes.hit
-  if (source === 'action_history') return eventTypes.action_history
   return [...eventTypes.hit, ...eventTypes.action_history]
 }
 
@@ -79,26 +76,15 @@ interface ActivityTabProps {
 }
 
 export function ActivityTabContent({ uuid, scope }: ActivityTabProps) {
-  const [sourceType, setSourceType] = useState('')
   const [eventType, setEventType] = useState('')
 
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useAdherentActivity(uuid, scope, {
-    sourceType: sourceType || undefined,
     eventType: eventType || undefined,
   })
   const { data: filters } = useAdherentActivityFilters(scope)
 
   const items = data?.pages.flatMap((p) => p.items) ?? []
-  const sourceOptions = [SOURCE_DEFAULT, ...(filters?.source_types ?? [])]
-  const eventOptions = [EVENT_DEFAULT, ...filterEventTypes(filters?.event_types, sourceType)]
-
-  const handleSourceChange = (value: string) => {
-    setSourceType(value)
-    const allowed = filterEventTypes(filters?.event_types, value)
-    if (eventType && !allowed.some((o) => o.value === eventType)) {
-      setEventType('')
-    }
-  }
+  const eventOptions = [EVENT_DEFAULT, ...flattenEventTypes(filters?.event_types)]
 
   return (
     <YStack flex={1} padding="$medium" paddingBottom={80}>
@@ -106,14 +92,6 @@ export function ActivityTabContent({ uuid, scope }: ActivityTabProps) {
         Activité
       </Text>
       <YStack gap="$small" mb="$medium">
-        <Select
-          placeholder="Source"
-          value={sourceType}
-          options={sourceOptions}
-          onChange={(v) => handleSourceChange(v ?? '')}
-          color="gray"
-          size="sm"
-        />
         <Select
           placeholder="Événement"
           value={eventType}

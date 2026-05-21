@@ -11,15 +11,6 @@
 
     "headers": [
       {
-        "source": "/canvaskit.wasm",
-        "headers": [
-          {
-            "key": "Content-Type",
-            "value": "application/wasm"
-          }
-        ]
-      },
-      {
         "source": "/.well-known/apple-app-site-association",
         "headers": [
           {

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { Spinner, useMedia, YStack } from 'tamagui'
@@ -6,10 +6,10 @@ import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 
 import { SideBarArea } from '@/components/AppStructure'
 import { TABBAR_HEIGHT_SM } from '@/components/AppStructure/hooks/useLayoutSpacing'
+import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
+import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
-import { useEventsMapQuery, useMapEventsFormatter } from '@/services/events/hook'
-
-import { EventMapHandle, roundCoordinateForMapSortAround } from '../map/components/EventMap'
+import { HubItemMapHandle, roundCoordinateForMapSortAround } from '../map/components/HubItemMap'
 import { useUserLocation } from '../map/hooks/useUserLocation'
 import { EventsHubDesktop } from './components/EventsHubDesktop'
 import { EventsHubMobile } from './components/EventsHubMobile'
@@ -17,19 +17,10 @@ import { HubMapBlock } from './components/HubMapBlock'
 
 const EventsHubPage = () => {
   const router = useRouter()
-  const eventMapRef = useRef<EventMapHandle>(null)
+  const hubItemMapRef = useRef<HubItemMapHandle>(null)
   const { coords, isLocating, requestLocation } = useUserLocation()
 
-  const sortAround = useMemo(
-    () =>
-      coords
-        ? {
-            lat: roundCoordinateForMapSortAround(coords[1]),
-            lng: roundCoordinateForMapSortAround(coords[0]),
-          }
-        : null,
-    [coords],
-  )
+  const [sortAround, setSortAround] = useState<{ lat: number; lng: number } | null>(null)
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const cameraPadding = useMemo(
@@ -47,14 +38,31 @@ const EventsHubPage = () => {
 
   const tabBarSafeBottom = useMemo(() => (!media.gtSm ? insets.bottom + TABBAR_HEIGHT_SM : 0), [media.gtSm, insets.bottom])
 
-  const { data, isLoading, isFetching } = useEventsMapQuery({ sortAround })
+  const { data, isLoading, isFetching } = useHubItemsQuery({
+    params: {
+      page: 1,
+      pageSize: 300,
+      bbox: FRANCE_METRO_HUB_BBOX,
+      upcomingOnly: true,
+      ...(sortAround ? { sortAround } : {}),
+    },
+  })
 
-  const mapEvents = useMapEventsFormatter(data?.items)
+  const mapItems = useMemo(() => mapHubItemsToMapMarkers(data?.items ?? []), [data?.items])
 
-  const handleEventPress = useCallback(
+  const handleMapItemPress = useCallback(
     (event: OnPressEvent) => {
-      const firstFeature = event.features?.[0]
-      const slug = firstFeature?.properties?.slug
+      const properties = event.features?.[0]?.properties as { itemType?: string; uuid?: string; slug?: string | null } | undefined
+      if (!properties) {
+        return
+      }
+
+      if (properties.itemType === 'action' && typeof properties.uuid === 'string' && properties.uuid.length > 0) {
+        router.push({ pathname: '/actions/[id]', params: { id: properties.uuid } })
+        return
+      }
+
+      const slug = properties.slug
       if (typeof slug === 'string' && slug.length > 0) {
         router.push(`/evenements/${slug}`)
       }
@@ -64,17 +72,21 @@ const EventsHubPage = () => {
 
   const handleRecenterPress = useCallback(() => {
     void (async () => {
-      const next = await requestLocation()
+      const next = await requestLocation({ showAlertOnFailure: true })
       if (next) {
-        eventMapRef.current?.flyToUserWithEventsZoom(next)
+        setSortAround({
+          lat: roundCoordinateForMapSortAround(next[1]),
+          lng: roundCoordinateForMapSortAround(next[0]),
+        })
+        hubItemMapRef.current?.flyToUserWithItemsZoom(next)
       }
     })()
   }, [requestLocation])
 
   const mapBlockCommonProps = {
-    eventMapRef,
-    mapEvents,
-    onEventPress: handleEventPress,
+    hubItemMapRef,
+    mapItems,
+    onItemPress: handleMapItemPress,
     onRecenterPress: handleRecenterPress,
     padding: cameraPadding,
     isLocating,
@@ -102,9 +114,7 @@ const EventsHubPage = () => {
 
   return (
     <EventsHubDesktop
-      mapLayer={
-        <HubMapBlock {...mapBlockCommonProps} variant="fullscreen" promoLeadingAccessory={<SideBarArea state="militant" />} />
-      }
+      mapLayer={<HubMapBlock {...mapBlockCommonProps} variant="fullscreen" promoLeadingAccessory={<SideBarArea state="militant" />} />}
       feedSuspenseFallback={feedSuspenseFallback}
     />
   )

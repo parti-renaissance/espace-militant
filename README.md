@@ -16,19 +16,19 @@ Renaissance App est l'application mobile et web officielle de Renaissance. Elle 
 
 ## Stack technique
 
-| Technologie | Version | Rôle |
-|---|---|---|
-| [Expo](https://docs.expo.dev/) | ~53 | Framework universel |
-| React Native | 0.79.5 | Runtime iOS / Android |
-| React | 19 | Runtime Web |
-| [Tamagui](https://tamagui.dev/) | ^1.132 | UI cross-platform |
-| TypeScript | ~5.8 | Typage strict |
-| [Expo Router](https://docs.expo.dev/router/introduction/) | ~5.1.5 | Navigation file-system |
-| [EAS Build / Update](https://docs.expo.dev/eas/) | — | CI/CD mobile |
-| Firebase (FCM / APNs) | ^12 | Notifications push |
-| Mapbox | 10.x | Cartographie |
-| Sentry | ~6.14 | Monitoring et crash reporting |
-| Storybook | 7.x | Développement de composants UI |
+| Technologie                                               | Version | Rôle                           |
+| --------------------------------------------------------- | ------- | ------------------------------ |
+| [Expo](https://docs.expo.dev/)                            | ~55     | Framework universel            |
+| React Native                                              | 0.83.2  | Runtime iOS / Android          |
+| React                                                     | 19.2    | Runtime Web                    |
+| [Tamagui](https://tamagui.dev/)                           | ^1.144  | UI cross-platform              |
+| TypeScript                                                | ~5.9    | Typage strict                  |
+| [Expo Router](https://docs.expo.dev/router/introduction/) | ~55     | Navigation file-system         |
+| [EAS Build / Update](https://docs.expo.dev/eas/)          | —       | CI/CD mobile                   |
+| Firebase (FCM / APNs)                                     | ^23     | Notifications push             |
+| Mapbox                                                    | ~10.3   | Cartographie                   |
+| Sentry                                                    | ~7.11   | Monitoring et crash reporting  |
+| Storybook                                                 | 7.6     | Développement de composants UI |
 
 ## Architecture
 
@@ -45,11 +45,11 @@ espace-militant/
 
 L'application utilise trois profils EAS :
 
-| Profil | Nom affiché | Scheme |
-|---|---|---|
-| Development | Vox Dev | `vox-dev://` |
-| Staging | _(variable)_ | `vox-staging://` |
-| Production | Renaissance | `vox://` |
+| Profil      | Nom affiché  | Scheme           |
+| ----------- | ------------ | ---------------- |
+| Development | Vox Dev      | `vox-dev://`     |
+| Staging     | _(variable)_ | `vox-staging://` |
+| Production  | Renaissance  | `vox://`         |
 
 ## Prérequis
 
@@ -95,14 +95,15 @@ yarn web            # Navigateur
 
 Les variables préfixées `EXPO_PUBLIC_` sont **intégrées dans le binaire** au moment du build. Elles ne sont pas secrètes — ne jamais y placer de clés privées ou de tokens serveur.
 
-| Variable | Description |
-|---|---|
-| `EXPO_PUBLIC_API_BASE_URL` | URL de base de l'API Renaissance Plateforme |
-| `EXPO_PUBLIC_OAUTH_BASE_URL` | URL du serveur d'authentification OAuth |
-| `EXPO_PUBLIC_OAUTH_CLIENT_ID` | Client ID OAuth 2.0 (public) |
-| `EXPO_PUBLIC_ASSOCIATED_DOMAIN` | Domaine pour les universal links |
-| `EXPO_PUBLIC_SENTRY_DSN` | DSN Sentry (public, conçu pour être exposé) |
-| `EXPO_PUBLIC_MAP_BOX_ACCESS_TOKEN` | Token Mapbox (public) |
+| Variable                           | Description                                                                                                                                   |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EXPO_PUBLIC_API_BASE_URL`         | URL de base de l'API Renaissance Plateforme                                                                                                   |
+| `EXPO_PUBLIC_OAUTH_BASE_URL`       | URL du serveur d'authentification OAuth                                                                                                       |
+| `EXPO_PUBLIC_OAUTH_CLIENT_ID`      | Client ID OAuth 2.0 (public)                                                                                                                  |
+| `EXPO_PUBLIC_ASSOCIATED_DOMAIN`    | Domaine pour les universal links                                                                                                              |
+| `EXPO_PUBLIC_SENTRY_DSN`           | DSN Sentry (public, conçu pour être exposé)                                                                                                   |
+| `EXPO_PUBLIC_MAP_BOX_ACCESS_TOKEN` | Token Mapbox (public, affichage des cartes)                                                                                                   |
+| `RNMAPBOX_MAPS_DOWNLOAD_TOKEN`     | Token secret Mapbox (téléchargement du SDK natif au build) — **ne pas committer** ; à configurer aussi comme secret EAS pour les builds cloud |
 
 Consultez `.env.exemple` pour la liste complète.
 

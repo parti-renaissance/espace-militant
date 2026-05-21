@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { usePathname } from 'expo-router'
 import { useMedia, XStack } from 'tamagui'
-import { Bot, DoorOpen, Globe, GraduationCap, LogOut, MapPin, PenLine, QrCode, Wrench, X, Zap } from '@tamagui/lucide-icons'
+import { Bot, DoorOpen, Globe, GraduationCap, LogOut, MapPin, PenLine, QrCode, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
@@ -99,10 +99,11 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                 <NavItem text="Webview" iconLeft={Globe} href="/webview" />
                 <NavItem text="Hub événements" iconLeft={MapPin} href="/evenements/hub" />
                 <NavItem text="StoryBook" iconLeft={PenLine} href="/tools/storybook" />
+                <NavItem text="Vidéo (API)" iconLeft={Video} href="/tools/video" />
                 <Text.SM semibold secondary mx="$small" mt="$medium">
                   Anciens outils
                 </Text.SM>
-                <NavItem text="Actions" iconLeft={Zap} href="/old/actions" />
+                <NavItem text="Actions" iconLeft={Zap} href="/actions/creer" />
                 <NavItem text="Scanner" iconLeft={QrCode} href="/scanner" />
                 <NavItem text="Porte à porte" iconLeft={DoorOpen} href="/old/porte-a-porte" />
                 <NavItem text="Formations" iconLeft={GraduationCap} href="/old/formations" />

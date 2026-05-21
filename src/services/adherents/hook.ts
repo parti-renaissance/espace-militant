@@ -39,8 +39,8 @@ export const adherentKeys = {
   sensitive: (type: RestAdherentSensitiveRequest['type'], uuid: string | undefined) => [...adherentKeys.all, 'sensitive', type, uuid] as const,
   donations: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'donations', uuid, scope] as const,
   elect: (uuid: string | undefined, scope: string | undefined) => [...adherentKeys.all, 'elect', uuid, scope] as const,
-  activity: (uuid: string | undefined, scope: string | undefined, sourceType?: string, eventType?: string) =>
-    [...adherentKeys.all, 'activity', uuid, scope, sourceType ?? null, eventType ?? null] as const,
+  activity: (uuid: string | undefined, scope: string | undefined, eventType?: string) =>
+    [...adherentKeys.all, 'activity', uuid, scope, eventType ?? null] as const,
   activityFilters: (scope: string | undefined) => [...adherentKeys.all, 'activity-filters', scope] as const,
 }
 
@@ -178,7 +178,6 @@ export const useAdherentDonations = (uuid: string | undefined, scope: string | u
 }
 
 export type UseAdherentActivityFilters = {
-  sourceType?: string
   eventType?: string
 }
 
@@ -194,14 +193,13 @@ export const useAdherentActivityFilters = (scope: string | undefined) => {
 
 export const useAdherentActivity = (uuid: string | undefined, scope: string | undefined, filters?: UseAdherentActivityFilters) => {
   return useInfiniteQuery<RestAdherentActivityResponse>({
-    queryKey: adherentKeys.activity(uuid, scope, filters?.sourceType, filters?.eventType),
+    queryKey: adherentKeys.activity(uuid, scope, filters?.eventType),
     queryFn: ({ pageParam = 1 }) => {
       const safeUuid = requireParam(uuid, 'uuid')
       const safeScope = requireParam(scope, 'scope')
       return api.getAdherentActivity(safeUuid)({
         scope: safeScope,
         page: pageParam as number,
-        ...(filters?.sourceType && { source_type: filters.sourceType }),
         ...(filters?.eventType && { event_type: filters.eventType }),
       })
     },

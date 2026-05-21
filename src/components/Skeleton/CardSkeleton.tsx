@@ -1,7 +1,5 @@
 import React, { ComponentProps, ComponentPropsWithoutRef } from 'react'
-import { useDerivedValue, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
 import Chip from '@/components/Chip/Chip'
-import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia'
 import { Circle, Separator, Square, Stack, StackProps, styled, Card as TCard, withStaticProperties, XStack, YStack } from 'tamagui'
 import { ButtonFrameStyled } from '../Button'
 
@@ -16,32 +14,8 @@ const CardFrame = styled(YStack, {
 
 export type SkeCardFrameProps = ComponentProps<typeof TCard>
 const SkeCardFrame = ({ children, ...props }: SkeCardFrameProps) => {
-  const [{ height, width }, setX] = React.useState<{ height: number; width: number }>({ height: 0, width: 0 })
-
-  const sharedWidth = useSharedValue(0)
-  const vectorStart = useDerivedValue(() => vec(sharedWidth.value, 0))
-  const vectorEnd = useDerivedValue(() => vec(sharedWidth.value + width, 0))
-
   return (
-    <CardFrame
-      {...props}
-      overflow="hidden"
-      position="relative"
-      onLayout={(e) => {
-        setX(e.nativeEvent.layout)
-        sharedWidth.value = -e.nativeEvent.layout.width
-        sharedWidth.value = withRepeat(withTiming(e.nativeEvent.layout.width, { duration: 1000 }), -1, true)
-      }}
-    >
-      <YStack gap="$medium" style={{ flex: 1, position: 'absolute', zIndex: 10, width, height }}>
-        {height > 0 && width > 0 && (
-          <Canvas style={{ flex: 1, position: 'absolute', zIndex: 10, width, height }}>
-            <Rect x={0} y={0} width={width} height={height}>
-              <LinearGradient start={vectorStart} end={vectorEnd} colors={['white', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)', 'white']} />
-            </Rect>
-          </Canvas>
-        )}
-      </YStack>
+    <CardFrame {...props} overflow="hidden">
       <YStack gap="$medium">{children}</YStack>
     </CardFrame>
   )

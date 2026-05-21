@@ -5933,9 +5933,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rnmapbox/maps@npm:10.1.42":
-  version: 10.1.42
-  resolution: "@rnmapbox/maps@npm:10.1.42"
+"@rnmapbox/maps@npm:~10.3.1":
+  version: 10.3.1
+  resolution: "@rnmapbox/maps@npm:10.3.1"
   dependencies:
     "@turf/along": "npm:6.5.0"
     "@turf/distance": "npm:6.5.0"
@@ -5943,13 +5943,13 @@ __metadata:
     "@turf/length": "npm:6.5.0"
     "@turf/nearest-point-on-line": "npm:6.5.0"
     "@types/geojson": "npm:^7946.0.7"
-    debounce: "npm:^1.2.0"
+    debounce: "npm:^2.2.0"
   peerDependencies:
     expo: ">=47.0.0"
     mapbox-gl: ^2.9.0
-    react: ">=16.6.1"
+    react: ">=17.0.0"
     react-dom: ">= 17.0.0"
-    react-native: ">=0.59.9"
+    react-native: ">=0.79"
   peerDependenciesMeta:
     expo:
       optional: true
@@ -5957,7 +5957,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/367d66fc99b2745bc606813eedd98632dff5571376dec018c485b5e365df63fd8c1fae07a25e287f2fe99d2d6f9dceb95a0928af97dbf95d88143abff5623a01
+  checksum: 10c0/f679d2facb0aa9c8f96663e849faa69792b2db10eb797c22e357edc8f99a52e55fe76b61c77535e38ea29d2a24217a6e72ede3595a9e32cb5852a7f02cc9a446
   languageName: node
   linkType: hard
 
@@ -6338,27 +6338,6 @@ __metadata:
   dependencies:
     "@sentry/core": "npm:10.37.0"
   checksum: 10c0/a7e8c582db5b3b709ddfc0cf3c870f5697d6fe6b03a451834e5da39b3197534b86c25737954eeb3ec873d6646f5340fbeeaac7ffc80eeba451f4e0337ba41345
-  languageName: node
-  linkType: hard
-
-"@shopify/react-native-skia@npm:2.4.18":
-  version: 2.4.18
-  resolution: "@shopify/react-native-skia@npm:2.4.18"
-  dependencies:
-    canvaskit-wasm: "npm:0.40.0"
-    react-reconciler: "npm:0.31.0"
-  peerDependencies:
-    react: ">=19.0"
-    react-native: ">=0.78"
-    react-native-reanimated: ">=3.19.1"
-  peerDependenciesMeta:
-    react-native:
-      optional: true
-    react-native-reanimated:
-      optional: true
-  bin:
-    setup-skia-web: scripts/setup-canvaskit.js
-  checksum: 10c0/24741a121c0bc3b4c3a321adb89ddcdb3add8cb66334b4a62510b2d11f377e086a1a2a8e3aac2737b9bf4eeb2716a1e026d540e47f1fcaed907030bfc7ee5972
   languageName: node
   linkType: hard
 
@@ -11630,13 +11609,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@webgpu/types@npm:0.1.21":
-  version: 0.1.21
-  resolution: "@webgpu/types@npm:0.1.21"
-  checksum: 10c0/74de9683b70064aeadcdd31381747650b323e7e2183fb38f90a35f1a79f80ad267c0a2ee5010c264befb3d31ad213dbdffa04897e2808f6b04feff8d66bc53e0
-  languageName: node
-  linkType: hard
-
 "@xmldom/xmldom@npm:^0.8.8":
   version: 0.8.13
   resolution: "@xmldom/xmldom@npm:0.8.13"
@@ -13053,15 +13025,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"canvaskit-wasm@npm:0.40.0":
-  version: 0.40.0
-  resolution: "canvaskit-wasm@npm:0.40.0"
-  dependencies:
-    "@webgpu/types": "npm:0.1.21"
-  checksum: 10c0/dde817c0ef979a67afad4ac3adf31c03133af2592efec17f715a98508fdf801104fbf05af29723fb39b4d8b2798ce5306bb3cb5c062209d9d90a750430f3361d
-  languageName: node
-  linkType: hard
-
 "capture-stack-trace@npm:^1.0.0":
   version: 1.0.2
   resolution: "capture-stack-trace@npm:1.0.2"
@@ -14102,10 +14065,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debounce@npm:^1.2.0":
-  version: 1.2.1
-  resolution: "debounce@npm:1.2.1"
-  checksum: 10c0/6c9320aa0973fc42050814621a7a8a78146c1975799b5b3cc1becf1f77ba9a5aa583987884230da0842a03f385def452fad5d60db97c3d1c8b824e38a8edf500
+"debounce@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "debounce@npm:2.2.0"
+  checksum: 10c0/684536fe9a04c9eea46cf02f119f69aa4071813ba25b9b43370e1503ea60b34fd38d694c7145fa2be504f9d40e7e39354cb9ed155c70954a0eefa391aefe271c
   languageName: node
   linkType: hard
 
@@ -16107,6 +16070,17 @@ __metadata:
   bin:
     expo-updates: bin/cli.js
   checksum: 10c0/535cada8444f5a86d274365a6b6e3e4d0d6bfb870e91c3520151b58a672f713ab0908aad43547609698ca21b916caf5fe6d73147b0c2c5af9ef58600fc4a6ec7
+  languageName: node
+  linkType: hard
+
+"expo-video@npm:~55.0.17":
+  version: 55.0.17
+  resolution: "expo-video@npm:55.0.17"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/e5d0f2f29a62d10c1c8e0393d81d008efa4fcafccf6d384bbf6df1c78acbd18767b035bee9cd7c2871fa85ca083118f75db9cc95eb730359f2b553b01aebcd8f
   languageName: node
   linkType: hard
 
@@ -23330,17 +23304,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-reconciler@npm:0.31.0":
-  version: 0.31.0
-  resolution: "react-reconciler@npm:0.31.0"
-  dependencies:
-    scheduler: "npm:^0.25.0"
-  peerDependencies:
-    react: ^19.0.0
-  checksum: 10c0/97920e1866c7206e200c3920c133c2e85f62a3c54fd9bc4b83c10c558d83d98eb378caab4fe37498e0cc1b1b2665d898627f2ae2537b29c8ab295ec8abc0c580
-  languageName: node
-  linkType: hard
-
 "react-refresh@npm:^0.14.0, react-refresh@npm:^0.14.2":
   version: 0.14.2
   resolution: "react-refresh@npm:0.14.2"
@@ -24050,13 +24013,6 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.1.0"
   checksum: 10c0/26383305e249651d4c58e6705d5f8425f153211aef95f15161c151f7b8de885f24751b377e4a0b3dd42cce09aad3f87a61dab7636859c0d89b7daf1a1e2a5c78
-  languageName: node
-  linkType: hard
-
-"scheduler@npm:^0.25.0":
-  version: 0.25.0
-  resolution: "scheduler@npm:0.25.0"
-  checksum: 10c0/a4bb1da406b613ce72c1299db43759526058fdcc413999c3c3e0db8956df7633acf395cb20eb2303b6a65d658d66b6585d344460abaee8080b4aa931f10eaafe
   languageName: node
   linkType: hard
 
@@ -26439,9 +26395,8 @@ __metadata:
     "@react-native-community/slider": "npm:5.0.1"
     "@react-native-firebase/app": "npm:^23.2.1"
     "@react-native-firebase/messaging": "npm:^23.2.1"
-    "@rnmapbox/maps": "npm:10.1.42"
+    "@rnmapbox/maps": "npm:~10.3.1"
     "@sentry/react-native": "npm:~7.11.0"
-    "@shopify/react-native-skia": "npm:2.4.18"
     "@storybook/addon-ondevice-actions": "npm:^7.6.16"
     "@storybook/addon-ondevice-controls": "npm:^7.6.16"
     "@storybook/react-native": "npm:^7.6.16"
@@ -26507,6 +26462,7 @@ __metadata:
     expo-splash-screen: "npm:~55.0.10"
     expo-status-bar: "npm:~55.0.4"
     expo-updates: "npm:~55.0.12"
+    expo-video: "npm:~55.0.17"
     expo-web-browser: "npm:~55.0.9"
     firebase: "npm:^12.2.1"
     firebase-tools: "npm:^13.7.1"

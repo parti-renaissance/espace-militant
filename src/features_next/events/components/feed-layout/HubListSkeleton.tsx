@@ -1,0 +1,57 @@
+import React from 'react'
+import { useMedia, YStack } from 'tamagui'
+
+import SkeCard from '@/components/Skeleton/CardSkeleton'
+
+const HubListSkeleton: React.FC = () => {
+  const media = useMedia()
+
+  return (
+    <YStack gap="$medium" paddingHorizontal={media.sm ? 0 : undefined}>
+      <SkeCard>
+        <SkeCard.Content>
+          <SkeCard.Chip />
+          <SkeCard.Title />
+          <SkeCard.Date />
+          <SkeCard.Author />
+          <SkeCard.Author />
+          <SkeCard.Actions />
+        </SkeCard.Content>
+      </SkeCard>
+      <SkeCard>
+        <SkeCard.Content>
+          <SkeCard.Chip />
+          <SkeCard.Image />
+          <SkeCard.Title />
+          <SkeCard.Date />
+          <SkeCard.Author />
+          <SkeCard.Author />
+          <SkeCard.Actions />
+        </SkeCard.Content>
+      </SkeCard>
+      <SkeCard>
+        <SkeCard.Content>
+          <SkeCard.Chip />
+          <SkeCard.Image />
+          <SkeCard.Title />
+          <SkeCard.Date />
+          <SkeCard.Author />
+          <SkeCard.Author />
+          <SkeCard.Actions />
+        </SkeCard.Content>
+      </SkeCard>
+      <SkeCard>
+        <SkeCard.Content>
+          <SkeCard.Chip />
+          <SkeCard.Title />
+          <SkeCard.Date />
+          <SkeCard.Author />
+          <SkeCard.Author />
+          <SkeCard.Actions />
+        </SkeCard.Content>
+      </SkeCard>
+    </YStack>
+  )
+}
+
+export default HubListSkeleton
