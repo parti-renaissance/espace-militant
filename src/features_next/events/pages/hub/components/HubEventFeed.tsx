@@ -5,7 +5,6 @@ import type { ReactNode } from 'react'
 import { memo, useCallback, useMemo, useRef } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
-import type { Href } from 'expo-router'
 import { getToken, Spinner, XStack, YStack } from 'tamagui'
 import { Calendar, CalendarCheck2, ChevronRight, ClipboardCheck, DoorOpen, Zap } from '@tamagui/lucide-icons'
 
@@ -29,17 +28,14 @@ const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.
 const getFeedRowKey = (row: HubFeedRowType): string =>
   row.type === 'event' ? row.event.uuid : (row.payload.id ?? `action-${row.payload.date.start.toISOString()}`)
 
-const CREER_EVENEMENT_HREF = '/evenements/creer' as const satisfies Href
-const CREER_ACTION_HREF = '/actions/creer' as const satisfies Href
-
-const HubOrganizePromptCards = memo(function HubOrganizePromptCards() {
+const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrganizeModal }: { onOpenOrganizeModal: () => void }) {
   return (
     <XStack gap="$medium" px="$medium">
       <YStack width="50%" flex={1}>
-        <ButtonCard theme="green" icon={Zap} label="Organisez une action près de chez vous" href={CREER_ACTION_HREF} />
+        <ButtonCard theme="green" icon={Zap} label="Organisez une action près de chez vous" onPress={onOpenOrganizeModal} />
       </YStack>
       <YStack width="50%" flex={1}>
-        <ButtonCard theme="blue" icon={Calendar} label="Organisez un événement" href={CREER_EVENEMENT_HREF} />
+        <ButtonCard theme="blue" icon={Calendar} label="Organisez un événement" onPress={onOpenOrganizeModal} />
       </YStack>
     </XStack>
   )
@@ -73,10 +69,11 @@ type HubEventFeedProps = {
   embeddedMapHeader?: ReactNode
   /** Marge sous le contenu pour la tab bar + safe area. */
   listContentInsetBottom?: number
+  onOpenOrganizeModal: () => void
 }
 
 const HubEventFeed = (props: HubEventFeedProps) => {
-  const { embeddedMapHeader, listContentInsetBottom = 0 } = props
+  const { embeddedMapHeader, listContentInsetBottom = 0, onOpenOrganizeModal } = props
   const { session, isAuth } = useSession()
   const { data: userData } = useGetProfil({ enabled: Boolean(session) })
   const filtersReady = !isAuth || userData !== undefined
@@ -103,7 +100,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
       <QueryBoundary>
         <PinnedItemBanner small />
       </QueryBoundary>
-      <HubOrganizePromptCards />
+      <HubOrganizePromptCards onOpenOrganizeModal={onOpenOrganizeModal} />
       <YStack px="$medium" gap="$medium">
         <XStack gap="$small">
           <CalendarCheck2 size={16} color="$blue5" />
