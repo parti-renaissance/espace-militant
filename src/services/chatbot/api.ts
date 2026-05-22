@@ -4,11 +4,13 @@ import { api } from '@/utils/api'
 
 import * as schemas from './schema'
 
+export const CHATBOT_AGENT_ID = 'gemini'
+
 /** Liste des threads de conversation (GET /ai/threads) */
 export const getChatbotThreadsList = api({
   method: 'GET',
   path: '/api/v3/ai/threads',
-  requestSchema: z.object({ page: z.number() }),
+  requestSchema: z.object({ page: z.number(), agent: z.string().optional() }),
   responseSchema: schemas.RestChatbotThreadsResponseSchema,
   type: 'private',
 })
