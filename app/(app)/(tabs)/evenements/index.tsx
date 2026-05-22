@@ -15,13 +15,13 @@ import { QueryBoundary } from '@/components/QueryBoundary'
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
 import { usePinnedEventsInfiniteQuery } from '@/services/events/hook'
-import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { useUserScopeFeatures } from '@/services/profile/hook'
 import { FEATURES } from '@/utils/Scopes'
 
 const CreateEventFloatingButton = () => {
   const { isAuth } = useSession()
-  const { hasFeature } = useGetExecutiveScopes()
-  const canCreate = isAuth && hasFeature ? hasFeature(FEATURES.EVENTS) : false
+  const { hasFeature } = useUserScopeFeatures({ enabled: isAuth })
+  const canCreate = isAuth && hasFeature(FEATURES.EVENTS)
 
   const floatingContent = useMemo(() => {
     if (!canCreate) return null

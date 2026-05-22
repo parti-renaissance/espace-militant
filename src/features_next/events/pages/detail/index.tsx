@@ -1,8 +1,6 @@
 import React from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
 
-import { GreetingCreateModal } from './components/GreetingCreateModal'
-
 import { DetailedAPIErrorPayload } from '@/core/errors'
 import { useSession } from '@/ctx/SessionProvider'
 import * as eventTypes from '@/services/events/schema'
@@ -10,6 +8,7 @@ import * as eventTypes from '@/services/events/schema'
 import { EventContent } from './components/EventContent'
 import { EventDenyScreen } from './components/EventDenyScreen'
 import { EventSkeleton } from './components/EventSkeleton'
+import { GreetingCreateModal } from './components/GreetingCreateModal'
 
 export default function EventDetailsScreen({ data }: { data: eventTypes.RestEvent }) {
   const { greet } = useLocalSearchParams<{ greet: string }>()

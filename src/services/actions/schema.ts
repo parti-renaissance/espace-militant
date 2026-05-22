@@ -110,6 +110,7 @@ export const RestPostActionRequestSchema = z.object({
   date: z.string(),
   description: z.string(),
   post_address: RestActionPostAddressInputSchema,
+  send_invitation_email: z.boolean().optional(),
 })
 
 export const RestPostActionResponseSchema = RestActionFullSchema
@@ -126,6 +127,7 @@ export const propertyPathPostActionSchema = z.enum([
   'type',
   'date',
   'description',
+  'send_invitation_email',
   'post_address',
   'post_address.address',
   'post_address.postal_code',

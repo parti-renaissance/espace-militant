@@ -7,7 +7,7 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import useResetFilters from '@/features_next/events/pages/feed/hooks/useResetFilters'
 
-import { useGetExecutiveScopes } from '@/services/profile/hook'
+import { useUserScopeFeatures } from '@/services/profile/hook'
 import { FEATURES } from '@/utils/Scopes'
 
 export type EmptyStateReason =
@@ -25,7 +25,7 @@ type Props = {
 }
 
 export const EmptyStateSection = ({ reason, onSwitchToAllItems, showResetButton }: Props) => {
-  const { hasFeature } = useGetExecutiveScopes()
+  const { hasFeature } = useUserScopeFeatures({ enabled: true })
   const { handleReset } = useResetFilters()
 
   const zoneLabel = reason.kind === 'zone_no_upcoming' ? reason.zoneLabel.replace(' • ', ' - ') : ''

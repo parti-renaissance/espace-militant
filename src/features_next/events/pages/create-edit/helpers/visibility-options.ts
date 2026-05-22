@@ -11,14 +11,14 @@ const ALL_VISIBILITY_OPTIONS: SelectOption<EventFormData['visibility']>[] = [
     value: 'public',
     icon: Unlock,
     label: 'Ouvert au public',
-    subLabel: 'Tout le monde peut s’y inscrire avec un prénom, un email et un code postal pour découvrir le Parti.',
+    subLabel: 'Tout le monde peut s’y inscrire avec un prénom, un email et un code postal.',
   },
   {
     value: 'private',
     icon: Lock,
     theme: 'blue',
-    label: 'Réservé aux millitants',
-    subLabel: 'Les externes ne pourront pas s’y inscrire sans adhérer ou créer un compte. Un aperçu sera visible publiquement.',
+    label: 'Réservé aux membres',
+    subLabel: 'Les externes ne pourront pas s’y inscrire sans créer un compte et renseigner leurs informations. Un aperçu sera visible publiquement.',
   },
   {
     value: 'adherent',
@@ -53,11 +53,14 @@ const isCommitteeScope = (selectedScopeData?: SelectedScopeData) => {
   return selectedScopeData?.code?.toLowerCase() === 'animator'
 }
 
+export const getPublicOnlyVisibilityOptions = (): SelectOption<EventFormData['visibility']>[] =>
+  ALL_VISIBILITY_OPTIONS.filter((opt) => opt.value === 'public')
+
 export const getVisibilityOptions = (selectedScopeData?: SelectedScopeData): SelectOption<EventFormData['visibility']>[] => {
   const scope = selectedScopeData?.code ?? ''
 
   if (!scope) {
-    return ALL_VISIBILITY_OPTIONS
+    return getPublicOnlyVisibilityOptions()
   }
 
   if (scope?.startsWith('agora_')) {

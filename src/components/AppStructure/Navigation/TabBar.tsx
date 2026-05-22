@@ -17,6 +17,7 @@ import Text from '@/components/base/Text'
 import { cadreNavItems, useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
 import type { IconComponent } from '@/models/common.model'
 import { useGetUserScopes } from '@/services/profile/hook'
+import { isExecutiveCadreScope } from '@/services/profile/utils'
 
 type Theme = 'blue' | 'purple' | 'green' | 'orange'
 
@@ -165,7 +166,7 @@ const ConfigurableTabBar = ({ hide = false, navCadreItems = cadreNavItems }: Con
   const { data: userScopes } = useGetUserScopes({ enabled: true })
 
   const hasExecutiveScope = useMemo(() => {
-    return userScopes?.some((s) => s.apps.includes('data_corner')) ?? false
+    return userScopes?.some(isExecutiveCadreScope) ?? false
   }, [userScopes])
 
   const visibleItemIds = useMemo(() => {

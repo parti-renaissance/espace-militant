@@ -11,6 +11,7 @@ import { logActionMutation, logActionMutationError } from '@/services/actions/lo
 import { mapActionFormToPostRequest, mapRestActionFullToFormDefaults, type ActionFormValues } from '@/services/actions/paramsMapper'
 import { ActionType, RestActionFull } from '@/services/actions/schema'
 
+import { useActionConfirmAlert } from '../components/ActionConfirmAlert'
 import { actionFormSchema } from './schema'
 
 export type ActionFormProps = {
@@ -52,6 +53,7 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
           date: addHours(new Date(), 1),
           post_address: { address: '', postal_code: '', city_name: '', country: '' },
           description: '',
+          send_invitation_email: true,
         },
   })
 
@@ -59,7 +61,7 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
   const cancelMutation = useCancelAction()
   const editMode = Boolean(edit)
 
-  const onSubmit = handleSubmit(
+  const finalSubmit = handleSubmit(
     (values) => {
       const payload = mapActionFormToPostRequest(values)
       logActionMutation(editMode ? 'form submit — update' : 'form submit — create', {
@@ -72,7 +74,10 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
         .then((data) => {
           logActionMutation('form submit — success', { uuid: data.uuid })
           reset(values)
-          router.replace({ pathname: '/actions/[id]', params: { id: data.uuid } })
+          router.replace({
+            pathname: '/actions/[id]',
+            params: { id: data.uuid, greet: editMode ? undefined : 'new' },
+          })
         })
         .catch((e) => {
           logActionMutationError('form submit — catch', e)
@@ -90,6 +95,15 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
       logActionMutation('form submit — validation client', { errors: validationErrors })
     },
   )
+
+  const { ConfirmAlert, present } = useActionConfirmAlert({
+    onAccept: finalSubmit,
+    control,
+    isPending: actionMutation.isPending,
+  })
+
+  const modalBeforeSubmit = handleSubmit(() => present())
+  const onSubmit = editMode ? finalSubmit : modalBeforeSubmit
 
   const onConfirmCancel = () => {
     if (!edit?.uuid) return
@@ -116,6 +130,7 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
       }}
     >
       {children}
+      {ConfirmAlert}
     </ActionFormContext.Provider>
   )
 }

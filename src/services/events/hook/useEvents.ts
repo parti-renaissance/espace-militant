@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-
 import { useToastController } from '@tamagui/toast'
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 
 import type { HubItemMapItem } from '@/features_next/events/pages/map/components/HubItemMap'
 import { isEventPast } from '@/features_next/events/utils'
+
 import { EventFilters } from '@/core/entities/Event'
 import { useSession } from '@/ctx/SessionProvider'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
@@ -14,9 +14,18 @@ import { eventPostFormError } from '@/services/events/error'
 import { FRANCE_METRO_EVENTS_BBOX } from '@/services/events/franceMetroBounds'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook'
 
-import { RestItemEvent, RestPostCountInvitationsEventRequest, RestPostEventRequest, RestPostEventSubsciptionRequest, RestPostPublicEventSubsciptionRequest } from '../schema'
+import {
+  RestFullEvent,
+  RestItemEvent,
+  RestPostCountInvitationsEventRequest,
+  RestPostEventRequest,
+  RestPostEventSubsciptionRequest,
+  RestPostPublicEventSubsciptionRequest,
+} from '../schema'
 import { optimisticToggleSubscribe, optimisticUpdate } from './helpers'
 import { QUERY_KEY_MAP_EVENTS, QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
+
+type CreateOrUpdateEventVariables = { payload: RestPostEventRequest; scope?: string }
 
 type FetchShortEventsOptions = {
   filters?: EventFilters
@@ -221,8 +230,8 @@ export const useCreateEvent = ({ editSlug, editUuid }: { editSlug?: string; edit
   const toast = useToastController()
   const successMessage = editSlug ? 'Événement modifié avec succès' : 'Événement créé avec succès'
   const errorMessage = editSlug ? 'Impossible de modifier cet événement' : 'Impossible de créer cet événement'
-  return useMutation({
-    mutationFn: editUuid ? ({ payload }: { payload: RestPostEventRequest; scope: string }) => api.updateEvent({ payload, eventId: editUuid }) : api.createEvent,
+  return useMutation<RestFullEvent, Error, CreateOrUpdateEventVariables>({
+    mutationFn: editUuid ? ({ payload }) => api.updateEvent({ payload, eventId: editUuid }) : ({ payload, scope }) => api.createEvent({ payload, scope }),
     onSuccess: (payload) => {
       toast.show('Succès', { message: successMessage, type: 'success' })
       if (editSlug) {

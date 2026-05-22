@@ -6,8 +6,9 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { EventFormContext } from '../helpers/context'
 
-const _EventScopeSelect = (props: Pick<EventFormContext, 'control' | 'isAuthor' | 'editMode' | 'scopeOptions'>) => {
-  return props.editMode ? null : (
+const _EventScopeSelect = (props: Pick<EventFormContext, 'control' | 'isAuthor' | 'editMode' | 'scopeOptions' | 'canCreateAsCadre'>) => {
+  const showScopeSelect = props.canCreateAsCadre && props.scopeOptions.length > 0
+  return props.editMode || !showScopeSelect ? null : (
     <>
       <Controller
         render={({ field, fieldState }) => {
