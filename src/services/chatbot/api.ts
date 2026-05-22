@@ -4,7 +4,7 @@ import { api } from '@/utils/api'
 
 import * as schemas from './schema'
 
-export const CHATBOT_AGENT_ID = 'gemini'
+export const CHATBOT_AGENT_ID = 'chatbot'
 
 /** Liste des threads de conversation (GET /ai/threads) */
 export const getChatbotThreadsList = api({

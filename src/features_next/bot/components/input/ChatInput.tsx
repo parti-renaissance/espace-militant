@@ -7,9 +7,9 @@ import { ArrowUpRight, Square } from '@tamagui/lucide-icons'
 import { VoxButton } from '@/components/Button/Button'
 
 import { BOT_MESSAGE_MAX_LENGTH } from '@/services/bot/api'
-import { useAutoGrowTextarea } from '../hooks/useAutoGrowTextarea'
-import { useEnterKeySubmit } from '../hooks/useEnterKeySubmit'
-import type { TamaguiInputRef } from '../utils/getDomFromTamaguiRef'
+import { useAutoGrowTextarea } from '../../hooks/useAutoGrowTextarea'
+import { useEnterKeySubmit } from '../../hooks/useEnterKeySubmit'
+import type { TamaguiInputRef } from '../../utils/getDomFromTamaguiRef'
 
 type Props = {
   inputRef: RefObject<TamaguiInputRef | null>

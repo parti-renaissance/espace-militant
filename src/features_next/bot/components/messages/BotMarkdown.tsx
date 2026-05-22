@@ -1,6 +1,6 @@
 import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
 
-import { htmlToMarkdown } from '../utils/htmlToMarkdown'
+import { htmlToMarkdown } from '../../utils/htmlToMarkdown'
 
 type Props = {
   content: string

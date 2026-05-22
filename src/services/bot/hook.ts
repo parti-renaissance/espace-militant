@@ -6,12 +6,10 @@ import { useUserStore } from '@/store/user-store'
 
 import { BOT_AGENT_ID, BOT_CHAT_URL, BOT_THREAD_HEADER } from './api'
 import { useMessagesHydration } from './hooks/useMessagesHydration'
+import { useSSEStream } from './hooks/useSSEStream'
 import { useThreadsListFallback } from './hooks/useThreadsListFallback'
 import type { BotChatError, BotChatMessage, RestBotChatRequest } from './schema'
 import { classifyHttpError } from './utils/classifyHttpError'
-import { parseSSEChunk } from './utils/parseSSEChunk'
-
-const FIRST_CHUNK_TIMEOUT_MS = 30_000
 
 export type UseBotChatReturn = {
   messages: BotChatMessage[]
@@ -33,22 +31,13 @@ export function useBotChat(): UseBotChatReturn {
   const setMessages = useBotStore((s) => s.setMessages)
 
   const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
   const [streamedContent, setStreamedContent] = useState('')
   const [error, setError] = useState<BotChatError | null>(null)
 
-  const xhrRef = useRef<XMLHttpRequest | null>(null)
-  const streamBufferRef = useRef('')
-  const lastProcessedIndexRef = useRef(0)
-  const lineBufferRef = useRef('')
-  const isMountedRef = useRef(true)
-  const abortedByUserRef = useRef(false)
-  const lastUserMessageRef = useRef<string | null>(null)
-  const firstChunkTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const firstChunkReceivedRef = useRef(false)
   const threadIdRef = useRef<string | null>(storedThreadId)
-  const inStreamErrorRef = useRef<string | null>(null)
-  const threadNotifiedRef = useRef(false)
+  const lastUserMessageRef = useRef<string | null>(null)
+  const streamBufferRef = useRef('')
+  const hadInStreamErrorRef = useRef(false)
   const hasHydratedOnceRef = useRef(false)
 
   useEffect(() => {
@@ -60,29 +49,6 @@ export function useBotChat(): UseBotChatReturn {
   useThreadsListFallback(storedThreadId)
   useMessagesHydration({ storedThreadId, setMessages, hasHydratedRef: hasHydratedOnceRef })
 
-  useEffect(() => {
-    isMountedRef.current = true
-    return () => {
-      isMountedRef.current = false
-      if (xhrRef.current) {
-        abortedByUserRef.current = true
-        xhrRef.current.abort()
-        xhrRef.current = null
-      }
-      if (firstChunkTimerRef.current) {
-        clearTimeout(firstChunkTimerRef.current)
-        firstChunkTimerRef.current = null
-      }
-    }
-  }, [])
-
-  const clearFirstChunkTimer = useCallback(() => {
-    if (firstChunkTimerRef.current) {
-      clearTimeout(firstChunkTimerRef.current)
-      firstChunkTimerRef.current = null
-    }
-  }, [])
-
   const commitStreamedMessage = useCallback(() => {
     if (!streamBufferRef.current) return
     setMessages((m) => [...m, { id: `stream-${Date.now()}`, role: 'assistant', content: streamBufferRef.current }])
@@ -90,24 +56,70 @@ export function useBotChat(): UseBotChatReturn {
     streamBufferRef.current = ''
   }, [setMessages])
 
-  const cleanupRequest = useCallback((): boolean => {
-    clearFirstChunkTimer()
-    xhrRef.current = null
-    if (!isMountedRef.current) return false
-    setIsLoading(false)
-    return true
-  }, [clearFirstChunkTimer])
+  const stream = useSSEStream({
+    url: BOT_CHAT_URL,
+    threadHeaderName: BOT_THREAD_HEADER,
+    getAuthToken: () => useUserStore.getState().user?.accessToken,
+    onThreadHeader: (uuid) => {
+      threadIdRef.current = uuid
+      if (useBotStore.getState().threadId !== uuid) {
+        useBotStore.getState().setThreadId(uuid)
+        hasHydratedOnceRef.current = true
+      }
+    },
+    onChunk: (text) => {
+      streamBufferRef.current += text
+      setStreamedContent(streamBufferRef.current)
+    },
+    onInStreamError: () => {
+      hadInStreamErrorRef.current = true
+    },
+    onComplete: () => {
+      if (hadInStreamErrorRef.current) {
+        commitStreamedMessage()
+        setError({ kind: 'serviceDown', message: i18next.t('bot.errors.serviceDown'), retryable: true })
+      } else if (streamBufferRef.current) {
+        commitStreamedMessage()
+      } else {
+        setError({ kind: 'truncated', message: i18next.t('bot.errors.truncated'), retryable: true })
+      }
+    },
+    onError: (err) => {
+      if (err.kind === 'http') {
+        setError(classifyHttpError(err.status, err.retryAfterHeader))
+      } else if (err.kind === 'timeout') {
+        setError({ kind: 'timeout', message: i18next.t('bot.errors.timeout'), retryable: true })
+      } else {
+        setError({ kind: 'network', message: i18next.t('bot.errors.network'), retryable: true })
+      }
+    },
+    onAbort: () => {
+      commitStreamedMessage()
+    },
+  })
 
-  const resetRequestState = useCallback((userMessage: string) => {
-    abortedByUserRef.current = false
-    firstChunkReceivedRef.current = false
-    threadNotifiedRef.current = false
-    inStreamErrorRef.current = null
-    lastUserMessageRef.current = userMessage
-    streamBufferRef.current = ''
-    lastProcessedIndexRef.current = 0
-    lineBufferRef.current = ''
-  }, [])
+  const sendMessage = useCallback(
+    (text: string) => {
+      const trimmed = text.trim()
+      if (!trimmed) return
+
+      lastUserMessageRef.current = trimmed
+      hadInStreamErrorRef.current = false
+      streamBufferRef.current = ''
+
+      setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', content: trimmed }])
+      setError(null)
+      setStreamedContent('')
+
+      const body: RestBotChatRequest = {
+        message: trimmed,
+        agent_id: BOT_AGENT_ID,
+        ...(threadIdRef.current ? { thread_id: threadIdRef.current } : {}),
+      }
+      stream.start(body)
+    },
+    [setMessages, stream],
+  )
 
   const handleInputChange = useCallback(
     (value: string) => {
@@ -117,137 +129,15 @@ export function useBotChat(): UseBotChatReturn {
     [error],
   )
 
-  const stop = useCallback(() => {
-    if (xhrRef.current) {
-      abortedByUserRef.current = true
-      xhrRef.current.abort()
-      xhrRef.current = null
-    }
-    clearFirstChunkTimer()
-  }, [clearFirstChunkTimer])
-
-  const sendMessage = useCallback(
-    (messageText: string) => {
-      const trimmed = messageText.trim()
-      if (!trimmed) return
-
-      resetRequestState(trimmed)
-      const userMessage: BotChatMessage = { id: `local-${Date.now()}`, role: 'user', content: trimmed }
-      setMessages((prev) => [...prev, userMessage])
-      setError(null)
-      setStreamedContent('')
-      setIsLoading(true)
-
-      const body: RestBotChatRequest = {
-        message: trimmed,
-        agent_id: BOT_AGENT_ID,
-        ...(threadIdRef.current ? { thread_id: threadIdRef.current } : {}),
-      }
-
-      const accessToken = useUserStore.getState().user?.accessToken
-      const xhr = new XMLHttpRequest()
-      xhrRef.current = xhr
-
-      xhr.open('POST', BOT_CHAT_URL, true)
-      xhr.setRequestHeader('Content-Type', 'application/json')
-      xhr.setRequestHeader('Accept', 'text/event-stream')
-      if (accessToken) {
-        xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
-      }
-
-      firstChunkTimerRef.current = setTimeout(() => {
-        if (firstChunkReceivedRef.current || xhrRef.current !== xhr) return
-        abortedByUserRef.current = false
-        xhr.abort()
-        if (!cleanupRequest()) return
-        setError({ kind: 'timeout', message: i18next.t('bot.errors.timeout'), retryable: true })
-      }, FIRST_CHUNK_TIMEOUT_MS)
-
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState >= 2 && !threadNotifiedRef.current) {
-          const headerThreadId = xhr.getResponseHeader(BOT_THREAD_HEADER)
-          if (headerThreadId) {
-            threadNotifiedRef.current = true
-            threadIdRef.current = headerThreadId
-            if (useBotStore.getState().threadId !== headerThreadId) {
-              useBotStore.getState().setThreadId(headerThreadId)
-              hasHydratedOnceRef.current = true
-            }
-          }
-        }
-
-        if (xhr.readyState === 3 || xhr.readyState === 4) {
-          const fullText = xhr.responseText
-          const from = lastProcessedIndexRef.current
-          if (from < fullText.length) {
-            firstChunkReceivedRef.current = true
-            clearFirstChunkTimer()
-            const newPart = fullText.substring(from)
-            lastProcessedIndexRef.current = fullText.length
-            lineBufferRef.current += newPart
-          }
-
-          const lines = lineBufferRef.current.split('\n')
-          const endIndex = xhr.readyState === 4 ? lines.length : Math.max(0, lines.length - 1)
-          for (let i = 0; i < endIndex; i++) {
-            const chunk = parseSSEChunk(lines[i])
-            if (!chunk) continue
-            if (chunk.kind === 'error') {
-              inStreamErrorRef.current = chunk.message || ''
-            } else {
-              streamBufferRef.current += chunk.text
-            }
-          }
-
-          lineBufferRef.current = xhr.readyState === 4 ? '' : (lines[lines.length - 1] ?? '')
-
-          if (isMountedRef.current) setStreamedContent(streamBufferRef.current)
-        }
-
-        if (xhr.readyState === 4) {
-          if (!cleanupRequest()) return
-
-          if (xhr.status >= 200 && xhr.status < 300) {
-            if (inStreamErrorRef.current !== null) {
-              commitStreamedMessage()
-              setError({ kind: 'serviceDown', message: i18next.t('bot.errors.serviceDown'), retryable: true })
-            } else if (streamBufferRef.current) {
-              commitStreamedMessage()
-            } else {
-              setError({ kind: 'truncated', message: i18next.t('bot.errors.truncated'), retryable: true })
-            }
-          } else if (xhr.status !== 0) {
-            setError(classifyHttpError(xhr.status, xhr.getResponseHeader('Retry-After')))
-          } else if (!abortedByUserRef.current) {
-            setError({ kind: 'network', message: i18next.t('bot.errors.network'), retryable: true })
-          }
-        }
-      }
-
-      xhr.onerror = () => {
-        if (!cleanupRequest()) return
-        setError({ kind: 'network', message: i18next.t('bot.errors.network'), retryable: true })
-      }
-
-      xhr.onabort = () => {
-        if (!cleanupRequest()) return
-        if (abortedByUserRef.current) commitStreamedMessage()
-      }
-
-      xhr.send(JSON.stringify(body))
-    },
-    [cleanupRequest, clearFirstChunkTimer, commitStreamedMessage, resetRequestState, setMessages],
-  )
-
   const handleSubmit = useCallback(() => {
-    if (!input.trim() || isLoading) return
+    if (!input.trim() || stream.isStreaming) return
     const message = input.trim()
     setInput('')
     sendMessage(message)
-  }, [input, isLoading, sendMessage])
+  }, [input, sendMessage, stream.isStreaming])
 
   const retry = useCallback(() => {
-    if (!lastUserMessageRef.current || isLoading) return
+    if (!lastUserMessageRef.current || stream.isStreaming) return
     setMessages((m) => {
       if (m.length > 0 && m[m.length - 1].role === 'user' && m[m.length - 1].content === lastUserMessageRef.current) {
         return m.slice(0, -1)
@@ -255,43 +145,38 @@ export function useBotChat(): UseBotChatReturn {
       return m
     })
     sendMessage(lastUserMessageRef.current)
-  }, [isLoading, sendMessage, setMessages])
+  }, [sendMessage, setMessages, stream.isStreaming])
 
   const submit = useCallback(
     (text: string) => {
-      if (isLoading) return
+      if (stream.isStreaming) return
       sendMessage(text)
     },
-    [isLoading, sendMessage],
+    [sendMessage, stream.isStreaming],
   )
 
   const reset = useCallback(() => {
-    if (xhrRef.current) {
-      abortedByUserRef.current = true
-      xhrRef.current.abort()
-      xhrRef.current = null
-    }
-    clearFirstChunkTimer()
+    stream.stop()
     threadIdRef.current = null
     hasHydratedOnceRef.current = false
     lastUserMessageRef.current = null
+    hadInStreamErrorRef.current = false
     streamBufferRef.current = ''
     setStreamedContent('')
     setError(null)
-    setIsLoading(false)
     useBotStore.getState().clearThread()
-  }, [clearFirstChunkTimer])
+  }, [stream])
 
   return {
     messages,
     input,
     handleInputChange,
     handleSubmit,
-    isLoading,
+    isLoading: stream.isStreaming,
     streamedContent,
     error,
     retry,
-    stop,
+    stop: stream.stop,
     submit,
     reset,
   }
