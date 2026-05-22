@@ -365,6 +365,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     agoraUuid,
     committeeUuid,
     scope: selectedScope,
+    canCreateAsCadre,
   })
 
   const modalBeforeSubmit = handleSubmit(() => present())
