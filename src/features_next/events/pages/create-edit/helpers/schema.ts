@@ -59,7 +59,7 @@ const postAddressSchema = z.object({
 
 export const createEventSchema = z
   .object({
-    scope: requiredString('Le champ de la portée'),
+    scope: z.string().optional().default(''),
     isPastEvent: z.boolean().optional().default(false),
     image: z
       .object({

@@ -87,10 +87,10 @@ export const getEventCategories = api({
   type: 'private',
 })
 
-export const createEvent = (props: { payload: schemas.RestPostEventRequest; scope: string }) =>
+export const createEvent = (props: { payload: schemas.RestPostEventRequest; scope?: string }) =>
   api({
     method: 'post',
-    path: '/api/v3/events?scope=' + props.scope,
+    path: props.scope ? '/api/v3/events?scope=' + props.scope : '/api/v3/events',
     requestSchema: schemas.RestPostEventRequestSchema,
     responseSchema: schemas.RestPostEventResponseSchema,
     errorThrowers: [eventPostFormErrorThrower],

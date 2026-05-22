@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import * as FileSystem from 'expo-file-system/legacy'
 import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
@@ -21,6 +22,7 @@ import { getFullVersion } from '@/utils/version'
 
 import { GenericResponseError } from '../common/errors/generic-errors'
 import { ProfilChangePasswordFormError } from './error'
+import { hasScopeFeature, isExecutiveCadreScope } from './utils'
 
 export const PROFIL_QUERY_KEY = 'profil'
 
@@ -73,6 +75,13 @@ export const useGetSuspenseUserScopes = () => {
   })
 }
 
+/** Scopes utilisateur + vérification de feature (`hasScopeFeature` sur tous les scopes). */
+export const useUserScopeFeatures = ({ enabled }: { enabled?: boolean } = {}) => {
+  const query = useGetUserScopes({ enabled })
+  const hasFeature = useCallback((featureKey: string) => hasScopeFeature(query.data, featureKey), [query.data])
+  return { ...query, hasFeature }
+}
+
 const processExecutiveScopes = (
   data: Awaited<ReturnType<typeof api.getUserScopes>> | undefined,
   isAuth: boolean,
@@ -91,7 +100,7 @@ const processExecutiveScopes = (
     }
   }
 
-  const cadre_scopes = data?.filter((s) => s.apps.includes('data_corner'))
+  const cadre_scopes = data?.filter(isExecutiveCadreScope)
   const [scopeWithMoreFeatures] = cadre_scopes?.sort((a, b) => (b.features.length > a.features.length ? 1 : -1)) || []
   const localDefaultScope = localDefaultScopeCode ? cadre_scopes?.find((s) => s.code === localDefaultScopeCode) : undefined
   const defaultScope = localDefaultScope ?? scopeWithMoreFeatures

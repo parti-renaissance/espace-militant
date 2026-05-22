@@ -29,6 +29,7 @@ export default function EventFormMobileScreen() {
     navigation,
     onSubmit,
     scopeOptions,
+    canCreateAsCadre,
     control,
     visibilityOptions,
     catOptions,
@@ -94,7 +95,13 @@ export default function EventFormMobileScreen() {
                 </MessageCard>
               )}
               <VoxCard.Content>
-                <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} />
+                <EventScopeSelect
+                  editMode={editMode}
+                  control={control}
+                  isAuthor={isAuthor}
+                  scopeOptions={scopeOptions}
+                  canCreateAsCadre={canCreateAsCadre}
+                />
                 <YStack>
                   <Controller
                     render={({ field, fieldState }) => {
@@ -128,19 +135,22 @@ export default function EventFormMobileScreen() {
                           options={visibilityOptions}
                           onChange={field.onChange}
                           onBlur={field.onBlur}
+                          disabled={!canCreateAsCadre}
                         />
                       )
                     }}
                     control={control}
                     name="visibility"
                   />
-                  <Controller
-                    render={({ field }) => {
-                      return <EventHiddenField value={field.value} onChange={field.onChange} disabled={visibility === 'invitation'} />
-                    }}
-                    control={control}
-                    name="hidden"
-                  />
+                  {canCreateAsCadre ? (
+                    <Controller
+                      render={({ field }) => {
+                        return <EventHiddenField value={field.value} onChange={field.onChange} disabled={visibility === 'invitation'} />
+                      }}
+                      control={control}
+                      name="hidden"
+                    />
+                  ) : null}
                 </YStack>
 
                 <Controller

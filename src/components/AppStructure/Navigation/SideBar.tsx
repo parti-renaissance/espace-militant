@@ -208,6 +208,8 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
   const { notificationGranted, triggerNotificationRequest } = useCheckNotificationsState()
   const hasExecutiveScopes = useMemo(() => executiveScopes?.list && executiveScopes.list.length > 0, [executiveScopes])
 
+  console.log('executiveScopes', executiveScopes)
+
   React.useEffect(() => {
     if (state === 'cadre') {
       setDisplayNavCadre(true)
