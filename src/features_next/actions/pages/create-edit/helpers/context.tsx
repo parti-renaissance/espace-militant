@@ -74,7 +74,10 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
         .then((data) => {
           logActionMutation('form submit — success', { uuid: data.uuid })
           reset(values)
-          router.replace({ pathname: '/actions/[id]', params: { id: data.uuid } })
+          router.replace({
+            pathname: '/actions/[id]',
+            params: { id: data.uuid, greet: editMode ? undefined : 'new' },
+          })
         })
         .catch((e) => {
           logActionMutationError('form submit — catch', e)

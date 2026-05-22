@@ -1,18 +1,25 @@
 import { ComponentProps } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Image, useMedia, XStack, YStack } from 'tamagui'
+import { Image } from 'expo-image'
+import { useMedia, XStack, YStack } from 'tamagui'
 import { Copy, Share2, X } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
-import { useEventSharing } from '@/components/ShareGroup/DetailShareGroup'
+import { useActionSharing } from '@/components/ShareGroup/DetailShareGroup'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import EventIllustration from '@/features_next/events/assets/images/event_illustration.png'
-import { EventItemProps } from '@/features_next/events/types'
+import ActionIllustration from '@/features_next/actions/assets/illu-actions.png'
 
-export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof ModalOrBottomSheet> } & EventItemProps) => {
-  const { copyUrl, isShareAvailable, openShareDialog } = useEventSharing({ event: props.event })
+import type { RestActionFull } from '@/services/actions/schema'
+
+type GreetingCreateModalProps = {
+  action: RestActionFull
+  modalProps: ComponentProps<typeof ModalOrBottomSheet>
+}
+
+export const GreetingCreateModal = (props: GreetingCreateModalProps) => {
+  const { copyUrl, isShareAvailable, openShareDialog } = useActionSharing({ action: props.action })
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const bottomPadding = insets.bottom > 0 ? insets.bottom : 16
@@ -27,8 +34,8 @@ export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof M
       <VoxCard borderColor="$colorTransparent" maxWidth={media.gtSm ? 420 : '100%'} pt="$medium" pb={bottomPadding}>
         <VoxCard.Content gap="$xlarge">
           <YStack gap="$medium" alignItems="center">
-            <Image source={EventIllustration} />
-            <Text.LG textAlign="center">Nouvel événement créé</Text.LG>
+            <Image source={ActionIllustration} style={{ height: 100, width: 100 }} contentFit="contain" />
+            <Text.LG textAlign="center">Nouvelle action créée</Text.LG>
           </YStack>
           <VoxCard borderRadius="$medium" backgroundColor="$blue1">
             <VoxCard.Content>
@@ -55,7 +62,7 @@ export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof M
           </VoxCard>
           <YStack width="100%">
             <VoxButton theme="gray" variant="soft" size="xl" width="100%" onPress={props.modalProps.onClose}>
-              Voir l'événement
+              Voir l'action
             </VoxButton>
           </YStack>
         </VoxCard.Content>
