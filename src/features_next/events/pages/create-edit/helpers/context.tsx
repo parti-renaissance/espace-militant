@@ -73,10 +73,7 @@ const roundMinutesToNextDecimal = (date: Date) => {
 }
 const useEventFormData = ({ edit }: EventFormProps) => {
   const scopes = useGetExecutiveScopes()
-  const scopeOptions = useMemo(
-    () => scopes.data?.list?.filter((x) => x.features.includes(FEATURES.EVENTS)).map(getFormatedScope) ?? [],
-    [scopes.data],
-  )
+  const scopeOptions = useMemo(() => scopes.data?.list?.filter((x) => x.features.includes(FEATURES.EVENTS)).map(getFormatedScope) ?? [], [scopes.data])
   const canCreateAsCadre = scopes.hasFeature(FEATURES.EVENTS)
   const { data } = useGetSuspenseProfil({ enabled: true })
 

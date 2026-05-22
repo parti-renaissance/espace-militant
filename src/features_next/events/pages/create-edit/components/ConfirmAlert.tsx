@@ -124,6 +124,9 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
       <VoxCard.Content justifyContent="space-between" gap="$large" maxWidth={media.sm ? 350 : 500}>
         <YStack gap="$medium">
           <Text.LG semibold>{props.title}</Text.LG>
+          <Text.MD color="$textPrimary">
+            Une fois créé vous pourrez toujours le modifier mais la première communication sera partie.
+          </Text.MD>
           <VisibilityReview visibility={visibility} />
           {!hidden ? (
             <XStack gap="$small" alignItems="center">

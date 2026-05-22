@@ -7,6 +7,7 @@ export type ActionFormValues = {
   date: Date
   description: string
   post_address: RestPostActionRequest['post_address']
+  send_invitation_email?: boolean
 }
 
 export const mapActionFormToPostRequest = (form: ActionFormValues): RestPostActionRequest => ({
@@ -19,6 +20,7 @@ export const mapActionFormToPostRequest = (form: ActionFormValues): RestPostActi
     city_name: form.post_address.city_name,
     country: form.post_address.country,
   },
+  send_invitation_email: form.send_invitation_email,
 })
 
 export const mapRestActionFullToFormDefaults = (action: RestActionFull): ActionFormValues => ({
