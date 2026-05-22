@@ -1,5 +1,5 @@
 import { createContext, useContext, useRef } from 'react'
-import { type Href, useRouter } from 'expo-router'
+import { type Href, useLocalSearchParams, useRouter } from 'expo-router'
 import { addHours } from 'date-fns'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type Control, type FieldPath, useForm } from 'react-hook-form'
@@ -40,16 +40,21 @@ export function useActionFormContext() {
   return ctx
 }
 
+const isActionType = (value: string | undefined): value is ActionType =>
+  value != null && (Object.values(ActionType) as string[]).includes(value)
+
 export function ActionFormContextProvider({ edit, children }: ActionFormProps & { children: React.ReactNode }) {
   const router = useRouter()
+  const { type: typeParam } = useLocalSearchParams<{ type?: string }>()
   const cancelModalRef = useRef<React.ComponentRef<typeof VoxSimpleModal>>(null)
+  const initialType = !edit && isActionType(typeParam) ? typeParam : ActionType.PAP
 
   const { control, handleSubmit, reset, setError } = useForm<ActionFormValues>({
     resolver: zodResolver(actionFormSchema),
     defaultValues: edit
       ? mapRestActionFullToFormDefaults(edit)
       : {
-          type: ActionType.PAP,
+          type: initialType,
           date: addHours(new Date(), 1),
           post_address: { address: '', postal_code: '', city_name: '', country: '' },
           description: '',

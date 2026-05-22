@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
-import { router, useNavigation } from 'expo-router'
+import { router, useLocalSearchParams, useNavigation } from 'expo-router'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { addHours, addMinutes, formatISO, isAfter, isBefore, isEqual, isPast, isValid, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
@@ -72,6 +72,7 @@ const roundMinutesToNextDecimal = (date: Date) => {
   }
 }
 const useEventFormData = ({ edit }: EventFormProps) => {
+  const { category: categoryParam } = useLocalSearchParams<{ category?: string }>()
   const scopes = useGetExecutiveScopes()
   const scopeOptions = useMemo(() => scopes.data?.list?.filter((x) => x.features.includes(FEATURES.EVENTS)).map(getFormatedScope) ?? [], [scopes.data])
   const canCreateAsCadre = scopes.hasFeature(FEATURES.EVENTS)
@@ -106,12 +107,22 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   /** Portée Agora : événements toujours « en ligne » (produit). */
   const defaultModeForScope = String(initialScopeCode).startsWith('agora_') ? 'online' : (edit?.mode ?? 'meeting')
 
+  const initialCategorySlug = useMemo(() => {
+    if (edit?.category?.slug) {
+      return edit.category.slug
+    }
+    if (categoryParam && baseCatOptions.some((option) => option.value === categoryParam)) {
+      return categoryParam
+    }
+    return ''
+  }, [baseCatOptions, categoryParam, edit?.category?.slug])
+
   const defaultValues = {
     isPastEvent,
     scope: initialScopeCode,
     name: edit?.name ?? '',
     image: edit?.image,
-    category: edit?.category?.slug ?? '',
+    category: initialCategorySlug,
     description: {
       pure: edit ? '12345678910' : '',
       json: edit?.json_description ?? '',
