@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
@@ -32,6 +32,7 @@ import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
 
 import { MapListToggle } from '../../components/feed-layout/MapListToggle'
+import { HubOrganizeCategoryModal } from '../hub/components/HubOrganizeCategoryModal'
 
 type HubFeedTab = 'all' | 'subscribed'
 
@@ -148,6 +149,15 @@ const HubFeed = () => {
   const { trackImpression } = useHits()
 
   const [activeTab, setActiveTab] = useState<HubFeedTab>('all')
+  const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
+
+  const handleOpenOrganizeModal = useCallback(() => {
+    setOrganizeModalOpen(true)
+  }, [])
+
+  const handleCloseOrganizeModal = useCallback(() => {
+    setOrganizeModalOpen(false)
+  }, [])
   const filters = eventFiltersState((s) => s.value)
   const setFiltersValue = eventFiltersState((s) => s.setValue)
   const { itemType: itemTypeParam } = useLocalSearchParams<{ itemType?: string }>()
@@ -396,12 +406,18 @@ const HubFeed = () => {
         ) : null}
         <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
           {isAuth && <BigSwitch options={HUB_TABS} value={activeTab} onChange={handleSwitchChange} />}
-          {!media.gtMd && <HubSideContent />}
+          {!media.gtMd && <HubSideContent onOpenOrganizeModal={handleOpenOrganizeModal} />}
         </YStack>
       </YStack>
     ),
-    [activeTab, media.gtMd, media.sm, isAuth, handleBack, handleSwitchChange, pinnedBannerOuterSpacing.paddingTop],
+    [activeTab, media.gtMd, media.sm, isAuth, handleBack, handleSwitchChange, handleOpenOrganizeModal, pinnedBannerOuterSpacing.paddingTop],
   )
+
+  const organizeModal = organizeModalOpen ? (
+    <Suspense fallback={null}>
+      <HubOrganizeCategoryModal open onClose={handleCloseOrganizeModal} />
+    </Suspense>
+  ) : null
 
   return (
     <>
@@ -454,10 +470,11 @@ const HubFeed = () => {
       {media.gtMd ? (
         <Layout.SideBar isSticky padding="right">
           <YStack>
-            <HubSideContent />
+            <HubSideContent onOpenOrganizeModal={handleOpenOrganizeModal} />
           </YStack>
         </Layout.SideBar>
       ) : null}
+      {organizeModal}
     </>
   )
 }

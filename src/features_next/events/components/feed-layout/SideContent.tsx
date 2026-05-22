@@ -30,19 +30,34 @@ const NewActionBtn = ({ children, ...props }: YStackProps & { children: string }
   </YStack>
 )
 
-const HubSideContent = () => {
+type HubSideContentProps = {
+  onOpenOrganizeModal?: () => void
+}
+
+const HubSideContent = ({ onOpenOrganizeModal }: HubSideContentProps) => {
   const { isAuth } = useSession()
   const { hasFeature } = useUserScopeFeatures({ enabled: isAuth })
   const showCreateEvent = isAuth && hasFeature(FEATURES.EVENTS)
   const showCreateAction = isAuth && hasFeature(FEATURES.ACTIONS)
+  const showOrganize = showCreateEvent || showCreateAction
   const media = useMedia()
 
   return (
     <YStack gap="$medium">
       {media.gtSm && (
         <Suspense>
-          {showCreateEvent ? <NewEventBtn>Organiser un événement</NewEventBtn> : null}
-          {showCreateAction ? <NewActionBtn>Créer une action</NewActionBtn> : null}
+          {onOpenOrganizeModal && showOrganize ? (
+            <YStack>
+              <VoxButton variant="soft" size="xl" theme="purple" width="100%" iconLeft={Sparkle} onPress={onOpenOrganizeModal}>
+                Organiser un événement
+              </VoxButton>
+            </YStack>
+          ) : (
+            <>
+              {showCreateEvent ? <NewEventBtn>Organiser un événement</NewEventBtn> : null}
+              {showCreateAction ? <NewActionBtn>Créer une action</NewActionBtn> : null}
+            </>
+          )}
         </Suspense>
       )}
       <YStack>

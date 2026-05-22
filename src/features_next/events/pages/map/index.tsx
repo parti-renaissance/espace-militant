@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
@@ -13,6 +13,7 @@ import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
 import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
 import { MapListToggle } from '../../components/feed-layout/MapListToggle'
+import { HubOrganizeCategoryModal } from '../hub/components/HubOrganizeCategoryModal'
 import HubItemMap, { FRANCE_METRO_CAMERA_BOUNDS, HubItemMapHandle, roundCoordinateForMapSortAround } from './components/HubItemMap'
 import SearchInThisAreaButton from './components/SearchInThisAreaButton'
 import { useMapSearchInAreaButton } from './hooks/useMapSearchInAreaButton'
@@ -27,6 +28,15 @@ const EventsMapPage = () => {
 
   const [sortAround, setSortAround] = useState<{ lat: number; lng: number } | null>(null)
   const [searchBbox, setSearchBbox] = useState<MapSearchBbox>(FRANCE_METRO_HUB_BBOX)
+  const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
+
+  const handleOpenOrganizeModal = useCallback(() => {
+    setOrganizeModalOpen(true)
+  }, [])
+
+  const handleCloseOrganizeModal = useCallback(() => {
+    setOrganizeModalOpen(false)
+  }, [])
 
   const {
     isVisible: isSearchInAreaVisible,
@@ -131,7 +141,14 @@ const EventsMapPage = () => {
     }
   }
 
+  const organizeModal = organizeModalOpen ? (
+    <Suspense fallback={null}>
+      <HubOrganizeCategoryModal open onClose={handleCloseOrganizeModal} />
+    </Suspense>
+  ) : null
+
   return (
+    <>
     <Layout.Main width="100%" maxWidth="100%" height="100%">
       <YStack flex={1}>
         <XStack position="absolute" top="$medium" pt={insets.top} left="$medium" right="$medium" zIndex={20}>
@@ -171,12 +188,14 @@ const EventsMapPage = () => {
           </YStack>
         )}
         <XStack position="absolute" bottom="$medium" right="$medium" zIndex={20} gap="$small">
-          <VoxButton variant="contained" size="lg" iconLeft={CirclePlus} theme="purple" onPress={() => router.push('/evenements/creer')}>
+          <VoxButton variant="contained" size="lg" iconLeft={CirclePlus} theme="purple" onPress={handleOpenOrganizeModal}>
             Organiser un événement
           </VoxButton>
         </XStack>
       </YStack>
     </Layout.Main>
+    {organizeModal}
+    </>
   )
 }
 
