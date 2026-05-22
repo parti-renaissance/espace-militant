@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { hasHttpResponse, isHttpSuccess } from '../utils/httpStatus'
-import { parseSSEChunk } from '../utils/parseSSEChunk'
+import { classifyXhrCompletion } from '../utils/classifyXhrCompletion'
+import { createSSEXhr } from '../utils/createSSEXhr'
+import { processSSEResponseText } from '../utils/processSSEResponseText'
+import type { SSEStreamError } from '../utils/sseTypes'
 
-export type SSEStreamError =
-  | { kind: 'http'; status: number; retryAfterHeader: string | null }
-  | { kind: 'timeout' }
-  | { kind: 'network' }
+export type { SSEStreamError }
 
 export type SSEStreamOptions = {
   url: string
@@ -89,16 +88,8 @@ export function useSSEStream(opts: SSEStreamOptions): SSEStreamReturn {
       lineBufferRef.current = ''
       setIsStreaming(true)
 
-      const xhr = new XMLHttpRequest()
+      const xhr = createSSEXhr(url, getAuthToken?.())
       xhrRef.current = xhr
-
-      xhr.open('POST', url, true)
-      xhr.setRequestHeader('Content-Type', 'application/json')
-      xhr.setRequestHeader('Accept', 'text/event-stream')
-      const token = getAuthToken?.()
-      if (token) {
-        xhr.setRequestHeader('Authorization', `Bearer ${token}`)
-      }
 
       firstChunkTimerRef.current = setTimeout(() => {
         if (firstChunkReceivedRef.current || xhrRef.current !== xhr) return
@@ -109,62 +100,42 @@ export function useSSEStream(opts: SSEStreamOptions): SSEStreamReturn {
       }, firstChunkTimeoutMs)
 
       xhr.onreadystatechange = () => {
-        const headersReceived = xhr.readyState >= XMLHttpRequest.HEADERS_RECEIVED
-        const bodyArriving = xhr.readyState === XMLHttpRequest.LOADING || xhr.readyState === XMLHttpRequest.DONE
-        const requestDone = xhr.readyState === XMLHttpRequest.DONE
+        const cb = callbacksRef.current
 
-        if (headersReceived && !threadNotifiedRef.current) {
-          const headerThreadId = xhr.getResponseHeader(threadHeaderName)
-          if (headerThreadId) {
+        if (xhr.readyState >= XMLHttpRequest.HEADERS_RECEIVED && !threadNotifiedRef.current) {
+          const tid = xhr.getResponseHeader(threadHeaderName)
+          if (tid) {
             threadNotifiedRef.current = true
-            callbacksRef.current.onThreadHeader?.(headerThreadId)
+            cb.onThreadHeader?.(tid)
           }
         }
 
-        if (bodyArriving) {
-          const fullText = xhr.responseText
-          const from = lastProcessedIndexRef.current
-          if (from < fullText.length) {
+        const isFinal = xhr.readyState === XMLHttpRequest.DONE
+        if (xhr.readyState === XMLHttpRequest.LOADING || isFinal) {
+          const { newIndex, newBuffer, chunks, consumedBytes } = processSSEResponseText({
+            fullText: xhr.responseText,
+            lastProcessedIndex: lastProcessedIndexRef.current,
+            lineBuffer: lineBufferRef.current,
+            isFinal,
+          })
+          if (consumedBytes > 0) {
             firstChunkReceivedRef.current = true
             clearFirstChunkTimer()
-            lastProcessedIndexRef.current = fullText.length
-            lineBufferRef.current += fullText.substring(from)
           }
-
-          const lines = lineBufferRef.current.split('\n')
-          const endIndex = requestDone ? lines.length : Math.max(0, lines.length - 1)
-          for (let i = 0; i < endIndex; i++) {
-            const chunk = parseSSEChunk(lines[i])
-            if (!chunk) continue
-            if (chunk.kind === 'error') {
-              callbacksRef.current.onInStreamError?.(chunk.message)
-            } else {
-              callbacksRef.current.onChunk?.(chunk.text)
-            }
+          lastProcessedIndexRef.current = newIndex
+          lineBufferRef.current = newBuffer
+          for (const chunk of chunks) {
+            if (chunk.kind === 'error') cb.onInStreamError?.(chunk.message)
+            else cb.onChunk?.(chunk.text)
           }
-
-          lineBufferRef.current = requestDone ? '' : (lines[lines.length - 1] ?? '')
         }
 
-        if (requestDone) {
+        if (isFinal) {
           if (!finalize()) return
-
-          const responded = hasHttpResponse(xhr.status)
-          const isSuccess = responded && isHttpSuccess(xhr.status)
-          const isHttpError = responded && !isSuccess
-          const isNetworkError = !responded && !abortedByUserRef.current
-
-          if (isSuccess) {
-            callbacksRef.current.onComplete?.()
-          } else if (isHttpError) {
-            callbacksRef.current.onError?.({
-              kind: 'http',
-              status: xhr.status,
-              retryAfterHeader: xhr.getResponseHeader('Retry-After'),
-            })
-          } else if (isNetworkError) {
-            callbacksRef.current.onError?.({ kind: 'network' })
-          }
+          const outcome = classifyXhrCompletion(xhr, abortedByUserRef.current)
+          if (outcome.kind === 'success') cb.onComplete?.()
+          else if (outcome.kind === 'http' || outcome.kind === 'network') cb.onError?.(outcome)
+          // 'aborted' → silent, dispatch happens via xhr.onabort
         }
       }
 

@@ -31,10 +31,9 @@ export function useMessagesHydration({ storedThreadId, setMessages, hasHydratedR
       return
     }
     hasHydratedRef.current = true
-    const history: BotChatMessage[] = [...query.data.items]
+    const history = [...query.data.items]
       .reverse()
-      .filter((m): m is typeof m & { role: 'user' | 'assistant' } => m.role === 'user' || m.role === 'assistant')
-      .map((m) => ({ id: m.uuid, role: m.role, content: m.content }))
+      .flatMap<BotChatMessage>((m) => (m.role === 'user' || m.role === 'assistant' ? [{ id: m.uuid, role: m.role, content: m.content }] : []))
     setMessages(history)
   }, [storedThreadId, query.data, setMessages, hasHydratedRef])
 }

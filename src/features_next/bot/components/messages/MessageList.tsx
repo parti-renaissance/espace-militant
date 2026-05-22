@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useState } from 'react'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import { isWeb, YStack } from 'tamagui'
 
@@ -31,9 +31,35 @@ export const MessageList = forwardRef<LayoutScrollViewRef, Props>(function Messa
   ref,
 ) {
   const [isAreaHovered, setIsAreaHovered] = useState(false)
+  const [openedMessageId, setOpenedMessageId] = useState<string | null>(null)
+
+  const closeActions = useCallback(() => setOpenedMessageId(null), [])
+
+  const handleToggleUserMessage = useCallback((id: string) => {
+    setOpenedMessageId((prev) => (prev === id ? null : id))
+  }, [])
+
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      onScroll(e)
+      if (openedMessageId !== null) setOpenedMessageId(null)
+    },
+    [onScroll, openedMessageId],
+  )
+
+  useEffect(() => {
+    if (!openedMessageId) return
+    const timer = setTimeout(closeActions, 4000)
+    return () => clearTimeout(timer)
+  }, [openedMessageId, closeActions])
 
   return (
-    <YStack flex={1} onHoverIn={() => setIsAreaHovered(true)} onHoverOut={() => setIsAreaHovered(false)}>
+    <YStack
+      flex={1}
+      onHoverIn={() => setIsAreaHovered(true)}
+      onHoverOut={() => setIsAreaHovered(false)}
+      onPress={openedMessageId ? closeActions : undefined}
+    >
       <LayoutScrollView
         ref={ref}
         style={{ flex: 1 }}
@@ -44,12 +70,21 @@ export const MessageList = forwardRef<LayoutScrollViewRef, Props>(function Messa
           minHeight: '100%',
           ...(isWeb ? { flex: 1 } : {}),
         }}
-        onScroll={onScroll}
+        onScroll={handleScroll}
         scrollEventThrottle={16}
       >
         {messages.map((m) =>
           m.role === 'user' ? (
-            <UserMessage key={m.id} content={m.content} isAreaHovered={isAreaHovered} onEdit={onEdit} onCopy={onCopy} />
+            <UserMessage
+              key={m.id}
+              messageId={m.id}
+              content={m.content}
+              isAreaHovered={isAreaHovered}
+              isOpen={openedMessageId === m.id}
+              onToggle={handleToggleUserMessage}
+              onEdit={onEdit}
+              onCopy={onCopy}
+            />
           ) : (
             <AssistantMessage key={m.id} content={m.content} isAreaHovered={isAreaHovered} onCopy={onCopy} />
           ),

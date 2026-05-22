@@ -10,12 +10,18 @@ import BotPage from '@/features_next/bot/pages/index'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
+import { useGetProfil } from '@/services/profile/hook'
 
 export default function BotRoute() {
   const { isAuth } = useSession()
+  const { data: profile } = useGetProfil({ enabled: true })
   const { t } = useTranslation()
 
   if (!isAuth) {
+    return <Redirect href="/evenements" />
+  }
+
+  if (profile && !profile.canary_tester) {
     return <Redirect href="/evenements" />
   }
 

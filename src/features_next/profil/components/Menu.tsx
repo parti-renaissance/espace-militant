@@ -54,11 +54,6 @@ const ProfilMenu = () => {
                   Chatbot
                 </Menu.Item>
               </Link>
-              <Link href="/idees/bot" asChild={!isWeb}>
-                <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Lightbulb}>
-                  Bot
-                </Menu.Item>
-              </Link>
               <Link href="/tools/storybook" asChild={!isWeb}>
                 <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={PenLine}>
                   StoryBook
@@ -75,6 +70,13 @@ const ProfilMenu = () => {
                 </Menu.Item>
               </Link>
             </>
+          )}
+          {profile?.canary_tester === true && (
+            <Link href="/idees/bot" asChild={!isWeb}>
+              <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Lightbulb}>
+                Bot
+              </Menu.Item>
+            </Link>
           )}
         </Menu>
       )}
