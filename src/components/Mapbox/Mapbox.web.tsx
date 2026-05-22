@@ -17,6 +17,8 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import _ from 'lodash'
 import { create } from 'zustand'
 
+import type { MapState } from '@rnmapbox/maps'
+
 import type { UserLocationProps } from './Mapbox'
 
 // --- TYPES & UTILITAIRES ---
@@ -36,6 +38,7 @@ type ShapeSourceRef = {
 type MapViewRef = {
   getCenter: () => Promise<[number, number]>
   getVisibleBounds: () => Promise<[[number, number], [number, number]]>
+  getZoom: () => Promise<number>
 }
 
 const mapPadding = (padding?: CameraPadding): PaddingOptions | undefined => {
@@ -139,10 +142,43 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
           [sw.lng, sw.lat],
         ]
       },
+      getZoom: async () => {
+        const map = mapRef.current
+        if (!map) {
+          throw new Error('MapView is not ready')
+        }
+        return map.getZoom()
+      },
     }
   }, [])
 
-  const { children, styleURL, pitchEnabled, scrollEnabled, zoomEnabled, rotateEnabled } = props
+  const { children, styleURL, pitchEnabled, scrollEnabled, zoomEnabled, rotateEnabled, onMapIdle } = props
+
+  const handleMoveEnd = useCallback(() => {
+    const map = mapRef.current
+    if (!map || !onMapIdle) return
+
+    const center = map.getCenter()
+    const bounds = map.getBounds()
+    const ne = bounds.getNorthEast()
+    const sw = bounds.getSouthWest()
+
+    const state: MapState = {
+      properties: {
+        center: [center.lng, center.lat],
+        bounds: {
+          ne: [ne.lng, ne.lat],
+          sw: [sw.lng, sw.lat],
+        },
+        zoom: map.getZoom(),
+        heading: map.getBearing(),
+        pitch: map.getPitch(),
+      },
+      gestures: { isGestureActive: false },
+    }
+
+    onMapIdle(state)
+  }, [onMapIdle])
 
   const handleMapClick = useCallback((e: mapboxgl.MapLayerMouseEvent) => {
     if (!e.features || e.features.length === 0) return
@@ -194,6 +230,7 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
       dragRotate={dragRotate}
       keyboard={dragPan || scrollZoom}
       onClick={handleMapClick}
+      onMoveEnd={onMapIdle ? handleMoveEnd : undefined}
       onMouseMove={handleInteractiveLayersMouseMove}
       onMouseLeave={resetMapCursor}
       onMouseOut={resetMapCursor}

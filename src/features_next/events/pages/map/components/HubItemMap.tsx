@@ -1,7 +1,6 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
 import { Platform } from 'react-native'
-import { YStack } from 'tamagui'
-import type { CameraPadding } from '@rnmapbox/maps'
+import type { CameraPadding, MapState } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 import { Feature, FeatureCollection, Point, type Position as GeoPosition } from 'geojson'
 
@@ -19,6 +18,8 @@ import pinEventPast from '@/features_next/events/assets/images/map/event-past.pn
 
 import { ActionType } from '@/services/actions/schema'
 import type { RestItemEvent } from '@/services/events/schema'
+
+import { mapCameraSnapshotFromMapState, type MapCameraSnapshot } from '../utils/mapSearchArea'
 
 export type HubItemMapInitialBounds = { ne: [number, number]; sw: [number, number] }
 
@@ -218,6 +219,7 @@ export type HubItemMapHandle = {
   animateCameraTo: (centerCoordinate: [number, number], zoomLevel: number) => void
   flyToUserWithItemsZoom: (userCoords: [number, number]) => void
   getVisibleBounds: () => Promise<[GeoPosition, GeoPosition]>
+  getZoom: () => Promise<number>
 }
 
 type HubItemMapSharedProps = {
@@ -230,6 +232,8 @@ type HubItemMapSharedProps = {
   userLocationLngLat?: [number, number] | null
   /** Carte dans un scroll parent (ex. header FlatList hub mobile) — active `requestDisallowInterceptTouchEvent` sur Android. */
   embeddedInScrollView?: boolean
+  /** Fin de mouvement caméra (debounce côté parent) — ex. bouton « Rechercher dans cette zone ». */
+  onMapIdle?: (snapshot: MapCameraSnapshot) => void
 }
 
 export type HubItemMapProps =
@@ -258,6 +262,7 @@ const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
       padding,
       userLocationLngLat,
       embeddedInScrollView = false,
+      onMapIdle,
     },
     ref,
   ) => {
@@ -289,14 +294,30 @@ const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
       return map.getVisibleBounds().then(([ne, sw]) => [roundLngLat(ne), roundLngLat(sw)] as [GeoPosition, GeoPosition])
     }, [])
 
+    const getZoom = useCallback(() => {
+      const map = mapViewRef.current
+      if (!map) {
+        return Promise.reject(new Error('HubItemMap: MapView is not mounted'))
+      }
+      return map.getZoom()
+    }, [])
+
+    const handleMapIdle = useCallback(
+      (state: MapState) => {
+        onMapIdle?.(mapCameraSnapshotFromMapState(state))
+      },
+      [onMapIdle],
+    )
+
     useImperativeHandle(
       ref,
       () => ({
         animateCameraTo,
         flyToUserWithItemsZoom,
         getVisibleBounds,
+        getZoom,
       }),
-      [animateCameraTo, flyToUserWithItemsZoom, getVisibleBounds],
+      [animateCameraTo, flyToUserWithItemsZoom, getVisibleBounds, getZoom],
     )
 
     const shape = useMemo<FeatureCollection<Point, HubItemMapFeatureProperties>>(() => {
@@ -347,6 +368,7 @@ const HubItemMap = forwardRef<HubItemMapHandle, HubItemMapProps>(
         zoomEnabled={isInteractive}
         rotateEnabled={false}
         pitchEnabled={false}
+        onMapIdle={onMapIdle ? handleMapIdle : undefined}
         {...(Platform.OS === 'android' && embeddedInScrollView && isInteractive ? { requestDisallowInterceptTouchEvent: true } : {})}
       >
         <MapboxGl.Camera ref={cameraRef} followUserLocation={false} padding={padding} {...cameraProps} />
