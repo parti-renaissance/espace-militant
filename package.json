@@ -97,7 +97,7 @@
     "intl-pluralrules": "^2.0.1",
     "lodash": "^4.18.1",
     "mapbox-gl": "^2.9.0",
-    "qs": "^6.14.2",
+    "qs": "^6.15.2",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-error-boundary": "^4.0.13",
