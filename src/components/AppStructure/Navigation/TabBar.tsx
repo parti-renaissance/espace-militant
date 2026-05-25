@@ -118,10 +118,7 @@ const Tab = ({
   const animatedIconStyle = useAnimatedStyle(() => {
     if (externalLink) return { transform: [{ scale: 1 }, { translateY: 0 }] }
     return {
-      transform: [
-        { scale: interpolate(scale.value, [0, 1], [1, 1.334]) },
-        { translateY: interpolate(scale.value, [0, 1], [0, 6]) },
-      ],
+      transform: [{ scale: interpolate(scale.value, [0, 1], [1, 1.334]) }, { translateY: interpolate(scale.value, [0, 1], [0, 6]) }],
     }
   })
 
@@ -152,8 +149,8 @@ type ConfigurableTabBarProps = {
   navCadreItems?: NavItemConfig[]
 }
 
-const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'parrainages', 'formations', 'more']
-const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'formations', 'more']
+const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'soutenir', 'idees']
+const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'soutenir', 'idees']
 const SHEET_SWITCH_DELAY_MS = 200
 
 const ConfigurableTabBar = ({ hide = false, navCadreItems = cadreNavItems }: ConfigurableTabBarProps) => {
@@ -187,9 +184,7 @@ const ConfigurableTabBar = ({ hide = false, navCadreItems = cadreNavItems }: Con
   }, [navCadreItems, pathname])
 
   const moreItems = useMemo(() => {
-    return navItems
-      .filter((item) => !visibleItemIds.includes(item.id))
-      .map((item) => ({ ...item, active: isNavItemActive(pathname, item.href) }))
+    return navItems.filter((item) => !visibleItemIds.includes(item.id)).map((item) => ({ ...item, active: isNavItemActive(pathname, item.href) }))
   }, [navItems, visibleItemIds, pathname])
 
   const currentRouteId = useMemo(() => {

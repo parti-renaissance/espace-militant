@@ -133,11 +133,11 @@ const EventsMapPage = () => {
 
   const handleBack = () => {
     if (isWeb) {
-      router.push('/evenements/hub')
+      router.push('/evenements')
     } else if (router.canGoBack()) {
       router.back()
     } else {
-      router.replace('/evenements/hub')
+      router.replace('/evenements')
     }
   }
 

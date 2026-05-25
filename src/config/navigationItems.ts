@@ -5,8 +5,7 @@ import {
   Award,
   Bot,
   Calendar,
-  CircleUser,
-  ClipboardCheck,
+  CalendarCheck,
   ClipboardList,
   CopyCheck,
   DoorOpen,
@@ -21,12 +20,13 @@ import {
   HeartHandshake,
   Home,
   Laptop,
-  Link,
+  Lightbulb,
   Mail,
   Map,
   MessageSquareDot,
   MessageSquareQuote,
   Network,
+  Newspaper,
   PartyPopper,
   PhoneOutgoing,
   ScrollText,
@@ -66,23 +66,18 @@ export type NavItemConfig = {
 
 // Configuration des items du menu militant pour utilisateurs connectés
 const militantNavItemsAuthConfig: NavItemConfig[] = [
-  { id: 'accueil', iconLeft: Home, text: 'Accueil', href: '/' },
-  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/(tabs)/evenements' },
-  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', href: '/(tabs)/parrainages' },
-  { id: 'formations', iconLeft: GraduationCap, text: 'Formations', externalUrlSlug: '/formations' },
-  { id: 'ressources', iconLeft: Link, text: 'Ressources', href: '/(tabs)/ressources' },
-  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', href: '/(tabs)/questionnaires' },
-  { id: 'profil', iconLeft: CircleUser, text: 'Profil', href: '/(tabs)/profil', displayIn: 'tabbar' },
+  { id: 'accueil', iconLeft: Newspaper, text: 'Accueil', href: '/' },
+  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/evenements' },
+  { id: 'soutenir', iconLeft: HeartHandshake, text: 'Soutenir', href: '/soutenir' },
+  { id: 'idees', iconLeft: Lightbulb, text: 'Idées', href: '/idees' },
 ] as const
 
 // Configuration des items du menu militant pour utilisateurs non connectés
 const militantNavItemsPublicConfig: NavItemConfig[] = [
   { id: 'accueil', iconLeft: Globe, text: 'parti-renaissance.fr', externalUrlSlug: 'https://parti-renaissance.fr/' },
-  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/(tabs)/evenements' },
-  { id: 'parrainages', iconLeft: HeartHandshake, text: 'Parrainages', disabled: true },
-  { id: 'formations', iconLeft: GraduationCap, text: 'Formations', disabled: true },
-  { id: 'ressources', iconLeft: Link, text: 'Ressources', disabled: true },
-  { id: 'questionnaires', iconLeft: ClipboardCheck, text: 'Questionnaires', disabled: true },
+  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/evenements' },
+  { id: 'soutenir', iconLeft: HeartHandshake, text: 'Soutenir', disabled: true },
+  { id: 'idees', iconLeft: Lightbulb, text: 'Idées', disabled: true },
 ] as const
 
 export const useMilitantNavItems = (): NavItemConfig[] => {

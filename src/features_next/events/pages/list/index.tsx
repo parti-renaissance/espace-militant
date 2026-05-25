@@ -386,7 +386,7 @@ const HubFeed = () => {
     if (router.canGoBack()) {
       router.back()
     } else {
-      router.push('/evenements/hub')
+      router.push('/evenements')
     }
   }, [router])
 

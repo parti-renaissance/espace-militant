@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
 import { Link, Redirect, useRouter } from 'expo-router'
 import Head from 'expo-router/head'
-import { QrCode } from '@tamagui/lucide-icons'
 import { useMedia, XStack } from 'tamagui'
+import { QrCode } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import Text from '@/components/base/Text'

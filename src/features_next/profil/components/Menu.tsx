@@ -71,11 +71,6 @@ const ProfilMenu = () => {
               </Link>
             </>
           )}
-          <Link href="/evenements/hub" asChild={!isWeb}>
-            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={MapPin} last>
-              Hub événements (Bêta)
-            </Menu.Item>
-          </Link>
         </Menu>
       )}
 
