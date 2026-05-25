@@ -295,11 +295,11 @@ function VoxMarkdownComponent({ content, isStreaming = false, styleOverride }: V
     }
   }, [theme.textPrimary?.val, theme.blue6?.val, theme.blue5?.val, theme.gray2?.val, theme.gray5?.val, theme.gray4?.val, theme.background?.val])
 
-  const finalStyles = useMemo(() => {
+  const mergedStyles = useMemo(() => {
     if (!styleOverride) return markdownStyles
-    const merged: Record<string, object> = { ...markdownStyles }
-    for (const key of Object.keys(styleOverride)) {
-      merged[key] = { ...(markdownStyles as Record<string, object>)[key], ...styleOverride[key] }
+    const merged = { ...markdownStyles } as Record<string, object>
+    for (const [key, value] of Object.entries(styleOverride)) {
+      merged[key] = { ...merged[key], ...value }
     }
     return merged as typeof markdownStyles
   }, [markdownStyles, styleOverride])
@@ -357,7 +357,7 @@ function VoxMarkdownComponent({ content, isStreaming = false, styleOverride }: V
 
   return (
     <MarkdownErrorBoundary content={content}>
-      <Markdown style={finalStyles} mergeStyle={false} onLinkPress={handleLinkPress} rules={markdownRules}>
+      <Markdown style={mergedStyles} mergeStyle={false} onLinkPress={handleLinkPress} rules={markdownRules}>
         {displayContent}
       </Markdown>
     </MarkdownErrorBoundary>

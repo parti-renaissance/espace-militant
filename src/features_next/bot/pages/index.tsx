@@ -11,6 +11,7 @@ import { useBotChat } from '@/services/bot/hook'
 import ScrollToBottomButton from '../components/ScrollToBottomButton'
 import InputDock from '../components/input/InputDock'
 import MessageList from '../components/messages/MessageList'
+import { useAutoScrollOnStream } from '../hooks/useAutoScrollOnStream'
 import { useBotMessageActions } from '../hooks/useBotMessageActions'
 import { useInitialScrollToBottom } from '../hooks/useInitialScrollToBottom'
 import type { TamaguiInputRef } from '../utils/getDomFromTamaguiRef'
@@ -29,7 +30,12 @@ export default function BotPage() {
     requestAnimationFrame(() => scrollViewRef.current?.scrollToEnd({ animated }))
   }, [])
 
+  const scrollToBottomNoAnim = useCallback(() => {
+    scrollViewRef.current?.scrollToEnd({ animated: false })
+  }, [])
+
   useInitialScrollToBottom(() => scrollToBottom(false), messages.length > 0)
+  useAutoScrollOnStream({ isAtBottom, streamedContent, messagesCount: messages.length, scrollFn: scrollToBottomNoAnim })
 
   const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent

@@ -24,7 +24,7 @@ export function getBotThreadMessages(params: { uuid: string; page?: number }) {
 export const getBotThreadsList = api({
   method: 'GET',
   path: '/api/v3/ai/threads',
-  requestSchema: z.object({ page: z.number(), agent: z.string().optional() }),
+  requestSchema: z.object({ page: z.number().optional(), agent: z.string().optional() }),
   responseSchema: schemas.BotThreadsResponseSchema,
   type: 'private',
 })
