@@ -1,8 +1,6 @@
-import { forwardRef, useCallback, useEffect, useState } from 'react'
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react'
+import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
 import { isWeb, YStack } from 'tamagui'
-
-import LayoutScrollView, { type LayoutScrollViewRef } from '@/components/AppStructure/Layout/LayoutScrollView'
 
 import type { BotChatError, BotChatMessage } from '@/services/bot/schema'
 
@@ -26,7 +24,7 @@ type Props = {
   onScroll: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
-export const MessageList = forwardRef<LayoutScrollViewRef, Props>(function MessageList(
+export const MessageList = forwardRef<FlatList<BotChatMessage>, Props>(function MessageList(
   { messages, isLoading, streamedContent, error, showEmpty, contentPaddingBottom, contentHorizontalPadding, onCopy, onEdit, onRetry, onScroll },
   ref,
 ) {
@@ -53,6 +51,37 @@ export const MessageList = forwardRef<LayoutScrollViewRef, Props>(function Messa
     return () => clearTimeout(timer)
   }, [openedMessageId, closeActions])
 
+  const renderItem = useCallback(
+    ({ item }: { item: BotChatMessage }) =>
+      item.role === 'user' ? (
+        <UserMessage
+          messageId={item.id}
+          content={item.content}
+          isAreaHovered={isAreaHovered}
+          isOpen={openedMessageId === item.id}
+          onToggle={handleToggleUserMessage}
+          onEdit={onEdit}
+          onCopy={onCopy}
+        />
+      ) : (
+        <AssistantMessage content={item.content} isAreaHovered={isAreaHovered} onCopy={onCopy} />
+      ),
+    [isAreaHovered, openedMessageId, handleToggleUserMessage, onEdit, onCopy],
+  )
+
+  const keyExtractor = useCallback((item: BotChatMessage) => item.id, [])
+
+  const ListFooter = useMemo(
+    () => (
+      <>
+        {isLoading && <LoadingMessage streamedContent={streamedContent} />}
+        {error && <ErrorBubble error={error} isLoading={isLoading} onRetry={onRetry} />}
+        {showEmpty && <EmptyState />}
+      </>
+    ),
+    [isLoading, streamedContent, error, onRetry, showEmpty],
+  )
+
   return (
     <YStack
       flex={1}
@@ -60,39 +89,23 @@ export const MessageList = forwardRef<LayoutScrollViewRef, Props>(function Messa
       onHoverOut={() => setIsAreaHovered(false)}
       onPress={openedMessageId ? closeActions : undefined}
     >
-      <LayoutScrollView
+      <FlatList<BotChatMessage>
         ref={ref}
         style={{ flex: 1 }}
         contentContainerStyle={{
           gap: 10,
           paddingBottom: contentPaddingBottom,
           paddingHorizontal: contentHorizontalPadding,
-          minHeight: '100%',
+          flexGrow: 1,
           ...(isWeb ? { flex: 1 } : {}),
         }}
+        data={messages}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        ListFooterComponent={ListFooter}
         onScroll={handleScroll}
         scrollEventThrottle={16}
-      >
-        {messages.map((m) =>
-          m.role === 'user' ? (
-            <UserMessage
-              key={m.id}
-              messageId={m.id}
-              content={m.content}
-              isAreaHovered={isAreaHovered}
-              isOpen={openedMessageId === m.id}
-              onToggle={handleToggleUserMessage}
-              onEdit={onEdit}
-              onCopy={onCopy}
-            />
-          ) : (
-            <AssistantMessage key={m.id} content={m.content} isAreaHovered={isAreaHovered} onCopy={onCopy} />
-          ),
-        )}
-        {isLoading && <LoadingMessage streamedContent={streamedContent} />}
-        {error && <ErrorBubble error={error} isLoading={isLoading} onRetry={onRetry} />}
-        {showEmpty && <EmptyState />}
-      </LayoutScrollView>
+      />
     </YStack>
   )
 })

@@ -1,17 +1,16 @@
-import { useTranslation } from 'react-i18next'
 import { Spinner, useMedia, View, XStack } from 'tamagui'
 
 import Text from '@/components/base/Text'
 
+import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
+
 import BotAvatar from './BotAvatar'
-import BotMarkdown from './BotMarkdown'
 
 type Props = {
   streamedContent: string
 }
 
 export function LoadingMessage({ streamedContent }: Props) {
-  const { t } = useTranslation()
   const media = useMedia()
 
   return (
@@ -26,12 +25,12 @@ export function LoadingMessage({ streamedContent }: Props) {
       <BotAvatar />
       <View flex={media.sm ? undefined : 1} width={media.sm ? '100%' : undefined} minWidth={0} overflow="hidden" p="$medium" br="$medium">
         {streamedContent ? (
-          <BotMarkdown content={streamedContent} isStreaming />
+          <VoxMarkdown content={streamedContent} isStreaming />
         ) : (
           <XStack gap="$small" alignItems="center">
             <Spinner size="small" color="$blue9" />
             <Text.SM primary regular>
-              {t('bot.typing')}
+              Analyse en cours…
             </Text.SM>
           </XStack>
         )}

@@ -1,7 +1,6 @@
 import React from 'react'
 import { Redirect } from 'expo-router'
 import Head from 'expo-router/head'
-import { useTranslation } from 'react-i18next'
 import { Lightbulb } from '@tamagui/lucide-icons'
 
 import Header from '@/components/AppStructure/Header'
@@ -15,7 +14,6 @@ import { useGetProfil } from '@/services/profile/hook'
 export default function BotRoute() {
   const { isAuth } = useSession()
   const { data: profile } = useGetProfil({ enabled: true })
-  const { t } = useTranslation()
 
   if (!isAuth) {
     return <Redirect href="/evenements" />
@@ -28,9 +26,9 @@ export default function BotRoute() {
   return (
     <>
       <Head>
-        <title>{metatags.createTitle(t('bot.title'))}</title>
+        <title>{metatags.createTitle('Idée')}</title>
       </Head>
-      <Header title={t('bot.title')} icon={Lightbulb} navigation={{ showBackButton: true }} style={{ showOn: 'sm' }} />
+      <Header title="Idée" icon={Lightbulb} navigation={{ showBackButton: true }} style={{ showOn: 'sm' }} />
       <Layout.Container safeHorizontalPadding={false} hideTabBar>
         <BotPage />
       </Layout.Container>

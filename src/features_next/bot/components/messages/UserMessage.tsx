@@ -1,10 +1,15 @@
-import { memo, useCallback } from 'react'
-import { useMedia, View, XStack } from 'tamagui'
-import { Copy, Pencil } from '@tamagui/lucide-icons'
+import { memo, useCallback } from 'react';
+import { useMedia, View, XStack } from 'tamagui';
+import { Copy, Pencil } from '@tamagui/lucide-icons';
 
-import { VoxButton } from '@/components/Button/Button'
 
-import BotMarkdown from './BotMarkdown'
+
+import { VoxButton } from '@/components/Button/Button';
+import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown';
+
+
+
+
 
 type Props = {
   messageId: string
@@ -50,7 +55,7 @@ function UserMessageComponent({ messageId, content, isAreaHovered, isOpen, onTog
         cursor="pointer"
         onPress={handleToggle}
       >
-        <BotMarkdown content={content} />
+        <VoxMarkdown content={content} />
       </View>
     </XStack>
   )

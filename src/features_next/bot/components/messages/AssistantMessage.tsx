@@ -4,8 +4,9 @@ import { Copy } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button/Button'
 
+import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
+
 import BotAvatar from './BotAvatar'
-import BotMarkdown from './BotMarkdown'
 
 type Props = {
   content: string
@@ -37,7 +38,7 @@ function AssistantMessageComponent({ content, isAreaHovered, onCopy }: Props) {
           borderBottomRightRadius="$medium"
           animation="quick"
         >
-          <BotMarkdown content={content} />
+          <VoxMarkdown content={content} />
         </View>
         <XStack justifyContent="flex-start">
           <VoxButton iconLeft={Copy} variant="text" theme="gray" size="sm" shrink onPress={() => onCopy(content)} />

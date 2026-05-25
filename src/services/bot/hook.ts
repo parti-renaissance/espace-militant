@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import i18next from 'i18next'
 
-import { useBotStore } from '@/store/bot-store'
+import { useBotStore } from '@/features_next/bot/store/bot-store'
 import { useUserStore } from '@/store/user-store'
 
 import { BOT_AGENT_ID, BOT_CHAT_URL, BOT_THREAD_HEADER } from './api'
@@ -77,20 +76,20 @@ export function useBotChat(): UseBotChatReturn {
     onComplete: () => {
       if (hadInStreamErrorRef.current) {
         commitStreamedMessage()
-        setError({ kind: 'serviceDown', message: i18next.t('bot.errors.serviceDown'), retryable: true })
+        setError({ kind: 'serviceDown', message: 'Le service est momentanément indisponible. Réessayez dans quelques instants.', retryable: true })
       } else if (streamBufferRef.current) {
         commitStreamedMessage()
       } else {
-        setError({ kind: 'truncated', message: i18next.t('bot.errors.truncated'), retryable: true })
+        setError({ kind: 'truncated', message: 'Réponse interrompue. Réessayez pour obtenir une réponse complète.', retryable: true })
       }
     },
     onError: (err) => {
       if (err.kind === 'http') {
         setError(classifyHttpError(err.status, err.retryAfterHeader))
       } else if (err.kind === 'timeout') {
-        setError({ kind: 'timeout', message: i18next.t('bot.errors.timeout'), retryable: true })
+        setError({ kind: 'timeout', message: 'Le service met trop de temps à répondre. Réessayez.', retryable: true })
       } else {
-        setError({ kind: 'network', message: i18next.t('bot.errors.network'), retryable: true })
+        setError({ kind: 'network', message: 'Connexion impossible. Vérifiez votre réseau puis réessayez.', retryable: true })
       }
     },
     onAbort: () => {

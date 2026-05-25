@@ -1,5 +1,4 @@
 import { useCallback, type RefObject } from 'react'
-import { useTranslation } from 'react-i18next'
 import { Keyboard, type NativeSyntheticEvent } from 'react-native'
 import { Input, isWeb, useMedia, View, YStack } from 'tamagui'
 import { ArrowUpRight, Square } from '@tamagui/lucide-icons'
@@ -21,7 +20,6 @@ type Props = {
 }
 
 export function ChatInput({ inputRef, value, isLoading, onChange, onSubmit, onStop }: Props) {
-  const { t } = useTranslation()
   const media = useMedia()
 
   useEnterKeySubmit(inputRef, onSubmit)
@@ -69,7 +67,7 @@ export function ChatInput({ inputRef, value, isLoading, onChange, onSubmit, onSt
           maxHeight={520}
           maxLength={BOT_MESSAGE_MAX_LENGTH}
           textAlignVertical="top"
-          placeholder={t('bot.placeholder')}
+          placeholder="Formulez votre demande…"
           editable
         />
       </View>

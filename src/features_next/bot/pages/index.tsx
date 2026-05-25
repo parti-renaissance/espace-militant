@@ -1,12 +1,12 @@
 import { useCallback, useRef, useState } from 'react'
-import { Keyboard, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
+import { FlatList, Keyboard, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
 import { isWeb, useMedia, YStack } from 'tamagui'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
-import type { LayoutScrollViewRef } from '@/components/AppStructure/Layout/LayoutScrollView'
 
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { useBotChat } from '@/services/bot/hook'
+import type { BotChatMessage } from '@/services/bot/schema'
 
 import ScrollToBottomButton from '../components/ScrollToBottomButton'
 import InputDock from '../components/input/InputDock'
@@ -18,7 +18,7 @@ import type { TamaguiInputRef } from '../utils/getDomFromTamaguiRef'
 
 export default function BotPage() {
   const media = useMedia()
-  const scrollViewRef = useRef<LayoutScrollViewRef>(null)
+  const scrollViewRef = useRef<FlatList<BotChatMessage>>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
   const keyboardHeight = useKeyboardHeight()
   const [isAtBottom, setIsAtBottom] = useState(true)

@@ -22,32 +22,6 @@
       "ok": "OK",
       "noDataPlaceholder": "-"
     },
-    "bot": {
-      "title": "Idée",
-      "placeholder": "Formulez votre demande…",
-      "newChatTitle": "Éducation, économie, écologie…",
-      "newChatDescription": "Sur quel sujet souhaitez-vous connaître nos propositions ?",
-      "suggestions": {
-        "q1": "Quelles sont les priorités de Gabriel Attal pour la France ?",
-        "q2": "Quelle est la politique économique de Gabriel Attal ?"
-      },
-      "typing": "Analyse en cours…",
-      "send": "Envoyer",
-      "stop": "Arrêter",
-      "retry": "Réessayer",
-      "disclaimer": "Les réponses sont générées par IA et peuvent contenir des erreurs. Vérifiez les informations importantes.",
-      "errors": {
-        "network": "Connexion impossible. Vérifiez votre réseau puis réessayez.",
-        "auth": "Votre session a expiré. Reconnectez-vous pour continuer.",
-        "forbidden": "Vous n'avez pas accès à cette fonctionnalité.",
-        "quota": "Limite d'utilisation atteinte. Réessayez plus tard.",
-        "quotaWithDelay": "Limite d'utilisation atteinte. Réessayez dans environ {{seconds}} secondes.",
-        "serviceDown": "Le service est momentanément indisponible. Réessayez dans quelques instants.",
-        "timeout": "Le service met trop de temps à répondre. Réessayez.",
-        "truncated": "Réponse interrompue. Réessayez pour obtenir une réponse complète.",
-        "unknown": "Une erreur inattendue est survenue. Réessayez."
-      }
-    },
     "vox_card": {
       "dayDateTime": "{{start, EEEE d MMMM yyyy}} à {{start, HH:mm}}",
       "dayDateTimeEnd": "{{start, EEEE d MMMM yyyy}} à {{start, HH:mm}} / {{end, HH:mm}}",

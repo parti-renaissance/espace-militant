@@ -1,19 +1,19 @@
-import { useTranslation } from 'react-i18next'
-import { XStack, YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui';
+import Text from '@/components/base/Text';
 
-import Text from '@/components/base/Text'
+const SUGGESTIONS = [
+  'Quelles sont les priorités de Gabriel Attal pour la France ?',
+  'Quelle est la politique économique de Gabriel Attal ?',
+]
 
 type Props = {
   onPress: (question: string) => void
 }
 
 export function SuggestionsList({ onPress }: Props) {
-  const { t } = useTranslation()
-  const suggestions = [t('bot.suggestions.q1'), t('bot.suggestions.q2')]
-
   return (
     <YStack gap="$small" width="100%" alignItems="flex-end">
-      {suggestions.map((q) => (
+      {SUGGESTIONS.map((q) => (
         <XStack
           key={q}
           onPress={() => onPress(q)}
