@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { usePathname } from 'expo-router'
 import { useMedia, XStack } from 'tamagui'
-import { Bot, DoorOpen, Globe, GraduationCap, LogOut, PenLine, QrCode, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
+import { Bot, DoorOpen, Globe, GraduationCap, Lightbulb, LogOut, PenLine, QrCode, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
@@ -74,6 +74,14 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
             <VoxCard borderRadius={16}>
               <VoxCard.Content padding="$small" gap={4}>
                 <NavItem text="Mode développeur" iconLeft={Wrench} onPress={() => setDevMode(true)} />
+              </VoxCard.Content>
+            </VoxCard>
+          )}
+
+          {profile?.canary_tester === true && (
+            <VoxCard borderRadius={16}>
+              <VoxCard.Content padding="$small" gap={4}>
+                <NavItem text="Bot" iconLeft={Lightbulb} href="/idees/bot" />
               </VoxCard.Content>
             </VoxCard>
           )}

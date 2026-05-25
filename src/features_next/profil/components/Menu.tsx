@@ -1,6 +1,6 @@
 import { Href, Link, usePathname } from 'expo-router'
 import { isWeb, useMedia, YStack } from 'tamagui'
-import { Bot, Globe, LogOut, PenLine, Video } from '@tamagui/lucide-icons'
+import { Bot, Globe, Lightbulb, LogOut, PenLine, Video } from '@tamagui/lucide-icons'
 
 import Menu from '@/components/menu/Menu'
 
@@ -70,6 +70,13 @@ const ProfilMenu = () => {
                 </Menu.Item>
               </Link>
             </>
+          )}
+          {profile?.canary_tester === true && (
+            <Link href="/idees/bot" asChild={!isWeb}>
+              <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Lightbulb}>
+                Bot
+              </Menu.Item>
+            </Link>
           )}
         </Menu>
       )}

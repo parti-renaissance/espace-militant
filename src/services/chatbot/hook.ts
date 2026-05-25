@@ -272,8 +272,8 @@ export function useCustomChat(options: UseCustomChatOptions = {}): UseCustomChat
 
 export const useGetPaginatedChatbotThreads = () => {
   return useInfiniteQuery({
-    queryKey: ['chatbot-threads'],
-    queryFn: ({ pageParam = 1 }) => chatbotApi.getChatbotThreadsList({ page: pageParam }),
+    queryKey: ['chatbot-threads', chatbotApi.CHATBOT_AGENT_ID],
+    queryFn: ({ pageParam = 1 }) => chatbotApi.getChatbotThreadsList({ page: pageParam, agent: chatbotApi.CHATBOT_AGENT_ID }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => (lastPage.metadata.current_page < lastPage.metadata.last_page ? lastPage.metadata.current_page + 1 : undefined),
     getPreviousPageParam: (firstPage) => (firstPage.metadata.current_page > 1 ? firstPage.metadata.current_page - 1 : undefined),
