@@ -3,7 +3,7 @@ import { Dimensions } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
-import { AlertTriangle, Calendar, Info, X } from '@tamagui/lucide-icons'
+import { Calendar, Info, X } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'

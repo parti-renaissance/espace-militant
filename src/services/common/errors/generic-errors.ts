@@ -15,7 +15,7 @@ export class GenericResponseError extends Error {
   }
 }
 
-export const genericErrorThrower = (error: unknown) => {
+const genericErrorHandler = (error: unknown, shouldLog: boolean) => {
   if (axios.isAxiosError(error)) {
     if (error.response?.data) {
       const { success, data } = GenericErrorResponseSchema.safeParse(error?.response?.data)
@@ -26,10 +26,14 @@ export const genericErrorThrower = (error: unknown) => {
     }
 
     if (error.code === 'ECONNABORTED') {
-      logTimeoutError(error)
+      if (shouldLog) {
+        logTimeoutError(error)
+      }
       throw new ServerTimeoutError(error.message)
     } else if (error.response) {
-      logHttpError(error)
+      if (shouldLog) {
+        void logHttpError(error)
+      }
 
       const payload = error?.response?.data as DetailedAPIErrorPayload
 
@@ -48,17 +52,31 @@ export const genericErrorThrower = (error: unknown) => {
           throw error
       }
     } else if (error.message === 'Network Error') {
-      logDefaultError(error)
+      if (shouldLog) {
+        logDefaultError(error)
+      }
       return error
     } else {
-      logDefaultError(error)
+      if (shouldLog) {
+        logDefaultError(error)
+      }
       throw error
     }
   } else if (error instanceof TypeError && error.message === 'Network request failed') {
-    logTypeError(error)
+    if (shouldLog) {
+      logTypeError(error)
+    }
     throw new ServerTimeoutError(error.message)
   } else if (error instanceof Error) {
-    logDefaultError(error)
+    if (shouldLog) {
+      logDefaultError(error)
+    }
   }
   return error
 }
+
+/** Maps and logs HTTP errors (default API pipeline). */
+export const genericErrorThrower = (error: unknown) => genericErrorHandler(error, true)
+
+/** Maps HTTP errors without Sentry logging — use when a feature layer logs (e.g. action mutations). */
+export const genericErrorMapper = (error: unknown) => genericErrorHandler(error, false)

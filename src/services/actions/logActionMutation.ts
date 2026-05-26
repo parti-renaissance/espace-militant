@@ -33,10 +33,6 @@ const serializeError = (error: unknown): Record<string, unknown> => {
   return { kind: 'unknown', value: String(error) }
 }
 
-export const logActionMutation = (step: string, data?: Record<string, unknown>) => {
-  ErrorMonitor.log(`[actions] ${step}`, data)
-}
-
 export const logActionMutationError = (step: string, error: unknown, data?: Record<string, unknown>) => {
   const payload: Record<string, unknown> = {
     ...data,
@@ -50,7 +46,12 @@ export const logActionMutationError = (step: string, error: unknown, data?: Reco
     payload.httpMethod = error.config?.method
   }
 
-  ErrorMonitor.log(`[actions] ${step} — error`, payload)
+  ErrorMonitor.logError({
+    domain: 'actions',
+    message: `Action mutation: ${step}`,
+    error,
+    extra: payload,
+  })
 }
 
 export const getActionMutationErrorMessage = (error: unknown, fallback: string): string => {
