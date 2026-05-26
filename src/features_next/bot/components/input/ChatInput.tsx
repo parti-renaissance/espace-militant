@@ -1,4 +1,4 @@
-import { useCallback, type RefObject } from 'react'
+import { useCallback, useState, type RefObject } from 'react'
 import { Keyboard, type NativeSyntheticEvent } from 'react-native'
 import { Input, isWeb, useMedia, View, YStack } from 'tamagui'
 import { ArrowUpRight, Square } from '@tamagui/lucide-icons'
@@ -21,6 +21,7 @@ type Props = {
 
 export function ChatInput({ inputRef, value, isLoading, onChange, onSubmit, onStop }: Props) {
   const media = useMedia()
+  const [isFocused, setIsFocused] = useState(false)
 
   useEnterKeySubmit(inputRef, onSubmit)
   useAutoGrowTextarea(inputRef, value)
@@ -45,9 +46,14 @@ export function ChatInput({ inputRef, value, isLoading, onChange, onSubmit, onSt
 
   return (
     <YStack
+      animation="quick"
       backgroundColor="$white1"
       borderColor="$textOutline"
       borderWidth={1}
+      shadowColor="$blue7"
+      shadowOpacity={isFocused ? 0.15 : 0}
+      shadowRadius={isFocused ? 12 : 0}
+      shadowOffset={{ width: 0, height: isFocused ? 4 : 0 }}
       borderTopLeftRadius={24}
       borderTopRightRadius={24}
       borderBottomLeftRadius={media.gtMd ? 24 : 0}
@@ -60,6 +66,8 @@ export function ChatInput({ inputRef, value, isLoading, onChange, onSubmit, onSt
           multiline
           value={value}
           onChangeText={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           onKeyPress={!isWeb ? handleKeyPress : undefined}
           onSubmitEditing={isWeb ? undefined : handleNativeSubmit}
           borderWidth={0}

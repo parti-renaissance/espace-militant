@@ -1,8 +1,7 @@
-import { forwardRef } from 'react'
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { forwardRef, useCallback, useMemo } from 'react'
+import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
 import { isWeb, Spinner, View } from 'tamagui'
 
-import LayoutScrollView, { type LayoutScrollViewRef } from '@/components/AppStructure/Layout/LayoutScrollView'
 import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
 
 import type { ChatMessage } from '@/services/chatbot/hook'
@@ -19,12 +18,57 @@ type Props = {
   onScroll: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
-export const MessageList = forwardRef<LayoutScrollViewRef, Props>(function MessageList(
+const keyExtractor = (item: ChatMessage) => item.id
+
+export const MessageList = forwardRef<FlatList<ChatMessage>, Props>(function MessageList(
   { messages, isLoading, streamedContent, error, showNewChat, contentPaddingBottom, onScroll },
   ref,
 ) {
+  const renderItem = useCallback(
+    ({ item }: { item: ChatMessage }) => (
+      <View
+        alignSelf={item.role === 'user' ? 'flex-end' : 'flex-start'}
+        maxWidth={item.role === 'user' ? '80%' : '100%'}
+        minWidth={0}
+        overflow="hidden"
+        bg={item.role === 'user' ? '$textOutline20' : undefined}
+        p="$medium"
+        borderTopLeftRadius="$medium"
+        borderTopRightRadius="$xsmall"
+        borderBottomLeftRadius="$medium"
+        borderBottomRightRadius="$medium"
+      >
+        <VoxMarkdown content={item.content} />
+      </View>
+    ),
+    [],
+  )
+
+  const ListHeader = useMemo(() => {
+    if (!error) return null
+    return (
+      <View padding="$medium" backgroundColor="$red3" borderRadius="$medium" marginHorizontal="$medium">
+        <VoxMarkdown content={error.message} />
+      </View>
+    )
+  }, [error])
+
+  const ListFooter = useMemo(
+    () => (
+      <>
+        {isLoading && (
+          <View alignSelf="flex-start" maxWidth="100%" minWidth={0} overflow="hidden" p="$medium" br="$medium">
+            {streamedContent ? <VoxMarkdown content={streamedContent} isStreaming /> : <Spinner size="small" />}
+          </View>
+        )}
+        {showNewChat && <NewChat />}
+      </>
+    ),
+    [isLoading, streamedContent, showNewChat],
+  )
+
   return (
-    <LayoutScrollView
+    <FlatList<ChatMessage>
       ref={ref}
       style={{ flex: 1 }}
       contentContainerStyle={{
@@ -34,38 +78,18 @@ export const MessageList = forwardRef<LayoutScrollViewRef, Props>(function Messa
         flexGrow: 1,
         ...(isWeb ? { flex: 1 } : {}),
       }}
+      data={messages}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      ListHeaderComponent={ListHeader}
+      ListFooterComponent={ListFooter}
       onScroll={onScroll}
       scrollEventThrottle={16}
-    >
-      {error && (
-        <View padding="$medium" backgroundColor="$red3" borderRadius="$medium" marginHorizontal="$medium">
-          <VoxMarkdown content={error.message} />
-        </View>
-      )}
-      {messages.map((m) => (
-        <View
-          key={m.id}
-          alignSelf={m.role === 'user' ? 'flex-end' : 'flex-start'}
-          maxWidth={m.role === 'user' ? '80%' : '100%'}
-          minWidth={0}
-          overflow="hidden"
-          bg={m.role === 'user' ? '$textOutline20' : undefined}
-          p="$medium"
-          borderTopLeftRadius="$medium"
-          borderTopRightRadius="$xsmall"
-          borderBottomLeftRadius="$medium"
-          borderBottomRightRadius="$medium"
-        >
-          <VoxMarkdown content={m.content} />
-        </View>
-      ))}
-      {isLoading && (
-        <View alignSelf="flex-start" maxWidth="100%" minWidth={0} overflow="hidden" p="$medium" br="$medium">
-          {streamedContent ? <VoxMarkdown content={streamedContent} isStreaming /> : <Spinner size="small" />}
-        </View>
-      )}
-      {showNewChat && <NewChat />}
-    </LayoutScrollView>
+      onScrollToIndexFailed={(info) => {
+        const flatList = ref && 'current' in ref ? ref.current : null
+        flatList?.scrollToOffset({ offset: info.averageItemLength * info.index, animated: true })
+      }}
+    />
   )
 })
 

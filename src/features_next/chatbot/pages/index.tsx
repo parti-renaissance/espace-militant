@@ -1,20 +1,17 @@
-import { useCallback, useEffect, useRef } from 'react'
-import { Keyboard } from 'react-native'
-import { isWeb, useMedia, YStack } from 'tamagui'
-import { useQueryClient } from '@tanstack/react-query'
+import { useCallback, useEffect, useRef } from 'react';
+import { FlatList, Keyboard } from 'react-native';
+import { isWeb, useMedia, YStack } from 'tamagui';
+import { useQueryClient } from '@tanstack/react-query';
+import Layout from '@/components/AppStructure/Layout/Layout';
+import JumpToBottomButton from '@/components/chat/JumpToBottomButton'
+import { useAutoScrollOnStream } from '@/hooks/chat/useAutoScrollOnStream';
+import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics';
+import { useChatScrollPosition } from '@/hooks/chat/useChatScrollPosition';
+import { useCustomChat, type ChatMessage } from '@/services/chatbot/hook';
+import { ChatBotNavigation } from '../components/ChatBotNavigation';
+import InputDock, { type TamaguiInputRef } from '../components/input/InputDock';
+import MessageList from '../components/messages/MessageList';
 
-import Layout from '@/components/AppStructure/Layout/Layout'
-import type { LayoutScrollViewRef } from '@/components/AppStructure/Layout/LayoutScrollView'
-import ScrollToBottomButton from '@/components/chat/ScrollToBottomButton'
-
-import { useAutoScrollOnStream } from '@/hooks/chat/useAutoScrollOnStream'
-import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
-import { useChatScrollPosition } from '@/hooks/chat/useChatScrollPosition'
-import { useCustomChat } from '@/services/chatbot/hook'
-
-import { ChatBotNavigation } from '../components/ChatBotNavigation'
-import InputDock, { type TamaguiInputRef } from '../components/input/InputDock'
-import MessageList from '../components/messages/MessageList'
 
 type ChatbotPageProps = {
   activeDiscussionId: string | null
@@ -24,7 +21,7 @@ type ChatbotPageProps = {
 export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChange }: ChatbotPageProps) {
   const media = useMedia()
   const queryClient = useQueryClient()
-  const scrollViewRef = useRef<LayoutScrollViewRef>(null)
+  const scrollViewRef = useRef<FlatList<ChatMessage>>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
   const { dockBottomOffset, scrollButtonBottom, contentPaddingBottom, onDockLayout } = useChatDockMetrics()
   const { isAtBottom, handleScroll } = useChatScrollPosition()
@@ -88,7 +85,7 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
             contentPaddingBottom={contentPaddingBottom}
             onScroll={handleScroll}
           />
-          {!isAtBottom && <ScrollToBottomButton onPress={() => scrollToBottom(true)} bottom={scrollButtonBottom} />}
+          {!isAtBottom && <JumpToBottomButton onPress={() => scrollToBottom(true)} bottom={scrollButtonBottom} />}
           <InputDock
             inputRef={inputRef}
             value={input}

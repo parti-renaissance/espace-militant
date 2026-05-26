@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 
-export function useInitialScrollToBottom(scrollFn: () => void, ready: boolean) {
+/** Appelle `scrollFn` une seule fois, dès que `ready` devient `true`, après deux frames d'attente. */
+export function useInitialScroll(scrollFn: () => void, ready: boolean) {
   const doneRef = useRef(false)
   useEffect(() => {
     if (doneRef.current || !ready) return

@@ -1,4 +1,4 @@
-import { ComponentRef, useCallback, useEffect, type RefObject } from 'react'
+import { ComponentRef, useCallback, useEffect, useState, type RefObject } from 'react'
 import type { LayoutChangeEvent, NativeSyntheticEvent } from 'react-native'
 import { Input, isWeb, useMedia, View, YStack } from 'tamagui'
 import { ArrowUpRight } from '@tamagui/lucide-icons'
@@ -22,6 +22,7 @@ type Props = {
 
 export function InputDock({ inputRef, value, isLoading, bottomOffset, onChange, onSubmit, onStop, onLayout }: Props) {
   const media = useMedia()
+  const [isFocused, setIsFocused] = useState(false)
 
   useEffect(() => {
     if (!isWeb || !inputRef.current) return
@@ -70,9 +71,14 @@ export function InputDock({ inputRef, value, isLoading, bottomOffset, onChange, 
       pb={media.gtMd ? '$medium' : 0}
     >
       <YStack
+        animation="quick"
         backgroundColor="$white1"
         borderColor="$textOutline"
         borderWidth={1}
+        shadowColor="$blue7"
+        shadowOpacity={isFocused ? 0.15 : 0}
+        shadowRadius={isFocused ? 12 : 0}
+        shadowOffset={{ width: 0, height: isFocused ? 4 : 0 }}
         borderTopLeftRadius={24}
         borderTopRightRadius={24}
         borderBottomLeftRadius={media.gtMd ? 24 : 0}
@@ -85,6 +91,8 @@ export function InputDock({ inputRef, value, isLoading, bottomOffset, onChange, 
             multiline
             value={value}
             onChangeText={onChange}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             onKeyPress={!isWeb ? handleKeyPress : undefined}
             onSubmitEditing={isWeb ? undefined : onSubmit}
             borderWidth={0}

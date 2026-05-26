@@ -8,7 +8,7 @@ type Props = {
   bottom: number
 }
 
-export function ScrollToBottomButton({ onPress, bottom }: Props) {
+export function JumpToBottomButton({ onPress, bottom }: Props) {
   return (
     <View position={isWeb ? 'fixed' : 'absolute'} bottom={bottom} alignSelf="center" zIndex={101}>
       <VoxButton variant="contained" theme="gray" iconLeft={ArrowDown} size="md" shrink onPress={onPress} />
@@ -16,4 +16,4 @@ export function ScrollToBottomButton({ onPress, bottom }: Props) {
   )
 }
 
-export default ScrollToBottomButton
+export default JumpToBottomButton

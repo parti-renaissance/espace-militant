@@ -11,8 +11,12 @@ type Args<T extends HasRole> = {
 }
 
 export type ChatScrollToMessage = {
+  /** Scroll animé vers le début du dernier message du bot (ou tout en bas si stream en cours / pas de message bot). */
   scrollToLastAssistant: () => void
+  /** Arme un scroll automatique vers le début du dernier message utilisateur dès qu'un nouveau message est ajouté. */
   armScrollToLastUser: () => void
+  /** Scroll instantané (sans animation) vers le début du dernier message du bot, ou tout en bas en fallback. */
+  scrollToInitial: () => void
 }
 
 export function useChatScrollToMessage<T extends HasRole>({ ref, messages, isLoading, scrollToBottom }: Args<T>): ChatScrollToMessage {
@@ -41,9 +45,18 @@ export function useChatScrollToMessage<T extends HasRole>({ ref, messages, isLoa
     ref.current?.scrollToIndex({ index: lastAssistantIndex, viewPosition: 0, animated: true })
   }, [messages, isLoading, scrollToBottom, ref])
 
+  const scrollToInitial = useCallback(() => {
+    const lastAssistantIndex = messages.findLastIndex((m) => m.role === 'assistant')
+    if (lastAssistantIndex < 0) {
+      ref.current?.scrollToEnd({ animated: false })
+      return
+    }
+    ref.current?.scrollToIndex({ index: lastAssistantIndex, viewPosition: 0, animated: false })
+  }, [messages, ref])
+
   const armScrollToLastUser = useCallback(() => {
     pendingScrollAfterSubmitRef.current = true
   }, [])
 
-  return { scrollToLastAssistant, armScrollToLastUser }
+  return { scrollToLastAssistant, armScrollToLastUser, scrollToInitial }
 }
