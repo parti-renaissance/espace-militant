@@ -2,7 +2,7 @@ import React from 'react'
 import CheckboxGroup from './CheckboxGroup'
 
 export default {
-  title: 'CheckboxGroup',
+  title: 'Formulaire/CheckboxGroup',
   component: CheckboxGroup,
 }
 

@@ -3,7 +3,7 @@ import { StoryObj } from '@storybook/react'
 import { Card, YStack } from 'tamagui'
 
 const meta = {
-  title: 'Address autocomplete',
+  title: 'Formulaire/AddressAutocomplete',
   component: () => (
     <Card width={400} p={'$medium'}>
       <YStack>

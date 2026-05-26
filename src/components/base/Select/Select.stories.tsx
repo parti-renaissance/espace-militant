@@ -19,7 +19,7 @@ const props = {
 }
 
 export default {
-  title: 'Select-2',
+  title: 'Formulaire/Select',
   component: Select,
   args: props,
 }
