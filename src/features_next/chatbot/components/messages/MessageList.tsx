@@ -29,8 +29,9 @@ export const MessageList = forwardRef<LayoutScrollViewRef, Props>(function Messa
       style={{ flex: 1 }}
       contentContainerStyle={{
         gap: 10,
+        paddingTop: 16,
         paddingBottom: contentPaddingBottom,
-        minHeight: '100%',
+        flexGrow: 1,
         ...(isWeb ? { flex: 1 } : {}),
       }}
       onScroll={onScroll}
