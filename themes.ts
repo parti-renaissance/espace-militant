@@ -1,16 +1,30 @@
 import { createThemeBuilder } from '@tamagui/theme-builder'
 import type { Variable } from '@tamagui/web'
 
-import { black, blue, gray, green, orange, purple, white, yellow } from './theme/colors.hsl'
+import { black, blue, gray, green, orange, pink, purple, red, teal, white, yellow } from './theme/colors.hsl'
+import { COLOR_SCALE_STEPS, PALETTE_NEUTRAL_STEP_INDEX, type ColorScaleName, type ColorScaleStep } from './theme/colorTokens'
+
+/** Scale steps only (50–950), ordered for Tamagui palettes — excludes legacy 1–9 aliases. */
+function pickScale(name: ColorScaleName, tokens: Record<string, string>): Record<string, string> {
+  const scale: Record<string, string> = {}
+  for (const step of COLOR_SCALE_STEPS) {
+    const key = `${name}${step}`
+    scale[key] = tokens[key]
+  }
+  return scale
+}
 
 const colorTokens = {
   light: {
-    blue,
-    gray,
-    green,
-    orange,
-    purple,
-    yellow,
+    blue: pickScale('blue', blue),
+    gray: pickScale('gray', gray),
+    green: pickScale('green', green),
+    orange: pickScale('orange', orange),
+    purple: pickScale('purple', purple),
+    yellow: pickScale('yellow', yellow),
+    red: pickScale('red', red),
+    pink: pickScale('pink', pink),
+    teal: pickScale('teal', teal),
     white,
   },
 }
@@ -22,20 +36,26 @@ const transparenciesPercents = [0, 8, 12, 16, 24, 32, 40, 48, 56, 64, 72, 80] as
 type PercentValue = (typeof transparenciesPercents)[number]
 const transparent = (hsl: string, opacity = 0) => hsl.replace(`%)`, `%, ${opacity})`).replace(`hsl(`, `hsla(`)
 const lightColors = {
-  ...addSetOfTransparenciesToColor(colorTokens.light.blue.blue5, 'blue', true),
-  ...colorTokens.light.blue,
-  ...addSetOfTransparenciesToColor(colorTokens.light.gray.gray5, 'gray', true),
-  ...colorTokens.light.gray,
-  ...addSetOfTransparenciesToColor(colorTokens.light.green.green5, 'green', true),
-  ...colorTokens.light.green,
-  ...addSetOfTransparenciesToColor(colorTokens.light.orange.orange5, 'orange', true),
-  ...colorTokens.light.orange,
-  ...addSetOfTransparenciesToColor(colorTokens.light.purple.purple5, 'purple', true),
-  ...colorTokens.light.purple,
-  ...addSetOfTransparenciesToColor(colorTokens.light.yellow.yellow5, 'yellow', true),
-  ...colorTokens.light.yellow,
+  ...addSetOfTransparenciesToColor(blue.blue500, 'blue', true),
+  ...blue,
+  ...addSetOfTransparenciesToColor(gray.gray500, 'gray', true),
+  ...gray,
+  ...addSetOfTransparenciesToColor(green.green500, 'green', true),
+  ...green,
+  ...addSetOfTransparenciesToColor(orange.orange500, 'orange', true),
+  ...orange,
+  ...addSetOfTransparenciesToColor(purple.purple500, 'purple', true),
+  ...purple,
+  ...addSetOfTransparenciesToColor(yellow.yellow500, 'yellow', true),
+  ...yellow,
+  ...addSetOfTransparenciesToColor(red.red500, 'red', true),
+  ...red,
+  ...addSetOfTransparenciesToColor(pink.pink500, 'pink', true),
+  ...pink,
+  ...addSetOfTransparenciesToColor(teal.teal500, 'teal', true),
+  ...teal,
   ...addSetOfTransparenciesToColor(white.white1, 'white', true),
-  ...colorTokens.light.white,
+  ...white,
 }
 
 const whiteTransparencies = addSetOfTransparenciesToColor(white.white1, 'white', false)
@@ -44,7 +64,10 @@ const blackTransparencies = addSetOfTransparenciesToColor(black.black1, 'black',
 export const palettes = (() => {
   const lightPalette = [...Object.values(whiteTransparencies), ...Object.values(white), ...Object.values(blackTransparencies).reverse()]
 
-  const getColorPalette = (colors: (typeof colorTokens)['light'][keyof (typeof colorTokens)['light']], neutral: number = 6): string[] => {
+  const getColorPalette = (
+    colors: (typeof colorTokens)['light'][keyof (typeof colorTokens)['light']],
+    neutral: number = PALETTE_NEUTRAL_STEP_INDEX,
+  ): string[] => {
     const colorPalette = Object.values(colors) as string[]
     // add our transparent colors first/last
     // and make sure the last (foreground) color is white/black rather than colorful
@@ -69,19 +92,25 @@ export const palettes = (() => {
 
 const text = {
   light: {
-    textPrimary: 'hsl(211,24%, 17%)',
-    textSecondary: 'hsl(208, 13%, 45%)',
-    textDisabled: 'hsl(210, 13%, 62%)',
-    textSurface: 'hsl(240, 9%, 98%)',
-    textOutline32: 'hsl(210, 13%, 88%)',
-    textOutline20: 'hsl(204, 13%, 92%)',
-    textOutline: 'hsl(210, 13%, 94%)',
-    textDanger: orange.orange5,
+    textPrimary: gray.gray900,
+    textSecondary: gray.gray600,
+    textDisabled: gray.gray400,
+    textSurface: white.white4,
+    textOutline32: gray.gray200,
+    textOutline20: gray.gray100,
+    textOutline: white.white8,
+    textDanger: orange.orange500,
   },
 }
 
 export const templates = (() => {
   const transparencies = transparenciesPercents.length - 1
+
+  /** Tailwind steps (50–950) as theme-aware tokens: $color50 … $color950 follow the active child theme palette. */
+  const scaleColorTemplate = Object.fromEntries(COLOR_SCALE_STEPS.map((step, index) => [`color${step}`, transparencies + 1 + index])) as Record<
+    `color${ColorScaleStep}`,
+    number
+  >
 
   // templates use the palette and specify index
   // negative goes backwards from end so -1 is the last item
@@ -104,6 +133,7 @@ export const templates = (() => {
     color10: transparencies + 10,
     color11: transparencies + 11,
     color12: transparencies + 12,
+    ...scaleColorTemplate,
     color025: -1,
     color05: -2,
     color075: -3,
@@ -181,9 +211,9 @@ export const templates = (() => {
   }
 
   const buttonContainedSurface = {
-    background: transparencies + 5,
-    backgroundHover: transparencies + 6,
-    backgroundPress: transparencies + 7,
+    background: transparencies + 7,
+    backgroundHover: transparencies + 8,
+    backgroundPress: transparencies + 9,
     color: white.white1,
     colorPress: white.white1,
     colorHover: white.white1,
@@ -208,13 +238,13 @@ export const templates = (() => {
   }
 
   const buttonSoftSurface = {
-    background: transparencies + 1,
-    backgroundHover: transparencies + 2,
-    backgroundPress: transparencies + 3,
-    color: transparencies + 8,
-    colorPress: transparencies + 8,
-    colorHover: transparencies + 8,
-    colorPop: transparencies + 9,
+    background: transparencies + 2,
+    backgroundHover: transparencies + 3,
+    backgroundPress: transparencies + 4,
+    color: text.light.textPrimary,
+    colorHover: text.light.textPrimary,
+    colorPress: text.light.textPrimary,
+    colorPop: text.light.textPrimary,
   }
 
   const buttonOutlinedSurface = {
@@ -583,6 +613,10 @@ const themeBuilder = createThemeBuilder()
     },
     gray: {
       palette: 'gray',
+      template: 'base',
+    },
+    teal: {
+      palette: 'teal',
       template: 'base',
     },
   })

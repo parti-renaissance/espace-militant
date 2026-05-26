@@ -1,7 +1,8 @@
 import { Platform } from 'react-native'
-import { GetThemeValueForKey } from '@tamagui/web'
 import { Image } from 'expo-image'
 import { Circle, CircleProps, getTokenValue, Spinner, Square, SquareProps, Token, YStack, ZStack } from 'tamagui'
+import { GetThemeValueForKey } from '@tamagui/web'
+
 import Text from '../base/Text'
 
 type ProfilePictureProps = {
@@ -44,7 +45,7 @@ const ProfilePicture = (props: ProfilePictureProps) => {
     />
   ) : (
     <Text
-      color={textColor ?? '$blue4'}
+      color={textColor ?? '$blue7'}
       fontSize={Platform.OS === 'ios' ? sizeValue / 2 : sizeValue / 2.5}
       textAlign="center"
       fontWeight={props.fontWeight ?? '$2'}

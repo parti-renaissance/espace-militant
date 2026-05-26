@@ -376,7 +376,7 @@ function RolesSection({ roles }: { roles: RestAdherentRole[] }) {
             roles.map((r, index) => {
               return (
                 <Chip key={`${r.code ?? 'role'}-${index}`} theme="purple" flexShrink={1} minWidth={0} maxWidth="100%">
-                  <Text.SM color="$color5" semibold numberOfLines={1} ellipsizeMode="tail">
+                  <Text.SM color="$color7" semibold numberOfLines={1} ellipsizeMode="tail">
                     {r.label ?? r.function}
                   </Text.SM>
                 </Chip>
@@ -399,7 +399,7 @@ function LabelsNationauxSection({ labels }: { labels: RestAdherentTag[] | null |
         <XStack flexWrap="wrap" gap={6}>
           {list.map((l, index) => (
             <Chip key={l.code ?? `${l.label}-${index}`} theme="gray">
-              <Text.SM color="$color5" semibold numberOfLines={1} ellipsizeMode="tail">
+              <Text.SM color="$color7" semibold numberOfLines={1} ellipsizeMode="tail">
                 {l.label}
               </Text.SM>
             </Chip>

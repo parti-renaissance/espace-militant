@@ -21,7 +21,7 @@ const TagChipRow = memo(function TagChipRow({ tags, theme }: { tags?: TagLike[] 
   return (
     <XStack overflow="hidden" minWidth={0} flexWrap="nowrap" gap={4} alignItems="center">
       <Chip theme={theme} flexShrink={1} minWidth={0}>
-        <Text.SM numberOfLines={1} ellipsizeMode="tail" semibold color="$color5">
+        <Text.SM numberOfLines={1} ellipsizeMode="tail" semibold color="$color7">
           {first.label}
         </Text.SM>
       </Chip>
@@ -52,13 +52,13 @@ const CotisationIconByCode = memo(function CotisationIconByCode({ code }: { code
   if (!code) return null
   switch (code) {
     case 'elu:attente_declaration':
-      return <CircleHelp size={12} color="$orange5" />
+      return <CircleHelp size={12} color="$orange7" />
 
     case 'elu:cotisation_ok':
     case 'elu:cotisation_ok:exempte':
     case 'elu:cotisation_ok:non_soumis':
     case 'elu:cotisation_ok:soumis':
-      return <CircleCheck size={12} color="$orange5" />
+      return <CircleCheck size={12} color="$orange7" />
 
     case 'elu:cotisation_nok':
     case 'elu:exempte_et_adherent_cotisation_nok':
