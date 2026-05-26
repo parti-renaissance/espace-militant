@@ -77,7 +77,7 @@ export function Frames() {
         </SF.Props>
 
         <SF.Props themedText>
-          <SF theme="purple">
+          <SF theme="pink">
             <SF.Container>
               <SF.Label>Test</SF.Label>
               <SF.ValueContainer>

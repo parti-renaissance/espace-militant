@@ -21,9 +21,9 @@ const SelectorContainer = styled(XStack, {
   cursor: 'pointer',
   justifyContent: 'space-between',
   borderRadius: 8,
-  backgroundColor: '$purple1',
-  hoverStyle: { backgroundColor: '$purple2' },
-  pressStyle: { backgroundColor: '$purple3' },
+  backgroundColor: '$pink1',
+  hoverStyle: { backgroundColor: '$pink2' },
+  pressStyle: { backgroundColor: '$pink3' },
   $sm: {
     padding: '$medium',
   },
@@ -52,23 +52,23 @@ const ScopeItemFrame = styled(ThemeableStack, {
   },
   focusStyle: {
     outlineWidth: 2,
-    outlineColor: '$purple5',
+    outlineColor: '$pink5',
     outlineStyle: 'solid',
   },
   variants: {
     selected: {
       true: {
-        backgroundColor: '$purple1',
+        backgroundColor: '$pink1',
         hoverStyle: {
-          backgroundColor: '$purple2',
+          backgroundColor: '$pink2',
         },
         pressStyle: {
-          backgroundColor: '$purple3',
+          backgroundColor: '$pink3',
         },
         focusStyle: {
-          backgroundColor: '$purple2',
+          backgroundColor: '$pink2',
           outlineWidth: 2,
-          outlineColor: '$purple6',
+          outlineColor: '$pink6',
           outlineStyle: 'solid',
         },
       },
@@ -180,22 +180,22 @@ export const ScopeSelector = () => {
         }}
         onPress={canSelect ? () => setDropdownOpen(!dropdownOpen) : undefined}
         cursor={canSelect ? 'pointer' : 'default'}
-        hoverStyle={!canSelect ? { backgroundColor: '$purple1' } : undefined}
-        pressStyle={!canSelect ? { backgroundColor: '$purple1' } : undefined}
+        hoverStyle={!canSelect ? { backgroundColor: '$pink1' } : undefined}
+        pressStyle={!canSelect ? { backgroundColor: '$pink1' } : undefined}
       >
         <YStack flexShrink={1} gap={4}>
-          <Text.MD semibold color={'$purple6'} numberOfLines={1}>
+          <Text.MD semibold color={'$pink6'} numberOfLines={1}>
             {displayScope.name}
           </Text.MD>
           {displayScope.role && (
-            <Text.SM color="$purple6" numberOfLines={1}>
+            <Text.SM color="$pink6" numberOfLines={1}>
               {displayScope.role}
             </Text.SM>
           )}
         </YStack>
         {canSelect && (
           <YStack flexShrink={0}>
-            <ChevronsUpDown size={16} color="$purple5" />
+            <ChevronsUpDown size={16} color="$pink5" />
           </YStack>
         )}
       </SelectorContainer>

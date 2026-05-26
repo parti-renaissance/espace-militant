@@ -28,31 +28,31 @@ export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
   return (
     <VoxCard
       inside={true}
-      bg="$purple1"
+      bg="$pink1"
       onPress={openCadre({ state: `/?scope=${default_scope?.code ?? ''}` })}
       cursor="pointer"
       animation="100ms"
       disabled={isPending}
       hoverStyle={{
-        bg: '$purple2',
+        bg: '$pink2',
       }}
       pressStyle={{
-        bg: '$purple3',
+        bg: '$pink3',
       }}
     >
       <VoxCard.Content>
         <XStack justifyContent="space-between" alignItems="center">
           <YStack flexShrink={1} flex={1}>
-            <Text.MD color="$purple6" semibold>
+            <Text.MD color="$pink6" semibold>
               {default_scope.name}
             </Text.MD>
             {default_scope.zones.map((z) => (
-              <Text.P color="$purple6" key={z.name + z.code}>
+              <Text.P color="$pink6" key={z.name + z.code}>
                 {z.name} ({z.code})
               </Text.P>
             ))}
           </YStack>
-          <YStack>{isPending ? <Spinner color="$purple6" /> : <ChevronRight size="$1" color="$purple6" />}</YStack>
+          <YStack>{isPending ? <Spinner color="$pink6" /> : <ChevronRight size="$1" color="$pink6" />}</YStack>
         </XStack>
       </VoxCard.Content>
     </VoxCard>

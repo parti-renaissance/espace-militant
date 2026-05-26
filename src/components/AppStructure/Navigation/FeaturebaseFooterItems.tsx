@@ -65,7 +65,7 @@ export const FeaturebaseFooterItems = ({ variant, collapsed }: FeaturebaseFooter
           key={item.text}
           iconLeft={item.icon}
           text={item.text}
-          theme="purple"
+          theme="pink"
           externalLink
           collapsed={collapsed}
           onPress={() => handleItemPress(item)}

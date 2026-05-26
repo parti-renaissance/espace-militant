@@ -11,7 +11,7 @@ import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
 import { type NavItemConfig } from '@/config/navigationItems'
 
 const Line = styled(YStack, {
-  backgroundColor: '$purple3',
+  backgroundColor: '$pink3',
   position: 'absolute',
   left: 36,
   top: -12,

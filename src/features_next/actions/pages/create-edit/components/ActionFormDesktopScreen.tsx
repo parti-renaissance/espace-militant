@@ -78,7 +78,7 @@ const ActionFormActions = () => {
         </VoxButton>
       ) : null}
       <YStack ml="auto">
-        <VoxButton onPress={onSubmit} size="md" variant="contained" theme="purple" loading={isPending} iconLeft={Sparkle}>
+        <VoxButton onPress={onSubmit} size="md" variant="contained" theme="pink" loading={isPending} iconLeft={Sparkle}>
           {isPending ? `${editMode ? 'Modification' : 'Création'}...` : `${editMode ? 'Modifier' : 'Créer'} l’action`}
         </VoxButton>
       </YStack>
@@ -132,7 +132,7 @@ export default function ActionFormDesktopScreen() {
           </VoxCard>
           {isPending ? (
             <YStack top={0} bottom={0} left={0} right={0} position="absolute" justifyContent="center" alignItems="center">
-              <Spinner size="large" color="$purple6" />
+              <Spinner size="large" color="$pink6" />
             </YStack>
           ) : null}
         </YStack>

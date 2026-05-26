@@ -13,7 +13,7 @@ import { FEATURES } from '@/utils/Scopes'
 const NewEventBtn = ({ children, ...props }: YStackProps & { children: string }) => (
   <YStack {...props}>
     <Link href="/evenements/creer" asChild={!isWeb}>
-      <VoxButton variant="soft" size="xl" theme="purple" iconLeft={Sparkle}>
+      <VoxButton variant="soft" size="xl" theme="pink" iconLeft={Sparkle}>
         {children}
       </VoxButton>
     </Link>
@@ -48,7 +48,7 @@ const HubSideContent = ({ onOpenOrganizeModal }: HubSideContentProps) => {
         <Suspense>
           {onOpenOrganizeModal && showOrganize ? (
             <YStack>
-              <VoxButton variant="soft" size="xl" theme="purple" width="100%" iconLeft={Sparkle} onPress={onOpenOrganizeModal}>
+              <VoxButton variant="soft" size="xl" theme="pink" width="100%" iconLeft={Sparkle} onPress={onOpenOrganizeModal}>
                 Organiser un événement
               </VoxButton>
             </YStack>

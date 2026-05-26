@@ -205,7 +205,7 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
             loading={props.isPending}
             flex={1}
             onPress={handleAccept}
-            theme="purple"
+            theme="pink"
           />
         </XStack>
       </VoxCard.Content>

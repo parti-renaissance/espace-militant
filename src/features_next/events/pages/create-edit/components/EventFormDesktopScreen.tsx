@@ -252,7 +252,7 @@ const EventFormActions = () => {
           onPress={() => onSubmit()}
           size="md"
           variant="contained"
-          theme="purple"
+          theme="pink"
           loading={isPending || isUploadImagePending || isUploadDeletePending}
           iconLeft={Sparkle}
         >

@@ -57,7 +57,7 @@ export type NavItemConfig = {
   active?: boolean
   hasAccess?: boolean
   onPress?: () => void
-  theme?: 'blue' | 'purple' | 'green' | 'orange'
+  theme?: 'blue' | 'pink' | 'green' | 'orange'
   frame?: 'primary' | 'secondary' | 'cadre'
   displayIn?: 'sidebar' | 'tabbar' | 'all' | 'never'
 }
@@ -132,42 +132,42 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
 export const militantNavItems: NavItemConfig[] = []
 
 const cadreNavItemsConfig: NavItemConfig[] = [
-  { id: FEATURES.DASHBOARD, iconLeft: Eye, text: "Vue d'ensemble", theme: 'purple', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
-  { id: FEATURES.MY_TEAM, iconLeft: Sparkle, text: 'Mon équipe cadre', theme: 'purple', externalUrlSlug: '/mon-equipe', externalLink: true },
-  { id: FEATURES.PUBLICATIONS, iconLeft: ScrollText, text: 'Mes publications', theme: 'purple', href: '/cadre/publications' },
-  { id: FEATURES.MESSAGES, iconLeft: Mail, text: 'Messagerie', theme: 'purple', externalUrlSlug: '/messagerie', externalLink: true },
-  { id: FEATURES.NEWS, iconLeft: MessageSquareDot, text: 'Notifications', theme: 'purple', externalUrlSlug: '/notifications', externalLink: true },
-  { id: FEATURES.DEPARTMENT_SITE, iconLeft: Laptop, text: 'Site départemental', theme: 'purple', externalUrlSlug: '/site-departemental', externalLink: true },
-  { id: FEATURES.MOBILE_APP, iconLeft: TabletSmartphone, text: 'Application mobile', theme: 'purple', externalUrlSlug: '/', externalLink: true },
-  { id: FEATURES.CONTACTS, iconLeft: UsersRound, text: 'Mes militants', theme: 'purple', href: '/cadre/militants' },
-  { id: FEATURES.CHATBOT, iconLeft: Bot, text: 'Chatbot', theme: 'purple', href: '/chatbot' },
-  { id: FEATURES.REFERRALS, iconLeft: HeartHandshake, text: 'Suivi des parrainages', theme: 'purple', externalUrlSlug: '/parrainages', externalLink: true },
+  { id: FEATURES.DASHBOARD, iconLeft: Eye, text: "Vue d'ensemble", theme: 'pink', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
+  { id: FEATURES.MY_TEAM, iconLeft: Sparkle, text: 'Mon équipe cadre', theme: 'pink', externalUrlSlug: '/mon-equipe', externalLink: true },
+  { id: FEATURES.PUBLICATIONS, iconLeft: ScrollText, text: 'Mes publications', theme: 'pink', href: '/cadre/publications' },
+  { id: FEATURES.MESSAGES, iconLeft: Mail, text: 'Messagerie', theme: 'pink', externalUrlSlug: '/messagerie', externalLink: true },
+  { id: FEATURES.NEWS, iconLeft: MessageSquareDot, text: 'Notifications', theme: 'pink', externalUrlSlug: '/notifications', externalLink: true },
+  { id: FEATURES.DEPARTMENT_SITE, iconLeft: Laptop, text: 'Site départemental', theme: 'pink', externalUrlSlug: '/site-departemental', externalLink: true },
+  { id: FEATURES.MOBILE_APP, iconLeft: TabletSmartphone, text: 'Application mobile', theme: 'pink', externalUrlSlug: '/', externalLink: true },
+  { id: FEATURES.CONTACTS, iconLeft: UsersRound, text: 'Mes militants', theme: 'pink', href: '/cadre/militants' },
+  { id: FEATURES.CHATBOT, iconLeft: Bot, text: 'Chatbot', theme: 'pink', href: '/chatbot' },
+  { id: FEATURES.REFERRALS, iconLeft: HeartHandshake, text: 'Suivi des parrainages', theme: 'pink', externalUrlSlug: '/parrainages', externalLink: true },
   {
     id: FEATURES.NATIONAL_EVENT,
     iconLeft: PartyPopper,
     text: 'Événements nationaux',
-    theme: 'purple',
+    theme: 'pink',
     externalUrlSlug: '/evenements-nationaux',
     externalLink: true,
   },
-  { id: FEATURES.EVENTS, iconLeft: Calendar, text: 'Mes événements', theme: 'purple', externalUrlSlug: '/evenements', externalLink: true, displayIn: 'never' },
-  { id: FEATURES.ADHERENT_FORMATIONS, iconLeft: GraduationCap, text: 'Mes formations', theme: 'purple', externalUrlSlug: '/formations', externalLink: true },
-  { id: FEATURES.EAGGLE, iconLeft: Map, text: 'Cartographie électorale', theme: 'purple', externalUrlSlug: '/cartographie-electorale', externalLink: true },
-  { id: FEATURES.SURVEY, iconLeft: ClipboardList, text: 'Questionnaires', theme: 'purple', externalUrlSlug: '/questionnaires', externalLink: true },
-  { id: FEATURES.PHONING_CAMPAIGN, iconLeft: PhoneOutgoing, text: 'Phoning', theme: 'purple', externalUrlSlug: '/phoning', externalLink: true },
-  { id: FEATURES.PAP, iconLeft: DoorOpen, text: 'Porte-à-porte', theme: 'purple', externalUrlSlug: '/porte-a-porte', externalLink: true },
-  { id: FEATURES.RIPOSTES, iconLeft: Swords, text: 'Ripostes', theme: 'purple', externalUrlSlug: '/ripostes', externalLink: true },
-  { id: FEATURES.TEAM, iconLeft: Group, text: 'Groupes', theme: 'purple', externalUrlSlug: '/groupes', externalLink: true },
-  { id: FEATURES.PROCURATIONS, iconLeft: Signature, text: 'Procurations', theme: 'purple', externalUrlSlug: '/procurations', externalLink: true },
-  { id: FEATURES.COMMITTEE, iconLeft: Network, text: 'Comités locaux', theme: 'purple', externalUrlSlug: '/comites', externalLink: true },
-  { id: FEATURES.CIRCONSCRIPTIONS, iconLeft: Goal, text: 'Circonscriptions', theme: 'purple', externalUrlSlug: '/circonscriptions', externalLink: true },
-  { id: FEATURES.DESIGNATION, iconLeft: CopyCheck, text: 'Désignations', theme: 'purple', externalUrlSlug: '/votes-et-consultations', externalLink: true },
-  { id: FEATURES.ELECTIONS, iconLeft: Vote, text: 'Votes et consultations', theme: 'purple', externalUrlSlug: '/votes-et-consultations', externalLink: true },
+  { id: FEATURES.EVENTS, iconLeft: Calendar, text: 'Mes événements', theme: 'pink', externalUrlSlug: '/evenements', externalLink: true, displayIn: 'never' },
+  { id: FEATURES.ADHERENT_FORMATIONS, iconLeft: GraduationCap, text: 'Mes formations', theme: 'pink', externalUrlSlug: '/formations', externalLink: true },
+  { id: FEATURES.EAGGLE, iconLeft: Map, text: 'Cartographie électorale', theme: 'pink', externalUrlSlug: '/cartographie-electorale', externalLink: true },
+  { id: FEATURES.SURVEY, iconLeft: ClipboardList, text: 'Questionnaires', theme: 'pink', externalUrlSlug: '/questionnaires', externalLink: true },
+  { id: FEATURES.PHONING_CAMPAIGN, iconLeft: PhoneOutgoing, text: 'Phoning', theme: 'pink', externalUrlSlug: '/phoning', externalLink: true },
+  { id: FEATURES.PAP, iconLeft: DoorOpen, text: 'Porte-à-porte', theme: 'pink', externalUrlSlug: '/porte-a-porte', externalLink: true },
+  { id: FEATURES.RIPOSTES, iconLeft: Swords, text: 'Ripostes', theme: 'pink', externalUrlSlug: '/ripostes', externalLink: true },
+  { id: FEATURES.TEAM, iconLeft: Group, text: 'Groupes', theme: 'pink', externalUrlSlug: '/groupes', externalLink: true },
+  { id: FEATURES.PROCURATIONS, iconLeft: Signature, text: 'Procurations', theme: 'pink', externalUrlSlug: '/procurations', externalLink: true },
+  { id: FEATURES.COMMITTEE, iconLeft: Network, text: 'Comités locaux', theme: 'pink', externalUrlSlug: '/comites', externalLink: true },
+  { id: FEATURES.CIRCONSCRIPTIONS, iconLeft: Goal, text: 'Circonscriptions', theme: 'pink', externalUrlSlug: '/circonscriptions', externalLink: true },
+  { id: FEATURES.DESIGNATION, iconLeft: CopyCheck, text: 'Désignations', theme: 'pink', externalUrlSlug: '/votes-et-consultations', externalLink: true },
+  { id: FEATURES.ELECTIONS, iconLeft: Vote, text: 'Votes et consultations', theme: 'pink', externalUrlSlug: '/votes-et-consultations', externalLink: true },
   {
     id: FEATURES.STATUTORY_MESSAGE,
     iconLeft: MessageSquareQuote,
     text: 'Message statutaire',
-    theme: 'purple',
+    theme: 'pink',
     externalUrlSlug: '/mails-statutaires',
     externalLink: true,
   },
@@ -175,14 +175,14 @@ const cadreNavItemsConfig: NavItemConfig[] = [
     id: FEATURES.GENERAL_MEETING_REPORTS,
     iconLeft: FileBadge,
     text: 'Procès-verbaux d’AG',
-    theme: 'purple',
+    theme: 'pink',
     externalUrlSlug: '/proces-verbal',
     externalLink: true,
   },
-  { id: FEATURES.DOCUMENTS, iconLeft: FileStack, text: 'Documents', theme: 'purple', externalUrlSlug: '/documents', externalLink: true },
-  { id: FEATURES.ELECTED_REPRESENTATIVE, iconLeft: Award, text: 'Élus', theme: 'purple', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
-  { id: FEATURES.ACTIONS, iconLeft: Zap, text: 'Actions', theme: 'purple', externalUrlSlug: '/actions', externalLink: true, displayIn: 'never' },
-  { id: FEATURES.CONTACTS_EXPORT, iconLeft: Download, text: 'Export contacts', theme: 'purple', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
+  { id: FEATURES.DOCUMENTS, iconLeft: FileStack, text: 'Documents', theme: 'pink', externalUrlSlug: '/documents', externalLink: true },
+  { id: FEATURES.ELECTED_REPRESENTATIVE, iconLeft: Award, text: 'Élus', theme: 'pink', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
+  { id: FEATURES.ACTIONS, iconLeft: Zap, text: 'Actions', theme: 'pink', externalUrlSlug: '/actions', externalLink: true, displayIn: 'never' },
+  { id: FEATURES.CONTACTS_EXPORT, iconLeft: Download, text: 'Export contacts', theme: 'pink', externalUrlSlug: '/', externalLink: true, displayIn: 'never' },
 ] as const
 
 export const useCadreNavItems = (): NavItemConfig[] => {

@@ -472,7 +472,7 @@ const HubFeed = () => {
           />
           {media.sm ? (
             <XStack position={isWeb ? 'fixed' : 'absolute'} bottom={organizeFabBottom} right="$medium" zIndex={20} gap="$small" pointerEvents="box-none">
-              <VoxButton variant="contained" size="lg" iconLeft={CirclePlus} theme="purple" onPress={handleOpenOrganizeModal}>
+              <VoxButton variant="contained" size="lg" iconLeft={CirclePlus} theme="pink" onPress={handleOpenOrganizeModal}>
                 Organiser un événement
               </VoxButton>
             </XStack>

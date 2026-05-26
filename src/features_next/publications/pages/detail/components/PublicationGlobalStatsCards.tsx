@@ -12,7 +12,7 @@ interface PublicationGlobalStatsCardsProps {
   stats: RestPublicationStatsResponse
 }
 
-export const StatCard: React.FC<{ value: string | number; label: string; theme?: ThemeName }> = ({ value, label, theme = 'purple' }) => (
+export const StatCard: React.FC<{ value: string | number; label: string; theme?: ThemeName }> = ({ value, label, theme = 'pink' }) => (
   <YStack theme={theme} backgroundColor="$gray1" borderRadius="$small" padding={12} flex={1} width="100%" minHeight={56} gap={2}>
     <Text fontSize={14} fontWeight="600" color={theme === 'gray' ? '$textPrimary' : '$color5'}>
       {value}

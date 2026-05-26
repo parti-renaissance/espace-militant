@@ -21,7 +21,7 @@ export function Size() {
 
 export function Default() {
   const variants = ['contained', 'outlined', 'soft', 'text'] as const
-  const colors = ['gray', 'purple', 'orange', 'blue', 'green', 'yellow'] as const
+  const colors = ['gray', 'pink', 'orange', 'blue', 'green', 'yellow'] as const
 
   return (
     <ScrollView flex={1} alignContent="center" justifyContent="center">

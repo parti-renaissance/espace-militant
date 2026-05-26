@@ -36,7 +36,7 @@ export const listAvailableFeatureByGroup = (scope: RestUserScopesResponse[number
 
 const ScopeCardFrame = styled(VoxCardFrame, {
   tag: 'button',
-  backgroundColor: '$purple/8',
+  backgroundColor: '$pink/8',
   animation: 'quick',
   cursor: 'pointer',
   borderWidth: 2,
@@ -44,27 +44,27 @@ const ScopeCardFrame = styled(VoxCardFrame, {
   overflow: 'hidden',
 
   pressStyle: {
-    borderColor: '$purple5',
-    backgroundColor: '$purple1',
+    borderColor: '$pink5',
+    backgroundColor: '$pink1',
   },
   hoverStyle: {
-    borderColor: '$purple3',
-    backgroundColor: '$purple/16',
+    borderColor: '$pink3',
+    backgroundColor: '$pink/16',
   },
   focusStyle: {
-    borderColor: '$purple5',
-    backgroundColor: '$purple1',
+    borderColor: '$pink5',
+    backgroundColor: '$pink1',
   },
 
   variants: {
     selected: {
       true: {
-        borderColor: '$purple5',
-        backgroundColor: '$purple1',
+        borderColor: '$pink5',
+        backgroundColor: '$pink1',
         cursor: 'default',
         hoverStyle: {
-          borderColor: '$purple5',
-          backgroundColor: '$purple1',
+          borderColor: '$pink5',
+          backgroundColor: '$pink1',
         },
       },
     },
@@ -97,18 +97,18 @@ export default function ScopeCard({ scope, selected, onPress, loading }: ScopeCa
       <VoxCard.Content pb={0} justifyContent="center">
         <XStack justifyContent="space-between" alignItems="center" gap="$medium">
           <YStack flexShrink={1} gap={8}>
-            <Text.MD semibold color="$purple6">
+            <Text.MD semibold color="$pink6">
               {scope.name}
             </Text.MD>
-            <Text.SM color="$purple5">{scope.zones.map(({ name, code }) => `${name} (${code})`).join(', ')}</Text.SM>
+            <Text.SM color="$pink5">{scope.zones.map(({ name, code }) => `${name} (${code})`).join(', ')}</Text.SM>
           </YStack>
           <YStack>
             {selected ? (
-              <VoxButton variant="text" theme="purple">
+              <VoxButton variant="text" theme="pink">
                 Sélectionné
               </VoxButton>
             ) : (
-              <VoxButton variant="outlined" bg="white" theme="purple" onPress={isWeb ? undefined : onPress} loading={loading}>
+              <VoxButton variant="outlined" bg="white" theme="pink" onPress={isWeb ? undefined : onPress} loading={loading}>
                 Choisir
               </VoxButton>
             )}
@@ -133,7 +133,7 @@ export default function ScopeCard({ scope, selected, onPress, loading }: ScopeCa
                   <YStack gap="$small" flexDirection={i > 0 ? 'column' : 'row'} flexWrap="wrap">
                     {features.map(({ access, name }) => (
                       <XStack gap="$xsmall" key={name}>
-                        {access ? <Check size={16} color="$purple9" /> : <X size={16} color="$textSecondary" />}
+                        {access ? <Check size={16} color="$pink9" /> : <X size={16} color="$textSecondary" />}
                         <Text.SM secondary>{name}</Text.SM>
                       </XStack>
                     ))}

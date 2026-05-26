@@ -39,7 +39,7 @@ const DesktopSkeleton = (props?: { editMode?: boolean }) => {
               <SF height={200} />
             </SkeCard.Content>
             <SkeCard.Content>
-              <SF theme="purple" />
+              <SF theme="pink" />
               <SkeCard.Separator />
               <SF />
               <SF />
@@ -54,7 +54,7 @@ const DesktopSkeleton = (props?: { editMode?: boolean }) => {
               <SF />
               <XStack alignItems="center" justifyContent="flex-end" gap="$small" flex={1} width="100%">
                 <XStack>
-                  <SkeCard.Button theme="purple" />
+                  <SkeCard.Button theme="pink" />
                 </XStack>
               </XStack>
             </SkeCard.Content>
@@ -94,7 +94,7 @@ const MobileSkeleton = (props?: { editMode?: boolean }) => {
         <YStack>
           <SkeCard>
             <SkeCard.Content>
-              <SF theme="purple" />
+              <SF theme="pink" />
               <SkeCard.Separator />
               <SF />
               <SF />

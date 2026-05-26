@@ -375,7 +375,7 @@ function RolesSection({ roles }: { roles: RestAdherentRole[] }) {
           ) : (
             roles.map((r, index) => {
               return (
-                <Chip key={`${r.code ?? 'role'}-${index}`} theme="purple" flexShrink={1} minWidth={0} maxWidth="100%">
+                <Chip key={`${r.code ?? 'role'}-${index}`} theme="pink" flexShrink={1} minWidth={0} maxWidth="100%">
                   <Text.SM color="$color7" semibold numberOfLines={1} ellipsizeMode="tail">
                     {r.label ?? r.function}
                   </Text.SM>

@@ -71,7 +71,7 @@ export const EmptyStateSection = ({ reason, onSwitchToAllItems, showResetButton 
 
         {canOrganize && (reason.kind === 'generic' || reason.kind === 'zone_no_upcoming') && (
           <Link href="/evenements/creer" asChild={!isWeb}>
-            <VoxButton variant="outlined" size="md" theme="purple" iconLeft={Sparkle}>
+            <VoxButton variant="outlined" size="md" theme="pink" iconLeft={Sparkle}>
               {reason.kind === 'generic' ? "J'en organise un" : 'Organiser un événement'}
             </VoxButton>
           </Link>

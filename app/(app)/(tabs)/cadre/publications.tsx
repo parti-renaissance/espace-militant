@@ -26,7 +26,7 @@ export default function PublicationsPage() {
         title="Mes Publications"
         navigation={{ showBackButton: false }}
         rightComponent={
-          <VoxButton variant="soft" theme="purple" iconLeft={Sparkle} size="lg" onPress={handleCreatePublication}>
+          <VoxButton variant="soft" theme="pink" iconLeft={Sparkle} size="lg" onPress={handleCreatePublication}>
             Nouvelle publication
           </VoxButton>
         }

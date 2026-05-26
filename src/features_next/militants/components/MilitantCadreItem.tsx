@@ -10,7 +10,7 @@ import { Chip } from '@/components'
 import { IconComponent } from '@/models/common.model'
 import type { RestAdherentListItem } from '@/services/adherents/schema'
 
-type ChipTheme = 'yellow' | 'blue' | 'gray' | 'purple' | 'orange'
+type ChipTheme = 'yellow' | 'blue' | 'gray' | 'pink' | 'orange'
 type TagLike = { label: string; code?: string }
 
 const TagChipRow = memo(function TagChipRow({ tags, theme }: { tags?: TagLike[] | null; theme: ChipTheme }) {
@@ -212,7 +212,7 @@ function MilitantCadreItemInner({
 
           <YStack width={col2Width} pr="$xlarge" gap={6} overflow="hidden" minWidth={0} justifyContent="center">
             {adherent_tags && <TagChipRow tags={adherent_tags} theme={getAdherentTagChipStyle(adherent_tags?.[0]?.code)} />}
-            {roles && <TagChipRow tags={roles} theme="purple" />}
+            {roles && <TagChipRow tags={roles} theme="pink" />}
             {elect_mandates.length > 0 && (
               <XStack gap={4}>
                 <TagChipRow tags={elect_mandates} theme="orange" />

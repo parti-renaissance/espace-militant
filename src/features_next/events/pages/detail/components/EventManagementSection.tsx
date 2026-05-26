@@ -43,8 +43,8 @@ const EventManagementSection = ({ event }: EventItemProps) => {
         <VoxCard.Content>
           <XStack justifyContent="space-between">
             <XStack gap="$small" alignItems="center">
-              <Sparkle size={16} color="$purple6" />
-              <Text.LG color="$purple6" semibold>
+              <Sparkle size={16} color="$pink6" />
+              <Text.LG color="$pink6" semibold>
                 Gestion
               </Text.LG>
             </XStack>
@@ -52,11 +52,11 @@ const EventManagementSection = ({ event }: EventItemProps) => {
 
           <XStack justifyContent="space-between">
             <XStack gap="$small" alignItems="center">
-              <Text.MD color="$purple6" semibold>
+              <Text.MD color="$pink6" semibold>
                 Liste des participants
               </Text.MD>
             </XStack>
-            <VoxButton variant="soft" theme="purple" size="sm" iconRight={Download} onPress={handlePress} loading={isPending}>
+            <VoxButton variant="soft" theme="pink" size="sm" iconRight={Download} onPress={handlePress} loading={isPending}>
               Télécharger la liste
             </VoxButton>
           </XStack>
@@ -65,7 +65,7 @@ const EventManagementSection = ({ event }: EventItemProps) => {
 
           {stats && (
             <YStack gap="$medium" mt={'$medium'}>
-              <Text.MD color="$purple6" semibold>
+              <Text.MD color="$pink6" semibold>
                 Statistiques de l'événement
               </Text.MD>
               <EventStatsCard stats={stats} />
@@ -74,7 +74,7 @@ const EventManagementSection = ({ event }: EventItemProps) => {
           <VoxCard.Separator />
           <XStack justifyContent="space-between">
             <XStack gap="$small" alignItems="center">
-              <Text.MD color="$purple6" semibold>
+              <Text.MD color="$pink6" semibold>
                 Gérer l'événement
               </Text.MD>
             </XStack>

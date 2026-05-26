@@ -37,7 +37,7 @@ export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectO
       ' ',
       <SF.Text key="description">{description}</SF.Text>,
     ],
-    theme: 'purple',
+    theme: 'pink',
     icon: Sparkle,
   }
 }
