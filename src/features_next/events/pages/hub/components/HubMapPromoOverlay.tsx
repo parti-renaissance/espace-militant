@@ -31,11 +31,11 @@ export const HubMapPromoOverlay = memo(function HubMapPromoOverlay({ leadingAcce
             <Text.MD semibold>Trouvez l’événement qui vous convient</Text.MD>
             <Text.MD secondary>Participez à nos meetings et mobilisez-vous sur le terrain avec la communauté militante.</Text.MD>
           </YStack>
-          <XStack gap="$small" justifyContent={media.gtSm ? 'space-between' : 'flex-start'}>
-            <VoxButton variant="outlined" theme="blue" size="md" iconLeft={Map} onPress={onOpenFullMap}>
+          <XStack gap="$small" width="100%" flexWrap="wrap">
+            <VoxButton variant="outlined" theme="blue" size="md" flexGrow={1} iconLeft={Map} onPress={onOpenFullMap}>
               Ouvrir la carte
             </VoxButton>
-            <VoxButton variant="contained" theme="blue" size="md" iconLeft={List} onPress={onOpenList}>
+            <VoxButton variant="contained" theme="blue" size="md" flexGrow={1} iconLeft={List} onPress={onOpenList}>
               Ouvrir la liste
             </VoxButton>
           </XStack>
