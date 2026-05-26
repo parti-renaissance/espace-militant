@@ -136,7 +136,7 @@ const ActionButtons = ({
     return (
       <XStack gap={8} width="100%">
         <YStack flex={1}>
-          <VoxButton theme="purple" {...buttonProps} variant="soft" iconLeft={PenLine} onPress={onEdit}>
+          <VoxButton theme="pink" {...buttonProps} variant="soft" iconLeft={PenLine} onPress={onEdit}>
             Éditer
           </VoxButton>
         </YStack>

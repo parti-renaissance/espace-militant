@@ -25,7 +25,7 @@ const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectOption<s
       ' ',
       <SF.Text key="description">{description}</SF.Text>,
     ],
-    theme: 'purple',
+    theme: 'pink',
     icon: Sparkle,
   }
 }
@@ -43,7 +43,7 @@ const MessageScopeSelector: React.FC<MessageScopeSelectorProps> = ({ value, onCh
       options={scopeOptions}
       onChange={onChange}
       size="lg"
-      theme="purple"
+      theme="pink"
       placeholder="Sélectionnez un rôle"
       disabled={disabled}
       matchTextWithTheme

@@ -33,7 +33,7 @@ export const Default: Story = {
         <VoxButton theme="blue" onPress={() => setOpenSympathisant(true)} width="100%">
           Sympathisant
         </VoxButton>
-        <VoxButton theme="purple" onPress={() => setOpenCadre(true)} width="100%">
+        <VoxButton theme="pink" onPress={() => setOpenCadre(true)} width="100%">
           Cadre
         </VoxButton>
 

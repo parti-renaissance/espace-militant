@@ -113,14 +113,14 @@ function MilitantSummaryCard({ data, engagementScore = null }: { data: RestAdher
         <XStack alignItems="center" justifyContent="space-between" gap="$medium">
           {adherentLabel && (
             <Chip theme="yellow" flexShrink={1}>
-              <Text.SM semibold color={'$color5'} numberOfLines={1} ellipsizeMode="tail">
+              <Text.SM semibold color={'$color7'} numberOfLines={1} ellipsizeMode="tail">
                 {adherentLabel}
               </Text.SM>
             </Chip>
           )}
           {activityLabel && (
             <XStack alignItems="center" gap={4}>
-              <Activity size={12} color="$green5" />
+              <Activity size={12} color="$green7" />
               <Text.XSM secondary>{activityLabel}</Text.XSM>
             </XStack>
           )}

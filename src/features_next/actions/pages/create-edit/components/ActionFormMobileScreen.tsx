@@ -38,7 +38,7 @@ export default function ActionFormMobileScreen() {
             <VoxHeader.Title>{`${editMode ? 'Modifier' : 'Créer'} l’action`}</VoxHeader.Title>
           </XStack>
           <XStack>
-            <VoxButton onPress={onSubmit} size="md" theme="purple" loading={isPending} iconLeft={editMode ? undefined : Sparkle}>
+            <VoxButton onPress={onSubmit} size="md" theme="pink" loading={isPending} iconLeft={editMode ? undefined : Sparkle}>
               {isPending ? `${editMode ? 'Modification' : 'Création'}...` : editMode ? 'Modifier' : 'Créer'}
             </VoxButton>
           </XStack>

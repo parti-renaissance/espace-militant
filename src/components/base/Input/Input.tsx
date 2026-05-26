@@ -22,7 +22,7 @@ function useIsInBottomSheet(): boolean {
 
 export type InputProps = {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  color?: 'white' | 'gray' | 'purple'
+  color?: 'white' | 'gray' | 'pink'
   error?: string
   label?: string
   placeholder?: string
@@ -93,10 +93,10 @@ const InputFrame = styled(XStack, {
       gray: {
         backgroundColor: '$gray1',
       },
-      purple: {
+      pink: {
         backgroundColor: '$white1',
         hoverStyle: {
-          backgroundColor: '$purple3',
+          backgroundColor: '$pink3',
           cursor: 'text',
         },
       },
@@ -234,7 +234,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
   const theme = useTheme()
 
   const defaultFakeTextProps = {
-    color: textInputProps.value ? (color !== 'purple' ? '$textPrimary' : '$purple6') : '$textSecondary',
+    color: textInputProps.value ? (color !== 'pink' ? '$textPrimary' : '$pink6') : '$textSecondary',
     semibold: !!textInputProps.value,
     numberOfLines: fakeProps?.multiline ? undefined : 1,
     borderBottomWidth: 0,

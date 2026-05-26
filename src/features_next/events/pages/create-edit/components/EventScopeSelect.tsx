@@ -16,7 +16,7 @@ const _EventScopeSelect = (props: Pick<EventFormContext, 'control' | 'isAuthor' 
             <Select
               error={fieldState.error?.message}
               size="sm"
-              theme="purple"
+              theme="pink"
               matchTextWithTheme
               label="Pour"
               value={field.value}

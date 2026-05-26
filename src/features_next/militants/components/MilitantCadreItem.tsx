@@ -10,7 +10,7 @@ import { Chip } from '@/components'
 import { IconComponent } from '@/models/common.model'
 import type { RestAdherentListItem } from '@/services/adherents/schema'
 
-type ChipTheme = 'yellow' | 'blue' | 'gray' | 'purple' | 'orange'
+type ChipTheme = 'yellow' | 'blue' | 'gray' | 'pink' | 'orange'
 type TagLike = { label: string; code?: string }
 
 const TagChipRow = memo(function TagChipRow({ tags, theme }: { tags?: TagLike[] | null; theme: ChipTheme }) {
@@ -21,7 +21,7 @@ const TagChipRow = memo(function TagChipRow({ tags, theme }: { tags?: TagLike[] 
   return (
     <XStack overflow="hidden" minWidth={0} flexWrap="nowrap" gap={4} alignItems="center">
       <Chip theme={theme} flexShrink={1} minWidth={0}>
-        <Text.SM numberOfLines={1} ellipsizeMode="tail" semibold color="$color5">
+        <Text.SM numberOfLines={1} ellipsizeMode="tail" semibold color="$color7">
           {first.label}
         </Text.SM>
       </Chip>
@@ -52,13 +52,13 @@ const CotisationIconByCode = memo(function CotisationIconByCode({ code }: { code
   if (!code) return null
   switch (code) {
     case 'elu:attente_declaration':
-      return <CircleHelp size={12} color="$orange5" />
+      return <CircleHelp size={12} color="$orange7" />
 
     case 'elu:cotisation_ok':
     case 'elu:cotisation_ok:exempte':
     case 'elu:cotisation_ok:non_soumis':
     case 'elu:cotisation_ok:soumis':
-      return <CircleCheck size={12} color="$orange5" />
+      return <CircleCheck size={12} color="$orange7" />
 
     case 'elu:cotisation_nok':
     case 'elu:exempte_et_adherent_cotisation_nok':
@@ -212,7 +212,7 @@ function MilitantCadreItemInner({
 
           <YStack width={col2Width} pr="$xlarge" gap={6} overflow="hidden" minWidth={0} justifyContent="center">
             {adherent_tags && <TagChipRow tags={adherent_tags} theme={getAdherentTagChipStyle(adherent_tags?.[0]?.code)} />}
-            {roles && <TagChipRow tags={roles} theme="purple" />}
+            {roles && <TagChipRow tags={roles} theme="pink" />}
             {elect_mandates.length > 0 && (
               <XStack gap={4}>
                 <TagChipRow tags={elect_mandates} theme="orange" />

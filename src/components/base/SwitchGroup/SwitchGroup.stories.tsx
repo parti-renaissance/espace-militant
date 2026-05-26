@@ -2,7 +2,7 @@ import React from 'react'
 import SwitchGroup from './SwitchGroup'
 
 export default {
-  title: 'SwitchGroup',
+  title: 'Formulaire/SwitchGroup',
   component: SwitchGroup,
 }
 

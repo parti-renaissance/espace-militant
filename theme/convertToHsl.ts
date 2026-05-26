@@ -1,37 +1,42 @@
 import fs from 'fs'
+import path from 'path'
 import convert from 'color-convert'
-import { blue, gray, green, orange, purple, yellow } from './colors.hex'
+
+import { COLOR_SCALE_NAMES } from './colorTokens'
+import { black, blue, gray, green, orange, pink, purple, red, teal, white, yellow } from './colors.hex'
 
 interface ColorMap {
   [key: string]: string
 }
 
+const scaleColors = { gray, purple, blue, teal, green, yellow, orange, red, pink }
+
 function convertColorsToHSL(colors: ColorMap): ColorMap {
   const hslColors: ColorMap = {}
   for (const key in colors) {
-    const hex = colors[key].substring(1) // remove #
+    const hex = colors[key].replace('#', '')
     const hsl = convert.hex.hsl(hex)
     hslColors[key] = `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`
   }
   return hslColors
 }
 
-const hslYellow = convertColorsToHSL(yellow)
-const hslPurple = convertColorsToHSL(purple)
-const hslOrange = convertColorsToHSL(orange)
-const hslGreen = convertColorsToHSL(green)
-const hslGray = convertColorsToHSL(gray)
-const hslBlue = convertColorsToHSL(blue)
+const hslExports = COLOR_SCALE_NAMES.map((name) => {
+  const hsl = convertColorsToHSL(scaleColors[name])
+  return `export const ${name} = ${JSON.stringify(hsl, null, 4)}`
+}).join('\n\n')
 
-const hslColors = ` export const yellow = ${JSON.stringify(hslYellow, null, 4)};
-export const purple = ${JSON.stringify(hslPurple, null, 4)};
-export const orange = ${JSON.stringify(hslOrange, null, 4)};
-export const green = ${JSON.stringify(hslGreen, null, 4)};
-export const gray = ${JSON.stringify(hslGray, null, 4)};
-export const blue = ${JSON.stringify(hslBlue, null, 4)}`
+const hslWhite = convertColorsToHSL(white)
+const hslBlack = convertColorsToHSL(black)
 
-fs.writeFile('colors.hsl.ts', hslColors, (err) => {
-  if (err) throw err
-  // eslint-disable-next-line no-console
-  console.log('The file has been saved!')
-})
+const hslColors = `${hslExports}
+
+export const white = ${JSON.stringify(hslWhite, null, 4)}
+
+export const black = ${JSON.stringify(hslBlack, null, 4)}
+`
+
+const outPath = path.join(__dirname, 'colors.hsl.ts')
+fs.writeFileSync(outPath, hslColors)
+// eslint-disable-next-line no-console
+console.log(`Wrote ${outPath}`)

@@ -17,7 +17,7 @@ interface IntegerIntervalProps {
   onChange: (value: IntegerIntervalValue) => void
   options: FilterOptionIntegerInterval
   size?: 'sm' | 'md' | 'lg'
-  color?: 'white' | 'gray' | 'purple'
+  color?: 'white' | 'gray' | 'pink'
 }
 
 function parseNum(s: string): number | null {

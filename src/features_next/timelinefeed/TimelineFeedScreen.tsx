@@ -103,7 +103,7 @@ const TimelineFeedMain = () => {
               </Text.MD>
               {hasPublications && (
                 <Link href="/publications" asChild>
-                  <VoxButton variant="soft" size="sm" theme="purple" iconLeft={Sparkle}>
+                  <VoxButton variant="soft" size="sm" theme="pink" iconLeft={Sparkle}>
                     Nouvelle publication
                   </VoxButton>
                 </Link>

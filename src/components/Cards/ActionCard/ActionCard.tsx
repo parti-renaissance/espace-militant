@@ -61,7 +61,7 @@ const ActionCard = ({
               Voir
             </VoxButton>
             {isMyAction ? (
-              <VoxButton disabled={isCancelled || isPassed} variant="outlined" theme="purple" iconLeft={Sparkle} onPress={onEdit}>
+              <VoxButton disabled={isCancelled || isPassed} variant="outlined" theme="pink" iconLeft={Sparkle} onPress={onEdit}>
                 Gérer
               </VoxButton>
             ) : (

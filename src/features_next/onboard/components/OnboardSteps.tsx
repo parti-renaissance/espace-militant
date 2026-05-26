@@ -133,10 +133,10 @@ export function OnboardStep6Cadre({ stepIndex, totalSteps, onFooterAction }: Onb
       stepIndex={stepIndex}
       totalSteps={totalSteps}
       onFooterAction={onFooterAction}
-      theme="purple"
+      theme="pink"
       Description={
         <Text medium textAlign="center" fontSize={media.gtSm ? 14 : 16} lineHeight={media.gtSm ? 22 : 24}>
-          Vous avez donc accès à une navigation supplémentaire et à des <Text bold>fonctionnalités Cadre</Text> qui sont indiquées <Text bold>en violet</Text>{' '}
+          Vous avez donc accès à une navigation supplémentaire et à des <Text bold>fonctionnalités Cadre</Text> qui sont indiquées <Text bold>en rose</Text>{' '}
           dans l’application.
         </Text>
       }
@@ -157,7 +157,7 @@ export function OnboardStep7Cadre({ stepIndex, totalSteps, onFooterAction }: Onb
       stepIndex={stepIndex}
       totalSteps={totalSteps}
       onFooterAction={onFooterAction}
-      theme="purple"
+      theme="pink"
       Description={
         <Text medium textAlign="center" fontSize={media.gtSm ? 14 : 16} lineHeight={media.gtSm ? 22 : 24}>
           <Text bold>Dans l’espace Cadre,</Text> changez de rôle pour accéder aux fonctionnalités associées. <Text bold>Lors de la création de contenu,</Text>{' '}

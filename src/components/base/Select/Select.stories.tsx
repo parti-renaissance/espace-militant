@@ -19,7 +19,7 @@ const props = {
 }
 
 export default {
-  title: 'Select-2',
+  title: 'Formulaire/Select',
   component: Select,
   args: props,
 }
@@ -77,7 +77,7 @@ export function Frames() {
         </SF.Props>
 
         <SF.Props themedText>
-          <SF theme="purple">
+          <SF theme="pink">
             <SF.Container>
               <SF.Label>Test</SF.Label>
               <SF.ValueContainer>

@@ -93,12 +93,12 @@ const RenderText: RenderFn<S.TipText, { editMode?: boolean; previewMode?: boolea
           lineHeight={hLh}
           fontWeight={marks?.includes('bold') ? '700' : '600'}
           fontStyle={fontStyle}
-          color="$purple5"
+          color="$pink5"
         >
           {data.text ? `{{${data.text}}}` : ' variable inconnue'}
         </Text>
       ) : (
-        <Text.MD multiline semibold={marks?.includes('bold')} fontStyle={fontStyle} color="$purple5">
+        <Text.MD multiline semibold={marks?.includes('bold')} fontStyle={fontStyle} color="$pink5">
           {data.text ? `{{${data.text}}}` : ' variable inconnue'}
         </Text.MD>
       )

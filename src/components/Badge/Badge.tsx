@@ -1,5 +1,6 @@
 import { ComponentProps } from 'react'
 import { styled, View } from 'tamagui'
+
 import Text from '../base/Text'
 
 export const BadgeFrame = styled(View, {
@@ -25,7 +26,7 @@ export type BadgeProps = {
 const Badge = ({ children, ...props }: BadgeProps) => {
   return (
     <BadgeFrame {...props}>
-      <Text.SM semibold color="$color5">
+      <Text.SM semibold color="$color7">
         {children}
       </Text.SM>
     </BadgeFrame>

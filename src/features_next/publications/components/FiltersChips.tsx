@@ -232,7 +232,7 @@ export const FiltersChips = ({ selectedFilters: rawSelectedFilters, onFilterChan
           // Détecter si la valeur commence par "!" (négation)
           const isNegation = typeof value === 'string' && value.startsWith('!')
           const isScopeTarget = isScopeTargetArray(value)
-          const theme = isNegation ? 'orange' : isScopeTarget ? 'purple' : 'gray'
+          const theme = isNegation ? 'orange' : isScopeTarget ? 'pink' : 'gray'
           const iconLeft = isNegation ? EqualNot : undefined
 
           // Si le filtre a une valeur par défaut ou est protégé (affichage "par défaut")

@@ -2,7 +2,7 @@ import React from 'react'
 import RadioGroup from './RadioGroup'
 
 export default {
-  title: 'RadioGroup',
+  title: 'Formulaire/RadioGroup',
   component: RadioGroup,
 }
 

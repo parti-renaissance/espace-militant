@@ -106,7 +106,7 @@ const _ActionConfirmAlert = forwardRef<ModalRef, ActionConfirmAlertProps>((props
         </YStack>
         <XStack gap="$medium">
           <VoxButton variant="outlined" flex={3} children="Annuler" onPress={handleCancel} theme="gray" />
-          <VoxButton children="Créer" loading={props.isPending} flex={1} onPress={handleAccept} theme="purple" />
+          <VoxButton children="Créer" loading={props.isPending} flex={1} onPress={handleAccept} theme="pink" />
         </XStack>
       </VoxCard.Content>
     </VoxSimpleModal>

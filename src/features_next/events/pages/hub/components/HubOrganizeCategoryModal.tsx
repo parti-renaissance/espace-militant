@@ -60,7 +60,7 @@ export function HubOrganizeCategoryModal({ open, onClose }: HubOrganizeCategoryM
             <VoxHeader.Title>Organiser</VoxHeader.Title>
           </XStack>
           <XStack>
-            <VoxButton size="md" theme="purple" onPress={handleContinue}>
+            <VoxButton size="md" theme="pink" onPress={handleContinue}>
               Suivant
             </VoxButton>
           </XStack>
@@ -130,7 +130,7 @@ export function HubOrganizeCategoryModal({ open, onClose }: HubOrganizeCategoryM
           </YStack>
           {media.gtMd ? (
             <XStack width="100%" height={56} px="$medium" alignItems="center" justifyContent="flex-end">
-              <VoxButton size="md" theme="purple" onPress={handleContinue}>
+              <VoxButton size="md" theme="pink" onPress={handleContinue}>
                 Suivant
               </VoxButton>
             </XStack>

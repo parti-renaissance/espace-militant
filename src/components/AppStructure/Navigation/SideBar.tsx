@@ -184,7 +184,7 @@ const MenuFooterContainer = styled(YStack, {
 } as const)
 
 const Line = styled(YStack, {
-  backgroundColor: '$purple3',
+  backgroundColor: '$pink3',
   position: 'absolute',
   left: 20,
   top: -16,
@@ -342,7 +342,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
                 text="CADRE"
                 collapsed={displayNavCadre}
                 iconRight={ChevronRight}
-                theme="purple"
+                theme="pink"
                 onPress={() => {
                   setDisplayNavCadre(!displayNavCadre)
                 }}
@@ -480,7 +480,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
               <NavItem
                 iconLeft={Ellipsis}
                 text="Plus"
-                theme="purple"
+                theme="pink"
                 dropdownVerticalPosition="top"
                 subItems={cadrePlusSubItems}
                 active={hiddenCadreNavItems.some((item) => item.active)}
