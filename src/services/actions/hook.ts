@@ -150,14 +150,15 @@ export const useSubscribeAction = (id?: string) => {
   const toast = useToastController()
   const user = useGetSuspenseProfil()
 
-  if (!user.data) {
-    throw new Error("L'utilisateur est introuvable")
-  }
-
   return useMutation({
-    mutationFn: () => (id ? api.subscribeToAction(id) : Promise.reject(new Error('No id provided'))),
+    mutationFn: () => {
+      if (!user.data) {
+        return Promise.reject(new Error("L'utilisateur est introuvable"))
+      }
+      return id ? api.subscribeToAction(id) : Promise.reject(new Error('No id provided'))
+    },
     onSuccess: () => {
-      if (id) {
+      if (id && user.data) {
         optimisticToggleSubscribeOnCaches(user.data, true, id, queryClient)
       }
       toast.show('Succès', { message: 'Inscription à l’action réussie', type: 'success' })
@@ -176,14 +177,15 @@ export const useUnsubscribeAction = (id?: string) => {
   const toast = useToastController()
   const user = useGetSuspenseProfil()
 
-  if (!user.data) {
-    throw new Error("L'utilisateur est introuvable")
-  }
-
   return useMutation({
-    mutationFn: () => (id ? api.unsubscribeFromAction(id) : Promise.reject(new Error('No id provided'))),
+    mutationFn: () => {
+      if (!user.data) {
+        return Promise.reject(new Error("L'utilisateur est introuvable"))
+      }
+      return id ? api.unsubscribeFromAction(id) : Promise.reject(new Error('No id provided'))
+    },
     onSuccess: () => {
-      if (id) {
+      if (id && user.data) {
         optimisticToggleSubscribeOnCaches(user.data, false, id, queryClient)
       }
       toast.show('Succès', { message: 'Désinscription de l’action réussie', type: 'success' })
