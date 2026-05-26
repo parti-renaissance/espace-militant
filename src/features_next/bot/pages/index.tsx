@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
-import { FlatList, Keyboard, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
+import { FlatList, Keyboard, Platform, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { isWeb, useMedia, YStack } from 'tamagui'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
@@ -18,13 +19,20 @@ import type { TamaguiInputRef } from '../utils/getDomFromTamaguiRef'
 
 export default function BotPage() {
   const media = useMedia()
+  const insets = useSafeAreaInsets()
   const scrollViewRef = useRef<FlatList<BotChatMessage>>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
   const keyboardHeight = useKeyboardHeight()
   const [isAtBottom, setIsAtBottom] = useState(true)
+  const [dockHeight, setDockHeight] = useState(0)
 
   const { messages, input, handleInputChange, handleSubmit: rawHandleSubmit, isLoading, streamedContent, error, retry, stop, submit } = useBotChat()
   const { handleCopy, handleEdit } = useBotMessageActions({ inputRef, setInput: handleInputChange })
+
+  const keyboardOpen = !isWeb && keyboardHeight > 0
+  const dockBottomOffset = isWeb ? 0 : keyboardOpen ? keyboardHeight + 8 : Platform.OS === 'ios' ? insets.bottom : 16
+  const scrollButtonBottom = dockBottomOffset + dockHeight + 8
+  const contentPaddingBottom = dockBottomOffset + dockHeight + 16
 
   const scrollToBottom = useCallback((animated = true) => {
     requestAnimationFrame(() => scrollViewRef.current?.scrollToEnd({ animated }))
@@ -44,7 +52,10 @@ export default function BotPage() {
 
   const handleSubmit = useCallback(() => {
     if (!input.trim() || isLoading) return
-    if (!isWeb) Keyboard.dismiss()
+    if (!isWeb) {
+      inputRef.current?.blur()
+      Keyboard.dismiss()
+    }
     rawHandleSubmit()
     scrollToBottom(true)
   }, [input, isLoading, rawHandleSubmit, scrollToBottom])
@@ -57,7 +68,10 @@ export default function BotPage() {
   const handleSuggestionPress = useCallback(
     (question: string) => {
       if (isLoading) return
-      if (!isWeb) Keyboard.dismiss()
+      if (!isWeb) {
+        inputRef.current?.blur()
+        Keyboard.dismiss()
+      }
       submit(question)
       scrollToBottom(true)
     },
@@ -76,24 +90,26 @@ export default function BotPage() {
           streamedContent={streamedContent}
           error={error}
           showEmpty={showEmpty}
-          contentPaddingBottom={isWeb ? 220 : 220 + keyboardHeight}
+          contentPaddingBottom={contentPaddingBottom}
           contentHorizontalPadding={media.sm ? 16 : 0}
           onCopy={handleCopy}
           onEdit={handleEdit}
           onRetry={handleRetry}
           onScroll={handleScroll}
         />
-        {!isAtBottom && <ScrollToBottomButton onPress={() => scrollToBottom(true)} keyboardHeight={keyboardHeight} />}
+        {!isAtBottom && <ScrollToBottomButton onPress={() => scrollToBottom(true)} bottom={scrollButtonBottom} />}
         <InputDock
           inputRef={inputRef}
           value={input}
           isLoading={isLoading}
           showSuggestions={showEmpty}
-          keyboardHeight={keyboardHeight}
+          keyboardOpen={keyboardOpen}
+          bottomOffset={dockBottomOffset}
           onChange={handleInputChange}
           onSubmit={handleSubmit}
           onStop={stop}
           onSuggestionPress={handleSuggestionPress}
+          onLayoutHeight={setDockHeight}
         />
       </YStack>
     </Layout.Main>

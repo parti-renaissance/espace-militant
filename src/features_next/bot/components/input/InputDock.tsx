@@ -1,6 +1,5 @@
 import { type RefObject } from 'react'
-import { Platform } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import type { LayoutChangeEvent } from 'react-native'
 import { isWeb, useMedia, YStack } from 'tamagui'
 
 import type { TamaguiInputRef } from '../../utils/getDomFromTamaguiRef'
@@ -13,21 +12,25 @@ type Props = {
   value: string
   isLoading: boolean
   showSuggestions: boolean
-  keyboardHeight: number
+  keyboardOpen: boolean
+  bottomOffset: number
   onChange: (value: string) => void
   onSubmit: () => void
   onStop: () => void
   onSuggestionPress: (question: string) => void
+  onLayoutHeight: (height: number) => void
 }
 
-export function InputDock({ inputRef, value, isLoading, showSuggestions, keyboardHeight, onChange, onSubmit, onStop, onSuggestionPress }: Props) {
+export function InputDock({ inputRef, value, isLoading, showSuggestions, keyboardOpen, bottomOffset, onChange, onSubmit, onStop, onSuggestionPress, onLayoutHeight }: Props) {
   const media = useMedia()
-  const insets = useSafeAreaInsets()
+
+  const handleLayout = (e: LayoutChangeEvent) => onLayoutHeight(e.nativeEvent.layout.height)
 
   return (
     <YStack
+      onLayout={handleLayout}
       position={isWeb ? 'fixed' : 'absolute'}
-      bottom={isWeb ? 0 : keyboardHeight + (Platform.OS === 'ios' ? insets.bottom : 16)}
+      bottom={bottomOffset}
       width="100%"
       maxWidth={media.gtSm ? 520 : '100%'}
       alignSelf="center"
@@ -39,7 +42,7 @@ export function InputDock({ inputRef, value, isLoading, showSuggestions, keyboar
     >
       {showSuggestions && <SuggestionsList onPress={onSuggestionPress} />}
       <ChatInput inputRef={inputRef} value={value} isLoading={isLoading} onChange={onChange} onSubmit={onSubmit} onStop={onStop} />
-      <BotDisclaimer />
+      {!keyboardOpen && <BotDisclaimer />}
     </YStack>
   )
 }

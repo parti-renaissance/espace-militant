@@ -94,6 +94,7 @@ export const MessageList = forwardRef<FlatList<BotChatMessage>, Props>(function 
         style={{ flex: 1 }}
         contentContainerStyle={{
           gap: 10,
+          paddingTop: 16,
           paddingBottom: contentPaddingBottom,
           paddingHorizontal: contentHorizontalPadding,
           flexGrow: 1,

@@ -1,5 +1,5 @@
 import { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
-import { Keyboard, NativeScrollEvent, NativeSyntheticEvent, Platform } from 'react-native'
+import { Keyboard, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, Platform } from 'react-native'
 import { Input, isWeb, Spinner, useMedia, View, YStack } from 'tamagui'
 import { ArrowDown, ArrowUpRight } from '@tamagui/lucide-icons'
 import { useQueryClient } from '@tanstack/react-query'
@@ -11,6 +11,8 @@ import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
 
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { useCustomChat } from '@/services/chatbot/hook'
+
+import { useAutoScrollOnStream } from '@/features_next/bot/hooks/useAutoScrollOnStream'
 
 import { ChatBotNavigation } from '../components/ChatBotNavigation'
 import { NewChat } from '../components/NewChat'
@@ -31,6 +33,15 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
   const inputRef = useRef<TamaguiInputRef>(null)
   const keyboardHeight = useKeyboardHeight()
   const [isAtBottom, setIsAtBottom] = useState(true)
+  const [dockHeight, setDockHeight] = useState(0)
+
+  const dockBottomOffset = isWeb ? 0 : keyboardHeight + (Platform.OS === 'android' ? 16 : 0)
+  const scrollButtonBottom = dockBottomOffset + dockHeight + 8
+  const contentPaddingBottom = dockBottomOffset + dockHeight + 16
+
+  const handleDockLayout = useCallback((e: LayoutChangeEvent) => {
+    setDockHeight(e.nativeEvent.layout.height)
+  }, [])
 
   const onThreadCreated = useCallback(
     (threadId: string) => {
@@ -60,6 +71,12 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
       scrollViewRef.current?.scrollToEnd({ animated })
     })
   }, [])
+
+  const scrollToBottomNoAnim = useCallback(() => {
+    scrollViewRef.current?.scrollToEnd({ animated: false })
+  }, [])
+
+  useAutoScrollOnStream({ isAtBottom, streamedContent, messagesCount: messages.length, scrollFn: scrollToBottomNoAnim })
 
   // Scroll to bottom when history loads for the first time in a given thread (initial load or switch)
   const prevScrolledThreadRef = useRef<string | null | undefined>(undefined)
@@ -128,7 +145,7 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
             style={{ flex: 1 }}
             contentContainerStyle={{
               gap: 10,
-              paddingBottom: isWeb ? 200 : 200 + keyboardHeight,
+              paddingBottom: contentPaddingBottom,
               minHeight: '100%',
               ...(isWeb ? { flex: 1 } : {}),
             }}
@@ -165,18 +182,14 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
             {!error && !activeDiscussionId && messages.length === 0 && !isLoading ? <NewChat /> : null}
           </LayoutScrollView>
           {!isAtBottom && (
-            <View
-              position={isWeb ? 'fixed' : 'absolute'}
-              bottom={isWeb ? 160 : 120 + keyboardHeight + (Platform.OS === 'android' ? 16 : 0)}
-              alignSelf="center"
-              zIndex={101}
-            >
+            <View position={isWeb ? 'fixed' : 'absolute'} bottom={scrollButtonBottom} alignSelf="center" zIndex={101}>
               <VoxButton variant="contained" theme="gray" iconLeft={ArrowDown} size="md" shrink onPress={() => scrollToBottom(true)} />
             </View>
           )}
           <YStack
+            onLayout={handleDockLayout}
             position={isWeb ? 'fixed' : 'absolute'}
-            bottom={isWeb ? 0 : keyboardHeight + (Platform.OS === 'android' ? 16 : 0)}
+            bottom={dockBottomOffset}
             width="100%"
             maxWidth={media.gtSm ? 520 : '100%'}
             alignSelf="center"
