@@ -18,17 +18,15 @@ type Props = {
   onSubmit: () => void
   onStop: () => void
   onSuggestionPress: (question: string) => void
-  onLayoutHeight: (height: number) => void
+  onLayout: (e: LayoutChangeEvent) => void
 }
 
-export function InputDock({ inputRef, value, isLoading, showSuggestions, keyboardOpen, bottomOffset, onChange, onSubmit, onStop, onSuggestionPress, onLayoutHeight }: Props) {
+export function InputDock({ inputRef, value, isLoading, showSuggestions, keyboardOpen, bottomOffset, onChange, onSubmit, onStop, onSuggestionPress, onLayout }: Props) {
   const media = useMedia()
-
-  const handleLayout = (e: LayoutChangeEvent) => onLayoutHeight(e.nativeEvent.layout.height)
 
   return (
     <YStack
-      onLayout={handleLayout}
+      onLayout={onLayout}
       position={isWeb ? 'fixed' : 'absolute'}
       bottom={bottomOffset}
       width="100%"

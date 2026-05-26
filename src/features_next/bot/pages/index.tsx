@@ -1,38 +1,31 @@
-import { useCallback, useRef, useState } from 'react'
-import { FlatList, Keyboard, Platform, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useCallback, useRef } from 'react'
+import { FlatList, Keyboard } from 'react-native'
 import { isWeb, useMedia, YStack } from 'tamagui'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
+import ScrollToBottomButton from '@/components/chat/ScrollToBottomButton'
 
-import useKeyboardHeight from '@/hooks/useKeyboardHeight'
+import { useAutoScrollOnStream } from '@/hooks/chat/useAutoScrollOnStream'
+import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
+import { useChatScrollPosition } from '@/hooks/chat/useChatScrollPosition'
 import { useBotChat } from '@/services/bot/hook'
 import type { BotChatMessage } from '@/services/bot/schema'
 
-import ScrollToBottomButton from '../components/ScrollToBottomButton'
 import InputDock from '../components/input/InputDock'
 import MessageList from '../components/messages/MessageList'
-import { useAutoScrollOnStream } from '../hooks/useAutoScrollOnStream'
 import { useBotMessageActions } from '../hooks/useBotMessageActions'
 import { useInitialScrollToBottom } from '../hooks/useInitialScrollToBottom'
 import type { TamaguiInputRef } from '../utils/getDomFromTamaguiRef'
 
 export default function BotPage() {
   const media = useMedia()
-  const insets = useSafeAreaInsets()
   const scrollViewRef = useRef<FlatList<BotChatMessage>>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
-  const keyboardHeight = useKeyboardHeight()
-  const [isAtBottom, setIsAtBottom] = useState(true)
-  const [dockHeight, setDockHeight] = useState(0)
+  const { keyboardOpen, dockBottomOffset, scrollButtonBottom, contentPaddingBottom, onDockLayout } = useChatDockMetrics()
+  const { isAtBottom, handleScroll } = useChatScrollPosition()
 
   const { messages, input, handleInputChange, handleSubmit: rawHandleSubmit, isLoading, streamedContent, error, retry, stop, submit } = useBotChat()
   const { handleCopy, handleEdit } = useBotMessageActions({ inputRef, setInput: handleInputChange })
-
-  const keyboardOpen = !isWeb && keyboardHeight > 0
-  const dockBottomOffset = isWeb ? 0 : keyboardOpen ? keyboardHeight + 8 : Platform.OS === 'ios' ? insets.bottom : 16
-  const scrollButtonBottom = dockBottomOffset + dockHeight + 8
-  const contentPaddingBottom = dockBottomOffset + dockHeight + 16
 
   const scrollToBottom = useCallback((animated = true) => {
     requestAnimationFrame(() => scrollViewRef.current?.scrollToEnd({ animated }))
@@ -44,11 +37,6 @@ export default function BotPage() {
 
   useInitialScrollToBottom(() => scrollToBottom(false), messages.length > 0)
   useAutoScrollOnStream({ isAtBottom, streamedContent, messagesCount: messages.length, scrollFn: scrollToBottomNoAnim })
-
-  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
-    setIsAtBottom(contentSize.height - contentOffset.y - layoutMeasurement.height < 80)
-  }, [])
 
   const handleSubmit = useCallback(() => {
     if (!input.trim() || isLoading) return
@@ -109,7 +97,7 @@ export default function BotPage() {
           onSubmit={handleSubmit}
           onStop={stop}
           onSuggestionPress={handleSuggestionPress}
-          onLayoutHeight={setDockHeight}
+          onLayout={onDockLayout}
         />
       </YStack>
     </Layout.Main>

@@ -1,18 +1,19 @@
-import { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
-import { Keyboard, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, Platform } from 'react-native'
+import { ComponentRef, useCallback, useEffect, useRef } from 'react'
+import { Keyboard, type NativeSyntheticEvent } from 'react-native'
 import { Input, isWeb, Spinner, useMedia, View, YStack } from 'tamagui'
-import { ArrowDown, ArrowUpRight } from '@tamagui/lucide-icons'
+import { ArrowUpRight } from '@tamagui/lucide-icons'
 import { useQueryClient } from '@tanstack/react-query'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView, { type LayoutScrollViewRef } from '@/components/AppStructure/Layout/LayoutScrollView'
 import { VoxButton } from '@/components/Button/Button'
+import ScrollToBottomButton from '@/components/chat/ScrollToBottomButton'
 import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
 
-import useKeyboardHeight from '@/hooks/useKeyboardHeight'
+import { useAutoScrollOnStream } from '@/hooks/chat/useAutoScrollOnStream'
+import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
+import { useChatScrollPosition } from '@/hooks/chat/useChatScrollPosition'
 import { useCustomChat } from '@/services/chatbot/hook'
-
-import { useAutoScrollOnStream } from '@/features_next/bot/hooks/useAutoScrollOnStream'
 
 import { ChatBotNavigation } from '../components/ChatBotNavigation'
 import { NewChat } from '../components/NewChat'
@@ -31,17 +32,8 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
   const queryClient = useQueryClient()
   const scrollViewRef = useRef<LayoutScrollViewRef>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
-  const keyboardHeight = useKeyboardHeight()
-  const [isAtBottom, setIsAtBottom] = useState(true)
-  const [dockHeight, setDockHeight] = useState(0)
-
-  const dockBottomOffset = isWeb ? 0 : keyboardHeight + (Platform.OS === 'android' ? 16 : 0)
-  const scrollButtonBottom = dockBottomOffset + dockHeight + 8
-  const contentPaddingBottom = dockBottomOffset + dockHeight + 16
-
-  const handleDockLayout = useCallback((e: LayoutChangeEvent) => {
-    setDockHeight(e.nativeEvent.layout.height)
-  }, [])
+  const { dockBottomOffset, scrollButtonBottom, contentPaddingBottom, onDockLayout } = useChatDockMetrics()
+  const { isAtBottom, handleScroll } = useChatScrollPosition()
 
   const onThreadCreated = useCallback(
     (threadId: string) => {
@@ -88,16 +80,12 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
     }
   }, [activeDiscussionId, messages.length, scrollToBottom])
 
-  // Track scroll position to show/hide "go to bottom" button
-  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
-    const distanceFromBottom = contentSize.height - contentOffset.y - layoutMeasurement.height
-    setIsAtBottom(distanceFromBottom < 80)
-  }, [])
-
   const handleSubmit = useCallback(() => {
     if (!input.trim() || isLoading) return
-    if (!isWeb) Keyboard.dismiss()
+    if (!isWeb) {
+      inputRef.current?.blur()
+      Keyboard.dismiss()
+    }
     rawHandleSubmit()
     scrollToBottom(true)
   }, [input, isLoading, rawHandleSubmit, scrollToBottom])
@@ -181,13 +169,9 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
             )}
             {!error && !activeDiscussionId && messages.length === 0 && !isLoading ? <NewChat /> : null}
           </LayoutScrollView>
-          {!isAtBottom && (
-            <View position={isWeb ? 'fixed' : 'absolute'} bottom={scrollButtonBottom} alignSelf="center" zIndex={101}>
-              <VoxButton variant="contained" theme="gray" iconLeft={ArrowDown} size="md" shrink onPress={() => scrollToBottom(true)} />
-            </View>
-          )}
+          {!isAtBottom && <ScrollToBottomButton onPress={() => scrollToBottom(true)} bottom={scrollButtonBottom} />}
           <YStack
-            onLayout={handleDockLayout}
+            onLayout={onDockLayout}
             position={isWeb ? 'fixed' : 'absolute'}
             bottom={dockBottomOffset}
             width="100%"
