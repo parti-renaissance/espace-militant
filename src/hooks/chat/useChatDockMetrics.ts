@@ -14,10 +14,12 @@ export type ChatDockMetrics = {
   onDockLayout: (e: LayoutChangeEvent) => void
 }
 
+const INITIAL_DOCK_HEIGHT_WEB = 180
+
 export function useChatDockMetrics(): ChatDockMetrics {
   const insets = useSafeAreaInsets()
   const keyboardHeight = useKeyboardHeight()
-  const [dockHeight, setDockHeight] = useState(0)
+  const [dockHeight, setDockHeight] = useState(isWeb ? INITIAL_DOCK_HEIGHT_WEB : 0)
 
   const keyboardOpen = !isWeb && keyboardHeight > 0
   const dockBottomOffset = isWeb ? 0 : keyboardOpen ? keyboardHeight + 8 : Platform.OS === 'ios' ? insets.bottom : 16

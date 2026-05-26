@@ -8,6 +8,7 @@ import ScrollToBottomButton from '@/components/chat/ScrollToBottomButton'
 import { useAutoScrollOnStream } from '@/hooks/chat/useAutoScrollOnStream'
 import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
 import { useChatScrollPosition } from '@/hooks/chat/useChatScrollPosition'
+import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage'
 import { useBotChat } from '@/services/bot/hook'
 import type { BotChatMessage } from '@/services/bot/schema'
 
@@ -35,6 +36,13 @@ export default function BotPage() {
     scrollViewRef.current?.scrollToEnd({ animated: false })
   }, [])
 
+  const { scrollToLastAssistant, armScrollToLastUser } = useChatScrollToMessage({
+    ref: scrollViewRef,
+    messages,
+    isLoading,
+    scrollToBottom,
+  })
+
   useInitialScrollToBottom(() => scrollToBottom(false), messages.length > 0)
   useAutoScrollOnStream({ isAtBottom, streamedContent, messagesCount: messages.length, scrollFn: scrollToBottomNoAnim })
 
@@ -44,14 +52,14 @@ export default function BotPage() {
       inputRef.current?.blur()
       Keyboard.dismiss()
     }
+    armScrollToLastUser()
     rawHandleSubmit()
-    scrollToBottom(true)
-  }, [input, isLoading, rawHandleSubmit, scrollToBottom])
+  }, [input, isLoading, rawHandleSubmit, armScrollToLastUser])
 
   const handleRetry = useCallback(() => {
+    armScrollToLastUser()
     retry()
-    scrollToBottom(true)
-  }, [retry, scrollToBottom])
+  }, [retry, armScrollToLastUser])
 
   const handleSuggestionPress = useCallback(
     (question: string) => {
@@ -60,10 +68,10 @@ export default function BotPage() {
         inputRef.current?.blur()
         Keyboard.dismiss()
       }
+      armScrollToLastUser()
       submit(question)
-      scrollToBottom(true)
     },
-    [isLoading, submit, scrollToBottom],
+    [isLoading, submit, armScrollToLastUser],
   )
 
   const showEmpty = !error && messages.length === 0 && !isLoading && !streamedContent
@@ -85,7 +93,7 @@ export default function BotPage() {
           onRetry={handleRetry}
           onScroll={handleScroll}
         />
-        {!isAtBottom && <ScrollToBottomButton onPress={() => scrollToBottom(true)} bottom={scrollButtonBottom} />}
+        {!isAtBottom && <ScrollToBottomButton onPress={scrollToLastAssistant} bottom={scrollButtonBottom} />}
         <InputDock
           inputRef={inputRef}
           value={input}

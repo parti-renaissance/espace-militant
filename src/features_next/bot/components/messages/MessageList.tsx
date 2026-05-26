@@ -106,6 +106,10 @@ export const MessageList = forwardRef<FlatList<BotChatMessage>, Props>(function 
         ListFooterComponent={ListFooter}
         onScroll={handleScroll}
         scrollEventThrottle={16}
+        onScrollToIndexFailed={(info) => {
+          const flatList = ref && 'current' in ref ? ref.current : null
+          flatList?.scrollToOffset({ offset: info.averageItemLength * info.index, animated: true })
+        }}
       />
     </YStack>
   )
