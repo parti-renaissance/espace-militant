@@ -55,7 +55,6 @@ class MarkdownErrorBoundary extends Component<MarkdownErrorBoundaryProps, Markdo
 export type VoxMarkdownProps = {
   content: string
   isStreaming?: boolean
-  styleOverride?: Record<string, object>
 }
 
 type MarkdownNode = {
@@ -70,7 +69,7 @@ type MarkdownImageStyles = {
   _VIEW_SAFE_image?: StyleProp<ImageStyle>
 }
 
-function VoxMarkdownComponent({ content, isStreaming = false, styleOverride }: VoxMarkdownProps) {
+function VoxMarkdownComponent({ content, isStreaming = false }: VoxMarkdownProps) {
   const theme = useTheme()
 
   const displayContent = useMemo(() => {
@@ -295,15 +294,6 @@ function VoxMarkdownComponent({ content, isStreaming = false, styleOverride }: V
     }
   }, [theme.textPrimary?.val, theme.blue6?.val, theme.blue5?.val, theme.gray2?.val, theme.gray5?.val, theme.gray4?.val, theme.background?.val])
 
-  const mergedStyles = useMemo(() => {
-    if (!styleOverride) return markdownStyles
-    const merged = { ...markdownStyles } as Record<string, object>
-    for (const [key, value] of Object.entries(styleOverride)) {
-      merged[key] = { ...merged[key], ...value }
-    }
-    return merged as typeof markdownStyles
-  }, [markdownStyles, styleOverride])
-
   const markdownRules = useMemo(
     () => ({
       image: (
@@ -357,7 +347,7 @@ function VoxMarkdownComponent({ content, isStreaming = false, styleOverride }: V
 
   return (
     <MarkdownErrorBoundary content={content}>
-      <Markdown style={mergedStyles} mergeStyle={false} onLinkPress={handleLinkPress} rules={markdownRules}>
+      <Markdown style={markdownStyles} mergeStyle={false} onLinkPress={handleLinkPress} rules={markdownRules}>
         {displayContent}
       </Markdown>
     </MarkdownErrorBoundary>
