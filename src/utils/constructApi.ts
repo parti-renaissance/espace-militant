@@ -13,6 +13,7 @@ interface APICallPayload<Request, Response> {
   errorThrowers?: ErrorThrower[]
   axiosConfig?: AxiosRequestConfig
   type?: 'private' | 'public'
+  skipGenericErrorLog?: boolean
 }
 
 export interface Instances {
@@ -31,6 +32,7 @@ export const createApi =
     useParams,
     errorThrowers,
     axiosConfig,
+    skipGenericErrorLog,
   }: APICallPayload<Request, Response>) => {
     return async (requestData: Request) => {
       try {
@@ -72,7 +74,7 @@ export const createApi =
         }
         return result.data
       } catch (error) {
-        return parseError(error, errorThrowers)
+        return parseError(error, errorThrowers, { skipGenericErrorLog })
       }
     }
   }

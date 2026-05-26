@@ -1,9 +1,10 @@
 import { Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useScrollToTop } from '@react-navigation/native'
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
-import { getToken, Spinner, useMedia, XStack, YStack } from 'tamagui'
-import { ArrowLeft } from '@tamagui/lucide-icons'
+import { getToken, getTokenValue, isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { ArrowLeft, CirclePlus } from '@tamagui/lucide-icons'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -142,6 +143,8 @@ type FeedListItem =
 
 const HubFeed = () => {
   const media = useMedia()
+  const insets = useSafeAreaInsets()
+  const organizeFabBottom = useMemo(() => Math.max(getTokenValue('$medium', 'space'), insets.bottom), [insets.bottom])
   const queryClient = useQueryClient()
   const router = useRouter()
   const { session, isAuth } = useSession()
@@ -422,50 +425,59 @@ const HubFeed = () => {
   return (
     <>
       <Layout.Main width="100%">
-        <LayoutFlatList<FeedListItem>
-          ref={flatListRef}
-          padding="left"
-          data={deferredFeed.sectionedData}
-          renderItem={renderItem}
-          keyExtractor={(item) =>
-            item.type === 'header'
-              ? `h-${item.sectionId}`
-              : item.type === 'empty_state'
-                ? `e-${item.reason.kind}${item.reason.kind === 'zone_no_upcoming' ? `-${item.reason.zoneLabel}` : ''}`
-                : item.row.type === 'event'
-                  ? item.row.event.uuid
-                  : (item.row.payload.id ?? item.row.payload.tag)
-          }
-          ListHeaderComponent={listHeader}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={FEED_VIEWABILITY_CONFIG}
-          refreshing={isManualRefreshing}
-          onRefresh={handleManualRefresh}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
-          hasMore={hasNextPage ?? false}
-          contentContainerStyle={feedContentContainerStyle}
-          removeClippedSubviews={Platform.OS === 'android'}
-          windowSize={21}
-          initialNumToRender={10}
-          maxToRenderPerBatch={10}
-          ListEmptyComponent={
-            showSkeleton ? (
-              <HubListSkeleton />
-            ) : (
-              <YStack py="$large">
-                <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllItems={handleSwitchToAllItems} showResetButton={hasActiveFilters} />
-              </YStack>
-            )
-          }
-          ListFooterComponent={
-            hasNextPage ? (
-              <YStack p="$medium" pb="$large">
-                <Spinner size="large" />
-              </YStack>
-            ) : null
-          }
-        />
+        <YStack flex={1}>
+          <LayoutFlatList<FeedListItem>
+            ref={flatListRef}
+            padding="left"
+            data={deferredFeed.sectionedData}
+            renderItem={renderItem}
+            keyExtractor={(item) =>
+              item.type === 'header'
+                ? `h-${item.sectionId}`
+                : item.type === 'empty_state'
+                  ? `e-${item.reason.kind}${item.reason.kind === 'zone_no_upcoming' ? `-${item.reason.zoneLabel}` : ''}`
+                  : item.row.type === 'event'
+                    ? item.row.event.uuid
+                    : (item.row.payload.id ?? item.row.payload.tag)
+            }
+            ListHeaderComponent={listHeader}
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={FEED_VIEWABILITY_CONFIG}
+            refreshing={isManualRefreshing}
+            onRefresh={handleManualRefresh}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            hasMore={hasNextPage ?? false}
+            contentContainerStyle={feedContentContainerStyle}
+            removeClippedSubviews={Platform.OS === 'android'}
+            windowSize={21}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            ListEmptyComponent={
+              showSkeleton ? (
+                <HubListSkeleton />
+              ) : (
+                <YStack py="$large">
+                  <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllItems={handleSwitchToAllItems} showResetButton={hasActiveFilters} />
+                </YStack>
+              )
+            }
+            ListFooterComponent={
+              hasNextPage ? (
+                <YStack p="$medium" pb="$large">
+                  <Spinner size="large" />
+                </YStack>
+              ) : null
+            }
+          />
+          {media.sm ? (
+            <XStack position={isWeb ? 'fixed' : 'absolute'} bottom={organizeFabBottom} right="$medium" zIndex={20} gap="$small" pointerEvents="box-none">
+              <VoxButton variant="contained" size="lg" iconLeft={CirclePlus} theme="purple" onPress={handleOpenOrganizeModal}>
+                Organiser un événement
+              </VoxButton>
+            </XStack>
+          ) : null}
+        </YStack>
       </Layout.Main>
       {media.gtMd ? (
         <Layout.SideBar isSticky padding="right">

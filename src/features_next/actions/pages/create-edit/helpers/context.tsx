@@ -7,7 +7,6 @@ import { type Control, type FieldPath, useForm } from 'react-hook-form'
 import VoxSimpleModal from '@/components/VoxSimpleModal'
 import { ActionFormError } from '@/services/actions/error'
 import { useActionMutation, useCancelAction } from '@/services/actions/hook'
-import { logActionMutation, logActionMutationError } from '@/services/actions/logActionMutation'
 import { mapActionFormToPostRequest, mapRestActionFullToFormDefaults, type ActionFormValues } from '@/services/actions/paramsMapper'
 import { ActionType, RestActionFull } from '@/services/actions/schema'
 
@@ -69,15 +68,9 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
   const finalSubmit = handleSubmit(
     (values) => {
       const payload = mapActionFormToPostRequest(values)
-      logActionMutation(editMode ? 'form submit — update' : 'form submit — create', {
-        editId: edit?.uuid,
-        formValues: values,
-        payload,
-      })
       actionMutation
         .mutateAsync({ payload })
         .then((data) => {
-          logActionMutation('form submit — success', { uuid: data.uuid })
           reset(values)
           router.replace({
             pathname: '/actions/[id]',
@@ -85,7 +78,6 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
           })
         })
         .catch((e) => {
-          logActionMutationError('form submit — catch', e)
           if (e instanceof ActionFormError) {
             e.violations.forEach((violation) => {
               const path = violation.propertyPath as FieldPath<ActionFormValues>
@@ -95,9 +87,6 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
             })
           }
         })
-    },
-    (validationErrors) => {
-      logActionMutation('form submit — validation client', { errors: validationErrors })
     },
   )
 

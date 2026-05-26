@@ -1,10 +1,16 @@
 import { has } from 'lodash'
 import { FieldValues, Path } from 'react-hook-form'
-import { genericErrorThrower } from './generic-errors'
+import { genericErrorMapper, genericErrorThrower } from './generic-errors'
 import { ErrorThrower } from './types'
 
-export const parseError = (error: unknown, throwers: Array<ErrorThrower> = []) => {
-  ;[...throwers, genericErrorThrower].reduce((acc, thrower) => thrower(acc), error)
+export type ParseErrorOptions = {
+  /** When true, generic HTTP logging is skipped (feature-level loggers handle Sentry). */
+  skipGenericErrorLog?: boolean
+}
+
+export const parseError = (error: unknown, throwers: Array<ErrorThrower> = [], options?: ParseErrorOptions) => {
+  const genericHandler = options?.skipGenericErrorLog ? genericErrorMapper : genericErrorThrower
+  ;[...throwers, genericHandler].reduce((acc, thrower) => thrower(acc), error)
   throw error instanceof Error ? error : new Error('Unknown error')
 }
 

@@ -1,7 +1,7 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { getTokenValue, isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft, CirclePlus, Crosshair } from '@tamagui/lucide-icons'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 
@@ -47,6 +47,7 @@ const EventsMapPage = () => {
 
   const media = useMedia()
   const insets = useSafeAreaInsets()
+  const organizeFabBottom = useMemo(() => Math.max(getTokenValue('$medium', 'space'), insets.bottom), [insets.bottom])
   const cameraPadding = useMemo(
     () => ({
       paddingTop: 0,
@@ -187,7 +188,7 @@ const EventsMapPage = () => {
             <Spinner size="large" />
           </YStack>
         )}
-        <XStack position="absolute" bottom="$medium" right="$medium" zIndex={20} gap="$small">
+        <XStack position={isWeb ? 'fixed' : 'absolute'} bottom={organizeFabBottom} right="$medium" zIndex={20} gap="$small" pointerEvents="box-none">
           <VoxButton variant="contained" size="lg" iconLeft={CirclePlus} theme="purple" onPress={handleOpenOrganizeModal}>
             Organiser un événement
           </VoxButton>

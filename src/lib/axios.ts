@@ -7,7 +7,7 @@ import { getFullVersion } from '@/utils/version'
 import axios, { AxiosError, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios'
 import { identity } from 'fp-ts/lib/function'
 import { isWeb } from 'tamagui'
-import * as Sentry from '@sentry/react-native'
+import { ErrorMonitor } from '@/utils/ErrorMonitor'
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
@@ -326,21 +326,13 @@ class TokenRefreshManager {
     }
     details.refreshFailureCount = this.refreshFailureCount
 
-    // Titre clair (séparation par contexte)
-    const message = `TokenRefresh: ${context}`
-
-    if (error instanceof Error) {
-      Sentry.captureException(error, {
-        tags: { refresh_context: context, component: 'TokenRefresh' },
-        extra: details,
-      })
-    } else {
-      Sentry.captureMessage(message, {
-        level: 'error',
-        tags: { refresh_context: context, component: 'TokenRefresh' },
-        extra: details,
-      })
-    }
+    ErrorMonitor.logError({
+      domain: 'auth',
+      message: `TokenRefresh: ${context}`,
+      error,
+      extra: details,
+      tags: { refresh_context: context },
+    })
   }
 }
 

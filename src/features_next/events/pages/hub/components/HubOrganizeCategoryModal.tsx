@@ -32,11 +32,13 @@ export function HubOrganizeCategoryModal({ open, onClose }: HubOrganizeCategoryM
   const media = useMedia()
   const { data: categories } = useSuspenseGetCategories()
   const [selection, setSelection] = useState<OrganizeSelection | null>(null)
-
-  const canContinue = selection != null
+  const [error, setError] = useState<string | null>(null)
 
   const handleContinue = useCallback(() => {
-    if (!selection) return
+    if (!selection) {
+      setError('Veuillez sélectionner ce que vous souhaitez organiser')
+      return
+    }
     onClose()
     if (selection.itemType === 'action') {
       router.push({ pathname: CREER_ACTION_HREF, params: { type: selection.value } })
@@ -58,14 +60,14 @@ export function HubOrganizeCategoryModal({ open, onClose }: HubOrganizeCategoryM
             <VoxHeader.Title>Organiser</VoxHeader.Title>
           </XStack>
           <XStack>
-            <VoxButton size="md" theme="purple" disabled={!canContinue} onPress={handleContinue}>
+            <VoxButton size="md" theme="purple" onPress={handleContinue}>
               Suivant
             </VoxButton>
           </XStack>
         </XStack>
       </VoxHeader>
     ),
-    [canContinue, handleContinue, onClose],
+    [handleContinue, onClose],
   )
 
   const desktopHeader = (
@@ -101,7 +103,10 @@ export function HubOrganizeCategoryModal({ open, onClose }: HubOrganizeCategoryM
                     label={ReadableActionType[type]}
                     Icon={ActionTypeIcon[type]}
                     selected={selection?.itemType === 'action' && selection.value === type}
-                    onPress={() => setSelection({ itemType: 'action', value: type })}
+                    onPress={() => {
+                      setError(null)
+                      setSelection({ itemType: 'action', value: type })
+                    }}
                   />
                 ))}
               </XStack>
@@ -113,15 +118,19 @@ export function HubOrganizeCategoryModal({ open, onClose }: HubOrganizeCategoryM
                     label={category.name}
                     Icon={Calendar}
                     selected={selection?.itemType === 'event' && selection.value === category.slug}
-                    onPress={() => setSelection({ itemType: 'event', value: category.slug })}
+                    onPress={() => {
+                      setError(null)
+                      setSelection({ itemType: 'event', value: category.slug })
+                    }}
                   />
                 ))}
               </XStack>
             </YStack>
+            {error ? <Text.SM color="$orange6">{error}</Text.SM> : null}
           </YStack>
           {media.gtMd ? (
             <XStack width="100%" height={56} px="$medium" alignItems="center" justifyContent="flex-end">
-              <VoxButton size="md" theme="purple" disabled={!canContinue} onPress={handleContinue}>
+              <VoxButton size="md" theme="purple" onPress={handleContinue}>
                 Suivant
               </VoxButton>
             </XStack>
