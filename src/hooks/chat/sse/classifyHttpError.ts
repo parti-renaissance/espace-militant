@@ -1,6 +1,6 @@
-import type { BotChatError } from '../schema'
+import type { ChatError } from '../types'
 
-export function classifyHttpError(status: number, retryAfterHeader: string | null): BotChatError {
+export function classifyHttpError(status: number, retryAfterHeader: string | null): ChatError {
   const retryAfterRaw = retryAfterHeader ? parseInt(retryAfterHeader, 10) : NaN
   const retryAfterSeconds = Number.isFinite(retryAfterRaw) && retryAfterRaw > 0 ? retryAfterRaw : undefined
 

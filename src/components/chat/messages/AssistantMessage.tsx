@@ -9,16 +9,17 @@ import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown'
 import BotAvatar from './BotAvatar'
 
 type Props = {
+  messageId: string
   content: string
-  isAreaHovered: boolean
   onCopy: (text: string) => void
 }
 
-function AssistantMessageComponent({ content, isAreaHovered, onCopy }: Props) {
+function AssistantMessageComponent({ messageId, content, onCopy }: Props) {
   const media = useMedia()
 
   return (
     <View
+      nativeID={`chat-msg-${messageId}`}
       alignSelf="flex-start"
       maxWidth="100%"
       gap="$small"
@@ -27,17 +28,7 @@ function AssistantMessageComponent({ content, isAreaHovered, onCopy }: Props) {
     >
       <BotAvatar />
       <YStack flex={media.sm ? undefined : 1} gap="$xsmall" minWidth={0} width={media.sm ? '100%' : undefined}>
-        <View
-          minWidth={0}
-          overflow="hidden"
-          bg={isAreaHovered ? '$textOutline10' : 'transparent'}
-          p="$medium"
-          borderTopLeftRadius="$xsmall"
-          borderTopRightRadius="$medium"
-          borderBottomLeftRadius="$medium"
-          borderBottomRightRadius="$medium"
-          animation="quick"
-        >
+        <View minWidth={0} overflow="hidden" p="$medium">
           <VoxMarkdown content={content} />
         </View>
         <XStack justifyContent="flex-start">

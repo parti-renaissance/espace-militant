@@ -1,5 +1,7 @@
 import z from 'zod'
 
+import type { ChatError, ChatErrorKind, ChatMessage } from '@/hooks/chat/types'
+
 export const RestBotChatRequestSchema = z.object({
   message: z.string(),
   thread_id: z.string().optional(),
@@ -7,20 +9,9 @@ export const RestBotChatRequestSchema = z.object({
 })
 export type RestBotChatRequest = z.infer<typeof RestBotChatRequestSchema>
 
-export type BotChatMessage = {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-}
-
-export type BotChatErrorKind = 'network' | 'auth' | 'forbidden' | 'quota' | 'serviceDown' | 'timeout' | 'truncated' | 'unknown'
-
-export type BotChatError = {
-  kind: BotChatErrorKind
-  message: string
-  retryable: boolean
-  retryAfterSeconds?: number
-}
+export type BotChatMessage = ChatMessage
+export type BotChatErrorKind = ChatErrorKind
+export type BotChatError = ChatError
 
 export const BotThreadMessageItemSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),

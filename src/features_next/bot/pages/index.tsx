@@ -1,73 +1,78 @@
-import { useCallback, useRef, useState } from 'react'
-import { FlatList, Keyboard, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
+import { useCallback, useRef } from 'react'
+import { FlatList, Keyboard } from 'react-native'
 import { isWeb, useMedia, YStack } from 'tamagui'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
+import MessageList from '@/components/chat/messages/MessageList'
 
-import useKeyboardHeight from '@/hooks/useKeyboardHeight'
+import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
+import { useChatMessageActions } from '@/hooks/chat/useChatMessageActions'
+import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage'
+import { useInitialScroll } from '@/hooks/chat/useInitialScroll'
+import type { ChatMessage } from '@/hooks/chat/types'
+import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef'
+import InputDock from '@/components/chat/input/InputDock'
+import { BOT_MESSAGE_MAX_LENGTH } from '@/services/bot/api'
 import { useBotChat } from '@/services/bot/hook'
-import type { BotChatMessage } from '@/services/bot/schema'
 
-import ScrollToBottomButton from '../components/ScrollToBottomButton'
-import InputDock from '../components/input/InputDock'
-import MessageList from '../components/messages/MessageList'
-import { useAutoScrollOnStream } from '../hooks/useAutoScrollOnStream'
-import { useBotMessageActions } from '../hooks/useBotMessageActions'
-import { useInitialScrollToBottom } from '../hooks/useInitialScrollToBottom'
-import type { TamaguiInputRef } from '../utils/getDomFromTamaguiRef'
+import EmptyState from '../components/EmptyState'
+import SuggestionsList from '../components/input/SuggestionsList'
 
 export default function BotPage() {
   const media = useMedia()
-  const scrollViewRef = useRef<FlatList<BotChatMessage>>(null)
+  const scrollViewRef = useRef<FlatList<ChatMessage>>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
-  const keyboardHeight = useKeyboardHeight()
-  const [isAtBottom, setIsAtBottom] = useState(true)
+  const { keyboardOpen, dockBottomOffset, scrollButtonBottom, contentPaddingBottom, onDockLayout } = useChatDockMetrics()
 
   const { messages, input, handleInputChange, handleSubmit: rawHandleSubmit, isLoading, streamedContent, error, retry, stop, submit } = useBotChat()
-  const { handleCopy, handleEdit } = useBotMessageActions({ inputRef, setInput: handleInputChange })
+  const { handleCopy, handleEdit } = useChatMessageActions({ inputRef, setInput: handleInputChange })
 
   const scrollToBottom = useCallback((animated = true) => {
     requestAnimationFrame(() => scrollViewRef.current?.scrollToEnd({ animated }))
   }, [])
 
-  const scrollToBottomNoAnim = useCallback(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: false })
-  }, [])
+  const { scrollToLastAssistant, armScrollToLastUser, scrollToInitial } = useChatScrollToMessage({
+    ref: scrollViewRef,
+    messages,
+    isLoading,
+    scrollToBottom,
+    webDomIdPrefix: 'chat-msg-',
+  })
 
-  useInitialScrollToBottom(() => scrollToBottom(false), messages.length > 0)
-  useAutoScrollOnStream({ isAtBottom, streamedContent, messagesCount: messages.length, scrollFn: scrollToBottomNoAnim })
-
-  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent
-    setIsAtBottom(contentSize.height - contentOffset.y - layoutMeasurement.height < 80)
-  }, [])
+  useInitialScroll(scrollToInitial, messages.length > 0)
 
   const handleSubmit = useCallback(() => {
     if (!input.trim() || isLoading) return
-    if (!isWeb) Keyboard.dismiss()
+    if (!isWeb) {
+      inputRef.current?.blur()
+      Keyboard.dismiss()
+    }
+    armScrollToLastUser()
     rawHandleSubmit()
-    scrollToBottom(true)
-  }, [input, isLoading, rawHandleSubmit, scrollToBottom])
+  }, [input, isLoading, rawHandleSubmit, armScrollToLastUser])
 
   const handleRetry = useCallback(() => {
+    armScrollToLastUser()
     retry()
-    scrollToBottom(true)
-  }, [retry, scrollToBottom])
+  }, [retry, armScrollToLastUser])
 
   const handleSuggestionPress = useCallback(
     (question: string) => {
       if (isLoading) return
-      if (!isWeb) Keyboard.dismiss()
+      if (!isWeb) {
+        inputRef.current?.blur()
+        Keyboard.dismiss()
+      }
+      armScrollToLastUser()
       submit(question)
-      scrollToBottom(true)
     },
-    [isLoading, submit, scrollToBottom],
+    [isLoading, submit, armScrollToLastUser],
   )
 
   const showEmpty = !error && messages.length === 0 && !isLoading && !streamedContent
 
   return (
-    <Layout.Main>
+    <Layout.Main maxWidth={600}>
       <YStack position="relative" flex={1} minHeight={isWeb && media.sm ? 'calc(100dvh - 56px)' : isWeb ? '100dvh' : '100%'} gap="$medium">
         <MessageList
           ref={scrollViewRef}
@@ -76,24 +81,26 @@ export default function BotPage() {
           streamedContent={streamedContent}
           error={error}
           showEmpty={showEmpty}
-          contentPaddingBottom={isWeb ? 220 : 220 + keyboardHeight}
+          emptyContent={<EmptyState />}
+          contentPaddingBottom={contentPaddingBottom}
           contentHorizontalPadding={media.sm ? 16 : 0}
           onCopy={handleCopy}
           onEdit={handleEdit}
           onRetry={handleRetry}
-          onScroll={handleScroll}
         />
-        {!isAtBottom && <ScrollToBottomButton onPress={() => scrollToBottom(true)} keyboardHeight={keyboardHeight} />}
         <InputDock
           inputRef={inputRef}
           value={input}
           isLoading={isLoading}
-          showSuggestions={showEmpty}
-          keyboardHeight={keyboardHeight}
+          keyboardOpen={keyboardOpen}
+          bottomOffset={dockBottomOffset}
+          placeholder="Formulez votre demande…"
+          maxLength={BOT_MESSAGE_MAX_LENGTH}
+          topSlot={showEmpty ? <SuggestionsList onPress={handleSuggestionPress} /> : undefined}
           onChange={handleInputChange}
           onSubmit={handleSubmit}
           onStop={stop}
-          onSuggestionPress={handleSuggestionPress}
+          onLayout={onDockLayout}
         />
       </YStack>
     </Layout.Main>

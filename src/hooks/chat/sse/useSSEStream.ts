@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { classifyXhrCompletion } from '../utils/classifyXhrCompletion'
-import { createSSEXhr } from '../utils/createSSEXhr'
-import { processSSEResponseText } from '../utils/processSSEResponseText'
-import type { SSEStreamError } from '../utils/sseTypes'
+import { classifyXhrCompletion } from './classifyXhrCompletion'
+import { createSSEXhr } from './createSSEXhr'
+import { processSSEResponseText } from './processSSEResponseText'
+import type { SSEStreamError } from './sseTypes'
 
 export type { SSEStreamError }
 

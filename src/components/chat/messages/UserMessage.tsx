@@ -1,27 +1,19 @@
 import { memo, useCallback } from 'react';
 import { useMedia, View, XStack } from 'tamagui';
 import { Copy, Pencil } from '@tamagui/lucide-icons';
-
-
-
 import { VoxButton } from '@/components/Button/Button';
 import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown';
-
-
-
-
 
 type Props = {
   messageId: string
   content: string
-  isAreaHovered: boolean
   isOpen: boolean
   onToggle: (id: string) => void
   onEdit: (text: string) => void
   onCopy: (text: string) => void
 }
 
-function UserMessageComponent({ messageId, content, isAreaHovered, isOpen, onToggle, onEdit, onCopy }: Props) {
+function UserMessageComponent({ messageId, content, isOpen, onToggle, onEdit, onCopy }: Props) {
   const media = useMedia()
   const actionsVisible = media.sm && isOpen
 
@@ -30,7 +22,7 @@ function UserMessageComponent({ messageId, content, isAreaHovered, isOpen, onTog
   }, [media.sm, messageId, onToggle])
 
   return (
-    <XStack alignSelf="flex-end" maxWidth="80%" gap="$xsmall" alignItems="center" group="userMsg">
+    <XStack alignSelf="flex-end" maxWidth="80%" gap="$xsmall" alignItems="center" group="userMsg" nativeID={`chat-msg-${messageId}`}>
       <XStack
         gap="$xsmall"
         opacity={actionsVisible ? 1 : 0}
@@ -44,7 +36,7 @@ function UserMessageComponent({ messageId, content, isAreaHovered, isOpen, onTog
       <View
         minWidth={0}
         overflow="hidden"
-        bg={isAreaHovered ? '$textOutline40' : '$textOutline20'}
+        bg="$textOutline20"
         p="$medium"
         borderTopLeftRadius="$medium"
         borderTopRightRadius="$xsmall"
