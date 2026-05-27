@@ -1,7 +1,7 @@
 import { useEffect, type RefObject } from 'react'
 import { isWeb } from 'tamagui'
 
-import { getDomFromTamaguiRef, type TamaguiInputRef } from '../utils/getDomFromTamaguiRef'
+import { getDomFromTamaguiRef, type TamaguiInputRef } from './utils/getDomFromTamaguiRef'
 
 export function useEnterKeySubmit(inputRef: RefObject<TamaguiInputRef | null>, onSubmit: () => void) {
   useEffect(() => {

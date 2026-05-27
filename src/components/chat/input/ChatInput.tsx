@@ -1,25 +1,25 @@
-import { useCallback, useState, type RefObject } from 'react'
-import { Keyboard, type NativeSyntheticEvent } from 'react-native'
-import { Input, isWeb, useMedia, View, YStack } from 'tamagui'
-import { ArrowUpRight, Square } from '@tamagui/lucide-icons'
+import { useCallback, useState, type RefObject } from 'react';
+import { Keyboard, type NativeSyntheticEvent } from 'react-native';
+import { Input, isWeb, useMedia, View, YStack } from 'tamagui';
+import { ArrowUpRight, Square } from '@tamagui/lucide-icons';
 
-import { VoxButton } from '@/components/Button/Button'
-
-import { BOT_MESSAGE_MAX_LENGTH } from '@/services/bot/api'
-import { useAutoGrowTextarea } from '../../hooks/useAutoGrowTextarea'
-import { useEnterKeySubmit } from '../../hooks/useEnterKeySubmit'
-import type { TamaguiInputRef } from '../../utils/getDomFromTamaguiRef'
+import { VoxButton } from '@/components/Button/Button';
+import { useAutoGrowTextarea } from '@/hooks/chat/useAutoGrowTextarea';
+import { useEnterKeySubmit } from '@/hooks/chat/useEnterKeySubmit';
+import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef';
 
 type Props = {
   inputRef: RefObject<TamaguiInputRef | null>
   value: string
   isLoading: boolean
+  placeholder?: string
+  maxLength?: number
   onChange: (value: string) => void
   onSubmit: () => void
   onStop: () => void
 }
 
-export function ChatInput({ inputRef, value, isLoading, onChange, onSubmit, onStop }: Props) {
+export function ChatInput({ inputRef, value, isLoading, placeholder = 'Posez votre question…', maxLength, onChange, onSubmit, onStop }: Props) {
   const media = useMedia()
   const [isFocused, setIsFocused] = useState(false)
 
@@ -54,10 +54,7 @@ export function ChatInput({ inputRef, value, isLoading, onChange, onSubmit, onSt
       shadowOpacity={isFocused ? 0.15 : 0}
       shadowRadius={isFocused ? 12 : 0}
       shadowOffset={{ width: 0, height: isFocused ? 4 : 0 }}
-      borderTopLeftRadius={24}
-      borderTopRightRadius={24}
-      borderBottomLeftRadius={media.gtMd ? 24 : 0}
-      borderBottomRightRadius={media.gtMd ? 24 : 0}
+      borderRadius={24}
       overflow="hidden"
     >
       <View paddingTop={8}>
@@ -73,9 +70,11 @@ export function ChatInput({ inputRef, value, isLoading, onChange, onSubmit, onSt
           borderWidth={0}
           focusStyle={{ outlineWidth: 0 }}
           maxHeight={520}
-          maxLength={BOT_MESSAGE_MAX_LENGTH}
-          textAlignVertical="top"
-          placeholder="Formulez votre demande…"
+          maxLength={maxLength}
+          verticalAlign="top"
+          placeholder={placeholder}
+          placeholderTextColor="$textSecondary"
+          autoFocus
           editable
         />
       </View>

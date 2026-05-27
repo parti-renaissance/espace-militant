@@ -4,10 +4,10 @@ import { RotateCcw } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button/Button'
 
-import type { BotChatError } from '@/services/bot/schema'
+import type { ChatError } from '@/hooks/chat/types'
 
 type Props = {
-  error: BotChatError
+  error: ChatError
   isLoading: boolean
   onRetry: () => void
 }

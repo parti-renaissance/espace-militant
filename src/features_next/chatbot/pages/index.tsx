@@ -1,17 +1,22 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { FlatList, Keyboard } from 'react-native';
-import { isWeb, useMedia, YStack } from 'tamagui';
-import { useQueryClient } from '@tanstack/react-query';
-import Layout from '@/components/AppStructure/Layout/Layout';
-import JumpToBottomButton from '@/components/chat/JumpToBottomButton'
-import { useAutoScrollOnStream } from '@/hooks/chat/useAutoScrollOnStream';
-import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics';
-import { useChatScrollPosition } from '@/hooks/chat/useChatScrollPosition';
-import { useCustomChat, type ChatMessage } from '@/services/chatbot/hook';
-import { ChatBotNavigation } from '../components/ChatBotNavigation';
-import InputDock, { type TamaguiInputRef } from '../components/input/InputDock';
-import MessageList from '../components/messages/MessageList';
+import { useCallback, useRef } from 'react'
+import { FlatList, Keyboard } from 'react-native'
+import { isWeb, useMedia, YStack } from 'tamagui'
+import { useQueryClient } from '@tanstack/react-query'
 
+import Layout from '@/components/AppStructure/Layout/Layout'
+import InputDock from '@/components/chat/input/InputDock'
+import MessageList from '@/components/chat/messages/MessageList'
+
+import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
+import { useChatMessageActions } from '@/hooks/chat/useChatMessageActions'
+import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage'
+import { useInitialScroll } from '@/hooks/chat/useInitialScroll'
+import type { ChatMessage } from '@/hooks/chat/types'
+import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef'
+import { useCustomChat } from '@/services/chatbot/hook'
+
+import { ChatBotNavigation } from '../components/ChatBotNavigation'
+import { NewChat } from '../components/NewChat'
 
 type ChatbotPageProps = {
   activeDiscussionId: string | null
@@ -23,8 +28,7 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
   const queryClient = useQueryClient()
   const scrollViewRef = useRef<FlatList<ChatMessage>>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
-  const { dockBottomOffset, scrollButtonBottom, contentPaddingBottom, onDockLayout } = useChatDockMetrics()
-  const { isAtBottom, handleScroll } = useChatScrollPosition()
+  const { keyboardOpen, dockBottomOffset, scrollButtonBottom, contentPaddingBottom, onDockLayout } = useChatDockMetrics()
 
   const onThreadCreated = useCallback(
     (threadId: string) => {
@@ -34,29 +38,25 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
     [queryClient, onActiveDiscussionChange],
   )
 
-  const { messages, input, handleInputChange, handleSubmit: rawHandleSubmit, isLoading, stop, streamedContent, error } = useCustomChat({
+  const { messages, input, handleInputChange, handleSubmit: rawHandleSubmit, isLoading, stop, streamedContent, error, retry } = useCustomChat({
     threadId: activeDiscussionId,
     onThreadCreated,
   })
+  const { handleCopy, handleEdit } = useChatMessageActions({ inputRef, setInput: handleInputChange })
 
   const scrollToBottom = useCallback((animated = true) => {
     requestAnimationFrame(() => scrollViewRef.current?.scrollToEnd({ animated }))
   }, [])
 
-  const scrollToBottomNoAnim = useCallback(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: false })
-  }, [])
+  const { scrollToLastAssistant, armScrollToLastUser, scrollToInitial } = useChatScrollToMessage({
+    ref: scrollViewRef,
+    messages,
+    isLoading,
+    scrollToBottom,
+    webDomIdPrefix: 'chat-msg-',
+  })
 
-  useAutoScrollOnStream({ isAtBottom, streamedContent, messagesCount: messages.length, scrollFn: scrollToBottomNoAnim })
-
-  const prevScrolledThreadRef = useRef<string | null | undefined>(undefined)
-  useEffect(() => {
-    if (messages.length === 0) return
-    if (prevScrolledThreadRef.current !== activeDiscussionId) {
-      prevScrolledThreadRef.current = activeDiscussionId
-      scrollToBottom(false)
-    }
-  }, [activeDiscussionId, messages.length, scrollToBottom])
+  useInitialScroll(scrollToInitial, messages.length > 0)
 
   const handleSubmit = useCallback(() => {
     if (!input.trim() || isLoading) return
@@ -64,33 +64,43 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
       inputRef.current?.blur()
       Keyboard.dismiss()
     }
+    armScrollToLastUser()
     rawHandleSubmit()
-    scrollToBottom(true)
-  }, [input, isLoading, rawHandleSubmit, scrollToBottom])
+  }, [input, isLoading, rawHandleSubmit, armScrollToLastUser])
+
+  const handleRetry = useCallback(() => {
+    armScrollToLastUser()
+    retry()
+  }, [retry, armScrollToLastUser])
 
   const showNewChat = !error && !activeDiscussionId && messages.length === 0 && !isLoading
 
   return (
     <>
       <ChatBotNavigation activeDiscussionId={activeDiscussionId} onActiveDiscussionChange={onActiveDiscussionChange} />
-      <Layout.Main>
-        <YStack position="relative" flex={1} minHeight={isWeb && media.sm ? 'calc(100dvh - 56px)' : isWeb ? '100dvh' : '100%'} gap="$medium">
+      <Layout.Main maxWidth={600}>
+        <YStack position="relative" flex={1} minHeight={isWeb ? 'calc(100dvh - 56px)' : '100%'} gap="$medium">
           <MessageList
             ref={scrollViewRef}
             messages={messages}
             isLoading={isLoading}
             streamedContent={streamedContent}
             error={error}
-            showNewChat={showNewChat}
+            showEmpty={showNewChat}
+            emptyContent={<NewChat />}
             contentPaddingBottom={contentPaddingBottom}
-            onScroll={handleScroll}
+            contentHorizontalPadding={media.sm ? 16 : 0}
+            onCopy={handleCopy}
+            onEdit={handleEdit}
+            onRetry={handleRetry}
           />
-          {!isAtBottom && <JumpToBottomButton onPress={() => scrollToBottom(true)} bottom={scrollButtonBottom} />}
           <InputDock
             inputRef={inputRef}
             value={input}
             isLoading={isLoading}
+            keyboardOpen={keyboardOpen}
             bottomOffset={dockBottomOffset}
+            placeholder="Posez votre question…"
             onChange={handleInputChange}
             onSubmit={handleSubmit}
             onStop={stop}

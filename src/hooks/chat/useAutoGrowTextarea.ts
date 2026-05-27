@@ -1,7 +1,7 @@
 import { useEffect, type RefObject } from 'react'
 import { isWeb } from 'tamagui'
 
-import { getDomFromTamaguiRef, type TamaguiInputRef } from '../utils/getDomFromTamaguiRef'
+import { getDomFromTamaguiRef, type TamaguiInputRef } from './utils/getDomFromTamaguiRef'
 
 const INPUT_MAX_HEIGHT = 200
 

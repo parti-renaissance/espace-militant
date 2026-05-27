@@ -2,14 +2,14 @@ import { useCallback, type RefObject } from 'react'
 import * as Clipboard from 'expo-clipboard'
 import { useToastController } from '@tamagui/toast'
 
-import { getDomFromTamaguiRef, type TamaguiInputRef } from '../utils/getDomFromTamaguiRef'
+import { getDomFromTamaguiRef, type TamaguiInputRef } from './utils/getDomFromTamaguiRef'
 
 type Params = {
   inputRef: RefObject<TamaguiInputRef | null>
   setInput: (value: string) => void
 }
 
-export function useBotMessageActions({ inputRef, setInput }: Params) {
+export function useChatMessageActions({ inputRef, setInput }: Params) {
   const toast = useToastController()
 
   const handleCopy = useCallback(
