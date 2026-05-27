@@ -96,7 +96,7 @@ const text = {
     textSecondary: gray.gray600,
     textDisabled: gray.gray400,
     textSurface: white.white4,
-    textOutline32: gray.gray200,
+    textOutline32: 'hsl(27, 13%, 88%)',
     textOutline20: gray.gray100,
     textOutline: white.white8,
     textDanger: orange.orange500,

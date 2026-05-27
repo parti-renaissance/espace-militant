@@ -1,5 +1,7 @@
 import { createFont } from 'tamagui'
 
+export const PLAAK_44_BOLD = 'Plaak-44-Bold'
+
 export const Maax = createFont({
   family: 'Maax',
   weight: {
@@ -31,6 +33,25 @@ export const Maax = createFont({
   face: {
     400: { normal: 'Maax-Medium', italic: 'Maax-MediumItalic' },
     700: { normal: 'Maax-Bold', italic: 'Maax-BoldItalic' },
+  },
+})
+
+export const Plaak = createFont({
+  family: PLAAK_44_BOLD,
+  weight: {
+    1: 400,
+    true: 400,
+  },
+  size: {
+    1: 32,
+    true: 32,
+  },
+  lineHeight: {
+    1: 23,
+    true: 23,
+  },
+  face: {
+    400: { normal: PLAAK_44_BOLD },
   },
 })
 

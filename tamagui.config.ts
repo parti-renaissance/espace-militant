@@ -1,6 +1,6 @@
 import { config as configBase } from '@tamagui/config/v3'
 import { createTamagui, createTokens } from 'tamagui'
-import { Maax, PublicSans } from './theme/fonts'
+import { Maax, Plaak, PublicSans } from './theme/fonts'
 import { themes } from './themes'
 
 const myTokens = createTokens({
@@ -51,7 +51,7 @@ export const config = createTamagui({
   tokens: myTokens,
   media: configBase.media,
   defaultFont: 'PublicSans',
-  fonts: { ...configBase.fonts, Maax, PublicSans },
+  fonts: { ...configBase.fonts, Maax, Plaak, PublicSans },
 })
 
 export default config
