@@ -34,13 +34,16 @@ const patchHubActionItems = (
   updater: (item: RestHubItem) => RestHubItem,
 ) => {
   queryClient.setQueriesData<InfiniteData<RestPagination<RestHubItem>>>({ queryKey: ['hub'] }, (old) => {
-    if (!old) return old
+    if (!old || !Array.isArray(old.pages)) return old
     return {
       ...old,
-      pages: old.pages.map((page) => ({
-        ...page,
-        items: page.items.map((item) => (item.uuid === actionId && isHubActionItem(item) ? updater(item) : item)),
-      })),
+      pages: old.pages.map((page) => {
+        if (!Array.isArray(page.items)) return page
+        return {
+          ...page,
+          items: page.items.map((item) => (item.uuid === actionId && isHubActionItem(item) ? updater(item) : item)),
+        }
+      }),
     }
   })
 }
@@ -54,20 +57,24 @@ const optimisticToggleSubscribeOnCaches = (
   const updateAction: helpers.OptimisticItemUpdater<RestAction | RestActionFull> = (old) => {
     if (!old) return undefined
 
+    const participant = createParticipant(me)
+
     return {
       ...old,
       user_registered_at: subscribe ? new Date() : null,
       ...(isFullAction(old)
         ? {
+            // Some stale caches can miss participants at runtime.
             participants: subscribe
-              ? [createParticipant(me), ...old.participants]
-              : old.participants.filter((x) => x.adherent.uuid !== me.uuid),
+              ? [participant, ...(old.participants ?? [])]
+              : (old.participants ?? []).filter((x) => x.adherent.uuid !== me.uuid),
           }
         : {
             participants_count: old.participants_count + (subscribe ? 1 : -1),
+            // Some stale caches can miss first_participants at runtime.
             first_participants: subscribe
-              ? [createParticipant(me), ...old.first_participants]
-              : old.first_participants.filter((x) => x.adherent.uuid !== me.uuid),
+              ? [participant, ...(old.first_participants ?? [])]
+              : (old.first_participants ?? []).filter((x) => x.adherent.uuid !== me.uuid),
           }),
     }
   }
