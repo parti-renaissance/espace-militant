@@ -14,10 +14,7 @@ export function useShowJumpToBottom({ lastMessageId, webDomIdPrefix = 'chat-msg-
 
   useEffect(() => {
     if (!isWeb) return
-    if (!lastMessageId) {
-      setShow(false)
-      return
-    }
+    if (!lastMessageId) return
 
     let observer: IntersectionObserver | null = null
     let frame = 0
@@ -46,5 +43,5 @@ export function useShowJumpToBottom({ lastMessageId, webDomIdPrefix = 'chat-msg-
     setShow(distance > HIDE_DISTANCE_PX)
   }, [])
 
-  return { show, handleScroll }
+  return { show: lastMessageId ? show : false, handleScroll }
 }
