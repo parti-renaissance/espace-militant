@@ -4,15 +4,11 @@ import { Image } from 'expo-image';
 import { useMedia, XStack, YStack } from 'tamagui';
 import { LinearGradient } from '@tamagui/linear-gradient';
 import { Dices, Share2 } from '@tamagui/lucide-icons'
-import Text from '@/components/base/Text';
 import { VoxButton } from '@/components/Button';
-import { PLAAK_44_BOLD } from '../../../../theme/fonts';
-import GAME_IMAGE from '../assets/game-icon.png';
+import CallToActionCard from '@/components/CallToActionCard/CallToActionCard';
+import GAME_IMAGE from '../../assets/game-icon.png';
 import ToiPresidentArrowLeft from './ToiPresidentArrowLeft';
 import ToiPresidentArrowRight from './ToiPresidentArrowRight';
-
-
-const PURPLE_PRIMARY = '#4555d1'
 
 export type ToiPresidentCardProps = ComponentProps<typeof YStack> & {
   onPlay?: () => void
@@ -36,7 +32,7 @@ export default function ToiPresidentCard({ onPlay, onShare, ...rest }: ToiPresid
         left={0}
         right={0}
         bottom={0}
-        colors={['#9EACF7', '#716AE7']}
+        colors={['$purple400', '$purple500']}
         start={[0, 0]}
         end={[0, 1]}
       />
@@ -87,44 +83,23 @@ export default function ToiPresidentCard({ onPlay, onShare, ...rest }: ToiPresid
         <ToiPresidentArrowRight />
       </YStack>
 
-      <YStack
-        backgroundColor="#F5F6FF"
-        borderRadius={16}
-        padding="$medium"
-        gap="$medium"
+      <CallToActionCard
+        title="Toi président - le jeu"
+        description="150 propositions de réforme - que feriez vous si vous étiez Président ?"
+        theme="purple"
+        backgroundColor="$purple50"
         zIndex={4}
         marginTop="auto"
       >
-        <YStack gap="$small">
-          <Text fontFamily={PLAAK_44_BOLD} fontSize={20} color="#27221F" letterSpacing={-0.8}>
-            Toi président - le jeu
-          </Text>
-          <Text.SM color="#6E6764" multiline>
-            150 propositions de réforme - que feriez vous si vous étiez Président ?
-          </Text.SM>
-        </YStack>
         <XStack gap="$small" flexWrap="wrap">
-          <VoxButton
-            variant="outlined"
-            iconLeft={Share2}
-            onPress={onShare}
-            borderColor={PURPLE_PRIMARY}
-            textColor={PURPLE_PRIMARY}
-          >
+          <VoxButton theme="purple" variant="outlined" iconLeft={Share2} onPress={onShare}>
             Partager
           </VoxButton>
-          <VoxButton
-            iconLeft={Dices}
-            onPress={onPlay}
-            backgroundColor={PURPLE_PRIMARY}
-            textColor="$white1"
-            hoverStyle={{ backgroundColor: '#3a48b8' }}
-            pressStyle={{ backgroundColor: '#3a48b8' }}
-          >
+          <VoxButton theme="purple" variant="contained" iconLeft={Dices} onPress={onPlay}>
             Faire une partie
           </VoxButton>
         </XStack>
-      </YStack>
+      </CallToActionCard>
     </YStack>
   )
 }

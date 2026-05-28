@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { FlatList, Keyboard } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
 import { isWeb, useMedia, YStack } from 'tamagui';
 import Layout from '@/components/AppStructure/Layout/Layout';
 import InputDock from '@/components/chat/input/InputDock';
@@ -21,7 +20,6 @@ import SuggestionsList from '../components/input/SuggestionsList';
 
 export default function BotPage() {
   const media = useMedia()
-  const params = useLocalSearchParams<{ question?: string }>()
   const scrollViewRef = useRef<FlatList<ChatMessage>>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
   const { keyboardOpen, dockBottomOffset, scrollButtonBottom, contentPaddingBottom, onDockLayout } = useChatDockMetrics()
@@ -45,15 +43,6 @@ export default function BotPage() {
 
   const lastMessageId = messages.length > 0 ? messages[messages.length - 1].id : null
   const { show: showJumpToBottom, handleScroll: handleJumpScroll } = useShowJumpToBottom({ lastMessageId })
-
-  const autoSubmittedRef = useRef(false)
-  useEffect(() => {
-    const initialQuestion = typeof params.question === 'string' ? params.question.trim() : ''
-    if (!initialQuestion || autoSubmittedRef.current || isLoading) return
-    autoSubmittedRef.current = true
-    armScrollToLastUser()
-    submit(initialQuestion)
-  }, [params.question, submit, isLoading, armScrollToLastUser])
 
   const handleSubmit = useCallback(() => {
     if (!input.trim() || isLoading) return
