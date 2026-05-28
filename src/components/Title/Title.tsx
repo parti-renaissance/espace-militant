@@ -85,11 +85,25 @@ const TitleHighlightBackground = styled(View, {
   position: 'absolute',
   left: 0,
   right: 0,
-  top: 0,
-  height: '110%',
+  top: -3,
+  variants: {
+    size: {
+      h1: {
+        top: -3,
+        height: 35,
+      },
+      h2: {
+        top: -1,
+        height: 22,
+      },
+    },
+  } as const,
   backgroundColor: '$yellow3',
   zIndex: 0,
   pointerEvents: 'none',
+  defaultVariants: {
+    size: 'h1',
+  },
 })
 
 const TitleHighlightText = styled(TitleText, {
@@ -103,7 +117,7 @@ function TitleHighlight({ children, ...props }: TitleHighlightProps) {
 
   return (
     <TitleHighlightFrame size={size} {...props}>
-      <TitleHighlightBackground />
+      <TitleHighlightBackground size={size} />
       <TitleHighlightText size={size}>{children}</TitleHighlightText>
     </TitleHighlightFrame>
   )
