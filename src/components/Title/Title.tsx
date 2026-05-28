@@ -31,6 +31,7 @@ const TitleText = styled(TamaguiText, {
   name: 'TitleText',
   context: TitleContext,
   fontFamily: PLAAK_44_BOLD,
+  fontWeight: '400',
   color: '$textPrimary',
   flexShrink: 0,
   whiteSpace: 'normal',
@@ -123,7 +124,7 @@ function TitleHighlight({ children, ...props }: TitleHighlightProps) {
   )
 }
 
-function Title({ children, size = 'h1', 'aria-label': ariaLabel, ...props }: TitleProps) {
+function TitleComponent({ children, size = 'h1', 'aria-label': ariaLabel, ...props }: TitleProps) {
   const frame = (
     <TitleContext.Provider size={size}>
       <TitleFrame size={size} {...props}>
@@ -145,14 +146,14 @@ function Title({ children, size = 'h1', 'aria-label': ariaLabel, ...props }: Tit
   )
 }
 
-const TitleComponent = withStaticProperties(Title, {
+const Title = withStaticProperties(TitleComponent, {
   Props: TitleContext.Provider,
   Text: TitleText,
   Break: TitleLineBreak,
   Highlight: TitleHighlight,
 })
 
-export default TitleComponent
+export default Title
 
 export type TitleSize = 'h1' | 'h2'
 
