@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { usePathname } from 'expo-router'
 import { useMedia, XStack } from 'tamagui'
-import { Bot, DoorOpen, Globe, GraduationCap, Lightbulb, LogOut, PenLine, QrCode, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
+import { Bot, DoorOpen, Globe, GraduationCap, HeartHandshake, Lightbulb, LogOut, PenLine, QrCode, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
@@ -114,6 +114,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                 <NavItem text="Scanner" iconLeft={QrCode} href="/scanner" />
                 <NavItem text="Porte à porte" iconLeft={DoorOpen} href="/old/porte-a-porte" />
                 <NavItem text="Formations" iconLeft={GraduationCap} href="/old/formations" />
+                <NavItem text="Parrainages" iconLeft={HeartHandshake} href="/old/parrainages" />
               </VoxCard.Content>
             </VoxCard>
           )}

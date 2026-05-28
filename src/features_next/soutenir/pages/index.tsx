@@ -1,8 +1,9 @@
+import { Suspense, useCallback, useState } from 'react'
 import { Linking } from 'react-native'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
-import { useMedia, XStack, YStack } from 'tamagui'
+import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import {
   CalendarDays,
   Facebook,
@@ -25,6 +26,10 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
 import Title from '@/components/Title/Title'
+import clientEnv from '@/config/clientEnv'
+import { HubOrganizeCategoryModal } from '@/features_next/events/pages/hub/components/HubOrganizeCategoryModal'
+import { useShareOrCopy } from '@/hooks/useShareOrCopy'
+import { useGetProfil } from '@/services/profile/hook'
 
 import HERO_IMAGE_URI from '../assets/soutenir-gabriel-attal.png'
 
@@ -35,17 +40,24 @@ const EXTERNAL_LINKS = {
 } as const
 
 const SOCIAL_LINKS = {
-  whatsapp: 'https://wa.me',
-  telegram: 'https://t.me',
-  instagram: 'https://www.instagram.com',
-  tiktok: 'https://www.tiktok.com',
-  x: 'https://x.com',
-  facebook: 'https://www.facebook.com',
-  linkedin: 'https://www.linkedin.com',
+  whatsapp: 'https://whatsapp.com/channel/0029VaEHqOx3rZZizaSlrH1R',
+  telegram: 'https://t.me/gabriel_attal',
+  instagram: 'https://www.instagram.com/gabrielattal/',
+  tiktok: 'https://www.tiktok.com/@gabriel_attal',
+  x: 'https://x.com/GabrielAttal',
+  facebook: 'https://www.facebook.com/GabrielAttal/',
+  linkedin: 'https://fr.linkedin.com/in/gabrielattal',
 } as const
 
+const INVITE_SHARE_MESSAGE = "Téléchargez l'application de campagne pour nous rejoindre !"
+const DEFAULT_APP_INVITE_URL = `https://${clientEnv.ASSOCIATED_DOMAIN}`
+
 const openInAppBrowser = (url: string) => {
-  void WebBrowser.openBrowserAsync(url)
+  if (isWeb) {
+    window.open(url, '_blank')
+  } else {
+    void WebBrowser.openBrowserAsync(url)
+  }
 }
 
 function HeroTitleSection() {
@@ -88,76 +100,103 @@ function ContactNationalButton() {
 
 function CallToActionCards() {
   const router = useRouter()
+  const { data: user } = useGetProfil()
+  const { handleShareOrCopy } = useShareOrCopy()
+  const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
+
+  const handleInviteFriend = useCallback(() => {
+    return handleShareOrCopy({
+      url: user?.referral_link ?? DEFAULT_APP_INVITE_URL,
+      message: INVITE_SHARE_MESSAGE,
+    })
+  }, [user?.referral_link, handleShareOrCopy])
+
+  const handleOpenOrganizeModal = useCallback(() => {
+    setOrganizeModalOpen(true)
+  }, [])
+
+  const handleCloseOrganizeModal = useCallback(() => {
+    setOrganizeModalOpen(false)
+  }, [])
+
+  const organizeModal = organizeModalOpen ? (
+    <Suspense fallback={null}>
+      <HubOrganizeCategoryModal open onClose={handleCloseOrganizeModal} />
+    </Suspense>
+  ) : null
 
   return (
-    <YStack gap="$medium">
-      <CallToActionCard icon={Lightbulb} title="Je partage une idée" description="Votre voix compte : soumettez vos propositions." theme="green">
-        <VoxButton theme="green" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.deposerUneIdee)}>
-          Déposer une idée
-        </VoxButton>
-      </CallToActionCard>
-
-      <CallToActionCard
-        icon={CalendarDays}
-        title="Je participe à un événement"
-        description="Meeting, action de terrain, collage ou réunion publique."
-        theme="blue"
-      >
-        <XStack flexWrap="wrap" gap={12}>
-          <VoxButton theme="blue" variant="soft" onPress={() => router.push('/evenements')}>
-            Voir les événements
+    <>
+      <YStack gap="$medium">
+        <CallToActionCard icon={Lightbulb} title="Je partage une idée" description="Votre voix compte : soumettez vos propositions." theme="green">
+          <VoxButton theme="green" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.deposerUneIdee)}>
+            Déposer une idée
           </VoxButton>
-          <VoxButton theme="pink" variant="outlined" iconLeft={Plus} onPress={() => router.push('/evenements/creer')}>
-            J&apos;organise un événement
+        </CallToActionCard>
+
+        <CallToActionCard
+          icon={CalendarDays}
+          title="Je participe à un événement"
+          description="Meeting, action de terrain, collage ou réunion publique."
+          theme="blue"
+        >
+          <XStack flexWrap="wrap" gap={12}>
+            <VoxButton theme="blue" variant="soft" onPress={() => router.push('/evenements')}>
+              Voir les événements
+            </VoxButton>
+            <VoxButton theme="pink" variant="outlined" iconLeft={Plus} onPress={handleOpenOrganizeModal}>
+              J&apos;organise un événement
+            </VoxButton>
+          </XStack>
+        </CallToActionCard>
+
+        <CallToActionCard icon={Users} title="Je rejoins l'équipe" description="Devenez ambassadeur de la campagne." theme="teal">
+          <VoxButton theme="teal" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.rejoindreEquipe)}>
+            Postuler
           </VoxButton>
-        </XStack>
-      </CallToActionCard>
+        </CallToActionCard>
 
-      <CallToActionCard icon={Users} title="Je rejoins l'équipe" description="Devenez ambassadeur de la campagne." theme="teal">
-        <VoxButton theme="teal" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.rejoindreEquipe)}>
-          Postuler
-        </VoxButton>
-      </CallToActionCard>
+        <CallToActionCard icon={Send} title="Je suis l'actualité de Gabriel Attal" description="Suivez-nous sur nos réseaux et partagez nos publications.">
+          <XStack flexWrap="wrap" gap={12}>
+            <VoxButton variant="soft" iconLeft={MessageCircle} onPress={() => Linking.openURL(SOCIAL_LINKS.whatsapp)}>
+              Whatsapp
+            </VoxButton>
+            <VoxButton variant="soft" iconLeft={Send} onPress={() => Linking.openURL(SOCIAL_LINKS.telegram)}>
+              Telegram
+            </VoxButton>
+          </XStack>
+          <XStack flexWrap="wrap" gap={12}>
+            <VoxButton variant="soft" iconLeft={Instagram} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.instagram)} />
+            <VoxButton variant="soft" iconLeft={Music2} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.tiktok)} />
+            <VoxButton variant="soft" iconLeft={Twitter} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.x)} />
+            <VoxButton variant="soft" iconLeft={Facebook} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.facebook)} />
+            <VoxButton variant="soft" iconLeft={Linkedin} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.linkedin)} />
+          </XStack>
+        </CallToActionCard>
 
-      <CallToActionCard icon={Send} title="Je suis l'actualité de Gabriel Attal" description="Suivez-nous sur nos réseaux et partagez nos publications.">
-        <XStack flexWrap="wrap" gap={12}>
-          <VoxButton variant="soft" iconLeft={MessageCircle} onPress={() => Linking.openURL(SOCIAL_LINKS.whatsapp)}>
-            Whatsapp
+        <CallToActionCard
+          icon={Send}
+          title="Je rejoins une Agora thématique"
+          description="Fabriquez nos idées de demain en rejoignant un groupe de travail et d'exploration sur une thématique."
+        >
+          <VoxButton variant="soft" onPress={() => router.push('/profil/mes-instances')}>
+            Rejoindre une Agora
           </VoxButton>
-          <VoxButton variant="soft" iconLeft={Send} onPress={() => Linking.openURL(SOCIAL_LINKS.telegram)}>
-            Telegram
+        </CallToActionCard>
+
+        <CallToActionCard
+          icon={UserPlus}
+          title="J'invite un ami sur la campagne"
+          description="Invitez une personne de votre entourage à télécharger l'application de campagne."
+          theme="orange"
+        >
+          <VoxButton theme="orange" variant="soft" onPress={handleInviteFriend}>
+            Envoyer une invitation
           </VoxButton>
-        </XStack>
-        <XStack flexWrap="wrap" gap={12}>
-          <VoxButton variant="soft" iconLeft={Instagram} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.instagram)} />
-          <VoxButton variant="soft" iconLeft={Music2} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.tiktok)} />
-          <VoxButton variant="soft" iconLeft={Twitter} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.x)} />
-          <VoxButton variant="soft" iconLeft={Facebook} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.facebook)} />
-          <VoxButton variant="soft" iconLeft={Linkedin} shrink onPress={() => Linking.openURL(SOCIAL_LINKS.linkedin)} />
-        </XStack>
-      </CallToActionCard>
-
-      <CallToActionCard
-        icon={Send}
-        title="Je rejoins une Agora thématique"
-        description="Fabriquez nos idées de demain en rejoignant un groupe de travail et d'exploration sur une thématique."
-      >
-        <VoxButton variant="soft" onPress={() => router.push('/profil/mes-instances')}>
-          Rejoindre une Agora
-        </VoxButton>
-      </CallToActionCard>
-
-      <CallToActionCard
-        icon={UserPlus}
-        title="J'invite un ami sur la campagne"
-        description="Invitez une personne de votre entourage à télécharger l'application de campagne."
-        theme="orange"
-      >
-        <VoxButton theme="orange" variant="soft" onPress={() => router.push('/parrainages')}>
-          Envoyer une invitation
-        </VoxButton>
-      </CallToActionCard>
-    </YStack>
+        </CallToActionCard>
+      </YStack>
+      {organizeModal}
+    </>
   )
 }
 

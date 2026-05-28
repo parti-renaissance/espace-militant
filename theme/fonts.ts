@@ -38,10 +38,10 @@ export const Maax = createFont({
 
 export const Plaak = createFont({
   family: PLAAK_44_BOLD,
-  defaultWeight: '400',
+  defaultWeight: 400,
   weight: {
-    1: '400',
-    true: '400',
+    1: 400,
+    true: 400,
   },
   size: {
     1: 32,
