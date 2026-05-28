@@ -1,22 +1,22 @@
-import { useCallback, useRef } from 'react'
-import { FlatList, Keyboard } from 'react-native'
-import { isWeb, useMedia, YStack } from 'tamagui'
+import { useCallback, useRef } from 'react';
+import { FlatList, Keyboard } from 'react-native';
+import { isWeb, useMedia, YStack } from 'tamagui';
+import Layout from '@/components/AppStructure/Layout/Layout';
+import InputDock from '@/components/chat/input/InputDock';
+import JumpToBottomButton from '@/components/chat/JumpToBottomButton';
+import MessageList from '@/components/chat/messages/MessageList';
+import type { ChatMessage } from '@/hooks/chat/types';
+import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics';
+import { useChatMessageActions } from '@/hooks/chat/useChatMessageActions';
+import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage';
+import { useInitialScroll } from '@/hooks/chat/useInitialScroll';
+import { useShowJumpToBottom } from '@/hooks/chat/useShowJumpToBottom';
+import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef';
+import { BOT_MESSAGE_MAX_LENGTH } from '@/services/bot/api';
+import { useBotChat } from '@/services/bot/hook';
+import EmptyState from '../components/EmptyState';
+import SuggestionsList from '../components/input/SuggestionsList';
 
-import Layout from '@/components/AppStructure/Layout/Layout'
-import MessageList from '@/components/chat/messages/MessageList'
-
-import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
-import { useChatMessageActions } from '@/hooks/chat/useChatMessageActions'
-import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage'
-import { useInitialScroll } from '@/hooks/chat/useInitialScroll'
-import type { ChatMessage } from '@/hooks/chat/types'
-import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef'
-import InputDock from '@/components/chat/input/InputDock'
-import { BOT_MESSAGE_MAX_LENGTH } from '@/services/bot/api'
-import { useBotChat } from '@/services/bot/hook'
-
-import EmptyState from '../components/EmptyState'
-import SuggestionsList from '../components/input/SuggestionsList'
 
 export default function BotPage() {
   const media = useMedia()
@@ -40,6 +40,9 @@ export default function BotPage() {
   })
 
   useInitialScroll(scrollToInitial, messages.length > 0)
+
+  const lastMessageId = messages.length > 0 ? messages[messages.length - 1].id : null
+  const { show: showJumpToBottom, handleScroll: handleJumpScroll } = useShowJumpToBottom({ lastMessageId })
 
   const handleSubmit = useCallback(() => {
     if (!input.trim() || isLoading) return
@@ -87,7 +90,9 @@ export default function BotPage() {
           onCopy={handleCopy}
           onEdit={handleEdit}
           onRetry={handleRetry}
+          onScroll={handleJumpScroll}
         />
+        {showJumpToBottom && <JumpToBottomButton onPress={scrollToLastAssistant} bottom={scrollButtonBottom} />}
         <InputDock
           inputRef={inputRef}
           value={input}

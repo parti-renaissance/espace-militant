@@ -2,19 +2,18 @@ import { useCallback, useRef } from 'react'
 import { FlatList, Keyboard } from 'react-native'
 import { isWeb, useMedia, YStack } from 'tamagui'
 import { useQueryClient } from '@tanstack/react-query'
-
 import Layout from '@/components/AppStructure/Layout/Layout'
+import JumpToBottomButton from '@/components/chat/JumpToBottomButton'
 import InputDock from '@/components/chat/input/InputDock'
 import MessageList from '@/components/chat/messages/MessageList'
-
 import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
 import { useChatMessageActions } from '@/hooks/chat/useChatMessageActions'
 import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage'
 import { useInitialScroll } from '@/hooks/chat/useInitialScroll'
+import { useShowJumpToBottom } from '@/hooks/chat/useShowJumpToBottom'
 import type { ChatMessage } from '@/hooks/chat/types'
 import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef'
 import { useCustomChat } from '@/services/chatbot/hook'
-
 import { ChatBotNavigation } from '../components/ChatBotNavigation'
 import { NewChat } from '../components/NewChat'
 
@@ -58,6 +57,9 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
 
   useInitialScroll(scrollToInitial, messages.length > 0)
 
+  const lastMessageId = messages.length > 0 ? messages[messages.length - 1].id : null
+  const { show: showJumpToBottom, handleScroll: handleJumpScroll } = useShowJumpToBottom({ lastMessageId })
+
   const handleSubmit = useCallback(() => {
     if (!input.trim() || isLoading) return
     if (!isWeb) {
@@ -93,7 +95,9 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
             onCopy={handleCopy}
             onEdit={handleEdit}
             onRetry={handleRetry}
+            onScroll={handleJumpScroll}
           />
+          {showJumpToBottom && <JumpToBottomButton onPress={scrollToLastAssistant} bottom={scrollButtonBottom} />}
           <InputDock
             inputRef={inputRef}
             value={input}

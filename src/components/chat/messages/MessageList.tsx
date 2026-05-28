@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { FlatList, useWindowDimensions, View } from 'react-native'
-import { isWeb, YStack } from 'tamagui'
+import { FlatList, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
+import { YStack } from 'tamagui'
 
 import type { ChatError, ChatMessage } from '@/hooks/chat/types'
 
@@ -21,10 +21,11 @@ type Props = {
   onCopy: (text: string) => void
   onEdit: (text: string) => void
   onRetry: () => void
+  onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
 }
 
 export const MessageList = forwardRef<FlatList<ChatMessage>, Props>(function MessageList(
-  { messages, isLoading, streamedContent, error, showEmpty, emptyContent, contentPaddingBottom, contentHorizontalPadding = 0, onCopy, onEdit, onRetry },
+  { messages, isLoading, streamedContent, error, showEmpty, emptyContent, contentPaddingBottom, contentHorizontalPadding = 0, onCopy, onEdit, onRetry, onScroll },
   ref,
 ) {
   const { height: windowHeight } = useWindowDimensions()
@@ -37,9 +38,13 @@ export const MessageList = forwardRef<FlatList<ChatMessage>, Props>(function Mes
     setOpenedMessageId((prev) => (prev === id ? null : id))
   }, [])
 
-  const handleScroll = useCallback(() => {
-    if (openedMessageId !== null) setOpenedMessageId(null)
-  }, [openedMessageId])
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (openedMessageId !== null) setOpenedMessageId(null)
+      onScroll?.(e)
+    },
+    [openedMessageId, onScroll],
+  )
 
   useEffect(() => {
     if (!openedMessageId) return
@@ -88,7 +93,6 @@ export const MessageList = forwardRef<FlatList<ChatMessage>, Props>(function Mes
           paddingBottom: contentPaddingBottom,
           paddingHorizontal: contentHorizontalPadding,
           flexGrow: 1,
-          ...(isWeb ? { flex: 1 } : {}),
         }}
         data={messages}
         keyExtractor={keyExtractor}
