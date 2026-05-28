@@ -1,11 +1,11 @@
 import { RestProfilResponse } from '@/services/profile/schema'
-import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap, HeartHandshake } from '@tamagui/lucide-icons'
+import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
 import { IconComponent } from '@/models/common.model'
 import * as magicLinkTypes from '@/services/magic-link/schema'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'parrainages' | 'questionnaires' | 'scanner'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'questionnaires' | 'scanner'
   screenName: string
   highlighted?: boolean
   icon: IconComponent
@@ -29,14 +29,6 @@ export const ROUTES: TabRoute[] = [
     screenName: 'Événements',
     icon: Calendar,
     theme: 'blue',
-  },
-  {
-    name: 'parrainages',
-    screenName: 'Parrainages',
-    icon: HeartHandshake,
-    theme: 'orange',
-    hidden: false,
-    hiddenMobile: false,
   },
   {
     name: 'actions',

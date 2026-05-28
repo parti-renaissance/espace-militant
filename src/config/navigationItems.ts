@@ -141,7 +141,6 @@ const cadreNavItemsConfig: NavItemConfig[] = [
   { id: FEATURES.MOBILE_APP, iconLeft: TabletSmartphone, text: 'Application mobile', theme: 'pink', externalUrlSlug: '/', externalLink: true },
   { id: FEATURES.CONTACTS, iconLeft: UsersRound, text: 'Mes militants', theme: 'pink', href: '/cadre/militants' },
   { id: FEATURES.CHATBOT, iconLeft: Bot, text: 'Chatbot', theme: 'pink', href: '/chatbot' },
-  { id: FEATURES.REFERRALS, iconLeft: HeartHandshake, text: 'Suivi des parrainages', theme: 'pink', externalUrlSlug: '/parrainages', externalLink: true },
   {
     id: FEATURES.NATIONAL_EVENT,
     iconLeft: PartyPopper,

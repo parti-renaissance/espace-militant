@@ -21,7 +21,7 @@ export default function ParrainagesPage() {
       <Head>
         <title>{metatags.createTitle('Parrainages')}</title>
       </Head>
-      <Header title="Parrainages" icon={HeartHandshake} navigation={{ showBackButton: false }} style={{ showOn: 'sm' }} />
+      <Header title="Parrainages" icon={HeartHandshake} navigation={{ showBackButton: true }} style={{ showOn: 'sm' }} />
       <Layout.Container safeHorizontalPadding={false}>
         <ReferralsScreen />
       </Layout.Container>
