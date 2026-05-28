@@ -1,6 +1,7 @@
 import { Linking } from 'react-native'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
+import * as WebBrowser from 'expo-web-browser'
 import { useMedia, XStack, YStack } from 'tamagui'
 import {
   CalendarDays,
@@ -43,6 +44,10 @@ const SOCIAL_LINKS = {
   linkedin: 'https://www.linkedin.com',
 } as const
 
+const openInAppBrowser = (url: string) => {
+  void WebBrowser.openBrowserAsync(url)
+}
+
 function HeroTitleSection() {
   return (
     <YStack gap="$medium">
@@ -75,7 +80,7 @@ function HeroImageSection({ isDesktop }: { isDesktop: boolean }) {
 
 function ContactNationalButton() {
   return (
-    <VoxButton variant="outlined" iconLeft={Phone} onPress={() => Linking.openURL(EXTERNAL_LINKS.contactNational)}>
+    <VoxButton variant="outlined" iconLeft={Phone} onPress={() => openInAppBrowser(EXTERNAL_LINKS.contactNational)}>
       Être contacté par les équipes nationales
     </VoxButton>
   )
@@ -87,7 +92,7 @@ function CallToActionCards() {
   return (
     <YStack gap="$medium">
       <CallToActionCard icon={Lightbulb} title="Je partage une idée" description="Votre voix compte : soumettez vos propositions." theme="green">
-        <VoxButton theme="green" variant="soft" onPress={() => Linking.openURL(EXTERNAL_LINKS.deposerUneIdee)}>
+        <VoxButton theme="green" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.deposerUneIdee)}>
           Déposer une idée
         </VoxButton>
       </CallToActionCard>
@@ -109,7 +114,7 @@ function CallToActionCards() {
       </CallToActionCard>
 
       <CallToActionCard icon={Users} title="Je rejoins l'équipe" description="Devenez ambassadeur de la campagne." theme="teal">
-        <VoxButton theme="teal" variant="soft" onPress={() => Linking.openURL(EXTERNAL_LINKS.rejoindreEquipe)}>
+        <VoxButton theme="teal" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.rejoindreEquipe)}>
           Postuler
         </VoxButton>
       </CallToActionCard>
