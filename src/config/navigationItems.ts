@@ -64,18 +64,18 @@ export type NavItemConfig = {
 
 // Configuration des items du menu militant pour utilisateurs connectés
 const militantNavItemsAuthConfig: NavItemConfig[] = [
-  { id: 'accueil', iconLeft: Newspaper, text: 'Accueil', href: '/' },
-  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/evenements' },
+  { id: 'accueil', iconLeft: Newspaper, text: 'M’informer', href: '/' },
+  { id: 'evenements', iconLeft: Zap, text: 'Agir', href: '/evenements' },
   { id: 'soutenir', iconLeft: HeartHandshake, text: 'Soutenir', href: '/soutenir' },
   { id: 'idees', iconLeft: Lightbulb, text: 'Idées', href: '/idees' },
 ] as const
 
 // Configuration des items du menu militant pour utilisateurs non connectés
 const militantNavItemsPublicConfig: NavItemConfig[] = [
-  { id: 'accueil', iconLeft: Globe, text: 'parti-renaissance.fr', externalUrlSlug: 'https://parti-renaissance.fr/' },
-  { id: 'evenements', iconLeft: Calendar, text: 'Événements', href: '/evenements' },
-  { id: 'soutenir', iconLeft: HeartHandshake, text: 'Soutenir', disabled: true },
-  { id: 'idees', iconLeft: Lightbulb, text: 'Idées', disabled: true },
+  { id: 'accueil', iconLeft: Newspaper, text: 'M’informer', href: '/', disabled: true },
+  { id: 'evenements', iconLeft: Zap, text: 'Agir', href: '/evenements' },
+  { id: 'soutenir', iconLeft: HeartHandshake, text: 'Soutenir', href: '/soutenir' },
+  { id: 'idees', iconLeft: Lightbulb, text: 'Idées', href: '/idees' },
 ] as const
 
 export const useMilitantNavItems = (): NavItemConfig[] => {

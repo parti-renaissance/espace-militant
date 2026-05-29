@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { usePathname } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb, styled, XStack, YStack } from 'tamagui'
-import { BellOff, ChevronRight, CircleCheckBig, Ellipsis, Globe, Haze, Sparkle } from '@tamagui/lucide-icons'
+import { BellOff, ChevronRight, Ellipsis, Globe, Rocket, Sparkle } from '@tamagui/lucide-icons'
 
 import { useVisibleNavItems } from '@/components/AppStructure/hooks/useVisibleNavItems'
 import { isNavItemActive } from '@/components/AppStructure/utils'
@@ -351,36 +351,36 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
           )}
         </MenuContainer>
         <MenuFooterContainer collapsed={displayNavCadre}>
+          <NavItem
+            iconLeft={Rocket}
+            text="attalpresident.fr"
+            externalLink
+            collapsed={displayNavCadre}
+            onPress={() => {
+              const url = 'https://attalpresident.fr/'
+              if (isWeb) {
+                window.open(url, '_blank')
+              } else {
+                void WebBrowser.openBrowserAsync(url)
+              }
+            }}
+          />
+          <NavItem
+            iconLeft={Globe}
+            text="parti-renaissance.fr"
+            externalLink
+            collapsed={displayNavCadre}
+            onPress={() => {
+              const url = 'https://parti-renaissance.fr/'
+              if (isWeb) {
+                window.open(url, '_blank')
+              } else {
+                void WebBrowser.openBrowserAsync(url)
+              }
+            }}
+          />
           {isAuth ? (
             <>
-              <NavItem
-                iconLeft={Globe}
-                text="parti-renaissance.fr"
-                externalLink
-                collapsed={displayNavCadre}
-                onPress={() => {
-                  const url = 'https://parti-renaissance.fr/'
-                  if (isWeb) {
-                    window.open(url, '_blank')
-                  } else {
-                    void WebBrowser.openBrowserAsync(url)
-                  }
-                }}
-              />
-              <NavItem
-                iconLeft={Haze}
-                text="nouvellerepublique.fr"
-                externalLink
-                collapsed={displayNavCadre}
-                onPress={() => {
-                  const url = 'https://nouvellerepublique.fr/'
-                  if (isWeb) {
-                    window.open(url, '_blank')
-                  } else {
-                    void WebBrowser.openBrowserAsync(url)
-                  }
-                }}
-              />
               {!user?.email_subscribed && (
                 <NavItem iconLeft={BellOff} text="Abonnement emails" href="/profil/communications" dangerAccent collapsed={displayNavCadre} />
               )}
@@ -410,42 +410,6 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
                 </Text.MD>
                 <VoxButton variant="outlined" size="lg" width="100%" theme="blue" onPress={() => signIn()}>
                   Me connecter
-                </VoxButton>
-              </YStack>
-
-              <YStack gap={16}>
-                <Text.MD semibold textWrap="balance">
-                  Adhérez pour débloquer{' '}
-                  <Text.MD semibold color="$yellow5">
-                    tous les contenus et fonctionnalités
-                  </Text.MD>
-                </Text.MD>
-
-                <YStack gap={8}>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Carte adhérent</Text.SM>
-                  </XStack>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Comités locaux</Text.SM>
-                  </XStack>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Événements exclusifs</Text.SM>
-                  </XStack>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Consultations</Text.SM>
-                  </XStack>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Élections internes</Text.SM>
-                  </XStack>
-                </YStack>
-
-                <VoxButton variant="contained" size="lg" width="100%" theme="yellow" onPress={() => signUp()}>
-                  J'adhère
                 </VoxButton>
               </YStack>
             </YStack>
