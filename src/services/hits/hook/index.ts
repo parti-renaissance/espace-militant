@@ -15,15 +15,17 @@ const THROTTLE_CLICK_MS = 30 * 1000
 
 const mutex = new Mutex()
 
-type TrackParams = { 
-  object_type?: ObjectType | null; 
-  object_id?: string; 
+type TrackParams = {
+  object_type?: ObjectType | null;
+  object_id?: string;
   source?: string;
   utm_source?: string;
   utm_campaign?: string;
   referrer_code?: string;
   target_url?: string;
   button_name?: string;
+  type?: string;
+  payload?: Record<string, unknown>;
 }
 type SessionBlob = { uuid: string; lastActiveAt: number }
 
