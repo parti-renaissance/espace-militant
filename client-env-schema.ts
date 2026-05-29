@@ -16,6 +16,7 @@ const envClientSchema = z.object({
   MAP_BOX_ACCESS_TOKEN: z.string(),
   APP_NAME: z.string(),
   CAMPAIGN_DOMAIN: z.string(),
+  FRIENDLY_CAPTCHA_SITE_KEY: z.string(),
 })
 
 export type ClientEnv = z.infer<typeof envClientSchema>

@@ -8,6 +8,7 @@ import { useVisibleNavItems } from '@/components/AppStructure/hooks/useVisibleNa
 import { isNavItemActive } from '@/components/AppStructure/utils'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import { SignUpButton } from '@/components/Buttons/AuthButton'
 
 import CadreIllustration from '@/assets/illustrations/CadreIllustration'
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
@@ -402,15 +403,13 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
           ) : (
             <YStack gap={24} p={12}>
               <YStack gap={16}>
-                <Text.MD semibold textWrap="balance">
-                  Je me connecte à{' '}
-                  <Text.MD semibold color="$blue5">
-                    mon espace
-                  </Text.MD>
+                <Text.MD semibold textWrap="balance" textAlign="center">
+                  Connectez-vous avec votre compte
                 </Text.MD>
                 <VoxButton variant="outlined" size="lg" width="100%" theme="blue" onPress={() => signIn()}>
                   Me connecter
                 </VoxButton>
+                <SignUpButton size="lg" />
               </YStack>
             </YStack>
           )}

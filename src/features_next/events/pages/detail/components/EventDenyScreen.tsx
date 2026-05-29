@@ -31,7 +31,7 @@ const AdhButton = () => {
       size="lg"
       flex={1}
       theme="yellow"
-      onPress={isAuth ? handleClick() : () => signUp({ utm_campaign: 'event' })}
+      onPress={isAuth ? handleClick() : () => signUp()}
       loading={isPending}
     >
       Adhérer

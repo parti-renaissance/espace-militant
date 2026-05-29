@@ -21,6 +21,7 @@ import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks
 import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen'
 
 import clientEnv from '@/config/clientEnv'
+import SignupTunnelGuard from '@/features_next/signup/components/SignupTunnelGuard'
 import { SessionProvider, useSession } from '@/ctx/SessionProvider'
 import useDeepLinkHandler from '@/hooks/useDeepLinkHandler'
 import useImportFont from '@/hooks/useImportFont'
@@ -141,7 +142,9 @@ function Root() {
                   <SessionProvider>
                     <PortalLayout>
                       <WaitingRoomHoc isLoading={!isFontsLoaded}>
-                        <Slot />
+                        <SignupTunnelGuard>
+                          <Slot />
+                        </SignupTunnelGuard>
                       </WaitingRoomHoc>
                     </PortalLayout>
                   </SessionProvider>

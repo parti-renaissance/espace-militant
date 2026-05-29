@@ -3678,6 +3678,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@friendlycaptcha/sdk@npm:^0.2.0":
+  version: 0.2.3
+  resolution: "@friendlycaptcha/sdk@npm:0.2.3"
+  checksum: 10c0/7b04bd519add67e0b6d2921a59bd1cb40f6c05b5545b9d367c7312a7531a1415eadb4e7d07c08e68e674b175f97b3f7f0b4730c4162866b98cf4216b2c825eea
+  languageName: node
+  linkType: hard
+
 "@gar/promise-retry@npm:^1.0.0":
   version: 1.0.2
   resolution: "@gar/promise-retry@npm:1.0.2"
@@ -26386,6 +26393,7 @@ __metadata:
     "@babel/core": "npm:^7.25.2"
     "@eslint/js": "npm:^10.0.0"
     "@expo/webpack-config": "npm:~19.0.1"
+    "@friendlycaptcha/sdk": "npm:^0.2.0"
     "@gorhom/bottom-sheet": "npm:^5.2.6"
     "@hookform/resolvers": "npm:^3.9.0"
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.1.1"
