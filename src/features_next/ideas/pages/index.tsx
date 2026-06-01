@@ -9,6 +9,7 @@ import FormationCard from '../components/FormationCard';
 import PrioritiesCard from '../components/PrioritiesCard';
 import ShareIdeaCard from '../components/ShareIdeaCard';
 import ToiPresidentCard from '../components/ToiPresident/ToiPresidentCard';
+import { useToiPresidentActions } from '../hooks/useToiPresidentActions';
 
 const EXTERNAL_LINKS = {
   deposerUneIdee: 'https://parti.re/app-idee/deposer-une-idee',
@@ -36,6 +37,7 @@ function HeroTitle({ size = 'h1' }: { size?: 'h1' | 'h2' }) {
 
 function DesktopContent() {
   const router = useRouter()
+  const toiPresident = useToiPresidentActions()
 
   return (
     <YStack gap="$large" width="100%">
@@ -49,9 +51,7 @@ function DesktopContent() {
           />
         </YStack>
         <YStack flex={1} flexBasis={0} minWidth={0}>
-          <ToiPresidentCard
-            flex={1}
-          />
+          <ToiPresidentCard flex={1} onPlay={toiPresident.play} onShare={toiPresident.share} />
         </YStack>
       </XStack>
       <XStack gap="$large" alignItems="stretch">
@@ -68,10 +68,11 @@ function DesktopContent() {
 
 function MobileContent() {
   const router = useRouter()
+  const toiPresident = useToiPresidentActions()
 
   return (
     <YStack gap="$large">
-      <ToiPresidentCard />
+      <ToiPresidentCard onPlay={toiPresident.play} onShare={toiPresident.share} />
       <HeroTitle size="h2" />
       <YStack gap="$medium">
         <BotQuestionCard onPress={() => router.push('/idees/bot')} />

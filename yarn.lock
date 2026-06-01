@@ -23172,6 +23172,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-share@npm:^12.3.1":
+  version: 12.3.1
+  resolution: "react-native-share@npm:12.3.1"
+  checksum: 10c0/4ee8a64e5a992ecf16bcf59a4d1384b3310d590d5fb0e7b07f60073635cc9de8fd3adf31bcbd93500252690bdf59a45ca6d01f3a834b32842768e1a02e5e5524
+  languageName: node
+  linkType: hard
+
 "react-native-svg@npm:15.15.3":
   version: 15.15.3
   resolution: "react-native-svg@npm:15.15.3"
@@ -26499,6 +26506,7 @@ __metadata:
     react-native-reanimated: "npm:4.2.1"
     react-native-safe-area-context: "npm:~5.6.0"
     react-native-screens: "npm:~4.23.0"
+    react-native-share: "npm:^12.3.1"
     react-native-svg: "npm:15.15.3"
     react-native-web: "npm:^0.21.0"
     react-native-webview: "npm:13.16.0"
