@@ -6,7 +6,7 @@ import { LinearGradient } from '@tamagui/linear-gradient';
 import { Dices, Share2 } from '@tamagui/lucide-icons'
 import { VoxButton } from '@/components/Button';
 import CallToActionCard from '@/components/CallToActionCard/CallToActionCard';
-import GAME_IMAGE from '../../assets/game-icon.png';
+import GAME_IMAGE from '../assets/game-icon.png';
 import ToiPresidentArrowLeft from './ToiPresidentArrowLeft';
 import ToiPresidentArrowRight from './ToiPresidentArrowRight';
 
