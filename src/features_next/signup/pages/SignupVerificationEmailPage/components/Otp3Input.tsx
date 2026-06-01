@@ -35,7 +35,25 @@ export default function Otp3Input({ onComplete, disabled, error }: Otp3InputProp
   )
 
   const handleChange = (index: number, value: string) => {
-    const digit = value.replace(/\D/g, '').slice(-1)
+    const cleaned = value.replace(/\D/g, '')
+
+    if (cleaned.length > 1) {
+      const next = [...digits]
+      const chars = cleaned.split('')
+      let lastFilled = index
+      for (let i = 0; i < chars.length && index + i < next.length; i++) {
+        next[index + i] = chars[i]
+        lastFilled = index + i
+      }
+      setDigits(next)
+
+      const focusIndex = Math.min(lastFilled + 1, next.length - 1)
+      inputsRef.current[focusIndex]?.focus()
+      submitIfComplete(next)
+      return
+    }
+
+    const digit = cleaned.slice(-1)
     const next = [...digits]
     next[index] = digit
     setDigits(next)
@@ -65,7 +83,7 @@ export default function Otp3Input({ onComplete, disabled, error }: Otp3InputProp
           onChangeText={(v) => handleChange(index, v)}
           onKeyPress={(e) => handleKeyPress(index, e)}
           keyboardType="number-pad"
-          maxLength={1}
+          maxLength={3}
           editable={!disabled}
           selectTextOnFocus
           accessibilityLabel={`Chiffre ${index + 1} du code de vérification`}

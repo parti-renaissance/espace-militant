@@ -16,6 +16,7 @@ import { useSignupSessionStore } from '@/features_next/signup/store/signup-sessi
 export default function SignupVerificationEmailPage() {
   const insets = useSafeAreaInsets()
   const email = useSignupSessionStore((s) => s.email)
+  const firstName = useSignupSessionStore((s) => s.firstName)
   const inlineError = useSignupSessionStore((s) => s.inlineError)
   const { activateWithCode, isActivating } = useSignupActivate()
 
@@ -27,7 +28,7 @@ export default function SignupVerificationEmailPage() {
     <ScrollView flex={1} backgroundColor="$gray50">
       <YStack flex={1} padding="$medium" paddingTop={insets.top + 16} paddingBottom={insets.bottom + 16} gap="$medium" maxWidth={520} alignSelf="center">
         <Title>
-          <Title.Highlight>Merci Maxime</Title.Highlight>
+          <Title.Highlight>Merci{firstName ? ` ${firstName}` : ''}</Title.Highlight>
           <Title.Text>😊</Title.Text>
           <Title.Break />
           <Title.Text>on y est presque</Title.Text>
@@ -52,11 +53,6 @@ export default function SignupVerificationEmailPage() {
             </MessageCard>
           ) : null}
           <OpenMailboxButton email={email} />
-          {isActivating ? (
-            <VoxButton theme="blue" size="lg" loading disabled>
-              Vérification…
-            </VoxButton>
-          ) : null}
         </YStack>
 
         <ResendCountdown email={email} />

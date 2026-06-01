@@ -8,9 +8,11 @@ import { SIGNUP_RESEND_COOLDOWN_MS } from '@/services/signup/constants'
  */
 type SignupSessionState = {
   email: string
+  firstName: string
   inlineError: string | null
   resendAvailableAt: number | null
   setEmail: (email: string) => void
+  setFirstName: (firstName: string) => void
   setInlineError: (message: string | null) => void
   startResendCooldown: () => void
   reset: () => void
@@ -18,6 +20,7 @@ type SignupSessionState = {
 
 const initialState = {
   email: '',
+  firstName: '',
   inlineError: null as string | null,
   resendAvailableAt: null as number | null,
 }
@@ -25,6 +28,7 @@ const initialState = {
 export const useSignupSessionStore = create<SignupSessionState>((set) => ({
   ...initialState,
   setEmail: (email) => set({ email }),
+  setFirstName: (firstName) => set({ firstName }),
   setInlineError: (inlineError) => set({ inlineError }),
   startResendCooldown: () => set({ resendAvailableAt: Date.now() + SIGNUP_RESEND_COOLDOWN_MS }),
   reset: () => set(initialState),

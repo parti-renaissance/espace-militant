@@ -59,6 +59,7 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
             <EuCampaignIllustration showText={false} />
             <XStack gap="$small">
               <SignInButton />
+              <SignUpButton />
             </XStack>
           </XStack>
         </Header>

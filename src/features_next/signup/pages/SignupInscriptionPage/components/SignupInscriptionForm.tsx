@@ -49,6 +49,7 @@ function SignupInscriptionForm({ onSuccess, onLoadingChange }: SignupInscription
   const [formError, setFormError] = useState<string | null>(null)
   const { mutateAsync: signup, isPending } = useSignup()
   const setEmail = useSignupSessionStore((s) => s.setEmail)
+  const setFirstName = useSignupSessionStore((s) => s.setFirstName)
   const startResendCooldown = useSignupSessionStore((s) => s.startResendCooldown)
 
   const { control, handleSubmit, setError } = useForm<SignupInscriptionFormValues>({
@@ -95,6 +96,7 @@ function SignupInscriptionForm({ onSuccess, onLoadingChange }: SignupInscription
     try {
       await signup(mapToApiPayload(data, recaptchaToken))
       setEmail(data.email.trim())
+      setFirstName(data.first_name.trim())
       startResendCooldown()
       onSuccess()
     } catch (error) {
@@ -127,7 +129,7 @@ function SignupInscriptionForm({ onSuccess, onLoadingChange }: SignupInscription
         name="first_name"
         control={control}
         render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-          <Input placeholder="Prénom" onBlur={onBlur} onChangeText={onChange} value={value} error={error?.message} autoComplete="given-name" />
+          <Input placeholder="Prénom" onBlur={onBlur} onChangeText={onChange} value={value} error={error?.message} autoComplete="given-name" size="sm" />
         )}
       />
 
@@ -144,6 +146,7 @@ function SignupInscriptionForm({ onSuccess, onLoadingChange }: SignupInscription
             autoCapitalize="none"
             keyboardType="email-address"
             autoComplete="email"
+            size="sm"
           />
         )}
       />
@@ -162,6 +165,7 @@ function SignupInscriptionForm({ onSuccess, onLoadingChange }: SignupInscription
               keyboardType="number-pad"
               maxLength={5}
               autoComplete="postal-code"
+              size="sm"
             />
             <XStack alignItems="center" gap="$small" flexShrink={1}>
               <MapPin size={16} color="$gray400" />
@@ -207,7 +211,7 @@ function SignupInscriptionForm({ onSuccess, onLoadingChange }: SignupInscription
         </VoxButton>
       </YStack>
 
-      <YStack alignItems="center" height={50}>
+      <YStack alignItems="center" height={75}>
         <FriendlyCaptchaWidget key={captchaResetKey} onToken={handleCaptchaToken} error={recaptchaError} />
       </YStack>
 
