@@ -17,24 +17,16 @@ export default function ResendCountdown({ email }: ResendCountdownProps) {
   const startResendCooldown = useSignupSessionStore((s) => s.startResendCooldown)
   const setInlineError = useSignupSessionStore((s) => s.setInlineError)
   const { mutateAsync: resend, isPending } = useResendSignupCode()
-  const [secondsLeft, setSecondsLeft] = useState(() => getResendSecondsLeft(resendAvailableAt))
-  const [prevResendAvailableAt, setPrevResendAvailableAt] = useState(resendAvailableAt)
-
-  if (resendAvailableAt !== prevResendAvailableAt) {
-    setPrevResendAvailableAt(resendAvailableAt)
-    setSecondsLeft(getResendSecondsLeft(resendAvailableAt))
-  }
+  const [, setTick] = useState(0)
 
   useEffect(() => {
     if (!isResendCooldownActive(resendAvailableAt)) return
 
-    const interval = setInterval(() => {
-      setSecondsLeft(getResendSecondsLeft(resendAvailableAt))
-    }, 1000)
-
+    const interval = setInterval(() => setTick((t) => t + 1), 1000)
     return () => clearInterval(interval)
   }, [resendAvailableAt])
 
+  const secondsLeft = getResendSecondsLeft(resendAvailableAt)
   const canResend = !isResendCooldownActive(resendAvailableAt)
 
   const handleResend = async () => {
@@ -43,7 +35,6 @@ export default function ResendCountdown({ email }: ResendCountdownProps) {
     try {
       await resend({ email })
       startResendCooldown()
-      setSecondsLeft(getResendSecondsLeft(useSignupSessionStore.getState().resendAvailableAt))
     } catch (error) {
       setInlineError(getSignupErrorMessage(error))
     }
@@ -64,11 +55,9 @@ export default function ResendCountdown({ email }: ResendCountdownProps) {
 
   return (
     <YStack justifyContent="center" alignItems="center" width="100%">
-      <YStack>
-        <VoxButton variant="outlined" theme="blue" size="sm" onPress={handleResend} loading={isPending} disabled={isPending}>
-          Renvoyer le code
-        </VoxButton>
-      </YStack>
+      <VoxButton variant="outlined" theme="blue" size="sm" onPress={handleResend} loading={isPending} disabled={isPending}>
+        Renvoyer le code
+      </VoxButton>
     </YStack>
   )
 }

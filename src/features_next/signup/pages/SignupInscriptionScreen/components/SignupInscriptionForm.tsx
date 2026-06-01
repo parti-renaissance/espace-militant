@@ -1,37 +1,22 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react'
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react'
 import { Linking, Pressable } from 'react-native'
 import { XStack, YStack } from 'tamagui'
 import { AlertTriangle, MapPin } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
-import { z } from 'zod'
 
 import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
-import FriendlyCaptchaWidget from '@/features_next/signup/pages/SignupInscriptionPage/components/FriendlyCaptchaWidget'
+import FriendlyCaptchaWidget from '@/features_next/signup/pages/SignupInscriptionScreen/components/FriendlyCaptchaWidget'
 import { useSignupSessionStore } from '@/features_next/signup/store/signup-session-store'
-import { applySignupViolationsToForm } from '@/features_next/signup/utils/errors'
+import { applySignupFormError } from '@/features_next/signup/utils/errors'
 
 import { DEFAULT_SIGNUP_SOURCE } from '@/services/signup/constants'
 import { useSignup } from '@/services/signup/hook'
-import type { RestPostSignupRequest } from '@/services/signup/schema'
-import { errorMessages } from '@/utils/errorMessages'
-
-const SignupInscriptionFormSchema = z.object({
-  first_name: z.string().min(1, errorMessages.emptyField).max(50),
-  email: z.string().email(errorMessages.email),
-  postal_code: z
-    .string()
-    .min(1, errorMessages.emptyField)
-    .max(15)
-    .regex(/^\d{5}$/, 'Code postal invalide (5 chiffres)'),
-  email_opt_in: z.boolean(),
-})
-
-type SignupInscriptionFormValues = z.infer<typeof SignupInscriptionFormSchema>
+import { SignupInscriptionFormSchema, type RestPostSignupRequest, type SignupInscriptionFormValues } from '@/services/signup/schema'
 
 export type SignupInscriptionFormHandle = {
   submit: () => void
@@ -39,15 +24,14 @@ export type SignupInscriptionFormHandle = {
 
 type SignupInscriptionFormProps = {
   onSuccess: () => void
-  onLoadingChange?: (loading: boolean) => void
 }
 
-function SignupInscriptionForm({ onSuccess, onLoadingChange }: SignupInscriptionFormProps, ref: React.Ref<SignupInscriptionFormHandle>) {
+function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: React.Ref<SignupInscriptionFormHandle>) {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null)
   const [recaptchaError, setRecaptchaError] = useState<string | null>(null)
   const [captchaResetKey, setCaptchaResetKey] = useState(0)
   const [formError, setFormError] = useState<string | null>(null)
-  const { mutateAsync: signup, isPending } = useSignup()
+  const { mutateAsync: signup } = useSignup()
   const setEmail = useSignupSessionStore((s) => s.setEmail)
   const setFirstName = useSignupSessionStore((s) => s.setFirstName)
   const startResendCooldown = useSignupSessionStore((s) => s.startResendCooldown)
@@ -82,10 +66,6 @@ function SignupInscriptionForm({ onSuccess, onLoadingChange }: SignupInscription
     [],
   )
 
-  useEffect(() => {
-    onLoadingChange?.(isPending)
-  }, [isPending, onLoadingChange])
-
   const onSubmit = handleSubmit(async (data) => {
     setFormError(null)
     setRecaptchaError(null)
@@ -100,7 +80,7 @@ function SignupInscriptionForm({ onSuccess, onLoadingChange }: SignupInscription
       startResendCooldown()
       onSuccess()
     } catch (error) {
-      applySignupViolationsToForm({
+      applySignupFormError({
         error,
         setError,
         setRecaptchaError: (message) => {
