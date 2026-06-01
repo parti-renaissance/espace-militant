@@ -18,9 +18,14 @@ export default function ResendCountdown({ email }: ResendCountdownProps) {
   const setInlineError = useSignupSessionStore((s) => s.setInlineError)
   const { mutateAsync: resend, isPending } = useResendSignupCode()
   const [secondsLeft, setSecondsLeft] = useState(() => getResendSecondsLeft(resendAvailableAt))
+  const [prevResendAvailableAt, setPrevResendAvailableAt] = useState(resendAvailableAt)
+
+  if (resendAvailableAt !== prevResendAvailableAt) {
+    setPrevResendAvailableAt(resendAvailableAt)
+    setSecondsLeft(getResendSecondsLeft(resendAvailableAt))
+  }
 
   useEffect(() => {
-    setSecondsLeft(getResendSecondsLeft(resendAvailableAt))
     if (!isResendCooldownActive(resendAvailableAt)) return
 
     const interval = setInterval(() => {

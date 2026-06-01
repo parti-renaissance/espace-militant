@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { YStack } from 'tamagui'
@@ -81,11 +81,6 @@ export default function FriendlyCaptchaWidget({ onToken, onError, error }: Frien
     },
     [onToken],
   )
-
-  useEffect(() => {
-    tokenSentRef.current = false
-    setLoadError(null)
-  }, [siteKey])
 
   const handleMessage = useCallback(
     (event: { nativeEvent: { data: string } }) => {

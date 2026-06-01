@@ -12,11 +12,16 @@ export default function Otp3Input({ onComplete, disabled, error }: Otp3InputProp
   const [digits, setDigits] = useState(['', '', ''])
   const inputsRef = useRef<Array<TextInput | null>>([])
   const lastSubmittedCodeRef = useRef<string | null>(null)
+  const [prevError, setPrevError] = useState(error)
+
+  if (error && error !== prevError) {
+    setPrevError(error)
+    lastSubmittedCodeRef.current = null
+    setDigits(['', '', ''])
+  }
 
   useEffect(() => {
     if (!error) return
-    lastSubmittedCodeRef.current = null
-    setDigits(['', '', ''])
     inputsRef.current[0]?.focus()
   }, [error])
 

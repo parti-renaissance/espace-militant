@@ -12,7 +12,6 @@ import {
   Eye,
   FileBadge,
   FileStack,
-  Globe,
   Goal,
   GraduationCap,
   Group,

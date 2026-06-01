@@ -4,7 +4,6 @@ import { ScrollView, YStack } from 'tamagui'
 import { AlertTriangle } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
-import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import Title from '@/components/Title/Title'
 import { useSignupActivate } from '@/features_next/signup/hooks/useSignupActivate'

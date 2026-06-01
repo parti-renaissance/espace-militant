@@ -200,7 +200,7 @@ interface SideBarProps {
 }
 
 export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => {
-  const { isAuth, signIn, signUp } = useSession()
+  const { isAuth, signIn } = useSession()
   const pathname = usePathname()
   const { data: user } = useGetProfil({ enabled: isAuth })
   const { data: executiveScopes } = useGetExecutiveScopes()
