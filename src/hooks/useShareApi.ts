@@ -59,7 +59,8 @@ export default function useShareApi() {
     const { file, ...content } = payload
 
     if (typeof window !== 'undefined' && navigator.share) {
-      const shareData: ShareData = { title: content.title, text: content.message, url: content.url }
+      const text = file ? [content.message, content.url].filter(Boolean).join('\n\n') : content.message
+      const shareData: ShareData = { title: content.title, text, url: file ? undefined : content.url }
       if (file) {
         const webFile = await buildWebFile(file)
         if (webFile) {
