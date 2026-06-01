@@ -1,5 +1,6 @@
-import { config as configBase } from '@tamagui/config/v3'
 import { createTamagui, createTokens } from 'tamagui'
+import { config as configBase } from '@tamagui/config/v3'
+
 import { Maax, Plaak, PublicSans } from './theme/fonts'
 import { themes } from './themes'
 
@@ -52,6 +53,10 @@ export const config = createTamagui({
   media: configBase.media,
   defaultFont: 'PublicSans',
   fonts: { ...configBase.fonts, Maax, Plaak, PublicSans },
+  selectionStyles: (theme) => ({
+    backgroundColor: theme.blue500,
+    color: theme.white1,
+  }),
 })
 
 export default config

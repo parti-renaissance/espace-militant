@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Platform } from 'react-native'
 import * as AuthSession from 'expo-auth-session'
 import { DiscoveryDocument } from 'expo-auth-session'
 import * as WebBrowser from 'expo-web-browser'
@@ -8,6 +7,7 @@ import { isWeb } from 'tamagui'
 
 import clientEnv from '@/config/clientEnv'
 import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
+import type { User } from '@/store/user-store'
 
 import useBrowserWarmUp from './useBrowserWarmUp'
 
@@ -42,6 +42,24 @@ try {
 
 export const REDIRECT_URI = AuthSession.makeRedirectUri()
 const BASE_REQUEST_CONFIG = { clientId: clientEnv.OAUTH_CLIENT_ID, redirectUri: REDIRECT_URI }
+const PKCE_VERIFIER_STORAGE_KEY = 'pkce_code_verifier'
+
+const storePkceVerifier = (verifier?: string) => {
+  if (isWeb && typeof window !== 'undefined' && verifier) {
+    window.sessionStorage.setItem(PKCE_VERIFIER_STORAGE_KEY, verifier)
+  }
+}
+
+const consumePkceVerifier = (): string | undefined => {
+  if (!isWeb || typeof window === 'undefined') {
+    return undefined
+  }
+  const verifier = window.sessionStorage.getItem(PKCE_VERIFIER_STORAGE_KEY) ?? undefined
+  if (verifier) {
+    window.sessionStorage.removeItem(PKCE_VERIFIER_STORAGE_KEY)
+  }
+  return verifier
+}
 
 export const useDiscoveryDocument = (register?: boolean) => {
   const [discovery, setDiscovery] = useState<DiscoveryDocument | null>(null)
@@ -64,7 +82,7 @@ export const useCodeAuthRequest = (props?: { register?: boolean; utm_campaign?: 
   const requestConfig = {
     ...BASE_REQUEST_CONFIG,
     scopes: ['jemarche_app', 'read:profile', 'write:profile'],
-    usePKCE: false,
+    usePKCE: true,
     extraParams: {
       utm_source: 'app',
       ...(props?.utm_campaign ? { utm_campaign: props.utm_campaign } : {}),
@@ -74,12 +92,40 @@ export const useCodeAuthRequest = (props?: { register?: boolean; utm_campaign?: 
   return AuthSession.useAuthRequest(requestConfig, discovery)
 }
 
-const exchangeCodeAsync = async ({ code, sessionId }: { code: string; sessionId?: string }) => {
+export const exchangeCodeAsync = async ({ code, sessionId, codeVerifier }: { code: string; sessionId?: string; codeVerifier?: string }) => {
   if (!code) {
     return null
   }
 
-  return AuthSession.exchangeCodeAsync({ ...BASE_REQUEST_CONFIG, code, extraParams: { session_id: sessionId ?? '' } }, await getDiscoveryDocument())
+  return AuthSession.exchangeCodeAsync(
+    {
+      ...BASE_REQUEST_CONFIG,
+      code,
+      extraParams: { session_id: sessionId ?? '', ...(codeVerifier ? { code_verifier: codeVerifier } : {}) },
+    },
+    await getDiscoveryDocument(),
+  )
+}
+
+type ExchangedSession = NonNullable<Awaited<ReturnType<typeof exchangeCodeAsync>>>
+
+// Maps an OAuth token-exchange response to the user-store credentials shape.
+// Shared by the login (SessionProvider) and signup-activation flows.
+export const credentialsFromTokenResponse = (session: ExchangedSession, isAdmin?: boolean): User => ({
+  accessToken: session.accessToken,
+  refreshToken: session.refreshToken,
+  sessionId: session.idToken,
+  accessTokenExpiresIn: session.expiresIn,
+  isAdmin,
+})
+
+export const createPkcePair = async (): Promise<{ codeChallenge: string; codeVerifier: string }> => {
+  const request = new AuthSession.AuthRequest({ ...BASE_REQUEST_CONFIG, usePKCE: true })
+  await request.getAuthRequestConfigAsync()
+  if (!request.codeChallenge || !request.codeVerifier) {
+    throw new AuthFlowError('Failed to generate a PKCE pair')
+  }
+  return { codeChallenge: request.codeChallenge, codeVerifier: request.codeVerifier }
 }
 
 export const useLogin = () => {
@@ -88,7 +134,8 @@ export const useLogin = () => {
   return async (payload?: { code?: string; sessionId?: string; state?: string }) => {
     if (payload?.code) {
       await safelyDismissAuthSession()
-      return exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId })
+      const codeVerifier = isWeb ? consumePkceVerifier() : req?.codeVerifier
+      return exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId, codeVerifier })
     }
 
     if (isWeb) {
@@ -96,6 +143,11 @@ export const useLogin = () => {
       url.searchParams.set('redirect_uri', req?.redirectUri ?? '')
       url.searchParams.set('client_id', req?.clientId ?? '')
       url.searchParams.set('response_type', 'code')
+      if (req?.codeChallenge) {
+        url.searchParams.set('code_challenge', req.codeChallenge)
+        url.searchParams.set('code_challenge_method', 'S256')
+        storePkceVerifier(req.codeVerifier)
+      }
       if (payload?.state) {
         url.searchParams.set('state', payload?.state)
       }
@@ -112,7 +164,7 @@ export const useLogin = () => {
       })
 
       if (codeResult.type === 'success') {
-        const session = await exchangeCodeAsync({ code: codeResult.params.code })
+        const session = await exchangeCodeAsync({ code: codeResult.params.code, codeVerifier: req?.codeVerifier })
         await waitForUiStabilization()
         return session
       }
@@ -131,10 +183,14 @@ export const useLogin = () => {
 
 export const useRegister = () => {
   useBrowserWarmUp()
-  const [, , promptAsync] = useCodeAuthRequest({ register: true }) ?? []
+  const [req, , promptAsync] = useCodeAuthRequest({ register: true }) ?? []
   return async ({ utm_campaign }: { utm_campaign?: string } = {}) => {
     if (isWeb) {
       let url = REGISTRATION_ENDPOINT + `?redirect_uri=${REDIRECT_URI}&utm_source=app`
+      if (req?.codeChallenge) {
+        url += `&code_challenge=${encodeURIComponent(req.codeChallenge)}&code_challenge_method=S256`
+        storePkceVerifier(req.codeVerifier)
+      }
       if (utm_campaign) {
         url += `&utm_campaign=${encodeURIComponent(utm_campaign)}`
       }
@@ -146,7 +202,7 @@ export const useRegister = () => {
 
     try {
       if (codeResult.type === 'success') {
-        const session = await exchangeCodeAsync({ code: codeResult.params.code })
+        const session = await exchangeCodeAsync({ code: codeResult.params.code, codeVerifier: req?.codeVerifier })
         await waitForUiStabilization()
         return session
       }

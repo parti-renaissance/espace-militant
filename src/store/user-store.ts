@@ -12,12 +12,15 @@ export interface User {
   accessTokenExpiresAt?: number
 }
 
+export type SignupTunnelStatus = 'pending' | 'skipped' | 'completed'
+
 interface UserSessionData {
   user: User | null
   onboardingOpenedAt: string | null
   hideResubscribeAlert: string | null
   defaultScope: string | null
   lastAvailableScopes: string[] | null
+  signupTunnelStatus: SignupTunnelStatus
 }
 
 const initialUserData: UserSessionData = {
@@ -26,6 +29,7 @@ const initialUserData: UserSessionData = {
   hideResubscribeAlert: null,
   defaultScope: null,
   lastAvailableScopes: null,
+  signupTunnelStatus: 'pending',
 }
 
 interface UserState extends UserSessionData {
@@ -35,6 +39,7 @@ interface UserState extends UserSessionData {
   setHideReSubscribeAlert: (x: string | null) => void
   setDefaultScope: (scope: string) => void
   setLastAvailableScopes: (scopes: string[]) => void
+  setSignupTunnelSkipped: () => void
   _hasHydrated: boolean
   _setHasHydrated: (hasHydrated: boolean) => void
   rehydrateFromStorage: () => Promise<void>
@@ -45,6 +50,7 @@ const userStoreSlice: StateCreator<UserState> = (set) => ({
   _hasHydrated: false,
   setDefaultScope: (scope) => set({ defaultScope: scope }),
   setLastAvailableScopes: (scopes) => set({ lastAvailableScopes: scopes }),
+  setSignupTunnelSkipped: () => set({ signupTunnelStatus: 'skipped' }),
   setCredentials: (user) => {
     const userWithExpiration: User = {
       ...user,
@@ -52,7 +58,7 @@ const userStoreSlice: StateCreator<UserState> = (set) => ({
         ? Date.now() + user.accessTokenExpiresIn * 1000
         : user.accessTokenExpiresAt,
     }
-    set({ ...initialUserData, user: userWithExpiration })
+    set({ ...initialUserData, user: userWithExpiration, signupTunnelStatus: 'completed' })
   },
   removeCredentials: () => set({ ...initialUserData }),
   setOnboardingOpenedAt: (onboardingOpenedAt) => set({ onboardingOpenedAt }),

@@ -68,7 +68,7 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
         {sidebarState && media.gtSm && <SideBar state={sidebarState} navCadreItems={cadreNavItems} />}
         {children}
       </LayoutWrapper>
-      {!media.gtSm && isAuth && <ConfigurableTabBar hide={hideTabBar} navCadreItems={cadreNavItems} />}
+      {!media.gtSm && <ConfigurableTabBar hide={hideTabBar} navCadreItems={cadreNavItems} />}
     </LayoutRoot>
   )
 }
