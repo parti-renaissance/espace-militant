@@ -2,6 +2,7 @@ import clientEnv from '@/config/clientEnv'
 
 export const UUID_PARAM = 'uuid'
 export const TOI_PRESIDENT_SHARE_MESSAGE = 'Toi président — le jeu'
+export const TOI_PRESIDENT_PATH = '/idees/toi-president'
 
 const EMBED_URL = clientEnv.TOI_PRESIDENT_EMBED_URL ?? ''
 const SHARE_URL = clientEnv.TOI_PRESIDENT_SHARE_URL ?? ''
@@ -27,5 +28,6 @@ export function getToiPresidentEmbedUrl(uuid?: string | null): string {
 }
 
 export function getToiPresidentShareUrl(): string {
-  return SHARE_URL
+  if (SHARE_URL) return SHARE_URL
+  return `https://${clientEnv.ASSOCIATED_DOMAIN}${TOI_PRESIDENT_PATH}`
 }

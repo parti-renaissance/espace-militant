@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { Platform, Share } from 'react-native'
 import { useQuery } from '@tanstack/react-query'
-import * as FileSystem from 'expo-file-system/legacy'
 import { UnavailabilityError } from 'expo-modules-core'
 import * as Sharing from 'expo-sharing'
 
@@ -30,18 +29,22 @@ async function buildWebFile(file: ShareFile): Promise<File | null> {
 }
 
 async function shareFileOnNative(file: ShareFile, content?: { url?: string; message?: string }): Promise<void> {
-  const fileName = file.fileName ?? DEFAULT_FILE_NAME
-  const fileUri = `${FileSystem.cacheDirectory}${fileName}`
-  await FileSystem.writeAsStringAsync(fileUri, toRawBase64(file.base64), { encoding: FileSystem.EncodingType.Base64 })
+  const { default: RNShare } = await import('react-native-share')
+  const dataUrl = `data:${file.mimeType};base64,${toRawBase64(file.base64)}`
+  const message = [content?.message, content?.url].filter(Boolean).join('\n\n') || undefined
 
-  if (content?.url || content?.message) {
-    const message = [content.message, content.url].filter(Boolean).join('\n\n')
-    const { default: RNShare } = await import('react-native-share')
-    await RNShare.open({ url: fileUri, message, type: file.mimeType })
-    return
+  try {
+    await RNShare.open({
+      url: dataUrl,
+      filename: file.fileName ?? DEFAULT_FILE_NAME,
+      type: file.mimeType,
+      message,
+      failOnCancel: false,
+    })
+  } catch (error) {
+    if (error instanceof Error && /did not share|cancel/i.test(error.message)) return
+    throw error
   }
-
-  await Sharing.shareAsync(fileUri, { mimeType: file.mimeType, UTI: file.mimeType })
 }
 
 export default function useShareApi() {
