@@ -5,7 +5,7 @@ import { Dices } from '@tamagui/lucide-icons'
 
 import Header from '@/components/AppStructure/Header'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import ToiPresidentGameScreen from '@/features_next/ideas/pages/toiPresident'
+import ToiPresidentGameScreen from '@/features_next/ideas/toiPresident/page'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'

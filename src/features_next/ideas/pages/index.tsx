@@ -8,8 +8,8 @@ import BotQuestionCard from '../components/BotQuestionCard';
 import FormationCard from '../components/FormationCard';
 import PrioritiesCard from '../components/PrioritiesCard';
 import ShareIdeaCard from '../components/ShareIdeaCard';
-import ToiPresidentCard from '../components/ToiPresident/ToiPresidentCard';
-import { useToiPresidentActions } from '../hooks/useToiPresidentActions';
+import ToiPresidentCard from '../toiPresident/components/ToiPresidentCard';
+import { useToiPresidentActions } from '../toiPresident/hooks/useToiPresidentActions';
 
 const EXTERNAL_LINKS = {
   deposerUneIdee: 'https://parti.re/app-idee/deposer-une-idee',

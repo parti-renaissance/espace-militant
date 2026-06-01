@@ -4,7 +4,7 @@ export const UUID_PARAM = 'uuid'
 export const TOI_PRESIDENT_SHARE_MESSAGE = 'Toi président — le jeu'
 
 const EMBED_URL = clientEnv.TOI_PRESIDENT_EMBED_URL ?? ''
-const SHARE_URL = clientEnv.TOI_PRESIDENT_SHARE_URL || EMBED_URL
+const SHARE_URL = clientEnv.TOI_PRESIDENT_SHARE_URL ?? ''
 
 export const ALLOWED_ORIGINS: string[] = (() => {
   try {
