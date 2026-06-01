@@ -18,6 +18,7 @@ const envClientSchema = z.object({
   CAMPAIGN_DOMAIN: z.string(),
   TOI_PRESIDENT_EMBED_URL: z.string().url().optional(),
   TOI_PRESIDENT_SHARE_URL: z.string().url().optional(),
+  FRIENDLY_CAPTCHA_SITE_KEY: z.string(),
 })
 
 export type ClientEnv = z.infer<typeof envClientSchema>

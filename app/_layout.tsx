@@ -12,9 +12,10 @@ import { isSupported } from '@firebase/messaging'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-import MapboxGl from '@/components/Mapbox/Mapbox'
 import { PortalLayout } from '@/components/layouts/PortalLayout'
+import MapboxGl from '@/components/Mapbox/Mapbox'
 import WaitingScreen from '@/components/WaitingScreen'
+import SignupTunnelGuard from '@/features_next/signup/components/SignupTunnelGuard'
 import { useInitPushNotification } from '@/features/push-notification/hook'
 import initRootAppNotification from '@/features/push-notification/logic/initRootAppNotification'
 import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks/useAppUpdate'
@@ -141,7 +142,9 @@ function Root() {
                   <SessionProvider>
                     <PortalLayout>
                       <WaitingRoomHoc isLoading={!isFontsLoaded}>
-                        <Slot />
+                        <SignupTunnelGuard>
+                          <Slot />
+                        </SignupTunnelGuard>
                       </WaitingRoomHoc>
                     </PortalLayout>
                   </SessionProvider>

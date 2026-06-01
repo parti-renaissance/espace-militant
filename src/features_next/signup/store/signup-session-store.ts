@@ -1,0 +1,44 @@
+import { create } from 'zustand'
+
+import { SIGNUP_RESEND_COOLDOWN_MS } from '@/services/signup/constants'
+
+/**
+ * État partagé entre les écrans du tunnel signup.
+ * Les étapes du parcours sont les routes Expo (`bienvenue` → `inscription` → `verification-email`).
+ */
+type SignupSessionState = {
+  email: string
+  firstName: string
+  inlineError: string | null
+  resendAvailableAt: number | null
+  setEmail: (email: string) => void
+  setFirstName: (firstName: string) => void
+  setInlineError: (message: string | null) => void
+  startResendCooldown: () => void
+  reset: () => void
+}
+
+const initialState = {
+  email: '',
+  firstName: '',
+  inlineError: null as string | null,
+  resendAvailableAt: null as number | null,
+}
+
+export const useSignupSessionStore = create<SignupSessionState>((set) => ({
+  ...initialState,
+  setEmail: (email) => set({ email }),
+  setFirstName: (firstName) => set({ firstName }),
+  setInlineError: (inlineError) => set({ inlineError }),
+  startResendCooldown: () => set({ resendAvailableAt: Date.now() + SIGNUP_RESEND_COOLDOWN_MS }),
+  reset: () => set(initialState),
+}))
+
+export function getResendSecondsLeft(resendAvailableAt: number | null): number {
+  if (!resendAvailableAt) return 0
+  return Math.max(0, Math.ceil((resendAvailableAt - Date.now()) / 1000))
+}
+
+export function isResendCooldownActive(resendAvailableAt: number | null): boolean {
+  return getResendSecondsLeft(resendAvailableAt) > 0
+}

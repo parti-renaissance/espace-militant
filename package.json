@@ -31,6 +31,7 @@
     "@10play/tentap-editor": "^0.6.1",
     "@eslint/js": "^10.0.0",
     "@expo/webpack-config": "~19.0.1",
+    "@friendlycaptcha/sdk": "^0.2.0",
     "@gorhom/bottom-sheet": "^5.2.6",
     "@hookform/resolvers": "^3.9.0",
     "@react-native-async-storage/async-storage": "2.2.0",
