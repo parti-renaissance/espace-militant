@@ -6,7 +6,8 @@ import { useToastController } from '@tamagui/toast'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { navigateToSignup } from '@/features_next/signup/utils/navigateToSignup'
-import useLogin from '@/hooks/useLogin'
+
+import useLogin, { credentialsFromTokenResponse } from '@/hooks/useLogin'
 import { useLogOut } from '@/services/logout/api'
 import { useGetProfil, useGetUserScopes } from '@/services/profile/hook'
 import { useUserStore } from '@/store/user-store'
@@ -80,8 +81,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
         if (!session) {
           return
         }
-        const { accessToken, refreshToken, idToken: sessionId, expiresIn } = session
-        setSession({ accessToken, refreshToken, sessionId, isAdmin: props?.isAdmin, accessTokenExpiresIn: expiresIn })
+        setSession(credentialsFromTokenResponse(session, props?.isAdmin))
         queryClient.resetQueries()
       } catch (e) {
         ErrorMonitor.log(e.message, { e })
