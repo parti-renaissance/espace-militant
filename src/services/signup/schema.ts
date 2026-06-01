@@ -34,14 +34,11 @@ export const RestPostSignupResponseSchema = z.null()
 export const RestPostSignupActivateRequestSchema = z.object({
   email: z.string().email(),
   code: z.string().length(3),
+  code_challenge: z.string(), // PKCE challenge (S256).
 })
 
 export const RestPostSignupActivateResponseSchema = z.object({
-  access_token: z.string(),
-  refresh_token: z.string(),
-  expires_in: z.number(),
-  token_type: z.string().optional(),
-  id_token: z.string().optional(),
+  code: z.string(), // OAuth authorization code
 })
 
 export const RestPostSignupResendCodeRequestSchema = z.object({
