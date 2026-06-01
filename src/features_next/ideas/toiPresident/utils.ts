@@ -26,6 +26,7 @@ const ShareProfileMessageSchema = z.object({
   payload: z.object({
     base64: z.string(),
     mimeType: z.string(),
+    text: z.string().optional(),
   }),
 })
 
