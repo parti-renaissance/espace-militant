@@ -1,29 +1,38 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { NativeSyntheticEvent, StyleSheet, TextInput, TextInputKeyPressEventData } from 'react-native'
-import { XStack } from 'tamagui'
+import { useTheme, XStack } from 'tamagui'
 
 type Otp3InputProps = {
   onComplete: (code: string) => void
   disabled?: boolean
-  error?: string | null
 }
 
-export default function Otp3Input({ onComplete, disabled, error }: Otp3InputProps) {
+export default function Otp3Input({ onComplete, disabled }: Otp3InputProps) {
+  const theme = useTheme()
   const [digits, setDigits] = useState(['', '', ''])
   const inputsRef = useRef<Array<TextInput | null>>([])
   const lastSubmittedCodeRef = useRef<string | null>(null)
-  const [prevError, setPrevError] = useState(error)
 
-  if (error && error !== prevError) {
-    setPrevError(error)
-    lastSubmittedCodeRef.current = null
-    setDigits(['', '', ''])
-  }
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        input: {
+          width: 52,
+          height: 64,
+          borderWidth: 1,
+          borderColor: theme.gray4?.val,
+          borderRadius: 16,
+          fontSize: 24,
+          textAlign: 'center',
+          backgroundColor: theme.white1?.val,
+        },
+      }),
+    [theme.gray4?.val, theme.white1?.val],
+  )
 
   useEffect(() => {
-    if (!error) return
     inputsRef.current[0]?.focus()
-  }, [error])
+  }, [])
 
   const submitIfComplete = useCallback(
     (next: string[]) => {
@@ -98,16 +107,3 @@ export default function Otp3Input({ onComplete, disabled, error }: Otp3InputProp
     </XStack>
   )
 }
-
-const styles = StyleSheet.create({
-  input: {
-    width: 52,
-    height: 64,
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 16,
-    fontSize: 24,
-    textAlign: 'center',
-    backgroundColor: '#fff',
-  },
-})

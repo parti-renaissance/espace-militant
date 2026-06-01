@@ -1,3 +1,4 @@
+import { SignupFormErrorThrower } from '@/services/signup/error'
 import * as schemas from '@/services/signup/schema'
 import { api } from '@/utils/api'
 
@@ -10,6 +11,7 @@ export const postSignup = (payload: schemas.RestPostSignupRequest) =>
     requestSchema: schemas.RestPostSignupRequestSchema,
     responseSchema: schemas.RestPostSignupResponseSchema,
     type: 'public',
+    errorThrowers: [SignupFormErrorThrower],
   })(payload)
 
 export const postSignupActivate = (payload: schemas.RestPostSignupActivateRequest) =>
