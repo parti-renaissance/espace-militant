@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import { memo, useCallback, useMemo, useRef } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
-import { Link } from 'expo-router'
+import { Link, router } from 'expo-router'
 import { getToken, Image, Spinner, XStack, YStack } from 'tamagui'
 import { CalendarCheck2, ClipboardCheck, DoorOpen, Plus } from '@tamagui/lucide-icons'
 
@@ -21,8 +21,10 @@ import HubListSkeleton from '@/features_next/events/components/feed-layout/HubLi
 import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
 import { HubFeedRow } from '@/features_next/events/components/list-item/HubFeedRow'
 
+import { useProfileCompletionAccess } from '@/features_next/profil/hooks/useProfileCompletionAccess'
 import { useSession } from '@/ctx/SessionProvider'
 import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
+import { handleLinkPress } from '@/utils/linkHandler'
 import { mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
 import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
@@ -32,7 +34,17 @@ const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.
 const getFeedRowKey = (row: HubFeedRowType): string =>
   row.type === 'event' ? row.event.uuid : (row.payload.id ?? `action-${row.payload.date.start.toISOString()}`)
 
+const MATERIEL_URL = 'https://parti.re'
+const PAP_HREF = '/old/porte-a-porte' as const
+
 const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrganizeModal }: { onOpenOrganizeModal: () => void }) {
+  const { runWithCompleteProfile } = useProfileCompletionAccess()
+
+  const handleCommanderMateriel = useCallback(() => {
+    const open = () => void handleLinkPress(MATERIEL_URL)
+    runWithCompleteProfile(open, { onSuccess: open })
+  }, [runWithCompleteProfile])
+
   return (
     <YStack gap="$medium" px="$medium">
       <CallToActionCard backgroundColor="$pink100" title="J’organise une action près de chez moi" description="Tractage, collage, porte-à-porte, boîtage, ...">
@@ -57,7 +69,7 @@ const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrga
           </YStack>
 
           <YStack gap={12}>
-            <VoxButton variant="soft" theme="gray" onPress={onOpenOrganizeModal}>
+            <VoxButton variant="soft" theme="gray" onPress={handleCommanderMateriel}>
               Commander
             </VoxButton>
           </YStack>
@@ -68,6 +80,17 @@ const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrga
 })
 
 const HubFooterResourceCards = memo(function HubFooterResourceCards() {
+  const { runWithCompleteProfile } = useProfileCompletionAccess()
+
+  const handleOpenPap = useCallback(() => {
+    runWithCompleteProfile(
+      () => {
+        router.push(PAP_HREF)
+      },
+      { redirectTo: PAP_HREF },
+    )
+  }, [runWithCompleteProfile])
+
   return (
     <>
       <CallToActionCard
@@ -86,11 +109,9 @@ const HubFooterResourceCards = memo(function HubFooterResourceCards() {
         title="Je fais un Porte-à-porte"
         description="Consultez la carte des adresses prioritaires pour organiser votre porte-à-porte."
       >
-        <Link href="/old/porte-a-porte" asChild>
-          <VoxButton variant="soft" theme="gray">
-            Plateforme de PAP
-          </VoxButton>
-        </Link>
+        <VoxButton variant="soft" theme="gray" onPress={handleOpenPap}>
+          Plateforme de PAP
+        </VoxButton>
       </CallToActionCard>
     </>
   )
