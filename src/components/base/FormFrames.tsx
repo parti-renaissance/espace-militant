@@ -20,8 +20,18 @@ export const FormFrameBase = styled(XStack, {
     white: {
       true: {
         backgroundColor: '$white1',
+        hoverStyle: {
+          backgroundColor: '$white4',
+        },
+        pressStyle: {
+          backgroundColor: '$white6',
+        },
+        focusStyle: {
+          backgroundColor: '$white6',
+          borderColor: '$blue9',
+        },
         disabledStyle: {
-          backgroundColor: '$white2',
+          backgroundColor: '$white1',
           opacity: 0.5,
           cursor: 'not-allowed',
         },

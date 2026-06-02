@@ -89,6 +89,22 @@ const InputFrame = styled(XStack, {
     color: {
       white: {
         backgroundColor: '$white1',
+        hoverStyle: {
+          backgroundColor: '$white4',
+          cursor: 'text',
+        },
+        pressStyle: {
+          backgroundColor: '$white6',
+        },
+        focusStyle: {
+          backgroundColor: '$white6',
+          borderColor: '$blue9',
+        },
+        disabledStyle: {
+          backgroundColor: '$white1',
+          opacity: 0.5,
+          cursor: 'not-allowed',
+        },
       },
       gray: {
         backgroundColor: '$gray1',

@@ -11,6 +11,7 @@ import InstanceCard from '@/components/InstanceCard/InstanceCard'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import ProfilLayout from '@/features_next/profil/components/Layout'
+import RequireCompleteProfileGate from '@/features_next/profil/components/RequireCompleteProfileGate'
 
 import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
@@ -242,108 +243,108 @@ const InstancesContent = () => {
       />
       <LayoutScrollView>
         <YStack gap={media.sm ? 8 : '$medium'} flex={1} pt={media.sm ? 8 : undefined}>
-            <InstanceCard
-              title="Mon assemblée"
-              icon={DoubleCircle}
-              description="Les Assemblées départementales, des Outre-Mer et celle des Français de l’Étranger sont le visage de notre parti à l’échelle locale. Elles sont pilotées par un bureau et leur Président, élus directement par les adhérents."
-              footer={
+          <InstanceCard
+            title="Mon assemblée"
+            icon={DoubleCircle}
+            description="Les Assemblées départementales, des Outre-Mer et celle des Français de l’Étranger sont le visage de notre parti à l’échelle locale. Elles sont pilotées par un bureau et leur Président, élus directement par les adhérents."
+            footer={
+              <Text.P>
+                Cette Assemblée vous a été attribuée en fonction de votre lieu de résidence.{' '}
+                <Link href="/(app)/profil/informations-personnelles" asChild={!isWeb}>
+                  <Text.P link>Modifiez votre adresse postale</Text.P>
+                </Link>{' '}
+                pour en changer.
+              </Text.P>
+            }
+          >
+            {assembly ? (
+              <InstanceCard.Content
+                title={assembly.name}
+                author={
+                  assembly?.manager
+                    ? {
+                        name: `${assembly?.manager.first_name ?? ''} ${assembly?.manager.last_name ?? ''}`,
+                        avatar: assembly?.manager.image_url ?? undefined,
+                        role: assembly?.manager.role ?? undefined,
+                      }
+                    : undefined
+                }
+              />
+            ) : (
+              <InstanceCard.EmptyState message="Vous n’avez pas d’Assemblée rattachée. Il s’agit certainement d’un bug, contactez adherents@parti-renaissance.fr." />
+            )}
+          </InstanceCard>
+          <InstanceCard
+            title="Mon délégué de circonscription"
+            icon={DoubleTriangle}
+            description="Chaque circonscription législative peut avoir un délégué de circonscription. Il s’agit du Député Ensemble de la circonscription ou d’un adhérent nommé par le bureau de l’Assemblée."
+            footer={
+              <YStack>
                 <Text.P>
-                  Cette Assemblée vous a été attribuée en fonction de votre lieu de résidence.{' '}
+                  Cette circonscription vous a été attribuée en fonction de votre lieu de résidence.{' '}
                   <Link href="/(app)/profil/informations-personnelles" asChild={!isWeb}>
                     <Text.P link>Modifiez votre adresse postale</Text.P>
                   </Link>{' '}
                   pour en changer.
                 </Text.P>
-              }
-            >
-              {assembly ? (
-                <InstanceCard.Content
-                  title={assembly.name}
-                  author={
-                    assembly?.manager
-                      ? {
-                          name: `${assembly?.manager.first_name ?? ''} ${assembly?.manager.last_name ?? ''}`,
-                          avatar: assembly?.manager.image_url ?? undefined,
-                          role: assembly?.manager.role ?? undefined,
-                        }
-                      : undefined
-                  }
-                />
-              ) : (
-                <InstanceCard.EmptyState message="Vous n’avez pas d’Assemblée rattachée. Il s’agit certainement d’un bug, contactez adherents@parti-renaissance.fr." />
-              )}
-            </InstanceCard>
-            <InstanceCard
-              title="Mon délégué de circonscription"
-              icon={DoubleTriangle}
-              description="Chaque circonscription législative peut avoir un délégué de circonscription. Il s’agit du Député Ensemble de la circonscription ou d’un adhérent nommé par le bureau de l’Assemblée."
-              footer={
-                <YStack>
-                  <Text.P>
-                    Cette circonscription vous a été attribuée en fonction de votre lieu de résidence.{' '}
-                    <Link href="/(app)/profil/informations-personnelles" asChild={!isWeb}>
-                      <Text.P link>Modifiez votre adresse postale</Text.P>
-                    </Link>{' '}
-                    pour en changer.
-                  </Text.P>
+              </YStack>
+            }
+          >
+            {circonscription ? (
+              <InstanceCard.Content
+                title={circonscription.name}
+                author={
+                  circonscription?.manager
+                    ? {
+                        name: `${circonscription?.manager.first_name ?? ''} ${circonscription?.manager.last_name ?? ''}`,
+                        avatar: circonscription?.manager.image_url ?? undefined,
+                        role: circonscription?.manager.role ?? undefined,
+                      }
+                    : undefined
+                }
+              />
+            ) : (
+              <InstanceCard.EmptyState message="Vous n’avez pas de circonscription rattachée." />
+            )}
+          </InstanceCard>
+
+          <InstanceCard
+            title="Mon comité"
+            icon={DoubleDiamond}
+            description="Échelon de proximité, les comités locaux sont le lieu privilégié de l’action militante. Ils animent la vie du parti et contribuent à notre implantation territoriale."
+            headerLeft={isSympathisant ? <VoxCard.AdhLock /> : null}
+            footer={
+              committeeContent.footerText || committeeContent.button ? (
+                <YStack gap="$medium">
+                  {committeeContent.footerText}
+                  {committee.message ? (
+                    <MessageCard theme="yellow" iconLeft={Info}>
+                      {committee.message}
+                    </MessageCard>
+                  ) : null}
+                  {committeeContent.button}
                 </YStack>
-              }
-            >
-              {circonscription ? (
-                <InstanceCard.Content
-                  title={circonscription.name}
-                  author={
-                    circonscription?.manager
-                      ? {
-                          name: `${circonscription?.manager.first_name ?? ''} ${circonscription?.manager.last_name ?? ''}`,
-                          avatar: circonscription?.manager.image_url ?? undefined,
-                          role: circonscription?.manager.role ?? undefined,
-                        }
-                      : undefined
-                  }
-                />
-              ) : (
-                <InstanceCard.EmptyState message="Vous n’avez pas de circonscription rattachée." />
-              )}
-            </InstanceCard>
+              ) : null
+            }
+          >
+            {committeeContent.content}
+          </InstanceCard>
 
-            <InstanceCard
-              title="Mon comité"
-              icon={DoubleDiamond}
-              description="Échelon de proximité, les comités locaux sont le lieu privilégié de l’action militante. Ils animent la vie du parti et contribuent à notre implantation territoriale."
-              headerLeft={isSympathisant ? <VoxCard.AdhLock /> : null}
-              footer={
-                committeeContent.footerText || committeeContent.button ? (
-                  <YStack gap="$medium">
-                    {committeeContent.footerText}
-                    {committee.message ? (
-                      <MessageCard theme="yellow" iconLeft={Info}>
-                        {committee.message}
-                      </MessageCard>
-                    ) : null}
-                    {committeeContent.button}
-                  </YStack>
-                ) : null
-              }
-            >
-              {committeeContent.content}
-            </InstanceCard>
-
-            <InstanceCard
-              title={agoras?.length > 1 ? 'Mes agoras thématiques' : 'Mon agora thématique'}
-              icon={DoubleSquare}
-              description="Les agoras thématiques sont un espace d’échange et de travail réservé aux adhérents Renaissance."
-              headerLeft={isSympathisant || !isAdherentDues ? <VoxCard.AdhLock due={!isAdherentDues} /> : null}
-              footer={
-                agorasContent.footerText || agorasContent.button ? (
-                  <YStack gap="$medium">
-                    {agorasContent.footerText}
-                    {agorasContent.button}
-                  </YStack>
-                ) : null
-              }
-            >
-              {agorasContent.content}
+          <InstanceCard
+            title={agoras?.length > 1 ? 'Mes agoras thématiques' : 'Mon agora thématique'}
+            icon={DoubleSquare}
+            description="Les agoras thématiques sont un espace d’échange et de travail réservé aux adhérents Renaissance."
+            headerLeft={isSympathisant || !isAdherentDues ? <VoxCard.AdhLock due={!isAdherentDues} /> : null}
+            footer={
+              agorasContent.footerText || agorasContent.button ? (
+                <YStack gap="$medium">
+                  {agorasContent.footerText}
+                  {agorasContent.button}
+                </YStack>
+              ) : null
+            }
+          >
+            {agorasContent.content}
           </InstanceCard>
         </YStack>
       </LayoutScrollView>
@@ -351,12 +352,12 @@ const InstancesContent = () => {
   )
 }
 
-const InstancesScreen = () => {
-  return (
-    <ProfilLayout>
+const InstancesScreen = () => (
+  <ProfilLayout>
+    <RequireCompleteProfileGate redirectTo="/profil/mes-instances">
       <InstancesContent />
-    </ProfilLayout>
-  )
-}
+    </RequireCompleteProfileGate>
+  </ProfilLayout>
+)
 
 export default InstancesScreen

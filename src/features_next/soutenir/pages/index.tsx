@@ -28,6 +28,7 @@ import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
 import Title from '@/components/Title/Title'
 import clientEnv from '@/config/clientEnv'
 import { HubOrganizeCategoryModal } from '@/features_next/events/pages/hub/components/HubOrganizeCategoryModal'
+import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { useGetProfil } from '@/services/profile/hook'
 
@@ -102,6 +103,7 @@ function CallToActionCards() {
   const router = useRouter()
   const { data: user } = useGetProfil()
   const { handleShareOrCopy } = useShareOrCopy()
+  const { openOrganiserModal } = useOpenOrganiserEvenement()
   const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
 
   const handleInviteFriend = useCallback(() => {
@@ -112,8 +114,8 @@ function CallToActionCards() {
   }, [user?.referral_link, handleShareOrCopy])
 
   const handleOpenOrganizeModal = useCallback(() => {
-    setOrganizeModalOpen(true)
-  }, [])
+    openOrganiserModal(() => setOrganizeModalOpen(true))
+  }, [openOrganiserModal])
 
   const handleCloseOrganizeModal = useCallback(() => {
     setOrganizeModalOpen(false)

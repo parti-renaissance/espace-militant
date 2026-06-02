@@ -28,7 +28,6 @@ import { FEATURES } from '@/utils/Scopes'
 
 import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
-import { OnboardConditional } from './components/OnboardConditional'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
@@ -171,7 +170,6 @@ const TimelineFeedScreen = () => {
 
   return (
     <>
-      <OnboardConditional />
       <Layout.Main>
         <BoundarySuspenseWrapper fallback={<HomeFeedMainSkeleton />}>
           <TimelineFeedMain />

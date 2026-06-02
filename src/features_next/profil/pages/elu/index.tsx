@@ -3,6 +3,7 @@ import { useMedia, YStack } from 'tamagui'
 
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
+import RequireCompleteProfileGate from '@/features_next/profil/components/RequireCompleteProfileGate'
 
 import { useGetElectProfil } from '@/services/profile/hook'
 
@@ -12,13 +13,13 @@ import DeclaEluCard from './components/DeclaEluCard'
 import DeclaMandateEluCard from './components/DeclaMandateEluCard'
 import InfoEluCard from './components/InfoEluCard'
 
-const EluScreen = () => {
-  return (
-    <ProfilLayout>
+const EluScreen = () => (
+  <ProfilLayout>
+    <RequireCompleteProfileGate redirectTo="/profil/informations-elu">
       <EluContent />
-    </ProfilLayout>
-  )
-}
+    </RequireCompleteProfileGate>
+  </ProfilLayout>
+)
 
 const EluContent = () => {
   const { data: profile } = useGetElectProfil()

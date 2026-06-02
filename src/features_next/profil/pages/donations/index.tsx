@@ -3,6 +3,7 @@ import { useMedia, YStack } from 'tamagui'
 
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
+import RequireCompleteProfileGate from '@/features_next/profil/components/RequireCompleteProfileGate'
 
 import { useGetDetailProfil } from '@/services/profile/hook'
 
@@ -28,13 +29,13 @@ const DonationsContent = () => {
   )
 }
 
-const DonationsScreen = () => {
-  return (
-    <ProfilLayout>
+const DonationsScreen = () => (
+  <ProfilLayout>
+    <RequireCompleteProfileGate redirectTo="/profil/cotisations-et-dons">
       <ForceBirthdateModal />
       <DonationsContent />
-    </ProfilLayout>
-  )
-}
+    </RequireCompleteProfileGate>
+  </ProfilLayout>
+)
 
 export default DonationsScreen

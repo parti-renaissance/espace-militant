@@ -40,16 +40,18 @@ const SelectFrame = styled(XStack, {
       true: {
         backgroundColor: '$white1',
         hoverStyle: {
-          backgroundColor: '$color1',
+          backgroundColor: '$white4',
+          cursor: 'pointer',
         },
         pressStyle: {
-          backgroundColor: '$color2',
+          backgroundColor: '$white6',
         },
         focusStyle: {
-          borderColor: '$color9',
+          backgroundColor: '$white6',
+          borderColor: '$blue9',
         },
         disabledStyle: {
-          backgroundColor: '$white2',
+          backgroundColor: '$white1',
           opacity: 0.5,
           cursor: 'not-allowed',
         },

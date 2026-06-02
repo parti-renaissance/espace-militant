@@ -1,11 +1,11 @@
-import { Link } from 'expo-router'
-import { isWeb, YStack } from 'tamagui'
+import { YStack } from 'tamagui'
 import { Ghost, Sparkle } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import useResetFilters from '@/features_next/events/pages/feed/hooks/useResetFilters'
+import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
 
 import { useUserScopeFeatures } from '@/services/profile/hook'
 import { FEATURES } from '@/utils/Scopes'
@@ -26,6 +26,7 @@ type Props = {
 
 export const EmptyStateSection = ({ reason, onSwitchToAllItems, showResetButton }: Props) => {
   const { hasFeature } = useUserScopeFeatures({ enabled: true })
+  const { openOrganiserEvenement } = useOpenOrganiserEvenement()
   const { handleReset } = useResetFilters()
 
   const zoneLabel = reason.kind === 'zone_no_upcoming' ? reason.zoneLabel.replace(' • ', ' - ') : ''
@@ -70,11 +71,9 @@ export const EmptyStateSection = ({ reason, onSwitchToAllItems, showResetButton 
         )}
 
         {canOrganize && (reason.kind === 'generic' || reason.kind === 'zone_no_upcoming') && (
-          <Link href="/evenements/creer" asChild={!isWeb}>
-            <VoxButton variant="outlined" size="md" theme="pink" iconLeft={Sparkle}>
-              {reason.kind === 'generic' ? "J'en organise un" : 'Organiser un événement'}
-            </VoxButton>
-          </Link>
+          <VoxButton variant="outlined" size="md" theme="pink" iconLeft={Sparkle} onPress={() => openOrganiserEvenement()}>
+            {reason.kind === 'generic' ? "J'en organise un" : 'Organiser un événement'}
+          </VoxButton>
         )}
       </YStack>
     </YStack>

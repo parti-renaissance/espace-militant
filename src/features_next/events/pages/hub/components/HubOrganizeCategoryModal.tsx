@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Dimensions } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, type Href } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { Calendar, Info, X } from '@tamagui/lucide-icons'
 
@@ -11,6 +11,9 @@ import { VoxHeader } from '@/components/Header/Header'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import ActionTypeSelector from '@/features_next/actions/pages/create-edit/components/ActionTypeSelector'
+
+import { useProfileCompletionAccess } from '@/features_next/profil/hooks/useProfileCompletionAccess'
+import { CREER_ACTION_HREF, CREER_EVENEMENT_HREF } from '@/features_next/profil/profileCompletion'
 
 import { ActionType, ActionTypeIcon, ReadableActionType } from '@/services/actions/schema'
 import { useSuspenseGetCategories } from '@/services/events/hook'
@@ -22,15 +25,13 @@ type HubOrganizeCategoryModalProps = {
 
 type OrganizeSelection = { itemType: 'action'; value: ActionType } | { itemType: 'event'; value: string }
 
-const CREER_ACTION_HREF = '/actions/creer' as const satisfies Href
-const CREER_EVENEMENT_HREF = '/evenements/creer' as const satisfies Href
-
 const windowSize = Dimensions.get('window')
 
 export function HubOrganizeCategoryModal({ open, onClose }: HubOrganizeCategoryModalProps) {
   const router = useRouter()
   const media = useMedia()
   const { data: categories } = useSuspenseGetCategories()
+  const { runWithCompleteProfile } = useProfileCompletionAccess()
   const [selection, setSelection] = useState<OrganizeSelection | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,13 +40,18 @@ export function HubOrganizeCategoryModal({ open, onClose }: HubOrganizeCategoryM
       setError('Veuillez sélectionner ce que vous souhaitez organiser')
       return
     }
-    onClose()
-    if (selection.itemType === 'action') {
-      router.push({ pathname: CREER_ACTION_HREF, params: { type: selection.value } })
-      return
+
+    const navigate = () => {
+      onClose()
+      if (selection.itemType === 'action') {
+        router.push({ pathname: CREER_ACTION_HREF, params: { type: selection.value } })
+        return
+      }
+      router.push({ pathname: CREER_EVENEMENT_HREF, params: { category: selection.value } })
     }
-    router.push({ pathname: CREER_EVENEMENT_HREF, params: { category: selection.value } })
-  }, [onClose, router, selection])
+
+    runWithCompleteProfile(navigate, { onSuccess: navigate })
+  }, [onClose, router, runWithCompleteProfile, selection])
 
   const mobileHeader = useMemo(
     () => (

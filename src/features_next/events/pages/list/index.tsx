@@ -32,6 +32,8 @@ import { mapHubItemsToPinnedEvents, mapHubItemToFeedRow, type HubFeedRow as HubF
 import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
 
+import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
+
 import { MapListToggle } from '../../components/feed-layout/MapListToggle'
 import { HubOrganizeCategoryModal } from '../hub/components/HubOrganizeCategoryModal'
 
@@ -154,9 +156,11 @@ const HubFeed = () => {
   const [activeTab, setActiveTab] = useState<HubFeedTab>('all')
   const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
 
+  const { openOrganiserModal } = useOpenOrganiserEvenement()
+
   const handleOpenOrganizeModal = useCallback(() => {
-    setOrganizeModalOpen(true)
-  }, [])
+    openOrganiserModal(() => setOrganizeModalOpen(true))
+  }, [openOrganiserModal])
 
   const handleCloseOrganizeModal = useCallback(() => {
     setOrganizeModalOpen(false)
