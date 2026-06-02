@@ -9,7 +9,6 @@ import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useSession } from '@/ctx/AuthContext'
 import * as api from '@/services/profile/api'
 import {
-  RestDetailedProfileResponse,
   RestDonationsResponse,
   RestProfilResponse,
   RestProfilResponseTagTypes,

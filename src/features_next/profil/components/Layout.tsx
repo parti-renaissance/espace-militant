@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Href, usePathname } from 'expo-router'
 import { useMedia, XStack } from 'tamagui'
-import { Bot, DoorOpen, Globe, GraduationCap, HeartHandshake, Lightbulb, LogOut, PenLine, QrCode, UserRoundPen, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
+import { Bot, DoorOpen, Globe, GraduationCap, HeartHandshake, LogOut, PenLine, QrCode, UserRoundPen, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'

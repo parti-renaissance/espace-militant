@@ -24,10 +24,17 @@ export function CompleteProfilProvider({ children }: { children: ReactNode }) {
   const [redirectTo, setRedirectTo] = useState<Href | undefined>()
   const onSuccessRef = useRef<(() => void) | undefined>(undefined)
 
-  useEffect(() => {
+  const [prevIsAuth, setPrevIsAuth] = useState(isAuth)
+  if (isAuth !== prevIsAuth) {
+    setPrevIsAuth(isAuth)
     if (!isAuth) {
       setOpen(false)
       setRedirectTo(undefined)
+    }
+  }
+
+  useEffect(() => {
+    if (!isAuth) {
       onSuccessRef.current = undefined
     }
   }, [isAuth])

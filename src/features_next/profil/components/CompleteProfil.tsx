@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Href, router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ScrollView, useMedia, useTheme, View, XStack, YStack } from 'tamagui'
@@ -169,12 +169,6 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
     reset(defaultValues)
     onClose()
   }, [defaultValues, onClose, reset])
-
-  useEffect(() => {
-    if (!open) {
-      setStep(1)
-    }
-  }, [open])
 
   const onNextStep = async () => {
     const isValid = await trigger([...STEP_1_FIELDS])
