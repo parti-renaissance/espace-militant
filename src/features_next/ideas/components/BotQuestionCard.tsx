@@ -1,7 +1,7 @@
 import { Platform, useWindowDimensions } from 'react-native'
 import { Image } from 'expo-image'
 import { XStack, YStack } from 'tamagui'
-import { ArrowUpRight, BotMessageSquare, Moon } from '@tamagui/lucide-icons'
+import { ArrowUpRight, BotMessageSquare, Sparkles } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ROBOT_IMAGE from '../assets/robot-icon.png'
@@ -30,7 +30,7 @@ export default function BotQuestionCard({ onPress, badge = 'Nuit' }: BotQuestion
               alignItems="center"
               alignSelf="flex-start"
             >
-              <Moon size={12} color="$purple600" />
+              <Sparkles size={12} color="$purple600" />
               <Text.SM semibold color="$purple600">
                 {badge}
               </Text.SM>
@@ -76,6 +76,8 @@ export default function BotQuestionCard({ onPress, badge = 'Nuit' }: BotQuestion
           gap="$small"
           cursor="pointer"
           onPress={onPress}
+          animation="medium"
+          hoverStyle={{ backgroundColor: '$purple100' }}
         >
           <BotMessageSquare size={16} color="$purple400" />
           <Text.MD flex={1} color="$gray600" numberOfLines={1}>

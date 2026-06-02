@@ -3,7 +3,7 @@ import { isWeb } from 'tamagui'
 
 import { getDomFromTamaguiRef, type TamaguiInputRef } from './utils/getDomFromTamaguiRef'
 
-const INPUT_MAX_HEIGHT = 200
+export const INPUT_MAX_HEIGHT = 180
 
 export function useAutoGrowTextarea(inputRef: RefObject<TamaguiInputRef | null>, value: string) {
   useEffect(() => {

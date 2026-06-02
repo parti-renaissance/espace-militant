@@ -105,14 +105,6 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
             </VoxCard>
           )}
 
-          {profile?.canary_tester === true && (
-            <VoxCard borderRadius={16}>
-              <VoxCard.Content padding="$small" gap={4}>
-                <NavItem text="Bot" iconLeft={Lightbulb} href="/idees/bot" />
-              </VoxCard.Content>
-            </VoxCard>
-          )}
-
           {clientEnv.ENVIRONMENT === 'staging' && devMode && (
             <VoxCard borderRadius={16}>
               <VoxCard.Content padding="$small" gap={4}>
