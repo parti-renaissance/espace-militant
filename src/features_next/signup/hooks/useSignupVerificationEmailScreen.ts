@@ -5,6 +5,7 @@ export function useSignupVerificationEmailScreen() {
   const email = useSignupSessionStore((s) => s.email)
   const firstName = useSignupSessionStore((s) => s.firstName)
   const inlineError = useSignupSessionStore((s) => s.inlineError)
+  const setInlineError = useSignupSessionStore((s) => s.setInlineError)
   const { activateWithCode, isActivating } = useSignupActivate()
 
   return {
@@ -15,6 +16,9 @@ export function useSignupVerificationEmailScreen() {
     needsRedirect: !email,
     onActivate: (code: string) => {
       if (email) activateWithCode(email, code)
+    },
+    onStartEditingCode: () => {
+      if (inlineError) setInlineError(null)
     },
   }
 }

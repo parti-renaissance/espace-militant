@@ -7,7 +7,8 @@ import SignupVerificationEmailFooter from '@/features_next/signup/pages/SignupVe
 import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/SignupVerificationEmailScrollBody'
 
 export default function SignupVerificationEmailMobileScreen() {
-  const { email, firstName, inlineError, isActivating, needsRedirect, onActivate } = useSignupVerificationEmailScreen()
+  const { email, firstName, inlineError, isActivating, needsRedirect, onActivate, onStartEditingCode } =
+    useSignupVerificationEmailScreen()
 
   if (needsRedirect) {
     return <Redirect href="/(signup)/inscription" />
@@ -22,6 +23,7 @@ export default function SignupVerificationEmailMobileScreen() {
           inlineError={inlineError}
           isActivating={isActivating}
           onActivate={onActivate}
+          onStartEditingCode={onStartEditingCode}
         />
         <SignupVerificationEmailFooter email={email} />
       </YStack>
