@@ -1,7 +1,6 @@
 import { useMedia, XStack, YStack } from 'tamagui'
 import { ArrowRight, Check, ChevronDown } from '@tamagui/lucide-icons'
 
-import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import Chip from '@/components/Chip/Chip'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'

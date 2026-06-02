@@ -15,13 +15,28 @@ type BienvenueVideoProps = {
   isError: boolean
   isScreenFocused: boolean
   maxHeight?: number
+  fillAvailableSpace?: boolean
 }
 
-export default function BienvenueVideo({ data, isLoading, isError, isScreenFocused, maxHeight }: BienvenueVideoProps) {
+export default function BienvenueVideo({
+  data,
+  isLoading,
+  isError,
+  isScreenFocused,
+  maxHeight,
+  fillAvailableSpace = false,
+}: BienvenueVideoProps) {
   const aspectRatio = data ? getVideoAspectRatio(data.width, data.height) : BIENVENUE_VIDEO_ASPECT_RATIO
 
   return (
-    <YStack flex={1} width="100%" aspectRatio={aspectRatio} maxHeight={maxHeight} {...(isWeb ? { height: '100%' } : undefined)}>
+    <YStack
+      flex={1}
+      minHeight={0}
+      width="100%"
+      {...(!fillAvailableSpace ? { aspectRatio } : undefined)}
+      maxHeight={maxHeight}
+      {...(isWeb ? { height: '100%' } : undefined)}
+    >
       <YStack width="100%" height="100%" borderRadius="$medium" overflow="hidden" bg="$black1">
         {isLoading ? (
           <YStack width="100%" height="100%" alignItems="center" justifyContent="center">

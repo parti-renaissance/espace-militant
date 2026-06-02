@@ -1,8 +1,6 @@
 import { YStack } from 'tamagui'
-import { AlertTriangle } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
-import { MessageCard } from '@/components/MessageCard/MessageCard'
 import Title from '@/components/Title/Title'
 import Otp3Input from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/Otp3Input'
 

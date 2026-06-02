@@ -18,7 +18,7 @@ export const SignInButton = (props: Omit<ComponentProps<typeof VoxButton>, 'chil
 
 export const SignUpButton = (props: Omit<ComponentProps<typeof VoxButton>, 'children'>) => {
   return (
-    <Link href="/(signup)/bienvenue">
+    <Link href="/(signup)/bienvenue" asChild>
       <VoxButton variant="text" size="md" theme="blue" {...props}>
         Je crée mon compte
       </VoxButton>
