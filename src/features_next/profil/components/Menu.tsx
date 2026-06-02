@@ -1,6 +1,6 @@
 import { Href, Link, usePathname } from 'expo-router'
 import { isWeb, useMedia, YStack } from 'tamagui'
-import { Bot, Globe, Lightbulb, LogOut, PenLine, Video } from '@tamagui/lucide-icons'
+import { Bot, Globe, LogOut, PenLine, Video } from '@tamagui/lucide-icons'
 
 import Menu from '@/components/menu/Menu'
 
@@ -45,39 +45,28 @@ const ProfilMenu = () => {
         ))}
       </Menu>
 
-      {(clientEnv.ENVIRONMENT === 'staging' || profile?.canary_tester === true) && (
+      {clientEnv.ENVIRONMENT === 'staging' && (
         <Menu>
-          {clientEnv.ENVIRONMENT === 'staging' && (
-            <>
-              <Link href="/chatbot" asChild={!isWeb}>
-                <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Bot}>
-                  Chatbot
-                </Menu.Item>
-              </Link>
-              <Link href="/tools/storybook" asChild={!isWeb}>
-                <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={PenLine}>
-                  StoryBook
-                </Menu.Item>
-              </Link>
-              <Link href="/tools/video" asChild={!isWeb}>
-                <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Video}>
-                  Vidéo (API)
-                </Menu.Item>
-              </Link>
-              <Link href="/webview" asChild={!isWeb}>
-                <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Globe}>
-                  Webview
-                </Menu.Item>
-              </Link>
-            </>
-          )}
-          {profile?.canary_tester === true && (
-            <Link href="/idees/bot" asChild={!isWeb}>
-              <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Lightbulb}>
-                Bot
-              </Menu.Item>
-            </Link>
-          )}
+          <Link href="/chatbot" asChild={!isWeb}>
+            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Bot}>
+              Chatbot
+            </Menu.Item>
+          </Link>
+          <Link href="/tools/storybook" asChild={!isWeb}>
+            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={PenLine}>
+              StoryBook
+            </Menu.Item>
+          </Link>
+          <Link href="/tools/video" asChild={!isWeb}>
+            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Video}>
+              Vidéo (API)
+            </Menu.Item>
+          </Link>
+          <Link href="/webview" asChild={!isWeb}>
+            <Menu.Item theme="orange" size={size} showArrow={showArrow} icon={Globe}>
+              Webview
+            </Menu.Item>
+          </Link>
         </Menu>
       )}
 

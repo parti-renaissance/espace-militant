@@ -1,10 +1,11 @@
 import { useCallback, useState, type RefObject } from 'react';
 import { Keyboard, type NativeSyntheticEvent } from 'react-native';
-import { Input, isWeb, useMedia, View, YStack } from 'tamagui';
+import { Input, isWeb, View, YStack } from 'tamagui';
 import { ArrowUpRight, Square } from '@tamagui/lucide-icons';
 
 import { VoxButton } from '@/components/Button/Button';
-import { useAutoGrowTextarea } from '@/hooks/chat/useAutoGrowTextarea';
+
+import { INPUT_MAX_HEIGHT, useAutoGrowTextarea } from '@/hooks/chat/useAutoGrowTextarea';
 import { useEnterKeySubmit } from '@/hooks/chat/useEnterKeySubmit';
 import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef';
 
@@ -20,7 +21,6 @@ type Props = {
 }
 
 export function ChatInput({ inputRef, value, isLoading, placeholder = 'Posez votre question…', maxLength, onChange, onSubmit, onStop }: Props) {
-  const media = useMedia()
   const [isFocused, setIsFocused] = useState(false)
 
   useEnterKeySubmit(inputRef, onSubmit)
@@ -69,7 +69,7 @@ export function ChatInput({ inputRef, value, isLoading, placeholder = 'Posez vot
           onSubmitEditing={isWeb ? undefined : handleNativeSubmit}
           borderWidth={0}
           focusStyle={{ outlineWidth: 0 }}
-          maxHeight={520}
+          maxHeight={INPUT_MAX_HEIGHT}
           maxLength={maxLength}
           verticalAlign="top"
           placeholder={placeholder}

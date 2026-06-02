@@ -1,26 +1,33 @@
 import React from 'react'
 import { Redirect } from 'expo-router'
 import Head from 'expo-router/head'
-import { Lightbulb } from '@tamagui/lucide-icons'
+import { Sparkles } from '@tamagui/lucide-icons'
 
+import { AccessDeny } from '@/components/AccessDeny'
 import Header from '@/components/AppStructure/Header'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import BotPage from '@/features_next/bot/pages/index'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
-import { useGetProfil } from '@/services/profile/hook'
+import { useUserScopeFeatures } from '@/services/profile/hook'
+import { FEATURES } from '@/utils/Scopes'
 
 export default function BotRoute() {
   const { isAuth } = useSession()
-  const { data: profile } = useGetProfil({ enabled: true })
+  const { hasFeature, isLoading } = useUserScopeFeatures({ enabled: isAuth })
+  const canAccess = hasFeature(FEATURES.AI_ANTISECHE)
 
   if (!isAuth) {
     return <Redirect href="/evenements" />
   }
 
-  if (profile && !profile.canary_tester) {
-    return <Redirect href="/evenements" />
+  if (!canAccess && !isLoading) {
+    return (
+      <Layout.Container hideSideBar hideTabBar>
+        <AccessDeny />
+      </Layout.Container>
+    )
   }
 
   return (
@@ -28,7 +35,7 @@ export default function BotRoute() {
       <Head>
         <title>{metatags.createTitle('Idée')}</title>
       </Head>
-      <Header title="Idée" icon={Lightbulb} navigation={{ showBackButton: true }} style={{ showOn: 'sm' }} />
+      <Header title="Nuit" icon={Sparkles} navigation={{ showBackButton: true }} style={{ showOn: 'sm' }} />
       <Layout.Container safeHorizontalPadding={false} hideTabBar>
         <BotPage />
       </Layout.Container>
