@@ -13,6 +13,8 @@ import { VoxButton } from '@/components/Button'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
+import { useProfileCompletionAccess } from '@/features_next/profil/hooks/useProfileCompletionAccess'
+
 import { useFieldSurveysWithRefresh } from '@/services/field-surveys/hook'
 import { FieldSurvey } from '@/services/field-surveys/schema'
 import { getFormattedDate } from '@/utils/date'
@@ -121,12 +123,17 @@ const SurveyListItem: React.FC<SurveyListItemProps> = ({ survey, onPress, showBo
 
 export const SurveyList: React.FC<{ surveys: FieldSurvey[] }> = ({ surveys }) => {
   const media = useMedia()
+  const { runWithCompleteProfile } = useProfileCompletionAccess()
 
   const handleSurveyPress = (survey: FieldSurvey) => {
-    router.push({
-      pathname: '/questionnaires/[id]',
-      params: { id: survey.uuid },
-    })
+    const redirectTo = { pathname: '/questionnaires/[id]', params: { id: survey.uuid } } as const
+
+    runWithCompleteProfile(
+      () => {
+        router.push(redirectTo)
+      },
+      { redirectTo },
+    )
   }
 
   return (
@@ -303,14 +310,7 @@ const FieldSurveysListPage: React.FC = () => {
                           porte.
                         </Text>
                       </YStack>
-                      <Image
-                        source={notepadSurvey}
-                        objectFit="contain"
-                        display={media.sm ? 'none' : 'block'}
-                        width={129}
-                        height={126}
-                        mr="$medium"
-                      />
+                      <Image source={notepadSurvey} objectFit="contain" display={media.sm ? 'none' : 'block'} width={129} height={126} mr="$medium" />
                     </XStack>
                   </VoxCard.Content>
                 </VoxCard>
