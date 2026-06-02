@@ -37,6 +37,8 @@ export const RestPostSignupActivateRequestSchema = z.object({
   email: z.string().email(),
   code: z.string().length(3),
   code_challenge: z.string(), // PKCE challenge (S256).
+  client_id: z.string(), // OAuth client
+  redirect_uri: z.string(), // OAuth redirect
 })
 
 export const RestPostSignupActivateResponseSchema = z.object({

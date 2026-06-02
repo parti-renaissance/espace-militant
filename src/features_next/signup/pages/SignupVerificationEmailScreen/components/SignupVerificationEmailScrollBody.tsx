@@ -1,6 +1,7 @@
 import { YStack } from 'tamagui'
 
 import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
 import Title from '@/components/Title/Title'
 import Otp3Input from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/Otp3Input'
 
@@ -9,8 +10,10 @@ type SignupVerificationEmailScrollBodyProps = {
   firstName: string
   inlineError: string | null
   isActivating: boolean
+  requiresManualLogin: boolean
   onActivate: (code: string) => void
   onStartEditingCode: () => void
+  onSignIn: () => void
 }
 
 export default function SignupVerificationEmailScrollBody({
@@ -18,8 +21,10 @@ export default function SignupVerificationEmailScrollBody({
   firstName,
   inlineError,
   isActivating,
+  requiresManualLogin,
   onActivate,
   onStartEditingCode,
+  onSignIn,
 }: SignupVerificationEmailScrollBodyProps) {
   return (
     <YStack gap="$medium" width="100%">
@@ -39,16 +44,31 @@ export default function SignupVerificationEmailScrollBody({
       </YStack>
 
       <YStack gap="$medium" alignItems="center" width="100%">
-        <Text.MD semibold textAlign="center">
-          Saisissez le code reçu par email pour valider votre inscription.
-        </Text.MD>
-        <Otp3Input
-          onComplete={onActivate}
-          disabled={isActivating}
-          hasError={Boolean(inlineError)}
-          onStartEditing={onStartEditingCode}
-        />
-        {inlineError ? <Text.MD color="$red600">{inlineError}</Text.MD> : null}
+        {requiresManualLogin ? (
+          <>
+            {inlineError ? (
+              <Text.MD textAlign="center" color="$red600">
+                {inlineError}
+              </Text.MD>
+            ) : null}
+            <VoxButton theme="blue" alignSelf="center" onPress={onSignIn}>
+              Me connecter
+            </VoxButton>
+          </>
+        ) : (
+          <>
+            <Text.MD semibold textAlign="center">
+              Saisissez le code reçu par email pour valider votre inscription.
+            </Text.MD>
+            <Otp3Input
+              onComplete={onActivate}
+              disabled={isActivating}
+              hasError={Boolean(inlineError)}
+              onStartEditing={onStartEditingCode}
+            />
+            {inlineError ? <Text.MD color="$red600">{inlineError}</Text.MD> : null}
+          </>
+        )}
       </YStack>
     </YStack>
   )
