@@ -12,6 +12,7 @@ type SignupVerificationEmailScrollBodyProps = {
   inlineError: string | null
   isActivating: boolean
   onActivate: (code: string) => void
+  onStartEditingCode: () => void
 }
 
 export default function SignupVerificationEmailScrollBody({
@@ -20,6 +21,7 @@ export default function SignupVerificationEmailScrollBody({
   inlineError,
   isActivating,
   onActivate,
+  onStartEditingCode,
 }: SignupVerificationEmailScrollBodyProps) {
   return (
     <YStack gap="$medium" width="100%">
@@ -42,12 +44,13 @@ export default function SignupVerificationEmailScrollBody({
         <Text.MD semibold textAlign="center">
           Saisissez le code reçu par email pour valider votre inscription.
         </Text.MD>
-        <Otp3Input key={inlineError ?? 'idle'} onComplete={onActivate} disabled={isActivating} />
-        {inlineError ? (
-          <MessageCard iconLeft={AlertTriangle} theme="orange">
-            {inlineError}
-          </MessageCard>
-        ) : null}
+        <Otp3Input
+          onComplete={onActivate}
+          disabled={isActivating}
+          hasError={Boolean(inlineError)}
+          onStartEditing={onStartEditingCode}
+        />
+        {inlineError ? <Text.MD color="$red600">{inlineError}</Text.MD> : null}
       </YStack>
     </YStack>
   )

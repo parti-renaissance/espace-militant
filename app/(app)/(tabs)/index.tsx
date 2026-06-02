@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Link, Redirect, useRouter } from 'expo-router'
+import { Link, Redirect, useLocalSearchParams, useRouter } from 'expo-router'
 import Head from 'expo-router/head'
 import { useMedia, XStack } from 'tamagui'
 import { QrCode } from '@tamagui/lucide-icons'
@@ -8,6 +8,7 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import Text from '@/components/base/Text'
 import FutureButton from '@/components/Buttons/FutureButton'
 import { ProfileNav, VoxHeader } from '@/components/Header/Header'
+import SignupCongartsModal from '@/features_next/signup/components/SignupCongartsModal'
 import TimelineFeedScreen from '@/features_next/timelinefeed/TimelineFeedScreen'
 
 import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
@@ -37,8 +38,12 @@ const HomeHeader = () => {
 export default function AccueilPage() {
   const { isAuth } = useSession()
   const router = useRouter()
+  const { signupCongrats, firstName } = useLocalSearchParams<{ signupCongrats?: '1'; firstName?: string }>()
   const { data: userScopes } = useGetUserScopes({ enabled: true })
   const hasScannerScope = useMemo(() => userScopes?.some((s) => s.code === 'meeting_scanner') ?? false, [userScopes])
+  const closeSignupCongratsModal = () => {
+    router.setParams({ signupCongrats: undefined, firstName: undefined })
+  }
 
   const floatingContent = useMemo(() => {
     if (!hasScannerScope) return null
@@ -65,6 +70,7 @@ export default function AccueilPage() {
       </Head>
       <HomeHeader />
       <Layout.Container floatingContent={floatingContent}>
+        <SignupCongartsModal isOpen={signupCongrats === '1'} firstName={firstName} onClose={closeSignupCongratsModal} />
         <TimelineFeedScreen />
       </Layout.Container>
     </>

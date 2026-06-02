@@ -12,7 +12,8 @@ import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/Sign
 
 export default function SignupVerificationEmailDesktopScreen() {
   const insets = useSafeAreaInsets()
-  const { email, firstName, inlineError, isActivating, needsRedirect, onActivate } = useSignupVerificationEmailScreen()
+  const { email, firstName, inlineError, isActivating, needsRedirect, onActivate, onStartEditingCode } =
+    useSignupVerificationEmailScreen()
 
   if (needsRedirect) {
     return <Redirect href="/(signup)/inscription" />
@@ -32,6 +33,7 @@ export default function SignupVerificationEmailDesktopScreen() {
             inlineError={inlineError}
             isActivating={isActivating}
             onActivate={onActivate}
+            onStartEditingCode={onStartEditingCode}
           />
         }
         footer={<SignupVerificationEmailFooter email={email} />}

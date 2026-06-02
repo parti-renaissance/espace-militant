@@ -54,7 +54,10 @@ export default function ResendCountdown({ email }: ResendCountdownProps) {
   }
 
   return (
-    <YStack justifyContent="center" alignItems="center" width="100%">
+    <YStack gap="$small" justifyContent="center" alignItems="center">
+      <Text.MD secondary textAlign="center">
+        Vous n’avez rien reçu ?
+      </Text.MD>
       <VoxButton variant="outlined" theme="blue" size="sm" onPress={handleResend} loading={isPending} disabled={isPending}>
         Renvoyer le code
       </VoxButton>
