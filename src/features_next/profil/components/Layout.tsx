@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { usePathname } from 'expo-router'
 import { useMedia, XStack } from 'tamagui'
-import { Bot, DoorOpen, Globe, GraduationCap, HeartHandshake, Lightbulb, LogOut, PenLine, QrCode, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
+import { Bot, DoorOpen, Globe, GraduationCap, HeartHandshake, Lightbulb, LogOut, PenLine, QrCode, UserRoundPen, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
@@ -17,6 +17,7 @@ import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
 import { useUserStore } from '@/store/user-store'
 
+import { useCompleteProfil } from '../context/CompleteProfilContext'
 import { pageConfigs } from '../configs'
 
 function ProfilLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +27,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
   const { user: credentials } = useUserStore()
   const { data: profile } = useGetProfil({ enabled: true })
   const [devMode, setDevMode] = useState(false)
+  const { openCompleteProfil } = useCompleteProfil()
 
   const visibleItems = Object.entries(pageConfigs).filter(([key, config]) => {
     if (key === 'index' && !media.gtSm) return false
@@ -103,6 +105,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                   </Text.SM>
                   <X size={16} color="$textDisabled" />
                 </XStack>
+                <NavItem text="Compléter le profil" iconLeft={UserRoundPen} onPress={openCompleteProfil} />
                 <NavItem text="Chatbot" iconLeft={Bot} href="/chatbot" />
                 <NavItem text="Webview" iconLeft={Globe} href="/webview" />
                 <NavItem text="StoryBook" iconLeft={PenLine} href="/tools/storybook" />
