@@ -5,9 +5,11 @@ import { DEFAULT_IMAGE_MIME, SHARE_FILE_NAME } from './constants'
 import type { Handler, Msg } from './types'
 
 export const shareProfile: Handler<Msg<'SHARE_PROFILE'>> = (message, ctx) => {
+  const text = message.payload.text ?? TOI_PRESIDENT_SHARE_MESSAGE
+  const shareUrl = ctx.shareUrl && !text.includes(ctx.shareUrl) ? ctx.shareUrl : undefined
   void ctx.shareAsync({
-    url: ctx.shareUrl,
-    message: TOI_PRESIDENT_SHARE_MESSAGE,
+    url: shareUrl,
+    message: text,
     file: {
       base64: stripBase64Prefix(message.payload.base64),
       mimeType: message.payload.mimeType,
