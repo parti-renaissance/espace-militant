@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { usePathname } from 'expo-router'
+import { Href, usePathname } from 'expo-router'
 import { useMedia, XStack } from 'tamagui'
 import { Bot, DoorOpen, Globe, GraduationCap, HeartHandshake, Lightbulb, LogOut, PenLine, QrCode, UserRoundPen, Video, Wrench, X, Zap } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
+import { NavItem, type NavItemProps } from '@/components/AppStructure/Navigation/NavItem'
 import { isNavItemActive } from '@/components/AppStructure/utils'
 import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
@@ -14,11 +14,18 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import clientEnv from '@/config/clientEnv'
 import { useSession } from '@/ctx/SessionProvider'
-import { useGetProfil } from '@/services/profile/hook'
+import { useGetProfil, useProfileCompletion } from '@/services/profile/hook'
 import { useUserStore } from '@/store/user-store'
 
 import { useCompleteProfil } from '../context/CompleteProfilContext'
-import { pageConfigs } from '../configs'
+import { pageConfigs, type ProfilNavItemConfig } from '../configs'
+
+const ROUTES_REQUIRING_COMPLETE_PROFILE: ProfilNavItemConfig['id'][] = [
+  'mes-instances',
+  'cotisations-et-dons',
+  'informations-personnelles',
+  'informations-elu',
+]
 
 function ProfilLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -28,6 +35,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
   const { data: profile } = useGetProfil({ enabled: true })
   const [devMode, setDevMode] = useState(false)
   const { openCompleteProfil } = useCompleteProfil()
+  const { isComplete, isLoading: isProfileCompletionLoading } = useProfileCompletion()
 
   const visibleItems = Object.entries(pageConfigs).filter(([key, config]) => {
     if (key === 'index' && !media.gtSm) return false
@@ -59,16 +67,33 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
         <Layout.SideBar isSticky gap="$medium">
           <VoxCard borderRadius={16}>
             <VoxCard.Content padding="$small" gap={4}>
-              {visibleItems.map(([key, config]) => (
-                <NavItem
-                  key={config.id}
-                  text={config.text}
-                  iconLeft={config.iconLeft}
-                  // @ts-expect-error - href type mismatch due to config type definition
-                  href={config.href}
-                  active={config.id === 'index' ? pathname === '/profil' : isNavItemActive(pathname, config.href as string)}
-                />
-              ))}
+              {visibleItems.map(([, config]) => {
+                const requiresCompleteProfile = ROUTES_REQUIRING_COMPLETE_PROFILE.includes(config.id)
+                const isActive = config.id === 'index' ? pathname === '/profil' : isNavItemActive(pathname, config.href)
+                const shouldOpenCompleteProfilModal = requiresCompleteProfile && !isProfileCompletionLoading && !isComplete
+
+                if (shouldOpenCompleteProfilModal) {
+                  return (
+                    <NavItem
+                      key={config.id}
+                      text={config.text}
+                      iconLeft={config.iconLeft}
+                      active={isActive}
+                      onPress={() => openCompleteProfil({ redirectTo: config.href as Href })}
+                    />
+                  )
+                }
+
+                return (
+                  <NavItem
+                    key={config.id}
+                    text={config.text}
+                    iconLeft={config.iconLeft}
+                    active={isActive}
+                    href={config.href as NavItemProps['href']}
+                  />
+                )
+              })}
             </VoxCard.Content>
           </VoxCard>
 
@@ -105,7 +130,11 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                   </Text.SM>
                   <X size={16} color="$textDisabled" />
                 </XStack>
-                <NavItem text="Compléter le profil" iconLeft={UserRoundPen} onPress={openCompleteProfil} />
+                <NavItem
+                  text="Compléter le profil"
+                  iconLeft={UserRoundPen}
+                  onPress={() => openCompleteProfil({ redirectTo: '/profil/mes-instances' })}
+                />
                 <NavItem text="Chatbot" iconLeft={Bot} href="/chatbot" />
                 <NavItem text="Webview" iconLeft={Globe} href="/webview" />
                 <NavItem text="StoryBook" iconLeft={PenLine} href="/tools/storybook" />

@@ -12,6 +12,8 @@ import { VoxButton } from '@/components/Button'
 import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
 import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
+import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
+
 import { MapListToggle } from '../../components/feed-layout/MapListToggle'
 import { HubOrganizeCategoryModal } from '../hub/components/HubOrganizeCategoryModal'
 import HubItemMap, { FRANCE_METRO_CAMERA_BOUNDS, HubItemMapHandle, roundCoordinateForMapSortAround } from './components/HubItemMap'
@@ -30,9 +32,11 @@ const EventsMapPage = () => {
   const [searchBbox, setSearchBbox] = useState<MapSearchBbox>(FRANCE_METRO_HUB_BBOX)
   const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
 
+  const { openOrganiserModal } = useOpenOrganiserEvenement()
+
   const handleOpenOrganizeModal = useCallback(() => {
-    setOrganizeModalOpen(true)
-  }, [])
+    openOrganiserModal(() => setOrganizeModalOpen(true))
+  }, [openOrganiserModal])
 
   const handleCloseOrganizeModal = useCallback(() => {
     setOrganizeModalOpen(false)

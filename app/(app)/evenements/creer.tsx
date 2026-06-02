@@ -6,6 +6,8 @@ import { AccessDeny } from '@/components/AccessDeny'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import EventFormScreen, { EventFormScreenSkeleton } from '@/features_next/events/pages/create-edit'
+import RequireCompleteProfileGate from '@/features_next/profil/components/RequireCompleteProfileGate'
+import { CREER_EVENEMENT_HREF } from '@/features_next/profil/profileCompletion'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
@@ -21,7 +23,17 @@ const CreateEventScreen: React.FC = () => {
     return <Redirect href={'/evenements'} />
   }
 
-  if (!canCreate && !isLoading) {
+  if (isLoading) {
+    return (
+      <Layout.Container hideSideBar hideTabBar>
+        <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton />}>
+          <EventFormScreenSkeleton />
+        </BoundarySuspenseWrapper>
+      </Layout.Container>
+    )
+  }
+
+  if (!canCreate) {
     return (
       <Layout.Container hideSideBar hideTabBar>
         <AccessDeny />
@@ -31,9 +43,11 @@ const CreateEventScreen: React.FC = () => {
 
   return (
     <Layout.Container hideSideBar hideTabBar>
-      <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton />}>
-        <_EventFormScreen />
-      </BoundarySuspenseWrapper>
+      <RequireCompleteProfileGate redirectTo={CREER_EVENEMENT_HREF}>
+        <BoundarySuspenseWrapper fallback={<EventFormScreenSkeleton />}>
+          <_EventFormScreen />
+        </BoundarySuspenseWrapper>
+      </RequireCompleteProfileGate>
     </Layout.Container>
   )
 }

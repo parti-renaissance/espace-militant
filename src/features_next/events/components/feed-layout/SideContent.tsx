@@ -1,34 +1,38 @@
 import React, { Suspense } from 'react'
-import { Link } from 'expo-router'
-import { isWeb, useMedia, YStack, YStackProps } from 'tamagui'
+import { useMedia, YStack, YStackProps } from 'tamagui'
 import { Sparkle, Zap } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
 import EventFilterForm from '@/features_next/events/components/forms/EventFilterForm/EventFilterForm'
+import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useUserScopeFeatures } from '@/services/profile/hook'
 import { FEATURES } from '@/utils/Scopes'
 
-const NewEventBtn = ({ children, ...props }: YStackProps & { children: string }) => (
-  <YStack {...props}>
-    <Link href="/evenements/creer" asChild={!isWeb}>
-      <VoxButton variant="soft" size="xl" theme="pink" iconLeft={Sparkle}>
-        {children}
-      </VoxButton>
-    </Link>
-  </YStack>
-)
+const NewEventBtn = ({ children, ...props }: YStackProps & { children: string }) => {
+  const { openOrganiserEvenement } = useOpenOrganiserEvenement()
 
-const NewActionBtn = ({ children, ...props }: YStackProps & { children: string }) => (
-  <YStack {...props}>
-    <Link href="/actions/creer" asChild={!isWeb}>
-      <VoxButton variant="soft" size="xl" theme="green" iconLeft={Zap}>
+  return (
+    <YStack {...props}>
+      <VoxButton variant="soft" size="xl" theme="pink" iconLeft={Sparkle} onPress={() => openOrganiserEvenement()}>
         {children}
       </VoxButton>
-    </Link>
-  </YStack>
-)
+    </YStack>
+  )
+}
+
+const NewActionBtn = ({ children, ...props }: YStackProps & { children: string }) => {
+  const { openCreateAction } = useOpenOrganiserEvenement()
+
+  return (
+    <YStack {...props}>
+      <VoxButton variant="soft" size="xl" theme="green" iconLeft={Zap} onPress={openCreateAction}>
+        {children}
+      </VoxButton>
+    </YStack>
+  )
+}
 
 type HubSideContentProps = {
   onOpenOrganizeModal?: () => void
@@ -36,6 +40,7 @@ type HubSideContentProps = {
 
 const HubSideContent = ({ onOpenOrganizeModal }: HubSideContentProps) => {
   const { isAuth } = useSession()
+  const { openOrganiserModal } = useOpenOrganiserEvenement()
   const { hasFeature } = useUserScopeFeatures({ enabled: isAuth })
   const showCreateEvent = isAuth && hasFeature(FEATURES.EVENTS)
   const showCreateAction = isAuth && hasFeature(FEATURES.ACTIONS)
@@ -48,7 +53,14 @@ const HubSideContent = ({ onOpenOrganizeModal }: HubSideContentProps) => {
         <Suspense>
           {onOpenOrganizeModal && showOrganize ? (
             <YStack>
-              <VoxButton variant="soft" size="xl" theme="pink" width="100%" iconLeft={Sparkle} onPress={onOpenOrganizeModal}>
+              <VoxButton
+                variant="soft"
+                size="xl"
+                theme="pink"
+                width="100%"
+                iconLeft={Sparkle}
+                onPress={() => openOrganiserModal(onOpenOrganizeModal)}
+              >
                 Organiser un événement
               </VoxButton>
             </YStack>

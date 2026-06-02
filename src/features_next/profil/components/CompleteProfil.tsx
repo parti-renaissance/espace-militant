@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Href, router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ScrollView, useMedia, useTheme, View, XStack, YStack } from 'tamagui'
 import { ArrowLeft, ArrowRight, X } from '@tamagui/lucide-icons'
@@ -87,9 +88,6 @@ type CompleteProfilSubmitValues = z.infer<typeof validateCompleteProfilSchema>
 const STEP_1_FIELDS = ['post_address', 'phone'] as const satisfies ReadonlyArray<keyof CompleteProfilFormValues>
 const MODAL_MAX_WIDTH = 440
 
-export const isProfileIdentityIncomplete = (profile: RestDetailedProfileResponse) =>
-  !profile.birthdate || !profile.first_name?.trim() || !profile.last_name?.trim() || !profile.gender
-
 const buildDefaultValues = (profile: RestDetailedProfileResponse): CompleteProfilFormValues => {
   const gender = profile.gender === 'male' || profile.gender === 'female' || profile.gender === 'other' ? profile.gender : undefined
 
@@ -144,9 +142,11 @@ const buildUpdatePayload = (data: CompleteProfilSubmitValues): RestUpdateProfile
 type CompleteProfilProps = {
   open: boolean
   onClose: () => void
+  redirectTo?: Href
+  onSuccess?: () => void
 }
 
-export default function CompleteProfil({ open, onClose }: CompleteProfilProps) {
+export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }: CompleteProfilProps) {
   const theme = useTheme()
   const media = useMedia()
   const insets = useSafeAreaInsets()
@@ -156,7 +156,7 @@ export default function CompleteProfil({ open, onClose }: CompleteProfilProps) {
 
   const defaultValues = useMemo(() => buildDefaultValues(profile), [profile])
 
-  const { control, handleSubmit, reset, trigger, setError } = useForm<CompleteProfilFormValues>({
+  const { control, handleSubmit, reset, trigger, setError, getValues } = useForm<CompleteProfilFormValues>({
     resolver: zodResolver(validateCompleteProfilFormSchema),
     defaultValues,
     mode: 'onChange',
@@ -178,9 +178,16 @@ export default function CompleteProfil({ open, onClose }: CompleteProfilProps) {
 
   const onNextStep = async () => {
     const isValid = await trigger([...STEP_1_FIELDS])
-    if (isValid) {
-      setStep(2)
+    if (!isValid) {
+      return
     }
+
+    if (!getValues('post_address')?.address?.trim()) {
+      setError('post_address.address', { message: 'Veuillez renseigner votre adresse' })
+      return
+    }
+
+    setStep(2)
   }
 
   const onPreviousStep = () => {
@@ -203,9 +210,20 @@ export default function CompleteProfil({ open, onClose }: CompleteProfilProps) {
       return
     }
 
+    if (!parsed.data.post_address?.address?.trim()) {
+      setError('post_address.address', { message: 'Veuillez renseigner votre adresse' })
+      setStep(1)
+      return
+    }
+
     mutateAsync(buildUpdatePayload(parsed.data))
       .then(() => {
         handleClose()
+        if (redirectTo) {
+          router.push(redirectTo)
+        } else {
+          onSuccess?.()
+        }
       })
       .catch((error) => {
         if (error instanceof ProfileFormError) {

@@ -1,12 +1,19 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Href } from 'expo-router'
 
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
-
-import { useSession } from '@/ctx/SessionProvider'
 import CompleteProfil from '@/features_next/profil/components/CompleteProfil'
 
+import { useSession } from '@/ctx/SessionProvider'
+
+export type OpenCompleteProfilOptions = {
+  redirectTo?: Href
+  /** Exécuté après validation du profil si `redirectTo` est absent. */
+  onSuccess?: () => void
+}
+
 type CompleteProfilContextValue = {
-  openCompleteProfil: () => void
+  openCompleteProfil: (options?: OpenCompleteProfilOptions) => void
 }
 
 const CompleteProfilContext = createContext<CompleteProfilContextValue | null>(null)
@@ -14,19 +21,32 @@ const CompleteProfilContext = createContext<CompleteProfilContextValue | null>(n
 export function CompleteProfilProvider({ children }: { children: ReactNode }) {
   const { isAuth } = useSession()
   const [open, setOpen] = useState(false)
+  const [redirectTo, setRedirectTo] = useState<Href | undefined>()
+  const onSuccessRef = useRef<(() => void) | undefined>(undefined)
 
   useEffect(() => {
     if (!isAuth) {
       setOpen(false)
+      setRedirectTo(undefined)
+      onSuccessRef.current = undefined
     }
   }, [isAuth])
 
-  const openCompleteProfil = useCallback(() => {
+  const openCompleteProfil = useCallback((options?: OpenCompleteProfilOptions) => {
+    setRedirectTo(options?.redirectTo)
+    onSuccessRef.current = options?.onSuccess
     setOpen(true)
   }, [])
 
   const handleClose = useCallback(() => {
     setOpen(false)
+    setRedirectTo(undefined)
+    onSuccessRef.current = undefined
+  }, [])
+
+  const handleSuccess = useCallback(() => {
+    onSuccessRef.current?.()
+    onSuccessRef.current = undefined
   }, [])
 
   const value = useMemo(
@@ -40,8 +60,8 @@ export function CompleteProfilProvider({ children }: { children: ReactNode }) {
     <CompleteProfilContext.Provider value={value}>
       {children}
       {isAuth ? (
-        <BoundarySuspenseWrapper fallback={null}>
-          <CompleteProfil open={open} onClose={handleClose} />
+        <BoundarySuspenseWrapper fallback={<></>}>
+          <CompleteProfil open={open} onClose={handleClose} redirectTo={redirectTo} onSuccess={handleSuccess} />
         </BoundarySuspenseWrapper>
       ) : null}
     </CompleteProfilContext.Provider>

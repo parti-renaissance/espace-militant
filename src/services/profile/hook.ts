@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import * as FileSystem from 'expo-file-system/legacy'
 import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
@@ -9,6 +9,7 @@ import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useSession } from '@/ctx/AuthContext'
 import * as api from '@/services/profile/api'
 import {
+  RestDetailedProfileResponse,
   RestDonationsResponse,
   RestProfilResponse,
   RestProfilResponseTagTypes,
@@ -20,11 +21,14 @@ import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { getMembershipStatus } from '@/utils/membershipStatus'
 import { getFullVersion } from '@/utils/version'
 
+import { isProfileComplete } from '@/features_next/profil/profileCompletion'
+
 import { GenericResponseError } from '../common/errors/generic-errors'
 import { ProfilChangePasswordFormError } from './error'
 import { hasScopeFeature, isExecutiveCadreScope } from './utils'
 
 export const PROFIL_QUERY_KEY = 'profil'
+export const PROFILE_DETAIL_QUERY_KEY = 'profileDetail'
 
 export const useGetProfil = (props?: { enabled?: boolean; placeholderData?: RestProfilResponse | PlaceholderDataFunction<RestProfilResponse> }) => {
   const isAuth = useUserStore((state) => !!state.user?.accessToken)
@@ -161,11 +165,39 @@ export const useMutateExecutiveScope = () => {
 
 export const useGetDetailProfil = () => {
   return useSuspenseQuery({
-    queryKey: ['profileDetail'],
+    queryKey: [PROFILE_DETAIL_QUERY_KEY],
     queryFn: () => api.getDetailedProfile(),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 5,
   })
+}
+
+export { isProfileComplete, isProfileIdentityIncomplete } from '@/features_next/profil/profileCompletion'
+
+/** Profil détaillé (`/api/v3/profile/me`) — champs requis pour l’inscription complète. */
+export const useProfileCompletion = () => {
+  const isAuth = useUserStore((state) => !!state.user?.accessToken)
+
+  const query = useQuery({
+    queryKey: [PROFILE_DETAIL_QUERY_KEY],
+    queryFn: () => api.getDetailedProfile(),
+    enabled: isAuth,
+    staleTime: 1000 * 60 * 5,
+  })
+
+  const isComplete = useMemo(
+    () => (query.data ? isProfileComplete(query.data) : false),
+    [query.data],
+  )
+
+  return {
+    profile: query.data,
+    isComplete,
+    isIncomplete: Boolean(query.data && !isComplete),
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    refetch: query.refetch,
+  }
 }
 
 class UnsubscribedError extends Error {
@@ -218,7 +250,7 @@ export const useMutationUpdateProfil = ({ userUuid }: { userUuid: string }) => {
         queryKey: [PROFIL_QUERY_KEY],
       })
       queryClient.invalidateQueries({
-        queryKey: ['profileDetail'],
+        queryKey: [PROFILE_DETAIL_QUERY_KEY],
       })
       queryClient.invalidateQueries({
         queryKey: ['electProfil'],

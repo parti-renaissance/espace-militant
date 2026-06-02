@@ -14,6 +14,8 @@ import { useUserLocation } from '../map/hooks/useUserLocation'
 import { EventsHubDesktop } from './components/EventsHubDesktop'
 import { EventsHubMobile } from './components/EventsHubMobile'
 import { HubMapBlock } from './components/HubMapBlock'
+import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
+
 import { HubOrganizeCategoryModal } from './components/HubOrganizeCategoryModal'
 
 const EventsHubPage = () => {
@@ -24,9 +26,11 @@ const EventsHubPage = () => {
   const [sortAround, setSortAround] = useState<{ lat: number; lng: number } | null>(null)
   const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
 
+  const { openOrganiserModal } = useOpenOrganiserEvenement()
+
   const handleOpenOrganizeModal = useCallback(() => {
-    setOrganizeModalOpen(true)
-  }, [])
+    openOrganiserModal(() => setOrganizeModalOpen(true))
+  }, [openOrganiserModal])
 
   const handleCloseOrganizeModal = useCallback(() => {
     setOrganizeModalOpen(false)

@@ -6,6 +6,8 @@ import { AccessDeny } from '@/components/AccessDeny'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import ActionForm, { ActionFormScreenSkeleton } from '@/features_next/actions/pages/create-edit'
+import RequireCompleteProfileGate from '@/features_next/profil/components/RequireCompleteProfileGate'
+import { CREER_ACTION_HREF } from '@/features_next/profil/profileCompletion'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
@@ -21,7 +23,17 @@ const CreateActionScreen: React.FC = () => {
     return <Redirect href="/evenements/list" />
   }
 
-  if (!canCreate && !isLoading) {
+  if (isLoading) {
+    return (
+      <Layout.Container hideSideBar hideTabBar>
+        <BoundarySuspenseWrapper fallback={<ActionFormScreenSkeleton />}>
+          <ActionFormScreenSkeleton />
+        </BoundarySuspenseWrapper>
+      </Layout.Container>
+    )
+  }
+
+  if (!canCreate) {
     return (
       <Layout.Container hideSideBar hideTabBar>
         <AccessDeny />
@@ -31,12 +43,14 @@ const CreateActionScreen: React.FC = () => {
 
   return (
     <Layout.Container hideSideBar hideTabBar>
-      <BoundarySuspenseWrapper fallback={<ActionFormScreenSkeleton />}>
-        <Head>
-          <title>{metatags.createTitle('Nouvelle action')}</title>
-        </Head>
-        <ActionForm />
-      </BoundarySuspenseWrapper>
+      <RequireCompleteProfileGate redirectTo={CREER_ACTION_HREF}>
+        <BoundarySuspenseWrapper fallback={<ActionFormScreenSkeleton />}>
+          <Head>
+            <title>{metatags.createTitle('Nouvelle action')}</title>
+          </Head>
+          <ActionForm />
+        </BoundarySuspenseWrapper>
+      </RequireCompleteProfileGate>
     </Layout.Container>
   )
 }
