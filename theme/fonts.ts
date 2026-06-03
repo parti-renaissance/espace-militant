@@ -1,6 +1,11 @@
+import { Platform } from 'react-native'
 import { createFont } from 'tamagui'
 
-export const PLAAK_44_BOLD = 'Plaak-44-Bold'
+/** Android/web: expo-font key (filename). iOS: PostScript name from the TTF. */
+export const PLAAK_44_BOLD = Platform.select({
+  ios: 'Plaak4Terme-44-BoldA',
+  default: 'Plaak-44-Bold',
+})!
 
 export const Maax = createFont({
   family: 'Maax',
