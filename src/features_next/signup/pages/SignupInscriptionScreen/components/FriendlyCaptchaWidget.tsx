@@ -5,11 +5,7 @@ import { YStack } from 'tamagui'
 
 import Text from '@/components/base/Text'
 
-import {
-  FRIENDLY_CAPTCHA_API_ENDPOINT,
-  FRIENDLY_CAPTCHA_SDK_VERSION,
-  FRIENDLY_CAPTCHA_SITE_KEY,
-} from '@/services/signup/constants'
+import { FRIENDLY_CAPTCHA_API_ENDPOINT, FRIENDLY_CAPTCHA_SDK_VERSION, FRIENDLY_CAPTCHA_SITE_KEY } from '@/services/signup/constants'
 
 type FriendlyCaptchaWidgetProps = {
   onToken: (token: string) => void
@@ -103,7 +99,9 @@ export default function FriendlyCaptchaWidget({ onToken, onError, error }: Frien
   if (!siteKey) {
     return (
       <YStack gap="$xsmall">
-        <Text.SM secondary color="$orange10">Configuration captcha manquante (EXPO_PUBLIC_FRIENDLY_CAPTCHA_SITE_KEY).</Text.SM>
+        <Text.SM secondary color="$orange10">
+          Configuration captcha manquante (EXPO_PUBLIC_FRIENDLY_CAPTCHA_SITE_KEY).
+        </Text.SM>
         {error ? <Text.SM color="$orange10">{error}</Text.SM> : null}
       </YStack>
     )
@@ -121,7 +119,7 @@ export default function FriendlyCaptchaWidget({ onToken, onError, error }: Frien
   }
 
   return (
-    <YStack gap="$xsmall">
+    <YStack gap="$xsmall" height={100} width="100%">
       <WebView
         source={{ html: buildCaptchaHtml(siteKey) }}
         style={styles.webview}

@@ -10,11 +10,11 @@ import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
-import { useSession } from '@/ctx/SessionProvider'
 import FriendlyCaptchaWidget from '@/features_next/signup/pages/SignupInscriptionScreen/components/FriendlyCaptchaWidget'
 import { useSignupSessionStore } from '@/features_next/signup/store/signup-session-store'
 import { applySignupFormError } from '@/features_next/signup/utils/errors'
 
+import { useSession } from '@/ctx/SessionProvider'
 import { DEFAULT_SIGNUP_SOURCE } from '@/services/signup/constants'
 import { useSignup } from '@/services/signup/hook'
 import { SignupInscriptionFormSchema, type RestPostSignupRequest, type SignupInscriptionFormValues } from '@/services/signup/schema'
@@ -187,13 +187,13 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
         </VoxButton>
       </YStack>
 
-      <YStack alignItems="center" height={75}>
+      <YStack alignItems="center" height={100}>
         <FriendlyCaptchaWidget key={captchaResetKey} onToken={handleCaptchaToken} error={recaptchaError} />
       </YStack>
 
       <Text.SM secondary>
         En continuant, vous acceptez nos{' '}
-        <Text.SM secondary color="$blue9" onPress={() => Linking.openURL('https://parti-renaissance.fr/politique-de-protection-des-donnees/')}>
+        <Text.SM secondary color="$blue9" onPress={() => Linking.openURL('https://parti-renaissance.fr/cgu')}>
           CGU
         </Text.SM>{' '}
         et notre{' '}
