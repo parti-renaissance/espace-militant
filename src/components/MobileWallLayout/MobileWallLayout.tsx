@@ -23,7 +23,7 @@ export default function MobileWallLayout() {
       <PageLayout.MainSingleColumn>
         {gtMd ? (
           <YStack p={'$xlarge'}>
-            <AppDownloadCTA variant={'screenshots'} />
+            <AppDownloadCTA size="large" />
           </YStack>
         ) : (
           <PageLayout.StateFrame paddingHorizontal={'$medium'}>

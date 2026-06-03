@@ -1,23 +1,41 @@
+import type { Meta, StoryObj } from '@storybook/react'
+import { YStack } from 'tamagui'
+
 import AppDownloadCTA from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
-import { StoryObj } from '@storybook/react'
-import { View } from 'tamagui'
 
 const meta = {
   title: 'Profil CTA/App Download',
-  component: () => (
-    <>
-      <View width={400} mb={'$medium'}>
-        <AppDownloadCTA />
-      </View>
-      <View width={400}>
-        <AppDownloadCTA variant={'screenshots'} />
-      </View>
-    </>
-  ),
-}
+  component: AppDownloadCTA,
+  decorators: [
+    (Story) => (
+      <YStack width={400} maxWidth="100%" padding="$medium" backgroundColor="$gray50">
+        <Story />
+      </YStack>
+    ),
+  ],
+} satisfies Meta<typeof AppDownloadCTA>
+
+export default meta
 
 type Story = StoryObj<typeof AppDownloadCTA>
 
-export const Default: Story = {}
+export const Large: Story = {
+  args: {
+    size: 'large',
+  },
+}
 
-export default meta
+export const Medium: Story = {
+  args: {
+    size: 'medium',
+  },
+}
+
+export const AllSizes: Story = {
+  render: () => (
+    <YStack gap="$large">
+      <AppDownloadCTA size="large" />
+      <AppDownloadCTA size="medium" />
+    </YStack>
+  ),
+}

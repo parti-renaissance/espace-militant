@@ -13,7 +13,8 @@ import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/Boun
 import { VoxButton } from '@/components/Button'
 import { FeedCard } from '@/components/Cards'
 import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
-import AppDownloadCTA from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
+import AppDownloadCTA, { type AppDownloadCTASize } from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
+import { useSession } from '@/ctx/SessionProvider'
 import { MyProfileCardNoLinks } from '@/components/ProfileCards/ProfileCard/MyProfileCard'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import VoxCard from '@/components/VoxCard/VoxCard'
@@ -169,6 +170,8 @@ const TimelineFeedMain = () => {
 
 const TimelineFeedScreen = () => {
   const media = useMedia()
+  const { isAuth } = useSession()
+  const appDownloadSize: AppDownloadCTASize = isAuth ? 'medium' : 'large'
 
   return (
     <>
@@ -189,14 +192,14 @@ const TimelineFeedScreen = () => {
                     <DefaultErrorFallback {...error} />
                   </VoxCard.Content>
                 </VoxCard>
-                <AppDownloadCTA />
+                <AppDownloadCTA size={appDownloadSize} />
               </YStack>
             )}
           >
             <ScrollView contentContainerStyle={{ height: '100dvh' }}>
               <YStack alignItems="center" justifyContent="center" gap="$medium">
                 <MyProfileCardNoLinks />
-                <AppDownloadCTA />
+                <AppDownloadCTA size={appDownloadSize} />
               </YStack>
             </ScrollView>
           </BoundarySuspenseWrapper>
