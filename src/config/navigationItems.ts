@@ -66,7 +66,7 @@ const militantNavItemsAuthConfig: NavItemConfig[] = [
   { id: 'accueil', iconLeft: Newspaper, text: 'M’informer', href: '/' },
   { id: 'evenements', iconLeft: Zap, text: 'Agir', href: '/evenements' },
   { id: 'soutenir', iconLeft: HeartHandshake, text: 'Soutenir', href: '/soutenir' },
-  { id: 'idees', iconLeft: Lightbulb, text: 'Idées', href: '/idees' },
+  { id: 'idees', iconLeft: Lightbulb, text: 'Débattre', href: '/idees' },
 ] as const
 
 // Configuration des items du menu militant pour utilisateurs non connectés
@@ -74,7 +74,7 @@ const militantNavItemsPublicConfig: NavItemConfig[] = [
   { id: 'accueil', iconLeft: Newspaper, text: 'M’informer', href: '/', disabled: true },
   { id: 'evenements', iconLeft: Zap, text: 'Agir', href: '/evenements' },
   { id: 'soutenir', iconLeft: HeartHandshake, text: 'Soutenir', href: '/soutenir' },
-  { id: 'idees', iconLeft: Lightbulb, text: 'Idées', href: '/idees' },
+  { id: 'idees', iconLeft: Lightbulb, text: 'Débattre', href: '/idees' },
 ] as const
 
 export const useMilitantNavItems = (): NavItemConfig[] => {
