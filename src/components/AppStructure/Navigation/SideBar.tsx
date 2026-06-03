@@ -409,7 +409,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
                 <VoxButton variant="outlined" size="lg" width="100%" theme="blue" onPress={() => signIn()}>
                   Me connecter
                 </VoxButton>
-                <SignUpButton size="lg" />
+                <SignUpButton size="lg" width="100%" />
               </YStack>
             </YStack>
           )}
