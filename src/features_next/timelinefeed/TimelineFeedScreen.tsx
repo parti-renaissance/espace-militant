@@ -8,17 +8,17 @@ import { useDebouncedCallback } from 'use-debounce'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
-import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import { FeedCard } from '@/components/Cards'
 import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
 import AppDownloadCTA, { type AppDownloadCTASize } from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
-import { useSession } from '@/ctx/SessionProvider'
 import { MyProfileCardNoLinks } from '@/components/ProfileCards/ProfileCard/MyProfileCard'
+import Title from '@/components/Title/Title'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
+import { useSession } from '@/ctx/SessionProvider'
 import { transformFeedItemToProps } from '@/helpers/homeFeed'
 import { useAlerts } from '@/services/alerts/hook'
 import { useHits } from '@/services/hits/hook'
@@ -100,9 +100,10 @@ const TimelineFeedMain = () => {
           {hasAlerts ? <AlertStack alerts={alerts} /> : null}
           {hasAlerts || hasPublications ? (
             <XStack justifyContent="space-between" alignItems="center" px={media.sm ? '$medium' : '$0'}>
-              <Text.MD color="$gray4" semibold>
-                Dernières actualités
-              </Text.MD>
+              <Title size="h1" aria-label="Des (bonnes) Nouvelles">
+                <Title.Text>Des (bonnes)</Title.Text>
+                <Title.Highlight>Nouvelles</Title.Highlight>
+              </Title>
               {hasPublications && (
                 <Link href="/publications" asChild>
                   <VoxButton variant="soft" size="sm" theme="pink" iconLeft={Sparkle}>
