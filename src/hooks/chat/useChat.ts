@@ -81,7 +81,7 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
     },
     onError: (err) => {
       if (err.kind === 'http') {
-        setError(classifyHttpError(err.status, err.retryAfterHeader))
+        setError(classifyHttpError(err.status, err.retryAfterHeader, err.responseBody))
       } else if (err.kind === 'timeout') {
         setError({ kind: 'timeout', message: 'Le service met trop de temps à répondre. Réessayez.', retryable: true })
       } else {

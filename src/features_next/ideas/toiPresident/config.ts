@@ -1,9 +1,5 @@
 import clientEnv from '@/config/clientEnv';
 
-
-
-
-
 export const UUID_PARAM = 'uuid'
 export const SHARE_URL_PARAM = 'share_url'
 export const TOI_PRESIDENT_SHARE_MESSAGE = 'Toi président — le jeu'
