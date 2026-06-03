@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Href, router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Href, router } from 'expo-router'
 import { ScrollView, useMedia, useTheme, View, XStack, YStack } from 'tamagui'
 import { ArrowLeft, ArrowRight, X } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -344,9 +344,8 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
       <>
         <YStack gap="$medium">
           <Title size="h1">
-            <Title.Text>On fait </Title.Text>
-            <Title.Highlight>connaissance</Title.Highlight>
-            <Title.Text> ?</Title.Text>
+            <Title.Text>ON Y EST </Title.Text>
+            <Title.Highlight>PRESQUE</Title.Highlight>
           </Title>
           <Text.LG regular>Quelques précisions pour savoir comment nous adresser à vous et adapter nos futurs échanges.</Text.LG>
         </YStack>

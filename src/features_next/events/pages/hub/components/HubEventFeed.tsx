@@ -20,14 +20,14 @@ import ILLUMATERIEL from '@/features_next/events/assets/images/illu-materiel.png
 import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
 import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
 import { HubFeedRow } from '@/features_next/events/components/list-item/HubFeedRow'
-
 import { useProfileCompletionAccess } from '@/features_next/profil/hooks/useProfileCompletionAccess'
+
 import { useSession } from '@/ctx/SessionProvider'
 import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
-import { handleLinkPress } from '@/utils/linkHandler'
 import { mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
 import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
+import { handleLinkPress } from '@/utils/linkHandler'
 
 const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.map(mapHubItemToFeedRow).filter((row): row is HubFeedRowType => row !== null)
 
@@ -95,7 +95,7 @@ const HubFooterResourceCards = memo(function HubFooterResourceCards() {
     <>
       <CallToActionCard
         icon={ClipboardCheck}
-        title="Je prends le poul du terrain"
+        title="Je prends l’avis du terrain"
         description="Allez à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à porte."
       >
         <Link href="/questionnaires" asChild>
