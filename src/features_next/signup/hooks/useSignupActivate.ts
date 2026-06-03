@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { router } from 'expo-router'
+import { Href, router } from 'expo-router'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useSignupSessionStore } from '@/features_next/signup/store/signup-session-store'
@@ -18,6 +18,7 @@ export function useSignupActivate() {
   const setInlineError = useSignupSessionStore((s) => s.setInlineError)
   const setRequiresManualLogin = useSignupSessionStore((s) => s.setRequiresManualLogin)
   const firstName = useSignupSessionStore((s) => s.firstName)
+  const redirectUri = useSignupSessionStore((s) => s.redirectUri)
   const activateMutation = useActivateSignup()
 
   const resetSignupSession = useSignupSessionStore((s) => s.reset)
@@ -46,10 +47,14 @@ export function useSignupActivate() {
 
         setCredentials(credentialsFromTokenResponse(session))
         queryClient.resetQueries()
-        router.replace({
-          pathname: '/',
-          params: { signupCongrats: '1', firstName: firstName || undefined },
-        })
+        if (redirectUri) {
+          router.replace(redirectUri as Href)
+        } else {
+          router.replace({
+            pathname: '/',
+            params: { signupCongrats: '1', firstName: firstName || undefined },
+          })
+        }
         resetSignupSession()
       } catch (error) {
         if (activated) {
@@ -61,7 +66,7 @@ export function useSignupActivate() {
         setInlineError(getSignupErrorMessage(error, 'Code incorrect. Vérifiez le code reçu par email.'))
       }
     },
-    [activateMutation, firstName, queryClient, resetSignupSession, setCredentials, setInlineError, setRequiresManualLogin],
+    [activateMutation, firstName, redirectUri, queryClient, resetSignupSession, setCredentials, setInlineError, setRequiresManualLogin],
   )
 
   return {

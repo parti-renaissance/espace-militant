@@ -9,11 +9,13 @@ import { SIGNUP_RESEND_COOLDOWN_MS } from '@/services/signup/constants'
 type SignupSessionState = {
   email: string
   firstName: string
+  redirectUri: string | null
   inlineError: string | null
   requiresManualLogin: boolean
   resendAvailableAt: number | null
   setEmail: (email: string) => void
   setFirstName: (firstName: string) => void
+  setRedirectUri: (redirectUri: string | null) => void
   setInlineError: (message: string | null) => void
   setRequiresManualLogin: (value: boolean) => void
   startResendCooldown: () => void
@@ -23,6 +25,7 @@ type SignupSessionState = {
 const initialState = {
   email: '',
   firstName: '',
+  redirectUri: null as string | null,
   inlineError: null as string | null,
   requiresManualLogin: false,
   resendAvailableAt: null as number | null,
@@ -32,6 +35,7 @@ export const useSignupSessionStore = create<SignupSessionState>((set) => ({
   ...initialState,
   setEmail: (email) => set({ email }),
   setFirstName: (firstName) => set({ firstName }),
+  setRedirectUri: (redirectUri) => set({ redirectUri }),
   setInlineError: (inlineError) => set({ inlineError }),
   setRequiresManualLogin: (requiresManualLogin) => set({ requiresManualLogin }),
   startResendCooldown: () => set({ resendAvailableAt: Date.now() + SIGNUP_RESEND_COOLDOWN_MS }),

@@ -10,6 +10,7 @@ import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
+import { useSession } from '@/ctx/SessionProvider'
 import FriendlyCaptchaWidget from '@/features_next/signup/pages/SignupInscriptionScreen/components/FriendlyCaptchaWidget'
 import { useSignupSessionStore } from '@/features_next/signup/store/signup-session-store'
 import { applySignupFormError } from '@/features_next/signup/utils/errors'
@@ -32,9 +33,11 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
   const [captchaResetKey, setCaptchaResetKey] = useState(0)
   const [formError, setFormError] = useState<string | null>(null)
   const { mutateAsync: signup } = useSignup()
+  const { signIn } = useSession()
   const setEmail = useSignupSessionStore((s) => s.setEmail)
   const setFirstName = useSignupSessionStore((s) => s.setFirstName)
   const startResendCooldown = useSignupSessionStore((s) => s.startResendCooldown)
+  const redirectUri = useSignupSessionStore((s) => s.redirectUri)
 
   const { control, handleSubmit, setError } = useForm<SignupInscriptionFormValues>({
     defaultValues: {
@@ -179,14 +182,7 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
         <Text.MD semibold textAlign="center">
           Avez-vous un compte Renaissance ?
         </Text.MD>
-        <VoxButton
-          theme="blue"
-          full
-          variant="text"
-          onPress={() => {
-            /** TODO: Add signin logic */
-          }}
-        >
+        <VoxButton theme="blue" full variant="text" onPress={() => signIn(redirectUri ? { state: redirectUri } : undefined)}>
           J’ai déja un compte, je me connecte
         </VoxButton>
       </YStack>

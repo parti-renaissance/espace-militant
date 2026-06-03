@@ -1,4 +1,8 @@
-import clientEnv from '@/config/clientEnv'
+import clientEnv from '@/config/clientEnv';
+
+
+
+
 
 export const UUID_PARAM = 'uuid'
 export const SHARE_URL_PARAM = 'share_url'
@@ -34,5 +38,5 @@ export function getToiPresidentEmbedUrl(uuid?: string | null): string {
 
 export function getToiPresidentShareUrl(): string {
   if (SHARE_URL) return SHARE_URL
-  return `https://${clientEnv.ASSOCIATED_DOMAIN}${TOI_PRESIDENT_PATH}`
+  return `https://attal.app/toi-president`
 }
