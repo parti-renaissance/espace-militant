@@ -1,29 +1,16 @@
-import { ComponentProps } from 'react'
-import { ActionCard, ActionVoxCardProps } from '@/components/Cards/ActionCard'
-import { NewsCard, NewsVoxCardProps } from '@/components/Cards/NewsCard'
+import { ActionCard } from '@/components/Cards/ActionCard'
+import { NewsCard } from '@/components/Cards/NewsCard'
 import EventListItem from '@/features_next/events/components/list-item/EventListItem'
-import PublicationCard, { PublicationCardProps } from '@/components/Cards/PublicationCard/PublicationCard'
+import PublicationCard from '@/components/Cards/PublicationCard/PublicationCard'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
-import TransactionalCard, { TransactionalCardProps } from '../TransactionalCard'
+import TransactionalCard from '../TransactionalCard'
+import SocialPostCard from '../SocialPostCard/SocialPostCard'
 
-export type FeedCardProps =
-  | ({
-      type: 'event'
-    } & ComponentProps<typeof EventListItem>)
-  | ({
-      type: 'action'
-    } & ActionVoxCardProps)
-  | ({
-      type: 'news'
-    } & NewsVoxCardProps)
-  | ({
-      type: 'publication'
-    } & PublicationCardProps)
-  | ({
-      type: 'transactional_message'
-    } & TransactionalCardProps)
+import type { FeedCardProps } from './FeedCard.types'
 
-const FeedCard = (props: FeedCardProps) => {
+export type { FeedCardProps } from './FeedCard.types'
+
+function FeedCard(props: FeedCardProps) {
   const { data } = useGetSuspenseProfil()
   switch (props.type) {
     case 'event':
@@ -36,6 +23,8 @@ const FeedCard = (props: FeedCardProps) => {
       return <PublicationCard {...props} />
     case 'transactional_message':
       return <TransactionalCard {...props} />
+    case 'social_post':
+      return <SocialPostCard {...props} />
     default:
       return null
   }
