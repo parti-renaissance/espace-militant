@@ -35,6 +35,8 @@ const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 const TimelineFeedCard = memo((item: RestTimelineFeedItem) => {
   const props = transformFeedItemToProps(item)
 
+  if (!props) return null
+
   if (Platform.OS === 'web' && props) {
     return (
       <TrackImpressionWeb objectType={item.type} objectId={item.objectID} source="page_timeline">
