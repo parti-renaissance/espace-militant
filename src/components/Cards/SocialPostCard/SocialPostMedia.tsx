@@ -25,14 +25,7 @@ const preventWebTextSelection = () => {
 }
 
 const SocialPostMediaFrame = ({ children }: { children: ReactNode }) => (
-  <YStack
-    width="100%"
-    minHeight={MIN_MEDIA_HEIGHT}
-    backgroundColor="$gray2"
-    overflow="hidden"
-    justifyContent="center"
-    {...webNoSelectStyle}
-  >
+  <YStack width="100%" minHeight={MIN_MEDIA_HEIGHT} backgroundColor="$gray2" overflow="hidden" justifyContent="center" {...webNoSelectStyle}>
     {children}
   </YStack>
 )
@@ -48,7 +41,7 @@ const SocialPostMediaItem = ({ item }: { item: RestTimelineFeedSocialMediaItem }
             width={item.width ?? undefined}
             height={item.height ?? undefined}
             autoPlay={false}
-            controls
+            controls={false}
             rounded={false}
           />
         </YStack>
@@ -220,13 +213,7 @@ const SocialPostMediaCarousel = ({ items, isWeb }: SocialPostMediaCarouselProps)
 
   return (
     <YStack width="100%" onLayout={handleLayout} {...(isWeb ? { userSelect: 'none' } : {})}>
-      <YStack
-        width="100%"
-        minHeight={MIN_MEDIA_HEIGHT}
-        position="relative"
-        pointerEvents="box-none"
-        {...(isWeb ? { userSelect: 'none' } : {})}
-      >
+      <YStack width="100%" minHeight={MIN_MEDIA_HEIGHT} position="relative" pointerEvents="box-none" {...(isWeb ? { userSelect: 'none' } : {})}>
         {containerWidth > 0 ? (
           <ScrollView
             ref={scrollRef}
