@@ -1,5 +1,5 @@
 export type SSEStreamError =
-  | { kind: 'http'; status: number; retryAfterHeader: string | null }
+  | { kind: 'http'; status: number; retryAfterHeader: string | null; responseBody: string | null }
   | { kind: 'timeout' }
   | { kind: 'network' }
 
