@@ -182,7 +182,7 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
         <Text.MD semibold textAlign="center">
           Avez-vous un compte Renaissance ?
         </Text.MD>
-        <VoxButton theme="blue" full variant="text" onPress={() => signIn(redirectUri ? { state: redirectUri } : undefined)}>
+        <VoxButton theme="blue" full variant="text" onPress={() => signIn({ state: redirectUri || '/' })}>
           J’ai déja un compte, je me connecte
         </VoxButton>
       </YStack>

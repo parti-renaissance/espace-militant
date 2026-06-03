@@ -25,6 +25,6 @@ export function useSignupVerificationEmailScreen() {
     onStartEditingCode: () => {
       if (inlineError) setInlineError(null)
     },
-    onSignIn: () => signIn(redirectUri ? { state: redirectUri } : undefined),
+    onSignIn: () => signIn({ state: redirectUri || '/' }),
   }
 }

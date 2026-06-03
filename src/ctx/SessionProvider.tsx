@@ -78,15 +78,15 @@ export function SessionProvider(props: React.PropsWithChildren) {
           return
         }
         setIsLoginInProgress(true)
-        const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
-        if (!session) {
-          keepLoadingForWebRedirect = isWeb && !props?.code
-          return
-        }
         const redirectState = normalizeStateRedirect(props?.state)
         if (redirectState) {
           pendingRedirectRef.current = redirectState
           hasRedirectedRef.current = false
+        }
+        const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
+        if (!session) {
+          keepLoadingForWebRedirect = isWeb && !props?.code
+          return
         }
         setSession(credentialsFromTokenResponse(session, props?.isAdmin))
         queryClient.resetQueries()
