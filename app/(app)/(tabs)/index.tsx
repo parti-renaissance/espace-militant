@@ -11,7 +11,7 @@ import { ProfileNav, VoxHeader } from '@/components/Header/Header'
 import SignupCongartsModal from '@/features_next/signup/components/SignupCongartsModal'
 import TimelineFeedScreen from '@/features_next/timelinefeed/TimelineFeedScreen'
 
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetUserScopes } from '@/services/profile/hook'
@@ -27,7 +27,7 @@ const HomeHeader = () => {
     <VoxHeader justifyContent="space-between" backgroundColor="$textSurface" borderWidth={0}>
       <XStack flex={1} flexBasis={0}>
         <Link href="/" replace>
-          <EuCampaignIllustration cursor="pointer" />
+          <Attal2027Illustration cursor="pointer" />
         </Link>
       </XStack>
       <ProfileNav flex={1} flexBasis={0} justifyContent="flex-end" />

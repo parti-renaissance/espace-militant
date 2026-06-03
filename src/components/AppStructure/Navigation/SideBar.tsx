@@ -11,7 +11,7 @@ import { VoxButton } from '@/components/Button'
 import { SignUpButton } from '@/components/Buttons/AuthButton'
 
 import CadreIllustration from '@/assets/illustrations/CadreIllustration'
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import { useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useSession } from '@/ctx/SessionProvider'
 import useCheckNotificationsState from '@/hooks/notifications/useCheckNotificationsState'
@@ -307,7 +307,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
     <SideBarArea state={state}>
       <SideBarContainer collapsed={displayNavCadre} isMilitantInCadreMode={displayNavCadre}>
         <LogoContainer collapsed={displayNavCadre}>
-          <EuCampaignIllustration showText={!displayNavCadre} />
+          <Attal2027Illustration showText={!displayNavCadre} showIcon={displayNavCadre} />
         </LogoContainer>
         <MenuContainer collapsed={displayNavCadre} onLayout={onMilitantMenuLayout}>
           {visibleMilitantNavItems.map((item) => (

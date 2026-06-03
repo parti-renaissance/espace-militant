@@ -1,7 +1,7 @@
 import React from 'react'
 import { Platform, SafeAreaView as RNSafeAreaView, TouchableWithoutFeedback } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import DisabledNotificationBell from '@/components/DisabledNotificationBell/DisabledNotificationBell'
 import { ROUTES } from '@/config/routes'
 import { useSession } from '@/ctx/SessionProvider'
@@ -129,7 +129,7 @@ const HeaderLeftNav = ({ options, navigation, back, segments, media }: HeaderLef
   return media.gtSm && isWeb ? (
     <Link href="/" asChild>
       <View cursor="pointer">
-        <EuCampaignIllustration />
+        <Attal2027Illustration />
       </View>
     </Link>
   ) : (

@@ -8,7 +8,7 @@ import { SideBar, SideBarState } from '@/components/AppStructure/Navigation/Side
 import ConfigurableTabBar from '@/components/AppStructure/Navigation/TabBar'
 import { SignInButton, SignUpButton } from '@/components/Buttons/AuthButton'
 
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import { useCadreNavItems } from '@/config/navigationItems'
 import { useSession } from '@/ctx/SessionProvider'
 
@@ -56,7 +56,7 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
       {media.sm && !isAuth ? (
         <Header title="">
           <XStack alignItems="center" justifyContent="space-between" width="100%">
-            <EuCampaignIllustration showText={false} />
+            <Attal2027Illustration showText={false} showIcon={true} />
             <XStack gap="$small">
               <SignInButton />
               <SignUpButton />
