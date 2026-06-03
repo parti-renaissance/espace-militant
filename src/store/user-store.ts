@@ -1,7 +1,9 @@
-import { AsyncStorage } from '@/hooks/useStorageState'
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
-import { create, StateCreator } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { create, StateCreator } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { AsyncStorage } from '@/hooks/useStorageState';
+import { ErrorMonitor } from '@/utils/ErrorMonitor';
+
 
 export interface User {
   accessToken: string
@@ -60,7 +62,7 @@ const userStoreSlice: StateCreator<UserState> = (set) => ({
     }
     set({ ...initialUserData, user: userWithExpiration, signupTunnelStatus: 'completed' })
   },
-  removeCredentials: () => set({ ...initialUserData }),
+  removeCredentials: () => set((state) => ({ ...initialUserData, signupTunnelStatus: state.signupTunnelStatus })),
   setOnboardingOpenedAt: (onboardingOpenedAt) => set({ onboardingOpenedAt }),
   _setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   setHideReSubscribeAlert: (hideResubscribeAlert) => set({ hideResubscribeAlert }),
@@ -82,12 +84,17 @@ const userStoreSlice: StateCreator<UserState> = (set) => ({
 
 const persistedUserStore = persist<UserState>(userStoreSlice, {
   name: 'user',
-  storage: createJSONStorage(() => AsyncStorage),
+  storage: createJSONStorage(() => ({
+    getItem: (key) => AsyncStorage.secure.getItem(key),
+    setItem: (key, value) => AsyncStorage.secure.setItem(key, value),
+    removeItem: (key) => AsyncStorage.secure.removeItem(key),
+  })),
   onRehydrateStorage: () => (state, error) => {
     if (state) {
       state._setHasHydrated(true)
     } else {
       if (error && error instanceof Error) {
+        useUserStore.setState({ _hasHydrated: true })
         ErrorMonitor.log('Failed to rehydrate user store', {
           error: error,
         })

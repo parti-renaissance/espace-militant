@@ -72,13 +72,20 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   const handleSignIn: AuthContextType['signIn'] = React.useCallback(
     async (props) => {
+      let keepLoadingForWebRedirect = false
       try {
         if (isLoginInProgress) {
           return
         }
         setIsLoginInProgress(true)
+        const redirectState = normalizeStateRedirect(props?.state)
+        if (redirectState) {
+          pendingRedirectRef.current = redirectState
+          hasRedirectedRef.current = false
+        }
         const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
         if (!session) {
+          keepLoadingForWebRedirect = isWeb && !props?.code
           return
         }
         setSession(credentialsFromTokenResponse(session, props?.isAdmin))
@@ -87,7 +94,9 @@ export function SessionProvider(props: React.PropsWithChildren) {
         ErrorMonitor.log(e.message, { e })
         toast.show('Erreur lors de la connexion', { type: 'error' })
       } finally {
-        setIsLoginInProgress(false)
+        if (!keepLoadingForWebRedirect) {
+          setIsLoginInProgress(false)
+        }
       }
     },
     [isLoginInProgress, login, queryClient],

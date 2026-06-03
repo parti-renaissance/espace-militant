@@ -8,6 +8,7 @@ export function useSignupVerificationEmailScreen() {
   const inlineError = useSignupSessionStore((s) => s.inlineError)
   const setInlineError = useSignupSessionStore((s) => s.setInlineError)
   const requiresManualLogin = useSignupSessionStore((s) => s.requiresManualLogin)
+  const redirectUri = useSignupSessionStore((s) => s.redirectUri)
   const { activateWithCode, isActivating } = useSignupActivate()
   const { signIn } = useSession()
 
@@ -24,6 +25,6 @@ export function useSignupVerificationEmailScreen() {
     onStartEditingCode: () => {
       if (inlineError) setInlineError(null)
     },
-    onSignIn: () => signIn(),
+    onSignIn: () => signIn({ state: redirectUri || '/' }),
   }
 }

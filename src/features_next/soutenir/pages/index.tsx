@@ -25,6 +25,7 @@ import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
+import { useRequireAuth } from '@/components/RequireAuth'
 import Title from '@/components/Title/Title'
 import clientEnv from '@/config/clientEnv'
 import { HubOrganizeCategoryModal } from '@/features_next/events/pages/hub/components/HubOrganizeCategoryModal'
@@ -104,7 +105,16 @@ function CallToActionCards() {
   const { data: user } = useGetProfil()
   const { handleShareOrCopy } = useShareOrCopy()
   const { openOrganiserModal } = useOpenOrganiserEvenement()
+  const { isAuth, redirectToSignup } = useRequireAuth()
   const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
+
+  const handleDeposerUneIdee = useCallback(() => {
+    if (!isAuth) {
+      redirectToSignup()
+      return
+    }
+    openInAppBrowser(EXTERNAL_LINKS.deposerUneIdee)
+  }, [isAuth, redirectToSignup])
 
   const handleInviteFriend = useCallback(() => {
     return handleShareOrCopy({
@@ -131,7 +141,7 @@ function CallToActionCards() {
     <>
       <YStack gap="$medium">
         <CallToActionCard icon={Lightbulb} title="Je partage une idée" description="Votre voix compte : soumettez vos propositions." theme="green">
-          <VoxButton theme="green" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.deposerUneIdee)}>
+          <VoxButton theme="green" variant="soft" onPress={handleDeposerUneIdee}>
             Déposer une idée
           </VoxButton>
         </CallToActionCard>

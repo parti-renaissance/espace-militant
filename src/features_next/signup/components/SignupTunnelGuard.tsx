@@ -1,9 +1,9 @@
-import type { PropsWithChildren } from 'react'
-import { Href, Redirect, useSegments } from 'expo-router'
-import { isWeb } from 'tamagui'
+import type { PropsWithChildren } from 'react';
+import { Href, Redirect, usePathname, useSegments } from 'expo-router'
+import { isWeb } from 'tamagui';
 
-import { useSession } from '@/ctx/SessionProvider'
-import { useUserStore } from '@/store/user-store'
+import { useSession } from '@/ctx/SessionProvider';
+import { useUserStore } from '@/store/user-store';
 
 /**
  * Mobile uniquement : affiche le tunnel signup tant que l'utilisateur
@@ -13,7 +13,10 @@ export default function SignupTunnelGuard({ children }: PropsWithChildren) {
   const { isAuth, isLoading } = useSession()
   const signupTunnelStatus = useUserStore((s) => s.signupTunnelStatus)
   const hasHydrated = useUserStore((s) => s._hasHydrated)
-  const isInSignupGroup = useSegments()[0] === '(signup)'
+  const segments = useSegments()
+  const pathname = usePathname()
+
+  const isInSignupFlow = segments[0] === '(signup)' || pathname.includes('inscription') || pathname.includes('bienvenue')
 
   const shouldEnterSignupTunnel =
     !isWeb &&
@@ -21,10 +24,15 @@ export default function SignupTunnelGuard({ children }: PropsWithChildren) {
     !isLoading &&
     !isAuth &&
     signupTunnelStatus === 'pending' &&
-    !isInSignupGroup
+    !isInSignupFlow
 
   if (shouldEnterSignupTunnel) {
-    return <Redirect href={'/(signup)/bienvenue' as Href} />
+    const href = (
+      pathname && pathname !== '/'
+        ? `/(signup)/bienvenue?redirectUri=${encodeURIComponent(pathname)}`
+        : '/(signup)/bienvenue'
+    ) as Href
+    return <Redirect href={href} />
   }
 
   return children

@@ -48,7 +48,13 @@ const useAppStateOnChange = (callback: () => Promise<void>) => {
   }, [callback])
 }
 
-export const useCheckStoreUpdate = () => {
+const useCheckStoreUpdateDev = () => ({
+  isAvailable: false,
+  isPending: false,
+  isError: null,
+})
+
+const useCheckStoreUpdateProd = () => {
   const [isPending, setIsPending] = useState(false)
   const [isBuildUpdateAvailable, setIsBuildUpdateAvailable] = useState(false)
   const [isError, setIsError] = useState<Error | null>(null)
@@ -78,7 +84,16 @@ export const useCheckStoreUpdate = () => {
   }
 }
 
-export const useCheckExpoUpdate = () => {
+export const useCheckStoreUpdate = __DEV__ ? useCheckStoreUpdateDev : useCheckStoreUpdateProd
+
+const useCheckExpoUpdateDev = () => ({
+  isAvailable: false,
+  isPending: false,
+  isError: null,
+  isProcessing: false,
+})
+
+const useCheckExpoUpdateProd = () => {
   const [isError, setIsError] = useState<Error | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const { isConnected } = NetInfo.useNetInfo()
@@ -143,3 +158,5 @@ export const useCheckExpoUpdate = () => {
     isProcessing: [updatesState.isDownloading, isProcessing].some(Boolean),
   }
 }
+
+export const useCheckExpoUpdate = __DEV__ ? useCheckExpoUpdateDev : useCheckExpoUpdateProd
