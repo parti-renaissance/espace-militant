@@ -167,7 +167,7 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
             <Pressable onPress={() => onChange(!value)} style={{ flex: 1 }}>
               <Text.MD multiline>
                 <Text.MD semibold multiline>
-                  Tenez moi informé par email
+                  Tenez-moi informé par email
                 </Text.MD>{' '}
                 de l&apos;actualité de politique de Renaissance{' '}
                 <Text.MD secondary multiline>

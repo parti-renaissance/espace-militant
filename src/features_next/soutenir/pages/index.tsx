@@ -27,13 +27,16 @@ import { VoxButton } from '@/components/Button'
 import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
 import { useRequireAuth } from '@/components/RequireAuth'
 import Title from '@/components/Title/Title'
-import clientEnv from '@/config/clientEnv'
 import { HubOrganizeCategoryModal } from '@/features_next/events/pages/hub/components/HubOrganizeCategoryModal'
 import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
+
+import clientEnv from '@/config/clientEnv'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { useGetProfil } from '@/services/profile/hook'
 
 import HERO_IMAGE_URI from '../assets/soutenir-gabriel-attal.png'
+
+const HERO_IMAGE_ASPECT_RATIO = 1024 / 660
 
 const EXTERNAL_LINKS = {
   deposerUneIdee: 'https://parti.re/app-soutenir/deposer-une-idee',
@@ -86,7 +89,8 @@ function HeroImageSection({ isDesktop }: { isDesktop: boolean }) {
         source={HERO_IMAGE_URI}
         contentFit="cover"
         contentPosition={isDesktop ? 'center' : 'top'}
-        style={{ width: '100%', height: isDesktop ? 504 : 360 }}
+        cachePolicy="memory-disk"
+        style={{ width: '100%', aspectRatio: isDesktop ? 424 / 504 : HERO_IMAGE_ASPECT_RATIO }}
       />
     </YStack>
   )
@@ -95,7 +99,7 @@ function HeroImageSection({ isDesktop }: { isDesktop: boolean }) {
 function ContactNationalButton() {
   return (
     <VoxButton variant="outlined" iconLeft={Phone} onPress={() => openInAppBrowser(EXTERNAL_LINKS.contactNational)}>
-      Être contacté par les équipes nationales
+      Être contacté par les équipes
     </VoxButton>
   )
 }
