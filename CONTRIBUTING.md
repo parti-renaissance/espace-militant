@@ -1,6 +1,6 @@
-# Guide de contribution — Renaissance App
+# Guide de contribution — Attal Président App
 
-Merci de l'intérêt porté à Renaissance App. Ce guide est là pour que ta contribution soit intégrée efficacement.
+Merci de l'intérêt porté à Attal Président App. Ce guide est là pour que ta contribution soit intégrée efficacement.
 
 ## Avant de commencer
 

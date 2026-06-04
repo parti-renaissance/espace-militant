@@ -98,7 +98,7 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
     })
   } else if (profile === 'production') {
     applyConfig(config, {
-      name: 'Renaissance',
+      name: 'Attal Président',
       scheme: 'vox',
       bundleIdentifier: baseIdentifier,
       package: basePackage,

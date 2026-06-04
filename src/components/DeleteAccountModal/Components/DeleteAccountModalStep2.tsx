@@ -1,13 +1,16 @@
+import { styled, View, XStack, YStack } from 'tamagui'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
+import { z } from 'zod'
+
 import Input from '@/components/base/Input/Input'
 import RadioGroup from '@/components/base/RadioGroup/RadioGroup'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+
 import { useDeleteProfil } from '@/services/profile/hook'
 import { UnregistrationReason } from '@/services/profile/schema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm } from 'react-hook-form'
-import { styled, View, XStack, YStack } from 'tamagui'
-import { z } from 'zod'
+
 interface Props {
   onClose: () => void
   onConfirm: () => void
@@ -57,7 +60,8 @@ export default function DeleteAccountModalStep2({ onClose, onConfirm, isAdherent
       </Text>
 
       <JustificationText paddingHorizontal={'$medium'}>
-        Cela nous attriste de voir un acteur de notre Parti décider de nous quitter. Nous aimerions beaucoup comprendre ce qui vous a conduit à cette décision.{' '}
+        Cela nous attriste de voir un acteur de notre Parti décider de nous quitter. Nous aimerions beaucoup comprendre ce qui vous a conduit à cette
+        décision.{' '}
       </JustificationText>
 
       <JustificationText paddingHorizontal={'$medium'}>
