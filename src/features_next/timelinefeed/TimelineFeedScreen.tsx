@@ -17,6 +17,7 @@ import { MyProfileCardNoLinks } from '@/components/ProfileCards/ProfileCard/MyPr
 import Title from '@/components/Title/Title'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import { syncTimelinePostVideoVisibility } from '@/features_next/video/helpers/syncTimelinePostVideoVisibility'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { transformFeedItemToProps } from '@/helpers/homeFeed'
@@ -29,7 +30,6 @@ import { FEATURES } from '@/utils/Scopes'
 
 import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
-import { syncTimelinePostVideoVisibility } from '@/features_next/video/helpers/syncTimelinePostVideoVisibility'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
@@ -91,32 +91,36 @@ const TimelineFeedMain = () => {
 
   const hasAlerts = useMemo(() => alerts.length > 0, [alerts.length])
   const hasPublications = useMemo(() => hasFeature(FEATURES.PUBLICATIONS), [hasFeature])
-  const shouldShowHeader = useMemo(() => hasAlerts || shouldShowNotificationCard || hasPublications, [hasAlerts, shouldShowNotificationCard, hasPublications])
+  const hasContentAboveTitle = shouldShowNotificationCard || hasAlerts
 
   const header = useMemo(
-    () =>
-      shouldShowHeader ? (
-        <YStack gap={media.sm ? 8 : 16}>
-          {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
-          {hasAlerts ? <AlertStack alerts={alerts} /> : null}
-          {hasAlerts || hasPublications ? (
-            <XStack justifyContent="space-between" alignItems="center" px={media.sm ? '$medium' : '$0'}>
-              <Title size="h1" aria-label="Des (bonnes) Nouvelles">
-                <Title.Text>Des (bonnes)</Title.Text>
-                <Title.Highlight>Nouvelles</Title.Highlight>
-              </Title>
-              {hasPublications && (
-                <Link href="/publications" asChild>
-                  <VoxButton variant="soft" size="sm" theme="pink" iconLeft={Sparkle}>
-                    Nouvelle publication
-                  </VoxButton>
-                </Link>
-              )}
-            </XStack>
+    () => (
+      <YStack gap={media.sm ? 8 : 16}>
+        {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
+        {hasAlerts ? <AlertStack alerts={alerts} /> : null}
+        <XStack
+          justifyContent="space-between"
+          alignItems="center"
+          px={media.sm ? '$medium' : '$0'}
+          pt={hasContentAboveTitle ? undefined : '$large'}
+          flexWrap="wrap"
+          gap="$medium"
+        >
+          <Title size="h1" aria-label="Des (bonnes) Nouvelles">
+            <Title.Text>Des (bonnes)</Title.Text>
+            <Title.Highlight>Nouvelles</Title.Highlight>
+          </Title>
+          {hasPublications ? (
+            <Link href="/publications" asChild>
+              <VoxButton variant="soft" size="sm" theme="pink" iconLeft={Sparkle}>
+                Nouvelle publication
+              </VoxButton>
+            </Link>
           ) : null}
-        </YStack>
-      ) : null,
-    [shouldShowHeader, shouldShowNotificationCard, hasAlerts, hasPublications, alerts, media.sm],
+        </XStack>
+      </YStack>
+    ),
+    [shouldShowNotificationCard, hasAlerts, hasPublications, hasContentAboveTitle, alerts, media.sm],
   )
 
   const onViewableItemsChanged = useCallback(
@@ -149,10 +153,7 @@ const TimelineFeedMain = () => {
     [],
   )
 
-  const viewabilityConfigCallbackPairs = useMemo(
-    () => [{ viewabilityConfig, onViewableItemsChanged }],
-    [onViewableItemsChanged, viewabilityConfig],
-  )
+  const viewabilityConfigCallbackPairs = useMemo(() => [{ viewabilityConfig, onViewableItemsChanged }], [onViewableItemsChanged, viewabilityConfig])
 
   return (
     <LayoutFlatList<RestTimelineFeedItem>

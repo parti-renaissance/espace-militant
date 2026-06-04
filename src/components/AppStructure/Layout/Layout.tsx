@@ -55,7 +55,7 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
     <LayoutRoot {...props}>
       {media.sm && !isAuth ? (
         <Header title="">
-          <XStack alignItems="center" justifyContent="space-between" width="100%">
+          <XStack height={60} alignItems="center" justifyContent="space-between" width="100%">
             <Attal2027Illustration showText={false} showIcon={true} />
             <XStack gap="$small">
               <SignInButton />

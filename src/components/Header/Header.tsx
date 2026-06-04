@@ -1,23 +1,26 @@
 import React from 'react'
 import { Platform, SafeAreaView as RNSafeAreaView, TouchableWithoutFeedback } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
+import { NativeStackHeaderProps } from '@react-navigation/native-stack'
+import { Link, router, usePathname, useSegments } from 'expo-router'
+import { isWeb, Spinner, Stack, styled, ThemeableStack, useMedia, useStyle, View, withStaticProperties, XStack, XStackProps, YStackProps } from 'tamagui'
+import { ArrowLeft } from '@tamagui/lucide-icons'
+import { capitalize } from 'lodash'
+
 import DisabledNotificationBell from '@/components/DisabledNotificationBell/DisabledNotificationBell'
+
+import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import { ROUTES } from '@/config/routes'
 import { useSession } from '@/ctx/SessionProvider'
-import { useGetProfil } from '@/services/profile/hook'
-import { NativeStackHeaderProps } from '@react-navigation/native-stack'
+import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import type { IconComponent } from '@/models/common.model'
-import { ArrowLeft } from '@tamagui/lucide-icons'
-import { Link, router, usePathname, useSegments } from 'expo-router'
-import { capitalize } from 'lodash'
-import { isWeb, Spinner, Stack, styled, ThemeableStack, useMedia, useStyle, View, withStaticProperties, XStack, XStackProps, YStackProps } from 'tamagui'
+import { useGetProfil } from '@/services/profile/hook'
+
 import Text from '../base/Text'
 import { SignInButton, SignUpButton } from '../Buttons/AuthButton'
 import Container from '../layouts/Container'
 import ProfilePicture from '../ProfilePicture'
 import AuthFallbackWrapper from '../Skeleton/AuthFallbackWrapper'
-import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
 const ButtonNav = styled(ThemeableStack, {
   tag: 'button',
@@ -53,18 +56,18 @@ const NavItem = (props: { route: (typeof ROUTES)[number]; isActive: boolean }) =
   const [isHover, setIsHover] = React.useState(false)
   const activeColor = (props.isActive || isHover) && props.route.theme !== 'gray' ? '$color5' : '$textPrimary'
   const path = props.route.name === '(home)' ? '/' : (`/${props.route.name}` as const)
-  
-  const externalLink = useOpenExternalContent({ 
+
+  const externalLink = useOpenExternalContent({
     slug: props.route.externalSlug ?? 'adhesion',
   })
-  
+
   if (props.route.externalSlug) {
     return (
-      <ButtonNav 
+      <ButtonNav
         onPress={externalLink.open({})}
-        onHoverIn={() => setIsHover(true)} 
-        onHoverOut={() => setIsHover(false)} 
-        theme={props.route.theme} 
+        onHoverIn={() => setIsHover(true)}
+        onHoverOut={() => setIsHover(false)}
+        theme={props.route.theme}
         active={props.isActive}
         disabled={externalLink.isPending}
       >
@@ -75,7 +78,7 @@ const NavItem = (props: { route: (typeof ROUTES)[number]; isActive: boolean }) =
       </ButtonNav>
     )
   }
-  
+
   return (
     <Link href={path} asChild={!isWeb} key={props.route.name}>
       <ButtonNav onHoverIn={() => setIsHover(true)} onHoverOut={() => setIsHover(false)} theme={props.route.theme} active={props.isActive}>
@@ -155,23 +158,8 @@ export const NavBar = () => {
   ) : null
 }
 
-export const ProfileView = ({
-  fullName,
-  imageUrl,
-}: {
-  fullName: string
-  imageUrl?: string
-}) => {
-  return (
-    <ProfilePicture
-      fullName={fullName}
-      src={imageUrl}
-      alt="profile picture"
-      size="$3"
-      margin={Platform.OS === 'ios' ? -2 : undefined}
-      rounded
-    />
-  )
+export const ProfileView = ({ fullName, imageUrl }: { fullName: string; imageUrl?: string }) => {
+  return <ProfilePicture fullName={fullName} src={imageUrl} alt="profile picture" size={44} margin={Platform.OS === 'ios' ? -2 : undefined} rounded />
 }
 const LoginView = () => (
   <View flexDirection="row" gap={'$medium'} justifyContent="space-between" alignItems="center">
@@ -192,10 +180,7 @@ export const ProfileNav = (props: XStackProps) => {
         <XStack alignItems="center" gap="$medium" {...props}>
           <DisabledNotificationBell />
           <Link href="/profil">
-            <ProfileView
-              fullName={`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`}
-              imageUrl={profile?.image_url ?? undefined}
-            />
+            <ProfileView fullName={`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`} imageUrl={profile?.image_url ?? undefined} />
           </Link>
         </XStack>
       ) : (
@@ -220,7 +205,7 @@ const Header = (_props: NativeStackHeaderProps & YStackProps) => {
         {...props}
         alignContent="center"
       >
-        <Stack flexDirection="row" justifyContent="space-between" alignItems="center" flex={1}>
+        <Stack height={60} flexDirection="row" justifyContent="space-between" alignItems="center" flex={1}>
           <HeaderLeftNav options={options} navigation={navigation} back={back} segments={segments} media={media} />
           {!(navigation.canGoBack() && navigation.getState().index > 0) && <NavBar />}
           {options.headerRight ? options.headerRight({ canGoBack: navigation.canGoBack() }) : <ProfileNav />}
@@ -232,7 +217,7 @@ const Header = (_props: NativeStackHeaderProps & YStackProps) => {
 
 export const SmallHeader: typeof Header = (props) => {
   const media = useMedia()
-  return <Header {...props} height={media.gtSm ? 82 : 52} />
+  return <Header {...props} height={media.gtSm ? 82 : 60} />
 }
 
 export default Header
@@ -242,7 +227,7 @@ export const VoxHeaderFrameStyled = styled(ThemeableStack, {
   flexDirection: 'row',
   alignItems: 'center',
   flex: 1,
-  height: 56,
+  height: 60,
 })
 
 const VoxHeaderContainerStyled = styled(Container, {
@@ -306,9 +291,7 @@ const VoxHeaderLeftButtonFrame = styled(ThemeableStack, {
   },
 })
 
-const VoxHeaderLeftButton = (
-  props: React.ComponentProps<typeof VoxHeaderLeftButtonFrame> & { icon?: IconComponent; backTitle?: string },
-) => {
+const VoxHeaderLeftButton = (props: React.ComponentProps<typeof VoxHeaderLeftButtonFrame> & { icon?: IconComponent; backTitle?: string }) => {
   const { backTitle, icon: IconComponent, ...restProps } = props
   return (
     <VoxHeaderLeftButtonFrame {...restProps} height="100%">

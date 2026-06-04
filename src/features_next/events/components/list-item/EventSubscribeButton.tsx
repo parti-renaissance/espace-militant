@@ -96,7 +96,7 @@ export const EventSubscribeButton = ({ uuid, slug, isPremium, userUuid, ...butto
       ) : null}
       <VoxButton
         iconLeft={Calendar}
-        variant="outlined"
+        variant="contained"
         theme={isPremium ? 'yellow' : 'blue'}
         testID="event-subscribe-button"
         loading={isPending}
