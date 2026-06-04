@@ -6,7 +6,7 @@ import Text from '@/components/base/Text'
 import { dateTimeFormat, getFormattedDate, getFormattedTime } from '@/utils/date'
 import { format, isValid } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { Input, isWeb } from 'tamagui'
+import { Input, isWeb, useTheme } from 'tamagui'
 
 interface DatePickerFieldProps {
   onChange?: (date: Date | undefined) => void
@@ -17,6 +17,7 @@ interface DatePickerFieldProps {
   placeholder?: string
   disabled?: boolean
   type?: 'date' | 'time' | 'datetime'
+  white?: boolean
 }
 
 const toDatetimeLocalValue = (date: Date) => {
@@ -24,9 +25,11 @@ const toDatetimeLocalValue = (date: Date) => {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
-const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabled, onChange, error, type = 'date', onBlur }, ref) => {
+const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabled, onChange, error, type = 'date', onBlur, white = false }, ref) => {
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false)
   const id = useId()
+  const theme = useTheme()
+  const pickerBackgroundColor = error ? theme.orange1?.val : white ? theme.white1?.val : '#e8ebed'
   
 
   // In case of mobile component
@@ -114,7 +117,7 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabl
         height: 36,
         padding: '4px 8px',
         borderRadius: 8,
-        backgroundColor: error ? '#fff3f0' : '#e8ebed',
+        backgroundColor: pickerBackgroundColor,
         outline: 'none',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
@@ -124,7 +127,7 @@ const DatePickerField = forwardRef<Input, DatePickerFieldProps>(({ value, disabl
     />
   ) : (
     <>
-      <FormFrame.Button onPress={onShow} error={Boolean(error)}>
+      <FormFrame.Button onPress={onShow} error={Boolean(error)} backgroundColor={white ? '$white1' : undefined}>
         <Text.MD color={error ? '$orange5' : '$textPrimary'}>{value ? formatedValue(type, value) : placeholder}</Text.MD>
       </FormFrame.Button>
       <DateTimePickerModal
