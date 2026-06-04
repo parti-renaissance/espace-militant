@@ -11,7 +11,11 @@ import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
 
 export default function RessourcesPage() {
-  const { isAuth } = useSession()
+  const { isAuth, isLoading } = useSession()
+
+  if (isLoading) {
+    return null
+  }
 
   if (!isAuth) {
     return <Redirect href={'/evenements'} />
