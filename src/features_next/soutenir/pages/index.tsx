@@ -35,7 +35,7 @@ import clientEnv from '@/config/clientEnv'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { useGetProfil } from '@/services/profile/hook'
 
-import HERO_IMAGE_URI from '../assets/soutenir-gabriel-attal.png'
+import HERO_IMAGE_URI from '../assets/soutenir-gabriel-attal.jpg'
 
 const HERO_IMAGE_ASPECT_RATIO = 1024 / 660
 
