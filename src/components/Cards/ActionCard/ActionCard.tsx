@@ -57,7 +57,7 @@ const ActionCard = ({
         {!asFull && <VoxCard.Author author={payload.author} />}
         {!asFull && (
           <XStack justifyContent="space-between">
-            <VoxButton variant="outlined" theme="gray" onPress={onShow} iconLeft={Eye}>
+            <VoxButton variant="outlined" theme="green" onPress={onShow} iconLeft={Eye}>
               Voir
             </VoxButton>
             {isMyAction ? (
@@ -92,7 +92,7 @@ export function SubscribeButton({ isRegister, id, large, disabled }: { isRegiste
   return (
     <VoxButton
       disabled={disabled}
-      variant={isRegister || disabled ? 'outlined' : 'contained'}
+      variant={isRegister ? 'soft' : 'contained'}
       theme="green"
       animation="quick"
       size={large ? 'xl' : 'md'}

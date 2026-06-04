@@ -18,11 +18,11 @@ export const EventUnSubscribeButton = ({ uuid, slug, isPremium, variant, userUui
     if (!userUuid) return
     mutate()
   }
-  const dynVariant = variant === 'contained' ? 'soft' : 'outlined'
+  const resolvedVariant = variant === 'contained' ? 'soft' : (variant ?? 'soft')
   return (
     <VoxButton
       iconLeft={CalendarOff}
-      variant={dynVariant}
+      variant={resolvedVariant}
       theme={isPremium ? 'yellow' : 'blue'}
       testID="event-unsubscribe-button"
       loading={isPending}
