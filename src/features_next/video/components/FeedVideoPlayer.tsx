@@ -59,10 +59,6 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, isSlideViewable, content
   })
 
   useEffect(() => {
-    setIsUserPaused(false)
-  }, [videoId, isActive])
-
-  useEffect(() => {
     safePlayerAction(() => {
       player.muted = isMuted
     })
@@ -170,15 +166,6 @@ export default function FeedVideoPlayer({
   const canPlay = isSlideViewable && isPostInView && isFocusedPost
   const isActiveVideo = activeVideoId === videoId
   const shouldMountPlayer = canPlay && isActiveVideo && isAppActive
-  /** Garde le player monté pendant une transition (évite flash vignette ↔ vidéo). */
-  const [wasMounted, setWasMounted] = useState(false)
-
-  useEffect(() => {
-    if (shouldMountPlayer) setWasMounted(true)
-    if (!isActiveVideo && !canPlay) setWasMounted(false)
-  }, [canPlay, isActiveVideo, shouldMountPlayer])
-
-  const showPlayer = shouldMountPlayer || (wasMounted && isActiveVideo && isAppActive)
 
   const handleThumbnailPress = useCallback(() => {
     if (!isPostInView || !isAppActive) return
@@ -193,8 +180,9 @@ export default function FeedVideoPlayer({
       backgroundColor="#000"
       {...(fill ? { flex: 1, height: '100%' } : { style: { aspectRatio } })}
     >
-      {showPlayer ? (
+      {shouldMountPlayer ? (
         <FeedVideoContent
+          key={videoId}
           contentId={contentId}
           hlsUrl={hlsUrl}
           videoId={videoId}

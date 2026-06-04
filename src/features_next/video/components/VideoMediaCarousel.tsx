@@ -210,7 +210,6 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
   const isHorizontalScrolling = useRef(false)
   const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const viewabilitySyncTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const slidesRef = useRef<CarouselSlide[]>([])
 
   const setViewableVideoForContent = useVideoFeedStore((s) => s.setViewableVideoForContent)
   const recomputeActiveVideoId = useVideoFeedStore((s) => s.recomputeActiveVideoId)
@@ -233,13 +232,11 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
     [contentId, items],
   )
 
-  slidesRef.current = slides
-
   const commitPlaybackSlide = useCallback(
     (slideId: string | null) => {
       setPlaybackSlideId((current) => (current === slideId ? current : slideId))
 
-      const slide = slidesRef.current.find((entry) => entry.id === slideId)
+      const slide = slides.find((entry) => entry.id === slideId)
       const nextVideoId = slide?.item.type === 'video' ? slideId : null
       setViewableVideoForContent(contentId, nextVideoId)
 
@@ -247,16 +244,16 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
         recomputeActiveVideoId()
       }
     },
-    [contentId, recomputeActiveVideoId, setViewableVideoForContent],
+    [contentId, recomputeActiveVideoId, setViewableVideoForContent, slides],
   )
 
   const commitPlaybackAtIndex = useCallback(
     (index: number) => {
-      const slide = slidesRef.current[index]
+      const slide = slides[index]
       if (!slide) return
       commitPlaybackSlide(slide.id)
     },
-    [commitPlaybackSlide],
+    [commitPlaybackSlide, slides],
   )
 
   useEffect(() => {
@@ -280,25 +277,28 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
     [commitPlaybackSlide],
   )
 
-  const onViewableItemsChanged = useRef(syncActiveVideoFromViewability)
-  onViewableItemsChanged.current = syncActiveVideoFromViewability
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: ViewToken<CarouselSlide>[] }) => {
+      if (isHorizontalScrolling.current) return
 
-  const handleViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken<CarouselSlide>[] }) => {
-    if (isHorizontalScrolling.current) return
+      if (viewabilitySyncTimeout.current) clearTimeout(viewabilitySyncTimeout.current)
 
-    if (viewabilitySyncTimeout.current) clearTimeout(viewabilitySyncTimeout.current)
+      if (CAROUSEL_VIEWABILITY_SYNC_MS > 0) {
+        viewabilitySyncTimeout.current = setTimeout(() => {
+          syncActiveVideoFromViewability(viewableItems)
+        }, CAROUSEL_VIEWABILITY_SYNC_MS)
+        return
+      }
 
-    if (CAROUSEL_VIEWABILITY_SYNC_MS > 0) {
-      viewabilitySyncTimeout.current = setTimeout(() => {
-        onViewableItemsChanged.current(viewableItems)
-      }, CAROUSEL_VIEWABILITY_SYNC_MS)
-      return
-    }
+      syncActiveVideoFromViewability(viewableItems)
+    },
+    [syncActiveVideoFromViewability],
+  )
 
-    onViewableItemsChanged.current(viewableItems)
-  }).current
-
-  const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig: VIEWABILITY_CONFIG, onViewableItemsChanged: handleViewableItemsChanged }]).current
+  const viewabilityConfigCallbackPairs = useMemo(
+    () => [{ viewabilityConfig: VIEWABILITY_CONFIG, onViewableItemsChanged }],
+    [onViewableItemsChanged],
+  )
 
   const handleLayout = (event: LayoutChangeEvent) => {
     const width = event.nativeEvent.layout.width

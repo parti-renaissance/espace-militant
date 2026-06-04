@@ -119,7 +119,7 @@ const TimelineFeedMain = () => {
     [shouldShowHeader, shouldShowNotificationCard, hasAlerts, hasPublications, alerts, media.sm],
   )
 
-  const onViewableItemsChangedHandler = useCallback(
+  const onViewableItemsChanged = useCallback(
     ({ viewableItems, changed }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
       syncTimelinePostVideoVisibility({
         viewableItems: viewableItems as ViewToken<RestTimelineFeedItem>[],
@@ -141,22 +141,18 @@ const TimelineFeedMain = () => {
     [trackImpression],
   )
 
-  const onViewableItemsChangedRef = useRef(onViewableItemsChangedHandler)
-  onViewableItemsChangedRef.current = onViewableItemsChangedHandler
+  const viewabilityConfig = useMemo(
+    () => ({
+      viewAreaCoveragePercentThreshold: 50,
+      minimumViewTime: 400,
+    }),
+    [],
+  )
 
-  const onViewableItemsChanged = useRef(
-    (info: { viewableItems: ViewToken[]; changed: ViewToken[] }) => onViewableItemsChangedRef.current(info),
-  ).current
-
-  const viewabilityConfigCallbackPairs = useRef([
-    {
-      viewabilityConfig: {
-        viewAreaCoveragePercentThreshold: 50,
-        minimumViewTime: 400,
-      },
-      onViewableItemsChanged,
-    },
-  ]).current
+  const viewabilityConfigCallbackPairs = useMemo(
+    () => [{ viewabilityConfig, onViewableItemsChanged }],
+    [onViewableItemsChanged, viewabilityConfig],
+  )
 
   return (
     <LayoutFlatList<RestTimelineFeedItem>
