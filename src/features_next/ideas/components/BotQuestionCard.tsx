@@ -46,10 +46,10 @@ export default function BotQuestionCard({ onPress, badge = 'Nuit' }: BotQuestion
 
         <YStack
           position="absolute"
-          top={-10}
-          right={0}
-          width={180}
-          height={240}
+          top={-30}
+          right={50}
+          width={100}
+          height={250}
           zIndex={0}
           cursor="pointer"
           onPress={onPress}
@@ -57,7 +57,7 @@ export default function BotQuestionCard({ onPress, badge = 'Nuit' }: BotQuestion
           opacity={hideRobot ? 0 : 1}
           x={hideRobot ? 60 : 0}
           scale={hideRobot ? 0.9 : 1}
-          $sm={{ top: -15, right: -20, width: 190 }}
+          $sm={{ top: -15, right: 0, width: 100 }}
         >
           <Image source={ROBOT_IMAGE} contentFit="contain" style={{ width: '100%', height: '100%' }} pointerEvents="none" />
         </YStack>

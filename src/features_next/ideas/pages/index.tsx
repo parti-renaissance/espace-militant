@@ -1,17 +1,17 @@
-import { useRouter } from 'expo-router'
-import * as WebBrowser from 'expo-web-browser'
-import { isWeb, useMedia, XStack, YStack } from 'tamagui'
+import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import { isWeb, useMedia, XStack, YStack } from 'tamagui';
 
-import Layout from '@/components/AppStructure/Layout/Layout'
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
-import Title from '@/components/Title/Title'
+import Layout from '@/components/AppStructure/Layout/Layout';
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView';
+import Title from '@/components/Title/Title';
 
-import BotQuestionCard from '../components/BotQuestionCard'
-import FormationCard from '../components/FormationCard'
-import PrioritiesCard from '../components/PrioritiesCard'
-import ShareIdeaCard from '../components/ShareIdeaCard'
-import ToiPresidentCard from '../toiPresident/components/ToiPresidentCard'
-import { useToiPresidentActions } from '../toiPresident/hooks/useToiPresidentActions'
+import BotQuestionCard from '../components/BotQuestionCard';
+import FormationCard from '../components/FormationCard';
+import PrioritiesCard from '../components/PrioritiesCard';
+import ShareIdeaCard from '../components/ShareIdeaCard';
+import ToiPresidentCard from '../toiPresident/components/ToiPresidentCard';
+import { useToiPresidentActions } from '../toiPresident/hooks/useToiPresidentActions';
 
 const EXTERNAL_LINKS = {
   deposerUneIdee: 'https://parti.re/app-idee/deposer-une-idee',
@@ -27,9 +27,9 @@ const openExternalLink = (url: string) => {
   }
 }
 
-function HeroTitle({ size = 'h1' }: { size?: 'h1' | 'h2' }) {
+function HeroTitle() {
   return (
-    <Title size={size} aria-label="Ensemble, Débattons de l'avenir">
+    <Title size="h1" aria-label="Ensemble, Débattons de l'avenir">
       <Title.Text>Ensemble,</Title.Text>
       <Title.Break />
       <Title.Highlight>Débattons de l&apos;avenir</Title.Highlight>
@@ -43,7 +43,7 @@ function DesktopContent() {
 
   return (
     <YStack gap="$large" width="100%">
-      <HeroTitle size="h1" />
+      <HeroTitle />
       <XStack gap="$large" alignItems="stretch" flexDirection="row" flexWrap="nowrap">
         <YStack flex={1} flexBasis={0} minWidth={0} gap="$medium">
           <BotQuestionCard onPress={() => router.push('/idees/bot')} />
@@ -72,7 +72,7 @@ function MobileContent() {
   return (
     <YStack gap="$large">
       <ToiPresidentCard onPlay={toiPresident.play} onShare={toiPresident.share} />
-      <HeroTitle size="h2" />
+      <HeroTitle/>
       <YStack gap="$medium">
         <BotQuestionCard onPress={() => router.push('/idees/bot')} />
         <PrioritiesCard onExplore={() => openExternalLink(EXTERNAL_LINKS.mesPriorites)} onCampaignSite={() => openExternalLink(EXTERNAL_LINKS.campagne)} />
