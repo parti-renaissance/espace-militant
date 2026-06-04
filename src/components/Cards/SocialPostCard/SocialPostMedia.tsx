@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 
 import AutoSizeImage from '@/components/AutoSizeImage'
 import VideoPlayer from '@/features_next/video/components/VideoPlayer'
+import { getVideoAspectRatio } from '@/features_next/video/components/VideoPlayer.types'
 
 import { RestTimelineFeedSocialMedia, RestTimelineFeedSocialMediaItem } from '@/services/timeline-feed/schema'
 
@@ -16,6 +17,20 @@ type FeedImage = {
 
 const MIN_MEDIA_HEIGHT = 200
 
+const getMediaAspectRatio = (item: RestTimelineFeedSocialMediaItem) => {
+  if (item.type === 'video') {
+    return getVideoAspectRatio(item.width ?? undefined, item.height ?? undefined)
+  }
+  return item.height > 0 ? item.width / item.height : 1
+}
+
+const getMediaHeightAtWidth = (item: RestTimelineFeedSocialMediaItem, width: number) => width / getMediaAspectRatio(item)
+
+const getCarouselHeight = (items: RestTimelineFeedSocialMediaItem[], containerWidth: number) => {
+  const heights = items.map((item) => getMediaHeightAtWidth(item, containerWidth))
+  return Math.max(MIN_MEDIA_HEIGHT, Math.min(...heights))
+}
+
 const webNoSelectStyle = Platform.OS === 'web' ? ({ userSelect: 'none' } as const) : undefined
 
 const preventWebTextSelection = () => {
@@ -24,17 +39,33 @@ const preventWebTextSelection = () => {
   }
 }
 
-const SocialPostMediaFrame = ({ children }: { children: ReactNode }) => (
-  <YStack width="100%" minHeight={MIN_MEDIA_HEIGHT} backgroundColor="$gray2" overflow="hidden" justifyContent="center" {...webNoSelectStyle}>
+const SocialPostMediaFrame = ({ children, height }: { children: ReactNode; height?: number }) => (
+  <YStack
+    width="100%"
+    height={height}
+    minHeight={height == null ? MIN_MEDIA_HEIGHT : undefined}
+    backgroundColor="$gray2"
+    overflow="hidden"
+    justifyContent="center"
+    alignItems="center"
+    {...webNoSelectStyle}
+  >
     {children}
   </YStack>
 )
 
-const SocialPostMediaItem = ({ item }: { item: RestTimelineFeedSocialMediaItem }) => {
+type SocialPostMediaItemProps = {
+  item: RestTimelineFeedSocialMediaItem
+  carouselHeight?: number
+}
+
+const SocialPostMediaItem = ({ item, carouselHeight }: SocialPostMediaItemProps) => {
+  const isCarouselSlide = carouselHeight != null && carouselHeight > 0
+
   if (item.type === 'video') {
     return (
-      <SocialPostMediaFrame>
-        <YStack width="100%" minHeight={MIN_MEDIA_HEIGHT}>
+      <SocialPostMediaFrame height={isCarouselSlide ? carouselHeight : undefined}>
+        <YStack width="100%" height={isCarouselSlide ? carouselHeight : undefined} minHeight={isCarouselSlide ? undefined : MIN_MEDIA_HEIGHT} flex={isCarouselSlide ? 1 : undefined}>
           <VideoPlayer
             hlsUrl={item.hls_url}
             thumbnailUrl={item.thumbnail_url}
@@ -43,19 +74,26 @@ const SocialPostMediaItem = ({ item }: { item: RestTimelineFeedSocialMediaItem }
             autoPlay={false}
             controls={false}
             rounded={false}
+            fill={isCarouselSlide}
           />
         </YStack>
       </SocialPostMediaFrame>
     )
   }
 
-  const aspectRatio = item.height > 0 ? item.width / item.height : 1
+  const aspectRatio = getMediaAspectRatio(item)
 
   return (
-    <SocialPostMediaFrame>
-      <YStack width="100%" minHeight={MIN_MEDIA_HEIGHT} style={{ aspectRatio }}>
-        <AutoSizeImage source={item.url} width={item.width} height={item.height} />
-      </YStack>
+    <SocialPostMediaFrame height={isCarouselSlide ? carouselHeight : undefined}>
+      {isCarouselSlide ? (
+        <YStack width="100%" height={carouselHeight} overflow="hidden" alignItems="center" justifyContent="center">
+          <AutoSizeImage fill source={item.url} width={item.width} height={item.height} />
+        </YStack>
+      ) : (
+        <YStack width="100%" minHeight={MIN_MEDIA_HEIGHT} style={{ aspectRatio }}>
+          <AutoSizeImage source={item.url} width={item.width} height={item.height} />
+        </YStack>
+      )}
     </SocialPostMediaFrame>
   )
 }
@@ -198,6 +236,11 @@ const SocialPostMediaCarousel = ({ items, isWeb }: SocialPostMediaCarouselProps)
     [containerWidth, items.length],
   )
 
+  const carouselHeight = useMemo(() => {
+    if (containerWidth <= 0) return MIN_MEDIA_HEIGHT
+    return getCarouselHeight(items, containerWidth)
+  }, [containerWidth, items])
+
   const showNav = isWeb && items.length > 1 && containerWidth > 0
   const canGoLeft = activeIndex > 0
   const canGoRight = activeIndex < items.length - 1
@@ -205,15 +248,15 @@ const SocialPostMediaCarousel = ({ items, isWeb }: SocialPostMediaCarouselProps)
   const scrollStyle = useMemo(
     () => ({
       width: '100%' as const,
-      minHeight: MIN_MEDIA_HEIGHT,
+      height: carouselHeight,
       ...webNoSelectStyle,
     }),
-    [],
+    [carouselHeight],
   )
 
   return (
     <YStack width="100%" onLayout={handleLayout} {...(isWeb ? { userSelect: 'none' } : {})}>
-      <YStack width="100%" minHeight={MIN_MEDIA_HEIGHT} position="relative" pointerEvents="box-none" {...(isWeb ? { userSelect: 'none' } : {})}>
+      <YStack width="100%" height={carouselHeight} position="relative" pointerEvents="box-none" {...(isWeb ? { userSelect: 'none' } : {})}>
         {containerWidth > 0 ? (
           <ScrollView
             ref={scrollRef}
@@ -225,11 +268,11 @@ const SocialPostMediaCarousel = ({ items, isWeb }: SocialPostMediaCarouselProps)
             onScrollEndDrag={handleScrollEnd}
             scrollEventThrottle={16}
             style={scrollStyle}
-            contentContainerStyle={{ minHeight: MIN_MEDIA_HEIGHT, ...webNoSelectStyle }}
+            contentContainerStyle={{ height: carouselHeight, ...webNoSelectStyle }}
           >
             {items.map((item, index) => (
-              <View key={index} style={{ width: containerWidth, minHeight: MIN_MEDIA_HEIGHT, ...webNoSelectStyle }}>
-                <SocialPostMediaItem item={item} />
+              <View key={index} style={{ width: containerWidth, height: carouselHeight, ...webNoSelectStyle }}>
+                <SocialPostMediaItem item={item} carouselHeight={carouselHeight} />
               </View>
             ))}
           </ScrollView>
