@@ -11,6 +11,7 @@ import { VideoPlayIcon } from './VideoPlayIcon'
 
 type NativeVideoContentProps = {
   hlsUrl: string
+  thumbnailUrl: string
   loop: boolean
   shouldPlay: boolean
   active: boolean
@@ -18,7 +19,7 @@ type NativeVideoContentProps = {
   contentFit: 'contain' | 'cover'
 }
 
-function NativeVideoContent({ hlsUrl, loop, shouldPlay, active, controls, contentFit }: NativeVideoContentProps) {
+function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, shouldPlay, active, controls, contentFit }: NativeVideoContentProps) {
   const player = useVideoPlayer(hlsUrl, (p) => {
     p.loop = loop
   })
@@ -45,11 +46,13 @@ function NativeVideoContent({ hlsUrl, loop, shouldPlay, active, controls, conten
 
   return (
     <YStack flex={1} position="relative" width="100%" height="100%">
+      <Image source={{ uri: thumbnailUrl }} style={styles.thumbnailBackground} contentFit="cover" pointerEvents="none" />
       <VideoView
         style={styles.video}
         player={player}
         nativeControls={controls}
         contentFit={contentFit}
+        pointerEvents={controls ? 'auto' : 'none'}
       />
       {!controls ? (
         <YStack
@@ -58,6 +61,7 @@ function NativeVideoContent({ hlsUrl, loop, shouldPlay, active, controls, conten
           left={0}
           right={0}
           bottom={0}
+          zIndex={2}
           alignItems="center"
           justifyContent="center"
           onPress={handleVideoPress}
@@ -124,17 +128,31 @@ export default function VideoPlayer({
           </YStack>
         </YStack>
       ) : (
-        <NativeVideoContent hlsUrl={hlsUrl} loop={loop} shouldPlay={shouldPlay} active={active} controls={controls} contentFit={contentFit} />
+        <NativeVideoContent
+          hlsUrl={hlsUrl}
+          thumbnailUrl={thumbnailUrl}
+          loop={loop}
+          shouldPlay={shouldPlay}
+          active={active}
+          controls={controls}
+          contentFit={contentFit}
+        />
       )}
     </YStack>
   )
 }
 
 const styles = StyleSheet.create({
-  video: {
-    flex: 1,
+  thumbnailBackground: {
+    ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
-    backgroundColor: '#000',
+  },
+  video: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+    zIndex: 1,
+    backgroundColor: 'transparent',
   },
 })

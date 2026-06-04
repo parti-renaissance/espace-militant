@@ -304,7 +304,10 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
   )
 
   const onViewableItemsChangedRef = useRef(onViewableItemsChanged)
-  onViewableItemsChangedRef.current = onViewableItemsChanged
+
+  useEffect(() => {
+    onViewableItemsChangedRef.current = onViewableItemsChanged
+  }, [onViewableItemsChanged])
 
   const viewabilityConfigCallbackPairs = useMemo(
     () => [

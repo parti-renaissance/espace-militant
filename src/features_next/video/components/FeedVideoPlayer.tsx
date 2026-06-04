@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Platform, StyleSheet } from 'react-native'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import { Image } from 'expo-image'
@@ -27,11 +27,12 @@ type FeedVideoContentProps = {
   contentId: string
   hlsUrl: string
   videoId: string
+  thumbnailUrl: string
   isSlideViewable: boolean
   contentFit: 'contain' | 'cover'
 }
 
-function FeedVideoContent({ contentId, hlsUrl, videoId, isSlideViewable, contentFit }: FeedVideoContentProps) {
+function FeedVideoContent({ contentId, hlsUrl, videoId, thumbnailUrl, isSlideViewable, contentFit }: FeedVideoContentProps) {
   const activeVideoId = useVideoFeedStore((s) => s.activeVideoId)
   const claimActiveVideo = useVideoFeedStore((s) => s.claimActiveVideo)
   const isMuted = useVideoFeedStore((s) => s.isMuted)
@@ -46,6 +47,11 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, isSlideViewable, content
   const shouldAutoPlay = canAutoPlay && isActive && isAppActive
   const [isUserPaused, setIsUserPaused] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const autoPlayAllowedRef = useRef(shouldAutoPlay && !isUserPaused)
+
+  useLayoutEffect(() => {
+    autoPlayAllowedRef.current = shouldAutoPlay && !isUserPaused
+  }, [shouldAutoPlay, isUserPaused])
 
   const player = useVideoPlayer(hlsUrl, (p) => {
     p.loop = true
@@ -65,23 +71,25 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, isSlideViewable, content
     return () => subscription.remove()
   }, [player])
 
-  useExpoPlayerAutoPlayback(player, shouldAutoPlay && !isUserPaused)
+  useExpoPlayerAutoPlayback(player, shouldAutoPlay && !isUserPaused, autoPlayAllowedRef)
 
   const handleVideoPress = useCallback(() => {
     if (!canInteract || !isAppActive) return
 
     safePlayerAction(() => {
       if (player.playing) {
+        autoPlayAllowedRef.current = false
         setIsUserPaused(true)
         player.pause()
         return
       }
 
+      autoPlayAllowedRef.current = shouldAutoPlay
       setIsUserPaused(false)
       claimActiveVideo(contentId, videoId)
       player.play()
     })
-  }, [canInteract, claimActiveVideo, contentId, isAppActive, player, videoId])
+  }, [canInteract, claimActiveVideo, contentId, isAppActive, player, shouldAutoPlay, videoId])
 
   const handleToggleMute = useCallback(() => {
     toggleMuted()
@@ -91,13 +99,21 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, isSlideViewable, content
 
   return (
     <YStack flex={1} position="relative" width="100%" height="100%">
-      <VideoView style={styles.video} player={player} nativeControls={false} contentFit={contentFit} />
+      <Image source={{ uri: thumbnailUrl }} style={styles.thumbnailBackground} contentFit="cover" pointerEvents="none" />
+      <VideoView
+        style={styles.video}
+        player={player}
+        nativeControls={false}
+        contentFit={contentFit}
+        pointerEvents="none"
+      />
       <YStack
         position="absolute"
         top={0}
         left={0}
         right={0}
         bottom={0}
+        zIndex={2}
         alignItems="center"
         justifyContent="center"
         onPress={handleVideoPress}
@@ -158,7 +174,7 @@ export default function FeedVideoPlayer({
       width="100%"
       borderRadius={rounded ? 8 : 0}
       overflow="hidden"
-      backgroundColor="#000"
+      backgroundColor="$gray2"
       {...(fill ? { flex: 1, height: '100%' } : { style: { aspectRatio } })}
     >
       {shouldMountPlayer ? (
@@ -167,6 +183,7 @@ export default function FeedVideoPlayer({
           contentId={contentId}
           hlsUrl={hlsUrl}
           videoId={videoId}
+          thumbnailUrl={thumbnailUrl}
           isSlideViewable={isSlideViewable}
           contentFit={contentFit}
         />
@@ -196,10 +213,16 @@ export default function FeedVideoPlayer({
 }
 
 const styles = StyleSheet.create({
-  video: {
-    flex: 1,
+  thumbnailBackground: {
+    ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
-    backgroundColor: '#000',
+  },
+  video: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+    zIndex: 1,
+    backgroundColor: 'transparent',
   },
 })

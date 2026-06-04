@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react'
 import { Platform } from 'react-native'
 import type { VideoPlayer } from 'expo-video'
 
@@ -29,7 +29,19 @@ export function safePlayerAction(action: () => void) {
  * Applies play/pause from a React effect without racing play() and pause() on web
  * (cancels a deferred play when the effect cleans up).
  */
-export function useExpoPlayerAutoPlayback(player: VideoPlayer, shouldPlay: boolean) {
+export function useExpoPlayerAutoPlayback(
+  player: VideoPlayer,
+  shouldPlay: boolean,
+  /** Mis à jour en synchrone (ex. pause utilisateur) pour éviter un play() différé après pause. */
+  playAllowedRef?: RefObject<boolean>,
+) {
+  const shouldPlayRef = useRef(shouldPlay)
+
+  useLayoutEffect(() => {
+    shouldPlayRef.current = shouldPlay
+    if (playAllowedRef) playAllowedRef.current = shouldPlay
+  }, [playAllowedRef, shouldPlay])
+
   useEffect(() => {
     installPlayAbortErrorHandler()
 
@@ -42,7 +54,8 @@ export function useExpoPlayerAutoPlayback(player: VideoPlayer, shouldPlay: boole
     let playFrame: number | null = null
 
     const play = () => {
-      if (!cancelled) safePlayerAction(() => player.play())
+      const allowed = playAllowedRef?.current ?? shouldPlayRef.current
+      if (!cancelled && allowed) safePlayerAction(() => player.play())
     }
 
     if (Platform.OS === 'web') {

@@ -77,9 +77,6 @@ export default function VideoPlayer({
   const [activatedUrl, setActivatedUrl] = useState<string | null>(autoPlay ? hlsUrl : null)
   const [ready, setReady] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
-  // Bascule à true au premier frame joué : la couche poster ne réapparaît jamais ensuite.
-  const [hasStarted, setHasStarted] = useState(false)
-
   const isActivated = autoPlay || activatedUrl === hlsUrl
   const aspectRatio = getVideoAspectRatio(width, height)
   const contentFit: 'cover' | 'contain' = fill ? 'cover' : 'contain'
@@ -103,10 +100,7 @@ export default function VideoPlayer({
     videoRef.current = node
     if (!node) return
 
-    const onPlay = () => {
-      setIsPlaying(true)
-      setHasStarted(true)
-    }
+    const onPlay = () => setIsPlaying(true)
     const onPause = () => setIsPlaying(false)
 
     node.addEventListener('play', onPlay)
@@ -189,30 +183,27 @@ export default function VideoPlayer({
       {...(fill ? { flex: 1, height: '100%' } : { style: { aspectRatio } })}
     >
       <YStack flex={1} position="relative" width="100%" height="100%">
+        <Image
+          source={{ uri: thumbnailUrl }}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          contentFit="cover"
+          pointerEvents="none"
+        />
         {/* Toujours montée : la ref reste stable, aucun remount => pas de flash. */}
         <video
           ref={setVideoNode}
           controls={isActivated && controls}
           playsInline
           loop={loop}
-          poster={thumbnailUrl}
           style={{
+            position: 'relative',
+            zIndex: 1,
             width: '100%',
             height: '100%',
             objectFit: contentFit,
-            backgroundColor: '#000',
+            backgroundColor: 'transparent',
           }}
         />
-
-        {/* Couche poster : recouvre la vidéo tant que le 1er frame n'a pas été joué. */}
-        {!hasStarted ? (
-          <Image
-            source={{ uri: thumbnailUrl }}
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-            contentFit="cover"
-            pointerEvents="none"
-          />
-        ) : null}
 
         {/* Overlay « grand play » avant activation. */}
         {showPlayButton ? (
