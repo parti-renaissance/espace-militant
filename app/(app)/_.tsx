@@ -4,9 +4,13 @@ import { Redirect } from 'expo-router'
 import { useSession } from '@/ctx/SessionProvider'
 
 export default function APage() {
-  const { isAuth } = useSession()
+  const { isAuth, isLoading } = useSession()
 
   // Fix React Navigation
+
+  if (isLoading) {
+    return null
+  }
 
   if (!isAuth) {
     return <Redirect href={'/evenements'} />

@@ -36,7 +36,7 @@ const HomeHeader = () => {
 }
 
 export default function AccueilPage() {
-  const { isAuth } = useSession()
+  const { isAuth, isLoading } = useSession()
   const router = useRouter()
   const { signupCongrats, firstName } = useLocalSearchParams<{ signupCongrats?: '1'; firstName?: string }>()
   const { data: userScopes } = useGetUserScopes({ enabled: true })
@@ -58,6 +58,10 @@ export default function AccueilPage() {
       </FutureButton>
     )
   }, [hasScannerScope, router])
+
+  if (isLoading) {
+    return null
+  }
 
   if (!isAuth) {
     return <Redirect href={'/evenements'} />
