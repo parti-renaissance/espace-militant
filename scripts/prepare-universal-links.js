@@ -32,7 +32,10 @@ function populateIosConfig(APPLE_TEAM_ID, BUNDLE_ID) {
 function populateAndroidConfig(PACKAGE_NAME) {
   return [
     {
-      relation: ['delegate_permission/common.handle_all_urls'],
+      relation: [
+        'delegate_permission/common.handle_all_urls',
+        'delegate_permission/common.get_login_creds',
+      ],
       target: {
         namespace: 'android_app',
         package_name: PACKAGE_NAME,
