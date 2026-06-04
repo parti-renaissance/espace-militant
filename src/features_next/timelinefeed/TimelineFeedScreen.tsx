@@ -29,6 +29,7 @@ import { FEATURES } from '@/utils/Scopes'
 
 import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
+import { syncTimelinePostVideoVisibility } from '@/features_next/video/helpers/syncTimelinePostVideoVisibility'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
@@ -118,27 +119,44 @@ const TimelineFeedMain = () => {
     [shouldShowHeader, shouldShowNotificationCard, hasAlerts, hasPublications, alerts, media.sm],
   )
 
-  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    if (Platform.OS !== 'web') {
-      viewableItems.forEach((viewToken) => {
-        if (viewToken.isViewable && viewToken.item) {
-          trackImpression({
-            object_type: viewToken.item.type,
-            object_id: viewToken.item.objectID,
-            source: 'page_timeline',
-          })
-        }
+  const onViewableItemsChangedHandler = useCallback(
+    ({ viewableItems, changed }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+      syncTimelinePostVideoVisibility({
+        viewableItems: viewableItems as ViewToken<RestTimelineFeedItem>[],
+        changed: changed as ViewToken<RestTimelineFeedItem>[],
       })
-    }
-  }, [])
 
-  const viewabilityConfig = useMemo(
-    () => ({
-      itemVisiblePercentThreshold: 50,
-      minimumViewTime: 400,
-    }),
-    [],
+      if (Platform.OS !== 'web') {
+        viewableItems.forEach((viewToken) => {
+          if (viewToken.isViewable && viewToken.item) {
+            trackImpression({
+              object_type: viewToken.item.type,
+              object_id: viewToken.item.objectID,
+              source: 'page_timeline',
+            })
+          }
+        })
+      }
+    },
+    [trackImpression],
   )
+
+  const onViewableItemsChangedRef = useRef(onViewableItemsChangedHandler)
+  onViewableItemsChangedRef.current = onViewableItemsChangedHandler
+
+  const onViewableItemsChanged = useRef(
+    (info: { viewableItems: ViewToken[]; changed: ViewToken[] }) => onViewableItemsChangedRef.current(info),
+  ).current
+
+  const viewabilityConfigCallbackPairs = useRef([
+    {
+      viewabilityConfig: {
+        viewAreaCoveragePercentThreshold: 50,
+        minimumViewTime: 400,
+      },
+      onViewableItemsChanged,
+    },
+  ]).current
 
   return (
     <LayoutFlatList<RestTimelineFeedItem>
@@ -148,8 +166,7 @@ const TimelineFeedMain = () => {
       renderItem={renderFeedItem}
       keyExtractor={(item) => item.objectID}
       ListHeaderComponent={header}
-      onViewableItemsChanged={onViewableItemsChanged}
-      viewabilityConfig={viewabilityConfig}
+      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs}
       refreshing={isManualRefreshing}
       onRefresh={handleManualRefresh}
       onEndReached={loadMore}
