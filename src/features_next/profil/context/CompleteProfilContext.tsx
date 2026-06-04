@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Href } from 'expo-router'
 
-import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import CompleteProfil from '@/features_next/profil/components/CompleteProfil'
 
 import { useSession } from '@/ctx/SessionProvider'
@@ -67,9 +66,7 @@ export function CompleteProfilProvider({ children }: { children: ReactNode }) {
     <CompleteProfilContext.Provider value={value}>
       {children}
       {isAuth ? (
-        <BoundarySuspenseWrapper fallback={<></>}>
-          <CompleteProfil open={open} onClose={handleClose} redirectTo={redirectTo} onSuccess={handleSuccess} />
-        </BoundarySuspenseWrapper>
+        <CompleteProfil open={open} onClose={handleClose} redirectTo={redirectTo} onSuccess={handleSuccess} />
       ) : null}
     </CompleteProfilContext.Provider>
   )

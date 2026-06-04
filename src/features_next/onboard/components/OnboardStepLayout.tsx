@@ -119,7 +119,7 @@ export default function OnboardStepLayout({
 
         <YStack gap="$medium" px={24} pt={24 + insets.top}>
           <Text.MD secondary semibold>
-            Bienvenue sur l'application Renaissance
+            Bienvenue sur l'application Attal Président
           </Text.MD>
           <StepperBar>
             {Array.from({ length: totalSteps }).map((_, i) => (

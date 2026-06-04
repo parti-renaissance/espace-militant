@@ -1,20 +1,22 @@
-import { useRouter } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
-import { isWeb, useMedia, XStack, YStack } from 'tamagui';
-import Layout from '@/components/AppStructure/Layout/Layout';
-import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView';
-import Title from '@/components/Title/Title';
-import BotQuestionCard from '../components/BotQuestionCard';
-import FormationCard from '../components/FormationCard';
-import PrioritiesCard from '../components/PrioritiesCard';
-import ShareIdeaCard from '../components/ShareIdeaCard';
-import ToiPresidentCard from '../toiPresident/components/ToiPresidentCard';
-import { useToiPresidentActions } from '../toiPresident/hooks/useToiPresidentActions';
+import { useRouter } from 'expo-router'
+import * as WebBrowser from 'expo-web-browser'
+import { isWeb, useMedia, XStack, YStack } from 'tamagui'
+
+import Layout from '@/components/AppStructure/Layout/Layout'
+import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import Title from '@/components/Title/Title'
+
+import BotQuestionCard from '../components/BotQuestionCard'
+import FormationCard from '../components/FormationCard'
+import PrioritiesCard from '../components/PrioritiesCard'
+import ShareIdeaCard from '../components/ShareIdeaCard'
+import ToiPresidentCard from '../toiPresident/components/ToiPresidentCard'
+import { useToiPresidentActions } from '../toiPresident/hooks/useToiPresidentActions'
 
 const EXTERNAL_LINKS = {
   deposerUneIdee: 'https://parti.re/app-idee/deposer-une-idee',
   campagne: 'https://attalpresident.fr/',
-  mesPriorites: 'https://attalpresident.fr/mes-priorites',
+  mesPriorites: 'https://parti.re/app-idee/mes-priorites',
 } as const
 
 const openExternalLink = (url: string) => {
@@ -45,10 +47,7 @@ function DesktopContent() {
       <XStack gap="$large" alignItems="stretch" flexDirection="row" flexWrap="nowrap">
         <YStack flex={1} flexBasis={0} minWidth={0} gap="$medium">
           <BotQuestionCard onPress={() => router.push('/idees/bot')} />
-          <PrioritiesCard
-            onExplore={() => openExternalLink(EXTERNAL_LINKS.mesPriorites)}
-            onCampaignSite={() => openExternalLink(EXTERNAL_LINKS.campagne)}
-          />
+          <PrioritiesCard onExplore={() => openExternalLink(EXTERNAL_LINKS.mesPriorites)} onCampaignSite={() => openExternalLink(EXTERNAL_LINKS.campagne)} />
         </YStack>
         <YStack flex={1} flexBasis={0} minWidth={0}>
           <ToiPresidentCard flex={1} onPlay={toiPresident.play} onShare={toiPresident.share} />

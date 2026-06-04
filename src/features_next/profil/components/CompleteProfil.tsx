@@ -11,8 +11,9 @@ import AddressAutocomplete from '@/components/AddressAutoComplete/AddressAutocom
 import Input from '@/components/base/Input/Input'
 import Select from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
+import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
-import DatePickerField from '@/components/DatePicker'
+import DateInput from '@/components/base/DateInput'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
 import Title from '@/components/Title/Title'
 
@@ -22,6 +23,8 @@ import { useGetDetailProfil, useMutationUpdateProfil } from '@/services/profile/
 import { RestDetailedProfileResponse, RestUpdateProfileRequest } from '@/services/profile/schema'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { phoneCodes } from '@/utils/phoneCodes'
+
+import { isValid } from 'date-fns'
 
 import { validateBirthdateFormSchema, validateCoordFormSchema, validateInformationsFormSchema, validateLocationFormSchema } from '../pages/account/form/schema'
 
@@ -105,7 +108,7 @@ const buildDefaultValues = (profile: RestDetailedProfileResponse): CompleteProfi
     gender,
     first_name: profile.first_name || '',
     last_name: profile.last_name || '',
-    birthdate: profile.birthdate ?? undefined,
+    birthdate: profile.birthdate && isValid(profile.birthdate) ? profile.birthdate : undefined,
   }
 }
 
@@ -151,6 +154,38 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const isMobileSheet = !media.gtSm
+
+  if (!open) {
+    return null
+  }
+
+  return (
+    <ModalOrPageBase
+      open={open}
+      onClose={onClose}
+      closeOnBackdropPress={false}
+      contentBackgroundColor={theme.gray50.val}
+      contentMaxWidth={isMobileSheet ? undefined : MODAL_MAX_WIDTH}
+      modalBreakpoint="gtSm"
+      scrollable={isMobileSheet ? false : undefined}
+    >
+      <BoundarySuspenseWrapper fallback={<></>}>
+        <CompleteProfilContent isMobileSheet={isMobileSheet} insets={insets} media={media} onClose={onClose} redirectTo={redirectTo} onSuccess={onSuccess} />
+      </BoundarySuspenseWrapper>
+    </ModalOrPageBase>
+  )
+}
+
+type CompleteProfilContentProps = {
+  isMobileSheet: boolean
+  insets: ReturnType<typeof useSafeAreaInsets>
+  media: ReturnType<typeof useMedia>
+  onClose: () => void
+  redirectTo?: Href
+  onSuccess?: () => void
+}
+
+function CompleteProfilContent({ isMobileSheet, insets, media, onClose, redirectTo, onSuccess }: CompleteProfilContentProps) {
   const { data: profile } = useGetDetailProfil()
   const [step, setStep] = useState<1 | 2>(1)
 
@@ -234,25 +269,21 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
 
   const footer =
     step === 1 ? (
-      <VoxButton theme="blue" size="xl" full iconRight={ArrowRight} onPress={onNextStep}>
+      <VoxButton theme="blue" size="xl" width="100%" iconRight={ArrowRight} onPress={onNextStep}>
         Suivant
       </VoxButton>
     ) : (
-      <VoxButton theme="blue" size="xl" full iconRight={ArrowRight} onPress={onSubmit} loading={isPending} disabled={isPending}>
+      <VoxButton theme="blue" size="xl" width="100%" iconRight={ArrowRight} onPress={onSubmit} loading={isPending} disabled={isPending}>
         Je valide mes infos
       </VoxButton>
     )
-
-  if (!open) {
-    return null
-  }
 
   const formContent =
     step === 1 ? (
       <>
         <YStack gap="$medium">
           <Title size="h1">
-            <Title.Text>Débloquez tout </Title.Text>
+            <Title.Text>Je Débloque tout </Title.Text>
             <Title.Break />
             <Title.Highlight>le potentiel</Title.Highlight>
             <Title.Text>de l’app</Title.Text>
@@ -276,6 +307,7 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
               }) => (
                 <AddressAutocomplete
                   color="white"
+                  size="sm"
                   placeholder="Adresse"
                   defaultValue={`${value?.address ?? ''} ${value?.city_name ?? ''}`.trim()}
                   onBlur={onBlur}
@@ -313,7 +345,7 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
                       searchable
                       color="white"
                       value={value?.country ?? 'FR'}
-                      size="lg"
+                      size="sm"
                       options={phoneCodes}
                       onChange={(country) => onChange({ number: value?.number, country })}
                     />
@@ -322,6 +354,7 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
                     <Input
                       value={value?.number}
                       color="white"
+                      size="sm"
                       placeholder="Téléphone (optionnel)"
                       onBlur={onBlur}
                       onChange={(number) => {
@@ -358,6 +391,7 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
                 placeholder="Civilité"
                 onBlur={onBlur}
                 color="white"
+                size="sm"
                 disabled={!!profile.certified}
                 value={value}
                 onChange={onChange}
@@ -370,56 +404,52 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
             )}
           />
 
-          <View flexDirection={media.gtMd ? 'row' : undefined} gap={media.gtMd ? '$medium' : '$large'}>
-            <View flex={media.gtMd ? 1 : undefined} flexBasis={media.gtMd ? 0 : undefined}>
-              <Controller
-                name="first_name"
-                control={control}
-                render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                  <Input
-                    color="white"
-                    disabled={!!profile.certified}
-                    placeholder="Prénom"
-                    value={value}
-                    onBlur={onBlur}
-                    onChange={onChange}
-                    error={error?.message}
-                  />
-                )}
+          <Controller
+            name="first_name"
+            control={control}
+            render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+              <Input
+                color="white"
+                size="sm"
+                disabled={!!profile.certified}
+                placeholder="Prénom"
+                value={value}
+                onBlur={onBlur}
+                onChange={onChange}
+                error={error?.message}
               />
-            </View>
+            )}
+          />
 
-            <View flex={media.gtMd ? 1 : undefined} flexBasis={media.gtMd ? 0 : undefined}>
-              <Controller
-                name="last_name"
-                control={control}
-                render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                  <Input
-                    color="white"
-                    disabled={!!profile.certified}
-                    placeholder="Nom"
-                    value={value}
-                    onBlur={onBlur}
-                    onChange={onChange}
-                    error={error?.message}
-                  />
-                )}
+          <Controller
+            name="last_name"
+            control={control}
+            render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+              <Input
+                color="white"
+                size="sm"
+                disabled={!!profile.certified}
+                placeholder="Nom"
+                value={value}
+                onBlur={onBlur}
+                onChange={onChange}
+                error={error?.message}
               />
-            </View>
-          </View>
+            )}
+          />
 
           <Controller
             name="birthdate"
             control={control}
-            render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-              <DatePickerField
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <DateInput
+                label="Date de naissance"
+                value={value && isValid(value) ? value : null}
+                onChange={(iso) => onChange(iso ? new Date(iso) : undefined)}
+                placeholder="Sélectionner date de naissance"
+                size="sm"
                 color="white"
                 disabled={!!profile.certified}
-                label="Date de naissance"
-                type="date"
-                value={value ?? undefined}
-                onBlur={onBlur}
-                onChange={onChange}
                 error={error?.message}
               />
             )}
@@ -429,52 +459,42 @@ export default function CompleteProfil({ open, onClose, redirectTo, onSuccess }:
     )
 
   return (
-    <ModalOrPageBase
-      open={open}
-      onClose={handleClose}
-      closeOnBackdropPress={false}
-      contentBackgroundColor={theme.gray50.val}
-      contentMaxWidth={isMobileSheet ? undefined : MODAL_MAX_WIDTH}
-      modalBreakpoint="gtSm"
-      scrollable={isMobileSheet ? false : undefined}
+    <YStack
+      width="100%"
+      maxWidth={isMobileSheet ? undefined : MODAL_MAX_WIDTH}
+      flex={isMobileSheet ? 1 : undefined}
+      backgroundColor="$gray50"
+      alignSelf={isMobileSheet ? undefined : 'center'}
     >
-      <YStack
-        width="100%"
-        maxWidth={isMobileSheet ? undefined : MODAL_MAX_WIDTH}
-        flex={isMobileSheet ? 1 : undefined}
-        backgroundColor="$gray50"
-        alignSelf={isMobileSheet ? undefined : 'center'}
-      >
-        <XStack width="100%" px="$medium" pt="$medium" justifyContent="space-between" alignItems="center">
+      <XStack width="100%" px="$medium" pt="$medium" justifyContent="space-between" alignItems="center">
+        <YStack>
+          <VoxButton variant="text" iconLeft={ArrowLeft} onPress={onPreviousStep}>
+            Retour
+          </VoxButton>
+        </YStack>
+        {media.gtSm ? (
           <YStack>
-            <VoxButton variant="text" iconLeft={ArrowLeft} onPress={onPreviousStep}>
-              Retour
-            </VoxButton>
+            <VoxButton theme="gray" variant="text" shrink iconLeft={X} onPress={handleClose}></VoxButton>
           </YStack>
-          {media.gtSm ? (
-            <YStack>
-              <VoxButton theme="gray" variant="text" shrink iconLeft={X} onPress={handleClose}></VoxButton>
+        ) : null}
+      </XStack>
+      {isMobileSheet ? (
+        <YStack flex={1} width="100%" backgroundColor="$gray50">
+          <ScrollView flexGrow={1} flexShrink={1} minHeight={0} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            <YStack gap="$large" padding="$large">
+              {formContent}
             </YStack>
-          ) : null}
-        </XStack>
-        {isMobileSheet ? (
-          <YStack flex={1} width="100%" backgroundColor="$gray50">
-            <ScrollView flex={1} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-              <YStack gap="$large" padding="$large">
-                {formContent}
-              </YStack>
-            </ScrollView>
-            <YStack paddingHorizontal="$large" paddingTop="$medium" paddingBottom={insets.bottom + 16} backgroundColor="$gray50">
-              {footer}
-            </YStack>
-          </YStack>
-        ) : (
-          <YStack gap="$large" padding="$large" width="100%">
-            {formContent}
+          </ScrollView>
+          <YStack flexShrink={0} width="100%" paddingHorizontal="$large" paddingTop="$medium" paddingBottom={insets.bottom + 16} backgroundColor="$gray50">
             {footer}
           </YStack>
-        )}
-      </YStack>
-    </ModalOrPageBase>
+        </YStack>
+      ) : (
+        <YStack gap="$large" padding="$large" width="100%">
+          {formContent}
+          {footer}
+        </YStack>
+      )}
+    </YStack>
   )
 }

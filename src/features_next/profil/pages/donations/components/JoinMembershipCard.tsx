@@ -4,12 +4,11 @@ import { styled, XStack, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import cotisationIllu from '@/features_next/profil/assets/cotisation-illu.png'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 
 import type { CommonMembershipCardProps } from './types'
-
-import cotisationIllu from '@/features_next/profil/assets/cotisation-illu.png'
 
 const HeaderFrame = styled(XStack, {
   padding: '$medium',

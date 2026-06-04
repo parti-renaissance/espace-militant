@@ -34,7 +34,7 @@ const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.
 const getFeedRowKey = (row: HubFeedRowType): string =>
   row.type === 'event' ? row.event.uuid : (row.payload.id ?? `action-${row.payload.date.start.toISOString()}`)
 
-const MATERIEL_URL = 'https://parti.re'
+const MATERIEL_URL = 'https://attal.app/commande-materiel'
 const PAP_HREF = '/old/porte-a-porte' as const
 
 const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrganizeModal }: { onOpenOrganizeModal: () => void }) {
@@ -80,6 +80,7 @@ const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrga
 })
 
 const HubFooterResourceCards = memo(function HubFooterResourceCards() {
+  const { isAuth } = useSession()
   const { runWithCompleteProfile } = useProfileCompletionAccess()
 
   const handleOpenPap = useCallback(() => {
@@ -104,15 +105,17 @@ const HubFooterResourceCards = memo(function HubFooterResourceCards() {
           </VoxButton>
         </Link>
       </CallToActionCard>
-      <CallToActionCard
-        icon={DoorOpen}
-        title="Je fais un Porte-à-porte"
-        description="Consultez la carte des adresses prioritaires pour organiser votre porte-à-porte."
-      >
-        <VoxButton variant="soft" theme="gray" onPress={handleOpenPap}>
-          Plateforme de PAP
-        </VoxButton>
-      </CallToActionCard>
+      {isAuth ? (
+        <CallToActionCard
+          icon={DoorOpen}
+          title="Je fais un Porte-à-porte"
+          description="Consultez la carte des adresses prioritaires pour organiser votre porte-à-porte."
+        >
+          <VoxButton variant="soft" theme="gray" onPress={handleOpenPap}>
+            Plateforme de PAP
+          </VoxButton>
+        </CallToActionCard>
+      ) : null}
     </>
   )
 })

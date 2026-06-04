@@ -55,7 +55,7 @@ Permet de pousser des correctifs JavaScript sans passer par les stores.
 |---|---|---|---|---|
 | `development` | Vox Dev | `fr.en-marche.jecoute.development` | `fr.en_marche.jecoute.development` | `vox-dev://` |
 | `staging` | _(variable)_ | `fr.en-marche.jecoute.staging` | `fr.en_marche.jecoute.staging` | `vox-staging://` |
-| `production` | Renaissance | `fr.en-marche.jecoute` | `fr.en_marche.jecoute` | `vox://` |
+| `production` | Attal Président | `fr.en-marche.jecoute` | `fr.en_marche.jecoute` | `vox://` |
 
 ---
 
