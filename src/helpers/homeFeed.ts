@@ -149,6 +149,7 @@ export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardPr
     case 'social_post':
       return {
         type,
+        contentId: feed.objectID,
         description: feed.description,
         date: feed.date,
         author: {

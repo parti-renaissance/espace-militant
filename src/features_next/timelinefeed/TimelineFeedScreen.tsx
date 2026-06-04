@@ -29,6 +29,7 @@ import { FEATURES } from '@/utils/Scopes'
 
 import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
+import { syncTimelinePostVideoVisibility } from '@/features_next/video/helpers/syncTimelinePostVideoVisibility'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
@@ -118,26 +119,39 @@ const TimelineFeedMain = () => {
     [shouldShowHeader, shouldShowNotificationCard, hasAlerts, hasPublications, alerts, media.sm],
   )
 
-  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    if (Platform.OS !== 'web') {
-      viewableItems.forEach((viewToken) => {
-        if (viewToken.isViewable && viewToken.item) {
-          trackImpression({
-            object_type: viewToken.item.type,
-            object_id: viewToken.item.objectID,
-            source: 'page_timeline',
-          })
-        }
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems, changed }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+      syncTimelinePostVideoVisibility({
+        viewableItems: viewableItems as ViewToken<RestTimelineFeedItem>[],
+        changed: changed as ViewToken<RestTimelineFeedItem>[],
       })
-    }
-  }, [])
+
+      if (Platform.OS !== 'web') {
+        viewableItems.forEach((viewToken) => {
+          if (viewToken.isViewable && viewToken.item) {
+            trackImpression({
+              object_type: viewToken.item.type,
+              object_id: viewToken.item.objectID,
+              source: 'page_timeline',
+            })
+          }
+        })
+      }
+    },
+    [trackImpression],
+  )
 
   const viewabilityConfig = useMemo(
     () => ({
-      itemVisiblePercentThreshold: 50,
+      viewAreaCoveragePercentThreshold: 50,
       minimumViewTime: 400,
     }),
     [],
+  )
+
+  const viewabilityConfigCallbackPairs = useMemo(
+    () => [{ viewabilityConfig, onViewableItemsChanged }],
+    [onViewableItemsChanged, viewabilityConfig],
   )
 
   return (
@@ -148,8 +162,7 @@ const TimelineFeedMain = () => {
       renderItem={renderFeedItem}
       keyExtractor={(item) => item.objectID}
       ListHeaderComponent={header}
-      onViewableItemsChanged={onViewableItemsChanged}
-      viewabilityConfig={viewabilityConfig}
+      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs}
       refreshing={isManualRefreshing}
       onRefresh={handleManualRefresh}
       onEndReached={loadMore}

@@ -8,10 +8,14 @@ import VoxCard, { VoxCardFrameProps } from '@/components/VoxCard/VoxCard'
 import { RestTimelineFeedSocialMedia } from '@/services/timeline-feed/schema'
 import { relativeDateFormatter } from '@/utils/DateFormatter'
 
+import VideoFeedPostVisibility from '@/features_next/video/components/VideoFeedPostVisibility'
+
 import SocialPostDescription from './SocialPostDescription'
 import SocialPostMedia from './SocialPostMedia'
 
 export type SocialPostCardProps = {
+  /** Identifiant stable du post (ex. objectID du feed) pour la lecture vidéo exclusive. */
+  contentId: string
   description: string | null
   date: string | null
   author: {
@@ -27,7 +31,7 @@ export type SocialPostCardProps = {
   } | null
 } & VoxCardFrameProps
 
-const SocialPostCard = ({ description, date, author, media, image, ...props }: SocialPostCardProps) => {
+const SocialPostCard = ({ contentId, description, date, author, media, image, ...props }: SocialPostCardProps) => {
   const mediaLayout = useMedia()
 
   return (
@@ -55,7 +59,9 @@ const SocialPostCard = ({ description, date, author, media, image, ...props }: S
           </XStack>
         </XStack>
 
-        <SocialPostMedia media={media} image={image} />
+        <VideoFeedPostVisibility contentId={contentId} media={media}>
+          <SocialPostMedia contentId={contentId} media={media} image={image} />
+        </VideoFeedPostVisibility>
 
         {description ? (
           <YStack px="$medium" pb="$medium" pt="$small">
