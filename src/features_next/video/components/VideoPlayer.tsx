@@ -4,16 +4,10 @@ import { useVideoPlayer, VideoView } from 'expo-video'
 import { Image } from 'expo-image'
 import { YStack } from 'tamagui'
 
+import { safePlayerAction, useExpoPlayerAutoPlayback } from '@/features_next/video/helpers/safePlayerPlayback'
+
 import { getVideoAspectRatio, type VideoPlayerProps } from './VideoPlayer.types'
 import { VideoPlayIcon } from './VideoPlayIcon'
-
-function safePlayerAction(action: () => void) {
-  try {
-    action()
-  } catch {
-    // Player natif déjà libéré au démontage (expo-video).
-  }
-}
 
 type NativeVideoContentProps = {
   hlsUrl: string
@@ -30,13 +24,7 @@ function NativeVideoContent({ hlsUrl, loop, shouldPlay, active, controls, conten
   })
   const [isPlaying, setIsPlaying] = useState(shouldPlay && active)
 
-  useEffect(() => {
-    if (shouldPlay && active) {
-      safePlayerAction(() => player.play())
-    } else {
-      safePlayerAction(() => player.pause())
-    }
-  }, [player, shouldPlay, active])
+  useExpoPlayerAutoPlayback(player, shouldPlay && active)
 
   useEffect(() => {
     const subscription = player.addListener('playingChange', ({ isPlaying: playing }) => {

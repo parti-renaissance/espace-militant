@@ -190,15 +190,23 @@ const SCROLL_ANIMATION_MS = 400
 /** Pendant le swipe horizontal, on gèle la slide « lecture » pour éviter le clignotement vignette/vidéo. */
 const CAROUSEL_VIEWABILITY_SYNC_MS = Platform.OS === 'android' ? 80 : 0
 
+const getPercentVisible = (token: ViewToken<CarouselSlide>) =>
+  (token as ViewToken<CarouselSlide> & { percentVisible?: number }).percentVisible ?? 0
+
 const pickViewableVideoSlideId = (viewableItems: ViewToken<CarouselSlide>[]): string | null => {
   const viewableVideos = viewableItems.filter((token) => token.isViewable && token.item?.item.type === 'video')
 
   if (viewableVideos.length === 0) return null
 
   const best = viewableVideos.reduce((current, candidate) => {
-    const currentPercent = current.percentVisible ?? 0
-    const candidatePercent = candidate.percentVisible ?? 0
-    return candidatePercent > currentPercent ? candidate : current
+    const currentPercent = getPercentVisible(current)
+    const candidatePercent = getPercentVisible(candidate)
+    if (candidatePercent !== currentPercent) {
+      return candidatePercent > currentPercent ? candidate : current
+    }
+    const currentIndex = current.index ?? -1
+    const candidateIndex = candidate.index ?? -1
+    return candidateIndex >= currentIndex ? candidate : current
   })
 
   return best.item?.id ?? null
@@ -295,9 +303,19 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
     [syncActiveVideoFromViewability],
   )
 
+  const onViewableItemsChangedRef = useRef(onViewableItemsChanged)
+  onViewableItemsChangedRef.current = onViewableItemsChanged
+
   const viewabilityConfigCallbackPairs = useMemo(
-    () => [{ viewabilityConfig: VIEWABILITY_CONFIG, onViewableItemsChanged }],
-    [onViewableItemsChanged],
+    () => [
+      {
+        viewabilityConfig: VIEWABILITY_CONFIG,
+        onViewableItemsChanged: ({ viewableItems }: { viewableItems: ViewToken<CarouselSlide>[] }) => {
+          onViewableItemsChangedRef.current({ viewableItems })
+        },
+      },
+    ],
+    [],
   )
 
   const handleLayout = (event: LayoutChangeEvent) => {
@@ -362,6 +380,11 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
     },
     [commitPlaybackAtIndex, containerWidth, items.length],
   )
+
+  useEffect(() => {
+    if (containerWidth <= 0 || slides.length === 0 || playbackSlideId != null) return
+    commitPlaybackAtIndex(0)
+  }, [commitPlaybackAtIndex, containerWidth, playbackSlideId, slides.length])
 
   const carouselHeight = useMemo(() => {
     if (containerWidth <= 0) return MIN_MEDIA_HEIGHT

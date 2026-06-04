@@ -8,14 +8,7 @@ import { Circle, YStack } from 'tamagui'
 import { useIsContentInFeedView, useVideoFeedStore } from '@/features_next/video/store/videoFeedStore'
 import { getVideoAspectRatio } from '@/features_next/video/components/VideoPlayer.types'
 import { VideoPlayIcon } from '@/features_next/video/components/VideoPlayIcon'
-
-function safePlayerAction(action: () => void) {
-  try {
-    action()
-  } catch {
-    // Player natif déjà libéré au démontage (expo-video).
-  }
-}
+import { safePlayerAction, useExpoPlayerAutoPlayback } from '@/features_next/video/helpers/safePlayerPlayback'
 
 export type FeedVideoPlayerProps = {
   contentId: string
@@ -48,8 +41,9 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, isSlideViewable, content
   const isPostInView = useIsContentInFeedView(contentId)
   const isFocusedPost = useVideoFeedStore((s) => s.focusedContentId === contentId)
   const isActive = activeVideoId === videoId
-  const canPlay = isSlideViewable && isPostInView && isFocusedPost
-  const shouldAutoPlay = canPlay && isActive && isAppActive
+  const canAutoPlay = isSlideViewable && isPostInView && isFocusedPost
+  const canInteract = canAutoPlay || (isActive && isPostInView && isFocusedPost)
+  const shouldAutoPlay = canAutoPlay && isActive && isAppActive
   const [isUserPaused, setIsUserPaused] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
 
@@ -71,22 +65,10 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, isSlideViewable, content
     return () => subscription.remove()
   }, [player])
 
-  useEffect(() => {
-    if (shouldAutoPlay && !isUserPaused) {
-      safePlayerAction(() => player.play())
-    } else {
-      safePlayerAction(() => player.pause())
-    }
-  }, [player, shouldAutoPlay, isUserPaused])
-
-  useEffect(() => {
-    return () => {
-      safePlayerAction(() => player.pause())
-    }
-  }, [player])
+  useExpoPlayerAutoPlayback(player, shouldAutoPlay && !isUserPaused)
 
   const handleVideoPress = useCallback(() => {
-    if (!canPlay || !isAppActive) return
+    if (!canInteract || !isAppActive) return
 
     safePlayerAction(() => {
       if (player.playing) {
@@ -99,7 +81,7 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, isSlideViewable, content
       claimActiveVideo(contentId, videoId)
       player.play()
     })
-  }, [canPlay, claimActiveVideo, contentId, isAppActive, player, videoId])
+  }, [canInteract, claimActiveVideo, contentId, isAppActive, player, videoId])
 
   const handleToggleMute = useCallback(() => {
     toggleMuted()
@@ -163,9 +145,8 @@ export default function FeedVideoPlayer({
   const claimActiveVideo = useVideoFeedStore((s) => s.claimActiveVideo)
   const isPostInView = useIsContentInFeedView(contentId)
   const isFocusedPost = useVideoFeedStore((s) => s.focusedContentId === contentId)
-  const canPlay = isSlideViewable && isPostInView && isFocusedPost
   const isActiveVideo = activeVideoId === videoId
-  const shouldMountPlayer = canPlay && isActiveVideo && isAppActive
+  const shouldMountPlayer = isPostInView && isFocusedPost && isActiveVideo && isAppActive
 
   const handleThumbnailPress = useCallback(() => {
     if (!isPostInView || !isAppActive) return
