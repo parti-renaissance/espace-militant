@@ -34,7 +34,7 @@ const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.
 const getFeedRowKey = (row: HubFeedRowType): string =>
   row.type === 'event' ? row.event.uuid : (row.payload.id ?? `action-${row.payload.date.start.toISOString()}`)
 
-const MATERIEL_URL = 'https://parti.re'
+const MATERIEL_URL = 'https://attal.app/commande-materiel'
 const PAP_HREF = '/old/porte-a-porte' as const
 
 const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrganizeModal }: { onOpenOrganizeModal: () => void }) {
