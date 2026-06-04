@@ -14,8 +14,8 @@ type Props = {
 
 export function ErrorBubble({ error, isLoading, onRetry }: Props) {
   return (
-    <YStack padding="$medium" backgroundColor="$red3" borderRadius="$medium" marginHorizontal="$medium" gap="$small">
-      <Text.SM primary regular multiline>
+    <YStack padding="$medium" backgroundColor="$red100" borderRadius="$medium" marginHorizontal="$medium" gap="$small">
+      <Text.SM color="$red900" regular multiline>
         {error.message}
       </Text.SM>
       {error.retryable && (

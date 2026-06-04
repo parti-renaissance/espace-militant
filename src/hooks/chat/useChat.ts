@@ -35,7 +35,7 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
   const threadIdRef = useRef<string | null>(threadId)
   const lastUserMessageRef = useRef<string | null>(null)
   const streamBufferRef = useRef('')
-  const hadInStreamErrorRef = useRef(false)
+  const inStreamErrorRef = useRef<{ message: string; retryAfter?: number } | null>(null)
 
   useEffect(() => {
     threadIdRef.current = threadId
@@ -66,13 +66,18 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       streamBufferRef.current += text
       setStreamedContent(streamBufferRef.current)
     },
-    onInStreamError: () => {
-      hadInStreamErrorRef.current = true
+    onInStreamError: (err) => {
+      inStreamErrorRef.current = err
     },
     onComplete: () => {
-      if (hadInStreamErrorRef.current) {
+      const inStreamError = inStreamErrorRef.current
+      if (inStreamError) {
         commitStreamedMessage()
-        setError({ kind: 'serviceDown', message: 'Le service est momentanément indisponible. Réessayez dans quelques instants.', retryable: true })
+        if (inStreamError.retryAfter !== undefined) {
+          setError({ kind: 'quota', message: inStreamError.message, retryable: false, retryAfterSeconds: inStreamError.retryAfter })
+        } else {
+          setError({ kind: 'serviceDown', message: 'Le service est momentanément indisponible. Réessayez dans quelques instants.', retryable: true })
+        }
       } else if (streamBufferRef.current) {
         commitStreamedMessage()
       } else {
@@ -99,7 +104,7 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       if (!trimmed) return
 
       lastUserMessageRef.current = trimmed
-      hadInStreamErrorRef.current = false
+      inStreamErrorRef.current = null
       streamBufferRef.current = ''
 
       setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', content: trimmed }])
