@@ -1,6 +1,4 @@
-import { AsyncStorage } from '@/hooks/useStorageState'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
 
 import type { BotChatMessage } from '@/services/bot/schema'
 
@@ -14,21 +12,13 @@ type BotState = {
   clearThread: () => void
 }
 
-export const useBotStore = create<BotState>()(
-  persist(
-    (set) => ({
-      threadId: null,
-      messages: [],
-      setThreadId: (id) => set({ threadId: id }),
-      setMessages: (arg) =>
-        set((state) => ({
-          messages: typeof arg === 'function' ? arg(state.messages) : arg,
-        })),
-      clearThread: () => set({ threadId: null, messages: [] }),
-    }),
-    {
-      name: 'bot-store',
-      storage: createJSONStorage(() => AsyncStorage),
-    },
-  ),
-)
+export const useBotStore = create<BotState>()((set) => ({
+  threadId: null,
+  messages: [],
+  setThreadId: (id) => set({ threadId: id }),
+  setMessages: (arg) =>
+    set((state) => ({
+      messages: typeof arg === 'function' ? arg(state.messages) : arg,
+    })),
+  clearThread: () => set({ threadId: null, messages: [] }),
+}))

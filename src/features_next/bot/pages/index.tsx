@@ -17,7 +17,6 @@ import { useBotChat } from '@/services/bot/hook';
 import EmptyState from '../components/EmptyState';
 import SuggestionsList from '../components/input/SuggestionsList';
 
-
 export default function BotPage() {
   const media = useMedia()
   const scrollViewRef = useRef<FlatList<ChatMessage>>(null)
