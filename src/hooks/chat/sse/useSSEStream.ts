@@ -14,7 +14,7 @@ export type SSEStreamOptions = {
   threadHeaderName?: string
   onThreadHeader?: (uuid: string) => void
   onChunk?: (text: string) => void
-  onInStreamError?: (message: string) => void
+  onInStreamError?: (error: { message: string; retryAfter?: number }) => void
   onComplete?: () => void
   onError?: (error: SSEStreamError) => void
   onAbort?: () => void
@@ -125,7 +125,7 @@ export function useSSEStream(opts: SSEStreamOptions): SSEStreamReturn {
           lastProcessedIndexRef.current = newIndex
           lineBufferRef.current = newBuffer
           for (const chunk of chunks) {
-            if (chunk.kind === 'error') cb.onInStreamError?.(chunk.message)
+            if (chunk.kind === 'error') cb.onInStreamError?.({ message: chunk.message, retryAfter: chunk.retryAfter })
             else cb.onChunk?.(chunk.text)
           }
         }

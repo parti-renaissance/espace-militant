@@ -48,7 +48,7 @@ export function InputDock({ inputRef, value, isLoading, keyboardOpen, bottomOffs
         onSubmit={onSubmit}
         onStop={onStop}
       />
-      {media.gtSm && !keyboardOpen && <BotDisclaimer />}
+      {!keyboardOpen && <BotDisclaimer />}
     </YStack>
   )
 }
