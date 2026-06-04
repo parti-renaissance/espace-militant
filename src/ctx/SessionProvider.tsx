@@ -5,7 +5,9 @@ import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import { useQueryClient } from '@tanstack/react-query'
 
-import useLogin, { useRegister } from '@/hooks/useLogin'
+import { navigateToSignup } from '@/features_next/signup/utils/navigateToSignup'
+
+import useLogin, { credentialsFromTokenResponse } from '@/hooks/useLogin'
 import { useLogOut } from '@/services/logout/api'
 import { useGetProfil, useGetUserScopes } from '@/services/profile/hook'
 import { useUserStore } from '@/store/user-store'
@@ -52,7 +54,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const queryClient = useQueryClient()
   const login = useLogin()
   const { mutateAsync: logout } = useLogOut()
-  const register = useRegister()
   const user = useGetProfil({ enabled: !!existingSession })
   const scope = useGetUserScopes({ enabled: !!user.data })
 
@@ -71,23 +72,31 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   const handleSignIn: AuthContextType['signIn'] = React.useCallback(
     async (props) => {
+      let keepLoadingForWebRedirect = false
       try {
         if (isLoginInProgress) {
           return
         }
         setIsLoginInProgress(true)
+        const redirectState = normalizeStateRedirect(props?.state)
+        if (redirectState) {
+          pendingRedirectRef.current = redirectState
+          hasRedirectedRef.current = false
+        }
         const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
         if (!session) {
+          keepLoadingForWebRedirect = isWeb && !props?.code
           return
         }
-        const { accessToken, refreshToken, idToken: sessionId, expiresIn } = session
-        setSession({ accessToken, refreshToken, sessionId, isAdmin: props?.isAdmin, accessTokenExpiresIn: expiresIn })
+        setSession(credentialsFromTokenResponse(session, props?.isAdmin))
         queryClient.resetQueries()
       } catch (e) {
         ErrorMonitor.log(e.message, { e })
         toast.show('Erreur lors de la connexion', { type: 'error' })
       } finally {
-        setIsLoginInProgress(false)
+        if (!keepLoadingForWebRedirect) {
+          setIsLoginInProgress(false)
+        }
       }
     },
     [isLoginInProgress, login, queryClient],
@@ -132,22 +141,9 @@ export function SessionProvider(props: React.PropsWithChildren) {
     handleSignIn({ code })
   }, [url, handleSignIn])
 
-  const handleRegister = React.useCallback(
-    async (props?: { utm_campaign?: string }) => {
-      try {
-        const session = await register(props)
-        if (!session) {
-          return
-        }
-        const { accessToken, refreshToken, idToken: sessionId, expiresIn } = session
-        setSession({ accessToken, refreshToken, sessionId, accessTokenExpiresIn: expiresIn })
-      } catch (e) {
-        ErrorMonitor.log(e.message, { e })
-        toast.show('Erreur lors de la connexion', { type: 'error' })
-      }
-    },
-    [isLoginInProgress],
-  )
+  const handleRegister = React.useCallback(async () => {
+    navigateToSignup()
+  }, [])
 
   const handleSignOut = React.useCallback(async () => {
     await logout()

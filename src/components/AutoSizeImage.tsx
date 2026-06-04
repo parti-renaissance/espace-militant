@@ -13,22 +13,26 @@ interface AutoSizeImageProps {
   ratio?: number
   width?: number
   height?: number
+  /** Remplit le conteneur parent et recadre en cover (ex. carousel). */
+  fill?: boolean
 }
 
-function AutoSizeImage({ width, height, ...props }: AutoSizeImageProps) {
+function AutoSizeImage({ width, height, fill = false, ...props }: AutoSizeImageProps) {
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(width && height ? { width, height } : null)
 
   return (
-    <Animated.View style={[styles.imageContainer]}>
+    <Animated.View style={[styles.imageContainer, fill && styles.imageContainerFill]}>
       <Image
         style={[
           styles.image,
-          {
-            aspectRatio: imageSize ? imageSize.width / imageSize.height : (props.ratio ?? 16 / 9),
-          },
+          fill
+            ? styles.imageFill
+            : {
+                aspectRatio: imageSize ? imageSize.width / imageSize.height : (props.ratio ?? 16 / 9),
+              },
         ]}
         source={typeof props.source === 'string' ? { uri: props.source } : props.source}
-        contentFit={'contain'}
+        contentFit={fill ? 'cover' : 'contain'}
         onLoad={(evt) => {
           if (evt.source && !imageSize) {
             setImageSize({
@@ -59,6 +63,20 @@ const styles = StyleSheet.create({
     flexBasis: 2,
     justifyContent: 'space-between',
     gap: 4,
+  },
+  imageContainerFill: {
+    flexDirection: 'column',
+    flexWrap: 'nowrap',
+    flexBasis: 'auto',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    gap: 0,
+  },
+  imageFill: {
+    width: '100%',
+    height: '100%',
+    flex: undefined,
   },
   overlay: {
     position: 'absolute',

@@ -6,9 +6,10 @@ import HubEventFeed from './HubEventFeed'
 export type EventsHubDesktopProps = {
   mapLayer: ReactNode
   feedSuspenseFallback: ReactNode
+  onOpenOrganizeModal: () => void
 }
 
-export function EventsHubDesktop({ mapLayer, feedSuspenseFallback }: EventsHubDesktopProps) {
+export function EventsHubDesktop({ mapLayer, feedSuspenseFallback, onOpenOrganizeModal }: EventsHubDesktopProps) {
   return (
     <>
       <YStack flex={1} position="relative">
@@ -18,7 +19,7 @@ export function EventsHubDesktop({ mapLayer, feedSuspenseFallback }: EventsHubDe
       </YStack>
       <YStack flex={1} flexShrink={0} minHeight={0} maxWidth={390} width="100%">
         <Suspense fallback={feedSuspenseFallback}>
-          <HubEventFeed />
+          <HubEventFeed onOpenOrganizeModal={onOpenOrganizeModal} />
         </Suspense>
       </YStack>
     </>

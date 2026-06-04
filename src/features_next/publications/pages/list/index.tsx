@@ -171,7 +171,7 @@ export default function PublicationsScreen() {
   }, [mutateScope, previousScope])
 
   const accessDenyButton = previousScope ? (
-    <VoxButton theme="purple" iconLeft={ArrowLeft} onPress={handleReturnToPreviousScope}>
+    <VoxButton theme="pink" iconLeft={ArrowLeft} onPress={handleReturnToPreviousScope}>
       Revenir au rôle précédent
     </VoxButton>
   ) : undefined

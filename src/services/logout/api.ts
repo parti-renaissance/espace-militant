@@ -1,4 +1,4 @@
-import { Linking } from 'react-native'
+import { Linking, Platform } from 'react-native'
 import clientEnv from '@/config/clientEnv'
 import { END_SESSION_ENDPOINT } from '@/config/discoveryDocument'
 import { REDIRECT_URI } from '@/hooks/useLogin'
@@ -23,6 +23,11 @@ export function useLogOut() {
 
       if (user?.isAdmin) {
         window.location.href = `${clientEnv.ADMIN_URL}/app/adherent/list?_switch_user=_exit`
+        return
+      }
+
+      if (Platform.OS === 'web') {
+        window.location.assign(`${END_SESSION_ENDPOINT}?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`)
         return
       }
 

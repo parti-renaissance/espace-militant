@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
-import { router, useNavigation } from 'expo-router'
+import { router, useLocalSearchParams, useNavigation } from 'expo-router'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { addHours, addMinutes, formatISO, isAfter, isBefore, isEqual, isPast, isValid, setMilliseconds, setMinutes, setSeconds, subHours } from 'date-fns'
@@ -20,7 +20,7 @@ import { FEATURES } from '@/utils/Scopes'
 
 import { useConfirmAlert } from '../components/ConfirmAlert'
 import { createEventSchema, EventFormData } from './schema'
-import getVisibilityOptions from './visibility-options'
+import getVisibilityOptions, { getPublicOnlyVisibilityOptions } from './visibility-options'
 
 export type EventFormProps = {
   edit?: RestFullEvent
@@ -37,7 +37,7 @@ export const getFormatedScope = (scope: RestUserScopesResponse[number]): SelectO
       ' ',
       <SF.Text key="description">{description}</SF.Text>,
     ],
-    theme: 'purple',
+    theme: 'pink',
     icon: Sparkle,
   }
 }
@@ -72,8 +72,10 @@ const roundMinutesToNextDecimal = (date: Date) => {
   }
 }
 const useEventFormData = ({ edit }: EventFormProps) => {
+  const { category: categoryParam } = useLocalSearchParams<{ category?: string }>()
   const scopes = useGetExecutiveScopes()
   const scopeOptions = useMemo(() => scopes.data?.list?.filter((x) => x.features.includes(FEATURES.EVENTS)).map(getFormatedScope) ?? [], [scopes.data])
+  const canCreateAsCadre = scopes.hasFeature(FEATURES.EVENTS)
   const { data } = useGetSuspenseProfil({ enabled: true })
 
   const isAuthor = useMemo(() => {
@@ -99,17 +101,28 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const editEventScope = edit?.organizer?.scope ?? 'national'
 
-  const initialScopeCode = edit ? (edit.organizer?.scope ?? 'national') : (scopes.data?.default?.code ?? 'national')
-  const defaultVisibilityForScope = edit?.visibility ?? (String(initialScopeCode).startsWith('agora_') ? 'invitation' : 'public')
+  const initialScopeCode = edit ? (edit.organizer?.scope ?? 'national') : canCreateAsCadre ? (scopes.data?.default?.code ?? 'national') : ''
+  const defaultVisibilityForScope =
+    edit?.visibility ?? (canCreateAsCadre ? (String(initialScopeCode).startsWith('agora_') ? 'invitation' : 'public') : 'public')
   /** Portée Agora : événements toujours « en ligne » (produit). */
   const defaultModeForScope = String(initialScopeCode).startsWith('agora_') ? 'online' : (edit?.mode ?? 'meeting')
+
+  const initialCategorySlug = useMemo(() => {
+    if (edit?.category?.slug) {
+      return edit.category.slug
+    }
+    if (categoryParam && baseCatOptions.some((option) => option.value === categoryParam)) {
+      return categoryParam
+    }
+    return ''
+  }, [baseCatOptions, categoryParam, edit?.category?.slug])
 
   const defaultValues = {
     isPastEvent,
     scope: initialScopeCode,
     name: edit?.name ?? '',
     image: edit?.image,
-    category: edit?.category?.slug ?? '',
+    category: initialCategorySlug,
     description: {
       pure: edit ? '12345678910' : '',
       json: edit?.json_description ?? '',
@@ -181,7 +194,10 @@ const useEventFormData = ({ edit }: EventFormProps) => {
   const selectedScopeData = useMemo(() => scopes.data?.list?.find((x) => x.code === selectedScope), [scopes.data, selectedScope])
 
   /** Mémoïsé une fois par `selectedScope` : réutilisé pour le select et pour l’effet de cohérence (pas d’appels redondés à `getVisibilityOptions` dans l’effet). */
-  const visibilityOptions = useMemo(() => getVisibilityOptions(selectedScopeData), [selectedScopeData])
+  const visibilityOptions = useMemo(
+    () => (canCreateAsCadre ? getVisibilityOptions(selectedScopeData) : getPublicOnlyVisibilityOptions()),
+    [canCreateAsCadre, selectedScopeData],
+  )
 
   const catOptions: SelectOption<string>[] = useMemo(() => {
     if (!selectedScope?.startsWith('agora_')) {
@@ -211,6 +227,16 @@ const useEventFormData = ({ edit }: EventFormProps) => {
    */
   const prevIsAgoraLeaderRef = useRef(isAgoraLeader)
   useEffect(() => {
+    if (!canCreateAsCadre) {
+      if (getValues('visibility') !== 'public') {
+        setValue('visibility', 'public', { shouldValidate: true })
+      }
+      if (getValues('hidden')) {
+        setValue('hidden', false, { shouldValidate: true })
+      }
+      return
+    }
+
     const scope = selectedScope
     if (!scope) return
 
@@ -238,7 +264,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     if (scope.startsWith('agora_') && getValues('mode') !== 'online') {
       setValue('mode', 'online', { shouldValidate: true })
     }
-  }, [edit, getValues, isAgoraLeader, selectedScope, setValue, visibilityOptions])
+  }, [canCreateAsCadre, edit, getValues, isAgoraLeader, selectedScope, setValue, visibilityOptions])
 
   useEffect(() => {
     if (visibility === 'invitation' && getValues('hidden')) {
@@ -255,6 +281,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
 
   const finalSubmit: SubmitHandler<EventFormData> = async (data) => {
     const { scope, image, mode, visio_url, post_address, ...payload } = data
+    const eventScope = scope || undefined
     const fullScope = scopes.data?.list?.find((x) => x.code === scope) ?? { attributes: { committees: edit?.committee, agoras: edit?.agoras } }
     try {
       const newEvent = await mutateAsync({
@@ -270,7 +297,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
           committee: fullScope?.attributes?.committees?.[0]?.uuid ?? null,
           agora: agoraUuid,
         },
-        scope,
+        scope: eventScope,
       })
 
       let errorImage = false
@@ -346,6 +373,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     agoraUuid,
     committeeUuid,
     scope: selectedScope,
+    canCreateAsCadre,
   })
 
   const modalBeforeSubmit = handleSubmit(() => present())
@@ -359,6 +387,7 @@ const useEventFormData = ({ edit }: EventFormProps) => {
     isUploadImagePending,
     isUploadDeletePending,
     scopeOptions,
+    canCreateAsCadre,
     catOptions,
     mode: mode ?? (isAgoraScope ? 'online' : 'meeting'),
     visibility: visibility ?? defaultVisibilityForScope,

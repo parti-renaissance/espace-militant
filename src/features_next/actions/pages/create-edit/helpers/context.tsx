@@ -1,5 +1,5 @@
 import { createContext, useContext, useRef } from 'react'
-import { type Href, useRouter } from 'expo-router'
+import { type Href, useLocalSearchParams, useRouter } from 'expo-router'
 import { addHours } from 'date-fns'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type Control, type FieldPath, useForm } from 'react-hook-form'
@@ -7,10 +7,10 @@ import { type Control, type FieldPath, useForm } from 'react-hook-form'
 import VoxSimpleModal from '@/components/VoxSimpleModal'
 import { ActionFormError } from '@/services/actions/error'
 import { useActionMutation, useCancelAction } from '@/services/actions/hook'
-import { logActionMutation, logActionMutationError } from '@/services/actions/logActionMutation'
 import { mapActionFormToPostRequest, mapRestActionFullToFormDefaults, type ActionFormValues } from '@/services/actions/paramsMapper'
 import { ActionType, RestActionFull } from '@/services/actions/schema'
 
+import { useActionConfirmAlert } from '../components/ActionConfirmAlert'
 import { actionFormSchema } from './schema'
 
 export type ActionFormProps = {
@@ -39,19 +39,25 @@ export function useActionFormContext() {
   return ctx
 }
 
+const isActionType = (value: string | undefined): value is ActionType =>
+  value != null && (Object.values(ActionType) as string[]).includes(value)
+
 export function ActionFormContextProvider({ edit, children }: ActionFormProps & { children: React.ReactNode }) {
   const router = useRouter()
+  const { type: typeParam } = useLocalSearchParams<{ type?: string }>()
   const cancelModalRef = useRef<React.ComponentRef<typeof VoxSimpleModal>>(null)
+  const initialType = !edit && isActionType(typeParam) ? typeParam : ActionType.PAP
 
   const { control, handleSubmit, reset, setError } = useForm<ActionFormValues>({
     resolver: zodResolver(actionFormSchema),
     defaultValues: edit
       ? mapRestActionFullToFormDefaults(edit)
       : {
-          type: ActionType.PAP,
+          type: initialType,
           date: addHours(new Date(), 1),
           post_address: { address: '', postal_code: '', city_name: '', country: '' },
           description: '',
+          send_invitation_email: true,
         },
   })
 
@@ -59,23 +65,19 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
   const cancelMutation = useCancelAction()
   const editMode = Boolean(edit)
 
-  const onSubmit = handleSubmit(
+  const finalSubmit = handleSubmit(
     (values) => {
       const payload = mapActionFormToPostRequest(values)
-      logActionMutation(editMode ? 'form submit — update' : 'form submit — create', {
-        editId: edit?.uuid,
-        formValues: values,
-        payload,
-      })
       actionMutation
         .mutateAsync({ payload })
         .then((data) => {
-          logActionMutation('form submit — success', { uuid: data.uuid })
           reset(values)
-          router.replace({ pathname: '/actions/[id]', params: { id: data.uuid } })
+          router.replace({
+            pathname: '/actions/[id]',
+            params: { id: data.uuid, greet: editMode ? undefined : 'new' },
+          })
         })
         .catch((e) => {
-          logActionMutationError('form submit — catch', e)
           if (e instanceof ActionFormError) {
             e.violations.forEach((violation) => {
               const path = violation.propertyPath as FieldPath<ActionFormValues>
@@ -86,10 +88,16 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
           }
         })
     },
-    (validationErrors) => {
-      logActionMutation('form submit — validation client', { errors: validationErrors })
-    },
   )
+
+  const { ConfirmAlert, present } = useActionConfirmAlert({
+    onAccept: finalSubmit,
+    control,
+    isPending: actionMutation.isPending,
+  })
+
+  const modalBeforeSubmit = handleSubmit(() => present())
+  const onSubmit = editMode ? finalSubmit : modalBeforeSubmit
 
   const onConfirmCancel = () => {
     if (!edit?.uuid) return
@@ -116,6 +124,7 @@ export function ActionFormContextProvider({ edit, children }: ActionFormProps & 
       }}
     >
       {children}
+      {ConfirmAlert}
     </ActionFormContext.Provider>
   )
 }

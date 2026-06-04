@@ -22,6 +22,9 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
   snapPoints?: number[]
   withKeyboard?: boolean
   modalBreakpoint?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'gtXs' | 'gtSm' | 'gtMd' | 'gtLg' | 'gtXl'
+  closeOnBackdropPress?: boolean
+  contentBackgroundColor?: string
+  contentMaxWidth?: number
 }
 
 /**
@@ -42,6 +45,9 @@ export default function ModalOrPageBase({
   mobileBackdrop,
   withKeyboard = true,
   modalBreakpoint = 'gtMd',
+  closeOnBackdropPress = true,
+  contentBackgroundColor = 'white',
+  contentMaxWidth,
 }: ModalOrPageBaseProps) {
   const viewport = useMedia()
   const insets = useSafeAreaInsets()
@@ -53,18 +59,29 @@ export default function ModalOrPageBase({
   if (isModal) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
-        <Pressable style={styles.centeredView} onPress={(event) => event.target == event.currentTarget && onClose?.()}>
+        <View style={styles.centeredView}>
           <ScrollView contentContainerStyle={styles.scrollContainer} bounces={false} showsVerticalScrollIndicator={false}>
-            <View style={styles.modalView}>
-              {modalContent}
-              {shouldDisplayCloseButton ? (
-                <TouchableOpacity style={{ position: 'absolute', top: 0, right: 0, padding: 14 }} onPress={onClose}>
-                  <X />
-                </TouchableOpacity>
-              ) : null}
-            </View>
+            <Pressable
+              style={[styles.backdrop, !closeOnBackdropPress && styles.backdropNonDismissible]}
+              onPress={(event) => event.target === event.currentTarget && closeOnBackdropPress && onClose?.()}
+            >
+              <View
+                style={[
+                  styles.modalView,
+                  { backgroundColor: contentBackgroundColor },
+                  contentMaxWidth ? { maxWidth: contentMaxWidth, width: '100%' } : null,
+                ]}
+              >
+                {modalContent}
+                {shouldDisplayCloseButton ? (
+                  <TouchableOpacity style={{ position: 'absolute', top: 0, right: 0, padding: 14 }} onPress={onClose}>
+                    <X />
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </Pressable>
           </ScrollView>
-        </Pressable>
+        </View>
       </Modal>
     )
   }
@@ -78,13 +95,13 @@ export default function ModalOrPageBase({
       disableDrag={!allowDrag}
       moveOnKeyboardChange={withKeyboard}
       onOpenChange={(x) => {
-        if (!x) {
+        if (!x && closeOnBackdropPress) {
           onClose?.()
         }
       }}
     >
       {mobileBackdrop && <Sheet.Overlay animation="lazy" backgroundColor="$shadow6" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />}
-      <Sheet.Frame>
+      <Sheet.Frame flex={scrollable === false ? 1 : undefined} backgroundColor={contentBackgroundColor}>
         <BottomSheetModalProvider>
           {shouldDisplayCloseHeader && (
             <TouchableOpacity style={[styles.header, { paddingTop: insets.top }]} onPress={onClose}>
@@ -102,7 +119,7 @@ export default function ModalOrPageBase({
               scrollEnabled={scrollable}
               keyboardShouldPersistTaps={'handled'}
               automaticallyAdjustKeyboardInsets={withKeyboard}
-              backgroundColor={'white'}
+              backgroundColor={contentBackgroundColor}
               contentContainerStyle={{
                 flexGrow: 1,
                 paddingBottom: insets.bottom,
@@ -124,10 +141,17 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  backdrop: {
+    flexGrow: 1,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
     cursor: 'pointer',
+  },
+  backdropNonDismissible: {
+    cursor: 'default',
   },
   modalView: {
     backgroundColor: 'white',
@@ -154,7 +178,5 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 })

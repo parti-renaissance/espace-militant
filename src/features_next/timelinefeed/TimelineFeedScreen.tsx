@@ -8,16 +8,18 @@ import { useDebouncedCallback } from 'use-debounce'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
-import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import { FeedCard } from '@/components/Cards'
 import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
-import AppDownloadCTA from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
+import AppDownloadCTA, { type AppDownloadCTASize } from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
 import { MyProfileCardNoLinks } from '@/components/ProfileCards/ProfileCard/MyProfileCard'
+import Title from '@/components/Title/Title'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import { syncTimelinePostVideoVisibility } from '@/features_next/video/helpers/syncTimelinePostVideoVisibility'
 
+import { useSession } from '@/ctx/SessionProvider'
 import { transformFeedItemToProps } from '@/helpers/homeFeed'
 import { useAlerts } from '@/services/alerts/hook'
 import { useHits } from '@/services/hits/hook'
@@ -28,13 +30,14 @@ import { FEATURES } from '@/utils/Scopes'
 
 import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
-import { OnboardConditional } from './components/OnboardConditional'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 
 const TimelineFeedCard = memo((item: RestTimelineFeedItem) => {
   const props = transformFeedItemToProps(item)
+
+  if (!props) return null
 
   if (Platform.OS === 'web' && props) {
     return (
@@ -88,54 +91,69 @@ const TimelineFeedMain = () => {
 
   const hasAlerts = useMemo(() => alerts.length > 0, [alerts.length])
   const hasPublications = useMemo(() => hasFeature(FEATURES.PUBLICATIONS), [hasFeature])
-  const shouldShowHeader = useMemo(() => hasAlerts || shouldShowNotificationCard || hasPublications, [hasAlerts, shouldShowNotificationCard, hasPublications])
+  const hasContentAboveTitle = shouldShowNotificationCard || hasAlerts
 
   const header = useMemo(
-    () =>
-      shouldShowHeader ? (
-        <YStack gap={media.sm ? 8 : 16}>
-          {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
-          {hasAlerts ? <AlertStack alerts={alerts} /> : null}
-          {hasAlerts || hasPublications ? (
-            <XStack justifyContent="space-between" alignItems="center" px={media.sm ? '$medium' : '$0'}>
-              <Text.MD color="$gray4" semibold>
-                Dernières actualités
-              </Text.MD>
-              {hasPublications && (
-                <Link href="/publications" asChild>
-                  <VoxButton variant="soft" size="sm" theme="purple" iconLeft={Sparkle}>
-                    Nouvelle publication
-                  </VoxButton>
-                </Link>
-              )}
-            </XStack>
+    () => (
+      <YStack gap={media.sm ? 8 : 16}>
+        {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
+        {hasAlerts ? <AlertStack alerts={alerts} /> : null}
+        <XStack
+          justifyContent="space-between"
+          alignItems="center"
+          px={media.sm ? '$medium' : '$0'}
+          pt={hasContentAboveTitle ? undefined : '$large'}
+          flexWrap="wrap"
+          gap="$medium"
+        >
+          <Title size="h1" aria-label="Des (bonnes) Nouvelles">
+            <Title.Text>Des (bonnes)</Title.Text>
+            <Title.Highlight>Nouvelles</Title.Highlight>
+          </Title>
+          {hasPublications ? (
+            <Link href="/publications" asChild>
+              <VoxButton variant="soft" size="sm" theme="pink" iconLeft={Sparkle}>
+                Nouvelle publication
+              </VoxButton>
+            </Link>
           ) : null}
-        </YStack>
-      ) : null,
-    [shouldShowHeader, shouldShowNotificationCard, hasAlerts, hasPublications, alerts, media.sm],
+        </XStack>
+      </YStack>
+    ),
+    [shouldShowNotificationCard, hasAlerts, hasPublications, hasContentAboveTitle, alerts, media.sm],
   )
 
-  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    if (Platform.OS !== 'web') {
-      viewableItems.forEach((viewToken) => {
-        if (viewToken.isViewable && viewToken.item) {
-          trackImpression({
-            object_type: viewToken.item.type,
-            object_id: viewToken.item.objectID,
-            source: 'page_timeline',
-          })
-        }
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems, changed }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+      syncTimelinePostVideoVisibility({
+        viewableItems: viewableItems as ViewToken<RestTimelineFeedItem>[],
+        changed: changed as ViewToken<RestTimelineFeedItem>[],
       })
-    }
-  }, [])
+
+      if (Platform.OS !== 'web') {
+        viewableItems.forEach((viewToken) => {
+          if (viewToken.isViewable && viewToken.item) {
+            trackImpression({
+              object_type: viewToken.item.type,
+              object_id: viewToken.item.objectID,
+              source: 'page_timeline',
+            })
+          }
+        })
+      }
+    },
+    [trackImpression],
+  )
 
   const viewabilityConfig = useMemo(
     () => ({
-      itemVisiblePercentThreshold: 50,
+      viewAreaCoveragePercentThreshold: 50,
       minimumViewTime: 400,
     }),
     [],
   )
+
+  const viewabilityConfigCallbackPairs = useMemo(() => [{ viewabilityConfig, onViewableItemsChanged }], [onViewableItemsChanged, viewabilityConfig])
 
   return (
     <LayoutFlatList<RestTimelineFeedItem>
@@ -145,8 +163,7 @@ const TimelineFeedMain = () => {
       renderItem={renderFeedItem}
       keyExtractor={(item) => item.objectID}
       ListHeaderComponent={header}
-      onViewableItemsChanged={onViewableItemsChanged}
-      viewabilityConfig={viewabilityConfig}
+      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs}
       refreshing={isManualRefreshing}
       onRefresh={handleManualRefresh}
       onEndReached={loadMore}
@@ -168,10 +185,11 @@ const TimelineFeedMain = () => {
 
 const TimelineFeedScreen = () => {
   const media = useMedia()
+  const { isAuth } = useSession()
+  const appDownloadSize: AppDownloadCTASize = isAuth ? 'medium' : 'large'
 
   return (
     <>
-      <OnboardConditional />
       <Layout.Main>
         <BoundarySuspenseWrapper fallback={<HomeFeedMainSkeleton />}>
           <TimelineFeedMain />
@@ -189,14 +207,14 @@ const TimelineFeedScreen = () => {
                     <DefaultErrorFallback {...error} />
                   </VoxCard.Content>
                 </VoxCard>
-                <AppDownloadCTA />
+                <AppDownloadCTA size={appDownloadSize} />
               </YStack>
             )}
           >
             <ScrollView contentContainerStyle={{ height: '100dvh' }}>
               <YStack alignItems="center" justifyContent="center" gap="$medium">
                 <MyProfileCardNoLinks />
-                <AppDownloadCTA />
+                <AppDownloadCTA size={appDownloadSize} />
               </YStack>
             </ScrollView>
           </BoundarySuspenseWrapper>

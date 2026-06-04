@@ -1,22 +1,28 @@
 import { ComponentProps } from 'react'
+import { Link } from 'expo-router'
+
 import { VoxButton } from '@/components/Button'
+
 import { useSession } from '@/ctx/SessionProvider'
 
 export const SignInButton = (props: Omit<ComponentProps<typeof VoxButton>, 'children'> & { redirectUri?: string }) => {
   const { signIn } = useSession()
+  const { redirectUri, ...buttonProps } = props
+
   return (
-    <VoxButton onPress={() => signIn({ state: props.redirectUri })} variant="text" size="md" {...props}>
+    <VoxButton onPress={() => signIn(redirectUri ? { state: redirectUri } : undefined)} variant="text" size="md" {...buttonProps}>
       Me connecter
     </VoxButton>
   )
 }
 
 export const SignUpButton = (props: Omit<ComponentProps<typeof VoxButton>, 'children'>) => {
-  const { signUp } = useSession()
   return (
-    <VoxButton onPress={() => signUp()} variant="outlined" size="md" theme="yellow" {...props}>
-      Adhérer
-    </VoxButton>
+    <Link href="/(signup)/bienvenue" asChild>
+      <VoxButton variant="text" size="md" theme="blue" {...props}>
+        Je crée mon compte
+      </VoxButton>
+    </Link>
   )
 }
 

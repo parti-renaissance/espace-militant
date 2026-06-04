@@ -37,7 +37,7 @@ export const EventParticipantsTable = ({ eventId, displayInvitationStatus = fals
 
   return (
     <YStack flex={1}>
-      <XStack flex={1} width="100%" theme="purple">
+      <XStack flex={1} width="100%" theme="pink">
         <Table.ScrollView splited="top" flex={1} horizontal>
           <Table.Col maxWidth={250}>
             <Table.Row.Header>
@@ -228,7 +228,7 @@ export const TableSkeleton = () => {
   const items = new Array(10).fill('') as string[]
   return (
     <YStack flex={1}>
-      <XStack flex={1} width="100%" theme="purple">
+      <XStack flex={1} width="100%" theme="pink">
         <Table splited="start">
           <Table.Col maxWidth={250}>
             <Table.Row.Header>

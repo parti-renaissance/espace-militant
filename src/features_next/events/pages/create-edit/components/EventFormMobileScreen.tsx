@@ -29,6 +29,7 @@ export default function EventFormMobileScreen() {
     navigation,
     onSubmit,
     scopeOptions,
+    canCreateAsCadre,
     control,
     visibilityOptions,
     catOptions,
@@ -75,7 +76,7 @@ export default function EventFormMobileScreen() {
               <VoxHeader.Title>{`${editMode ? 'Modifier' : 'Créer'} l'événement`}</VoxHeader.Title>
             </XStack>
             <XStack>
-              <VoxButton onPress={() => onSubmit()} size="md" theme="purple" loading={isPending} iconLeft={editMode ? undefined : Sparkle}>
+              <VoxButton onPress={() => onSubmit()} size="md" theme="pink" loading={isPending} iconLeft={editMode ? undefined : Sparkle}>
                 {[isUploadImagePending, isUploadDeletePending, isPending].every((x) => x === false) ? `${editMode ? 'Modifier' : 'Créer'}` : null}
                 {isUploadImagePending ? 'image...' : null}
                 {isUploadDeletePending ? 'image...' : null}
@@ -94,7 +95,13 @@ export default function EventFormMobileScreen() {
                 </MessageCard>
               )}
               <VoxCard.Content>
-                <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} />
+                <EventScopeSelect
+                  editMode={editMode}
+                  control={control}
+                  isAuthor={isAuthor}
+                  scopeOptions={scopeOptions}
+                  canCreateAsCadre={canCreateAsCadre}
+                />
                 <YStack>
                   <Controller
                     render={({ field, fieldState }) => {
@@ -128,19 +135,22 @@ export default function EventFormMobileScreen() {
                           options={visibilityOptions}
                           onChange={field.onChange}
                           onBlur={field.onBlur}
+                          disabled={!canCreateAsCadre}
                         />
                       )
                     }}
                     control={control}
                     name="visibility"
                   />
-                  <Controller
-                    render={({ field }) => {
-                      return <EventHiddenField value={field.value} onChange={field.onChange} disabled={visibility === 'invitation'} />
-                    }}
-                    control={control}
-                    name="hidden"
-                  />
+                  {canCreateAsCadre ? (
+                    <Controller
+                      render={({ field }) => {
+                        return <EventHiddenField value={field.value} onChange={field.onChange} disabled={visibility === 'invitation'} />
+                      }}
+                      control={control}
+                      name="hidden"
+                    />
+                  ) : null}
                 </YStack>
 
                 <Controller

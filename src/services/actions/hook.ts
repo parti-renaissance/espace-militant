@@ -10,7 +10,7 @@ import type { RestProfilResponse } from '@/services/profile/schema'
 
 import * as api from './api'
 import { ActionFormError } from './error'
-import { getActionMutationErrorMessage, logActionMutation, logActionMutationError } from './logActionMutation'
+import { getActionMutationErrorMessage, logActionMutationError } from './logActionMutation'
 import type { RestPostActionRequest } from './schema'
 import { isFullAction, RestAction, RestActionFull, RestActionParticipant } from './schema'
 
@@ -34,13 +34,16 @@ const patchHubActionItems = (
   updater: (item: RestHubItem) => RestHubItem,
 ) => {
   queryClient.setQueriesData<InfiniteData<RestPagination<RestHubItem>>>({ queryKey: ['hub'] }, (old) => {
-    if (!old) return old
+    if (!old || !Array.isArray(old.pages)) return old
     return {
       ...old,
-      pages: old.pages.map((page) => ({
-        ...page,
-        items: page.items.map((item) => (item.uuid === actionId && isHubActionItem(item) ? updater(item) : item)),
-      })),
+      pages: old.pages.map((page) => {
+        if (!Array.isArray(page.items)) return page
+        return {
+          ...page,
+          items: page.items.map((item) => (item.uuid === actionId && isHubActionItem(item) ? updater(item) : item)),
+        }
+      }),
     }
   })
 }
@@ -54,20 +57,24 @@ const optimisticToggleSubscribeOnCaches = (
   const updateAction: helpers.OptimisticItemUpdater<RestAction | RestActionFull> = (old) => {
     if (!old) return undefined
 
+    const participant = createParticipant(me)
+
     return {
       ...old,
       user_registered_at: subscribe ? new Date() : null,
       ...(isFullAction(old)
         ? {
+            // Some stale caches can miss participants at runtime.
             participants: subscribe
-              ? [createParticipant(me), ...old.participants]
-              : old.participants.filter((x) => x.adherent.uuid !== me.uuid),
+              ? [participant, ...(old.participants ?? [])]
+              : (old.participants ?? []).filter((x) => x.adherent.uuid !== me.uuid),
           }
         : {
             participants_count: old.participants_count + (subscribe ? 1 : -1),
+            // Some stale caches can miss first_participants at runtime.
             first_participants: subscribe
-              ? [createParticipant(me), ...old.first_participants]
-              : old.first_participants.filter((x) => x.adherent.uuid !== me.uuid),
+              ? [participant, ...(old.first_participants ?? [])]
+              : (old.first_participants ?? []).filter((x) => x.adherent.uuid !== me.uuid),
           }),
     }
   }
@@ -98,14 +105,12 @@ export const useActionMutation = ({ actionId }: { actionId?: string } = {}) => {
 
   return useMutation({
     mutationFn: ({ payload }: { payload: RestPostActionRequest }) => {
-      logActionMutation(isEdit ? 'mutationFn — update' : 'mutationFn — create', { actionId, payload })
       if (isEdit && actionId) {
         return api.updateAction({ id: actionId, payload })
       }
       return api.createAction(payload)
     },
     onSuccess: (data) => {
-      logActionMutation(isEdit ? 'onSuccess — update' : 'onSuccess — create', { uuid: data.uuid })
       const message = isEdit ? 'L’action a bien été modifiée' : 'L’action a bien été créée'
       toast.show('Succès', { message, type: 'success' })
       queryClient.setQueryData([QUERY_KEY_ACTION, data.uuid], data)
@@ -150,14 +155,15 @@ export const useSubscribeAction = (id?: string) => {
   const toast = useToastController()
   const user = useGetSuspenseProfil()
 
-  if (!user.data) {
-    throw new Error("L'utilisateur est introuvable")
-  }
-
   return useMutation({
-    mutationFn: () => (id ? api.subscribeToAction(id) : Promise.reject(new Error('No id provided'))),
+    mutationFn: () => {
+      if (!user.data) {
+        return Promise.reject(new Error("L'utilisateur est introuvable"))
+      }
+      return id ? api.subscribeToAction(id) : Promise.reject(new Error('No id provided'))
+    },
     onSuccess: () => {
-      if (id) {
+      if (id && user.data) {
         optimisticToggleSubscribeOnCaches(user.data, true, id, queryClient)
       }
       toast.show('Succès', { message: 'Inscription à l’action réussie', type: 'success' })
@@ -176,14 +182,15 @@ export const useUnsubscribeAction = (id?: string) => {
   const toast = useToastController()
   const user = useGetSuspenseProfil()
 
-  if (!user.data) {
-    throw new Error("L'utilisateur est introuvable")
-  }
-
   return useMutation({
-    mutationFn: () => (id ? api.unsubscribeFromAction(id) : Promise.reject(new Error('No id provided'))),
+    mutationFn: () => {
+      if (!user.data) {
+        return Promise.reject(new Error("L'utilisateur est introuvable"))
+      }
+      return id ? api.unsubscribeFromAction(id) : Promise.reject(new Error('No id provided'))
+    },
     onSuccess: () => {
-      if (id) {
+      if (id && user.data) {
         optimisticToggleSubscribeOnCaches(user.data, false, id, queryClient)
       }
       toast.show('Succès', { message: 'Désinscription de l’action réussie', type: 'success' })

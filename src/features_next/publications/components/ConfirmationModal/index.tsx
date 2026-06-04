@@ -148,10 +148,10 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
               <VoxCard.Content justifyContent="center" alignItems="center" gap="$small" h={112}>
                 {isLoadingNumbers ? (
                   <View alignItems="center" justifyContent="center" height={52}>
-                    <Spinner color="$purple5" />
+                    <Spinner color="$pink5" />
                   </View>
                 ) : (
-                  <Text color="$purple5" fontSize={40} lineHeight={52} semibold>
+                  <Text color="$pink5" fontSize={40} lineHeight={52} semibold>
                     {recipients?.contacts ?? 0}
                   </Text>
                 )}
@@ -165,9 +165,9 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
                 <VoxCard.Content>
                   <XStack gap="$xsmall" alignItems="center" height={20}>
                     {isLoadingNumbers ? (
-                      <Spinner color="$purple5" />
+                      <Spinner color="$pink5" />
                     ) : (
-                      <Text.LG color="$purple5" semibold>
+                      <Text.LG color="$pink5" semibold>
                         {recipients?.push ?? 0}
                       </Text.LG>
                     )}
@@ -181,9 +181,9 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
                 <VoxCard.Content>
                   <XStack gap="$xsmall" alignItems="center" height={20}>
                     {isLoadingNumbers ? (
-                      <Spinner color="$purple5" />
+                      <Spinner color="$pink5" />
                     ) : (
-                      <Text.LG color="$purple5" semibold>
+                      <Text.LG color="$pink5" semibold>
                         {recipients?.email ?? 0}
                       </Text.LG>
                     )}
@@ -197,9 +197,9 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
                 <VoxCard.Content>
                   <XStack gap="$xsmall" alignItems="center" height={20}>
                     {isLoadingNumbers ? (
-                      <Spinner color="$purple5" />
+                      <Spinner color="$pink5" />
                     ) : (
-                      <Text.LG color="$purple5" semibold>
+                      <Text.LG color="$pink5" semibold>
                         {recipients?.push_email ?? 0}
                       </Text.LG>
                     )}
@@ -282,7 +282,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
             Retour à l'édition
           </VoxButton>
           <VoxButton
-            theme="purple"
+            theme="pink"
             variant="contained"
             iconRight={SendHorizontal}
             onPress={handleSendMessage}

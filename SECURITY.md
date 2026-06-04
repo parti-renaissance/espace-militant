@@ -1,4 +1,4 @@
-# Politique de sécurité — Renaissance App
+# Politique de sécurité — Attal Président App
 
 ## Versions supportées
 
@@ -40,7 +40,7 @@ Envoyer un email à **security@parti-renaissance.fr** avec :
 
 ### Dans le périmètre de cette politique
 
-- Application mobile iOS et Android (Renaissance App)
+- Application mobile iOS et Android (Attal Président App)
 - Application web
 - Deep links : schémas `vox://`, `vox-staging://`, `vox-dev://`
 - Authentification OAuth 2.0 (flux PKCE via `expo-auth-session`)

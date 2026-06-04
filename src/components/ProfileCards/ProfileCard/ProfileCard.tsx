@@ -52,7 +52,7 @@ export default function ProfileCard({ firstName = '', lastName = '', tags, onBut
 
         {onButtonPress && (
           <YStack>
-            <VoxButton width="100%" pop variant="soft" theme="purple" iconLeft={Repeat} onPress={onButtonPress}>
+            <VoxButton width="100%" pop variant="soft" theme="pink" iconLeft={Repeat} onPress={onButtonPress}>
               Mon espace cadre
             </VoxButton>
           </YStack>

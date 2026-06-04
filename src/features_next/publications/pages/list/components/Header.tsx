@@ -22,7 +22,7 @@ function HeaderTop({ handleCreatePublication }: { handleCreatePublication: () =>
         <Text.LG semibold>Mes publications</Text.LG>
         <Text.SM secondary>Gérez et analyser vos publications depuis votre tableau de bord</Text.SM>
       </YStack>
-      <VoxButton variant="soft" theme="purple" iconLeft={Sparkle} size="lg" onPress={handleCreatePublication}>
+      <VoxButton variant="soft" theme="pink" iconLeft={Sparkle} size="lg" onPress={handleCreatePublication}>
         {media.md ? 'Envoyer' : 'Envoyer une publication'}
       </VoxButton>
     </XStack>

@@ -1,0 +1,94 @@
+import { useCallback, useState, type RefObject } from 'react';
+import { Keyboard, type NativeSyntheticEvent } from 'react-native';
+import { Input, isWeb, View, YStack } from 'tamagui';
+import { ArrowUpRight, Square } from '@tamagui/lucide-icons';
+
+import { VoxButton } from '@/components/Button/Button';
+
+import { INPUT_MAX_HEIGHT, useAutoGrowTextarea } from '@/hooks/chat/useAutoGrowTextarea';
+import { useEnterKeySubmit } from '@/hooks/chat/useEnterKeySubmit';
+import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef';
+
+type Props = {
+  inputRef: RefObject<TamaguiInputRef | null>
+  value: string
+  isLoading: boolean
+  placeholder?: string
+  maxLength?: number
+  onChange: (value: string) => void
+  onSubmit: () => void
+  onStop: () => void
+}
+
+export function ChatInput({ inputRef, value, isLoading, placeholder = 'Posez votre question…', maxLength, onChange, onSubmit, onStop }: Props) {
+  const [isFocused, setIsFocused] = useState(false)
+
+  useEnterKeySubmit(inputRef, onSubmit)
+  useAutoGrowTextarea(inputRef, value)
+
+  const handleKeyPress = useCallback(
+    (e: NativeSyntheticEvent<{ key: string; shiftKey?: boolean }>) => {
+      if (!isWeb) return
+      const { key, shiftKey } = e.nativeEvent
+      if (key === 'Enter' && !shiftKey) {
+        e.preventDefault?.()
+        onSubmit()
+        return false
+      }
+    },
+    [onSubmit],
+  )
+
+  const handleNativeSubmit = useCallback(() => {
+    if (!isWeb) Keyboard.dismiss()
+    onSubmit()
+  }, [onSubmit])
+
+  return (
+    <YStack
+      animation="quick"
+      backgroundColor="$white1"
+      borderColor="$textOutline"
+      borderWidth={1}
+      shadowColor="$blue7"
+      shadowOpacity={isFocused ? 0.15 : 0}
+      shadowRadius={isFocused ? 12 : 0}
+      shadowOffset={{ width: 0, height: isFocused ? 4 : 0 }}
+      borderRadius={24}
+      overflow="hidden"
+    >
+      <View paddingTop={8}>
+        <Input
+          ref={inputRef}
+          multiline
+          value={value}
+          onChangeText={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onKeyPress={!isWeb ? handleKeyPress : undefined}
+          onSubmitEditing={isWeb ? undefined : handleNativeSubmit}
+          borderWidth={0}
+          focusStyle={{ outlineWidth: 0 }}
+          maxHeight={INPUT_MAX_HEIGHT}
+          maxLength={maxLength}
+          verticalAlign="top"
+          placeholder={placeholder}
+          placeholderTextColor="$textSecondary"
+          autoFocus
+          editable
+        />
+      </View>
+      <View flex={1} pt={4} mb={16} paddingHorizontal={16} flexDirection="row" gap="$small" justifyContent="flex-end" alignItems="center">
+        <VoxButton
+          theme="blue"
+          onPress={isLoading ? onStop : onSubmit}
+          iconLeft={isLoading ? Square : ArrowUpRight}
+          shrink
+          disabled={!isLoading && !value.trim()}
+        />
+      </View>
+    </YStack>
+  )
+}
+
+export default ChatInput

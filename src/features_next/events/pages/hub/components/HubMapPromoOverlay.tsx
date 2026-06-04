@@ -4,8 +4,8 @@ import { useRouter } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { List, Map } from '@tamagui/lucide-icons'
 
-import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import Title from '@/components/Title/Title'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 type HubMapPromoOverlayProps = {
@@ -28,14 +28,18 @@ export const HubMapPromoOverlay = memo(function HubMapPromoOverlay({ leadingAcce
       <VoxCard flexShrink={1} width="100%" maxWidth={media.gtXs ? 340 : undefined} borderRadius={16}>
         <VoxCard.Content>
           <YStack gap="$small">
-            <Text.MD semibold>Trouvez l’événement qui vous convient</Text.MD>
-            <Text.MD secondary>Participez à nos meetings et mobilisez-vous sur le terrain avec la communauté militante.</Text.MD>
+            <Title size="h1">
+              <Title.Text>Trouvez </Title.Text>
+              <Title.Highlight>l’événement</Title.Highlight>
+              <Title.Break />
+              <Title.Highlight>qui vous convient</Title.Highlight>
+            </Title>
           </YStack>
-          <XStack gap="$small" justifyContent={media.gtSm ? 'space-between' : 'flex-start'}>
-            <VoxButton variant="outlined" theme="blue" size="md" iconLeft={Map} onPress={onOpenFullMap}>
+          <XStack gap="$small" width="100%" flexWrap="wrap">
+            <VoxButton variant="outlined" theme="blue" size="md" flexGrow={1} iconLeft={Map} onPress={onOpenFullMap}>
               Ouvrir la carte
             </VoxButton>
-            <VoxButton variant="contained" theme="blue" size="md" iconLeft={List} onPress={onOpenList}>
+            <VoxButton variant="contained" theme="blue" size="md" flexGrow={1} iconLeft={List} onPress={onOpenList}>
               Ouvrir la liste
             </VoxButton>
           </XStack>

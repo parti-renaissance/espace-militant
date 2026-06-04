@@ -1,4 +1,4 @@
-# Renaissance App
+# Attal Président App
 
 **Application universelle d'engagement civique et militant — iOS · Android · Web**
 
@@ -8,7 +8,7 @@
 
 ---
 
-Renaissance App est l'application mobile et web officielle de Renaissance. Elle permet aux militants et sympathisants d'accéder à leurs actions locales, événements, actualités et outils d'engagement — sur iOS, Android et le web depuis une base de code unique.
+Attal Président App est l'application mobile et web officielle d'Attal Président. Elle permet aux militants et sympathisants d'accéder à leurs actions locales, événements, actualités et outils d'engagement — sur iOS, Android et le web depuis une base de code unique.
 
 > **⚠️ Contributeurs : lisez ceci avant d'écrire du code UI.**
 >
@@ -49,7 +49,7 @@ L'application utilise trois profils EAS :
 | ----------- | ------------ | ---------------- |
 | Development | Vox Dev      | `vox-dev://`     |
 | Staging     | _(variable)_ | `vox-staging://` |
-| Production  | Renaissance  | `vox://`         |
+| Production  | Attal Président  | `vox://`         |
 
 ## Prérequis
 
@@ -97,7 +97,7 @@ Les variables préfixées `EXPO_PUBLIC_` sont **intégrées dans le binaire** au
 
 | Variable                           | Description                                                                                                                                   |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `EXPO_PUBLIC_API_BASE_URL`         | URL de base de l'API Renaissance Plateforme                                                                                                   |
+| `EXPO_PUBLIC_API_BASE_URL`         | URL de base de l'API Attal Président Plateforme                                                                                                   |
 | `EXPO_PUBLIC_OAUTH_BASE_URL`       | URL du serveur d'authentification OAuth                                                                                                       |
 | `EXPO_PUBLIC_OAUTH_CLIENT_ID`      | Client ID OAuth 2.0 (public)                                                                                                                  |
 | `EXPO_PUBLIC_ASSOCIATED_DOMAIN`    | Domaine pour les universal links                                                                                                              |

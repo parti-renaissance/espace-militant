@@ -7,7 +7,7 @@ import type { User } from '@/store/user-store'
 export type AuthContextType = {
   signIn: (props?: { code?: string; isAdmin?: boolean; state?: string }) => Promise<void>
   signOut: () => Promise<void>
-  signUp: (props?: { utm_campaign?: string }) => Promise<void>
+  signUp: () => Promise<void>
   isAuth: boolean
   isAdmin: boolean
   session?: User | null

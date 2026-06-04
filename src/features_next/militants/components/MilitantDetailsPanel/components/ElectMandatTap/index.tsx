@@ -143,7 +143,7 @@ function MandatsTagsSection({ isLoading, canSeeElectedRepresentative, electManda
       {!canSeeElectedRepresentative &&
         electMandatesList.map((mandate, index) => (
           <Chip key={mandate.code ?? `${mandate.label}-${index}`} theme="orange">
-            <Text.SM color="$color5" semibold>
+            <Text.SM color="$color7" semibold>
               {mandate.label}
             </Text.SM>
           </Chip>
@@ -152,7 +152,7 @@ function MandatsTagsSection({ isLoading, canSeeElectedRepresentative, electManda
         <Chip key={tag.code ?? `${tag.label}-${index}`} theme="orange">
           <XStack gap={4} alignItems="center">
             <CotisationIconByCode code={tag.code} />
-            <Text.SM color="$color5" semibold>
+            <Text.SM color="$color7" semibold>
               {tag.label}
             </Text.SM>
           </XStack>
@@ -192,7 +192,7 @@ function DeclaredMandatesSection({ isLoading, declaredMandates, declarationLabel
       <XStack gap="$small" flexWrap="wrap">
         {declaredMandates.map((mandate) => (
           <Chip key={mandate} theme="orange" outlined>
-            <Text.SM color="$color5" semibold>
+            <Text.SM color="$color7" semibold>
               {declarationLabels.get(mandate) ?? mandate}
             </Text.SM>
           </Chip>

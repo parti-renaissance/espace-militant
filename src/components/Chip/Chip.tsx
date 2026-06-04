@@ -37,7 +37,7 @@ const Chip = ({ children, icon, ...props }: ChipProps & { icon?: IconComponent }
   const Icon = icon
   const content =
     typeof children === 'string' ? (
-      <Text.SM semibold color={props.alert ? 'white' : '$color5'}>
+      <Text.SM semibold color={props.alert ? 'white' : '$color7'}>
         {children}
       </Text.SM>
     ) : (
@@ -46,7 +46,7 @@ const Chip = ({ children, icon, ...props }: ChipProps & { icon?: IconComponent }
 
   return (
     <ChipFrame {...props} theme={props.theme ?? 'gray'}>
-      {Icon && <Icon color={props.alert ? 'white' : '$color5'} testID="chip-icon" size={12} />}
+      {Icon && <Icon color={props.alert ? 'white' : '$color7'} testID="chip-icon" size={12} />}
       {content}
     </ChipFrame>
   )

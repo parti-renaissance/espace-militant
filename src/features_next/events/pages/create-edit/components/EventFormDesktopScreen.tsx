@@ -28,6 +28,7 @@ const EventFormAside = () => {
   const {
     isPastEvent,
     scopeOptions,
+    canCreateAsCadre,
     control,
     editMode,
     visibilityOptions,
@@ -43,7 +44,7 @@ const EventFormAside = () => {
 
   return (
     <YStack gap="$medium">
-      <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} />
+      <EventScopeSelect editMode={editMode} control={control} isAuthor={isAuthor} scopeOptions={scopeOptions} canCreateAsCadre={canCreateAsCadre} />
       <YStack gap="$xsmall">
         <Controller
           render={({ field, fieldState }) => {
@@ -57,6 +58,7 @@ const EventFormAside = () => {
                 options={visibilityOptions}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
+                disabled={!canCreateAsCadre}
               />
             )
           }}
@@ -64,13 +66,15 @@ const EventFormAside = () => {
           name="visibility"
         />
 
-        <Controller
-          render={({ field }) => {
-            return <EventHiddenField value={field.value} onChange={field.onChange} disabled={visibility === 'invitation'} />
-          }}
-          control={control}
-          name="hidden"
-        />
+        {canCreateAsCadre ? (
+          <Controller
+            render={({ field }) => {
+              return <EventHiddenField value={field.value} onChange={field.onChange} disabled={visibility === 'invitation'} />
+            }}
+            control={control}
+            name="hidden"
+          />
+        ) : null}
       </YStack>
 
       <Controller
@@ -248,7 +252,7 @@ const EventFormActions = () => {
           onPress={() => onSubmit()}
           size="md"
           variant="contained"
-          theme="purple"
+          theme="pink"
           loading={isPending || isUploadImagePending || isUploadDeletePending}
           iconLeft={Sparkle}
         >
@@ -263,13 +267,21 @@ const EventFormActions = () => {
 }
 
 const EventFormMain = () => {
-  const { control } = useEventFormContext()
+  const { control, canCreateAsCadre } = useEventFormContext()
 
   return (
     <YStack gap="$medium">
       <Controller
         render={({ field }) => {
-          return <FormFileImage placeholder="Ajouter une image de couverture" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+          return (
+            <FormFileImage
+              height={canCreateAsCadre ? 326 : 285}
+              placeholder="Ajouter une image de couverture"
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            />
+          )
         }}
         control={control}
         name="image"
@@ -296,7 +308,14 @@ const EventFormMain = () => {
         render={({ field, fieldState }) => {
           return (
             <YStack minHeight={100} maxHeight={400}>
-              <DescriptionInput error={fieldState.error?.message} label="Description" value={field.value!} onChange={field.onChange} onBlur={field.onBlur} />
+              <DescriptionInput
+                height={canCreateAsCadre ? 214 : 165}
+                error={fieldState.error?.message}
+                label="Description"
+                value={field.value!}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
             </YStack>
           )
         }}
@@ -346,7 +365,7 @@ export const EventFormDesktopScreen = () => {
                 <YStack flex={1} flexShrink={1} gap="$medium" paddingHorizontal="$medium">
                   <EventFormMain />
                 </YStack>
-                <YStack maxWidth={400} paddingHorizontal="$medium" gap="$medium">
+                <YStack width={400} paddingHorizontal="$medium" gap="$medium">
                   <EventFormAside />
                 </YStack>
               </XStack>

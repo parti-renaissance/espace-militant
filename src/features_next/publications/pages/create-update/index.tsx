@@ -151,7 +151,7 @@ const MessageEditorPage = (props?: { scope?: string; messageId?: string }) => {
                 <VoxHeader.Title icon={media.gtSm ? Speech : undefined}>{media.gtSm ? 'Nouvelle publication' : 'Publication'}</VoxHeader.Title>
               </XStack>
               <XStack flex={1} justifyContent="flex-end" w={100}>
-                <VoxButton size="lg" loading={messageQuery.isPending} disabled={isInitialLoading} theme="purple" onPress={() => editorRef.current?.submit()}>
+                <VoxButton size="lg" loading={messageQuery.isPending} disabled={isInitialLoading} theme="pink" onPress={() => editorRef.current?.submit()}>
                   Suivant
                 </VoxButton>
               </XStack>

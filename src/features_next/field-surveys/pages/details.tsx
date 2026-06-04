@@ -14,6 +14,8 @@ import { VoxHeader } from '@/components/Header/Header'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
+import RequireCompleteProfileGate from '@/features_next/profil/components/RequireCompleteProfileGate'
+
 import redirectToStore from '@/helpers/redirectToStore'
 import { useFieldSurvey, useSubmitFieldSurveyAnswers } from '@/services/field-surveys/hook'
 
@@ -88,6 +90,10 @@ const SideRight = styled(YStack, {
 
 const FieldSurveyDetailsPage: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>()
+  const surveyRedirectTo = useMemo(
+    () => (id ? ({ pathname: '/questionnaires/[id]', params: { id } } as const) : ('/questionnaires' as const)),
+    [id],
+  )
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -373,6 +379,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
   return (
     <>
       <QuitConfirmModal isOpen={displayQuitModal} onConfirm={handleQuit} onClose={() => setDisplayQuitModal(false)} />
+      <RequireCompleteProfileGate redirectTo={surveyRedirectTo}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -465,6 +472,7 @@ const FieldSurveyDetailsPage: React.FC = () => {
           {media.sm && survey && !error && !isLoading && <NavigationButtons />}
         </YStack>
       </KeyboardAvoidingView>
+      </RequireCompleteProfileGate>
     </>
   )
 }

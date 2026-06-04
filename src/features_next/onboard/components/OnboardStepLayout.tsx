@@ -37,11 +37,11 @@ const StepperBar = styled(XStack, {
 })
 
 const GRADIENT_BLUE = ['#EFF7FF', '#B2D8FF'] as const
-const GRADIENT_PURPLE = ['#F9F3FF', '#E0CAF3'] as const
+const GRADIENT_PINK = ['#FFF0F7', '#FFBEE0'] as const
 
 type OnboardFooterButtonProps = {
   action: FooterAction
-  theme: 'blue' | 'purple'
+  theme: 'blue' | 'pink'
   onPress: () => void
 }
 
@@ -78,7 +78,7 @@ type OnboardStepLayoutProps = {
   stepIndex: number
   totalSteps: number
   onFooterAction: (action: FooterAction) => void
-  theme?: 'blue' | 'purple'
+  theme?: 'blue' | 'pink'
   Description?: React.ReactNode | React.ReactNode[]
   buttonDirection?: 'row' | 'column'
 }
@@ -96,8 +96,8 @@ export default function OnboardStepLayout({
   buttonDirection = 'row',
 }: OnboardStepLayoutProps) {
   const media = useMedia()
-  const gradientColors = theme === 'purple' ? GRADIENT_PURPLE : GRADIENT_BLUE
-  const stepColor = theme === 'purple' ? '$purple5' : '$blue5'
+  const gradientColors = theme === 'pink' ? GRADIENT_PINK : GRADIENT_BLUE
+  const stepColor = theme === 'pink' ? '$pink5' : '$blue5'
   const insets = useSafeAreaInsets()
 
   return (
@@ -119,7 +119,7 @@ export default function OnboardStepLayout({
 
         <YStack gap="$medium" px={24} pt={24 + insets.top}>
           <Text.MD secondary semibold>
-            Bienvenue sur l'application Renaissance
+            Bienvenue sur l'application Attal Président
           </Text.MD>
           <StepperBar>
             {Array.from({ length: totalSteps }).map((_, i) => (

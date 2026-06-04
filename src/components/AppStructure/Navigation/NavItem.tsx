@@ -90,33 +90,33 @@ const NavSecondaryItemFrame = styled(NavItemFrame, {
 
 const NavCadreItemFrame = styled(NavItemFrame, {
   borderWidth: 1,
-  borderColor: '$purple2',
+  borderColor: '$pink2',
   hoverStyle: {
-    borderColor: '$purple1',
-    backgroundColor: '$purple1',
+    borderColor: '$pink1',
+    backgroundColor: '$pink1',
   },
   pressStyle: {
-    borderColor: '$purple2',
-    backgroundColor: '$purple2',
+    borderColor: '$pink2',
+    backgroundColor: '$pink2',
   },
   focusVisibleStyle: {
     outlineWidth: 2,
-    outlineColor: '$purple5',
+    outlineColor: '$pink5',
     outlineStyle: 'solid',
     outlineOffset: 0,
   },
   variants: {
     active: {
       true: {
-        borderColor: '$purple1',
-        backgroundColor: '$purple1',
+        borderColor: '$pink1',
+        backgroundColor: '$pink1',
         hoverStyle: {
-          borderColor: '$purple2',
-          backgroundColor: '$purple2',
+          borderColor: '$pink2',
+          backgroundColor: '$pink2',
         },
         pressStyle: {
-          borderColor: '$purple3',
-          backgroundColor: '$purple3',
+          borderColor: '$pink3',
+          backgroundColor: '$pink3',
         },
       },
     },
@@ -181,13 +181,13 @@ const IconContainer = styled(YStack, {
       },
       cadre: {
         backgroundColor: 'white',
-        ['$group-hover']: { backgroundColor: '$purple1' },
-        ['$group-press']: { backgroundColor: '$purple2' },
+        ['$group-hover']: { backgroundColor: '$pink1' },
+        ['$group-press']: { backgroundColor: '$pink2' },
       },
       cadreActive: {
-        backgroundColor: '$purple1',
-        ['$group-hover']: { backgroundColor: '$purple2' },
-        ['$group-press']: { backgroundColor: '$purple3' },
+        backgroundColor: '$pink1',
+        ['$group-hover']: { backgroundColor: '$pink2' },
+        ['$group-press']: { backgroundColor: '$pink3' },
       },
     },
   },
@@ -255,7 +255,7 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
 
     const hasSubItems = Boolean(subItems?.length)
     const isWebLink = Boolean(href && isWeb)
-    const contentColor = disabled ? '$textOutline32' : frame === 'cadre' ? '$purple6' : '$textPrimary'
+    const contentColor = disabled ? '$textOutline32' : frame === 'cadre' ? '$pink6' : '$textPrimary'
 
     const iconTone = useMemo<IconTone>(() => {
       if (disabled) return 'disabled'
@@ -269,7 +269,7 @@ export const NavItem = forwardRef<TamaguiElement, NavItemProps>(
 
     const iconColor = useMemo(() => {
       if (dangerAccent) return '#FD393D'
-      if (frame === 'cadre') return '$purple5'
+      if (frame === 'cadre') return '$pink5'
       if (frame === 'secondary') return active ? '$color5' : '$textSecondary'
       if (active) return '$color5'
       return contentColor

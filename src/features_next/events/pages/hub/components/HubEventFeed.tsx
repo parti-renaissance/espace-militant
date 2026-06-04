@@ -5,65 +5,117 @@ import type { ReactNode } from 'react'
 import { memo, useCallback, useMemo, useRef } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
-import type { Href } from 'expo-router'
-import { getToken, Spinner, XStack, YStack } from 'tamagui'
-import { Calendar, CalendarCheck2, ChevronRight, ClipboardCheck, DoorOpen, Zap } from '@tamagui/lucide-icons'
+import { Link, router } from 'expo-router'
+import { getToken, Image, Spinner, XStack, YStack } from 'tamagui'
+import { CalendarCheck2, ClipboardCheck, DoorOpen, Plus } from '@tamagui/lucide-icons'
 
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
+import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
+import IconTitleRow from '@/components/CallToActionCard/IconTitleRow'
 import { QueryBoundary } from '@/components/QueryBoundary'
+import Title from '@/components/Title/Title'
+import ILLUMATERIEL from '@/features_next/events/assets/images/illu-materiel.png'
 import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
 import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
 import { HubFeedRow } from '@/features_next/events/components/list-item/HubFeedRow'
+import { useProfileCompletionAccess } from '@/features_next/profil/hooks/useProfileCompletionAccess'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
 import { mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
 import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
-
-import { ButtonCard } from './ButtonCard'
+import { handleLinkPress } from '@/utils/linkHandler'
 
 const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.map(mapHubItemToFeedRow).filter((row): row is HubFeedRowType => row !== null)
 
 const getFeedRowKey = (row: HubFeedRowType): string =>
   row.type === 'event' ? row.event.uuid : (row.payload.id ?? `action-${row.payload.date.start.toISOString()}`)
 
-const CREER_EVENEMENT_HREF = '/evenements/creer' as const satisfies Href
-const CREER_ACTION_HREF = '/actions/creer' as const satisfies Href
+const MATERIEL_URL = 'https://attal.app/commande-materiel'
+const PAP_HREF = '/old/porte-a-porte' as const
 
-const HubOrganizePromptCards = memo(function HubOrganizePromptCards() {
+const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrganizeModal }: { onOpenOrganizeModal: () => void }) {
+  const { runWithCompleteProfile } = useProfileCompletionAccess()
+
+  const handleCommanderMateriel = useCallback(() => {
+    const open = () => void handleLinkPress(MATERIEL_URL)
+    runWithCompleteProfile(open, { onSuccess: open })
+  }, [runWithCompleteProfile])
+
   return (
-    <XStack gap="$medium" px="$medium">
-      <YStack width="50%" flex={1}>
-        <ButtonCard theme="green" icon={Zap} label="Organisez une action près de chez vous" href={CREER_ACTION_HREF} />
-      </YStack>
-      <YStack width="50%" flex={1}>
-        <ButtonCard theme="blue" icon={Calendar} label="Organisez un événement" href={CREER_EVENEMENT_HREF} />
-      </YStack>
-    </XStack>
+    <YStack gap="$medium" px="$medium">
+      <CallToActionCard backgroundColor="$pink100" title="J’organise une action près de chez moi" description="Tractage, collage, porte-à-porte, boîtage, ...">
+        <VoxButton variant="contained" theme="pink" iconLeft={Plus} onPress={onOpenOrganizeModal}>
+          Organiser un événement
+        </VoxButton>
+      </CallToActionCard>
+      <XStack backgroundColor="$white0" borderRadius="$medium" padding="$medium" gap="$medium">
+        <Image source={ILLUMATERIEL} width={84} height={112} objectFit="contain" />
+        <YStack gap="$medium" flexShrink={1}>
+          <YStack gap="$small">
+            <IconTitleRow
+              title={
+                <Title size="h2">
+                  <Title.Text>Je Commande du matériel</Title.Text>
+                </Title>
+              }
+            />
+            <Text.SM color="$gray6" regular>
+              Recevez gratuitement tracts et affiches officiels pour vos actions.
+            </Text.SM>
+          </YStack>
+
+          <YStack gap={12}>
+            <VoxButton variant="soft" theme="gray" onPress={handleCommanderMateriel}>
+              Commander
+            </VoxButton>
+          </YStack>
+        </YStack>
+      </XStack>
+    </YStack>
   )
 })
 
 const HubFooterResourceCards = memo(function HubFooterResourceCards() {
+  const { isAuth } = useSession()
+  const { runWithCompleteProfile } = useProfileCompletionAccess()
+
+  const handleOpenPap = useCallback(() => {
+    runWithCompleteProfile(
+      () => {
+        router.push(PAP_HREF)
+      },
+      { redirectTo: PAP_HREF },
+    )
+  }, [runWithCompleteProfile])
+
   return (
     <>
-      <ButtonCard
-        horizontal
+      <CallToActionCard
         icon={ClipboardCheck}
-        rightIcon={ChevronRight}
-        label="Questionnaires de terrain"
+        title="Je prends l’avis du terrain"
         description="Allez à la rencontre de nos électeurs, sur les marchés, dans la rue ou en porte à porte."
-        href="/questionnaires"
-      />
-      <ButtonCard
-        horizontal
-        icon={DoorOpen}
-        rightIcon={ChevronRight}
-        label="Porte-à-porte"
-        description="Consultez la carte des adresses prioritaires pour organiser votre porte-à-porte."
-        href="/old/porte-a-porte"
-      />
+      >
+        <Link href="/questionnaires" asChild>
+          <VoxButton variant="soft" theme="gray">
+            Voir les questionnaires
+          </VoxButton>
+        </Link>
+      </CallToActionCard>
+      {isAuth ? (
+        <CallToActionCard
+          icon={DoorOpen}
+          title="Je fais un Porte-à-porte"
+          description="Consultez la carte des adresses prioritaires pour organiser votre porte-à-porte."
+        >
+          <VoxButton variant="soft" theme="gray" onPress={handleOpenPap}>
+            Plateforme de PAP
+          </VoxButton>
+        </CallToActionCard>
+      ) : null}
     </>
   )
 })
@@ -73,10 +125,11 @@ type HubEventFeedProps = {
   embeddedMapHeader?: ReactNode
   /** Marge sous le contenu pour la tab bar + safe area. */
   listContentInsetBottom?: number
+  onOpenOrganizeModal: () => void
 }
 
 const HubEventFeed = (props: HubEventFeedProps) => {
-  const { embeddedMapHeader, listContentInsetBottom = 0 } = props
+  const { embeddedMapHeader, listContentInsetBottom = 0, onOpenOrganizeModal } = props
   const { session, isAuth } = useSession()
   const { data: userData } = useGetProfil({ enabled: Boolean(session) })
   const filtersReady = !isAuth || userData !== undefined
@@ -103,15 +156,12 @@ const HubEventFeed = (props: HubEventFeedProps) => {
       <QueryBoundary>
         <PinnedItemBanner small />
       </QueryBoundary>
-      <HubOrganizePromptCards />
+      <HubOrganizePromptCards onOpenOrganizeModal={onOpenOrganizeModal} />
       <YStack px="$medium" gap="$medium">
-        <XStack gap="$small">
-          <CalendarCheck2 size={16} color="$blue5" />
-          <Text.MD semibold>Mon agenda</Text.MD>
-        </XStack>
+        <IconTitleRow icon={CalendarCheck2} title="Mon agenda" />
         {hubItems.length > 0 ? (
           <Text.MD secondary semibold>
-            Vous avez {hubItems.length} inscription{hubItems.length > 1 ? 's' : ''} à venir.
+            Vous avez {hubItems.length} événement{hubItems.length > 1 ? 's' : ''} à venir auquel vous êtes inscrit.
           </Text.MD>
         ) : null}
       </YStack>
@@ -140,7 +190,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
     return (
       <YStack px="$medium">
         <Text.MD secondary semibold lineHeight={22}>
-          Votre agenda est vide. Vous retrouverez ici vos événements et actions à venir auxquels vous participez.
+          Vous n’êtes inscrit à aucun événement. Vous retrouverez ici tous les événements à venir auxquels vous vous inscrirez.
         </Text.MD>
       </YStack>
     )

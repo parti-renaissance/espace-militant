@@ -2,15 +2,16 @@ import React, { useMemo, useState } from 'react'
 import { usePathname } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb, styled, XStack, YStack } from 'tamagui'
-import { BellOff, ChevronRight, CircleCheckBig, Ellipsis, Globe, Haze, Sparkle } from '@tamagui/lucide-icons'
+import { BellOff, ChevronRight, Ellipsis, Globe, Rocket, Sparkle } from '@tamagui/lucide-icons'
 
 import { useVisibleNavItems } from '@/components/AppStructure/hooks/useVisibleNavItems'
 import { isNavItemActive } from '@/components/AppStructure/utils'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import { SignUpButton } from '@/components/Buttons/AuthButton'
 
 import CadreIllustration from '@/assets/illustrations/CadreIllustration'
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import { useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useSession } from '@/ctx/SessionProvider'
 import useCheckNotificationsState from '@/hooks/notifications/useCheckNotificationsState'
@@ -184,7 +185,7 @@ const MenuFooterContainer = styled(YStack, {
 } as const)
 
 const Line = styled(YStack, {
-  backgroundColor: '$purple3',
+  backgroundColor: '$pink3',
   position: 'absolute',
   left: 20,
   top: -16,
@@ -199,7 +200,7 @@ interface SideBarProps {
 }
 
 export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => {
-  const { isAuth, signIn, signUp } = useSession()
+  const { isAuth, signIn } = useSession()
   const pathname = usePathname()
   const { data: user } = useGetProfil({ enabled: isAuth })
   const { data: executiveScopes } = useGetExecutiveScopes()
@@ -306,7 +307,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
     <SideBarArea state={state}>
       <SideBarContainer collapsed={displayNavCadre} isMilitantInCadreMode={displayNavCadre}>
         <LogoContainer collapsed={displayNavCadre}>
-          <EuCampaignIllustration showText={!displayNavCadre} />
+          <Attal2027Illustration showText={!displayNavCadre} showIcon={displayNavCadre} />
         </LogoContainer>
         <MenuContainer collapsed={displayNavCadre} onLayout={onMilitantMenuLayout}>
           {visibleMilitantNavItems.map((item) => (
@@ -342,7 +343,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
                 text="CADRE"
                 collapsed={displayNavCadre}
                 iconRight={ChevronRight}
-                theme="purple"
+                theme="pink"
                 onPress={() => {
                   setDisplayNavCadre(!displayNavCadre)
                 }}
@@ -351,36 +352,36 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
           )}
         </MenuContainer>
         <MenuFooterContainer collapsed={displayNavCadre}>
+          <NavItem
+            iconLeft={Rocket}
+            text="attalpresident.fr"
+            externalLink
+            collapsed={displayNavCadre}
+            onPress={() => {
+              const url = 'https://attalpresident.fr/'
+              if (isWeb) {
+                window.open(url, '_blank')
+              } else {
+                void WebBrowser.openBrowserAsync(url)
+              }
+            }}
+          />
+          <NavItem
+            iconLeft={Globe}
+            text="parti-renaissance.fr"
+            externalLink
+            collapsed={displayNavCadre}
+            onPress={() => {
+              const url = 'https://parti-renaissance.fr/'
+              if (isWeb) {
+                window.open(url, '_blank')
+              } else {
+                void WebBrowser.openBrowserAsync(url)
+              }
+            }}
+          />
           {isAuth ? (
             <>
-              <NavItem
-                iconLeft={Globe}
-                text="parti-renaissance.fr"
-                externalLink
-                collapsed={displayNavCadre}
-                onPress={() => {
-                  const url = 'https://parti-renaissance.fr/'
-                  if (isWeb) {
-                    window.open(url, '_blank')
-                  } else {
-                    void WebBrowser.openBrowserAsync(url)
-                  }
-                }}
-              />
-              <NavItem
-                iconLeft={Haze}
-                text="nouvellerepublique.fr"
-                externalLink
-                collapsed={displayNavCadre}
-                onPress={() => {
-                  const url = 'https://nouvellerepublique.fr/'
-                  if (isWeb) {
-                    window.open(url, '_blank')
-                  } else {
-                    void WebBrowser.openBrowserAsync(url)
-                  }
-                }}
-              />
               {!user?.email_subscribed && (
                 <NavItem iconLeft={BellOff} text="Abonnement emails" href="/profil/communications" dangerAccent collapsed={displayNavCadre} />
               )}
@@ -402,51 +403,13 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
           ) : (
             <YStack gap={24} p={12}>
               <YStack gap={16}>
-                <Text.MD semibold textWrap="balance">
-                  Je me connecte à{' '}
-                  <Text.MD semibold color="$blue5">
-                    mon espace
-                  </Text.MD>
+                <Text.MD semibold textWrap="balance" textAlign="center">
+                  Connectez-vous avec votre compte
                 </Text.MD>
                 <VoxButton variant="outlined" size="lg" width="100%" theme="blue" onPress={() => signIn()}>
                   Me connecter
                 </VoxButton>
-              </YStack>
-
-              <YStack gap={16}>
-                <Text.MD semibold textWrap="balance">
-                  Adhérez pour débloquer{' '}
-                  <Text.MD semibold color="$yellow5">
-                    tous les contenus et fonctionnalités
-                  </Text.MD>
-                </Text.MD>
-
-                <YStack gap={8}>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Carte adhérent</Text.SM>
-                  </XStack>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Comités locaux</Text.SM>
-                  </XStack>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Événements exclusifs</Text.SM>
-                  </XStack>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Consultations</Text.SM>
-                  </XStack>
-                  <XStack gap={8} alignItems="center">
-                    <CircleCheckBig size={16} color="$green4" />
-                    <Text.SM medium>Élections internes</Text.SM>
-                  </XStack>
-                </YStack>
-
-                <VoxButton variant="contained" size="lg" width="100%" theme="yellow" onPress={() => signUp()}>
-                  J'adhère
-                </VoxButton>
+                <SignUpButton size="lg" width="100%" />
               </YStack>
             </YStack>
           )}
@@ -480,7 +443,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
               <NavItem
                 iconLeft={Ellipsis}
                 text="Plus"
-                theme="purple"
+                theme="pink"
                 dropdownVerticalPosition="top"
                 subItems={cadrePlusSubItems}
                 active={hiddenCadreNavItems.some((item) => item.active)}

@@ -69,7 +69,7 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
           <BreadCrumbV2
             items={[
               { id: 'read', label: 'Lecture', icon: Eye },
-              { id: 'stats', label: 'Statistiques', icon: PieChart, color: '$purple5' },
+              { id: 'stats', label: 'Statistiques', icon: PieChart, color: '$pink5' },
             ]}
             value={activeSection}
             onChange={(v) => {
@@ -103,14 +103,14 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
                 <PieChart size={20} />
                 <Text.LG semibold>Statistiques de publication</Text.LG>
               </XStack>
-              <VoxCard bg="$purple1" borderWidth={0}>
+              <VoxCard bg="$pink1" borderWidth={0}>
                 <VoxCard.Content>
                   <XStack gap="$medium" alignItems="center">
-                    <Text.SM color="$purple6">
+                    <Text.SM color="$pink6">
                       Vous pouvez voir ces statistiques uniquement car vous êtes Cadre avec un rôle au sein de l'instance qui l'a envoyée.
                     </Text.SM>
                     <YStack>
-                      <Sparkle size={20} color="$purple6" />
+                      <Sparkle size={20} color="$pink6" />
                     </YStack>
                   </XStack>
                 </VoxCard.Content>

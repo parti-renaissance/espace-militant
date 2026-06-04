@@ -1,4 +1,5 @@
 export default {
+'Plaak-44-Bold': require('assets/fonts/Plaak-44-Bold.ttf'),
 'PublicSans-Black': require('assets/fonts/PublicSans/PublicSans-Black.ttf'),
 'PublicSans-BlackItalic': require('assets/fonts/PublicSans/PublicSans-BlackItalic.ttf'),
 'PublicSans-Bold': require('assets/fonts/PublicSans/PublicSans-Bold.ttf'),

@@ -31,6 +31,8 @@ export const ObjectHitSchema = BaseHitSchema.extend({
   utm_source: z.string().optional(),
   utm_campaign: z.string().optional(),
   referrer_code: z.string().optional(),
+  type: z.string().optional(),
+  payload: z.record(z.string(), z.unknown()).optional(),
 }).strip()
 
 export const HitPayloadSchema = z.union([ActivitySessionHitSchema, ObjectHitSchema])

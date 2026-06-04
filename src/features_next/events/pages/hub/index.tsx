@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useMemo, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { Spinner, useMedia, YStack } from 'tamagui'
@@ -14,6 +14,9 @@ import { useUserLocation } from '../map/hooks/useUserLocation'
 import { EventsHubDesktop } from './components/EventsHubDesktop'
 import { EventsHubMobile } from './components/EventsHubMobile'
 import { HubMapBlock } from './components/HubMapBlock'
+import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
+
+import { HubOrganizeCategoryModal } from './components/HubOrganizeCategoryModal'
 
 const EventsHubPage = () => {
   const router = useRouter()
@@ -21,6 +24,17 @@ const EventsHubPage = () => {
   const { coords, isLocating, requestLocation } = useUserLocation()
 
   const [sortAround, setSortAround] = useState<{ lat: number; lng: number } | null>(null)
+  const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
+
+  const { openOrganiserModal } = useOpenOrganiserEvenement()
+
+  const handleOpenOrganizeModal = useCallback(() => {
+    openOrganiserModal(() => setOrganizeModalOpen(true))
+  }, [openOrganiserModal])
+
+  const handleCloseOrganizeModal = useCallback(() => {
+    setOrganizeModalOpen(false)
+  }, [])
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const cameraPadding = useMemo(
@@ -102,21 +116,35 @@ const EventsHubPage = () => {
     </YStack>
   )
 
+  const organizeModal = organizeModalOpen ? (
+    <Suspense fallback={null}>
+      <HubOrganizeCategoryModal open onClose={handleCloseOrganizeModal} />
+    </Suspense>
+  ) : null
+
   if (!media.gtSm) {
     return (
-      <EventsHubMobile
-        embeddedMapHeader={<HubMapBlock {...mapBlockCommonProps} variant="embedded" />}
-        tabBarSafeBottom={tabBarSafeBottom}
-        feedSuspenseFallback={feedSuspenseFallback}
-      />
+      <>
+        <EventsHubMobile
+          embeddedMapHeader={<HubMapBlock {...mapBlockCommonProps} variant="embedded" />}
+          tabBarSafeBottom={tabBarSafeBottom}
+          feedSuspenseFallback={feedSuspenseFallback}
+          onOpenOrganizeModal={handleOpenOrganizeModal}
+        />
+        {organizeModal}
+      </>
     )
   }
 
   return (
-    <EventsHubDesktop
-      mapLayer={<HubMapBlock {...mapBlockCommonProps} variant="fullscreen" promoLeadingAccessory={<SideBarArea state="militant" />} />}
-      feedSuspenseFallback={feedSuspenseFallback}
-    />
+    <>
+      <EventsHubDesktop
+        mapLayer={<HubMapBlock {...mapBlockCommonProps} variant="fullscreen" promoLeadingAccessory={<SideBarArea state="militant" />} />}
+        feedSuspenseFallback={feedSuspenseFallback}
+        onOpenOrganizeModal={handleOpenOrganizeModal}
+      />
+      {organizeModal}
+    </>
   )
 }
 

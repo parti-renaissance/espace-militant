@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react'
 import * as FileSystem from 'expo-file-system/legacy'
 import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
@@ -19,10 +20,14 @@ import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { getMembershipStatus } from '@/utils/membershipStatus'
 import { getFullVersion } from '@/utils/version'
 
+import { isProfileComplete } from '@/features_next/profil/profileCompletion'
+
 import { GenericResponseError } from '../common/errors/generic-errors'
 import { ProfilChangePasswordFormError } from './error'
+import { hasScopeFeature, isExecutiveCadreScope } from './utils'
 
 export const PROFIL_QUERY_KEY = 'profil'
+export const PROFILE_DETAIL_QUERY_KEY = 'profileDetail'
 
 export const useGetProfil = (props?: { enabled?: boolean; placeholderData?: RestProfilResponse | PlaceholderDataFunction<RestProfilResponse> }) => {
   const isAuth = useUserStore((state) => !!state.user?.accessToken)
@@ -73,6 +78,13 @@ export const useGetSuspenseUserScopes = () => {
   })
 }
 
+/** Scopes utilisateur + vérification de feature (`hasScopeFeature` sur tous les scopes). */
+export const useUserScopeFeatures = ({ enabled }: { enabled?: boolean } = {}) => {
+  const query = useGetUserScopes({ enabled })
+  const hasFeature = useCallback((featureKey: string) => hasScopeFeature(query.data, featureKey), [query.data])
+  return { ...query, hasFeature }
+}
+
 const processExecutiveScopes = (
   data: Awaited<ReturnType<typeof api.getUserScopes>> | undefined,
   isAuth: boolean,
@@ -91,7 +103,7 @@ const processExecutiveScopes = (
     }
   }
 
-  const cadre_scopes = data?.filter((s) => s.apps.includes('data_corner'))
+  const cadre_scopes = data?.filter(isExecutiveCadreScope)
   const [scopeWithMoreFeatures] = cadre_scopes?.sort((a, b) => (b.features.length > a.features.length ? 1 : -1)) || []
   const localDefaultScope = localDefaultScopeCode ? cadre_scopes?.find((s) => s.code === localDefaultScopeCode) : undefined
   const defaultScope = localDefaultScope ?? scopeWithMoreFeatures
@@ -152,11 +164,39 @@ export const useMutateExecutiveScope = () => {
 
 export const useGetDetailProfil = () => {
   return useSuspenseQuery({
-    queryKey: ['profileDetail'],
+    queryKey: [PROFILE_DETAIL_QUERY_KEY],
     queryFn: () => api.getDetailedProfile(),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 5,
   })
+}
+
+export { isProfileComplete, isProfileIdentityIncomplete } from '@/features_next/profil/profileCompletion'
+
+/** Profil détaillé (`/api/v3/profile/me`) — champs requis pour l’inscription complète. */
+export const useProfileCompletion = () => {
+  const isAuth = useUserStore((state) => !!state.user?.accessToken)
+
+  const query = useQuery({
+    queryKey: [PROFILE_DETAIL_QUERY_KEY],
+    queryFn: () => api.getDetailedProfile(),
+    enabled: isAuth,
+    staleTime: 1000 * 60 * 5,
+  })
+
+  const isComplete = useMemo(
+    () => (query.data ? isProfileComplete(query.data) : false),
+    [query.data],
+  )
+
+  return {
+    profile: query.data,
+    isComplete,
+    isIncomplete: Boolean(query.data && !isComplete),
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    refetch: query.refetch,
+  }
 }
 
 class UnsubscribedError extends Error {
@@ -209,7 +249,7 @@ export const useMutationUpdateProfil = ({ userUuid }: { userUuid: string }) => {
         queryKey: [PROFIL_QUERY_KEY],
       })
       queryClient.invalidateQueries({
-        queryKey: ['profileDetail'],
+        queryKey: [PROFILE_DETAIL_QUERY_KEY],
       })
       queryClient.invalidateQueries({
         queryKey: ['electProfil'],

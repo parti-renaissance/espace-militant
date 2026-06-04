@@ -2,7 +2,7 @@ import { YStack } from 'tamagui'
 import Switch from './SwitchV2'
 
 export default {
-  title: 'SwitchV2',
+  title: 'Formulaire/SwitchV2',
   component: Switch,
 }
 

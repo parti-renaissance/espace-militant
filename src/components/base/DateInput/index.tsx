@@ -13,7 +13,7 @@ interface DateInputProps {
   onChange: (value: string | null) => void
   placeholder?: string
   size?: 'sm' | 'md' | 'lg'
-  color?: 'gray' | 'blue' | 'green' | 'red'
+  color?: 'gray' | 'blue' | 'green' | 'red' | 'white'
   disabled?: boolean
   error?: string
   resetable?: boolean
@@ -62,7 +62,8 @@ export default function DateInput({
       pt="$xsmall"
       pb="$xsmall"
       overflow="hidden"
-      theme={color}
+      white={color === 'white'}
+      theme={color === 'white' ? 'gray' : color}
       alignItems="center"
       justifyContent="space-between"
       size={size}
@@ -71,7 +72,15 @@ export default function DateInput({
 
       <XStack alignItems="center">
         <XStack mr="$xsmall">
-          <DatePickerField disabled={disabled} type="date" value={getDateValue()} onChange={handleDateChange} placeholder={placeholder} />
+          <DatePickerField
+            disabled={disabled}
+            type="date"
+            value={getDateValue()}
+            onChange={handleDateChange}
+            placeholder={placeholder}
+            white={color === 'white'}
+            error={error}
+          />
         </XStack>
 
         {resetable && value && (

@@ -1,32 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { View } from 'react-native'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { DefaultTheme, ThemeProvider } from '@react-navigation/native'
-import { BlurView } from 'expo-blur'
-import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
-import { isWeb, TamaguiProvider, ViewProps } from 'tamagui'
-import config from 'tamagui.config'
-import { ToastProvider } from '@tamagui/toast'
-import { isSupported } from '@firebase/messaging'
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import React, { useEffect, useRef } from 'react';
+import { View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { BlurView } from 'expo-blur';
+import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { isWeb, TamaguiProvider, ViewProps } from 'tamagui';
+import config from 'tamagui.config';
+import { ToastProvider } from '@tamagui/toast';
+import { isSupported } from '@firebase/messaging';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import MapboxGl from '@/components/Mapbox/Mapbox'
-import { PortalLayout } from '@/components/layouts/PortalLayout'
-import WaitingScreen from '@/components/WaitingScreen'
-import { useInitPushNotification } from '@/features/push-notification/hook'
-import initRootAppNotification from '@/features/push-notification/logic/initRootAppNotification'
-import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks/useAppUpdate'
-import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen'
+import { PortalLayout } from '@/components/layouts/PortalLayout';
+import MapboxGl from '@/components/Mapbox/Mapbox';
+import WaitingScreen from '@/components/WaitingScreen';
+import SignupTunnelGuard from '@/features_next/signup/components/SignupTunnelGuard';
+import { useInitPushNotification } from '@/features/push-notification/hook';
+import initRootAppNotification from '@/features/push-notification/logic/initRootAppNotification';
+import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks/useAppUpdate';
+import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen';
 
-import clientEnv from '@/config/clientEnv'
-import { SessionProvider, useSession } from '@/ctx/SessionProvider'
-import useDeepLinkHandler from '@/hooks/useDeepLinkHandler'
-import useImportFont from '@/hooks/useImportFont'
-import { useHits } from '@/services/hits/hook'
-import { useInitMatomo } from '@/services/matomo/hook'
-import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import clientEnv from '@/config/clientEnv';
+import { SessionProvider, useSession } from '@/ctx/SessionProvider';
+import useDeepLinkHandler from '@/hooks/useDeepLinkHandler';
+import useImportFont from '@/hooks/useImportFont';
+import { useHits } from '@/services/hits/hook';
+import { useInitMatomo } from '@/services/matomo/hook';
+import { ErrorMonitor } from '@/utils/ErrorMonitor';
 
 MapboxGl.setAccessToken(clientEnv.MAP_BOX_ACCESS_TOKEN)
 
@@ -40,11 +41,15 @@ const { navigationIntegration } = ErrorMonitor.configure()
 
 SplashScreen.preventAutoHideAsync()
 
+let hasRegisteredNavigation = false
+let hasMountedNavigatorOnce = false
+
 const useRegisterRoutingInstrumentation = () => {
   const navigationRef = useNavigationContainerRef()
 
   useEffect(() => {
-    if (navigationRef) {
+    if (navigationRef && !hasRegisteredNavigation) {
+      hasRegisteredNavigation = true
       navigationIntegration.registerNavigationContainer(navigationRef)
     }
   }, [navigationRef])
@@ -73,7 +78,13 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
     }
   }, [isAuth, trackActivitySession])
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading) {
+      hasMountedNavigatorOnce = true
+    }
+  }, [isLoading])
+
+  if (isLoading && !hasMountedNavigatorOnce) {
     return <WaitingScreen />
   }
 
@@ -113,19 +124,18 @@ export const unstable_settings = {
   initialRouteName: '(app)',
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      retry: false,
+    },
+  },
+})
+
+
 function Root() {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            refetchOnWindowFocus: false,
-            refetchOnMount: false,
-            retry: false,
-          },
-        },
-      }),
-  )
   const [isFontsLoaded] = useImportFont()
   useRegisterRoutingInstrumentation()
 
@@ -141,7 +151,9 @@ function Root() {
                   <SessionProvider>
                     <PortalLayout>
                       <WaitingRoomHoc isLoading={!isFontsLoaded}>
-                        <Slot />
+                        <SignupTunnelGuard>
+                          <Slot />
+                        </SignupTunnelGuard>
                       </WaitingRoomHoc>
                     </PortalLayout>
                   </SessionProvider>

@@ -2,7 +2,7 @@ import { YStack } from 'tamagui'
 import Radio from './Radio'
 
 export default {
-  title: 'Radio',
+  title: 'Formulaire/Radio',
   component: Radio,
 }
 

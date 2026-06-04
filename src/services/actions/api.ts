@@ -20,6 +20,7 @@ export const createAction = (payload: schemas.RestPostActionRequest) =>
     requestSchema: schemas.RestPostActionRequestSchema,
     responseSchema: schemas.RestPostActionResponseSchema,
     errorThrowers: [actionFormErrorThrower],
+    skipGenericErrorLog: true,
     type: 'private',
   })(payload)
 
@@ -30,6 +31,7 @@ export const updateAction = (props: { id: string; payload: schemas.RestPutAction
     requestSchema: schemas.RestPutActionRequestSchema,
     responseSchema: schemas.RestPutActionResponseSchema,
     errorThrowers: [actionFormErrorThrower],
+    skipGenericErrorLog: true,
     type: 'private',
   })(props.payload)
 
@@ -39,6 +41,7 @@ export const cancelAction = (request: schemas.RestPutActionCancelRequest) =>
     path: `/api/v3/actions/${request.id}/cancel`,
     requestSchema: z.void(),
     responseSchema: z.any(),
+    skipGenericErrorLog: true,
     type: 'private',
   })()
 
@@ -48,6 +51,7 @@ export const subscribeToAction = (id: string) =>
     path: `/api/v3/actions/${id}/register`,
     requestSchema: z.void(),
     responseSchema: z.any(),
+    skipGenericErrorLog: true,
     type: 'private',
   })()
 
@@ -57,5 +61,6 @@ export const unsubscribeFromAction = (id: string) =>
     path: `/api/v3/actions/${id}/register`,
     requestSchema: z.void(),
     responseSchema: z.any(),
+    skipGenericErrorLog: true,
     type: 'private',
   })()

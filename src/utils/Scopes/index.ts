@@ -1,6 +1,7 @@
 export const FEATURES = {
   ACTIONS: 'actions',
   ADHERENT_FORMATIONS: 'adherent_formations',
+  AI_ANTISECHE: 'ai_antiseche',
   CHATBOT: 'chatbot',
   CIRCONSCRIPTIONS: 'circonscriptions',
   COMMITTEE: 'committee',

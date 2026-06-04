@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import BotBilanCTA from '@/components/ProfileCards/BotBilanCTA/BotBilanCTA'
 import { StoryObj } from '@storybook/react'
 import { View } from 'tamagui'
 import Text from '../base/Text'
@@ -18,11 +17,11 @@ const Component = () => {
 }
 
 const meta = {
-  title: 'Select/Assembly',
+  title: 'Formulaire/AssemblySelect',
   component: Component,
 }
 
-type Story = StoryObj<typeof BotBilanCTA>
+type Story = StoryObj<typeof Component>
 
 export const Default: Story = {}
 

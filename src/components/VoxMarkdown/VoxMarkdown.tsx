@@ -102,7 +102,7 @@ function VoxMarkdownComponent({ content, isStreaming = false }: VoxMarkdownProps
         lineHeight: bodyLineHeight,
         color: primary,
         marginTop: 0,
-        marginBottom: 8,
+        marginBottom: 0,
       },
       heading1: {
         fontFamily: fontBold,

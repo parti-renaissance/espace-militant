@@ -3,7 +3,7 @@ import { Stack } from 'tamagui'
 import Input from './Input'
 
 export default {
-  title: 'Input',
+  title: 'Formulaire/Input',
   component: Input,
 }
 

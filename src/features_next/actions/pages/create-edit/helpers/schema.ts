@@ -33,6 +33,7 @@ export const actionFormSchema = z.object({
       }
     }),
   description: z.string().max(1000).optional(),
+  send_invitation_email: z.boolean().optional(),
 })
 
 export type ActionFormSchemaValues = z.infer<typeof actionFormSchema>

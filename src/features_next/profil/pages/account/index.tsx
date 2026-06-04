@@ -3,6 +3,7 @@ import { useMedia, YStack } from 'tamagui'
 
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import ProfilLayout from '@/features_next/profil/components/Layout'
+import RequireCompleteProfileGate from '@/features_next/profil/components/RequireCompleteProfileGate'
 
 import { useGetDetailProfil } from '@/services/profile/hook'
 
@@ -30,12 +31,12 @@ const AccountContent = () => {
   )
 }
 
-const AccountScreen = () => {
-  return (
-    <ProfilLayout>
+const AccountScreen = () => (
+  <ProfilLayout>
+    <RequireCompleteProfileGate redirectTo="/profil/informations-personnelles">
       <AccountContent />
-    </ProfilLayout>
-  )
-}
+    </RequireCompleteProfileGate>
+  </ProfilLayout>
+)
 
 export default AccountScreen

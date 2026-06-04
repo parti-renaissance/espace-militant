@@ -42,7 +42,7 @@ const GoToButton = ({ eventUuid, source }: { eventUuid: string; source?: string 
   }
 
   return (
-    <VoxButton variant="outlined" theme="gray" iconLeft={Eye} testID="event-show-button" onPress={handlePress}>
+    <VoxButton variant="outlined" theme="blue" iconLeft={Eye} testID="event-show-button" onPress={handlePress}>
       Voir
     </VoxButton>
   )

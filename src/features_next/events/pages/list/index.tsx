@@ -1,9 +1,10 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useScrollToTop } from '@react-navigation/native'
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
-import { getToken, Spinner, useMedia, XStack, YStack } from 'tamagui'
-import { ArrowLeft } from '@tamagui/lucide-icons'
+import { getToken, getTokenValue, isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
+import { ArrowLeft, CirclePlus } from '@tamagui/lucide-icons'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -31,7 +32,10 @@ import { mapHubItemsToPinnedEvents, mapHubItemToFeedRow, type HubFeedRow as HubF
 import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
 
+import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
+
 import { MapListToggle } from '../../components/feed-layout/MapListToggle'
+import { HubOrganizeCategoryModal } from '../hub/components/HubOrganizeCategoryModal'
 
 type HubFeedTab = 'all' | 'subscribed'
 
@@ -141,6 +145,8 @@ type FeedListItem =
 
 const HubFeed = () => {
   const media = useMedia()
+  const insets = useSafeAreaInsets()
+  const organizeFabBottom = useMemo(() => Math.max(getTokenValue('$medium', 'space'), insets.bottom), [insets.bottom])
   const queryClient = useQueryClient()
   const router = useRouter()
   const { session, isAuth } = useSession()
@@ -148,6 +154,17 @@ const HubFeed = () => {
   const { trackImpression } = useHits()
 
   const [activeTab, setActiveTab] = useState<HubFeedTab>('all')
+  const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
+
+  const { openOrganiserModal } = useOpenOrganiserEvenement()
+
+  const handleOpenOrganizeModal = useCallback(() => {
+    openOrganiserModal(() => setOrganizeModalOpen(true))
+  }, [openOrganiserModal])
+
+  const handleCloseOrganizeModal = useCallback(() => {
+    setOrganizeModalOpen(false)
+  }, [])
   const filters = eventFiltersState((s) => s.value)
   const setFiltersValue = eventFiltersState((s) => s.setValue)
   const { itemType: itemTypeParam } = useLocalSearchParams<{ itemType?: string }>()
@@ -376,7 +393,7 @@ const HubFeed = () => {
     if (router.canGoBack()) {
       router.back()
     } else {
-      router.push('/evenements/hub')
+      router.push('/evenements')
     }
   }, [router])
 
@@ -396,68 +413,84 @@ const HubFeed = () => {
         ) : null}
         <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
           {isAuth && <BigSwitch options={HUB_TABS} value={activeTab} onChange={handleSwitchChange} />}
-          {!media.gtMd && <HubSideContent />}
+          {!media.gtMd && <HubSideContent onOpenOrganizeModal={handleOpenOrganizeModal} />}
         </YStack>
       </YStack>
     ),
-    [activeTab, media.gtMd, media.sm, isAuth, handleBack, handleSwitchChange, pinnedBannerOuterSpacing.paddingTop],
+    [activeTab, media.gtMd, media.sm, isAuth, handleBack, handleSwitchChange, handleOpenOrganizeModal, pinnedBannerOuterSpacing.paddingTop],
   )
+
+  const organizeModal = organizeModalOpen ? (
+    <Suspense fallback={null}>
+      <HubOrganizeCategoryModal open onClose={handleCloseOrganizeModal} />
+    </Suspense>
+  ) : null
 
   return (
     <>
       <Layout.Main width="100%">
-        <LayoutFlatList<FeedListItem>
-          ref={flatListRef}
-          padding="left"
-          data={deferredFeed.sectionedData}
-          renderItem={renderItem}
-          keyExtractor={(item) =>
-            item.type === 'header'
-              ? `h-${item.sectionId}`
-              : item.type === 'empty_state'
-                ? `e-${item.reason.kind}${item.reason.kind === 'zone_no_upcoming' ? `-${item.reason.zoneLabel}` : ''}`
-                : item.row.type === 'event'
-                  ? item.row.event.uuid
-                  : (item.row.payload.id ?? item.row.payload.tag)
-          }
-          ListHeaderComponent={listHeader}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={FEED_VIEWABILITY_CONFIG}
-          refreshing={isManualRefreshing}
-          onRefresh={handleManualRefresh}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
-          hasMore={hasNextPage ?? false}
-          contentContainerStyle={feedContentContainerStyle}
-          removeClippedSubviews={Platform.OS === 'android'}
-          windowSize={21}
-          initialNumToRender={10}
-          maxToRenderPerBatch={10}
-          ListEmptyComponent={
-            showSkeleton ? (
-              <HubListSkeleton />
-            ) : (
-              <YStack py="$large">
-                <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllItems={handleSwitchToAllItems} showResetButton={hasActiveFilters} />
-              </YStack>
-            )
-          }
-          ListFooterComponent={
-            hasNextPage ? (
-              <YStack p="$medium" pb="$large">
-                <Spinner size="large" />
-              </YStack>
-            ) : null
-          }
-        />
+        <YStack flex={1}>
+          <LayoutFlatList<FeedListItem>
+            ref={flatListRef}
+            padding="left"
+            data={deferredFeed.sectionedData}
+            renderItem={renderItem}
+            keyExtractor={(item) =>
+              item.type === 'header'
+                ? `h-${item.sectionId}`
+                : item.type === 'empty_state'
+                  ? `e-${item.reason.kind}${item.reason.kind === 'zone_no_upcoming' ? `-${item.reason.zoneLabel}` : ''}`
+                  : item.row.type === 'event'
+                    ? item.row.event.uuid
+                    : (item.row.payload.id ?? item.row.payload.tag)
+            }
+            ListHeaderComponent={listHeader}
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={FEED_VIEWABILITY_CONFIG}
+            refreshing={isManualRefreshing}
+            onRefresh={handleManualRefresh}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            hasMore={hasNextPage ?? false}
+            contentContainerStyle={feedContentContainerStyle}
+            removeClippedSubviews={Platform.OS === 'android'}
+            windowSize={21}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            ListEmptyComponent={
+              showSkeleton ? (
+                <HubListSkeleton />
+              ) : (
+                <YStack py="$large">
+                  <EmptyStateSection reason={deferredFeed.emptyReason} onSwitchToAllItems={handleSwitchToAllItems} showResetButton={hasActiveFilters} />
+                </YStack>
+              )
+            }
+            ListFooterComponent={
+              hasNextPage ? (
+                <YStack p="$medium" pb="$large">
+                  <Spinner size="large" />
+                </YStack>
+              ) : null
+            }
+          />
+          {media.sm ? (
+            <XStack position={isWeb ? 'fixed' : 'absolute'} bottom={organizeFabBottom} right="$medium" zIndex={20} gap="$small" pointerEvents="box-none">
+              <VoxButton variant="contained" size="lg" iconLeft={CirclePlus} theme="pink" onPress={handleOpenOrganizeModal}>
+                Organiser un événement
+              </VoxButton>
+            </XStack>
+          ) : null}
+        </YStack>
       </Layout.Main>
       {media.gtMd ? (
         <Layout.SideBar isSticky padding="right">
           <YStack>
-            <HubSideContent />
+            <HubSideContent onOpenOrganizeModal={handleOpenOrganizeModal} />
           </YStack>
         </Layout.SideBar>
       ) : null}
+      {organizeModal}
     </>
   )
 }

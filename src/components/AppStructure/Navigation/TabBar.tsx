@@ -17,8 +17,9 @@ import Text from '@/components/base/Text'
 import { cadreNavItems, useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
 import type { IconComponent } from '@/models/common.model'
 import { useGetUserScopes } from '@/services/profile/hook'
+import { isExecutiveCadreScope } from '@/services/profile/utils'
 
-type Theme = 'blue' | 'purple' | 'green' | 'orange'
+type Theme = 'blue' | 'pink' | 'green' | 'orange'
 
 const SAV = Platform.OS !== 'ios' ? SafeAreaView : RNSafeAreaView
 const SAVProps: { edges?: ('bottom' | 'top' | 'left' | 'right')[] } = Platform.OS !== 'ios' ? { edges: ['bottom'] } : {}
@@ -117,10 +118,7 @@ const Tab = ({
   const animatedIconStyle = useAnimatedStyle(() => {
     if (externalLink) return { transform: [{ scale: 1 }, { translateY: 0 }] }
     return {
-      transform: [
-        { scale: interpolate(scale.value, [0, 1], [1, 1.334]) },
-        { translateY: interpolate(scale.value, [0, 1], [0, 6]) },
-      ],
+      transform: [{ scale: interpolate(scale.value, [0, 1], [1, 1.334]) }, { translateY: interpolate(scale.value, [0, 1], [0, 6]) }],
     }
   })
 
@@ -151,8 +149,8 @@ type ConfigurableTabBarProps = {
   navCadreItems?: NavItemConfig[]
 }
 
-const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'parrainages', 'formations', 'more']
-const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'formations', 'more']
+const DEFAULT_TAB_ORDER = ['accueil', 'evenements', 'soutenir', 'idees']
+const CADRE_TAB_ORDER = ['accueil', 'evenements', 'cadreSheet', 'soutenir', 'idees']
 const SHEET_SWITCH_DELAY_MS = 200
 
 const ConfigurableTabBar = ({ hide = false, navCadreItems = cadreNavItems }: ConfigurableTabBarProps) => {
@@ -165,7 +163,7 @@ const ConfigurableTabBar = ({ hide = false, navCadreItems = cadreNavItems }: Con
   const { data: userScopes } = useGetUserScopes({ enabled: true })
 
   const hasExecutiveScope = useMemo(() => {
-    return userScopes?.some((s) => s.apps.includes('data_corner')) ?? false
+    return userScopes?.some(isExecutiveCadreScope) ?? false
   }, [userScopes])
 
   const visibleItemIds = useMemo(() => {
@@ -186,9 +184,7 @@ const ConfigurableTabBar = ({ hide = false, navCadreItems = cadreNavItems }: Con
   }, [navCadreItems, pathname])
 
   const moreItems = useMemo(() => {
-    return navItems
-      .filter((item) => !visibleItemIds.includes(item.id))
-      .map((item) => ({ ...item, active: isNavItemActive(pathname, item.href) }))
+    return navItems.filter((item) => !visibleItemIds.includes(item.id)).map((item) => ({ ...item, active: isNavItemActive(pathname, item.href) }))
   }, [navItems, visibleItemIds, pathname])
 
   const currentRouteId = useMemo(() => {
@@ -287,7 +283,7 @@ const ConfigurableTabBar = ({ hide = false, navCadreItems = cadreNavItems }: Con
       position.value = withSpring(pos)
 
       let theme: Theme = 'blue'
-      if (activeTabKey === 'cadreSheet') theme = 'purple'
+      if (activeTabKey === 'cadreSheet') theme = 'pink'
       else if (activeTabKey !== 'more') {
         const config = getConfig(activeTabKey)
         theme = (config?.theme ?? 'blue') as Theme
@@ -334,10 +330,10 @@ const ConfigurableTabBar = ({ hide = false, navCadreItems = cadreNavItems }: Con
           name: 'cadreSheet',
           label: 'Cadre',
           icon: Sparkle,
-          theme: 'purple',
+          theme: 'pink',
           tabId: 'cadreSheet',
           layoutKey: 'cadreSheet',
-          activeColorVal: themes.light.purple5?.val,
+          activeColorVal: themes.light.pink5?.val,
           ...common,
         }
       }

@@ -27,7 +27,7 @@ export default function EmptyState() {
         </Text.MD>
       </YStack>
       <YStack>
-        <VoxButton variant="outlined" theme="purple" iconLeft={Sparkle} onPress={handleCreatePublication}>
+        <VoxButton variant="outlined" theme="pink" iconLeft={Sparkle} onPress={handleCreatePublication}>
           Envoyer ma première publication
         </VoxButton>
       </YStack>

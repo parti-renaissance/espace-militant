@@ -38,7 +38,7 @@ export default function EmptyStateWithFilters({
       </YStack>
       {onResetFilters && (
         <YStack>
-          <VoxButton variant="outlined" theme="purple" iconLeft={RotateCcw} onPress={onResetFilters}>
+          <VoxButton variant="outlined" theme="pink" iconLeft={RotateCcw} onPress={onResetFilters}>
             Réinitialiser les filtres
           </VoxButton>
         </YStack>

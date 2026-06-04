@@ -11,14 +11,48 @@ export const RestTimelineFeedAddressSchema = z.object({
   country: z.string().nullable(),
 })
 
+export type RestTimelineFeedSocialMediaPhoto = z.infer<typeof RestTimelineFeedSocialMediaPhotoSchema>
+export const RestTimelineFeedSocialMediaPhotoSchema = z.object({
+  type: z.literal('photo'),
+  url: z.string(),
+  width: z.number(),
+  height: z.number(),
+})
+
+export type RestTimelineFeedSocialMediaVideo = z.infer<typeof RestTimelineFeedSocialMediaVideoSchema>
+export const RestTimelineFeedSocialMediaVideoSchema = z.object({
+  type: z.literal('video'),
+  hls_url: z.string(),
+  preview_url: z.string().optional(),
+  thumbnail_url: z.string(),
+  width: z.number().nullable().optional(),
+  height: z.number().nullable().optional(),
+  duration: z.number().nullable().optional(),
+})
+
+export type RestTimelineFeedSocialMediaItem = z.infer<typeof RestTimelineFeedSocialMediaItemSchema>
+export const RestTimelineFeedSocialMediaItemSchema = z.union([
+  RestTimelineFeedSocialMediaPhotoSchema,
+  RestTimelineFeedSocialMediaVideoSchema,
+])
+
+export type RestTimelineFeedSocialMedia = z.infer<typeof RestTimelineFeedSocialMediaSchema>
+export const RestTimelineFeedSocialMediaSchema = z.object({
+  network: z.enum(['twitter', 'instagram']),
+  type: z.string(),
+  items: z.array(RestTimelineFeedSocialMediaItemSchema),
+})
+
 export type RestTimelineFeedAuthor = z.infer<typeof RestTimelineFeedAuthorSchema>
 export const RestTimelineFeedAuthorSchema = z.object({
   first_name: z.string().nullable(),
   last_name: z.string().nullable(),
+  username: z.string().nullish(),
   role: z.string().nullish(),
   instance: z.string().nullish(),
   zone: z.string().nullish(),
-  image_url: z.string().url().nullish(),
+  image_url: z.string().nullish(),
+  instance_key: z.string().nullish(),
   uuid: z.string().nullish(),
   scope: z.string().nullish(),
   theme: z.object({
@@ -33,7 +67,18 @@ export type RestTimelineFeedItem = z.infer<typeof RestTimelineFeedItemSchema>
 export const RestTimelineFeedItemSchema = z.object({
   objectID: z.string(),
   identifier: z.string().nullable(),
-  type: z.enum(['news', 'event', 'phoning-campaign', 'pap-campaign', 'survey', 'riposte', 'action', 'publication', 'transactional_message']),
+  type: z.enum([
+    'news',
+    'event',
+    'phoning-campaign',
+    'pap-campaign',
+    'survey',
+    'riposte',
+    'action',
+    'publication',
+    'transactional_message',
+    'social_network_post',
+  ]),
   title: z.string().nullable(),
   description: z.string().nullable(),
   author: RestTimelineFeedAuthorSchema.nullable().optional(),
@@ -68,6 +113,13 @@ export const RestTimelineFeedItemSchema = z.object({
   zone_codes: z.union([z.array(z.string()), z.array(z.array(z.string()))]).nullish(),
   committee_uuid: z.string().nullish(),
   agora_uuid: z.string().nullish(),
+  media: RestTimelineFeedSocialMediaSchema.nullable().optional(),
+  access: z
+    .object({
+      author_id: z.union([z.string(), z.null()]).optional(),
+      team_owner_id: z.union([z.string(), z.null()]).optional(),
+    })
+    .nullish(),
 })
 
 export type RestTimelineFeedResponse = z.infer<typeof RestTimelineFeedResponseSchema>

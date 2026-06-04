@@ -1,4 +1,4 @@
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import { Spinner, YStack } from 'tamagui'
 
 export default function WaitingScreen() {
@@ -16,7 +16,7 @@ export default function WaitingScreen() {
       pointerEvents="none"
       zIndex={1000}
     >
-      <EuCampaignIllustration />
+      <Attal2027Illustration />
       <Spinner color="$blue9" size="large" />
     </YStack>
   )

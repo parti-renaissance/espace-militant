@@ -1,10 +1,12 @@
 import { XStack } from 'tamagui'
 import { Clock9, Eye, Sparkle, XCircle, Zap, ZapOff } from '@tamagui/lucide-icons'
 import { isBefore } from 'date-fns'
+import { usePathname } from 'expo-router'
 import { capitalize } from 'lodash'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { VoxButton } from '@/components/Button'
+import { useSession } from '@/ctx/SessionProvider'
 import VoxCard, { VoxCardAttendeesProps, VoxCardAuthorProps, VoxCardDateProps, VoxCardFrameProps, VoxCardLocationProps } from '@/components/VoxCard/VoxCard'
 
 import { useSubscribeAction, useUnsubscribeAction } from '@/services/actions/hook'
@@ -55,11 +57,11 @@ const ActionCard = ({
         {!asFull && <VoxCard.Author author={payload.author} />}
         {!asFull && (
           <XStack justifyContent="space-between">
-            <VoxButton variant="outlined" theme="gray" onPress={onShow} iconLeft={Eye}>
+            <VoxButton variant="outlined" theme="green" onPress={onShow} iconLeft={Eye}>
               Voir
             </VoxButton>
             {isMyAction ? (
-              <VoxButton disabled={isCancelled || isPassed} variant="outlined" theme="purple" iconLeft={Sparkle} onPress={onEdit}>
+              <VoxButton disabled={isCancelled || isPassed} variant="outlined" theme="pink" iconLeft={Sparkle} onPress={onEdit}>
                 Gérer
               </VoxButton>
             ) : (
@@ -74,17 +76,23 @@ const ActionCard = ({
 }
 
 export function SubscribeButton({ isRegister, id, large, disabled }: { isRegister: boolean; id?: string; large?: boolean; disabled?: boolean }) {
+  const { isAuth, signIn } = useSession()
+  const pathname = usePathname()
   const subscribe = useSubscribeAction(id)
   const unsubscribe = useUnsubscribeAction(id)
   const isloaderSub = subscribe.isPending || unsubscribe.isPending
 
   const handleOnSubscribe = useDebouncedCallback((isRegister: boolean) => {
+    if (!isAuth) {
+      signIn({ state: pathname })
+      return
+    }
     isRegister ? unsubscribe.mutate() : subscribe.mutate()
   }, 300)
   return (
     <VoxButton
       disabled={disabled}
-      variant={isRegister || disabled ? 'outlined' : 'contained'}
+      variant={isRegister ? 'soft' : 'contained'}
       theme="green"
       animation="quick"
       size={large ? 'xl' : 'md'}

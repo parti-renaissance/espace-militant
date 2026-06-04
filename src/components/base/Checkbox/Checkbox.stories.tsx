@@ -2,7 +2,7 @@ import { YStack } from 'tamagui'
 import Checkbox from './Checkbox'
 
 export default {
-  title: 'Checkbox',
+  title: 'Formulaire/Checkbox',
   component: Checkbox,
 }
 

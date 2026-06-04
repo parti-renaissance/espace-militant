@@ -1,4 +1,11 @@
+import { Platform } from 'react-native'
 import { createFont } from 'tamagui'
+
+/** Android/web: expo-font key (filename). iOS: PostScript name from the TTF. */
+export const PLAAK_44_BOLD = Platform.select({
+  ios: 'Plaak4Terme-44-BoldA',
+  default: 'Plaak-44-Bold',
+})!
 
 export const Maax = createFont({
   family: 'Maax',
@@ -31,6 +38,26 @@ export const Maax = createFont({
   face: {
     400: { normal: 'Maax-Medium', italic: 'Maax-MediumItalic' },
     700: { normal: 'Maax-Bold', italic: 'Maax-BoldItalic' },
+  },
+})
+
+export const Plaak = createFont({
+  family: PLAAK_44_BOLD,
+  defaultWeight: 400,
+  weight: {
+    1: 400,
+    true: 400,
+  },
+  size: {
+    1: 32,
+    true: 32,
+  },
+  lineHeight: {
+    1: 23,
+    true: 23,
+  },
+  face: {
+    400: { normal: PLAAK_44_BOLD },
   },
 })
 

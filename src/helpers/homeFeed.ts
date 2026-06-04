@@ -1,9 +1,11 @@
+import { router } from 'expo-router'
+
 import { type FeedCardProps } from '@/components/Cards'
+
 import { ActionType } from '@/core/entities/Action'
 import { ReadableActionType } from '@/services/actions/schema'
 import * as FeedMapper from '@/services/common/mapper/mapTimelineFeedToRestEvent'
 import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
-import { router } from 'expo-router'
 
 const transformFeedItemType = (type: RestTimelineFeedItem['type']): FeedCardProps['type'] => {
   switch (type) {
@@ -21,6 +23,8 @@ const transformFeedItemType = (type: RestTimelineFeedItem['type']): FeedCardProp
       return 'publication'
     case 'transactional_message':
       return 'transactional_message'
+    case 'social_network_post':
+      return 'social_post'
   }
 }
 
@@ -42,14 +46,30 @@ const transformFeedItemTypeToTag = (type: RestTimelineFeedItem['type']) => {
       return 'Publication'
     case 'transactional_message':
       return 'Message'
+    case 'social_network_post':
+      return 'Réseau social'
   }
 }
 
-export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardProps => {
+// TODO improve with real user name
+const getAuthorName = (feed: RestTimelineFeedItem) => {
+  const parts = [feed.author?.first_name, feed.author?.last_name].filter(Boolean)
+  return parts.length > 0 ? parts.join(' ') : null
+}
+
+const getSocialAuthorUsername = (feed: RestTimelineFeedItem) => {
+  const raw = feed.author?.username
+  if (raw) return raw.startsWith('@') ? raw : `@${raw}`
+  if (feed.author?.first_name) return `@${feed.author.first_name}`
+  return null
+}
+
+export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardProps | undefined => {
   const type = transformFeedItemType(feed.type)
+  if (!type) return undefined
   const author = {
     role: feed.author?.role ?? null,
-    name: feed.author?.first_name && feed.author?.last_name ? `${feed.author.first_name} ${feed.author.last_name}` : null,
+    name: getAuthorName(feed),
     title: feed.author?.instance ?? null,
     pictureLink: feed.author?.image_url ?? undefined,
     zone: feed.author?.zone ?? null,
@@ -125,6 +145,20 @@ export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardPr
         description: feed.description!,
         ctaLink: feed.cta_link ?? '',
         ctaLabel: feed.cta_label ?? null,
+      }
+    case 'social_post':
+      return {
+        type,
+        contentId: feed.objectID,
+        description: feed.description,
+        date: feed.date,
+        author: {
+          name: getAuthorName(feed),
+          username: getSocialAuthorUsername(feed),
+          pictureLink: feed.author?.image_url ?? undefined,
+        },
+        media: feed.media ?? null,
+        image: feed.image,
       }
   }
 }

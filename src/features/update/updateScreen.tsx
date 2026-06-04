@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import EuCampaignIllustration from '@/assets/illustrations/EuCampaignIllustration'
+import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import LayoutPage from '@/components/layouts/PageLayout/PageLayout'
@@ -24,7 +24,7 @@ export function UpdateStoreScreen() {
     <LayoutPage>
       <View p={'$medium'} pt={insets.top} pb={insets.bottom + getTokenValue('$medium')} flex={1}>
         <XStack alignItems="center" justifyContent="center" gap={'$large'}>
-          <EuCampaignIllustration pt={'$large'} showIcon={false} />
+          <Attal2027Illustration pt={'$large'} showIcon={false} />
         </XStack>
         <YStack alignItems="center" justifyContent="center" flex={1} gap={'$large'}>
           <Image source={updateRefreshImg} style={{ width: '100%', height: 200 }} contentFit="contain" />
@@ -54,7 +54,7 @@ export function UpdateExpoScreen() {
     <LayoutPage>
       <View p={'$medium'} pt={insets.top} pb={insets.bottom + getTokenValue('$medium')} flex={1}>
         <XStack alignItems="center" justifyContent="center" gap={'$large'}>
-          <EuCampaignIllustration pt={'$large'} showIcon={false} />
+          <Attal2027Illustration pt={'$large'} showIcon={false} />
         </XStack>
         <YStack alignItems="center" justifyContent="center" flex={1} gap={'$large'}>
           <Image source={updateRefreshImg} style={{ width: '100%', height: 200 }} contentFit="contain" />
