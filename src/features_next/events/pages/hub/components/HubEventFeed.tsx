@@ -80,6 +80,7 @@ const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrga
 })
 
 const HubFooterResourceCards = memo(function HubFooterResourceCards() {
+  const { isAuth } = useSession()
   const { runWithCompleteProfile } = useProfileCompletionAccess()
 
   const handleOpenPap = useCallback(() => {
@@ -104,15 +105,17 @@ const HubFooterResourceCards = memo(function HubFooterResourceCards() {
           </VoxButton>
         </Link>
       </CallToActionCard>
-      <CallToActionCard
-        icon={DoorOpen}
-        title="Je fais un Porte-à-porte"
-        description="Consultez la carte des adresses prioritaires pour organiser votre porte-à-porte."
-      >
-        <VoxButton variant="soft" theme="gray" onPress={handleOpenPap}>
-          Plateforme de PAP
-        </VoxButton>
-      </CallToActionCard>
+      {isAuth ? (
+        <CallToActionCard
+          icon={DoorOpen}
+          title="Je fais un Porte-à-porte"
+          description="Consultez la carte des adresses prioritaires pour organiser votre porte-à-porte."
+        >
+          <VoxButton variant="soft" theme="gray" onPress={handleOpenPap}>
+            Plateforme de PAP
+          </VoxButton>
+        </CallToActionCard>
+      ) : null}
     </>
   )
 })

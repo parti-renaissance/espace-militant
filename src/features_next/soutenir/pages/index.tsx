@@ -29,6 +29,7 @@ import { useRequireAuth } from '@/components/RequireAuth'
 import Title from '@/components/Title/Title'
 import { HubOrganizeCategoryModal } from '@/features_next/events/pages/hub/components/HubOrganizeCategoryModal'
 import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
+import { DoubleSquare } from '@/features_next/profil/pages/instances/components/icons'
 
 import clientEnv from '@/config/clientEnv'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
@@ -191,7 +192,7 @@ function CallToActionCards() {
         </CallToActionCard>
 
         <CallToActionCard
-          icon={Send}
+          icon={DoubleSquare}
           title="Je rejoins une Agora thématique"
           description="Fabriquez nos idées de demain en rejoignant un groupe de travail et d'exploration sur une thématique."
         >
