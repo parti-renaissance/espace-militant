@@ -25,15 +25,15 @@ export function SignupEngagementCard() {
       <YStack gap="$small">
         <XStack flexShrink={1} gap={12}>
           <UsersRound size={16} color="$purple500" />
-          <Text.SM>Rejoindre une communauté qui s&apos;engage pour le pays.</Text.SM>
+          <Text.SM flexShrink={1}>Rejoindre une communauté qui s&apos;engage pour le pays.</Text.SM>
         </XStack>
         <XStack flexShrink={1} gap={12}>
           <Zap size={16} color="$purple500" />
-          <Text.SM>Mener des actions concrètes pour changer les choses près de chez vous.</Text.SM>
+          <Text.SM flexShrink={1}>Mener des actions concrètes pour changer les choses près de chez vous.</Text.SM>
         </XStack>
         <XStack flexShrink={1} gap={12}>
           <Newspaper size={16} color="$purple500" />
-          <Text.SM>Partager notre actualité et notre projet.</Text.SM>
+          <Text.SM flexShrink={1}>Partager notre actualité et notre projet.</Text.SM>
         </XStack>
       </YStack>
     </YStack>

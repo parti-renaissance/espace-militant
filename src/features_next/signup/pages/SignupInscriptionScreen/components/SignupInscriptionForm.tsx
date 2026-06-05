@@ -45,6 +45,7 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
       email: '',
       postal_code: '',
       email_opt_in: false,
+      cgu_accepted: false,
     },
     resolver: zodResolver(SignupInscriptionFormSchema),
     mode: 'onSubmit',
@@ -178,29 +179,62 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
           </XStack>
         )}
       />
-      <YStack gap="$small">
-        <Text.MD semibold textAlign="center">
-          Avez-vous un compte Renaissance ?
+      <Controller
+        name="cgu_accepted"
+        control={control}
+        render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+          <YStack gap="$xsmall">
+            <XStack alignItems="flex-start" gap="$small">
+              <Checkbox checked={value} onPress={() => onChange(!value)} onBlur={onBlur} />
+              <Pressable onPress={() => onChange(!value)} style={{ flex: 1 }}>
+                <Text.SM multiline color={error ? '$red600' : '$textPrimary'}>
+                  En continuant, vous acceptez nos{' '}
+                  <Text.SM color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://parti-renaissance.fr/cgu')}>
+                    CGU
+                  </Text.SM>{' '}
+                  et notre{' '}
+                  <Text.SM color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://parti-renaissance.fr/politique-de-protection-des-donnees/')}>
+                    Politique de confidentialité
+                  </Text.SM>
+                  , et vous autorisez Renaissance à vous envoyer des emails relatifs à votre inscription.
+                </Text.SM>
+              </Pressable>
+            </XStack>
+            {error ? (
+              <Text.XSM color="$red500" pl={42}>
+                {error.message}
+              </Text.XSM>
+            ) : null}
+          </YStack>
+        )}
+      />
+
+      <YStack gap="$small" py="$medium">
+        <Text.MD semibold>
+          Un compte Renaissance ?{' '}
+          <Text.MD semibold color="$blue600" cursor="pointer" onPress={() => signIn({ state: redirectUri || '/' })}>
+            Je me connecte
+          </Text.MD>
         </Text.MD>
-        <VoxButton theme="blue" full variant="text" onPress={() => signIn({ state: redirectUri || '/' })}>
-          J’ai déja un compte, je me connecte
-        </VoxButton>
       </YStack>
 
       <YStack alignItems="center" height={100}>
         <FriendlyCaptchaWidget key={captchaResetKey} onToken={handleCaptchaToken} error={recaptchaError} />
       </YStack>
 
-      <Text.SM secondary>
-        En continuant, vous acceptez nos{' '}
-        <Text.SM secondary color="$blue9" onPress={() => Linking.openURL('https://parti-renaissance.fr/cgu')}>
-          CGU
-        </Text.SM>{' '}
-        et notre{' '}
-        <Text.SM secondary color="$blue9" onPress={() => Linking.openURL('https://parti-renaissance.fr/politique-de-protection-des-donnees/')}>
-          Politique de confidentialité
+      <Text.SM secondary multiline>
+        Les informations recueillies dans ce formulaire sont traitées par Renaissance afin de créer et gérer votre compte, personnaliser votre application et
+        vous proposer des événements et actions près de chez vous. Avec votre accord, elles servent également à vous tenir informé(e) de nos activités.
+        Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression et d&apos;opposition sur vos données, que vous pouvez
+        exercer en écrivant à{' '}
+        <Text.SM secondary color="$blue9" cursor="pointer" onPress={() => Linking.openURL('mailto:dpo@parti-renaissance.fr')}>
+          dpo@parti-renaissance.fr
         </Text.SM>
-        , et vous autorisez Renaissance à vous envoyer des emails relatifs à votre inscription.
+        . Vous pouvez également introduire une réclamation auprès de la CNIL. Pour en savoir plus, consultez notre{' '}
+        <Text.SM secondary color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://parti-renaissance.fr/politique-de-protection-des-donnees/')}>
+          politique de confidentialité
+        </Text.SM>
+        .
       </Text.SM>
     </YStack>
   )
