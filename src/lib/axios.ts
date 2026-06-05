@@ -28,6 +28,29 @@ const TOKEN_EXPIRATION_LEEWAY = 30_000 // 30s de marge pour le clock skew
 const REHYDRATE_COOLDOWN = 5_000 // 5s entre deux réhydratations
 const REFRESH_BACKOFF_DELAYS = [1000, 2000, 5000] // Backoff progressif en ms
 
+const extractOauthError = (error: unknown): Record<string, unknown> => {
+  if (error instanceof AxiosError) {
+    const data = error.response?.data
+    if (data && typeof data === 'object') {
+      const d = data as Record<string, unknown>
+      return { status: error.response?.status, error: d.error, error_description: d.error_description, hint: d.hint, message: d.message }
+    }
+    return { status: error.response?.status, raw: typeof data === 'string' ? data : undefined, message: error.message }
+  }
+  if (error instanceof Error) {
+    return { name: error.name, message: error.message }
+  }
+  return { value: String(error) }
+}
+
+export const logAuthEvent = (event: string, extra?: Record<string, unknown>, toSentry: boolean = true): void => {
+  // eslint-disable-next-line no-console
+  console.log(`[AUTH] ${event}`, extra ?? {})
+  if (toSentry) {
+    ErrorMonitor.logError({ message: `AUTH ${event}`, domain: 'auth', extra, tags: { auth_event: event } })
+  }
+}
+
 /**
  * Gestionnaire centralisé pour le refresh des tokens.
  */
@@ -82,12 +105,16 @@ class TokenRefreshManager {
       }
 
       this.updateUserWithToken(response)
+      logAuthEvent('refresh success', { context, expiresIn: response.expires_in, rotatedRefreshToken: !!response.refresh_token }, false)
       return response
     } catch (refreshError) {
       const isInvalidToken = this.isInvalidTokenError(refreshError)
 
+      logAuthEvent('refresh failed', { context, isInvalidToken, refreshTokenFingerprint: refreshToken.slice(-6), ...extractOauthError(refreshError) })
+
       if (isInvalidToken) {
         this.logError(refreshError, context)
+        logAuthEvent('logout: refresh token rejected', { context })
         useUserStore.getState().removeCredentials()
         return undefined
       }
@@ -250,6 +277,7 @@ class TokenRefreshManager {
     const freshRefreshToken = freshUser?.refreshToken
 
     if (!freshRefreshToken) {
+      logAuthEvent('logout: no refresh token on 401', { hadFailedToken: !!failedAccessToken })
       useUserStore.getState().removeCredentials()
       return undefined
     }
@@ -381,6 +409,10 @@ publicInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
 authInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
 authInstance.interceptors.request.use(authInterceptor, errorMonitor)
 refreshInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
+refreshInstance.interceptors.response.use(identity, (error: AxiosError) => {
+  logAuthEvent('refresh endpoint rejected', extractOauthError(error))
+  return Promise.reject(error)
+})
 
 authInstance.interceptors.response.use(
   identity,
@@ -395,6 +427,8 @@ authInstance.interceptors.response.use(
       return Promise.reject(error)
     }
     originalRequest._retry = true
+
+    logAuthEvent('401 received', { url: originalRequest.url, method: originalRequest.method }, false)
 
     try {
       const authHeader = (originalRequest.headers?.Authorization ?? '') as string
@@ -433,6 +467,7 @@ authInstance.interceptors.response.use(
         tokenRefreshManager.logError(err, '403 during refresh')
       } else if (tokenRefreshManager['isInvalidTokenError'](err)) {
         tokenRefreshManager.logError(err, 'invalid refresh during refresh')
+        logAuthEvent('logout: invalid refresh in interceptor', extractOauthError(err))
         useUserStore.getState().removeCredentials()
       } else {
         tokenRefreshManager.logError(err, 'unexpected error during refresh')
