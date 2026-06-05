@@ -58,11 +58,24 @@ const SOCIAL_LINKS = {
 const INVITE_SHARE_MESSAGE = "Téléchargez l'application de campagne pour nous rejoindre !"
 const DEFAULT_APP_INVITE_URL = `https://${clientEnv.ASSOCIATED_DOMAIN}`
 
-const openInAppBrowser = (url: string) => {
+const appendPublicIdParam = (url: string, publicId?: string | null): string => {
+  if (!publicId) return url
+  try {
+    const parsed = new URL(url)
+    parsed.searchParams.set('public_id', publicId)
+    return parsed.toString()
+  } catch {
+    const separator = url.includes('?') ? '&' : '?'
+    return `${url}${separator}public_id=${encodeURIComponent(publicId)}`
+  }
+}
+
+const openInAppBrowser = (url: string, publicId?: string | null) => {
+  const finalUrl = appendPublicIdParam(url, publicId)
   if (isWeb) {
-    window.open(url, '_blank')
+    window.open(finalUrl, '_blank')
   } else {
-    void WebBrowser.openBrowserAsync(url)
+    void WebBrowser.openBrowserAsync(finalUrl)
   }
 }
 
@@ -98,8 +111,10 @@ function HeroImageSection({ isDesktop }: { isDesktop: boolean }) {
 }
 
 function ContactNationalButton() {
+  const { data: user } = useGetProfil()
+
   return (
-    <VoxButton variant="outlined" iconLeft={Phone} onPress={() => openInAppBrowser(EXTERNAL_LINKS.contactNational)}>
+    <VoxButton variant="outlined" iconLeft={Phone} onPress={() => openInAppBrowser(EXTERNAL_LINKS.contactNational, user?.id)}>
       Être contacté par les équipes
     </VoxButton>
   )
@@ -118,8 +133,8 @@ function CallToActionCards() {
       redirectToSignup()
       return
     }
-    openInAppBrowser(EXTERNAL_LINKS.deposerUneIdee)
-  }, [isAuth, redirectToSignup])
+    openInAppBrowser(EXTERNAL_LINKS.deposerUneIdee, user?.id)
+  }, [isAuth, redirectToSignup, user?.id])
 
   const handleInviteFriend = useCallback(() => {
     return handleShareOrCopy({
@@ -168,7 +183,7 @@ function CallToActionCards() {
         </CallToActionCard>
 
         <CallToActionCard icon={Users} title="Je rejoins l'équipe" description="Devenez ambassadeur de la campagne." theme="teal">
-          <VoxButton theme="teal" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.rejoindreEquipe)}>
+          <VoxButton theme="teal" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.rejoindreEquipe, user?.id)}>
             Postuler
           </VoxButton>
         </CallToActionCard>
