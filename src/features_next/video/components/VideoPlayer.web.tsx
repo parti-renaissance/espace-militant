@@ -4,6 +4,7 @@ import { YStack } from 'tamagui'
 
 import { getVideoAspectRatio, type VideoPlayerProps } from './VideoPlayer.types'
 import { VideoPlayIcon } from './VideoPlayIcon'
+import { isAutoplayPolicyError, shouldShowVideoPlayIcon } from '@/features_next/video/helpers/videoPlaybackUi'
 
 const HLS_JS_URL = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js'
 
@@ -76,24 +77,50 @@ export default function VideoPlayer({
   // URL effectivement activée. Si `hlsUrl` change, on repasse au poster (sauf autoPlay).
   const [activatedUrl, setActivatedUrl] = useState<string | null>(autoPlay ? hlsUrl : null)
   const [ready, setReady] = useState(false)
+  const [isUserPaused, setIsUserPaused] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
-  // Bascule à true au premier frame joué : la couche poster ne réapparaît jamais ensuite.
-  const [hasStarted, setHasStarted] = useState(false)
-
+  const [autoplayFailed, setAutoplayFailed] = useState(false)
+  const [isStartingManually, setIsStartingManually] = useState(false)
+  const pendingManualPlayRef = useRef(false)
   const isActivated = autoPlay || activatedUrl === hlsUrl
+  const shouldAttemptAutoPlay = autoPlay && active && isActivated
   const aspectRatio = getVideoAspectRatio(width, height)
   const contentFit: 'cover' | 'contain' = fill ? 'cover' : 'contain'
 
+  const playVideoElement = useCallback(() => {
+    const video = videoRef.current
+    if (!video) return
+    void video.play().catch((error) => {
+      if (isAutoplayPolicyError(error)) {
+        setAutoplayFailed(true)
+        setIsStartingManually(false)
+      }
+    })
+  }, [])
+
   const handleActivate = useCallback(() => {
     setActivatedUrl(hlsUrl)
-  }, [hlsUrl])
+    setIsStartingManually(true)
+    setIsUserPaused(false)
+    setAutoplayFailed(false)
+    pendingManualPlayRef.current = true
+    if (ready && activatedUrl === hlsUrl) {
+      pendingManualPlayRef.current = false
+      playVideoElement()
+    }
+  }, [activatedUrl, hlsUrl, ready, playVideoElement])
 
   const handleTogglePlay = useCallback(() => {
     const video = videoRef.current
     if (!video) return
     if (video.paused) {
-      void video.play().catch(() => undefined)
+      setIsUserPaused(false)
+      setAutoplayFailed(false)
+      void video.play().catch((error) => {
+        if (isAutoplayPolicyError(error)) setAutoplayFailed(true)
+      })
     } else {
+      setIsUserPaused(true)
       video.pause()
     }
   }, [])
@@ -105,7 +132,8 @@ export default function VideoPlayer({
 
     const onPlay = () => {
       setIsPlaying(true)
-      setHasStarted(true)
+      setAutoplayFailed(false)
+      setIsStartingManually(false)
     }
     const onPause = () => setIsPlaying(false)
 
@@ -164,21 +192,36 @@ export default function VideoPlayer({
     }
   }, [isActivated, hlsUrl])
 
-  // Play / pause déclaratif : se synchronise sur `active` et la disponibilité de la source.
+  // Lecture manuelle : démarre dès que la source HLS est prête (tap sur le poster).
+  useEffect(() => {
+    if (!isActivated || !ready || !pendingManualPlayRef.current) return
+    pendingManualPlayRef.current = false
+    playVideoElement()
+  }, [isActivated, ready, playVideoElement])
+
+  // Play / pause déclaratif : uniquement pour l'autoplay (`autoPlay` prop).
   useEffect(() => {
     if (!isActivated || !ready) return
     const video = videoRef.current
     if (!video) return
 
-    if (active) {
-      void video.play().catch(() => undefined)
-    } else {
+    if (shouldAttemptAutoPlay && !isUserPaused) {
+      void video.play().catch((error) => {
+        if (isAutoplayPolicyError(error)) setAutoplayFailed(true)
+      })
+    } else if (!active || isUserPaused) {
       video.pause()
     }
-  }, [isActivated, ready, active])
+  }, [active, isActivated, isUserPaused, ready, shouldAttemptAutoPlay])
 
   const showPlayButton = !isActivated
   const showCustomControls = isActivated && !controls
+  const showPlayIcon = shouldShowVideoPlayIcon(
+    isPlaying,
+    isUserPaused,
+    autoplayFailed && shouldAttemptAutoPlay,
+    shouldAttemptAutoPlay || isStartingManually,
+  )
 
   return (
     <YStack
@@ -189,30 +232,28 @@ export default function VideoPlayer({
       {...(fill ? { flex: 1, height: '100%' } : { style: { aspectRatio } })}
     >
       <YStack flex={1} position="relative" width="100%" height="100%">
+        <Image
+          source={{ uri: thumbnailUrl }}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          contentFit="cover"
+          pointerEvents="none"
+        />
         {/* Toujours montée : la ref reste stable, aucun remount => pas de flash. */}
         <video
           ref={setVideoNode}
           controls={isActivated && controls}
           playsInline
           loop={loop}
-          poster={thumbnailUrl}
           style={{
+            position: 'relative',
+            zIndex: 1,
             width: '100%',
             height: '100%',
             objectFit: contentFit,
-            backgroundColor: '#000',
+            backgroundColor: 'transparent',
+            pointerEvents: isActivated ? 'auto' : 'none',
           }}
         />
-
-        {/* Couche poster : recouvre la vidéo tant que le 1er frame n'a pas été joué. */}
-        {!hasStarted ? (
-          <Image
-            source={{ uri: thumbnailUrl }}
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-            contentFit="cover"
-            pointerEvents="none"
-          />
-        ) : null}
 
         {/* Overlay « grand play » avant activation. */}
         {showPlayButton ? (
@@ -222,6 +263,7 @@ export default function VideoPlayer({
             left={0}
             right={0}
             bottom={0}
+            zIndex={2}
             alignItems="center"
             justifyContent="center"
             backgroundColor="rgba(0,0,0,0.2)"
@@ -244,16 +286,17 @@ export default function VideoPlayer({
             left={0}
             right={0}
             bottom={0}
+            zIndex={2}
             alignItems="center"
             justifyContent="center"
             onPress={handleTogglePlay}
             cursor="pointer"
             role="button"
-            aria-label={isPlaying ? 'Mettre en pause' : 'Lire la vidéo'}
-            hoverStyle={isPlaying ? undefined : { backgroundColor: 'rgba(0,0,0,0.15)' }}
-            pressStyle={isPlaying ? undefined : { opacity: 0.9 }}
+            aria-label={showPlayIcon ? 'Lire la vidéo' : 'Mettre en pause'}
+            hoverStyle={showPlayIcon ? { backgroundColor: 'rgba(0,0,0,0.15)' } : undefined}
+            pressStyle={showPlayIcon ? { opacity: 0.9 } : undefined}
           >
-            {!isPlaying ? <VideoPlayIcon /> : null}
+            {showPlayIcon ? <VideoPlayIcon /> : null}
           </YStack>
         ) : null}
       </YStack>

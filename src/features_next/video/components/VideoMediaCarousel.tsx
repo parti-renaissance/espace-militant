@@ -190,15 +190,23 @@ const SCROLL_ANIMATION_MS = 400
 /** Pendant le swipe horizontal, on gèle la slide « lecture » pour éviter le clignotement vignette/vidéo. */
 const CAROUSEL_VIEWABILITY_SYNC_MS = Platform.OS === 'android' ? 80 : 0
 
+const getPercentVisible = (token: ViewToken<CarouselSlide>) =>
+  (token as ViewToken<CarouselSlide> & { percentVisible?: number }).percentVisible ?? 0
+
 const pickViewableVideoSlideId = (viewableItems: ViewToken<CarouselSlide>[]): string | null => {
   const viewableVideos = viewableItems.filter((token) => token.isViewable && token.item?.item.type === 'video')
 
   if (viewableVideos.length === 0) return null
 
   const best = viewableVideos.reduce((current, candidate) => {
-    const currentPercent = current.percentVisible ?? 0
-    const candidatePercent = candidate.percentVisible ?? 0
-    return candidatePercent > currentPercent ? candidate : current
+    const currentPercent = getPercentVisible(current)
+    const candidatePercent = getPercentVisible(candidate)
+    if (candidatePercent !== currentPercent) {
+      return candidatePercent > currentPercent ? candidate : current
+    }
+    const currentIndex = current.index ?? -1
+    const candidateIndex = candidate.index ?? -1
+    return candidateIndex >= currentIndex ? candidate : current
   })
 
   return best.item?.id ?? null
@@ -210,6 +218,7 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
   const isHorizontalScrolling = useRef(false)
   const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const viewabilitySyncTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const initializedPlaybackForContent = useRef<string | null>(null)
 
   const setViewableVideoForContent = useVideoFeedStore((s) => s.setViewableVideoForContent)
   const recomputeActiveVideoId = useVideoFeedStore((s) => s.recomputeActiveVideoId)
@@ -295,15 +304,40 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
     [syncActiveVideoFromViewability],
   )
 
+  const onViewableItemsChangedRef = useRef(onViewableItemsChanged)
+
+  useEffect(() => {
+    onViewableItemsChangedRef.current = onViewableItemsChanged
+  }, [onViewableItemsChanged])
+
   const viewabilityConfigCallbackPairs = useMemo(
-    () => [{ viewabilityConfig: VIEWABILITY_CONFIG, onViewableItemsChanged }],
-    [onViewableItemsChanged],
+    () => [
+      {
+        viewabilityConfig: VIEWABILITY_CONFIG,
+        onViewableItemsChanged: ({ viewableItems }: { viewableItems: ViewToken<CarouselSlide>[] }) => {
+          onViewableItemsChangedRef.current({ viewableItems })
+        },
+      },
+    ],
+    [],
   )
 
-  const handleLayout = (event: LayoutChangeEvent) => {
-    const width = event.nativeEvent.layout.width
-    if (width > 0 && width !== containerWidth) setContainerWidth(width)
-  }
+  const handleLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const width = event.nativeEvent.layout.width
+      if (width <= 0) return
+
+      if (width !== containerWidth) {
+        setContainerWidth(width)
+      }
+
+      if (slides.length > 0 && initializedPlaybackForContent.current !== contentId) {
+        initializedPlaybackForContent.current = contentId
+        commitPlaybackAtIndex(0)
+      }
+    },
+    [commitPlaybackAtIndex, containerWidth, contentId, slides.length],
+  )
 
   const indexFromOffset = useCallback(
     (offsetX: number) => {
