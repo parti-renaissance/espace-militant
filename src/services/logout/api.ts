@@ -2,7 +2,6 @@ import { Linking, Platform } from 'react-native'
 import clientEnv from '@/config/clientEnv'
 import { END_SESSION_ENDPOINT } from '@/config/discoveryDocument'
 import { REDIRECT_URI } from '@/hooks/useLogin'
-import { logAuthEvent } from '@/lib/axios'
 import { logout } from '@/services/profile/api'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
@@ -15,11 +14,9 @@ export function useLogOut() {
 
   return useMutation<WebBrowser.WebBrowserAuthSessionResult | void, Error>({
     mutationFn: async () => {
-      logAuthEvent('manual logout requested', { isAdmin: !!user?.isAdmin, platform: Platform.OS })
       return logout()
     },
     onSuccess: async () => {
-      logAuthEvent('manual logout success', { isAdmin: !!user?.isAdmin })
       removeCredentials()
       queryClient.clear()
       await queryClient.invalidateQueries()
@@ -49,7 +46,6 @@ export function useLogOut() {
       return WebBrowser.openAuthSessionAsync(`${END_SESSION_ENDPOINT}?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`, REDIRECT_URI)
     },
     onError: (error) => {
-      logAuthEvent('manual logout error', { message: error.message })
       ErrorMonitor.log('Cannot open web browser on disconnect', {
         error: error,
       })

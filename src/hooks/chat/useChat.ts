@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 
+import { refreshOn401 } from '@/lib/axios'
 import { useUserStore } from '@/store/user-store'
 
 import { classifyHttpError } from './sse/classifyHttpError'
@@ -34,6 +35,7 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
 
   const threadIdRef = useRef<string | null>(threadId)
   const lastUserMessageRef = useRef<string | null>(null)
+  const hasTriedRefreshRef = useRef(false)
   const streamBufferRef = useRef('')
   const inStreamErrorRef = useRef<{ message: string; retryAfter?: number } | null>(null)
 
@@ -85,6 +87,21 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       }
     },
     onError: (err) => {
+      if (err.kind === 'http' && err.status === 401 && !hasTriedRefreshRef.current) {
+        hasTriedRefreshRef.current = true
+        const failedToken = useUserStore.getState().user?.accessToken
+        refreshOn401(failedToken).then((refreshed) => {
+          if (refreshed && lastUserMessageRef.current) {
+            const retryBody: Record<string, unknown> = { message: lastUserMessageRef.current }
+            if (agentId) retryBody.agent_id = agentId
+            if (threadIdRef.current) retryBody.thread_id = threadIdRef.current
+            stream.start(retryBody)
+          } else {
+            setError(classifyHttpError(401, null, null))
+          }
+        })
+        return
+      }
       if (err.kind === 'http') {
         setError(classifyHttpError(err.status, err.retryAfterHeader, err.responseBody))
       } else if (err.kind === 'timeout') {
@@ -104,6 +121,7 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       if (!trimmed) return
 
       lastUserMessageRef.current = trimmed
+      hasTriedRefreshRef.current = false
       inStreamErrorRef.current = null
       streamBufferRef.current = ''
 
