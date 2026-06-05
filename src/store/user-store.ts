@@ -47,7 +47,7 @@ interface UserState extends UserSessionData {
   rehydrateFromStorage: () => Promise<void>
 }
 
-const userStoreSlice: StateCreator<UserState> = (set) => ({
+const userStoreSlice: StateCreator<UserState> = (set, get) => ({
   ...initialUserData,
   _hasHydrated: false,
   setDefaultScope: (scope) => set({ defaultScope: scope }),
@@ -72,17 +72,19 @@ const userStoreSlice: StateCreator<UserState> = (set) => ({
   _setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   setHideReSubscribeAlert: (hideResubscribeAlert) => set({ hideResubscribeAlert }),
   rehydrateFromStorage: async () => {
-    // Force la réhydratation depuis le storage pour éviter les désynchronisations entre onglets
     try {
-      const stored = await AsyncStorage.getItem('user')
-      const storedSecure = await AsyncStorage.secure.getItem('user')
+      const stored = await AsyncStorage.secure.getItem('user')
+      if (!stored) return
+      const storedUser = JSON.parse(stored)?.state?.user as User | undefined
+      if (!storedUser?.accessToken) return
+      const current = get().user
+      const storedExpiresAt = storedUser.accessTokenExpiresAt ?? 0
+      const currentExpiresAt = current?.accessTokenExpiresAt ?? 0
+      const adopt = Boolean(current) && storedExpiresAt > currentExpiresAt
       // eslint-disable-next-line no-console
-      console.log('[AUTH] rehydrateFromStorage read', { hasStored: stored != null, hasStoredSecure: storedSecure != null })
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        if (parsed.state?.user) {
-          set({ user: parsed.state.user })
-        }
+      console.log('[AUTH] rehydrateFromStorage', { adopt, storedExpiresAt, currentExpiresAt })
+      if (adopt) {
+        set({ user: storedUser })
       }
     } catch (error) {
       ErrorMonitor.log('Failed to rehydrate from storage', { error })
