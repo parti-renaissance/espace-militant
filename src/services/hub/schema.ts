@@ -64,7 +64,6 @@ export const RestHubItemSchema = z.object({
   image: RestHubItemImageSchema,
   editable: z.boolean(),
   user_registered_at: z.string().nullish(),
-  edit_link: z.string().optional(),
   object_state: z.enum(['full', 'partial']).optional(),
 })
 

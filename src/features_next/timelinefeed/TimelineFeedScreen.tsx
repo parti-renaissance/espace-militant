@@ -145,15 +145,26 @@ const TimelineFeedMain = () => {
     [trackImpression],
   )
 
-  const viewabilityConfig = useMemo(
-    () => ({
-      viewAreaCoveragePercentThreshold: 50,
-      minimumViewTime: 400,
-    }),
+  const onViewableItemsChangedRef = useRef(onViewableItemsChanged)
+
+  useEffect(() => {
+    onViewableItemsChangedRef.current = onViewableItemsChanged
+  }, [onViewableItemsChanged])
+
+  const viewabilityConfigCallbackPairs = useMemo(
+    () => [
+      {
+        viewabilityConfig: {
+          viewAreaCoveragePercentThreshold: 50,
+          minimumViewTime: 400,
+        },
+        onViewableItemsChanged: ({ viewableItems, changed }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+          onViewableItemsChangedRef.current({ viewableItems, changed })
+        },
+      },
+    ],
     [],
   )
-
-  const viewabilityConfigCallbackPairs = useMemo(() => [{ viewabilityConfig, onViewableItemsChanged }], [onViewableItemsChanged, viewabilityConfig])
 
   return (
     <LayoutFlatList<RestTimelineFeedItem>

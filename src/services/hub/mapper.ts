@@ -70,7 +70,6 @@ export const mapHubItemToRestItemEvent = (item: RestHubItem): RestItemEvent | nu
     user_registered_at: item.user_registered_at,
     is_national: item.is_national,
     editable: item.editable,
-    edit_link: item.edit_link,
   }
 
   if (objectState === 'full') {
