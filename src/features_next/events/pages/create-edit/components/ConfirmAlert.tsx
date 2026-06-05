@@ -124,9 +124,7 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
       <VoxCard.Content justifyContent="space-between" gap="$large" maxWidth={media.sm ? 350 : 500}>
         <YStack gap="$medium">
           <Text.LG semibold>{props.title}</Text.LG>
-          <Text.MD color="$textPrimary">
-            Une fois créé vous pourrez toujours le modifier mais la première communication sera partie.
-          </Text.MD>
+          <Text.MD color="$textPrimary">Une fois créé vous pourrez toujours le modifier mais la première communication sera partie.</Text.MD>
           <VisibilityReview visibility={visibility} />
           {!hidden ? (
             <XStack gap="$small" alignItems="center">
@@ -182,9 +180,7 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
                         options={[
                           {
                             value: 'notif',
-                            label: props.canCreateAsCadre
-                              ? 'Inviter également mes contacts par email.'
-                              : 'Inviter par email tous les contacts de la commune',
+                            label: props.canCreateAsCadre ? 'Inviter également mes contacts par email.' : 'Inviter par email tous les contacts de la commune',
                           },
                         ]}
                       />
@@ -199,11 +195,11 @@ const _ConfirmAlert = forwardRef<ModalRef, ConfirmAlertProps>((props, ref) => {
           ) : null}
         </YStack>
         <XStack gap="$medium">
-          <VoxButton variant="outlined" flex={3} children="Annuler" onPress={handleCancel} theme="gray" />
+          <VoxButton variant="outlined" children="Annuler" onPress={handleCancel} theme="gray" />
           <VoxButton
             children={!hidden && isInvitationVisibility(visibility) ? 'Envoyer les invitations' : 'Créer'}
             loading={props.isPending}
-            flex={1}
+            flexGrow={1}
             onPress={handleAccept}
             theme="pink"
           />

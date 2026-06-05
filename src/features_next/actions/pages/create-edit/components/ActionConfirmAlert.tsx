@@ -48,9 +48,7 @@ const _ActionConfirmAlert = forwardRef<ModalRef, ActionConfirmAlertProps>((props
       <VoxCard.Content justifyContent="space-between" gap="$large" maxWidth={media.sm ? 350 : 500}>
         <YStack gap="$medium">
           <Text.LG semibold>Créer l’action ?</Text.LG>
-          <Text.MD color="$textPrimary">
-            Une fois créé vous pourrez toujours le modifier mais la première communication sera partie.
-          </Text.MD>
+          <Text.MD color="$textPrimary">Une fois créé vous pourrez toujours le modifier mais la première communication sera partie.</Text.MD>
           <XStack gap="$small" alignItems="center">
             <Theme name="blue">
               <XStack flexGrow={1} paddingHorizontal="$medium">
@@ -61,8 +59,7 @@ const _ActionConfirmAlert = forwardRef<ModalRef, ActionConfirmAlertProps>((props
                   <Text.MD bold color="$color5">
                     Réservé aux membres.{' '}
                   </Text.MD>
-                  Les externes ne pourront pas s’y inscrire sans créer un compte et renseigner leurs informations. Un aperçu sera visible
-                  publiquement.
+                  Les externes ne pourront pas s’y inscrire sans créer un compte et renseigner leurs informations. Un aperçu sera visible publiquement.
                 </Text.MD>
               </YStack>
             </Theme>
@@ -105,8 +102,8 @@ const _ActionConfirmAlert = forwardRef<ModalRef, ActionConfirmAlertProps>((props
           />
         </YStack>
         <XStack gap="$medium">
-          <VoxButton variant="outlined" flex={3} children="Annuler" onPress={handleCancel} theme="gray" />
-          <VoxButton children="Créer" loading={props.isPending} flex={1} onPress={handleAccept} theme="pink" />
+          <VoxButton variant="outlined" children="Annuler" onPress={handleCancel} theme="gray" />
+          <VoxButton children="Créer" loading={props.isPending} flexGrow={1} onPress={handleAccept} theme="pink" />
         </XStack>
       </VoxCard.Content>
     </VoxSimpleModal>
