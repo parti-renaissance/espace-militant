@@ -18,7 +18,12 @@ export default function QuestionnairesPage() {
       <Head>
         <title>{metatags.createTitle('Questionnaires de terrain')}</title>
       </Head>
-      <Header title={media.xxs ? 'Questionnaires' : 'Questionnaires de terrain'} icon={ClipboardCheck} navigation={{ showBackButton: false }} />
+      <Header
+        title={media.xxs ? 'Questionnaires' : 'Questionnaires de terrain'}
+        icon={ClipboardCheck}
+        navigation={{ showBackButton: true }}
+        style={{ showOn: 'sm' }}
+      />
       <Layout.Container safeHorizontalPadding={false}>
         <FieldSurveysListPage />
       </Layout.Container>
