@@ -25,7 +25,7 @@ export default function PrioritiesCard({ onExplore, onCampaignSite }: Priorities
     >
       <YStack gap="$small">
         <VoxButton theme="purple" variant="soft" onPress={onExplore}>
-          Explorer nos idées
+          Explorer nos engagements
         </VoxButton>
         <VoxButton theme="purple" variant="outlined" iconLeft={Rocket} onPress={onCampaignSite}>
           Notre site de campagne

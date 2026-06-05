@@ -4,8 +4,12 @@ import { useMedia, XStack, YStack } from 'tamagui';
 import { LinearGradient } from '@tamagui/linear-gradient';
 import { Dices, Share2 } from '@tamagui/lucide-icons';
 
+
+
 import { VoxButton } from '@/components/Button';
 import CallToActionCard from '@/components/CallToActionCard/CallToActionCard';
+
+
 
 import GAME_IMAGE from '../assets/game-card.jpg';
 
@@ -41,7 +45,7 @@ export default function ToiPresidentCard({ onPlay, onShare, ...rest }: ToiPresid
 
       <CallToActionCard
         title="Toi président - le jeu"
-        description="150 propositions de réforme - que feriez vous si vous étiez Président ?"
+        description="150 propositions de réformes issues du débat public, que feriez-vous si vous étiez Président ?"
         theme="purple"
         backgroundColor="$purple50"
         zIndex={4}
