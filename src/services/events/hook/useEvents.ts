@@ -12,6 +12,8 @@ import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/events/api'
 import { eventPostFormError } from '@/services/events/error'
 import { FRANCE_METRO_EVENTS_BBOX } from '@/services/events/franceMetroBounds'
+import { invalidateHubQueries } from '@/services/hub/helpers'
+import { hubKeys } from '@/services/hub/hook'
 import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook'
 
 import {
@@ -22,7 +24,7 @@ import {
   RestPostEventSubsciptionRequest,
   RestPostPublicEventSubsciptionRequest,
 } from '../schema'
-import { optimisticToggleSubscribe, optimisticUpdate } from './helpers'
+import { optimisticToggleSubscribe, optimisticUpdate, rollbackOptimisticSubscribe } from './helpers'
 import { QUERY_KEY_MAP_EVENTS, QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
 
 type CreateOrUpdateEventVariables = { payload: RestPostEventRequest; scope?: string }
@@ -137,11 +139,16 @@ export const useSubscribeEvent = ({ id: eventId, slug }: { id: string; slug?: st
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: RestPostEventSubsciptionRequest) => api.subscribeToEvent(eventId, payload),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: hubKeys.all })
+      return optimisticToggleSubscribe(true, { eventId, slug }, queryClient)
+    },
     onSuccess: () => {
       toast.show('Succès', { message: "Inscription à l'événement réussie", type: 'success' })
-      optimisticToggleSubscribe(true, { eventId, slug }, queryClient)
+      invalidateHubQueries(queryClient)
     },
-    onError: (error) => {
+    onError: (error, _, context) => {
+      rollbackOptimisticSubscribe(queryClient, context)
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })
       } else {
@@ -156,11 +163,16 @@ export const useUnsubscribeEvent = ({ id: eventId, slug }: { id: string; slug?: 
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => api.unsubscribeFromEvent(eventId),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: hubKeys.all })
+      return optimisticToggleSubscribe(false, { eventId, slug }, queryClient)
+    },
     onSuccess: () => {
       toast.show('Succès', { message: "Désinscription de l'événement réussie", type: 'success' })
-      optimisticToggleSubscribe(false, { eventId, slug }, queryClient)
+      invalidateHubQueries(queryClient)
     },
-    onError: (error) => {
+    onError: (error, _, context) => {
+      rollbackOptimisticSubscribe(queryClient, context)
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })
       } else {
@@ -185,18 +197,21 @@ export const useSubscribePublicEvent = ({ id: eventId, slug }: { id: string; slu
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (payload: RestPostPublicEventSubsciptionRequest) => api.subscribePublicEvent(eventId, payload),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: hubKeys.all })
+      return optimisticToggleSubscribe(true, { eventId, slug }, queryClient)
+    },
     onSuccess: () => {
       toast.show('Succès', { message: "Inscription à l'événement réussie", type: 'success' })
+      invalidateHubQueries(queryClient)
     },
-    onMutate: () => optimisticToggleSubscribe(true, { eventId, slug }, queryClient),
-    onError: (error) => {
+    onError: (error, _, context) => {
+      rollbackOptimisticSubscribe(queryClient, context)
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })
       } else {
         toast.show('Erreur', { message: "Impossible de s'inscrire à cet événement", type: 'error' })
       }
-      optimisticToggleSubscribe(false, { eventId, slug }, queryClient)
-      return error
     },
   })
 }
