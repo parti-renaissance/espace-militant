@@ -42,28 +42,7 @@ const isPostAddressFilled = (postAddress?: PostAddressFormValue | null) => {
 }
 
 const validateCompleteProfilStep1Schema = z.object({
-  post_address: z
-    .object({
-      address: z.string().optional().nullable(),
-      postal_code: z.string().optional().nullable(),
-      city_name: z.string().optional().nullable(),
-      country: z.string().optional().nullable(),
-    })
-    .nullable()
-    .optional()
-    .superRefine((postAddress, ctx) => {
-      if (!isPostAddressFilled(postAddress)) return
-
-      const result = validateLocationFormSchema.safeParse({ post_address: postAddress })
-      if (result.success) return
-
-      result.error.issues.forEach((issue) => {
-        ctx.addIssue({
-          ...issue,
-          path: ['post_address', ...(issue.path.slice(1) as (string | number)[])],
-        })
-      })
-    }),
+  post_address: validateLocationFormSchema.shape.post_address,
   phone: validateCoordFormSchema.shape.phone,
 })
 
@@ -96,10 +75,10 @@ const buildDefaultValues = (profile: RestDetailedProfileResponse): CompleteProfi
 
   return {
     post_address: {
-      address: profile.post_address?.address ?? undefined,
-      city_name: profile.post_address?.city_name ?? undefined,
-      postal_code: profile.post_address?.postal_code ?? undefined,
-      country: profile.post_address?.country ?? undefined,
+      address: profile.post_address?.address ?? '',
+      city_name: profile.post_address?.city_name ?? '',
+      postal_code: profile.post_address?.postal_code ?? '',
+      country: profile.post_address?.country ?? '',
     },
     phone: {
       country: profile.phone?.country ?? 'FR',
@@ -191,7 +170,7 @@ function CompleteProfilContent({ isMobileSheet, insets, media, onClose, redirect
 
   const defaultValues = useMemo(() => buildDefaultValues(profile), [profile])
 
-  const { control, handleSubmit, reset, trigger, setError, getValues } = useForm<CompleteProfilFormValues>({
+  const { control, handleSubmit, reset, trigger, setError } = useForm<CompleteProfilFormValues>({
     resolver: zodResolver(validateCompleteProfilFormSchema),
     defaultValues,
     mode: 'onChange',
@@ -208,11 +187,6 @@ function CompleteProfilContent({ isMobileSheet, insets, media, onClose, redirect
   const onNextStep = async () => {
     const isValid = await trigger([...STEP_1_FIELDS])
     if (!isValid) {
-      return
-    }
-
-    if (!getValues('post_address')?.address?.trim()) {
-      setError('post_address.address', { message: 'Veuillez renseigner votre adresse' })
       return
     }
 
@@ -236,12 +210,6 @@ function CompleteProfilContent({ isMobileSheet, insets, media, onClose, redirect
           setError(path, { message: issue.message })
         }
       })
-      return
-    }
-
-    if (!parsed.data.post_address?.address?.trim()) {
-      setError('post_address.address', { message: 'Veuillez renseigner votre adresse' })
-      setStep(1)
       return
     }
 
@@ -306,6 +274,7 @@ function CompleteProfilContent({ isMobileSheet, insets, media, onClose, redirect
                 },
               }) => (
                 <AddressAutocomplete
+                  addressOnly
                   color="white"
                   size="sm"
                   placeholder="Adresse"
@@ -320,9 +289,11 @@ function CompleteProfilContent({ isMobileSheet, insets, media, onClose, redirect
                     })
                   }
                   error={
-                    postAddressErrors?.address || postAddressErrors?.city_name || postAddressErrors?.postal_code || postAddressErrors?.country
-                      ? 'Veuillez saisir une adresse valide'
-                      : error?.message
+                    postAddressErrors?.address?.message ||
+                    postAddressErrors?.city_name?.message ||
+                    postAddressErrors?.postal_code?.message ||
+                    postAddressErrors?.country?.message ||
+                    error?.message
                   }
                 />
               )}

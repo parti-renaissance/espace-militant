@@ -9,6 +9,7 @@ import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useSession } from '@/ctx/AuthContext'
 import * as api from '@/services/profile/api'
 import {
+  RestDetailedProfileResponse,
   RestDonationsResponse,
   RestProfilResponse,
   RestProfilResponseTagTypes,
@@ -237,13 +238,50 @@ export const useGetResubscribeLoop = (props: { enabled: boolean }) => {
   })
 }
 
+type RestUpdateProfileRequestWithPhone = RestUpdateProfileRequest & {
+  phone?: RestDetailedProfileResponse['phone']
+}
+
+const mergeDetailedProfileUpdate = (
+  current: RestDetailedProfileResponse,
+  update: RestUpdateProfileRequestWithPhone,
+): RestDetailedProfileResponse => ({
+  ...current,
+  ...(update.first_name !== undefined ? { first_name: update.first_name } : {}),
+  ...(update.last_name !== undefined ? { last_name: update.last_name } : {}),
+  ...(update.gender !== undefined ? { gender: update.gender } : {}),
+  ...(update.custom_gender !== undefined ? { custom_gender: update.custom_gender } : {}),
+  ...(update.nationality !== undefined ? { nationality: update.nationality } : {}),
+  ...(update.birthdate !== undefined ? { birthdate: update.birthdate } : {}),
+  ...(update.party_membership !== undefined ? { party_membership: update.party_membership } : {}),
+  ...(update.email_address !== undefined ? { email_address: update.email_address } : {}),
+  ...(update.facebook_page_url !== undefined ? { facebook_page_url: update.facebook_page_url } : {}),
+  ...(update.twitter_page_url !== undefined ? { twitter_page_url: update.twitter_page_url } : {}),
+  ...(update.linkedin_page_url !== undefined ? { linkedin_page_url: update.linkedin_page_url } : {}),
+  ...(update.instagram_page_url !== undefined ? { instagram_page_url: update.instagram_page_url } : {}),
+  ...(update.telegram_page_url !== undefined ? { telegram_page_url: update.telegram_page_url } : {}),
+  post_address:
+    update.post_address === undefined
+      ? current.post_address
+      : update.post_address === null
+        ? null
+        : {
+            ...(current.post_address ?? {}),
+            ...update.post_address,
+          },
+  phone: update.phone !== undefined ? update.phone : current.phone,
+})
+
 export const useMutationUpdateProfil = ({ userUuid }: { userUuid: string }) => {
   const toast = useToastController()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (data: RestUpdateProfileRequest) => api.updateProfile(userUuid, data),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData<RestDetailedProfileResponse>([PROFILE_DETAIL_QUERY_KEY], (current) =>
+        current ? mergeDetailedProfileUpdate(current, variables) : current,
+      )
       toast.show('Succès', { message: 'Profil mis à jour', type: 'success' })
       queryClient.invalidateQueries({
         queryKey: [PROFIL_QUERY_KEY],

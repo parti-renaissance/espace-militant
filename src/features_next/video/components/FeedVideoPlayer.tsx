@@ -38,13 +38,15 @@ function FeedVideoLayer({ contentId, hlsUrl, videoId, isSlideViewable, contentFi
   const isMuted = useVideoFeedStore((s) => s.isMuted)
   const toggleMuted = useVideoFeedStore((s) => s.toggleMuted)
   const isAppActive = useVideoFeedStore((s) => s.isAppActive)
+  const isScreenFocused = useVideoFeedStore((s) => s.isScreenFocused)
+  const canPlay = isAppActive && isScreenFocused
 
   const isPostInView = useIsContentInFeedView(contentId)
   const isFocusedPost = useVideoFeedStore((s) => s.focusedContentId === contentId)
   const isActive = activeVideoId === videoId
   const canAutoPlay = isSlideViewable && isPostInView && isFocusedPost
   const canInteract = canAutoPlay || (isActive && isPostInView && isFocusedPost)
-  const shouldAutoPlay = canAutoPlay && isActive && isAppActive
+  const shouldAutoPlay = canAutoPlay && isActive && canPlay
   const [isUserPaused, setIsUserPaused] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [autoplayFailed, setAutoplayFailed] = useState(false)
@@ -82,7 +84,7 @@ function FeedVideoLayer({ contentId, hlsUrl, videoId, isSlideViewable, contentFi
   const showPlayIcon = shouldShowVideoPlayIcon(isPlaying, isUserPaused, autoplayFailed && shouldAutoPlay, shouldAutoPlay)
 
   const handleVideoPress = useCallback(() => {
-    if (!canInteract || !isAppActive) return
+    if (!canInteract || !canPlay) return
 
     safePlayerAction(() => {
       if (player.playing) {
@@ -98,7 +100,7 @@ function FeedVideoLayer({ contentId, hlsUrl, videoId, isSlideViewable, contentFi
       claimActiveVideo(contentId, videoId)
       player.play()
     })
-  }, [canInteract, claimActiveVideo, contentId, isAppActive, player, shouldAutoPlay, videoId])
+  }, [canInteract, canPlay, claimActiveVideo, contentId, player, shouldAutoPlay, videoId])
 
   const handleToggleMute = useCallback(() => {
     toggleMuted()
@@ -167,18 +169,20 @@ export default function FeedVideoPlayer({
   const aspectRatio = getVideoAspectRatio(width, height)
   const contentFit = fill ? 'cover' : 'contain'
   const isAppActive = useVideoFeedStore((s) => s.isAppActive)
+  const isScreenFocused = useVideoFeedStore((s) => s.isScreenFocused)
+  const canPlay = isAppActive && isScreenFocused
   const claimActiveVideo = useVideoFeedStore((s) => s.claimActiveVideo)
   const isPostInView = useIsContentInFeedView(contentId)
   const isFocusedPost = useVideoFeedStore((s) => s.focusedContentId === contentId)
   const viewableVideoId = useVideoFeedStore((s) => s.viewableVideoIdByContentId[contentId] ?? null)
   const isAutoPlayTarget = isPostInView && isFocusedPost && viewableVideoId === videoId
-  const shouldMountPlayer = isAutoPlayTarget && isAppActive
+  const shouldMountPlayer = isAutoPlayTarget && canPlay
   const showManualPlayOverlay = isPostInView && !shouldMountPlayer
 
   const handleThumbnailPress = useCallback(() => {
-    if (!isPostInView || !isAppActive) return
+    if (!isPostInView || !canPlay) return
     claimActiveVideo(contentId, videoId)
-  }, [claimActiveVideo, contentId, isAppActive, isPostInView, videoId])
+  }, [canPlay, claimActiveVideo, contentId, isPostInView, videoId])
 
   return (
     <YStack

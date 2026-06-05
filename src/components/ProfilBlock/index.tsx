@@ -1,5 +1,10 @@
 import { ComponentPropsWithoutRef, useState } from 'react'
 import { Platform } from 'react-native'
+import { ImageResult, manipulateAsync, SaveFormat } from 'expo-image-manipulator'
+import * as ImagePicker from 'expo-image-picker'
+import { useMedia, XStack, YStack } from 'tamagui'
+import { Delete, Plus, Repeat2, Settings2 } from '@tamagui/lucide-icons'
+
 import ProfileTags from '@/components/ActivistTags'
 import { DropdownWrapper } from '@/components/base/Dropdown'
 import Text from '@/components/base/Text'
@@ -7,13 +12,12 @@ import { VoxButton } from '@/components/Button'
 import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import { useCompleteProfil } from '@/features_next/profil/context/CompleteProfilContext'
+
 import { UserTagEnum } from '@/core/entities/UserProfile'
-import { useDeleteProfilPicture, useGetProfil, useGetTags, usePostProfilPicture } from '@/services/profile/hook'
+import { useDeleteProfilPicture, useGetProfil, useGetTags, usePostProfilPicture, useProfileCompletion } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
-import { Delete, Plus, Repeat2, Settings2 } from '@tamagui/lucide-icons'
-import { ImageResult, manipulateAsync, SaveFormat } from 'expo-image-manipulator'
-import * as ImagePicker from 'expo-image-picker'
-import { useMedia, XStack, YStack } from 'tamagui'
+
 import ImageCroper from './CropImg'
 
 const dropDownItems = [
@@ -119,11 +123,37 @@ const UploadPP = (props: { profil: RestProfilResponse }) => {
   )
 }
 
+const ProfileCompletionButton = () => {
+  const { isComplete, isLoading } = useProfileCompletion()
+  const { openCompleteProfil } = useCompleteProfil()
+
+  if (isLoading || isComplete) {
+    return null
+  }
+
+  return (
+    <YStack alignItems="center">
+      <YStack>
+        <VoxButton
+          variant="outlined"
+          onPress={(event) => {
+            event?.stopPropagation?.()
+            openCompleteProfil()
+          }}
+        >
+          Je complète mes infos
+        </VoxButton>
+      </YStack>
+    </YStack>
+  )
+}
+
 export default function ProfilBlock({ editablePicture = true, ...props }: ComponentPropsWithoutRef<typeof VoxCard> & { editablePicture?: boolean }) {
   const { data: profil } = useGetProfil()
   const { tags } = useGetTags({ tags: [UserTagEnum.ELU, UserTagEnum.SYMPATHISANT, UserTagEnum.ADHERENT] })
   const media = useMedia()
-  
+  const instanceLabel = [profil?.instances?.assembly?.name, profil?.instances?.committee?.name].filter(Boolean).join(', ')
+
   return profil ? (
     <VoxCard bg={media.sm ? 'transparent' : undefined} borderWidth={media.sm ? 0 : undefined} {...props}>
       <VoxCard.Content>
@@ -138,9 +168,12 @@ export default function ProfilBlock({ editablePicture = true, ...props }: Compon
           </Text.LG>
         </YStack>
         <ProfileTags tags={tags ?? []} justifyContent="center" />
-        <Text.MD medium textAlign="center">
-          {[profil.instances?.assembly?.name, profil.instances?.committee?.name].filter(Boolean).join(', ')}
-        </Text.MD>
+        {instanceLabel ? (
+          <Text.MD medium textAlign="center">
+            {instanceLabel}
+          </Text.MD>
+        ) : null}
+        <ProfileCompletionButton />
       </VoxCard.Content>
     </VoxCard>
   ) : (

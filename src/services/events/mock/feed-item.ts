@@ -87,5 +87,4 @@ export const unRegisterEvent = {
 export const editableEvent = {
   object_state: 'full',
   editable: true,
-  edit_link: 'http://google.fr',
 } as const

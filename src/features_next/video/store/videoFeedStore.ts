@@ -29,6 +29,8 @@ type VideoFeedState = {
   toggleMuted: () => void
   isAppActive: boolean
   setAppActive: (active: boolean) => void
+  isScreenFocused: boolean
+  setScreenFocused: (focused: boolean) => void
 }
 
 export const useVideoFeedStore = create<VideoFeedState>((set, get) => ({
@@ -145,6 +147,8 @@ export const useVideoFeedStore = create<VideoFeedState>((set, get) => ({
   toggleMuted: () => set((state) => ({ isMuted: !state.isMuted })),
   isAppActive: true,
   setAppActive: (isAppActive) => set({ isAppActive }),
+  isScreenFocused: true,
+  setScreenFocused: (isScreenFocused) => set({ isScreenFocused }),
 }))
 
 /** Évite les re-renders si la visibilité du post n'a pas changé. */

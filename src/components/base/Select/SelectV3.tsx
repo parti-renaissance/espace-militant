@@ -54,8 +54,10 @@ const Select = <A extends string>(props: SelectProps<A>) => {
     return x.label
   }
 
+  const isFailed = Boolean(props.error)
+
   return (
-    <YStack>
+    <YStack gap="$xsmall">
       {isDropdown ? (
         <SelectDropdown ref={modalRef} frameRef={frameRef} {...props} openAbove={props.openAbove} />
       ) : (
@@ -68,7 +70,9 @@ const Select = <A extends string>(props: SelectProps<A>) => {
           white={props.color === 'white'}
           size={props.size ?? 'lg'}
           onPress={handlePress}
-          error={Boolean(props.error)}
+          error={isFailed}
+          borderColor={isFailed ? '$red500' : '$colorTransparent'}
+          focusStyle={isFailed ? { borderColor: '$red500' } : undefined}
           ref={frameRef}
           onLayout={() => {
             modalRef.current?.setModalPosition?.()
@@ -91,10 +95,8 @@ const Select = <A extends string>(props: SelectProps<A>) => {
         </SF>
       </SF.Props>
       {props.error ? (
-        <XStack paddingHorizontal="$medium" alignSelf="flex-start" pt="$xsmall">
-          <Text.XSM textAlign="right" color="$orange5">
-            {props.error}
-          </Text.XSM>
+        <XStack gap="$small" alignItems="center" pl="$medium">
+          <Text.XSM color="$red500">{props.error}</Text.XSM>
         </XStack>
       ) : null}
     </YStack>
