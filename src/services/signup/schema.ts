@@ -56,14 +56,17 @@ export const SignupInscriptionFormSchema = RestPostSignupRequestObjectSchema.pic
   email: true,
   email_opt_in: true,
 }).extend({
-  first_name: z.string().min(1, errorMessages.emptyField).max(50),
-  email: z.string().email(errorMessages.email),
+  first_name: z.string({ required_error: errorMessages.required }).min(1, errorMessages.required).max(50),
+  email: z.string({ required_error: errorMessages.required }).min(1, errorMessages.required).email(errorMessages.email),
   postal_code: z
-    .string()
-    .min(1, errorMessages.emptyField)
+    .string({ required_error: errorMessages.required })
+    .min(1, errorMessages.required)
     .max(15)
     .regex(/^\d{5}$/, 'Code postal invalide (5 chiffres)'),
   email_opt_in: z.boolean(),
+  cgu_accepted: z
+    .boolean({ required_error: errorMessages.required })
+    .refine((value) => value, { message: errorMessages.needChecked }),
 })
 
 // ----------------- Types -----------------

@@ -1,5 +1,6 @@
 export const errorMessages = {
-  emptyField: 'Ce champ ne doit pas être vide.',
+  emptyField: 'Ce champ est obligatoire.',
+  required: 'Ce champ est obligatoire.',
   email: 'L’adresse email n’est pas valide.',
-  needChecked: 'Vous devez cocher cette case.',
+  needChecked: 'Ce champ est obligatoire.',
 }
