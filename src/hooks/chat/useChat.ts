@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 
+import { refreshOn401 } from '@/lib/axios'
 import { useUserStore } from '@/store/user-store'
 
 import { classifyHttpError } from './sse/classifyHttpError'
@@ -34,8 +35,9 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
 
   const threadIdRef = useRef<string | null>(threadId)
   const lastUserMessageRef = useRef<string | null>(null)
+  const hasTriedRefreshRef = useRef(false)
   const streamBufferRef = useRef('')
-  const hadInStreamErrorRef = useRef(false)
+  const inStreamErrorRef = useRef<{ message: string; retryAfter?: number } | null>(null)
 
   useEffect(() => {
     threadIdRef.current = threadId
@@ -66,13 +68,18 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       streamBufferRef.current += text
       setStreamedContent(streamBufferRef.current)
     },
-    onInStreamError: () => {
-      hadInStreamErrorRef.current = true
+    onInStreamError: (err) => {
+      inStreamErrorRef.current = err
     },
     onComplete: () => {
-      if (hadInStreamErrorRef.current) {
+      const inStreamError = inStreamErrorRef.current
+      if (inStreamError) {
         commitStreamedMessage()
-        setError({ kind: 'serviceDown', message: 'Le service est momentanément indisponible. Réessayez dans quelques instants.', retryable: true })
+        if (inStreamError.retryAfter !== undefined) {
+          setError({ kind: 'quota', message: inStreamError.message, retryable: false, retryAfterSeconds: inStreamError.retryAfter })
+        } else {
+          setError({ kind: 'serviceDown', message: 'Le service est momentanément indisponible. Réessayez dans quelques instants.', retryable: true })
+        }
       } else if (streamBufferRef.current) {
         commitStreamedMessage()
       } else {
@@ -80,6 +87,21 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       }
     },
     onError: (err) => {
+      if (err.kind === 'http' && err.status === 401 && !hasTriedRefreshRef.current) {
+        hasTriedRefreshRef.current = true
+        const failedToken = useUserStore.getState().user?.accessToken
+        refreshOn401(failedToken).then((refreshed) => {
+          if (refreshed && lastUserMessageRef.current) {
+            const retryBody: Record<string, unknown> = { message: lastUserMessageRef.current }
+            if (agentId) retryBody.agent_id = agentId
+            if (threadIdRef.current) retryBody.thread_id = threadIdRef.current
+            stream.start(retryBody)
+          } else {
+            setError(classifyHttpError(401, null, null))
+          }
+        })
+        return
+      }
       if (err.kind === 'http') {
         setError(classifyHttpError(err.status, err.retryAfterHeader, err.responseBody))
       } else if (err.kind === 'timeout') {
@@ -99,7 +121,8 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       if (!trimmed) return
 
       lastUserMessageRef.current = trimmed
-      hadInStreamErrorRef.current = false
+      hasTriedRefreshRef.current = false
+      inStreamErrorRef.current = null
       streamBufferRef.current = ''
 
       setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', content: trimmed }])

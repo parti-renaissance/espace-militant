@@ -80,9 +80,12 @@ const InputFrame = styled(XStack, {
     },
     error: {
       true: {
-        backgroundColor: '$orange1',
+        borderColor: '$red500',
+        focusStyle: {
+          borderColor: '$red500',
+        },
         focusVisibleStyle: {
-          borderColor: '$orange1',
+          borderColor: '$red500',
         },
       },
     },
@@ -275,6 +278,8 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
         minHeight={fill ? 0 : undefined}
         size={multiline ? undefined : (size ?? 'lg')}
         forceStyle={isFocused ? 'focus' : undefined}
+        borderColor={isFailed ? '$red500' : '$colorTransparent'}
+        focusStyle={isFailed ? { borderColor: '$red500' } : undefined}
         onPress={handlePress}
         withoutLabel={!hasLabel}
       >
@@ -290,7 +295,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
                 (placeholder && textInputProps.value && textInputProps.value.length > 0) ||
                 (placeholder && textInputProps.defaultValue && textInputProps.defaultValue.length > 0)) && (
                 <XStack alignSelf="flex-start" width="100%">
-                  <Text.XSM flex={1} color={error ? '$orange5' : '$textPrimary'} numberOfLines={1}>
+                  <Text.XSM flex={1} color={error ? '$red500' : '$textPrimary'} numberOfLines={1}>
                     {label ?? placeholder}
                   </Text.XSM>
                 </XStack>
@@ -306,12 +311,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
                 paddingBottom: breathingSpace,
                 marginBottom: -breathingSpace,
                 fontSize: 14,
-                height:
-                  fill && multiline
-                    ? '100%'
-                    : Platform.OS === 'android' && !multiline
-                      ? 18 + breathingSpace
-                      : 'auto',
+                height: fill && multiline ? '100%' : Platform.OS === 'android' && !multiline ? 18 + breathingSpace : 'auto',
                 flex: fill && multiline ? 1 : undefined,
                 width: '100%',
                 minWidth: 0,
@@ -359,7 +359,7 @@ export default forwardRef<ComponentRef<typeof BottomSheetTextInput>, InputProps>
             if (h && h !== errorLayoutHeight) setErrorLayoutHeight(h)
           }}
         >
-          <Text.XSM color="$orange5">{error}</Text.XSM>
+          <Text.XSM color="$red500">{error}</Text.XSM>
         </XStack>
       )}
     </YStack>

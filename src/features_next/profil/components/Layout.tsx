@@ -136,7 +136,7 @@ function ProfilLayout({ children }: { children: React.ReactNode }) {
                 </Text.SM>
                 <NavItem text="Actions" iconLeft={Zap} href="/actions/creer" />
                 <NavItem text="Scanner" iconLeft={QrCode} href="/scanner" />
-                <NavItem text="Porte à porte" iconLeft={DoorOpen} href="/old/porte-a-porte" />
+                <NavItem text="Porte à porte" iconLeft={DoorOpen} href="/porte-a-porte" />
                 <NavItem text="Formations" iconLeft={GraduationCap} href="/old/formations" />
                 <NavItem text="Parrainages" iconLeft={HeartHandshake} href="/old/parrainages" />
               </VoxCard.Content>

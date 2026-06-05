@@ -1,5 +1,5 @@
 import React from 'react'
-import { XStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
 import { X } from '@tamagui/lucide-icons'
 
 import { FormFrame } from '@/components/base/FormFrames'
@@ -53,46 +53,44 @@ export default function DateInput({
     onChange(null)
   }
 
+  const isFailed = Boolean(error)
+
   return (
-    <FormFrame
-      height="auto"
-      flexDirection="row"
-      pl="$medium"
-      pr="$xsmall"
-      pt="$xsmall"
-      pb="$xsmall"
-      overflow="hidden"
-      white={color === 'white'}
-      theme={color === 'white' ? 'gray' : color}
-      alignItems="center"
-      justifyContent="space-between"
-      size={size}
-    >
-      <FormFrame.Label>{label}</FormFrame.Label>
+    <YStack gap="$xsmall">
+      <FormFrame
+        height="auto"
+        flexDirection="row"
+        pl="$medium"
+        pr="$xsmall"
+        pt="$xsmall"
+        pb="$xsmall"
+        overflow="hidden"
+        white={color === 'white'}
+        theme={color === 'white' ? 'gray' : color}
+        alignItems="center"
+        justifyContent="space-between"
+        size={size}
+        error={isFailed}
+        borderColor={isFailed ? '$red500' : '$colorTransparent'}
+        focusStyle={isFailed ? { borderColor: '$red500' } : undefined}
+      >
+        <FormFrame.Label>{label}</FormFrame.Label>
 
-      <XStack alignItems="center">
-        <XStack mr="$xsmall">
-          <DatePickerField
-            disabled={disabled}
-            type="date"
-            value={getDateValue()}
-            onChange={handleDateChange}
-            placeholder={placeholder}
-            white={color === 'white'}
-            error={error}
-          />
+        <XStack alignItems="center">
+          <XStack mr="$xsmall">
+            <DatePickerField disabled={disabled} type="date" value={getDateValue()} onChange={handleDateChange} placeholder={placeholder} />
+          </XStack>
+
+          {resetable && value && (
+            <VoxButton size="md" variant="text" onPress={handleReset} disabled={disabled} iconSize={20} shrink iconLeft={X} textColor="$gray5" theme={color} />
+          )}
         </XStack>
-
-        {resetable && value && (
-          <VoxButton size="md" variant="text" onPress={handleReset} disabled={disabled} iconSize={20} shrink iconLeft={X} textColor="$gray5" theme={color} />
-        )}
-      </XStack>
-
+      </FormFrame>
       {error && (
-        <Text.XSM color="$orange5" textAlign="left">
-          {error}
-        </Text.XSM>
+        <XStack gap="$small" alignItems="center" pl="$medium">
+          <Text.XSM color="$red500">{error}</Text.XSM>
+        </XStack>
       )}
-    </FormFrame>
+    </YStack>
   )
 }

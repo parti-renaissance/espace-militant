@@ -1,55 +1,95 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import { Image } from 'expo-image'
 import { YStack } from 'tamagui'
 
+import { safePlayerAction, useExpoPlayerAutoPlayback } from '@/features_next/video/helpers/safePlayerPlayback'
+import { shouldShowVideoPlayIcon } from '@/features_next/video/helpers/videoPlaybackUi'
+
 import { getVideoAspectRatio, type VideoPlayerProps } from './VideoPlayer.types'
 import { VideoPlayIcon } from './VideoPlayIcon'
 
-function safePlayerAction(action: () => void) {
-  try {
-    action()
-  } catch {
-    // Player natif déjà libéré au démontage (expo-video).
-  }
-}
-
 type NativeVideoContentProps = {
   hlsUrl: string
+  thumbnailUrl: string
   loop: boolean
-  shouldPlay: boolean
+  autoPlay: boolean
+  /** Lecture demandée par un tap sur le poster (autoPlay=false). */
+  startOnMount: boolean
   active: boolean
   controls: boolean
   contentFit: 'contain' | 'cover'
 }
 
-function NativeVideoContent({ hlsUrl, loop, shouldPlay, active, controls, contentFit }: NativeVideoContentProps) {
+function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount, active, controls, contentFit }: NativeVideoContentProps) {
   const player = useVideoPlayer(hlsUrl, (p) => {
     p.loop = loop
   })
-  const [isPlaying, setIsPlaying] = useState(shouldPlay && active)
-
-  useEffect(() => {
-    if (shouldPlay && active) {
-      safePlayerAction(() => player.play())
-    } else {
-      safePlayerAction(() => player.pause())
-    }
-  }, [player, shouldPlay, active])
+  const [isUserPaused, setIsUserPaused] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [autoplayFailed, setAutoplayFailed] = useState(false)
+  const shouldAttemptAutoPlay = autoPlay && active
 
   useEffect(() => {
     const subscription = player.addListener('playingChange', ({ isPlaying: playing }) => {
       setIsPlaying(playing)
+      if (playing) setAutoplayFailed(false)
     })
     return () => subscription.remove()
   }, [player])
 
+  const handleAutoplayFailed = useCallback(() => {
+    setAutoplayFailed(true)
+  }, [])
+
+  useExpoPlayerAutoPlayback(
+    player,
+    shouldAttemptAutoPlay && !isUserPaused,
+    undefined,
+    handleAutoplayFailed,
+    autoPlay,
+  )
+
+  const pendingManualStartRef = useRef(startOnMount)
+
+  useEffect(() => {
+    pendingManualStartRef.current = startOnMount
+  }, [startOnMount])
+
+  useEffect(() => {
+    if (!startOnMount || !active) return
+
+    const tryStart = () => {
+      if (!pendingManualStartRef.current || player.status !== 'readyToPlay') return
+      pendingManualStartRef.current = false
+      safePlayerAction(() => {
+        setIsUserPaused(false)
+        setAutoplayFailed(false)
+        player.play()
+      })
+    }
+
+    const subscription = player.addListener('statusChange', tryStart)
+    if (player.status === 'readyToPlay') queueMicrotask(tryStart)
+    return () => subscription.remove()
+  }, [active, player, startOnMount])
+
+  const showPlayIcon = shouldShowVideoPlayIcon(
+    isPlaying,
+    isUserPaused,
+    autoplayFailed && shouldAttemptAutoPlay,
+    shouldAttemptAutoPlay || startOnMount,
+  )
+
   const handleVideoPress = useCallback(() => {
     safePlayerAction(() => {
       if (player.playing) {
+        setIsUserPaused(true)
         player.pause()
       } else {
+        setIsUserPaused(false)
+        setAutoplayFailed(false)
         player.play()
       }
     })
@@ -57,11 +97,13 @@ function NativeVideoContent({ hlsUrl, loop, shouldPlay, active, controls, conten
 
   return (
     <YStack flex={1} position="relative" width="100%" height="100%">
+      <Image source={{ uri: thumbnailUrl }} style={styles.thumbnailBackground} contentFit="cover" pointerEvents="none" />
       <VideoView
         style={styles.video}
         player={player}
         nativeControls={controls}
         contentFit={contentFit}
+        pointerEvents={controls ? 'auto' : 'none'}
       />
       {!controls ? (
         <YStack
@@ -70,14 +112,15 @@ function NativeVideoContent({ hlsUrl, loop, shouldPlay, active, controls, conten
           left={0}
           right={0}
           bottom={0}
+          zIndex={2}
           alignItems="center"
           justifyContent="center"
           onPress={handleVideoPress}
           role="button"
-          aria-label={isPlaying ? 'Mettre en pause' : 'Lire la vidéo'}
-          pressStyle={isPlaying ? undefined : { opacity: 0.9 }}
+          aria-label={showPlayIcon ? 'Lire la vidéo' : 'Mettre en pause'}
+          pressStyle={showPlayIcon ? { opacity: 0.9 } : undefined}
         >
-          {!isPlaying ? <VideoPlayIcon /> : null}
+          {showPlayIcon ? <VideoPlayIcon /> : null}
         </YStack>
       ) : null}
     </YStack>
@@ -136,17 +179,32 @@ export default function VideoPlayer({
           </YStack>
         </YStack>
       ) : (
-        <NativeVideoContent hlsUrl={hlsUrl} loop={loop} shouldPlay={shouldPlay} active={active} controls={controls} contentFit={contentFit} />
+        <NativeVideoContent
+          hlsUrl={hlsUrl}
+          thumbnailUrl={thumbnailUrl}
+          loop={loop}
+          autoPlay={autoPlay}
+          startOnMount={!autoPlay && shouldPlay}
+          active={active}
+          controls={controls}
+          contentFit={contentFit}
+        />
       )}
     </YStack>
   )
 }
 
 const styles = StyleSheet.create({
-  video: {
-    flex: 1,
+  thumbnailBackground: {
+    ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
-    backgroundColor: '#000',
+  },
+  video: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+    zIndex: 1,
+    backgroundColor: 'transparent',
   },
 })

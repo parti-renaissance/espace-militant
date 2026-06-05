@@ -7,7 +7,6 @@ export const map = (x: RestTimelineFeedItem): Partial<RestFullEvent> & { uuid: s
     slug: x.identifier!,
     name: x.title ?? undefined,
     editable: x.editable ?? undefined,
-    edit_link: x.edit_link,
     post_address: (x.post_address ?? undefined) as RestFullEvent['post_address'],
     organizer: x.author as RestFullEvent['organizer'],
     category: {
@@ -36,7 +35,6 @@ export const mapEventToFeed = (x: Partial<RestFullEvent>): Partial<RestTimelineF
     identifier: x.slug,
     title: x.name,
     editable: x.editable,
-    edit_link: x.edit_link,
     post_address: x.post_address,
     author: x.organizer,
     category: x.category?.name,

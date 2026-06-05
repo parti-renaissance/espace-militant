@@ -151,9 +151,8 @@ export const isEventEditable = (
 ): event is Partial<RestFullEvent> & {
   object_state: 'full'
   editable: true
-  edit_link: string
 } => {
-  return Boolean(isEventFull(event) && event.editable && event.edit_link && !isEventCancelled(event))
+  return Boolean(isEventFull(event) && event.editable && !isEventCancelled(event))
 }
 
 export const isEventRegister = (

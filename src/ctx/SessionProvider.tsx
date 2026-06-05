@@ -43,9 +43,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
     return {}
   }, [])
 
-  const pendingRedirectRef = React.useRef<string | undefined>(normalizeStateRedirect(bootParams.state))
-  const hasRedirectedRef = React.useRef(false)
-
   const url = useURL()
 
   const [isLoginInProgress, setIsLoginInProgress] = React.useState(false)
@@ -60,16 +57,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const isGlobalLoading = [isLoginInProgress, user.isLoading, scope.isLoading, !_hasHydrated].some(Boolean)
   const isAuth = Boolean(existingSession && !isGlobalLoading)
 
-  React.useEffect(() => {
-    if (hasRedirectedRef.current) return
-    const redirectState = pendingRedirectRef.current
-    if (existingSession && redirectState && !isGlobalLoading) {
-      hasRedirectedRef.current = true
-      pendingRedirectRef.current = undefined
-      router.replace(redirectState as Href)
-    }
-  }, [existingSession, isGlobalLoading])
-
   const handleSignIn: AuthContextType['signIn'] = React.useCallback(
     async (props) => {
       let keepLoadingForWebRedirect = false
@@ -78,11 +65,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
           return
         }
         setIsLoginInProgress(true)
-        const redirectState = normalizeStateRedirect(props?.state)
-        if (redirectState) {
-          pendingRedirectRef.current = redirectState
-          hasRedirectedRef.current = false
-        }
         const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
         if (!session) {
           keepLoadingForWebRedirect = isWeb && !props?.code
@@ -90,6 +72,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
         }
         setSession(credentialsFromTokenResponse(session, props?.isAdmin))
         queryClient.resetQueries()
+        router.replace((normalizeStateRedirect(props?.state) ?? '/') as Href)
       } catch (e) {
         ErrorMonitor.log(e.message, { e })
         toast.show('Erreur lors de la connexion', { type: 'error' })
@@ -108,19 +91,14 @@ export function SessionProvider(props: React.PropsWithChildren) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => {
     if (!isWeb) return
-    const { code, _switch_user } = bootParams
+    const { code, state, _switch_user } = bootParams
     if (!code) return
     if (_switch_user) {
       queryClient.cancelQueries()
       queryClient.clear()
       removeCredentials()
     }
-    const hadState = Boolean(pendingRedirectRef.current)
-    handleSignIn({ code, isAdmin: _switch_user === 'true' }).then(() => {
-      if (!hadState) {
-        router.replace('/' as Href)
-      }
-    })
+    handleSignIn({ code, isAdmin: _switch_user === 'true', state })
   }, [])
 
   const processedCodeRef = React.useRef<string | undefined>(undefined)
@@ -131,14 +109,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
     if (!code || processedCodeRef.current === code) return
     processedCodeRef.current = code
 
-    const stateParam = queryParams?.state as string | undefined
-    const redirectState = normalizeStateRedirect(stateParam)
-    if (redirectState) {
-      pendingRedirectRef.current = redirectState
-      hasRedirectedRef.current = false
-    }
-
-    handleSignIn({ code })
+    const state = queryParams?.state as string | undefined
+    handleSignIn({ code, state })
   }, [url, handleSignIn])
 
   const handleRegister = React.useCallback(async () => {

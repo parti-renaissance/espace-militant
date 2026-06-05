@@ -1,5 +1,6 @@
 import { memo, useCallback } from 'react';
-import { useMedia, View, XStack } from 'tamagui';
+import { Keyboard } from 'react-native';
+import { isWeb, useMedia, View, XStack } from 'tamagui';
 import { Copy, Pencil } from '@tamagui/lucide-icons';
 import { VoxButton } from '@/components/Button/Button';
 import VoxMarkdown from '@/components/VoxMarkdown/VoxMarkdown';
@@ -18,6 +19,7 @@ function UserMessageComponent({ messageId, content, isOpen, onToggle, onEdit, on
   const actionsVisible = media.sm && isOpen
 
   const handleToggle = useCallback(() => {
+    if (!isWeb) Keyboard.dismiss()
     if (media.sm) onToggle(messageId)
   }, [media.sm, messageId, onToggle])
 

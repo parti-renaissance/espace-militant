@@ -1,4 +1,4 @@
-export type ParsedChunk = { kind: 'content'; text: string } | { kind: 'error'; message: string } | null
+export type ParsedChunk = { kind: 'content'; text: string } | { kind: 'error'; message: string; retryAfter?: number } | null
 
 export function parseSSEChunk(line: string): ParsedChunk {
   const trimmed = line.trim()
@@ -9,7 +9,9 @@ export function parseSSEChunk(line: string): ParsedChunk {
     const parsed = JSON.parse(data) as Record<string, unknown> | string
     if (typeof parsed === 'string') return { kind: 'content', text: parsed }
     if (parsed && typeof parsed === 'object' && 'error' in parsed) {
-      return { kind: 'error', message: String(parsed.error ?? '') }
+      const retryAfterRaw = parsed.retry_after
+      const retryAfter = typeof retryAfterRaw === 'number' && retryAfterRaw > 0 ? retryAfterRaw : undefined
+      return { kind: 'error', message: String(parsed.error ?? ''), retryAfter }
     }
     const val = parsed.chunk ?? parsed.message ?? parsed.content ?? ''
     const text = typeof val === 'string' ? val : String(val)

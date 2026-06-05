@@ -11,9 +11,12 @@ export const FormFrameBase = styled(XStack, {
   variants: {
     error: {
       true: {
-        backgroundColor: '$orange1',
+        borderColor: '$red500',
         focusStyle: {
-          borderColor: '$orange1',
+          borderColor: '$red500',
+        },
+        focusVisibleStyle: {
+          borderColor: '$red500',
         },
       },
     },

@@ -18,6 +18,7 @@ import Title from '@/components/Title/Title'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { syncTimelinePostVideoVisibility } from '@/features_next/video/helpers/syncTimelinePostVideoVisibility'
+import { useVideoFeedScreenFocus } from '@/features_next/video/hooks/useVideoFeedScreenFocus'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { transformFeedItemToProps } from '@/helpers/homeFeed'
@@ -31,6 +32,27 @@ import { FEATURES } from '@/utils/Scopes'
 import { HomeFeedMainSkeleton, HomeFeedSidebarSkeleton } from './components/HomeFeedSkeleton'
 import NotificationSubscribeCard from './components/NotificationSubscribeCard'
 import { useShouldShowNotificationCard } from './hooks/useShouldShowNotificationCard'
+
+const TIMELINE_VIEWABILITY_CONFIG = {
+  viewAreaCoveragePercentThreshold: 50,
+  minimumViewTime: 400,
+} as const
+
+type TimelineViewabilityPayload = {
+  viewableItems: ViewToken<RestTimelineFeedItem>[]
+  changed: ViewToken<RestTimelineFeedItem>[]
+}
+
+const timelineViewabilityCallbackRef: {
+  current: (payload: TimelineViewabilityPayload) => void
+} = { current: () => undefined }
+
+const onTimelineViewableItemsChanged = ({ viewableItems, changed }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+  timelineViewabilityCallbackRef.current({
+    viewableItems: viewableItems as ViewToken<RestTimelineFeedItem>[],
+    changed: changed as ViewToken<RestTimelineFeedItem>[],
+  })
+}
 
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 
@@ -51,6 +73,8 @@ const TimelineFeedCard = memo((item: RestTimelineFeedItem) => {
 })
 
 const TimelineFeedMain = () => {
+  useVideoFeedScreenFocus()
+
   const media = useMedia()
   const shouldShowNotificationCard = useShouldShowNotificationCard()
   const { data: paginatedFeed, fetchNextPage, hasNextPage, ...feedQuery } = useGetPaginatedFeed()
@@ -58,7 +82,16 @@ const TimelineFeedMain = () => {
   const { hasFeature } = useGetSuspenseExecutiveScopes()
   const { trackImpression } = useHits()
 
-  const feedData = paginatedFeed?.pages.map((page) => page?.hits ?? []).flat()
+  const feedData = useMemo(() => {
+    const items = paginatedFeed?.pages.flatMap((page) => page?.hits ?? []) ?? []
+    const seen = new Set<string>()
+
+    return items.filter((item) => {
+      if (seen.has(item.objectID)) return false
+      seen.add(item.objectID)
+      return true
+    })
+  }, [paginatedFeed?.pages])
 
   const [isManualRefreshing, setIsManualRefreshing] = useState(false)
   const isRefetching = feedQuery.isRefetching || alertQuery.isRefetching
@@ -145,15 +178,9 @@ const TimelineFeedMain = () => {
     [trackImpression],
   )
 
-  const viewabilityConfig = useMemo(
-    () => ({
-      viewAreaCoveragePercentThreshold: 50,
-      minimumViewTime: 400,
-    }),
-    [],
-  )
-
-  const viewabilityConfigCallbackPairs = useMemo(() => [{ viewabilityConfig, onViewableItemsChanged }], [onViewableItemsChanged, viewabilityConfig])
+  useEffect(() => {
+    timelineViewabilityCallbackRef.current = onViewableItemsChanged
+  }, [onViewableItemsChanged])
 
   return (
     <LayoutFlatList<RestTimelineFeedItem>
@@ -163,7 +190,8 @@ const TimelineFeedMain = () => {
       renderItem={renderFeedItem}
       keyExtractor={(item) => item.objectID}
       ListHeaderComponent={header}
-      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs}
+      onViewableItemsChanged={onTimelineViewableItemsChanged}
+      viewabilityConfig={TIMELINE_VIEWABILITY_CONFIG}
       refreshing={isManualRefreshing}
       onRefresh={handleManualRefresh}
       onEndReached={loadMore}
