@@ -218,6 +218,7 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
   const isHorizontalScrolling = useRef(false)
   const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const viewabilitySyncTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const initializedPlaybackForContent = useRef<string | null>(null)
 
   const setViewableVideoForContent = useVideoFeedStore((s) => s.setViewableVideoForContent)
   const recomputeActiveVideoId = useVideoFeedStore((s) => s.recomputeActiveVideoId)
@@ -321,10 +322,22 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
     [],
   )
 
-  const handleLayout = (event: LayoutChangeEvent) => {
-    const width = event.nativeEvent.layout.width
-    if (width > 0 && width !== containerWidth) setContainerWidth(width)
-  }
+  const handleLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const width = event.nativeEvent.layout.width
+      if (width <= 0) return
+
+      if (width !== containerWidth) {
+        setContainerWidth(width)
+      }
+
+      if (slides.length > 0 && initializedPlaybackForContent.current !== contentId) {
+        initializedPlaybackForContent.current = contentId
+        commitPlaybackAtIndex(0)
+      }
+    },
+    [commitPlaybackAtIndex, containerWidth, contentId, slides.length],
+  )
 
   const indexFromOffset = useCallback(
     (offsetX: number) => {
@@ -383,11 +396,6 @@ export default function VideoMediaCarousel({ contentId, items, isWeb }: VideoMed
     },
     [commitPlaybackAtIndex, containerWidth, items.length],
   )
-
-  useEffect(() => {
-    if (containerWidth <= 0 || slides.length === 0 || playbackSlideId != null) return
-    commitPlaybackAtIndex(0)
-  }, [commitPlaybackAtIndex, containerWidth, playbackSlideId, slides.length])
 
   const carouselHeight = useMemo(() => {
     if (containerWidth <= 0) return MIN_MEDIA_HEIGHT
