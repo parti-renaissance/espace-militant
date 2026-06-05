@@ -62,12 +62,7 @@ const userStoreSlice: StateCreator<UserState> = (set, get) => ({
     }
     set({ ...initialUserData, user: userWithExpiration, signupTunnelStatus: 'completed' })
   },
-  removeCredentials: () =>
-    set((state) => {
-      // eslint-disable-next-line no-console
-      console.log('[AUTH] removeCredentials', { hadUser: !!state.user, stack: new Error().stack })
-      return { ...initialUserData, signupTunnelStatus: state.signupTunnelStatus }
-    }),
+  removeCredentials: () => set((state) => ({ ...initialUserData, signupTunnelStatus: state.signupTunnelStatus })),
   setOnboardingOpenedAt: (onboardingOpenedAt) => set({ onboardingOpenedAt }),
   _setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   setHideReSubscribeAlert: (hideResubscribeAlert) => set({ hideResubscribeAlert }),
@@ -81,8 +76,6 @@ const userStoreSlice: StateCreator<UserState> = (set, get) => ({
       const storedExpiresAt = storedUser.accessTokenExpiresAt ?? 0
       const currentExpiresAt = current?.accessTokenExpiresAt ?? 0
       const adopt = Boolean(current) && storedExpiresAt > currentExpiresAt
-      // eslint-disable-next-line no-console
-      console.log('[AUTH] rehydrateFromStorage', { adopt, storedExpiresAt, currentExpiresAt })
       if (adopt) {
         set({ user: storedUser })
       }
