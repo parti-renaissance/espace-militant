@@ -1,3 +1,8 @@
+import { Link } from 'expo-router'
+import { isWeb, Spinner, XStack, YStack } from 'tamagui'
+import { ChevronRight, ClipboardCheck, GraduationCap, History, Link as LinkIcon, SquareUser, UserPlus } from '@tamagui/lucide-icons'
+import { getYear } from 'date-fns'
+
 import Text from '@/components/base/Text'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import InfoCard from '@/components/InfoCard/InfoCard'
@@ -5,16 +10,13 @@ import Menu from '@/components/menu/Menu'
 import ProfilBlock from '@/components/ProfilBlock'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import RenewMembershipButton from '@/features_next/profil/pages/donations/components/RenewMembershipButton'
+
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import { useGetExecutiveScopes, useGetProfil, useGetSuspenseProfil } from '@/services/profile/hook'
+import { useGetExecutiveScopes, useGetProfil, useGetSuspenseProfil, useProfileCompletion } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { getMembershipStatus } from '@/utils/membershipStatus'
-import { ChevronRight, ClipboardCheck, GraduationCap, History, Link as LinkIcon, SquareUser, UserPlus } from '@tamagui/lucide-icons'
-import { getYear } from 'date-fns'
-import { Link } from 'expo-router'
-import { isWeb, Spinner, XStack, YStack } from 'tamagui'
 
 export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
   const { data } = useGetExecutiveScopes()
@@ -102,6 +104,30 @@ const EluCard = () => {
   )
 }
 
+const MY_PROFILE_CARD_PROFIL_BLOCK_PROPS = {
+  editablePicture: false,
+  inside: true,
+  bg: '$textSurface',
+  animation: '100ms',
+  hoverStyle: {
+    bg: '$gray1',
+  },
+} as const
+
+const MyProfileCardProfilBlock = () => {
+  const { isComplete } = useProfileCompletion()
+
+  if (!isComplete) {
+    return <ProfilBlock {...MY_PROFILE_CARD_PROFIL_BLOCK_PROPS} />
+  }
+
+  return (
+    <Link href="/profil" asChild={!isWeb}>
+      <ProfilBlock {...MY_PROFILE_CARD_PROFIL_BLOCK_PROPS} />
+    </Link>
+  )
+}
+
 export default function MyProfileCard() {
   const { user: session } = useUserStore()
   const user = useGetProfil({ enabled: !!session })
@@ -126,17 +152,7 @@ export default function MyProfileCard() {
         <VoxCard.Content>
           <BoundarySuspenseWrapper>
             <>
-              <Link href="/profil" asChild={!isWeb}>
-                <ProfilBlock
-                  editablePicture={false}
-                  inside
-                  bg="$textSurface"
-                  animation="100ms"
-                  hoverStyle={{
-                    bg: '$gray1',
-                  }}
-                />
-              </Link>
+              <MyProfileCardProfilBlock />
 
               {!showEluCard && statusAdh ? <MembershipCard status={statusAdh} /> : null}
               {showEluCard ? <EluCard /> : null}
@@ -149,17 +165,11 @@ export default function MyProfileCard() {
             Ressources
           </Menu.Item>
         </Link>
-        <Menu.Item 
-          size="sm" 
-          icon={GraduationCap} 
-          showArrow
-          onPress={openFormations()}
-          disabled={isPendingFormations}
-        >
+        <Menu.Item size="sm" icon={GraduationCap} showArrow onPress={openFormations()} disabled={isPendingFormations}>
           Formations
         </Menu.Item>
         <Link href="/questionnaires" asChild={!isWeb}>
-          <Menu.Item size="sm" icon={ClipboardCheck} showArrow >
+          <Menu.Item size="sm" icon={ClipboardCheck} showArrow>
             Questionnaires
           </Menu.Item>
         </Link>
@@ -190,17 +200,7 @@ export function MyProfileCardNoLinks() {
         <VoxCard.Content>
           <BoundarySuspenseWrapper>
             <>
-              <Link href="/profil" asChild={!isWeb}>
-                <ProfilBlock
-                  editablePicture={false}
-                  inside
-                  bg="$textSurface"
-                  animation="100ms"
-                  hoverStyle={{
-                    bg: '$gray1',
-                  }}
-                />
-              </Link>
+              <MyProfileCardProfilBlock />
 
               {!showEluCard && statusAdh ? <MembershipCard status={statusAdh} /> : null}
               {showEluCard ? <EluCard /> : null}
