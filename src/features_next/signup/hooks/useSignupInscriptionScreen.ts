@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Href, router } from 'expo-router'
 
+import { useSyncSignupRedirectUri } from '@/features_next/signup/hooks/useSyncSignupRedirectUri'
 import type { SignupInscriptionFormHandle } from '@/features_next/signup/pages/SignupInscriptionScreen/components/SignupInscriptionForm'
 import { useSignupSessionStore } from '@/features_next/signup/store/signup-session-store'
 
@@ -8,6 +9,8 @@ import { useSignup } from '@/services/signup/hook'
 import { useUserStore } from '@/store/user-store'
 
 export function useSignupInscriptionScreen() {
+  useSyncSignupRedirectUri()
+
   const formRef = useRef<SignupInscriptionFormHandle>(null)
   const { isPending: isSubmitting } = useSignup()
   const setSignupTunnelSkipped = useUserStore((s) => s.setSignupTunnelSkipped)
