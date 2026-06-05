@@ -304,7 +304,7 @@ const VoxCardAdhLock = (props?: { lock?: boolean; due?: boolean; isPrivate?: boo
 
   const text = (() => {
     if (isInvitation) return 'Réservé aux invités'
-    if (isPrivate) return 'Réservé aux militants'
+    if (isPrivate) return 'Réservé aux membres'
     if (due) return 'Réservé aux adhérents à jour'
     return 'Réservé aux adhérents'
   })()
