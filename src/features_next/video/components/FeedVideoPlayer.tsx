@@ -9,6 +9,7 @@ import { useIsContentInFeedView, useVideoFeedStore } from '@/features_next/video
 import { getVideoAspectRatio } from '@/features_next/video/components/VideoPlayer.types'
 import { VideoPlayIcon } from '@/features_next/video/components/VideoPlayIcon'
 import { safePlayerAction, useExpoPlayerAutoPlayback } from '@/features_next/video/helpers/safePlayerPlayback'
+import { shouldShowVideoPlayIcon } from '@/features_next/video/helpers/videoPlaybackUi'
 
 export type FeedVideoPlayerProps = {
   contentId: string
@@ -23,16 +24,15 @@ export type FeedVideoPlayerProps = {
   rounded?: boolean
 }
 
-type FeedVideoContentProps = {
+type FeedVideoLayerProps = {
   contentId: string
   hlsUrl: string
   videoId: string
-  thumbnailUrl: string
   isSlideViewable: boolean
   contentFit: 'contain' | 'cover'
 }
 
-function FeedVideoContent({ contentId, hlsUrl, videoId, thumbnailUrl, isSlideViewable, contentFit }: FeedVideoContentProps) {
+function FeedVideoLayer({ contentId, hlsUrl, videoId, isSlideViewable, contentFit }: FeedVideoLayerProps) {
   const activeVideoId = useVideoFeedStore((s) => s.activeVideoId)
   const claimActiveVideo = useVideoFeedStore((s) => s.claimActiveVideo)
   const isMuted = useVideoFeedStore((s) => s.isMuted)
@@ -47,6 +47,7 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, thumbnailUrl, isSlideVie
   const shouldAutoPlay = canAutoPlay && isActive && isAppActive
   const [isUserPaused, setIsUserPaused] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [autoplayFailed, setAutoplayFailed] = useState(false)
   const autoPlayAllowedRef = useRef(shouldAutoPlay && !isUserPaused)
 
   useLayoutEffect(() => {
@@ -67,11 +68,22 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, thumbnailUrl, isSlideVie
   useEffect(() => {
     const subscription = player.addListener('playingChange', ({ isPlaying: playing }) => {
       setIsPlaying(playing)
+      if (playing) setAutoplayFailed(false)
     })
     return () => subscription.remove()
   }, [player])
 
-  useExpoPlayerAutoPlayback(player, shouldAutoPlay && !isUserPaused, autoPlayAllowedRef)
+  useEffect(() => {
+    if (!shouldAutoPlay) setAutoplayFailed(false)
+  }, [shouldAutoPlay])
+
+  const handleAutoplayFailed = useCallback(() => {
+    setAutoplayFailed(true)
+  }, [])
+
+  useExpoPlayerAutoPlayback(player, shouldAutoPlay && !isUserPaused, autoPlayAllowedRef, handleAutoplayFailed)
+
+  const showPlayIcon = shouldShowVideoPlayIcon(isPlaying, isUserPaused, autoplayFailed, shouldAutoPlay)
 
   const handleVideoPress = useCallback(() => {
     if (!canInteract || !isAppActive) return
@@ -86,6 +98,7 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, thumbnailUrl, isSlideVie
 
       autoPlayAllowedRef.current = shouldAutoPlay
       setIsUserPaused(false)
+      setAutoplayFailed(false)
       claimActiveVideo(contentId, videoId)
       player.play()
     })
@@ -98,8 +111,7 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, thumbnailUrl, isSlideVie
   const MuteIcon = isMuted ? VolumeX : Volume2
 
   return (
-    <YStack flex={1} position="relative" width="100%" height="100%">
-      <Image source={{ uri: thumbnailUrl }} style={styles.thumbnailBackground} contentFit="cover" pointerEvents="none" />
+    <>
       <VideoView
         style={styles.video}
         player={player}
@@ -118,28 +130,30 @@ function FeedVideoContent({ contentId, hlsUrl, videoId, thumbnailUrl, isSlideVie
         justifyContent="center"
         onPress={handleVideoPress}
         role="button"
-        aria-label={isPlaying ? 'Mettre en pause' : 'Lire la vidéo'}
-        pressStyle={isPlaying ? undefined : { opacity: 0.9 }}
+        aria-label={showPlayIcon ? 'Lire la vidéo' : 'Mettre en pause'}
+        pressStyle={showPlayIcon ? { opacity: 0.9 } : undefined}
       >
-        {!isPlaying ? <VideoPlayIcon /> : null}
+        {showPlayIcon ? <VideoPlayIcon /> : null}
       </YStack>
-      <YStack
-        position="absolute"
-        bottom={12}
-        right={12}
-        zIndex={10}
-        onPress={handleToggleMute}
-        onMouseDown={Platform.OS === 'web' ? (event) => event.preventDefault() : undefined}
-        role="button"
-        aria-label={isMuted ? 'Activer le son' : 'Couper le son'}
-        pressStyle={{ opacity: 0.85 }}
-        cursor="pointer"
-      >
-        <Circle size={36} backgroundColor="rgba(0,0,0,0.55)" alignItems="center" justifyContent="center">
-          <MuteIcon size={18} color="white" />
-        </Circle>
-      </YStack>
-    </YStack>
+      {isPlaying ? (
+        <YStack
+          position="absolute"
+          bottom={12}
+          right={12}
+          zIndex={10}
+          onPress={handleToggleMute}
+          onMouseDown={Platform.OS === 'web' ? (event) => event.preventDefault() : undefined}
+          role="button"
+          aria-label={isMuted ? 'Activer le son' : 'Couper le son'}
+          pressStyle={{ opacity: 0.85 }}
+          cursor="pointer"
+        >
+          <Circle size={36} backgroundColor="rgba(0,0,0,0.55)" alignItems="center" justifyContent="center">
+            <MuteIcon size={18} color="white" />
+          </Circle>
+        </YStack>
+      ) : null}
+    </>
   )
 }
 
@@ -157,12 +171,13 @@ export default function FeedVideoPlayer({
   const aspectRatio = getVideoAspectRatio(width, height)
   const contentFit = fill ? 'cover' : 'contain'
   const isAppActive = useVideoFeedStore((s) => s.isAppActive)
-  const activeVideoId = useVideoFeedStore((s) => s.activeVideoId)
   const claimActiveVideo = useVideoFeedStore((s) => s.claimActiveVideo)
   const isPostInView = useIsContentInFeedView(contentId)
   const isFocusedPost = useVideoFeedStore((s) => s.focusedContentId === contentId)
-  const isActiveVideo = activeVideoId === videoId
-  const shouldMountPlayer = isPostInView && isFocusedPost && isActiveVideo && isAppActive
+  const viewableVideoId = useVideoFeedStore((s) => s.viewableVideoIdByContentId[contentId] ?? null)
+  const isAutoPlayTarget = isPostInView && isFocusedPost && viewableVideoId === videoId
+  const shouldMountPlayer = isAutoPlayTarget && isAppActive
+  const showManualPlayOverlay = isPostInView && !shouldMountPlayer
 
   const handleThumbnailPress = useCallback(() => {
     if (!isPostInView || !isAppActive) return
@@ -177,25 +192,25 @@ export default function FeedVideoPlayer({
       backgroundColor="$gray2"
       {...(fill ? { flex: 1, height: '100%' } : { style: { aspectRatio } })}
     >
-      {shouldMountPlayer ? (
-        <FeedVideoContent
-          key={videoId}
-          contentId={contentId}
-          hlsUrl={hlsUrl}
-          videoId={videoId}
-          thumbnailUrl={thumbnailUrl}
-          isSlideViewable={isSlideViewable}
-          contentFit={contentFit}
-        />
-      ) : (
-        <YStack flex={1} position="relative" width="100%" height="100%">
-          <Image source={{ uri: thumbnailUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+      <YStack flex={1} position="relative" width="100%" height="100%">
+        <Image source={{ uri: thumbnailUrl }} style={styles.thumbnailBackground} contentFit="cover" pointerEvents="none" />
+        {shouldMountPlayer ? (
+          <FeedVideoLayer
+            contentId={contentId}
+            hlsUrl={hlsUrl}
+            videoId={videoId}
+            isSlideViewable={isSlideViewable}
+            contentFit={contentFit}
+          />
+        ) : null}
+        {showManualPlayOverlay ? (
           <YStack
             position="absolute"
             top={0}
             left={0}
             right={0}
             bottom={0}
+            zIndex={3}
             alignItems="center"
             justifyContent="center"
             backgroundColor="rgba(0,0,0,0.2)"
@@ -206,8 +221,8 @@ export default function FeedVideoPlayer({
           >
             <VideoPlayIcon />
           </YStack>
-        </YStack>
-      )}
+        ) : null}
+      </YStack>
     </YStack>
   )
 }
