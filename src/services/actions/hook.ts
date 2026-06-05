@@ -1,10 +1,16 @@
 import { useToastController } from '@tamagui/toast'
-import { InfiniteData, useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
 import * as helpers from '@/services/common/helpers'
-import { isHubActionItem, type RestHubItem } from '@/services/hub/schema'
-import type { RestPagination } from '@/services/common/schema'
-import { optimisticToggleSubscribe as toggleSubscribeOnfeed } from '@/services/timeline-feed/hook/helpers'
+import { hubKeys } from '@/services/hub/hook'
+import {
+  getCachedHubQueries,
+  invalidateHubQueries,
+  patchHubSubscription,
+  restoreHubQueries,
+  type HubQueriesSnapshot,
+} from '@/services/hub/helpers'
+import { getCachedPaginatedShortFeedItems, optimisticToggleSubscribe as toggleSubscribeOnfeed } from '@/services/timeline-feed/hook/helpers'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
 import type { RestProfilResponse } from '@/services/profile/schema'
 
@@ -16,8 +22,10 @@ import { isFullAction, RestAction, RestActionFull, RestActionParticipant } from 
 
 export const QUERY_KEY_ACTION = 'action'
 
-const invalidateHub = (queryClient: ReturnType<typeof useQueryClient>) => {
-  queryClient.invalidateQueries({ queryKey: ['hub'] })
+type ActionSubscribeSnapshot = {
+  hub: HubQueriesSnapshot
+  action: RestAction | RestActionFull | undefined
+  shortFeedItems: ReturnType<typeof getCachedPaginatedShortFeedItems>
 }
 
 const createParticipant = (me: RestProfilResponse): RestActionParticipant => ({
@@ -28,32 +36,18 @@ const createParticipant = (me: RestProfilResponse): RestActionParticipant => ({
   updated_at: new Date(),
 })
 
-const patchHubActionItems = (
-  queryClient: ReturnType<typeof useQueryClient>,
-  actionId: string,
-  updater: (item: RestHubItem) => RestHubItem,
-) => {
-  queryClient.setQueriesData<InfiniteData<RestPagination<RestHubItem>>>({ queryKey: ['hub'] }, (old) => {
-    if (!old || !Array.isArray(old.pages)) return old
-    return {
-      ...old,
-      pages: old.pages.map((page) => {
-        if (!Array.isArray(page.items)) return page
-        return {
-          ...page,
-          items: page.items.map((item) => (item.uuid === actionId && isHubActionItem(item) ? updater(item) : item)),
-        }
-      }),
-    }
-  })
-}
-
 const optimisticToggleSubscribeOnCaches = (
   me: RestProfilResponse,
   subscribe: boolean,
   actionId: string,
   queryClient: ReturnType<typeof useQueryClient>,
-) => {
+): ActionSubscribeSnapshot => {
+  const snapshot: ActionSubscribeSnapshot = {
+    hub: getCachedHubQueries(queryClient),
+    action: queryClient.getQueryData<RestAction | RestActionFull>([QUERY_KEY_ACTION, actionId]),
+    shortFeedItems: getCachedPaginatedShortFeedItems(queryClient)!,
+  }
+
   const updateAction: helpers.OptimisticItemUpdater<RestAction | RestActionFull> = (old) => {
     if (!old) return undefined
 
@@ -81,13 +75,19 @@ const optimisticToggleSubscribeOnCaches = (
 
   toggleSubscribeOnfeed(subscribe, actionId, queryClient)
   helpers.optimisticSetDataById({ id: actionId, updater: updateAction, queryClient, queryKey: QUERY_KEY_ACTION })
+  patchHubSubscription(queryClient, { itemId: actionId, itemType: 'action', subscribe })
 
-  patchHubActionItems(queryClient, actionId, (item) => ({
-    ...item,
-    user_registered_at: subscribe ? new Date().toISOString() : null,
-    participants_count:
-      item.participants_count != null ? item.participants_count + (subscribe ? 1 : -1) : item.participants_count,
-  }))
+  return snapshot
+}
+
+const rollbackActionSubscribe = (queryClient: ReturnType<typeof useQueryClient>, actionId: string, snapshot: ActionSubscribeSnapshot | undefined) => {
+  if (!snapshot) return
+
+  restoreHubQueries(queryClient, snapshot.hub)
+  snapshot.shortFeedItems?.forEach(([key, data]) => {
+    queryClient.setQueryData(key, data)
+  })
+  queryClient.setQueryData([QUERY_KEY_ACTION, actionId], snapshot.action)
 }
 
 export const useAction = ({ id }: { id: string }) => {
@@ -114,7 +114,7 @@ export const useActionMutation = ({ actionId }: { actionId?: string } = {}) => {
       const message = isEdit ? 'L’action a bien été modifiée' : 'L’action a bien été créée'
       toast.show('Succès', { message, type: 'success' })
       queryClient.setQueryData([QUERY_KEY_ACTION, data.uuid], data)
-      invalidateHub(queryClient)
+      invalidateHubQueries(queryClient)
     },
     onError: (error) => {
       const fallback = isEdit ? 'Impossible de modifier l’action' : 'Impossible de créer l’action'
@@ -140,7 +140,7 @@ export const useCancelAction = () => {
     onSuccess: (_, { id }) => {
       toast.show('Succès', { message: 'L’action a bien été annulée', type: 'success' })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ACTION, id] })
-      invalidateHub(queryClient)
+      invalidateHubQueries(queryClient)
     },
     onError: (error) => {
       const fallback = 'Impossible d’annuler cette action'
@@ -162,14 +162,19 @@ export const useSubscribeAction = (id?: string) => {
       }
       return id ? api.subscribeToAction(id) : Promise.reject(new Error('No id provided'))
     },
-    onSuccess: () => {
-      if (id && user.data) {
-        optimisticToggleSubscribeOnCaches(user.data, true, id, queryClient)
-      }
-      toast.show('Succès', { message: 'Inscription à l’action réussie', type: 'success' })
-      invalidateHub(queryClient)
+    onMutate: async () => {
+      if (!id || !user.data) return undefined
+
+      await queryClient.cancelQueries({ queryKey: hubKeys.all })
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEY_ACTION, id] })
+      return optimisticToggleSubscribeOnCaches(user.data, true, id, queryClient)
     },
-    onError: (error) => {
+    onSuccess: () => {
+      toast.show('Succès', { message: 'Inscription à l’action réussie', type: 'success' })
+      invalidateHubQueries(queryClient)
+    },
+    onError: (error, _, context) => {
+      if (id) rollbackActionSubscribe(queryClient, id, context)
       const fallback = 'Impossible de s’inscrire à l’action'
       logActionMutationError('onError — subscribe', error, { id })
       toast.show('Erreur', { message: getActionMutationErrorMessage(error, fallback), type: 'error' })
@@ -189,14 +194,19 @@ export const useUnsubscribeAction = (id?: string) => {
       }
       return id ? api.unsubscribeFromAction(id) : Promise.reject(new Error('No id provided'))
     },
-    onSuccess: () => {
-      if (id && user.data) {
-        optimisticToggleSubscribeOnCaches(user.data, false, id, queryClient)
-      }
-      toast.show('Succès', { message: 'Désinscription de l’action réussie', type: 'success' })
-      invalidateHub(queryClient)
+    onMutate: async () => {
+      if (!id || !user.data) return undefined
+
+      await queryClient.cancelQueries({ queryKey: hubKeys.all })
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEY_ACTION, id] })
+      return optimisticToggleSubscribeOnCaches(user.data, false, id, queryClient)
     },
-    onError: (error) => {
+    onSuccess: () => {
+      toast.show('Succès', { message: 'Désinscription de l’action réussie', type: 'success' })
+      invalidateHubQueries(queryClient)
+    },
+    onError: (error, _, context) => {
+      if (id) rollbackActionSubscribe(queryClient, id, context)
       const fallback = 'Impossible de se désinscrire de l’action'
       logActionMutationError('onError — unsubscribe', error, { id })
       toast.show('Erreur', { message: getActionMutationErrorMessage(error, fallback), type: 'error' })

@@ -1,13 +1,47 @@
 import * as helpers from '@/services/common/helpers'
 import * as FeedMapper from '@/services/common/mapper/mapTimelineFeedToRestEvent'
 import { isPartialEvent, RestEvent, RestFullEvent } from '@/services/events/schema'
-import { optimisticFeedUpdate, optimisticToggleSubscribe as toggleSubscribeOnfeed } from '@/services/timeline-feed/hook/helpers'
+import { getCachedHubQueries, patchHubSubscription, restoreHubQueries } from '@/services/hub/helpers'
+import {
+  getCachedPaginatedShortFeedItems,
+  optimisticFeedUpdate,
+  optimisticToggleSubscribe as toggleSubscribeOnfeed,
+} from '@/services/timeline-feed/hook/helpers'
 import { QueryClient } from '@tanstack/react-query'
 import { QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
 
-export const optimisticToggleSubscribe = async (subscribe: boolean, identifier: { eventId: string; slug?: string }, queryClient: QueryClient) => {
-  const previousData = {
+export type OptimisticSubscribeSnapshot = {
+  shortEvents: ReturnType<typeof helpers.getCachedPaginatedData<RestEvent>>
+  shortFeedItems: ReturnType<typeof getCachedPaginatedShortFeedItems>
+  hub: ReturnType<typeof getCachedHubQueries>
+  eventQueryKey: readonly [string, string]
+  event: RestEvent | undefined
+}
+
+export const rollbackOptimisticSubscribe = (queryClient: QueryClient, snapshot: OptimisticSubscribeSnapshot | undefined) => {
+  if (!snapshot) return
+
+  snapshot.shortEvents?.forEach(([key, data]) => {
+    queryClient.setQueryData(key, data)
+  })
+  snapshot.shortFeedItems?.forEach(([key, data]) => {
+    queryClient.setQueryData(key, data)
+  })
+  queryClient.setQueryData(snapshot.eventQueryKey, snapshot.event)
+  restoreHubQueries(queryClient, snapshot.hub)
+}
+
+export const optimisticToggleSubscribe = async (
+  subscribe: boolean,
+  identifier: { eventId: string; slug?: string },
+  queryClient: QueryClient,
+): Promise<OptimisticSubscribeSnapshot> => {
+  const eventQueryKey = [QUERY_KEY_SINGLE_EVENT, identifier.slug ?? identifier.eventId] as const
+  const previousData: OptimisticSubscribeSnapshot = {
     shortEvents: helpers.getCachedPaginatedData<RestEvent>(queryClient, QUERY_KEY_PAGINATED_SHORT_EVENTS)!,
+    shortFeedItems: getCachedPaginatedShortFeedItems(queryClient)!,
+    hub: getCachedHubQueries(queryClient),
+    eventQueryKey,
     event: helpers.getCachedSingleItem<RestEvent>(identifier.slug ?? identifier.eventId, queryClient, QUERY_KEY_SINGLE_EVENT),
   }
 
@@ -25,6 +59,7 @@ export const optimisticToggleSubscribe = async (subscribe: boolean, identifier: 
   toggleSubscribeOnfeed(subscribe, identifier.eventId, queryClient)
   helpers.optimisticSetPaginatedData({ ...optimisticParams, id: identifier.eventId, queryKey: QUERY_KEY_PAGINATED_SHORT_EVENTS })
   helpers.optimisticSetDataById({ ...optimisticParams, id: identifier.slug ?? identifier.eventId, queryKey: QUERY_KEY_SINGLE_EVENT })
+  patchHubSubscription(queryClient, { itemId: identifier.eventId, itemType: 'event', subscribe })
   return previousData
 }
 
