@@ -4,17 +4,29 @@ import { z } from 'zod'
 
 import { errorMessages } from '@/utils/errorMessages'
 
-const buildReqError = (start: string) => ({
-  required_error: `${start} est obligatoire.`,
-})
+const buildReqError = (start: string) => {
+  const message = `${start} est obligatoire.`
+  return {
+    required_error: message,
+    invalid_type_error: message,
+  }
+}
 
-const requiredString = (start: string) => z.string().min(1, `${start} est obligatoire.`)
+const requiredString = (start: string) => {
+  const message = `${start} est obligatoire.`
+  return z.string({ ...buildReqError(start), invalid_type_error: message }).min(1, message)
+}
 
 const buildLinkError = (start: string) => `le lien ${start} n’est pas valide.`
 
-export const validateBirthdateFormSchema = z.date().refine((birthdate) => isBefore(birthdate, subYears(new Date(), 15)), {
-  message: 'L’âge doit être d’au moins 15 ans.',
-})
+export const validateBirthdateFormSchema = z
+  .date({
+    required_error: 'La date de naissance est obligatoire.',
+    invalid_type_error: 'La date de naissance est obligatoire.',
+  })
+  .refine((birthdate) => isBefore(birthdate, subYears(new Date(), 15)), {
+    message: 'L’âge doit être d’au moins 15 ans.',
+  })
 
 export const validateNationalityFormSchema = z.string({ message: 'La nationalité est obligatoire.' }).refine((nationality) => nationality.length === 2, {
   message: 'La nationalité doit être composée de 2 caractères.',
@@ -56,7 +68,7 @@ export const validateLocationFormSchema = z.object({
   post_address: z
     .object({
       address: requiredString('L’adresse'),
-      postal_code: z.string(),
+      postal_code: z.string().default(''),
       city_name: requiredString('La ville'),
       country: requiredString('Le pays'),
     })
@@ -84,13 +96,18 @@ export const validateAccountFormSchema = z.object({
   last_name: requiredString('Le nom'),
   gender: z.enum(['male', 'female', 'other'], buildReqError('Le genre')),
   nationality: z.string().length(2, 'Le code pays doit être de deux lettres').optional(),
-  birthdate: z.date().refine((birthdate) => isBefore(birthdate, subYears(new Date(), 15)), {
-    message: "L'âge doit être d'au moins 15 ans.",
-  }),
+  birthdate: z
+    .date({
+      required_error: 'La date de naissance est obligatoire.',
+      invalid_type_error: 'La date de naissance est obligatoire.',
+    })
+    .refine((birthdate) => isBefore(birthdate, subYears(new Date(), 15)), {
+      message: "L'âge doit être d'au moins 15 ans.",
+    }),
   post_address: z
     .object({
       address: requiredString('L’adresse'),
-      postal_code: z.string(),
+      postal_code: z.string().default(''),
       city_name: requiredString('La ville'),
       country: requiredString('Le pays'),
     })
