@@ -62,7 +62,12 @@ const userStoreSlice: StateCreator<UserState> = (set) => ({
     }
     set({ ...initialUserData, user: userWithExpiration, signupTunnelStatus: 'completed' })
   },
-  removeCredentials: () => set((state) => ({ ...initialUserData, signupTunnelStatus: state.signupTunnelStatus })),
+  removeCredentials: () =>
+    set((state) => {
+      // eslint-disable-next-line no-console
+      console.log('[AUTH] removeCredentials', { hadUser: !!state.user, stack: new Error().stack })
+      return { ...initialUserData, signupTunnelStatus: state.signupTunnelStatus }
+    }),
   setOnboardingOpenedAt: (onboardingOpenedAt) => set({ onboardingOpenedAt }),
   _setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   setHideReSubscribeAlert: (hideResubscribeAlert) => set({ hideResubscribeAlert }),
@@ -70,6 +75,9 @@ const userStoreSlice: StateCreator<UserState> = (set) => ({
     // Force la réhydratation depuis le storage pour éviter les désynchronisations entre onglets
     try {
       const stored = await AsyncStorage.getItem('user')
+      const storedSecure = await AsyncStorage.secure.getItem('user')
+      // eslint-disable-next-line no-console
+      console.log('[AUTH] rehydrateFromStorage read', { hasStored: stored != null, hasStoredSecure: storedSecure != null })
       if (stored) {
         const parsed = JSON.parse(stored)
         if (parsed.state?.user) {
