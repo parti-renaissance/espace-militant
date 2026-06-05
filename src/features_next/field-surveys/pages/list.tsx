@@ -8,6 +8,7 @@ import { ArrowLeft, Calendar, ClipboardCheck, FileQuestion, Flag, MapPin, Pen, R
 import { Layout } from '@/components/AppStructure'
 import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
+import { ContentBackButton } from '@/components/ContentBackButton'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
@@ -291,6 +292,7 @@ const FieldSurveysListPage: React.FC = () => {
             style={{ height: media.sm ? 250 : 350, marginHorizontal: spacingValues.paddingLeft, borderRadius: 16, overflow: 'hidden' }}
           />
           <ContentWrapper>
+            <ContentBackButton fallbackPath="/" />
             <VoxCard borderRadius="$medium" bg="white" mx={media.sm ? '$medium' : 0}>
               <VoxCard.Content p={media.sm ? 12 : '$medium'}>
                 <VoxCard bg="$blue1" inside>
