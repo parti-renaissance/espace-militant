@@ -3,7 +3,7 @@ import { Href, Redirect, router, useRootNavigationState, usePathname } from 'exp
 
 import { useSession } from '@/ctx/SessionProvider';
 
-const buildSignupHref = (redirectUri: string): Href => ({ pathname: '/(signup)/bienvenue', params: { redirectUri } }) as Href
+const buildSignupHref = (redirectUri: string): Href => ({ pathname: '/(signup)/inscription', params: { redirectUri } }) as Href
 
 export function useRequireAuth() {
   const { isAuth, isLoading } = useSession()

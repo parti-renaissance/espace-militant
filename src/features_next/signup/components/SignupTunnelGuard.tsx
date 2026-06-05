@@ -29,8 +29,8 @@ export default function SignupTunnelGuard({ children }: PropsWithChildren) {
   if (shouldEnterSignupTunnel) {
     const href = (
       pathname && pathname !== '/'
-        ? `/(signup)/bienvenue?redirectUri=${encodeURIComponent(pathname)}`
-        : '/(signup)/bienvenue'
+        ? `/(signup)/inscription?redirectUri=${encodeURIComponent(pathname)}`
+        : '/(signup)/inscription'
     ) as Href
     return <Redirect href={href} />
   }
