@@ -1,5 +1,5 @@
 import React, { Component, useMemo } from 'react'
-import { ImageStyle, Linking, StyleProp, Text } from 'react-native'
+import { ImageStyle, Linking, StyleProp, Text, TextStyle } from 'react-native'
 import FitImage from 'react-native-fit-image'
 import Markdown from 'react-native-markdown-display'
 import { useTheme } from 'tamagui'
@@ -296,6 +296,16 @@ function VoxMarkdownComponent({ content, isStreaming = false }: VoxMarkdownProps
 
   const markdownRules = useMemo(
     () => ({
+      textgroup: (node: MarkdownNode, children: React.ReactNode[], _parent: MarkdownNode[], rulesStyles: { textgroup?: StyleProp<TextStyle> }) => (
+        <Text key={node.key} style={rulesStyles.textgroup} selectable>
+          {children}
+        </Text>
+      ),
+      text: (node: MarkdownNode & { content?: string }, _children: React.ReactNode[], _parent: MarkdownNode[], rulesStyles: { text?: StyleProp<TextStyle> }, inheritedStyles: StyleProp<TextStyle> = {}) => (
+        <Text key={node.key} style={[inheritedStyles, rulesStyles.text]} selectable>
+          {node.content}
+        </Text>
+      ),
       image: (
         node: MarkdownNode,
         _children: React.ReactNode[],

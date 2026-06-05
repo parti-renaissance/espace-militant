@@ -100,7 +100,7 @@ export default function BotPage() {
           bottomOffset={dockBottomOffset}
           placeholder="Formulez votre demande…"
           maxLength={BOT_MESSAGE_MAX_LENGTH}
-          topSlot={showEmpty ? <SuggestionsList onPress={handleSuggestionPress} /> : undefined}
+          topSlot={showEmpty && !keyboardOpen ? <SuggestionsList onPress={handleSuggestionPress} /> : undefined}
           onChange={handleInputChange}
           onSubmit={handleSubmit}
           onStop={stop}
