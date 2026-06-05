@@ -1,4 +1,4 @@
-import { Fragment, useMemo } from 'react'
+import { Fragment } from 'react'
 import { YStack } from 'tamagui'
 import { Info } from '@tamagui/lucide-icons'
 import { Controller } from 'react-hook-form'
@@ -8,82 +8,50 @@ import DatePickerField from '@/components/DatePicker'
 import { VoxHeader } from '@/components/Header/Header'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
-import NationalitySelect from '@/components/NationalitySelect/NationalitySelect'
 
 import { useGetDetailProfil } from '@/services/profile/hook'
 
 import AbstractProfilForm from './AbstractProfilForm'
-import { validateBirthdateFormSchema, validateNationalityFormSchema } from './schema'
+import { validateBirthdateFormSchema } from './schema'
 
 const ForceBirthdateModal = () => {
   const { data: profile } = useGetDetailProfil()
-  const message = useMemo(() => {
-    const base = 'Pour accéder à votre profil, veuillez renseigner votre '
-    if (profile.birthdate && !profile.nationality) {
-      return base + 'nationalité.'
-    }
-    if (!profile.birthdate && profile.nationality) {
-      return base + 'date de naissance.'
-    }
-    return base
-  }, [profile])
 
   return (
-    <ModalOrPageBase open={!profile.birthdate || !profile.nationality} header={<VoxHeader.ModalFrame />}>
+    <ModalOrPageBase open={!profile.birthdate} header={<VoxHeader.ModalFrame />}>
       <AbstractProfilForm
         uuid={profile.uuid}
         defaultValues={
           {
             birthdate: profile.birthdate,
-            nationality: profile.nationality ?? undefined,
           } as const
         }
         validatorSchema={z.object({
           birthdate: validateBirthdateFormSchema,
-          nationality: validateNationalityFormSchema,
         })}
       >
         {({ control }) => (
           <Fragment>
             <MessageCard theme="yellow" iconLeft={Info}>
-              {message}
+              Pour accéder à votre profil, veuillez renseigner votre date de naissance.
             </MessageCard>
 
             <YStack gap="$large">
-              {!profile.birthdate ? (
-                <Controller
-                  name="birthdate"
-                  control={control}
-                  render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                    <DatePickerField
-                      color="gray"
-                      label="Date de naissance"
-                      type="date"
-                      value={value ?? undefined}
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      error={error?.message}
-                    />
-                  )}
-                />
-              ) : null}
-              {!profile.nationality ? (
-                <Controller
-                  name="nationality"
-                  control={control}
-                  render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
-                    <NationalitySelect
-                      id="nationality"
-                      color="gray"
-                      value={value ?? undefined}
-                      placeholder="Nationalité"
-                      onBlur={onBlur}
-                      onChange={onChange}
-                      error={error?.message}
-                    />
-                  )}
-                />
-              ) : null}
+              <Controller
+                name="birthdate"
+                control={control}
+                render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+                  <DatePickerField
+                    color="gray"
+                    label="Date de naissance"
+                    type="date"
+                    value={value ?? undefined}
+                    onBlur={onBlur}
+                    onChange={onChange}
+                    error={error?.message}
+                  />
+                )}
+              />
             </YStack>
           </Fragment>
         )}
