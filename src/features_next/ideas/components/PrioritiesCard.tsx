@@ -1,8 +1,8 @@
-import { XStack } from 'tamagui'
-import { Flag, Rocket } from '@tamagui/lucide-icons'
+import { YStack } from 'tamagui';
+import { Flag, Rocket } from '@tamagui/lucide-icons';
 
-import { VoxButton } from '@/components/Button'
-import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
+import { VoxButton } from '@/components/Button';
+import CallToActionCard from '@/components/CallToActionCard/CallToActionCard';
 
 export type PrioritiesCardProps = {
   onExplore?: () => void
@@ -14,17 +14,23 @@ export default function PrioritiesCard({ onExplore, onCampaignSite }: Priorities
     <CallToActionCard
       icon={Flag}
       title="Nos priorités pour la France"
-      description="Les 4 chantiers capitaux de la campagne de Gabriel Attal pour redevenir la première puissance européenne : école, salaires, frontières, intelligence artificielle."
+      description={
+        <>
+          Les 4 chantiers capitaux de Gabriel Attal pour préparer l'avenir de la France : école, salaires,{' '}
+          frontières, intelligence artificielle. Les 2 dettes à résorber : dette publique et{' '}
+          dette climatique.
+        </>
+      }
       theme="purple"
     >
-      <XStack gap="$small" flexWrap="wrap">
+      <YStack gap="$small">
         <VoxButton theme="purple" variant="soft" onPress={onExplore}>
           Explorer nos idées
         </VoxButton>
         <VoxButton theme="purple" variant="outlined" iconLeft={Rocket} onPress={onCampaignSite}>
           Notre site de campagne
         </VoxButton>
-      </XStack>
+      </YStack>
     </CallToActionCard>
   )
 }
