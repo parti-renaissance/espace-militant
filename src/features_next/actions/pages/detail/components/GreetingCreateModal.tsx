@@ -8,6 +8,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import { useActionSharing } from '@/components/ShareGroup/DetailShareGroup'
+import Title from '@/components/Title/Title'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import ActionIllustration from '@/features_next/actions/assets/illu-actions.png'
 
@@ -35,20 +36,22 @@ export const GreetingCreateModal = (props: GreetingCreateModalProps) => {
         <VoxCard.Content gap="$xlarge">
           <YStack gap="$medium" alignItems="center">
             <Image source={ActionIllustration} style={{ height: 100, width: 100 }} contentFit="contain" />
-            <Text.LG textAlign="center">Nouvelle action créée</Text.LG>
+            <Title size="h2">
+              <Title.Text>Nouvelle action créée</Title.Text>
+            </Title>
           </YStack>
-          <VoxCard borderRadius="$medium" backgroundColor="$blue1">
+          <VoxCard borderRadius="$medium" backgroundColor="$blue50" shadowColor="transparent" borderWidth={0}>
             <VoxCard.Content>
               <YStack alignItems="center" gap="$medium">
-                <Text.LG color="$blue8" textAlign="center">
+                <Text.LG color="$blue700" textAlign="center">
                   C’est quand même mieux à plusieurs
                 </Text.LG>
-                <Text.MD medium textAlign="center">
+                <Text.MD multiline medium textAlign="center">
                   Envoyez le lien d’inscription sur Telegram, WhatsApp ou même par email pour que l’on puisse vous rejoindre.
                 </Text.MD>
 
                 <XStack gap="$medium" justifyContent="center" width="100%">
-                  <VoxButton variant="outlined" size="xl" flexGrow={1} iconLeft={Copy} onPress={copyUrl}>
+                  <VoxButton theme="blue" variant="outlined" size="xl" iconLeft={Copy} onPress={copyUrl}>
                     Copier le lien
                   </VoxButton>
                   {isShareAvailable ? (

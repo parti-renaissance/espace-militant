@@ -1,12 +1,14 @@
 import { ComponentProps } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Image, useMedia, XStack, YStack } from 'tamagui'
+import { Image } from 'expo-image'
+import { useMedia, XStack, YStack } from 'tamagui'
 import { Copy, Share2, X } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import { useEventSharing } from '@/components/ShareGroup/DetailShareGroup'
+import Title from '@/components/Title/Title'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import EventIllustration from '@/features_next/events/assets/images/event_illustration.png'
 import { EventItemProps } from '@/features_next/events/types'
@@ -27,21 +29,23 @@ export const GreetingCreateModal = (props: { modalProps: ComponentProps<typeof M
       <VoxCard borderColor="$colorTransparent" maxWidth={media.gtSm ? 420 : '100%'} pt="$medium" pb={bottomPadding}>
         <VoxCard.Content gap="$xlarge">
           <YStack gap="$medium" alignItems="center">
-            <Image source={EventIllustration} />
-            <Text.LG textAlign="center">Nouvel événement créé</Text.LG>
+            <Image source={EventIllustration} style={{ height: 100, width: 100 }} contentFit="contain" />
+            <Title size="h2">
+              <Title.Text>Nouvel événement créé</Title.Text>
+            </Title>
           </YStack>
-          <VoxCard borderRadius="$medium" backgroundColor="$blue1">
+          <VoxCard borderRadius="$medium" backgroundColor="$blue50" shadowColor="transparent" borderWidth={0}>
             <VoxCard.Content>
               <YStack alignItems="center" gap="$medium">
-                <Text.LG color="$blue8" textAlign="center">
+                <Text.LG color="$blue700" textAlign="center">
                   C’est quand même mieux à plusieurs
                 </Text.LG>
-                <Text.MD medium textAlign="center">
+                <Text.MD multiline medium textAlign="center">
                   Envoyez le lien d’inscription sur Telegram, WhatsApp ou même par email pour que l’on puisse vous rejoindre.
                 </Text.MD>
 
                 <XStack gap="$medium" justifyContent="center" width="100%">
-                  <VoxButton variant="outlined" size="xl" flexGrow={1} iconLeft={Copy} onPress={copyUrl}>
+                  <VoxButton theme="blue" variant="outlined" size="xl" iconLeft={Copy} onPress={copyUrl}>
                     Copier le lien
                   </VoxButton>
                   {isShareAvailable ? (
