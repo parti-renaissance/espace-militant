@@ -87,11 +87,9 @@ export default function VideoPlayer({
   const aspectRatio = getVideoAspectRatio(width, height)
   const contentFit: 'cover' | 'contain' = fill ? 'cover' : 'contain'
 
-  const tryPlay = useCallback(() => {
+  const playVideoElement = useCallback(() => {
     const video = videoRef.current
     if (!video) return
-    setIsUserPaused(false)
-    setAutoplayFailed(false)
     void video.play().catch((error) => {
       if (isAutoplayPolicyError(error)) {
         setAutoplayFailed(true)
@@ -103,12 +101,14 @@ export default function VideoPlayer({
   const handleActivate = useCallback(() => {
     setActivatedUrl(hlsUrl)
     setIsStartingManually(true)
+    setIsUserPaused(false)
+    setAutoplayFailed(false)
     pendingManualPlayRef.current = true
     if (ready && activatedUrl === hlsUrl) {
       pendingManualPlayRef.current = false
-      tryPlay()
+      playVideoElement()
     }
-  }, [activatedUrl, hlsUrl, ready, tryPlay])
+  }, [activatedUrl, hlsUrl, ready, playVideoElement])
 
   const handleTogglePlay = useCallback(() => {
     const video = videoRef.current
@@ -196,8 +196,8 @@ export default function VideoPlayer({
   useEffect(() => {
     if (!isActivated || !ready || !pendingManualPlayRef.current) return
     pendingManualPlayRef.current = false
-    tryPlay()
-  }, [isActivated, ready, tryPlay])
+    playVideoElement()
+  }, [isActivated, ready, playVideoElement])
 
   // Play / pause déclaratif : uniquement pour l'autoplay (`autoPlay` prop).
   useEffect(() => {
@@ -214,16 +214,12 @@ export default function VideoPlayer({
     }
   }, [active, isActivated, isUserPaused, ready, shouldAttemptAutoPlay])
 
-  useEffect(() => {
-    if (!shouldAttemptAutoPlay) setAutoplayFailed(false)
-  }, [shouldAttemptAutoPlay])
-
   const showPlayButton = !isActivated
   const showCustomControls = isActivated && !controls
   const showPlayIcon = shouldShowVideoPlayIcon(
     isPlaying,
     isUserPaused,
-    autoplayFailed,
+    autoplayFailed && shouldAttemptAutoPlay,
     shouldAttemptAutoPlay || isStartingManually,
   )
 

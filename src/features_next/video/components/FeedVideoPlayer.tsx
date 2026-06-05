@@ -73,17 +73,13 @@ function FeedVideoLayer({ contentId, hlsUrl, videoId, isSlideViewable, contentFi
     return () => subscription.remove()
   }, [player])
 
-  useEffect(() => {
-    if (!shouldAutoPlay) setAutoplayFailed(false)
-  }, [shouldAutoPlay])
-
   const handleAutoplayFailed = useCallback(() => {
     setAutoplayFailed(true)
   }, [])
 
   useExpoPlayerAutoPlayback(player, shouldAutoPlay && !isUserPaused, autoPlayAllowedRef, handleAutoplayFailed)
 
-  const showPlayIcon = shouldShowVideoPlayIcon(isPlaying, isUserPaused, autoplayFailed, shouldAutoPlay)
+  const showPlayIcon = shouldShowVideoPlayIcon(isPlaying, isUserPaused, autoplayFailed && shouldAutoPlay, shouldAutoPlay)
 
   const handleVideoPress = useCallback(() => {
     if (!canInteract || !isAppActive) return

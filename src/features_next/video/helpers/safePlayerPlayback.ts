@@ -94,7 +94,7 @@ export function useExpoPlayerAutoPlayback(
       cancelled = true
       if (playFrame != null) cancelAnimationFrame(playFrame)
     }
-  }, [player, playAllowedRef, shouldPlay])
+  }, [pauseWhenStopped, player, playAllowedRef, shouldPlay])
 
   useEffect(() => {
     return () => safePlayerAction(() => player.pause())

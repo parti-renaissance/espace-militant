@@ -39,10 +39,6 @@ function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount
     return () => subscription.remove()
   }, [player])
 
-  useEffect(() => {
-    if (!shouldAttemptAutoPlay) setAutoplayFailed(false)
-  }, [shouldAttemptAutoPlay])
-
   const handleAutoplayFailed = useCallback(() => {
     setAutoplayFailed(true)
   }, [])
@@ -74,15 +70,15 @@ function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount
       })
     }
 
-    tryStart()
     const subscription = player.addListener('statusChange', tryStart)
+    if (player.status === 'readyToPlay') queueMicrotask(tryStart)
     return () => subscription.remove()
   }, [active, player, startOnMount])
 
   const showPlayIcon = shouldShowVideoPlayIcon(
     isPlaying,
     isUserPaused,
-    autoplayFailed,
+    autoplayFailed && shouldAttemptAutoPlay,
     shouldAttemptAutoPlay || startOnMount,
   )
 
