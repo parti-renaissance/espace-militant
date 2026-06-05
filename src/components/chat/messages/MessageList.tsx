@@ -100,6 +100,8 @@ export const MessageList = forwardRef<FlatList<ChatMessage>, Props>(function Mes
         ListFooterComponent={ListFooter}
         onScroll={handleScroll}
         scrollEventThrottle={16}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         onScrollToIndexFailed={(info) => {
           const flatList = ref && 'current' in ref ? ref.current : null
           setTimeout(() => {

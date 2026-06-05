@@ -4,7 +4,7 @@ import { XStack, YStack } from 'tamagui'
 import { ArrowUpRight, BotMessageSquare, Sparkles } from '@tamagui/lucide-icons'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import ROBOT_IMAGE from '../assets/robot-icon.png'
+import NUIT_IMAGE from '../assets/nuit-ia-badge.gif'
 
 export type BotQuestionCardProps = {
   onPress?: () => void
@@ -59,7 +59,7 @@ export default function BotQuestionCard({ onPress, badge = 'Nuit' }: BotQuestion
           scale={hideRobot ? 0.9 : 1}
           $sm={{ top: -15, right: 0, width: 100 }}
         >
-          <Image source={ROBOT_IMAGE} contentFit="contain" style={{ width: '100%', height: '100%' }} pointerEvents="none" />
+          <Image source={NUIT_IMAGE} contentFit="contain" style={{ width: '100%', height: '100%' }} pointerEvents="none" />
         </YStack>
 
         <XStack

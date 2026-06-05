@@ -74,7 +74,7 @@ export function ChatInput({ inputRef, value, isLoading, placeholder = 'Posez vot
           verticalAlign="top"
           placeholder={placeholder}
           placeholderTextColor="$textSecondary"
-          autoFocus
+          autoFocus={isWeb}
           editable
         />
       </View>
