@@ -146,8 +146,8 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
               onChangeText={onChange}
               value={value}
               error={error?.message}
-              keyboardType="number-pad"
-              maxLength={5}
+              maxLength={10}
+              autoCapitalize="characters"
               autoComplete="postal-code"
               size="sm"
             />
