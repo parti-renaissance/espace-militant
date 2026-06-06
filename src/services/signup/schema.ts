@@ -60,9 +60,8 @@ export const SignupInscriptionFormSchema = RestPostSignupRequestObjectSchema.pic
   email: z.string({ required_error: errorMessages.required }).min(1, errorMessages.required).email(errorMessages.email),
   postal_code: z
     .string({ required_error: errorMessages.required })
-    .min(1, errorMessages.required)
-    .max(15)
-    .regex(/^\d{5}$/, 'Code postal invalide (5 chiffres)'),
+    .min(3, 'Le code postal doit contenir au moins 3 caractères')
+    .max(10, 'Le code postal ne peut pas dépasser 10 caractères'),
   email_opt_in: z.boolean(),
   cgu_accepted: z
     .boolean({ required_error: errorMessages.required })
