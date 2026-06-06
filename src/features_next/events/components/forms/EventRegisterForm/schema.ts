@@ -16,8 +16,8 @@ export const PublicSubscribtionFormDataSchema = z.object({
     .string({
       required_error: 'Le code postal ne doit pas être vide',
     })
-    .min(4, { message: 'Le code postal doit contenir au minimum 4 chiffres' })
-    .max(6, { message: 'Le code postal doit contenir au maximum 6 chiffres' }),
+    .min(3, { message: 'Le code postal doit contenir au minimum 3 chiffres' })
+    .max(10, { message: 'Le code postal doit contenir au maximum 10 chiffres' }),
   cgu_accepted: z.boolean().refine((value) => value, { message: 'Vous devez accepter les CGU' }),
   join_newsletter: z.boolean(),
 })

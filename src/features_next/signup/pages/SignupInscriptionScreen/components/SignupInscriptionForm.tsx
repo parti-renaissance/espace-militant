@@ -146,8 +146,8 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
               onChangeText={onChange}
               value={value}
               error={error?.message}
-              keyboardType="number-pad"
-              maxLength={5}
+              maxLength={10}
+              autoCapitalize="characters"
               autoComplete="postal-code"
               size="sm"
             />
@@ -189,11 +189,11 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
               <Pressable onPress={() => onChange(!value)} style={{ flex: 1 }}>
                 <Text.SM multiline color={error ? '$red600' : '$textPrimary'}>
                   En continuant, vous acceptez nos{' '}
-                  <Text.SM color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://parti-renaissance.fr/cgu')}>
+                  <Text.SM color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://attalpresident.fr/cgu')}>
                     CGU
                   </Text.SM>{' '}
                   et notre{' '}
-                  <Text.SM color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://parti-renaissance.fr/politique-de-protection-des-donnees/')}>
+                  <Text.SM color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://attalpresident.fr/confidentialite')}>
                     Politique de confidentialité
                   </Text.SM>
                   , et vous autorisez Renaissance à vous envoyer des emails relatifs à votre inscription.
@@ -231,7 +231,7 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
           dpo@parti-renaissance.fr
         </Text.SM>
         . Vous pouvez également introduire une réclamation auprès de la CNIL. Pour en savoir plus, consultez notre{' '}
-        <Text.SM secondary color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://parti-renaissance.fr/politique-de-protection-des-donnees/')}>
+        <Text.SM secondary color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://attalpresident.fr/confidentialite')}>
           politique de confidentialité
         </Text.SM>
         .

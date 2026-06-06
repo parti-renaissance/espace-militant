@@ -1,5 +1,7 @@
-import { activistTagSchema } from '@/data/Activist/schema'
 import { z } from 'zod'
+
+import { activistTagSchema } from '@/data/Activist/schema'
+
 import { createRestPaginationSchema } from '../common/schema'
 
 // ------- Event Schemas ----------
@@ -192,7 +194,7 @@ export const RestPostPublicEventSubsciptionRequest = z.object({
   first_name: z.string(),
   last_name: z.string(),
   email_address: z.string().email(),
-  postal_code: z.string().min(4).max(6),
+  postal_code: z.string().min(3).max(10),
   cgu_accepted: z.boolean(),
   join_newsletter: z.boolean(),
   utm_source: z.string().optional(),
