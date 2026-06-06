@@ -381,10 +381,6 @@ publicInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
 authInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
 authInstance.interceptors.request.use(authInterceptor, errorMonitor)
 refreshInstance.interceptors.request.use(appVersionInterceptor, errorMonitor)
-refreshInstance.interceptors.response.use(identity, (error: AxiosError) => {
-  logAuthEvent('refresh endpoint rejected', extractOauthError(error))
-  return Promise.reject(error)
-})
 
 authInstance.interceptors.response.use(
   identity,
