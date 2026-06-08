@@ -6,6 +6,27 @@ import clientEnv from '@/config/clientEnv'
 
 type LinkPressEvent = { preventDefault?: () => void }
 
+export type QueryParams = Record<string, string | number | boolean | null | undefined>
+
+export const appendQueryParams = (url: string, params?: QueryParams): string => {
+  if (!params) return url
+
+  const entries = Object.entries(params).filter((entry): entry is [string, string | number | boolean] => entry[1] != null && entry[1] !== '')
+  if (entries.length === 0) return url
+
+  try {
+    const parsed = new URL(url)
+    for (const [key, value] of entries) {
+      parsed.searchParams.set(key, String(value))
+    }
+    return parsed.toString()
+  } catch {
+    const search = new URLSearchParams(Object.fromEntries(entries.map(([key, value]) => [key, String(value)])))
+    const separator = url.includes('?') ? '&' : '?'
+    return `${url}${separator}${search.toString()}`
+  }
+}
+
 /**
  * Vérifie si une URL est un lien interne (relatif ou vers le domaine associé)
  */
@@ -38,8 +59,12 @@ export const handleLinkPress = async (url: string, onLinkClick?: (target_url: st
     const urlObj = new URL(url)
     router.push(urlObj.pathname as Href)
   } else if (isWeb) {
-    window.open(url, '_blank')
+    window.open(url, '_blank', 'noopener,noreferrer')
   } else {
     await WebBrowser.openBrowserAsync(url)
   }
+}
+
+export const openExternalLink = async (url: string, params?: QueryParams) => {
+  await handleLinkPress(appendQueryParams(url, params))
 }

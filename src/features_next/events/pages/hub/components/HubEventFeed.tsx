@@ -27,7 +27,7 @@ import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
 import { mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
 import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
-import { handleLinkPress } from '@/utils/linkHandler'
+import { openExternalLink } from '@/utils/linkHandler'
 
 const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.map(mapHubItemToFeedRow).filter((row): row is HubFeedRowType => row !== null)
 
@@ -38,12 +38,13 @@ const MATERIEL_URL = 'https://attal.app/commande-materiel'
 const PAP_HREF = '/porte-a-porte' as const
 
 const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrganizeModal }: { onOpenOrganizeModal: () => void }) {
+  const { data: user } = useGetProfil()
   const { runWithCompleteProfile } = useProfileCompletionAccess()
 
   const handleCommanderMateriel = useCallback(() => {
-    const open = () => void handleLinkPress(MATERIEL_URL)
+    const open = () => void openExternalLink(MATERIEL_URL, { public_id: user?.id })
     runWithCompleteProfile(open, { onSuccess: open })
-  }, [runWithCompleteProfile])
+  }, [runWithCompleteProfile, user?.id])
 
   return (
     <YStack gap="$medium" px="$medium">
