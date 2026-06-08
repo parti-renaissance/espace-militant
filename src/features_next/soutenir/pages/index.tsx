@@ -2,8 +2,7 @@ import { Suspense, useCallback, useState } from 'react'
 import { Linking } from 'react-native'
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
-import * as WebBrowser from 'expo-web-browser'
-import { isWeb, useMedia, XStack, YStack } from 'tamagui'
+import { useMedia, XStack, YStack } from 'tamagui'
 import {
   CalendarDays,
   Facebook,
@@ -33,6 +32,7 @@ import { DoubleSquare } from '@/features_next/profil/pages/instances/components/
 
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { useGetProfil } from '@/services/profile/hook'
+import { openExternalLink } from '@/utils/linkHandler'
 
 import HERO_IMAGE_URI from '../assets/soutenir-gabriel-attal.jpg'
 
@@ -56,27 +56,6 @@ const SOCIAL_LINKS = {
 
 const INVITE_SHARE_MESSAGE = "Téléchargez l'application de campagne pour nous rejoindre !"
 const DEFAULT_APP_INVITE_URL = 'https://attal.app/stores'
-
-const appendPublicIdParam = (url: string, publicId?: string | null): string => {
-  if (!publicId) return url
-  try {
-    const parsed = new URL(url)
-    parsed.searchParams.set('public_id', publicId)
-    return parsed.toString()
-  } catch {
-    const separator = url.includes('?') ? '&' : '?'
-    return `${url}${separator}public_id=${encodeURIComponent(publicId)}`
-  }
-}
-
-const openInAppBrowser = (url: string, publicId?: string | null) => {
-  const finalUrl = appendPublicIdParam(url, publicId)
-  if (isWeb) {
-    window.open(finalUrl, '_blank')
-  } else {
-    void WebBrowser.openBrowserAsync(finalUrl)
-  }
-}
 
 function HeroTitleSection() {
   return (
@@ -113,7 +92,7 @@ function ContactNationalButton() {
   const { data: user } = useGetProfil()
 
   return (
-    <VoxButton variant="outlined" iconLeft={Phone} onPress={() => openInAppBrowser(EXTERNAL_LINKS.contactNational, user?.id)}>
+    <VoxButton variant="outlined" iconLeft={Phone} onPress={() => openExternalLink(EXTERNAL_LINKS.contactNational, { public_id: user?.id })}>
       Être contacté par les équipes
     </VoxButton>
   )
@@ -132,7 +111,7 @@ function CallToActionCards() {
       redirectToSignup()
       return
     }
-    openInAppBrowser(EXTERNAL_LINKS.deposerUneIdee, user?.id)
+    void openExternalLink(EXTERNAL_LINKS.deposerUneIdee, { public_id: user?.id })
   }, [isAuth, redirectToSignup, user?.id])
 
   const handleInviteFriend = useCallback(() => {
@@ -140,7 +119,7 @@ function CallToActionCards() {
       url: DEFAULT_APP_INVITE_URL,
       message: INVITE_SHARE_MESSAGE,
     })
-  }, [user?.referral_link, handleShareOrCopy])
+  }, [handleShareOrCopy])
 
   const handleOpenOrganizeModal = useCallback(() => {
     openOrganiserModal(() => setOrganizeModalOpen(true))
@@ -182,7 +161,7 @@ function CallToActionCards() {
         </CallToActionCard>
 
         <CallToActionCard icon={Users} title="Je rejoins l'équipe" description="Devenez ambassadeur de la campagne." theme="teal">
-          <VoxButton theme="teal" variant="soft" onPress={() => openInAppBrowser(EXTERNAL_LINKS.rejoindreEquipe, user?.id)}>
+          <VoxButton theme="teal" variant="soft" onPress={() => openExternalLink(EXTERNAL_LINKS.rejoindreEquipe, { public_id: user?.id })}>
             Postuler
           </VoxButton>
         </CallToActionCard>

@@ -1,11 +1,11 @@
 import { useRouter } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
-import { isWeb, useMedia, XStack, YStack } from 'tamagui';
+import { useMedia, XStack, YStack } from 'tamagui';
 
 import Layout from '@/components/AppStructure/Layout/Layout';
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView';
 import Title from '@/components/Title/Title';
 import { useGetProfil } from '@/services/profile/hook';
+import { openExternalLink } from '@/utils/linkHandler';
 
 import BotQuestionCard from '../components/BotQuestionCard';
 import FormationCard from '../components/FormationCard';
@@ -19,27 +19,6 @@ const EXTERNAL_LINKS = {
   campagne: 'https://attalpresident.fr/',
   mesPriorites: 'https://parti.re/app-idee/mes-priorites',
 } as const
-
-const appendPublicIdParam = (url: string, publicId?: string | null): string => {
-  if (!publicId) return url
-  try {
-    const parsed = new URL(url)
-    parsed.searchParams.set('public_id', publicId)
-    return parsed.toString()
-  } catch {
-    const separator = url.includes('?') ? '&' : '?'
-    return `${url}${separator}public_id=${encodeURIComponent(publicId)}`
-  }
-}
-
-const openExternalLink = (url: string, publicId?: string | null) => {
-  const finalUrl = appendPublicIdParam(url, publicId)
-  if (isWeb) {
-    window.open(finalUrl, '_blank', 'noopener,noreferrer')
-  } else {
-    void WebBrowser.openBrowserAsync(finalUrl)
-  }
-}
 
 function HeroTitle() {
   return (
@@ -70,7 +49,7 @@ function DesktopContent() {
       </XStack>
       <XStack gap="$large" alignItems="stretch">
         <YStack flex={1} flexBasis={0} minWidth={0}>
-          <ShareIdeaCard onPress={() => openExternalLink(EXTERNAL_LINKS.deposerUneIdee, user?.id)} />
+          <ShareIdeaCard onPress={() => openExternalLink(EXTERNAL_LINKS.deposerUneIdee, { public_id: user?.id })} />
         </YStack>
         <YStack flex={1} flexBasis={0} minWidth={0}>
           <FormationCard />
@@ -92,7 +71,7 @@ function MobileContent() {
       <YStack gap="$medium">
         <BotQuestionCard onPress={() => router.push('/idees/bot')} />
         <PrioritiesCard onExplore={() => openExternalLink(EXTERNAL_LINKS.mesPriorites)} onCampaignSite={() => openExternalLink(EXTERNAL_LINKS.campagne)} />
-        <ShareIdeaCard onPress={() => openExternalLink(EXTERNAL_LINKS.deposerUneIdee, user?.id)} />
+        <ShareIdeaCard onPress={() => openExternalLink(EXTERNAL_LINKS.deposerUneIdee, { public_id: user?.id })} />
         <FormationCard />
       </YStack>
     </YStack>
