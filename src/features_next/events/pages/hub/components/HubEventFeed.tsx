@@ -2,7 +2,7 @@
  * Liste minimaliste du hub : bannière épinglée + inscriptions à venir uniquement.
  */
 import type { ReactNode } from 'react'
-import { memo, useCallback, useMemo, useRef } from 'react'
+import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useScrollToTop } from '@react-navigation/native'
 import { Link, router } from 'expo-router'
@@ -20,6 +20,7 @@ import ILLUMATERIEL from '@/features_next/events/assets/images/illu-materiel.png
 import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
 import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
 import { HubFeedRow } from '@/features_next/events/components/list-item/HubFeedRow'
+import { useCanOrderMateriel } from '@/features_next/events/hooks/useCanOrderMateriel'
 import { useProfileCompletionAccess } from '@/features_next/profil/hooks/useProfileCompletionAccess'
 
 import { useSession } from '@/ctx/SessionProvider'
@@ -29,6 +30,8 @@ import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
 import { openExternalLink } from '@/utils/linkHandler'
 
+import { MaterielOrderAccessModal } from './MaterielOrderAccessModal'
+
 const mapHubItemsToFeedRows = (items: RestHubItem[]): HubFeedRowType[] => items.map(mapHubItemToFeedRow).filter((row): row is HubFeedRowType => row !== null)
 
 const getFeedRowKey = (row: HubFeedRowType): string =>
@@ -37,18 +40,41 @@ const getFeedRowKey = (row: HubFeedRowType): string =>
 const MATERIEL_URL = 'https://attal.app/commande-materiel'
 const PAP_HREF = '/porte-a-porte' as const
 
-const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrganizeModal }: { onOpenOrganizeModal: () => void }) {
+const HubOrganizePromptCards = memo(function HubOrganizePromptCards({
+  hubItems,
+  onOpenOrganizeModal,
+}: {
+  hubItems: RestHubItem[]
+  onOpenOrganizeModal: () => void
+}) {
   const { data: user } = useGetProfil()
   const { runWithCompleteProfile } = useProfileCompletionAccess()
+  const { canOrderMateriel, isLoading: isAccessLoading } = useCanOrderMateriel(hubItems)
+  const [accessModalOpen, setAccessModalOpen] = useState(false)
 
   const handleCommanderMateriel = useCallback(() => {
-    const open = () => void openExternalLink(MATERIEL_URL, { public_id: user?.id })
-    runWithCompleteProfile(open, { onSuccess: open })
-  }, [runWithCompleteProfile, user?.id])
+    const proceed = () => {
+      if (canOrderMateriel) {
+        void openExternalLink(MATERIEL_URL, { public_id: user?.id })
+        return
+      }
+      setAccessModalOpen(true)
+    }
+
+    if (isAccessLoading) {
+      return
+    }
+
+    runWithCompleteProfile(proceed, { onSuccess: proceed })
+  }, [canOrderMateriel, isAccessLoading, runWithCompleteProfile, user?.id])
 
   return (
     <YStack gap="$medium" px="$medium">
-      <CallToActionCard backgroundColor="$pink100" title="J’organise une action près de chez moi" description="Tractage, collage, porte-à-porte, boîtage, ...">
+      <CallToActionCard
+        backgroundColor="$pink100"
+        title="J’organise un événement près de chez moi"
+        description="Tractage, collage, porte-à-porte, boîtage, ..."
+      >
         <VoxButton variant="contained" theme="pink" iconLeft={Plus} onPress={onOpenOrganizeModal}>
           Organiser un événement
         </VoxButton>
@@ -76,6 +102,7 @@ const HubOrganizePromptCards = memo(function HubOrganizePromptCards({ onOpenOrga
           </YStack>
         </YStack>
       </XStack>
+      <MaterielOrderAccessModal open={accessModalOpen} onClose={() => setAccessModalOpen(false)} onOpenOrganizeModal={onOpenOrganizeModal} />
     </YStack>
   )
 })
@@ -157,7 +184,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
       <QueryBoundary>
         <PinnedItemBanner small />
       </QueryBoundary>
-      <HubOrganizePromptCards onOpenOrganizeModal={onOpenOrganizeModal} />
+      <HubOrganizePromptCards hubItems={hubItems} onOpenOrganizeModal={onOpenOrganizeModal} />
       <YStack px="$medium" gap="$medium">
         <IconTitleRow icon={CalendarCheck2} title="Mon agenda" />
         {hubItems.length > 0 ? (
