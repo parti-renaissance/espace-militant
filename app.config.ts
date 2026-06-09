@@ -16,6 +16,9 @@ interface ConfigOptions {
   icon?: string
 }
 
+/** ASCII bundle name for ASWebAuthenticationSession (iOS strips diacritics otherwise). */
+const toIosBundleName = (name: string) => name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
 const setAssociatedDomain = (config: Partial<ExpoConfig>, associatedDomain: string | undefined) => {
   if (!associatedDomain) return
   if (config.ios) {
@@ -41,6 +44,11 @@ const applyConfig = (config: Partial<ExpoConfig>, options: ConfigOptions) => {
     }
     if (options.icon) {
       config.ios.icon = options.icon
+    }
+    config.ios.infoPlist = {
+      ...config.ios.infoPlist,
+      CFBundleDisplayName: options.name,
+      CFBundleName: toIosBundleName(options.name),
     }
   }
   if (config.android) {
