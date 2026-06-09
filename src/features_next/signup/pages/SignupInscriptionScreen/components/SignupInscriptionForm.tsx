@@ -38,6 +38,7 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
   const setFirstName = useSignupSessionStore((s) => s.setFirstName)
   const startResendCooldown = useSignupSessionStore((s) => s.startResendCooldown)
   const redirectUri = useSignupSessionStore((s) => s.redirectUri)
+  const referrerCode = useSignupSessionStore((s) => s.ref)
 
   const { control, handleSubmit, setError } = useForm<SignupInscriptionFormValues>({
     defaultValues: {
@@ -66,8 +67,9 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
       postal_code: data.postal_code.trim(),
       country: 'FR',
       email_opt_in: data.email_opt_in,
+      ...(referrerCode ? { referrer_code: referrerCode } : {}),
     }),
-    [],
+    [referrerCode],
   )
 
   const onSubmit = handleSubmit(async (data) => {
