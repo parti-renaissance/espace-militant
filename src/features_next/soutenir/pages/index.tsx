@@ -36,8 +36,6 @@ import { openExternalLink } from '@/utils/linkHandler'
 
 import HERO_IMAGE_URI from '../assets/soutenir-gabriel-attal.jpg'
 
-const HERO_IMAGE_ASPECT_RATIO = 1024 / 660
-
 const EXTERNAL_LINKS = {
   deposerUneIdee: 'https://parti.re/app-soutenir/deposer-une-idee',
   rejoindreEquipe: 'https://parti.re/app-soutenir/rejoindre-lequipe',
@@ -82,7 +80,7 @@ function HeroImageSection({ isDesktop }: { isDesktop: boolean }) {
         contentFit="cover"
         contentPosition={isDesktop ? 'center' : 'top'}
         cachePolicy="memory-disk"
-        style={{ width: '100%', aspectRatio: isDesktop ? 424 / 504 : HERO_IMAGE_ASPECT_RATIO }}
+        style={{ width: '100%', aspectRatio: isDesktop ? 424 / 363 : 390 / 264 }}
       />
     </YStack>
   )
@@ -128,6 +126,14 @@ function CallToActionCards() {
   const handleCloseOrganizeModal = useCallback(() => {
     setOrganizeModalOpen(false)
   }, [])
+
+  const handleRejoindreAgora = useCallback(() => {
+    if (!isAuth) {
+      redirectToSignup()
+      return
+    }
+    router.push('/profil/mes-instances')
+  }, [isAuth, redirectToSignup, router])
 
   const organizeModal = organizeModalOpen ? (
     <Suspense fallback={null}>
@@ -189,7 +195,7 @@ function CallToActionCards() {
           title="Je rejoins une Agora thématique"
           description="Fabriquez nos idées de demain en rejoignant un groupe de travail et d'exploration sur une thématique."
         >
-          <VoxButton variant="soft" onPress={() => router.push('/profil/mes-instances')}>
+          <VoxButton variant="soft" onPress={handleRejoindreAgora}>
             Rejoindre une Agora
           </VoxButton>
         </CallToActionCard>
