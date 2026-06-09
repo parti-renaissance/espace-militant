@@ -12,6 +12,7 @@ import { useLogOut } from '@/services/logout/api'
 import { useGetProfil, useGetUserScopes } from '@/services/profile/hook'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { vlog } from '@/utils/vlog'
 
 import { AuthContext, type AuthContextType } from './AuthContext'
 
@@ -57,29 +58,50 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const isGlobalLoading = [isLoginInProgress, user.isLoading, scope.isLoading, !_hasHydrated].some(Boolean)
   const isAuth = Boolean(existingSession && !isGlobalLoading)
 
+  React.useEffect(() => {
+    vlog('session-state', {
+      href: isWeb && typeof window !== 'undefined' ? window.location.href : undefined,
+      existingSession: !!existingSession,
+      hasHydrated: _hasHydrated,
+      isLoginInProgress,
+      userLoading: user.isLoading,
+      scopeLoading: scope.isLoading,
+      isGlobalLoading,
+      isAuth,
+    })
+  }, [existingSession, _hasHydrated, isLoginInProgress, user.isLoading, scope.isLoading, isGlobalLoading, isAuth])
+
   const handleSignIn: AuthContextType['signIn'] = React.useCallback(
     async (props) => {
       let keepLoadingForWebRedirect = false
       try {
+        vlog('signIn:start', { hasCode: !!props?.code, state: props?.state, isAdmin: props?.isAdmin, isLoginInProgress })
         if (isLoginInProgress) {
+          vlog('signIn:already-in-progress')
           return
         }
         setIsLoginInProgress(true)
         const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
+        vlog('signIn:login-result', { hasSession: !!session })
         if (!session) {
           keepLoadingForWebRedirect = isWeb && !props?.code
+          vlog('signIn:no-session', { keepLoadingForWebRedirect })
           return
         }
         setSession(credentialsFromTokenResponse(session, props?.isAdmin))
         queryClient.resetQueries()
-        router.replace((normalizeStateRedirect(props?.state) ?? '/') as Href)
+        const target = (normalizeStateRedirect(props?.state) ?? '/') as Href
+        vlog('signIn:replace', { target })
+        router.replace(target)
       } catch (e) {
+        vlog('signIn:error', { message: e?.message })
         ErrorMonitor.log(e.message, { e })
         toast.show('Erreur lors de la connexion', { type: 'error' })
       } finally {
         if (!keepLoadingForWebRedirect) {
           setIsLoginInProgress(false)
         }
+        vlog('signIn:finally', { keepLoadingForWebRedirect })
       }
     },
     [isLoginInProgress, login, queryClient],
@@ -92,6 +114,14 @@ export function SessionProvider(props: React.PropsWithChildren) {
   React.useEffect(() => {
     if (!isWeb) return
     const { code, state, _switch_user } = bootParams
+    vlog('boot', {
+      href: typeof window !== 'undefined' ? window.location.href : undefined,
+      isSecureContext: typeof window !== 'undefined' ? window.isSecureContext : undefined,
+      hasCryptoSubtle: typeof window !== 'undefined' ? !!(window.crypto && window.crypto.subtle) : undefined,
+      hasCode: !!code,
+      state,
+      switchUser: _switch_user,
+    })
     if (!code) return
     if (_switch_user) {
       queryClient.cancelQueries()
