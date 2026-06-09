@@ -7,12 +7,24 @@ export const AuthRoutes = {
 
 export type AuthRoutePath = (typeof AuthRoutes)[keyof typeof AuthRoutes]
 
-export function getAuthHref(route: AuthRoutePath, redirectUri?: string): Href {
+export type AuthHrefParams = {
+  redirectUri?: string
+  ref?: string
+}
+
+export function getAuthHref(route: AuthRoutePath, params?: string | AuthHrefParams): Href {
+  const { redirectUri, ref } = typeof params === 'string' ? { redirectUri: params } : (params ?? {})
+  const query = new URLSearchParams()
+
   if (redirectUri && redirectUri !== '/') {
-    return `${route}?redirectUri=${encodeURIComponent(redirectUri)}` as Href
+    query.set('redirectUri', redirectUri)
+  }
+  if (ref) {
+    query.set('ref', ref)
   }
 
-  return route as Href
+  const qs = query.toString()
+  return (qs ? `${route}?${qs}` : route) as Href
 }
 
 /** Première ouverture et action volontaire « Je m'inscris ». */
