@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Asset } from 'expo-asset'
-import { Href, router, useFocusEffect } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 
 import illuInscription from '@/features_next/signup/assets/illu-inscription.jpg'
 import { useSyncSignupRedirectUri } from '@/features_next/signup/hooks/useSyncSignupRedirectUri'
+import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation'
 import { SIGNUP_BIENVENUE_VIDEO_UUID } from '@/services/signup/constants'
 import { useVideo } from '@/services/video/hook'
 
@@ -25,7 +26,7 @@ export function useSignupBienvenueScreen() {
 
   const handleContinue = useCallback(() => {
     setIsScreenFocused(false)
-    router.replace('/(signup)/inscription' as Href)
+    router.replace(getAuthHref(AuthRoutes.INSCRIPTION))
   }, [])
 
   return {

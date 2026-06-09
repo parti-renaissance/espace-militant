@@ -1,8 +1,9 @@
 import type { PropsWithChildren } from 'react';
-import { Href, Redirect, usePathname, useSegments } from 'expo-router'
+import { Redirect, usePathname, useSegments } from 'expo-router'
 import { isWeb } from 'tamagui';
 
 import { useSession } from '@/ctx/SessionProvider';
+import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation';
 import { useUserStore } from '@/store/user-store';
 
 /**
@@ -27,12 +28,7 @@ export default function SignupTunnelGuard({ children }: PropsWithChildren) {
     !isInSignupFlow
 
   if (shouldEnterSignupTunnel) {
-    const href = (
-      pathname && pathname !== '/'
-        ? `/(signup)/inscription?redirectUri=${encodeURIComponent(pathname)}`
-        : '/(signup)/inscription'
-    ) as Href
-    return <Redirect href={href} />
+    return <Redirect href={getAuthHref(AuthRoutes.BIENVENUE, pathname)} />
   }
 
   return children

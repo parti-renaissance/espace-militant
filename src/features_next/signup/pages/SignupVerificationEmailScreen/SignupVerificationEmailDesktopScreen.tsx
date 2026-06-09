@@ -1,6 +1,7 @@
 import { Redirect } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
 import {
   SignupDesktopFormColumn,
   SignupDesktopIllustrationColumn,
@@ -16,7 +17,7 @@ export default function SignupVerificationEmailDesktopScreen() {
     useSignupVerificationEmailScreen()
 
   if (needsRedirect) {
-    return <Redirect href="/(signup)/inscription" />
+    return <Redirect href={AuthRoutes.INSCRIPTION} />
   }
 
   return (

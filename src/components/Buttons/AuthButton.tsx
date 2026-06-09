@@ -2,6 +2,7 @@ import { ComponentProps } from 'react'
 import { Link } from 'expo-router'
 
 import { VoxButton } from '@/components/Button'
+import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
 
 import { useSession } from '@/ctx/SessionProvider'
 
@@ -18,7 +19,7 @@ export const SignInButton = (props: Omit<ComponentProps<typeof VoxButton>, 'chil
 
 export const SignUpButton = (props: Omit<ComponentProps<typeof VoxButton>, 'children'>) => {
   return (
-    <Link href="/(signup)/bienvenue" asChild>
+    <Link href={AuthRoutes.BIENVENUE} asChild>
       <VoxButton variant="text" size="md" theme="blue" {...props}>
         Je crée mon compte
       </VoxButton>

@@ -5,7 +5,7 @@ import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { navigateToSignup } from '@/features_next/signup/utils/navigateToSignup'
+import { navigateToWelcome } from '@/features_next/signup/utils/authNavigation'
 
 import useLogin, { credentialsFromTokenResponse } from '@/hooks/useLogin'
 import { useLogOut } from '@/services/logout/api'
@@ -114,7 +114,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
   }, [url, handleSignIn])
 
   const handleRegister = React.useCallback(async () => {
-    navigateToSignup()
+    navigateToWelcome()
   }, [])
 
   const handleSignOut = React.useCallback(async () => {
