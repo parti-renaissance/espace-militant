@@ -127,6 +127,14 @@ function CallToActionCards() {
     setOrganizeModalOpen(false)
   }, [])
 
+  const handleRejoindreAgora = useCallback(() => {
+    if (!isAuth) {
+      redirectToSignup()
+      return
+    }
+    router.push('/profil/mes-instances')
+  }, [isAuth, redirectToSignup, router])
+
   const organizeModal = organizeModalOpen ? (
     <Suspense fallback={null}>
       <HubOrganizeCategoryModal open onClose={handleCloseOrganizeModal} />
@@ -187,7 +195,7 @@ function CallToActionCards() {
           title="Je rejoins une Agora thématique"
           description="Fabriquez nos idées de demain en rejoignant un groupe de travail et d'exploration sur une thématique."
         >
-          <VoxButton variant="soft" onPress={() => router.push('/profil/mes-instances')}>
+          <VoxButton variant="soft" onPress={handleRejoindreAgora}>
             Rejoindre une Agora
           </VoxButton>
         </CallToActionCard>
