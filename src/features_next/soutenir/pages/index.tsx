@@ -36,8 +36,6 @@ import { openExternalLink } from '@/utils/linkHandler'
 
 import HERO_IMAGE_URI from '../assets/soutenir-gabriel-attal.jpg'
 
-const HERO_IMAGE_ASPECT_RATIO = 1024 / 660
-
 const EXTERNAL_LINKS = {
   deposerUneIdee: 'https://parti.re/app-soutenir/deposer-une-idee',
   rejoindreEquipe: 'https://parti.re/app-soutenir/rejoindre-lequipe',
@@ -82,7 +80,7 @@ function HeroImageSection({ isDesktop }: { isDesktop: boolean }) {
         contentFit="cover"
         contentPosition={isDesktop ? 'center' : 'top'}
         cachePolicy="memory-disk"
-        style={{ width: '100%', aspectRatio: isDesktop ? 424 / 504 : HERO_IMAGE_ASPECT_RATIO }}
+        style={{ width: '100%', aspectRatio: isDesktop ? 424 / 363 : 390 / 264 }}
       />
     </YStack>
   )
