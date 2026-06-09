@@ -30,6 +30,7 @@ import { HubOrganizeCategoryModal } from '@/features_next/events/pages/hub/compo
 import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
 import { DoubleSquare } from '@/features_next/profil/pages/instances/components/icons'
 
+import clientEnv from '@/config/clientEnv'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { useGetProfil } from '@/services/profile/hook'
 import { openExternalLink } from '@/utils/linkHandler'
@@ -53,7 +54,8 @@ const SOCIAL_LINKS = {
 } as const
 
 const INVITE_SHARE_MESSAGE = "Téléchargez l'application de campagne pour nous rejoindre !"
-const DEFAULT_APP_INVITE_URL = 'https://attal.app/stores'
+
+const getAppInviteUrl = (publicId?: string | null) => `https://${clientEnv.ASSOCIATED_DOMAIN}/bienvenue?ref=${publicId ?? 'share'}`
 
 function HeroTitleSection() {
   return (
@@ -114,10 +116,10 @@ function CallToActionCards() {
 
   const handleInviteFriend = useCallback(() => {
     return handleShareOrCopy({
-      url: DEFAULT_APP_INVITE_URL,
+      url: getAppInviteUrl(user?.id),
       message: INVITE_SHARE_MESSAGE,
     })
-  }, [handleShareOrCopy])
+  }, [handleShareOrCopy, user?.id])
 
   const handleOpenOrganizeModal = useCallback(() => {
     openOrganiserModal(() => setOrganizeModalOpen(true))
