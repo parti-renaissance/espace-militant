@@ -28,8 +28,8 @@
         "NSCalendarsUsageDescription": "Requis pour partager les événements dans le calendrier",
         "NSContactsUsageDescription": "Requis pour partager les événements dans le calendrier",
         "NSCalendarsWriteOnlyAccessUsageDescription": "Requis pour partager les événements dans le calendrier",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Requis pour localiser les portes à frapper et les questionnaires réalisés.",
-        "NSLocationWhenInUseUsageDescription": "Requis pour localiser les portes à frapper et les questionnaires réalisés."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Nécessaire pour vous proposer les événements et actualités à proximité.",
+        "NSLocationWhenInUseUsageDescription": "Nécessaire pour vous proposer les événements et actualités à proximité."
       }
     },
     "android": {
@@ -106,7 +106,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Autorisez $(PRODUCT_NAME) à vous localiser pour vous aider à trouver les portes à frapper et les actions à réaliser."
+          "locationAlwaysAndWhenInUsePermission": "Autorisez $(PRODUCT_NAME) à accéder à votre localisation pour vous proposer les événements et actualités à proximité."
         }
       ],
       ["expo-notifications"],
