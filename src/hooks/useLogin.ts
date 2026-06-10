@@ -8,6 +8,7 @@ import { isWeb } from 'tamagui'
 import clientEnv from '@/config/clientEnv'
 import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
 import type { User } from '@/store/user-store'
+import { vlog } from '@/utils/vlog'
 
 import useBrowserWarmUp from './useBrowserWarmUp'
 
@@ -42,6 +43,7 @@ try {
 
 export const REDIRECT_URI = AuthSession.makeRedirectUri()
 const BASE_REQUEST_CONFIG = { clientId: clientEnv.OAUTH_CLIENT_ID, redirectUri: REDIRECT_URI }
+vlog('useLogin:config', { REDIRECT_URI, oauthBaseUrl: clientEnv.OAUTH_BASE_URL, associatedDomain: clientEnv.ASSOCIATED_DOMAIN })
 const PKCE_VERIFIER_STORAGE_KEY = 'pkce_code_verifier'
 
 const storePkceVerifier = (verifier?: string) => {
@@ -135,6 +137,7 @@ export const useLogin = () => {
     if (payload?.code) {
       await safelyDismissAuthSession()
       const codeVerifier = isWeb ? consumePkceVerifier() : req?.codeVerifier
+      vlog('login:exchange', { hasCode: !!payload.code, hasVerifier: !!codeVerifier })
       return exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId, codeVerifier })
     }
 
@@ -153,6 +156,7 @@ export const useLogin = () => {
       }
       req?.scopes!.forEach((scope) => url.searchParams.append('scope[]', scope))
       Object.entries(req?.extraParams ?? {}).forEach(([key, value]) => url.searchParams.set(key, value))
+      vlog('login:web-redirect', { hasReq: !!req, redirectUri: req?.redirectUri, hasChallenge: !!req?.codeChallenge, authUrl: url.toString() })
       window.location.href = url.toString()
       return null
     }
