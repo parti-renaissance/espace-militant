@@ -6,6 +6,7 @@ import { isWeb, XStack, YStack } from 'tamagui'
 
 import Text from '@/components/base/Text'
 
+import { type HitSource } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 import { ObjectType } from '@/services/hits/schema'
 import { handleLinkPress, isInternalLink } from '@/utils/linkHandler'
@@ -383,6 +384,7 @@ export const TipTapRenderer = (props: {
   numberOfLines?: number
   object_id?: string
   object_type?: ObjectType
+  hitSource?: HitSource
   editMode?: boolean
   previewMode?: boolean
 }) => {
@@ -397,6 +399,7 @@ export const TipTapRenderer = (props: {
         trackClick({
           object_id: props.object_id,
           object_type: props.object_type,
+          source: props.hitSource,
           target_url,
           button_name,
         })
@@ -408,7 +411,7 @@ export const TipTapRenderer = (props: {
         }
       }
     }
-  }, [props.object_id, props.object_type, trackClick])
+  }, [props.object_id, props.object_type, props.hitSource, trackClick])
 
   if (type === 'string') {
     return (

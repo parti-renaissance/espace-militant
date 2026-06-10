@@ -10,6 +10,7 @@ import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomShe
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 import type { RestAlertsResponse } from '@/services/alerts/schema'
+import { HIT_SOURCES, type HitSource } from '@/services/hits/constants'
 
 export type MeetingAlertCollapsedProps = {
   payload: RestAlertsResponse[0]
@@ -17,7 +18,17 @@ export type MeetingAlertCollapsedProps = {
   onPressShare: () => void
 } & AlertVoxCardProps
 
-const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsResponse[0]; isOpen: boolean; closeModal: () => void }) => {
+const TicketModal = ({
+  payload,
+  isOpen,
+  closeModal,
+  hitSource,
+}: {
+  payload: RestAlertsResponse[0]
+  isOpen: boolean
+  closeModal: () => void
+  hitSource: HitSource
+}) => {
   const media = useMedia()
 
   return (
@@ -33,7 +44,12 @@ const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsRespo
         )}
         <Image src={payload.data?.ticket_url} width={240} height={240} resizeMode="contain" />
         {payload.data?.info_url ? (
-          <VoxButton alignSelf={'center'} variant="outlined" iconRight={ExternalLink} onPress={createOnShow(payload.data?.info_url)}>
+          <VoxButton
+            alignSelf={'center'}
+            variant="outlined"
+            iconRight={ExternalLink}
+            onPress={createOnShow(payload.data?.info_url, 'Voir les infos pratiques', hitSource)}
+          >
             Voir les infos pratiques
           </VoxButton>
         ) : null}
@@ -42,7 +58,13 @@ const TicketModal = ({ payload, isOpen, closeModal }: { payload: RestAlertsRespo
   )
 }
 
-const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: MeetingAlertCollapsedProps) => {
+const MeetingAlertCollapsed = ({
+  payload,
+  onPressShare,
+  onShow,
+  hitSource = HIT_SOURCES.PAGE_TIMELINE,
+  ...props
+}: MeetingAlertCollapsedProps) => {
   const [isTicketOpen, setIsTicketOpen] = useState(false)
   const alreadySubscribed = !!payload.data
   const hasTicket = !!payload?.data?.ticket_url
@@ -120,7 +142,7 @@ const MeetingAlertCollapsed = ({ payload, onPressShare, onShow, ...props }: Meet
           </XStack>
         </YStack>
       </VoxCard.Content>
-      <TicketModal payload={payload} isOpen={isTicketOpen} closeModal={() => setIsTicketOpen(false)} />
+      <TicketModal payload={payload} isOpen={isTicketOpen} closeModal={() => setIsTicketOpen(false)} hitSource={hitSource} />
     </VoxCard>
   )
 }

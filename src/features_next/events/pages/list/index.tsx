@@ -26,6 +26,7 @@ import { eventFiltersState, type HubItemTypeFilter } from '@/features_next/event
 import { groupEventsBySection, isEventPast } from '@/features_next/events/utils'
 
 import { useSession } from '@/ctx/SessionProvider'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 import { hubKeys, useHubItemsInfiniteQuery, usePinnedHubItemsInfiniteQuery } from '@/services/hub/hook'
 import { mapHubItemsToPinnedEvents, mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
@@ -326,7 +327,7 @@ const HubFeed = () => {
             </YStack>
           )
         case 'hub_row':
-          return <HubFeedRow row={item.row} userUuid={userData?.uuid} source="page_events" />
+          return <HubFeedRow row={item.row} userUuid={userData?.uuid} source={HIT_SOURCES.PAGE_EVENTS} />
         default:
           return null
       }
@@ -343,13 +344,13 @@ const HubFeed = () => {
           trackImpressionRef.current({
             object_type: 'event',
             object_id: row.event.uuid,
-            source: 'page_events',
+            source: HIT_SOURCES.PAGE_EVENTS,
           })
         } else if (row.payload.id) {
           trackImpressionRef.current({
             object_type: 'action',
             object_id: row.payload.id,
-            source: 'page_events',
+            source: HIT_SOURCES.PAGE_EVENTS,
           })
         }
       }

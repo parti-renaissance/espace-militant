@@ -7,6 +7,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 
 import type { RestAlertsResponse } from '@/services/alerts/schema'
+import { HIT_SOURCES, type HitSource } from '@/services/hits/constants'
 
 import AlertCard from '../AlertCard'
 
@@ -160,9 +161,10 @@ export function AnimatedStack({ children, isOpen }: { children: React.ReactNode[
 interface AlertStackProps {
   alerts: RestAlertsResponse
   initialCollapsed?: boolean
+  hitSource?: HitSource
 }
 
-const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed }) => {
+const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed, hitSource = HIT_SOURCES.PAGE_TIMELINE }) => {
   const media = useMedia()
   const hasMultiple = alerts.length > 1
   const [collapsed, setCollapsed] = useState(initialCollapsed ?? (hasMultiple ? true : false))
@@ -194,11 +196,11 @@ const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed }) => 
       </XStack>
       <YStack mx="$medium" margin={media.gtSm ? 0 : undefined}>
         {alerts.length === 1 ? (
-          alerts.map((alert, i) => <AlertCard key={i} payload={alert} />)
+          alerts.map((alert, i) => <AlertCard key={i} payload={alert} hitSource={hitSource} />)
         ) : (
           <AnimatedStack isOpen={!collapsed}>
             {alerts.map((alert, i) => (
-              <AlertCard key={i} payload={alert} />
+              <AlertCard key={i} payload={alert} hitSource={hitSource} />
             ))}
           </AnimatedStack>
         )}

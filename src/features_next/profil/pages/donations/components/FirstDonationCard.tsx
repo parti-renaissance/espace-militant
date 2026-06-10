@@ -6,6 +6,7 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 
 import donIllu from '@/features_next/profil/assets/don-illu.png'
 
@@ -16,7 +17,7 @@ const HeaderFrame = styled(XStack, {
 })
 
 export default function (props: { full?: boolean }) {
-  const { isPending, open: handlePress } = useOpenExternalContent({ slug: 'donation' })
+  const { isPending, open: handlePress } = useOpenExternalContent({ slug: 'donation', source: HIT_SOURCES.PAGE_PROFIL })
   return (
     <VoxCard bg="$green1" inside>
       <HeaderFrame>

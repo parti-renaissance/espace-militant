@@ -8,7 +8,7 @@ import { useHits } from '@/services/hits/hook'
 import { ALLOWED_ORIGINS, getToiPresidentShareUrl } from '../config'
 import { parseToiPresidentMessage } from '../utils'
 
-import { HIT_SOURCE } from './useToiPresidentMessages/constants'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { dispatchMessage } from './useToiPresidentMessages/registry'
 
 export function useToiPresidentMessages() {
@@ -20,7 +20,7 @@ export function useToiPresidentMessages() {
   useEffect(() => {
     if (didTrackOpenRef.current) return
     didTrackOpenRef.current = true
-    void trackOpen({ source: HIT_SOURCE })
+    void trackOpen({ source: HIT_SOURCES.TOI_PRESIDENT })
   }, [trackOpen])
 
   const handleMessage = useCallback(

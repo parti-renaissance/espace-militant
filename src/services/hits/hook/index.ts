@@ -3,6 +3,7 @@ import { AppState } from 'react-native'
 import NetInfo from '@react-native-community/netinfo'
 import { AsyncStorage } from '@/hooks/useStorageState'
 import { postHit } from '@/services/hits/api'
+import { type HitSource } from '@/services/hits/constants'
 import { HitPayload, HitPayloadSchema, ObjectType } from '@/services/hits/schema'
 import { formatLocalISO, getAppSystem, getAppVersionTag, getUserAgentSafe, generateUuid } from './helpers'
 import { Mutex } from 'async-mutex'
@@ -18,7 +19,7 @@ const mutex = new Mutex()
 type TrackParams = {
   object_type?: ObjectType | null;
   object_id?: string;
-  source?: string;
+  source?: HitSource | string;
   utm_source?: string;
   utm_campaign?: string;
   referrer_code?: string;

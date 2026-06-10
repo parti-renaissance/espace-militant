@@ -12,6 +12,7 @@ import PublicationCard from '@/components/Cards/PublicationCard/PublicationCard'
 import { ContentBackButton } from '@/components/ContentBackButton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { RestGetMessageContentResponse, RestGetMessageFiltersResponse, RestGetMessageResponse } from '@/services/publications/schema'
 import { RestPublicationStatsResponse } from '@/services/stats/schema'
 
@@ -85,7 +86,14 @@ export function PublicationContent({ data, stats, filters, onRefreshStats, isRef
           <ContentBackButton fallbackPath="/publications" />
           {(activeSection === 'read' || media.gtSm) && (
             <YStack gap="$medium" pt={media.sm ? '$medium' : 0}>
-              <PublicationCard showFullContent={true} title={data.subject} description={data?.json_content} author={data.sender} uuid={data.uuid} />
+              <PublicationCard
+                showFullContent={true}
+                title={data.subject}
+                description={data?.json_content}
+                author={data.sender}
+                uuid={data.uuid}
+                hitSource={HIT_SOURCES.PAGE_PUBLICATION_READ}
+              />
               {filters && (
                 <VoxCard gap="$medium" bg="$textOutline" mt="$medium">
                   <VoxCard.Content>

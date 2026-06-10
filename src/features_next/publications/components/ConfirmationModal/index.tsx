@@ -9,6 +9,7 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useGetIsMessageTilSync, useGetMessageCountRecipients, useGetMessageFilters, useSendMessage } from '@/services/publications/hook'
 import { RestAvailableSender } from '@/services/publications/schema'
 
@@ -82,7 +83,7 @@ const ConfirmationModal = forwardRef<ViewportModalRef, ConfirmationModalProps>((
               id: isMessageTilSync?.uuid || '',
               congratulations: 'true',
               withoutAnimation: 'true',
-              source: 'page_publication_edition',
+              source: HIT_SOURCES.PAGE_PUBLICATION_EDITION,
             },
           })
         },

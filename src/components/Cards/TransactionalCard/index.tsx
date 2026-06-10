@@ -7,6 +7,7 @@ import Text from '@/components/base/Text'
 import { VoxCard } from '@/components/VoxCard/VoxCard'
 
 import { genericErrorThrower } from '@/services/common/errors/generic-errors'
+import { HIT_SOURCES, type HitSource } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 
 export type TransactionalCardProps = {
@@ -16,7 +17,17 @@ export type TransactionalCardProps = {
   ctaLabel: string | null
 }
 
-export default function TransactionalCard({ title, description, ctaLink, ctaLabel }: TransactionalCardProps) {
+type TransactionalCardComponentProps = TransactionalCardProps & {
+  hitSource?: HitSource
+}
+
+export default function TransactionalCard({
+  title,
+  description,
+  ctaLink,
+  ctaLabel,
+  hitSource = HIT_SOURCES.PAGE_TIMELINE,
+}: TransactionalCardComponentProps) {
   const router = useRouter()
   const { trackClick } = useHits()
 
@@ -25,6 +36,7 @@ export default function TransactionalCard({ title, description, ctaLink, ctaLabe
 
     trackClick({
       object_type: 'transactional_message',
+      source: hitSource,
       target_url: ctaLink,
       button_name: ctaLabel || undefined,
     })

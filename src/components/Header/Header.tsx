@@ -13,6 +13,7 @@ import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import { ROUTES } from '@/config/routes'
 import { useSession } from '@/ctx/SessionProvider'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import type { IconComponent } from '@/models/common.model'
 import { useGetProfil } from '@/services/profile/hook'
 
@@ -59,6 +60,7 @@ const NavItem = (props: { route: (typeof ROUTES)[number]; isActive: boolean }) =
 
   const externalLink = useOpenExternalContent({
     slug: props.route.externalSlug ?? 'adhesion',
+    source: HIT_SOURCES.PAGE_NAV,
   })
 
   if (props.route.externalSlug) {

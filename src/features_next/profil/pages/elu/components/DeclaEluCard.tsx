@@ -8,6 +8,7 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useGetTags } from '@/services/profile/hook'
 
 import DeclaForm from './DeclaForm'
@@ -43,7 +44,11 @@ const EluOkExempte = () => {
 }
 
 const EluExempteNonAdh = () => {
-  const { isPending, open: handlePress } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'elu' })
+  const { isPending, open: handlePress } = useOpenExternalContent({
+    slug: 'adhesion',
+    source: HIT_SOURCES.PAGE_PROFIL,
+    utm_campaign: 'elu',
+  })
   return (
     <FrameElu badgeTitle="Exempté de cotisation élu si à jour de cotisation adhérent">
       <Text.MD semibold>

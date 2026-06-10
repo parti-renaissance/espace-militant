@@ -6,13 +6,14 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { AlertUtils } from '@/screens/shared/AlertUtils'
 import { useCancelDonation } from '@/services/profile/hook'
 import type { RestDonationsResponse } from '@/services/profile/schema'
 import { getHumanFormattedDate } from '@/utils/date'
 
 export default function (props: { subscription: RestDonationsResponse[number]; full?: boolean }) {
-  const { isPending, open: handlePress } = useOpenExternalContent({ slug: 'donation' })
+  const { isPending, open: handlePress } = useOpenExternalContent({ slug: 'donation', source: HIT_SOURCES.PAGE_PROFIL })
   const { mutate: cancelDonation, isPending: isCancelPending } = useCancelDonation()
 
   const subscriptionDate = props.subscription?.date ? new Date(props.subscription.date) : null
