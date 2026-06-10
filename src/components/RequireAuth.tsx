@@ -1,16 +1,15 @@
 import { PropsWithChildren, useCallback } from 'react';
-import { Href, Redirect, router, useRootNavigationState, usePathname } from 'expo-router';
+import { Redirect, router, useRootNavigationState, usePathname } from 'expo-router';
 
+import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation';
 import { useSession } from '@/ctx/SessionProvider';
-
-const buildSignupHref = (redirectUri: string): Href => ({ pathname: '/(signup)/inscription', params: { redirectUri } }) as Href
 
 export function useRequireAuth() {
   const { isAuth, isLoading } = useSession()
   const pathname = usePathname()
 
   const redirectToSignup = useCallback(() => {
-    router.push(buildSignupHref(pathname))
+    router.push(getAuthHref(AuthRoutes.INSCRIPTION, pathname))
   }, [pathname])
 
   return { isAuth, isLoading, redirectToSignup }
@@ -24,7 +23,7 @@ export function RequireAuth({ children }: PropsWithChildren) {
   if (isLoading || !isNavigationReady) return null
 
   if (!isAuth) {
-    return <Redirect href={buildSignupHref(pathname)} />
+    return <Redirect href={getAuthHref(AuthRoutes.INSCRIPTION, pathname)} />
   }
 
   return <>{children}</>

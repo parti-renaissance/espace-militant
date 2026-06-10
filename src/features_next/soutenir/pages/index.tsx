@@ -30,13 +30,12 @@ import { HubOrganizeCategoryModal } from '@/features_next/events/pages/hub/compo
 import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
 import { DoubleSquare } from '@/features_next/profil/pages/instances/components/icons'
 
+import clientEnv from '@/config/clientEnv'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { useGetProfil } from '@/services/profile/hook'
 import { openExternalLink } from '@/utils/linkHandler'
 
 import HERO_IMAGE_URI from '../assets/soutenir-gabriel-attal.jpg'
-
-const HERO_IMAGE_ASPECT_RATIO = 1024 / 660
 
 const EXTERNAL_LINKS = {
   deposerUneIdee: 'https://parti.re/app-soutenir/deposer-une-idee',
@@ -55,7 +54,8 @@ const SOCIAL_LINKS = {
 } as const
 
 const INVITE_SHARE_MESSAGE = "Téléchargez l'application de campagne pour nous rejoindre !"
-const DEFAULT_APP_INVITE_URL = 'https://attal.app/stores'
+
+const getAppInviteUrl = (publicId?: string | null) => `https://${clientEnv.ASSOCIATED_DOMAIN}/bienvenue?ref=${publicId ?? 'share'}`
 
 function HeroTitleSection() {
   return (
@@ -82,7 +82,7 @@ function HeroImageSection({ isDesktop }: { isDesktop: boolean }) {
         contentFit="cover"
         contentPosition={isDesktop ? 'center' : 'top'}
         cachePolicy="memory-disk"
-        style={{ width: '100%', aspectRatio: isDesktop ? 424 / 504 : HERO_IMAGE_ASPECT_RATIO }}
+        style={{ width: '100%', aspectRatio: isDesktop ? 424 / 363 : 390 / 264 }}
       />
     </YStack>
   )
@@ -116,10 +116,10 @@ function CallToActionCards() {
 
   const handleInviteFriend = useCallback(() => {
     return handleShareOrCopy({
-      url: DEFAULT_APP_INVITE_URL,
+      url: getAppInviteUrl(user?.id),
       message: INVITE_SHARE_MESSAGE,
     })
-  }, [handleShareOrCopy])
+  }, [handleShareOrCopy, user?.id])
 
   const handleOpenOrganizeModal = useCallback(() => {
     openOrganiserModal(() => setOrganizeModalOpen(true))
@@ -128,6 +128,14 @@ function CallToActionCards() {
   const handleCloseOrganizeModal = useCallback(() => {
     setOrganizeModalOpen(false)
   }, [])
+
+  const handleRejoindreAgora = useCallback(() => {
+    if (!isAuth) {
+      redirectToSignup()
+      return
+    }
+    router.push('/profil/mes-instances')
+  }, [isAuth, redirectToSignup, router])
 
   const organizeModal = organizeModalOpen ? (
     <Suspense fallback={null}>
@@ -189,7 +197,7 @@ function CallToActionCards() {
           title="Je rejoins une Agora thématique"
           description="Fabriquez nos idées de demain en rejoignant un groupe de travail et d'exploration sur une thématique."
         >
-          <VoxButton variant="soft" onPress={() => router.push('/profil/mes-instances')}>
+          <VoxButton variant="soft" onPress={handleRejoindreAgora}>
             Rejoindre une Agora
           </VoxButton>
         </CallToActionCard>
