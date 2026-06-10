@@ -13,6 +13,7 @@ import { getEventItemImageFallback, isEventPartial } from '@/features_next/event
 
 import { useSession } from '@/ctx/SessionProvider'
 import type { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { usePinnedHubItemsInfiniteQuery } from '@/services/hub/hook'
 import { mapHubItemsToPinnedEvents } from '@/services/hub/mapper'
 
@@ -121,7 +122,7 @@ function PinnedEventCardWrapper({ sizeMode, isSmallContainer, children }: { size
 
 const PinnedEventCard = memo(({ event, sizeMode, isSmallContainer }: { event: PinnedEventItem; sizeMode: CardSizeMode; isSmallContainer: boolean }) => {
   const router = useRouter()
-  const href = `/evenements/${event.slug}?source=page_events_pinned` as Href
+  const href = `/evenements/${event.slug}?source=${HIT_SOURCES.PAGE_EVENTS_PINNED}` as Href
 
   return (
     <PinnedEventCardWrapper sizeMode={sizeMode} isSmallContainer={isSmallContainer}>

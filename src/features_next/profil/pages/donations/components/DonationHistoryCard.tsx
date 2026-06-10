@@ -11,14 +11,19 @@ import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useGetDonations } from '@/services/profile/hook'
 import { RestDonationsResponse } from '@/services/profile/schema'
 
 const getType = (x: RestDonationsResponse[number]) => x.type_label || x.type
 
 const EmptyState = () => {
-  const donationLink = useOpenExternalContent({ slug: 'donation' })
-  const subscriptionLink = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil' })
+  const donationLink = useOpenExternalContent({ slug: 'donation', source: HIT_SOURCES.PAGE_PROFIL })
+  const subscriptionLink = useOpenExternalContent({
+    slug: 'adhesion',
+    source: HIT_SOURCES.PAGE_PROFIL,
+    utm_campaign: 'profil',
+  })
 
   return (
     <_EmptyState>

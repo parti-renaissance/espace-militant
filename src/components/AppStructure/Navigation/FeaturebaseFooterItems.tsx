@@ -6,6 +6,7 @@ import { CircleHelp, LifeBuoy, RefreshCcw } from '@tamagui/lucide-icons'
 import { VoxButton } from '@/components/Button'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import type { IconComponent } from '@/models/common.model'
 import { useGetExecutiveScopes } from '@/services/profile/hook'
 import { FEATURES } from '@/utils/Scopes'
@@ -31,7 +32,7 @@ type FeaturebaseFooterItemProps = {
 }
 
 export const FeaturebaseFooterItems = ({ variant, collapsed }: FeaturebaseFooterItemProps) => {
-  const openExternalContentHook = useOpenExternalContent({ slug: 'cadre' })
+  const openExternalContentHook = useOpenExternalContent({ slug: 'cadre', source: HIT_SOURCES.PAGE_NAV })
   const { data: executiveScopes } = useGetExecutiveScopes()
 
   if (!executiveScopes?.default?.features?.includes(FEATURES.FEATUREBASE)) {

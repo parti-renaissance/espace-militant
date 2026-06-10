@@ -15,6 +15,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { useGetProfil } from '@/services/profile/hook'
 import { useReferrals, useReferralStatistics } from '@/services/referral/hook'
@@ -351,7 +352,11 @@ export const ReferralScoreCard = ({
 // ============================================================================
 
 export const ReferralLockedCard = ({ hideHeader }: { hideHeader?: boolean }) => {
-  const { isPending, open: openAdh } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'parrainages' })
+  const { isPending, open: openAdh } = useOpenExternalContent({
+    slug: 'adhesion',
+    source: HIT_SOURCES.PAGE_REFERRALS,
+    utm_campaign: 'parrainages',
+  })
 
   return (
     <InstanceCard title="Parrainages" icon={HeartHandshake} hideHeader={hideHeader}>

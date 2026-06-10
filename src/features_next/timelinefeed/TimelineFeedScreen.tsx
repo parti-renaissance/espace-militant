@@ -23,6 +23,7 @@ import { useVideoFeedScreenFocus } from '@/features_next/video/hooks/useVideoFee
 import { useSession } from '@/ctx/SessionProvider'
 import { transformFeedItemToProps } from '@/helpers/homeFeed'
 import { useAlerts } from '@/services/alerts/hook'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 import { useGetSuspenseExecutiveScopes } from '@/services/profile/hook'
 import { useGetPaginatedFeed } from '@/services/timeline-feed/hook'
@@ -63,13 +64,13 @@ const TimelineFeedCard = memo((item: RestTimelineFeedItem) => {
 
   if (Platform.OS === 'web' && props) {
     return (
-      <TrackImpressionWeb objectType={item.type} objectId={item.objectID} source="page_timeline">
-        <FeedCardMemoized {...props} />
+      <TrackImpressionWeb objectType={item.type} objectId={item.objectID} source={HIT_SOURCES.PAGE_TIMELINE}>
+        <FeedCardMemoized {...props} hitSource={HIT_SOURCES.PAGE_TIMELINE} />
       </TrackImpressionWeb>
     )
   }
 
-  return <FeedCardMemoized {...props} />
+  return <FeedCardMemoized {...props} hitSource={HIT_SOURCES.PAGE_TIMELINE} />
 })
 
 const TimelineFeedMain = () => {
@@ -169,7 +170,7 @@ const TimelineFeedMain = () => {
             trackImpression({
               object_type: viewToken.item.type,
               object_id: viewToken.item.objectID,
-              source: 'page_timeline',
+              source: HIT_SOURCES.PAGE_TIMELINE,
             })
           }
         })

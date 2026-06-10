@@ -41,6 +41,7 @@ import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
 import { useSession } from '@/ctx/SessionProvider'
 import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import type { IconComponent } from '@/models/common.model'
 import { useGetExecutiveScopes, useHasRecentMembership } from '@/services/profile/hook'
 import { FEATURES } from '@/utils/Scopes'
@@ -80,7 +81,7 @@ const militantNavItemsPublicConfig: NavItemConfig[] = [
 
 export const useMilitantNavItems = (): NavItemConfig[] => {
   const { isAuth } = useSession()
-  const openExternalContentHook = useOpenExternalContent({ slug: 'formation' })
+  const openExternalContentHook = useOpenExternalContent({ slug: 'formation', source: HIT_SOURCES.PAGE_NAV })
   const { hasAccess: hasFormationsAccess } = useHasRecentMembership()
 
   const openRef = useRef(openExternalContentHook.open)
@@ -187,7 +188,7 @@ const cadreNavItemsConfig: NavItemConfig[] = [
 export const useCadreNavItems = (): NavItemConfig[] => {
   const { isAuth } = useSession()
   const { data } = useGetExecutiveScopes()
-  const openExternalContentHook = useOpenExternalContent({ slug: 'cadre' })
+  const openExternalContentHook = useOpenExternalContent({ slug: 'cadre', source: HIT_SOURCES.PAGE_NAV })
 
   const defaultScope = data?.default
   const defaultScopeCode = defaultScope?.code ?? ''

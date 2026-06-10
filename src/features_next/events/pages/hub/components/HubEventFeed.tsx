@@ -25,6 +25,7 @@ import { useProfileCompletionAccess } from '@/features_next/profil/hooks/useProf
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
 import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
@@ -231,7 +232,7 @@ const HubEventFeed = (props: HubEventFeedProps) => {
         padding={false}
         data={feedRows}
         keyExtractor={getFeedRowKey}
-        renderItem={({ item }) => <HubFeedRow row={item} userUuid={userData?.uuid} source="page_events_hub" />}
+        renderItem={({ item }) => <HubFeedRow row={item} userUuid={userData?.uuid} source={HIT_SOURCES.PAGE_EVENTS_HUB} />}
         ListHeaderComponent={listHeaderComponent}
         contentContainerStyle={contentContainerStyleMerged}
         removeClippedSubviews={embeddedMapHeader != null && Platform.OS !== 'web' ? false : undefined}

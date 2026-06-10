@@ -15,6 +15,7 @@ import RequireCompleteProfileGate from '@/features_next/profil/components/Requir
 
 import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useLeaveMyAgora } from '@/services/agoras/hook'
 import { useGetDetailProfil, useGetInstances, useGetTags, useIsAdherentDues } from '@/services/profile/hook'
 import { RestInstancesResponse } from '@/services/profile/schema'
@@ -45,8 +46,16 @@ const InstancesContent = () => {
   const [circonscription] = data.filter(isCirconscription)
   const agoras = data.filter(isAgora)
   const { data: profile } = useGetDetailProfil()
-  const { isPending: isPendingAgora, open: openAdhAgora } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil_instances_agoras' })
-  const { isPending: isPendingCommitee, open: openAdhCommitee } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil_instances_comités' })
+  const { isPending: isPendingAgora, open: openAdhAgora } = useOpenExternalContent({
+    slug: 'adhesion',
+    source: HIT_SOURCES.PAGE_PROFIL,
+    utm_campaign: 'profil_instances_agoras',
+  })
+  const { isPending: isPendingCommitee, open: openAdhCommitee } = useOpenExternalContent({
+    slug: 'adhesion',
+    source: HIT_SOURCES.PAGE_PROFIL,
+    utm_campaign: 'profil_instances_comités',
+  })
 
   const { mutateAsync } = useLeaveMyAgora()
 

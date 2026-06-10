@@ -5,15 +5,18 @@ import { MeetingAlertCollapsed } from '@/components/Cards/AlertCard/components'
 import VoxCard, { VoxCardFrameProps } from '@/components/VoxCard/VoxCard'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
+import { HIT_SOURCES, type HitSource } from '@/services/hits/constants'
 import { createOnShow } from '@/components/Cards/AlertCard/utils'
 import { BellElectric, ExternalLink, Radio } from '@tamagui/lucide-icons'
 import { XStack } from 'tamagui'
 
 export type AlertVoxCardProps = {
   payload: RestAlertsResponse[0]
+  hitSource?: HitSource
 } & VoxCardFrameProps
 
 const AlertMeetingCard = (props: AlertVoxCardProps) => {
+  const hitSource = props.hitSource ?? HIT_SOURCES.PAGE_TIMELINE
   const { handleShareOrCopy } = useShareOrCopy()
 
   const onPressShare = () => {
@@ -23,15 +26,16 @@ const AlertMeetingCard = (props: AlertVoxCardProps) => {
 
   return (
     <MeetingAlertCollapsed
-      onShow={createOnShow(props.payload.cta_url, props.payload.cta_label)}
+      onShow={createOnShow(props.payload.cta_url, props.payload.cta_label, hitSource)}
       onPressShare={onPressShare}
       payload={props.payload}
+      hitSource={hitSource}
     />
   )
 }
 
-const AlertOnLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
-  const onShow = createOnShow(payload.cta_url, payload.cta_label)
+const AlertOnLiveCard = ({ payload, hitSource = HIT_SOURCES.PAGE_TIMELINE, ...props }: AlertVoxCardProps) => {
+  const onShow = createOnShow(payload.cta_url, payload.cta_label, hitSource)
   return (
     <VoxCard
       {...props}
@@ -62,8 +66,8 @@ const AlertOnLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
   )
 }
 
-const AlertAnnonceLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
-  const onShow = createOnShow(payload.cta_url, payload.cta_label)
+const AlertAnnonceLiveCard = ({ payload, hitSource = HIT_SOURCES.PAGE_TIMELINE, ...props }: AlertVoxCardProps) => {
+  const onShow = createOnShow(payload.cta_url, payload.cta_label, hitSource)
   return (
     <VoxCard
     {...props}
@@ -93,8 +97,8 @@ const AlertAnnonceLiveCard = ({ payload, ...props }: AlertVoxCardProps) => {
   )
 }
 
-const AlertBasicCard = ({ payload, ...props }: AlertVoxCardProps) => {
-  const onShow = createOnShow(payload.cta_url, payload.cta_label)
+const AlertBasicCard = ({ payload, hitSource = HIT_SOURCES.PAGE_TIMELINE, ...props }: AlertVoxCardProps) => {
+  const onShow = createOnShow(payload.cta_url, payload.cta_label, hitSource)
   return (
     <VoxCard
       {...props}

@@ -1,6 +1,7 @@
 import { View, YStack } from 'tamagui'
 
 import { TipTapRenderer } from '@/components/TipTapRenderer'
+import { type HitSource } from '@/services/hits/constants'
 import { useThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
@@ -12,6 +13,7 @@ export const RichTextRenderer = (props: {
   numberOfLines?: number
   object_id?: string
   previewMode?: boolean
+  hitSource?: HitSource
 }) => {
   const { containerStyle, wrapperStyle } = useThemeStyle(props.data, props.edgePosition)
   if (!props.data.content) return null
@@ -25,6 +27,7 @@ export const RichTextRenderer = (props: {
           numberOfLines={props.numberOfLines}
           object_id={props.object_id}
           object_type="publication"
+          hitSource={props.hitSource}
           editMode={props.displayToolbar}
           previewMode={props.previewMode ?? false}
         />
