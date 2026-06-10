@@ -4,7 +4,7 @@ import type { LayoutChangeEvent } from 'react-native'
 // Valeurs par défaut (peuvent être surchargées via les props)
 const DEFAULT_ITEM_HEIGHT = 44 // 40px hauteur + 4px gap
 const DEFAULT_CADRE_MARGIN = 32 // Margin top du bouton CADRE
-const MIN_VISIBLE_ITEMS = 3 // Nombre minimum d'items toujours visibles
+const MIN_VISIBLE_ITEMS = 2 // Nombre minimum d'items toujours visibles
 
 interface UseVisibleNavItemsOptions<T> {
   items: readonly T[]
