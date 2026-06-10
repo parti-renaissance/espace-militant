@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 
 import { navigateToSignup } from '@/features_next/signup/utils/navigateToSignup'
 
+import useBfcacheRestore from '@/hooks/useBfcacheRestore'
 import useLogin, { credentialsFromTokenResponse } from '@/hooks/useLogin'
 import { useLogOut } from '@/services/logout/api'
 import { useGetProfil, useGetUserScopes } from '@/services/profile/hook'
@@ -47,6 +48,11 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   const [isLoginInProgress, setIsLoginInProgress] = React.useState(false)
   const toast = useToastController()
+
+  useBfcacheRestore(() => {
+    setIsLoginInProgress(false)
+    void useUserStore.persist.rehydrate()
+  })
 
   const queryClient = useQueryClient()
   const login = useLogin()
