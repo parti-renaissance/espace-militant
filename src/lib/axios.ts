@@ -338,6 +338,8 @@ class TokenRefreshManager {
 
 const tokenRefreshManager = new TokenRefreshManager()
 
+export const refreshOn401 = (failedAccessToken?: string) => tokenRefreshManager.refreshOn401(failedAccessToken)
+
 const errorMonitor = (error: AxiosError) => {
   return Promise.reject(error)
 }

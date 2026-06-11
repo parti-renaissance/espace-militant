@@ -29,6 +29,8 @@ export default function BotPage() {
   const { scrollToBottom, armScrollToLastUser, scrollToInitial } = useChatScrollToMessage({
     ref: scrollViewRef,
     messages,
+    streamedContent,
+    isStreaming: isLoading,
     webDomIdPrefix: 'chat-msg-',
   })
 

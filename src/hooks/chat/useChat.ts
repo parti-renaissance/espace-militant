@@ -3,8 +3,10 @@ import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateA
 import { refreshOn401 } from '@/lib/axios'
 import { useUserStore } from '@/store/user-store'
 
+import { chatErrors } from './chatErrors'
 import { classifyHttpError } from './sse/classifyHttpError'
 import { useSSEStream } from './sse/useSSEStream'
+import { useTypewriter } from './useTypewriter'
 import type { ChatError, ChatMessage } from './types'
 
 export type UseChatOptions = {
@@ -30,13 +32,12 @@ export type UseChatReturn = {
 
 export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCreated, setMessages }: UseChatOptions): UseChatReturn {
   const [input, setInput] = useState('')
-  const [streamedContent, setStreamedContent] = useState('')
   const [error, setError] = useState<ChatError | null>(null)
+  const { display: streamedContent, busy, push, finish, stop: stopTyping, reset } = useTypewriter()
 
   const threadIdRef = useRef<string | null>(threadId)
   const lastUserMessageRef = useRef<string | null>(null)
   const hasTriedRefreshRef = useRef(false)
-  const streamBufferRef = useRef('')
   const inStreamErrorRef = useRef<{ message: string; retryAfter?: number } | null>(null)
 
   useEffect(() => {
@@ -48,13 +49,22 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
     onThreadCreatedRef.current = onThreadCreated
   }, [onThreadCreated])
 
-  const commitStreamedMessage = useCallback(() => {
-    const content = streamBufferRef.current
-    if (!content) return
-    streamBufferRef.current = ''
-    setMessages((m) => [...m, { id: `stream-${Date.now()}`, role: 'assistant', content }])
-    setStreamedContent('')
-  }, [setMessages])
+  const buildBody = useCallback(
+    (message: string) => {
+      const body: Record<string, unknown> = { message }
+      if (agentId) body.agent_id = agentId
+      if (threadIdRef.current) body.thread_id = threadIdRef.current
+      return body
+    },
+    [agentId],
+  )
+
+  const appendAssistant = useCallback(
+    (content: string) => {
+      if (content) setMessages((m) => [...m, { id: `stream-${Date.now()}`, role: 'assistant', content }])
+    },
+    [setMessages],
+  )
 
   const stream = useSSEStream({
     url,
@@ -64,56 +74,38 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       threadIdRef.current = uuid
       onThreadCreatedRef.current?.(uuid)
     },
-    onChunk: (text) => {
-      streamBufferRef.current += text
-      setStreamedContent(streamBufferRef.current)
-    },
+    onChunk: (text) => push(text),
     onInStreamError: (err) => {
       inStreamErrorRef.current = err
     },
     onComplete: () => {
       const inStreamError = inStreamErrorRef.current
-      if (inStreamError) {
-        commitStreamedMessage()
-        if (inStreamError.retryAfter !== undefined) {
-          setError({ kind: 'quota', message: inStreamError.message, retryable: false, retryAfterSeconds: inStreamError.retryAfter })
-        } else {
-          setError({ kind: 'serviceDown', message: 'Le service est momentanément indisponible. Réessayez dans quelques instants.', retryable: true })
+      finish((content) => {
+        appendAssistant(content)
+        if (inStreamError) {
+          setError(inStreamError.retryAfter !== undefined ? chatErrors.quota(inStreamError.message, inStreamError.retryAfter) : chatErrors.serviceDown())
+        } else if (!content) {
+          setError(chatErrors.truncated())
         }
-      } else if (streamBufferRef.current) {
-        commitStreamedMessage()
-      } else {
-        setError({ kind: 'truncated', message: 'Réponse interrompue. Réessayez pour obtenir une réponse complète.', retryable: true })
-      }
+      })
     },
     onError: (err) => {
       if (err.kind === 'http' && err.status === 401 && !hasTriedRefreshRef.current) {
         hasTriedRefreshRef.current = true
-        const failedToken = useUserStore.getState().user?.accessToken
-        refreshOn401(failedToken).then((refreshed) => {
-          if (refreshed && lastUserMessageRef.current) {
-            const retryBody: Record<string, unknown> = { message: lastUserMessageRef.current }
-            if (agentId) retryBody.agent_id = agentId
-            if (threadIdRef.current) retryBody.thread_id = threadIdRef.current
-            stream.start(retryBody)
-          } else {
-            setError(classifyHttpError(401, null, null))
-          }
+        refreshOn401(useUserStore.getState().user?.accessToken).then((refreshed) => {
+          if (refreshed && lastUserMessageRef.current) stream.start(buildBody(lastUserMessageRef.current))
+          else setError(classifyHttpError(401, null, null))
         })
         return
       }
-      if (err.kind === 'http') {
-        setError(classifyHttpError(err.status, err.retryAfterHeader, err.responseBody))
-      } else if (err.kind === 'timeout') {
-        setError({ kind: 'timeout', message: 'Le service met trop de temps à répondre. Réessayez.', retryable: true })
-      } else {
-        setError({ kind: 'network', message: 'Connexion impossible. Vérifiez votre réseau puis réessayez.', retryable: true })
-      }
+      setError(chatErrors.fromStream(err))
     },
     onAbort: () => {
-      commitStreamedMessage()
+      appendAssistant(stopTyping())
     },
   })
+
+  const isLoading = stream.isStreaming || busy
 
   const sendMessage = useCallback(
     (text: string) => {
@@ -123,19 +115,14 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       lastUserMessageRef.current = trimmed
       hasTriedRefreshRef.current = false
       inStreamErrorRef.current = null
-      streamBufferRef.current = ''
+      reset()
 
       setMessages((prev) => [...prev, { id: `local-${Date.now()}`, role: 'user', content: trimmed }])
       setError(null)
-      setStreamedContent('')
 
-      const body: Record<string, unknown> = { message: trimmed }
-      if (agentId) body.agent_id = agentId
-      if (threadIdRef.current) body.thread_id = threadIdRef.current
-
-      stream.start(body)
+      stream.start(buildBody(trimmed))
     },
-    [agentId, setMessages, stream],
+    [buildBody, reset, setMessages, stream],
   )
 
   const handleInputChange = useCallback(
@@ -147,14 +134,14 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
   )
 
   const handleSubmit = useCallback(() => {
-    if (!input.trim() || stream.isStreaming) return
+    if (!input.trim() || isLoading) return
     const message = input.trim()
     setInput('')
     sendMessage(message)
-  }, [input, sendMessage, stream.isStreaming])
+  }, [input, sendMessage, isLoading])
 
   const retry = useCallback(() => {
-    if (!lastUserMessageRef.current || stream.isStreaming) return
+    if (!lastUserMessageRef.current || isLoading) return
     setMessages((m) => {
       if (m.length > 0 && m[m.length - 1].role === 'user' && m[m.length - 1].content === lastUserMessageRef.current) {
         return m.slice(0, -1)
@@ -162,15 +149,20 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
       return m
     })
     sendMessage(lastUserMessageRef.current)
-  }, [sendMessage, setMessages, stream.isStreaming])
+  }, [sendMessage, setMessages, isLoading])
 
   const submit = useCallback(
     (text: string) => {
-      if (stream.isStreaming) return
+      if (isLoading) return
       sendMessage(text)
     },
-    [sendMessage, stream.isStreaming],
+    [sendMessage, isLoading],
   )
+
+  const handleStop = useCallback(() => {
+    if (stream.isStreaming) stream.stop()
+    else if (busy) appendAssistant(stopTyping())
+  }, [stream, busy, appendAssistant, stopTyping])
 
   return {
     input,
@@ -178,8 +170,8 @@ export function useChat({ url, agentId, threadHeaderName, threadId, onThreadCrea
     handleSubmit,
     submit,
     retry,
-    stop: stream.stop,
-    isLoading: stream.isStreaming,
+    stop: handleStop,
+    isLoading,
     streamedContent,
     error,
   }
