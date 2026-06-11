@@ -92,11 +92,34 @@ export const ErrorMonitor = {
     })
     return { navigationIntegration }
   },
-  /** Dev-only tracing. Does not send events to Sentry in production. */
+  /**
+   * Legacy error reporting. Prefer `logError` for new call sites.
+   * Sends to Sentry in production with level `warning` (not filtered by beforeSend).
+   */
   log: (message: string, payload?: Record<string, unknown>) => {
     if (__DEV__) {
       // eslint-disable-next-line no-console
       console.log('[ErrorMonitor]', message, payload)
+      return
+    }
+
+    const error =
+      payload?.error instanceof Error
+        ? payload.error
+        : payload?.e instanceof Error
+          ? payload.e
+          : undefined
+
+    if (error) {
+      Sentry.captureException(error, {
+        level: 'warning',
+        extra: { ...payload, logMessage: message },
+      })
+    } else {
+      Sentry.captureMessage(message, {
+        level: 'warning',
+        extra: payload,
+      })
     }
   },
   /** Production error reporting with level `error` and optional exception stack. */
