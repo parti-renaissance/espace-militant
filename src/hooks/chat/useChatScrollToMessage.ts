@@ -1,24 +1,25 @@
-import { useCallback, useEffect, useRef, type RefObject } from 'react'
+import { useCallback, useContext, useEffect, useRef, type RefObject } from 'react'
 import type { FlatList } from 'react-native'
 import { isWeb } from 'tamagui'
+
+import { ScrollContext } from '@/components/AppStructure/Layout/LayoutContext'
 
 type HasRoleAndId = { role: string; id: string }
 
 type Args<T extends HasRoleAndId> = {
   ref: RefObject<FlatList<T> | null>
   messages: T[]
-  isLoading: boolean
-  scrollToBottom: (animated?: boolean) => void
   webDomIdPrefix?: string
 }
 
 export type ChatScrollToMessage = {
-  scrollToLastAssistant: () => void
+  scrollToBottom: () => void
   armScrollToLastUser: () => void
   scrollToInitial: () => void
 }
 
-export function useChatScrollToMessage<T extends HasRoleAndId>({ ref, messages, isLoading, scrollToBottom, webDomIdPrefix }: Args<T>): ChatScrollToMessage {
+export function useChatScrollToMessage<T extends HasRoleAndId>({ ref, messages, webDomIdPrefix }: Args<T>): ChatScrollToMessage {
+  const { layoutRef } = useContext(ScrollContext)
   const pendingScrollAfterSubmitRef = useRef(false)
 
   useEffect(() => {
@@ -41,26 +42,13 @@ export function useChatScrollToMessage<T extends HasRoleAndId>({ ref, messages, 
     })
   }, [messages, ref, webDomIdPrefix])
 
-  const scrollToLastAssistant = useCallback(() => {
-    if (isLoading) {
-      scrollToBottom(true)
+  const scrollToBottom = useCallback(() => {
+    if (isWeb && layoutRef?.current) {
+      layoutRef.current.scrollTo({ top: layoutRef.current.scrollHeight, behavior: 'smooth' })
       return
     }
-    const lastAssistantIndex = messages.findLastIndex((m) => m.role === 'assistant')
-    if (lastAssistantIndex < 0) {
-      scrollToBottom(true)
-      return
-    }
-    const lastAssistantMessage = messages[lastAssistantIndex]
-    if (isWeb && webDomIdPrefix) {
-      const el = document.getElementById(`${webDomIdPrefix}${lastAssistantMessage.id}`)
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        return
-      }
-    }
-    ref.current?.scrollToIndex({ index: lastAssistantIndex, viewPosition: 0, animated: true })
-  }, [messages, isLoading, scrollToBottom, ref, webDomIdPrefix])
+    ref.current?.scrollToEnd({ animated: true })
+  }, [ref, layoutRef])
 
   const scrollToInitial = useCallback(() => {
     const lastUserIndex = messages.findLastIndex((m) => m.role === 'user')
@@ -77,5 +65,5 @@ export function useChatScrollToMessage<T extends HasRoleAndId>({ ref, messages, 
     pendingScrollAfterSubmitRef.current = true
   }, [])
 
-  return { scrollToLastAssistant, armScrollToLastUser, scrollToInitial }
+  return { scrollToBottom, armScrollToLastUser, scrollToInitial }
 }
