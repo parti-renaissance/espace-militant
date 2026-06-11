@@ -43,15 +43,9 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
   })
   const { handleCopy, handleEdit } = useChatMessageActions({ inputRef, setInput: handleInputChange })
 
-  const scrollToBottom = useCallback((animated = true) => {
-    requestAnimationFrame(() => scrollViewRef.current?.scrollToEnd({ animated }))
-  }, [])
-
-  const { scrollToLastAssistant, armScrollToLastUser, scrollToInitial } = useChatScrollToMessage({
+  const { scrollToBottom, armScrollToLastUser, scrollToInitial } = useChatScrollToMessage({
     ref: scrollViewRef,
     messages,
-    isLoading,
-    scrollToBottom,
     webDomIdPrefix: 'chat-msg-',
   })
 
@@ -97,7 +91,7 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
             onRetry={handleRetry}
             onScroll={handleJumpScroll}
           />
-          {showJumpToBottom && <JumpToBottomButton onPress={scrollToLastAssistant} bottom={scrollButtonBottom} />}
+          {showJumpToBottom && <JumpToBottomButton onPress={scrollToBottom} bottom={scrollButtonBottom} />}
           <InputDock
             inputRef={inputRef}
             value={input}
