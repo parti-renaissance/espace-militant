@@ -4,6 +4,7 @@ import {
   type Camera as C,
   type CircleLayer as CL,
   type FillLayer as FL,
+  type SymbolLayer as SL,
   type Images as Img,
   type MapView as MV,
   type ShapeSource as SS,
@@ -65,6 +66,19 @@ const toKebabCase = (str: string) => {
   return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase()
 }
 
+const MAPBOX_LABEL_LOCALE = 'fr'
+
+const localizeMapLabels = (map: mapboxgl.Map, locale = MAPBOX_LABEL_LOCALE) => {
+  const layers = map.getStyle()?.layers
+  if (!layers) return
+
+  for (const layer of layers) {
+    if (layer.type !== 'symbol' || !layer.id.includes('-label') || !layer.layout?.['text-field']) continue
+
+    map.setLayoutProperty(layer.id, 'text-field', ['coalesce', ['get', `name_${locale}`], ['get', 'name']])
+  }
+}
+
 export enum UserTrackingMode {
   Follow = 'normal',
   FollowWithHeading = 'compass',
@@ -112,6 +126,7 @@ export const setAccessToken = (accessToken: string) => {
 
 const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) => {
   const mapRef = useRef<MapRef>(null)
+  const mapInstanceRef = useRef<mapboxgl.Map | null>(null)
   const interactiveLayerIds = useStore((state) => state.interactiveLayerIds)
 
   useEffect(() => {
@@ -153,6 +168,24 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
   }, [])
 
   const { children, styleURL, pitchEnabled, scrollEnabled, zoomEnabled, rotateEnabled, onMapIdle } = props
+
+  const handleLoad = useCallback(() => {
+    mapInstanceRef.current = mapRef.current?.getMap() ?? null
+    if (mapInstanceRef.current) localizeMapLabels(mapInstanceRef.current)
+  }, [])
+
+  useEffect(() => {
+    const map = mapInstanceRef.current
+    if (!map) return
+
+    const localize = () => localizeMapLabels(map)
+    map.on('style.load', localize)
+    if (map.isStyleLoaded()) localize()
+
+    return () => {
+      map.off('style.load', localize)
+    }
+  }, [styleURL])
 
   const handleMoveEnd = useCallback(() => {
     const map = mapRef.current
@@ -222,6 +255,7 @@ const MapView = forwardRef<MapViewRef, ComponentProps<typeof MV>>((props, ref) =
       ref={mapRef}
       mapboxAccessToken={staticStore.accessToken}
       mapStyle={styleURL}
+      onLoad={handleLoad}
       pitchWithRotate={pitchEnabled}
       dragPan={dragPan}
       scrollZoom={scrollZoom}
@@ -328,7 +362,7 @@ const CircleLayer = (props: ComponentProps<typeof CL> & { source?: string }) => 
   return <Layer id={props.id} type="circle" source={props.source} paint={paint} {...filterProps(props.filter)} />
 }
 
-const SymbolLayer = (props: ComponentProps<typeof CL> & { source?: string }) => {
+const SymbolLayer = (props: ComponentProps<typeof SL> & { source?: string }) => {
   useRegisterLayer(props.id)
   const { textColor, ...rest } = props.style || {}
   const paint = useMemo(() => _.mapKeys(textColor ? { textColor } : {}, (_, k) => toKebabCase(k)), [textColor])
