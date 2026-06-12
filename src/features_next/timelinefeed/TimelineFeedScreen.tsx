@@ -11,7 +11,7 @@ import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import { FeedCard } from '@/components/Cards'
-import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
+import { AlertItemBanner } from '@/features_next/timelinefeed/components/AlertItemBanner'
 import AppDownloadCTA, { type AppDownloadCTASize } from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
 import { MyProfileCardNoLinks } from '@/components/ProfileCards/ProfileCard/MyProfileCard'
 import Title from '@/components/Title/Title'
@@ -23,6 +23,7 @@ import { useVideoFeedScreenFocus } from '@/features_next/video/hooks/useVideoFee
 import { useSession } from '@/ctx/SessionProvider'
 import { transformFeedItemToProps } from '@/helpers/homeFeed'
 import { useAlerts } from '@/services/alerts/hook'
+import { filterBannerAlerts } from '@/services/alerts/utils'
 import { HIT_SOURCES } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 import { useGetSuspenseExecutiveScopes } from '@/services/profile/hook'
@@ -123,7 +124,8 @@ const TimelineFeedMain = () => {
     return <TimelineFeedCard {...item} />
   }, [])
 
-  const hasAlerts = useMemo(() => alerts.length > 0, [alerts.length])
+  const bannerAlerts = useMemo(() => filterBannerAlerts(alerts), [alerts])
+  const hasAlerts = bannerAlerts.length > 0
   const hasPublications = useMemo(() => hasFeature(FEATURES.PUBLICATIONS), [hasFeature])
   const hasContentAboveTitle = shouldShowNotificationCard || hasAlerts
 
@@ -131,7 +133,7 @@ const TimelineFeedMain = () => {
     () => (
       <YStack gap={media.sm ? 8 : 16}>
         {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
-        {hasAlerts ? <AlertStack alerts={alerts} /> : null}
+        {hasAlerts ? <AlertItemBanner alerts={bannerAlerts} /> : null}
         <XStack
           justifyContent="space-between"
           alignItems="center"
@@ -154,7 +156,7 @@ const TimelineFeedMain = () => {
         </XStack>
       </YStack>
     ),
-    [shouldShowNotificationCard, hasAlerts, hasPublications, hasContentAboveTitle, alerts, media.sm],
+    [shouldShowNotificationCard, hasAlerts, hasPublications, hasContentAboveTitle, bannerAlerts, media.sm],
   )
 
   const onViewableItemsChanged = useCallback(
