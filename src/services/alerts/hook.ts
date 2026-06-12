@@ -1,5 +1,6 @@
-import { getAlerts } from '@/services/alerts/api'
 import { useSuspenseQuery } from '@tanstack/react-query'
+
+import { getAlerts } from '@/services/alerts/api'
 
 export const useAlerts = () => {
   return useSuspenseQuery({

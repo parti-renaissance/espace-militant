@@ -11,18 +11,20 @@ import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import { VoxButton } from '@/components/Button'
 import { FeedCard } from '@/components/Cards'
-import AlertStack from '@/components/Cards/AlertCard/components/AlertStack'
 import AppDownloadCTA, { type AppDownloadCTASize } from '@/components/ProfileCards/AppDownloadCTA/AppDownloadCTA'
 import { MyProfileCardNoLinks } from '@/components/ProfileCards/ProfileCard/MyProfileCard'
 import Title from '@/components/Title/Title'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 import VoxCard from '@/components/VoxCard/VoxCard'
+import { AlertItemBanner } from '@/features_next/timelinefeed/components/AlertItemBanner'
+import { LiveAlerts } from '@/features_next/timelinefeed/components/LiveAlerts'
 import { syncTimelinePostVideoVisibility } from '@/features_next/video/helpers/syncTimelinePostVideoVisibility'
 import { useVideoFeedScreenFocus } from '@/features_next/video/hooks/useVideoFeedScreenFocus'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { transformFeedItemToProps } from '@/helpers/homeFeed'
 import { useAlerts } from '@/services/alerts/hook'
+import { filterBannerAlerts, filterLiveAlerts } from '@/services/alerts/utils'
 import { HIT_SOURCES } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 import { useGetSuspenseExecutiveScopes } from '@/services/profile/hook'
@@ -123,15 +125,21 @@ const TimelineFeedMain = () => {
     return <TimelineFeedCard {...item} />
   }, [])
 
-  const hasAlerts = useMemo(() => alerts.length > 0, [alerts.length])
+  const liveAlerts = useMemo(() => filterLiveAlerts(alerts), [alerts])
+  const bannerAlerts = useMemo(() => filterBannerAlerts(alerts), [alerts])
+  const hasLiveAlerts = liveAlerts.length > 0
+  const hasAlerts = bannerAlerts.length > 0
   const hasPublications = useMemo(() => hasFeature(FEATURES.PUBLICATIONS), [hasFeature])
-  const hasContentAboveTitle = shouldShowNotificationCard || hasAlerts
+  const hasContentAboveTitle = shouldShowNotificationCard || hasLiveAlerts || hasAlerts
 
   const header = useMemo(
     () => (
       <YStack gap={media.sm ? 8 : 16}>
-        {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
-        {hasAlerts ? <AlertStack alerts={alerts} /> : null}
+        <YStack gap={16} mt={16}>
+          {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
+          {hasLiveAlerts ? <LiveAlerts alerts={liveAlerts} /> : null}
+          {hasAlerts ? <AlertItemBanner alerts={bannerAlerts} /> : null}
+        </YStack>
         <XStack
           justifyContent="space-between"
           alignItems="center"
@@ -154,7 +162,7 @@ const TimelineFeedMain = () => {
         </XStack>
       </YStack>
     ),
-    [shouldShowNotificationCard, hasAlerts, hasPublications, hasContentAboveTitle, alerts, media.sm],
+    [shouldShowNotificationCard, hasLiveAlerts, hasAlerts, hasPublications, hasContentAboveTitle, liveAlerts, bannerAlerts, media.sm],
   )
 
   const onViewableItemsChanged = useCallback(
