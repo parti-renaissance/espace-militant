@@ -62,7 +62,11 @@ const userStoreSlice: StateCreator<UserState> = (set, get) => ({
     }
     set({ ...initialUserData, user: userWithExpiration, signupTunnelStatus: 'completed' })
   },
-  removeCredentials: () => set((state) => ({ ...initialUserData, signupTunnelStatus: state.signupTunnelStatus })),
+  removeCredentials: () =>
+    set((state) => ({
+      ...initialUserData,
+      signupTunnelStatus: state.user ? 'skipped' : state.signupTunnelStatus,
+    })),
   setOnboardingOpenedAt: (onboardingOpenedAt) => set({ onboardingOpenedAt }),
   _setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
   setHideReSubscribeAlert: (hideResubscribeAlert) => set({ hideResubscribeAlert }),

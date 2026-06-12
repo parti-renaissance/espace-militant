@@ -9,19 +9,34 @@ import clientEnv from '@/config/clientEnv'
 import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
 import type { User } from '@/store/user-store'
 
+import { authDebugTraceStep } from '@/utils/authDebugLog'
+
 import useBrowserWarmUp from './useBrowserWarmUp'
 
 const STABILIZATION_DELAY_MS = 75
 
 const waitForUiStabilization = () => new Promise((resolve) => setTimeout(resolve, STABILIZATION_DELAY_MS))
 
-const safelyDismissAuthSession = async () => {
+export const safelyDismissAuthSession = async () => {
+  let dismissAuthOk = false
+  let dismissBrowserOk = false
+
   try {
     await WebBrowser.dismissAuthSession()
-    await waitForUiStabilization()
+    dismissAuthOk = true
   } catch {
     // No auth session to dismiss or already closed by native browser hand-off.
   }
+  try {
+    await WebBrowser.dismissBrowser()
+    dismissBrowserOk = true
+  } catch {
+    // Browser can already be closed depending on iOS hand-off timing.
+  }
+  await waitForUiStabilization()
+
+  // RE-4964 TEMP AUTH DEBUG — remove after QA investigation
+  authDebugTraceStep('browser_dismissed', { dismissAuthOk, dismissBrowserOk })
 }
 
 class AuthFlowError extends Error {
@@ -135,7 +150,18 @@ export const useLogin = () => {
     if (payload?.code) {
       await safelyDismissAuthSession()
       const codeVerifier = isWeb ? consumePkceVerifier() : req?.codeVerifier
-      return exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId, codeVerifier })
+
+      // RE-4964 TEMP AUTH DEBUG — remove after QA investigation
+      authDebugTraceStep('code_exchange_start', { hasCodeVerifier: Boolean(codeVerifier), hasSessionId: Boolean(payload.sessionId) })
+
+      try {
+        const session = await exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId, codeVerifier })
+        authDebugTraceStep('code_exchange_success', { hasSession: Boolean(session) })
+        return session
+      } catch (error) {
+        authDebugTraceStep('code_exchange_failed', { errorName: error instanceof Error ? error.name : 'unknown' })
+        throw error
+      }
     }
 
     if (isWeb) {
@@ -158,10 +184,15 @@ export const useLogin = () => {
     }
 
     try {
+      // RE-4964 TEMP AUTH DEBUG — remove after QA investigation
+      authDebugTraceStep('prompt_async_start')
+
       const codeResult = await promptAsync({
         presentationStyle: WebBrowser.WebBrowserPresentationStyle.CURRENT_CONTEXT,
         createTask: false,
       })
+
+      authDebugTraceStep('prompt_async_result', { resultType: codeResult.type })
 
       if (codeResult.type === 'success') {
         const session = await exchangeCodeAsync({ code: codeResult.params.code, codeVerifier: req?.codeVerifier })
