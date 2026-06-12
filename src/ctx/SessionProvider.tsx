@@ -48,6 +48,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const url = useURL()
 
   const [isLoginInProgress, setIsLoginInProgress] = React.useState(false)
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false)
   const toast = useToastController()
 
   useBfcacheRestore(() => {
@@ -57,7 +58,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   const queryClient = useQueryClient()
   const login = useLogin()
-  const { mutateAsync: logout } = useLogOut()
+  const { mutateAsync: logout } = useLogOut({ setIsLoggingOut })
   const user = useGetProfil({ enabled: !!existingSession })
   const scope = useGetUserScopes({ enabled: !!user.data })
 
@@ -151,7 +152,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   const handleSignOut = React.useCallback(async () => {
     await logout()
-  }, [])
+  }, [logout])
 
   const providerValue = useMemo(
     () =>
@@ -162,11 +163,12 @@ export function SessionProvider(props: React.PropsWithChildren) {
         session: existingSession,
         isLoading: isGlobalLoading,
         isAuth,
+        isLoggingOut,
         isAdmin: existingSession?.isAdmin === true,
         user,
         scope,
       }) satisfies AuthContextType,
-    [handleSignIn, handleSignOut, handleRegister, existingSession, isGlobalLoading, isAuth, user, scope],
+    [handleSignIn, handleSignOut, handleRegister, existingSession, isGlobalLoading, isAuth, isLoggingOut, user, scope],
   )
 
   return <AuthContext.Provider value={providerValue}>{props.children}</AuthContext.Provider>
