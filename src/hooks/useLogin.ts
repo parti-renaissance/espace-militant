@@ -8,14 +8,13 @@ import { isWeb } from 'tamagui'
 import clientEnv from '@/config/clientEnv'
 import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
 import type { User } from '@/store/user-store'
-
 import { authDebugTraceStep } from '@/utils/authDebugLog'
 
 import useBrowserWarmUp from './useBrowserWarmUp'
 
-const STABILIZATION_DELAY_MS = 75
+const STABILIZATION_DELAY_MS = 150
 
-const waitForUiStabilization = () => new Promise((resolve) => setTimeout(resolve, STABILIZATION_DELAY_MS))
+export const waitForUiStabilization = () => new Promise<void>((resolve) => setTimeout(resolve, STABILIZATION_DELAY_MS))
 
 export const safelyDismissAuthSession = async () => {
   let dismissAuthOk = false
