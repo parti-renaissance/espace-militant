@@ -46,6 +46,8 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
   const { scrollToBottom, armScrollToLastUser, scrollToInitial } = useChatScrollToMessage({
     ref: scrollViewRef,
     messages,
+    streamedContent,
+    isStreaming: isLoading,
     webDomIdPrefix: 'chat-msg-',
   })
 
