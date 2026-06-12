@@ -13,6 +13,7 @@ import { useLogOut } from '@/services/logout/api'
 import { useGetProfil, useGetUserScopes } from '@/services/profile/hook'
 import { useUserStore } from '@/store/user-store'
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
+import { authDebugTraceEnd, authDebugTraceStep } from '@/utils/authDebugLog'
 
 import { AuthContext, type AuthContextType } from './AuthContext'
 
@@ -67,19 +68,40 @@ export function SessionProvider(props: React.PropsWithChildren) {
     async (props) => {
       let keepLoadingForWebRedirect = false
       try {
-        if (isLoginInProgress) {
+        // Allow OAuth callback (magic link / universal link) while promptAsync is still open.
+        if (isLoginInProgress && !props?.code) {
+          // RE-4964 TEMP AUTH DEBUG — remove after QA investigation
+          authDebugTraceStep('sign_in_blocked', { reason: 'login_in_progress_without_code' })
+          authDebugTraceEnd('blocked')
           return
         }
+
+        // RE-4964 TEMP AUTH DEBUG — remove after QA investigation
+        authDebugTraceStep('sign_in_started', {
+          hasCode: Boolean(props?.code),
+          isLoginInProgress,
+          source: props?.code ? 'oauth_callback' : 'user_action',
+        })
+
         setIsLoginInProgress(true)
         const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
         if (!session) {
           keepLoadingForWebRedirect = isWeb && !props?.code
+          // RE-4964 TEMP AUTH DEBUG — remove after QA investigation
+          authDebugTraceEnd('no_session', {
+            hasCode: Boolean(props?.code),
+            keepLoadingForWebRedirect,
+          })
           return
         }
         setSession(credentialsFromTokenResponse(session, props?.isAdmin))
         queryClient.resetQueries()
         router.replace((normalizeStateRedirect(props?.state) ?? '/') as Href)
+        // RE-4964 TEMP AUTH DEBUG — remove after QA investigation
+        authDebugTraceEnd('success', { hasCode: Boolean(props?.code) })
       } catch (e) {
+        // RE-4964 TEMP AUTH DEBUG — remove after QA investigation
+        authDebugTraceEnd('error', { errorMessage: e instanceof Error ? e.message : 'unknown' })
         ErrorMonitor.log(e.message, { e })
         toast.show('Erreur lors de la connexion', { type: 'error' })
       } finally {
@@ -113,10 +135,14 @@ export function SessionProvider(props: React.PropsWithChildren) {
     const { queryParams } = parse(url)
     const code = queryParams?.code as string | undefined
     if (!code || processedCodeRef.current === code) return
-    processedCodeRef.current = code
 
     const state = queryParams?.state as string | undefined
-    handleSignIn({ code, state })
+
+    // RE-4964 TEMP AUTH DEBUG — remove after QA investigation
+    authDebugTraceStep('oauth_url_received', { hasState: Boolean(state) })
+
+    processedCodeRef.current = code
+    void handleSignIn({ code, state })
   }, [url, handleSignIn])
 
   const handleRegister = React.useCallback(async () => {
