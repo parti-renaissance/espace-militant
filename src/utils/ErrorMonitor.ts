@@ -8,7 +8,6 @@ const IGNORED_ERROR_PATTERNS = [
   'messaging/unsupported-browser',
   'ExpoWebBrowser.warmUpAsync',
   'The refresh token is invalid',
-  'invalid_grant',
 ]
 
 const getEventText = (event: ErrorEvent): string => {
@@ -42,7 +41,10 @@ const shouldDropEvent = (event: ErrorEvent): boolean => {
   if (text.includes('unsupported-browser')) return true
   if (text.includes('warmupasync')) return true
   if (text.includes('refresh token') && text.includes('invalid')) return true
-  if (text.includes('invalid_grant')) return true
+  if (text.includes('invalid_grant')) {
+    const isLoginAuth = event.tags?.domain === 'auth' && !event.tags?.refresh_context
+    if (!isLoginAuth) return true
+  }
 
   if (ex?.type === 'AxiosError' && ex?.value === 'Network Error') return true
 
