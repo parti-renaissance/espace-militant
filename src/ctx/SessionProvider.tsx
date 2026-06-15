@@ -59,11 +59,11 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const queryClient = useQueryClient()
   const login = useLogin()
   const { mutateAsync: logout } = useLogOut({ setIsLoggingOut })
-  const user = useGetProfil({ enabled: !!existingSession })
-  const scope = useGetUserScopes({ enabled: !!user.data })
+  const user = useGetProfil({ enabled: !!existingSession && !isLoggingOut })
+  const scope = useGetUserScopes({ enabled: !!user.data && !isLoggingOut })
 
   const isGlobalLoading = [isLoginInProgress, user.isLoading, scope.isLoading, !_hasHydrated].some(Boolean)
-  const isAuth = Boolean(existingSession && !isGlobalLoading)
+  const isAuth = Boolean(existingSession && !isGlobalLoading && !isLoggingOut)
 
   const handleSignIn: AuthContextType['signIn'] = React.useCallback(
     async (props) => {
