@@ -1,21 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-const TOKEN_FADE_MS = 5
-const SPACE_DELAY_MS = 10
-const PUNCTUATION_DELAY_MS = 15
-const SENTENCE_DELAY_MS = 3
+const FRAME_DELAY_MS = 8
+const MIN_CHUNK_SIZE = 4
+const MAX_CHUNK_SIZE = 48
+const BACKLOG_FRAMES = 8
 
-function getNextTokenEnd(text: string, start: number): number {
-  const codePoint = text.codePointAt(start)
-  if (codePoint === undefined) return start
-  return start + (codePoint > 0xffff ? 2 : 1)
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value))
 }
 
-function getTokenDelay(token: string): number {
-  if (/^\s$/.test(token)) return SPACE_DELAY_MS
-  if (/^[.!?…]$/.test(token)) return SENTENCE_DELAY_MS
-  if (/^[,;:]$/.test(token)) return PUNCTUATION_DELAY_MS
-  return TOKEN_FADE_MS
+function getNextChunkEnd(text: string, start: number): number {
+  const remaining = text.length - start
+  const chunkSize = clamp(Math.ceil(remaining / BACKLOG_FRAMES), MIN_CHUNK_SIZE, MAX_CHUNK_SIZE)
+  let end = Math.min(text.length, start + chunkSize)
+
+  if (end < text.length) {
+    const charCode = text.charCodeAt(end - 1)
+    if (charCode >= 0xd800 && charCode <= 0xdbff) end += 1
+  }
+
+  return end
 }
 
 export type Typewriter = {
@@ -32,9 +36,7 @@ export function useTypewriter(): Typewriter {
   const [busy, setBusy] = useState(false)
   const bufferRef = useRef('')
   const indexRef = useRef(0)
-  const delayRef = useRef(TOKEN_FADE_MS)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const finishRef = useRef<((text: string) => void) | null>(null)
 
   const cancel = useCallback(() => {
     if (timerRef.current !== null) {
@@ -46,8 +48,6 @@ export function useTypewriter(): Typewriter {
   const clearInternals = useCallback(() => {
     bufferRef.current = ''
     indexRef.current = 0
-    delayRef.current = TOKEN_FADE_MS
-    finishRef.current = null
     setDisplay('')
   }, [])
 
@@ -56,29 +56,20 @@ export function useTypewriter(): Typewriter {
       timerRef.current = null
       const full = bufferRef.current
       if (indexRef.current < full.length) {
-        const previousIndex = indexRef.current
-        indexRef.current = getNextTokenEnd(full, previousIndex)
-        delayRef.current = getTokenDelay(full.slice(previousIndex, indexRef.current))
+        indexRef.current = getNextChunkEnd(full, indexRef.current)
         setDisplay(full.slice(0, indexRef.current))
       }
       if (indexRef.current < full.length) {
-        timerRef.current = setTimeout(tick, delayRef.current)
-        return
-      }
-      const done = finishRef.current
-      if (done) {
-        const content = full
-        clearInternals()
-        setBusy(false)
-        done(content)
+        timerRef.current = setTimeout(tick, FRAME_DELAY_MS)
       }
     },
-    [clearInternals],
+    [],
   )
 
   const push = useCallback(
     (text: string) => {
       bufferRef.current += text
+      setBusy(true)
       if (timerRef.current === null) timerRef.current = setTimeout(tick, 0)
     },
     [tick],
@@ -86,22 +77,18 @@ export function useTypewriter(): Typewriter {
 
   const finish = useCallback(
     (onDone: (text: string) => void) => {
-      if (indexRef.current >= bufferRef.current.length) {
-        const content = bufferRef.current
-        clearInternals()
-        onDone(content)
-        return
-      }
-      finishRef.current = onDone
-      setBusy(true)
-      if (timerRef.current === null) timerRef.current = setTimeout(tick, delayRef.current)
+      const content = bufferRef.current
+      cancel()
+      clearInternals()
+      setBusy(false)
+      onDone(content)
     },
-    [clearInternals, tick],
+    [cancel, clearInternals],
   )
 
   const stop = useCallback(() => {
     cancel()
-    const content = bufferRef.current.slice(0, indexRef.current)
+    const content = bufferRef.current
     clearInternals()
     setBusy(false)
     return content

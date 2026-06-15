@@ -4,8 +4,6 @@ import FitImage from 'react-native-fit-image'
 import Markdown from 'react-native-markdown-display'
 import { useTheme } from 'tamagui'
 
-const STREAMING_CURSOR = '▎'
-
 const bodyFontSize = 14
 const bodyLineHeight = 22
 const fontRegular = 'PublicSans-Regular'
@@ -75,7 +73,6 @@ function VoxMarkdownComponent({ content, isStreaming = false }: VoxMarkdownProps
   const displayContent = useMemo(() => {
     let raw = content
     if (isStreaming && raw) {
-      raw = `${raw}${STREAMING_CURSOR}`
       raw = sanitizeIncompleteCodeBlocks(raw)
     }
     return raw
