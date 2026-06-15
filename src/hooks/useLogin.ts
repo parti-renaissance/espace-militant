@@ -11,20 +11,25 @@ import type { User } from '@/store/user-store'
 
 import useBrowserWarmUp from './useBrowserWarmUp'
 
-const STABILIZATION_DELAY_MS = 75
+const STABILIZATION_DELAY_MS = 150
 
-const waitForUiStabilization = () => new Promise((resolve) => setTimeout(resolve, STABILIZATION_DELAY_MS))
+export const waitForUiStabilization = () => new Promise<void>((resolve) => setTimeout(resolve, STABILIZATION_DELAY_MS))
 
-const safelyDismissAuthSession = async () => {
+export const safelyDismissAuthSession = async () => {
   try {
     await WebBrowser.dismissAuthSession()
-    await waitForUiStabilization()
   } catch {
     // No auth session to dismiss or already closed by native browser hand-off.
   }
+  try {
+    await WebBrowser.dismissBrowser()
+  } catch {
+    // Browser can already be closed depending on iOS hand-off timing.
+  }
+  await waitForUiStabilization()
 }
 
-class AuthFlowError extends Error {
+export class AuthFlowError extends Error {
   details?: unknown
 
   constructor(message: string, details?: unknown) {
@@ -176,6 +181,7 @@ export const useLogin = () => {
 
       throw new AuthFlowError('Unexpected login auth result', codeResult)
     } catch (error) {
+      if (error instanceof AuthFlowError) throw error
       throw new AuthFlowError('Technical login failure', error)
     }
   }

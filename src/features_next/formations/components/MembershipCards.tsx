@@ -6,6 +6,7 @@ import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 
 import illuFormations from '../assets/illu-formations.png'
 
@@ -14,6 +15,7 @@ export function JoinMembershipCard() {
   const windowDimensions = useWindowDimensions()
   const { isPending, open: openAdhesion } = useOpenExternalContent({
     slug: 'adhesion',
+    source: HIT_SOURCES.PAGE_FORMATIONS,
     utm_campaign: 'formations',
   })
 
@@ -61,6 +63,7 @@ export function RenewMembershipCard() {
   const windowDimensions = useWindowDimensions()
   const { isPending, open: openAdhesion } = useOpenExternalContent({
     slug: 'adhesion',
+    source: HIT_SOURCES.PAGE_FORMATIONS,
     utm_campaign: 'formations',
   })
 
@@ -108,6 +111,7 @@ export function AccessFormationsCard() {
   const windowDimensions = useWindowDimensions()
   const { isPending, open: openFormations } = useOpenExternalContent({
     slug: 'formation',
+    source: HIT_SOURCES.PAGE_FORMATIONS,
     utm_campaign: 'formations',
   })
 

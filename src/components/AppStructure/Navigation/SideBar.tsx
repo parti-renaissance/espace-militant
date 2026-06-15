@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import { usePathname } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
-import { isWeb, styled, XStack, YStack } from 'tamagui'
-import { BellOff, ChevronRight, Ellipsis, Globe, Rocket, Sparkle } from '@tamagui/lucide-icons'
+import { isWeb, styled, useWindowDimensions, XStack, YStack } from 'tamagui'
+import { BellOff, ChevronRight, Ellipsis, Globe, Newspaper, Rocket, Sparkle, UsersRound, Zap } from '@tamagui/lucide-icons'
 
 import { useVisibleNavItems } from '@/components/AppStructure/hooks/useVisibleNavItems'
 import { isNavItemActive } from '@/components/AppStructure/utils'
@@ -10,8 +10,8 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { SignUpButton } from '@/components/Buttons/AuthButton'
 
-import CadreIllustration from '@/assets/illustrations/CadreIllustration'
 import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
+import CadreIllustration from '@/assets/illustrations/CadreIllustration'
 import { useMilitantNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useSession } from '@/ctx/SessionProvider'
 import useCheckNotificationsState from '@/hooks/notifications/useCheckNotificationsState'
@@ -194,6 +194,83 @@ const Line = styled(YStack, {
   height: '100%',
 })
 
+const openExternalUrl = (url: string) => {
+  if (isWeb) {
+    window.open(url, '_blank')
+  } else {
+    void WebBrowser.openBrowserAsync(url)
+  }
+}
+
+const ExternalNavLinks = ({ collapsed }: { collapsed: boolean }) => (
+  <>
+    <NavItem iconLeft={Rocket} text="attalpresident.fr" externalLink collapsed={collapsed} onPress={() => openExternalUrl('https://attalpresident.fr/')} />
+    <NavItem iconLeft={Globe} text="parti-renaissance.fr" externalLink collapsed={collapsed} onPress={() => openExternalUrl('https://parti-renaissance.fr/')} />
+  </>
+)
+
+const LoggedOutSideBarFooter = ({ collapsed, onSignIn }: { collapsed: boolean; onSignIn: () => void }) => {
+  const { height: viewportHeight } = useWindowDimensions()
+  const showLoggedOutBenefits = viewportHeight >= 750
+
+  return (
+    <YStack gap={24}>
+      <YStack gap={24} px={12}>
+        <Text.MD semibold textWrap="balance" textAlign="center">
+          Connectez-vous avec votre compte
+        </Text.MD>
+        <YStack gap={16}>
+          <VoxButton variant="soft" size="lg" width="100%" theme="blue" onPress={onSignIn}>
+            Je me connecte
+          </VoxButton>
+          <SignUpButton size="lg" width="100%" />
+        </YStack>
+      </YStack>
+      {showLoggedOutBenefits ? (
+        <YStack gap={16} px={12}>
+          <XStack gap={12} alignItems="center">
+            <XStack width={16}>
+              <UsersRound size={16} color="$blue9" />
+            </XStack>
+            <Text.SM flex={1} secondary flexShrink={1}>
+              <Text.SM semibold secondary>
+                Rejoindrez une communauté
+              </Text.SM>{' '}
+              qui s&apos;engagent pour le pays.
+            </Text.SM>
+          </XStack>
+          <XStack gap={12} alignItems="center">
+            <XStack width={16}>
+              <Zap size={16} color="$blue9" />
+            </XStack>
+            <Text.SM flex={1} secondary flexShrink={1}>
+              Menez des{' '}
+              <Text.SM semibold secondary>
+                actions concrètes
+              </Text.SM>{' '}
+              pour changer les choses près de chez vous.
+            </Text.SM>
+          </XStack>
+          <XStack gap={12} alignItems="center">
+            <XStack width={16}>
+              <Newspaper size={16} color="$blue9" />
+            </XStack>
+            <Text.SM flex={1} secondary flexShrink={1}>
+              Partagez notre{' '}
+              <Text.SM semibold secondary>
+                actualité et notre projet.
+              </Text.SM>
+            </Text.SM>
+          </XStack>
+        </YStack>
+      ) : null}
+      <YStack gap={4} mt={24}>
+        <ExternalNavLinks collapsed={collapsed} />
+      </YStack>
+    </YStack>
+  )
+}
+
 interface SideBarProps {
   state?: SideBarState
   navCadreItems: NavItemConfig[]
@@ -352,34 +429,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
           )}
         </MenuContainer>
         <MenuFooterContainer collapsed={displayNavCadre}>
-          <NavItem
-            iconLeft={Rocket}
-            text="attalpresident.fr"
-            externalLink
-            collapsed={displayNavCadre}
-            onPress={() => {
-              const url = 'https://attalpresident.fr/'
-              if (isWeb) {
-                window.open(url, '_blank')
-              } else {
-                void WebBrowser.openBrowserAsync(url)
-              }
-            }}
-          />
-          <NavItem
-            iconLeft={Globe}
-            text="parti-renaissance.fr"
-            externalLink
-            collapsed={displayNavCadre}
-            onPress={() => {
-              const url = 'https://parti-renaissance.fr/'
-              if (isWeb) {
-                window.open(url, '_blank')
-              } else {
-                void WebBrowser.openBrowserAsync(url)
-              }
-            }}
-          />
+          {isAuth && <ExternalNavLinks collapsed={displayNavCadre} />}
           {isAuth ? (
             <>
               {!user?.email_subscribed && (
@@ -401,17 +451,7 @@ export const SideBar = ({ state = 'militant', navCadreItems }: SideBarProps) => 
               />
             </>
           ) : (
-            <YStack gap={24} p={12}>
-              <YStack gap={16}>
-                <Text.MD semibold textWrap="balance" textAlign="center">
-                  Connectez-vous avec votre compte
-                </Text.MD>
-                <VoxButton variant="outlined" size="lg" width="100%" theme="blue" onPress={() => signIn()}>
-                  Me connecter
-                </VoxButton>
-                <SignUpButton size="lg" width="100%" />
-              </YStack>
-            </YStack>
+            <LoggedOutSideBarFooter collapsed={displayNavCadre} onSignIn={() => signIn()} />
           )}
         </MenuFooterContainer>
       </SideBarContainer>

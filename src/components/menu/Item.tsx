@@ -3,6 +3,7 @@ import { ChevronRight } from '@tamagui/lucide-icons'
 import { styled, TamaguiElement, XStack } from 'tamagui'
 import Text from '../base/Text'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import * as magicLinkTypes from '@/services/magic-link/schema'
 import type { IconComponent } from '@/models/common.model'
 
@@ -96,8 +97,9 @@ const Item = forwardRef<
     externalSlug?: magicLinkTypes.Slugs
   }
 >(({ children, icon: Icon, showArrow, externalSlug, ...props }, ref) => {
-  const externalLink = useOpenExternalContent({ 
+  const externalLink = useOpenExternalContent({
     slug: externalSlug ?? 'adhesion',
+    source: HIT_SOURCES.PAGE_NAV,
   })
   
   const handlePress = externalSlug ? externalLink.open({}) : props.onPress

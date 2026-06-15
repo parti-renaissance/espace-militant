@@ -7,7 +7,8 @@ import { useQueryClient } from '@tanstack/react-query'
 
 import { navigateToWelcome } from '@/features_next/signup/utils/authNavigation'
 
-import useLogin, { credentialsFromTokenResponse } from '@/hooks/useLogin'
+import useBfcacheRestore from '@/hooks/useBfcacheRestore'
+import useLogin, { AuthFlowError, credentialsFromTokenResponse } from '@/hooks/useLogin'
 import { useLogOut } from '@/services/logout/api'
 import { useGetProfil, useGetUserScopes } from '@/services/profile/hook'
 import { useUserStore } from '@/store/user-store'
@@ -46,24 +47,32 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const url = useURL()
 
   const [isLoginInProgress, setIsLoginInProgress] = React.useState(false)
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false)
   const toast = useToastController()
+
+  useBfcacheRestore(() => {
+    setIsLoginInProgress(false)
+    void useUserStore.persist.rehydrate()
+  })
 
   const queryClient = useQueryClient()
   const login = useLogin()
-  const { mutateAsync: logout } = useLogOut()
-  const user = useGetProfil({ enabled: !!existingSession })
-  const scope = useGetUserScopes({ enabled: !!user.data })
+  const { mutateAsync: logout } = useLogOut({ setIsLoggingOut })
+  const user = useGetProfil({ enabled: !!existingSession && !isLoggingOut })
+  const scope = useGetUserScopes({ enabled: !!user.data && !isLoggingOut })
 
   const isGlobalLoading = [isLoginInProgress, user.isLoading, scope.isLoading, !_hasHydrated].some(Boolean)
-  const isAuth = Boolean(existingSession && !isGlobalLoading)
+  const isAuth = Boolean(existingSession && !isGlobalLoading && !isLoggingOut)
 
   const handleSignIn: AuthContextType['signIn'] = React.useCallback(
     async (props) => {
       let keepLoadingForWebRedirect = false
       try {
-        if (isLoginInProgress) {
+        // Allow OAuth callback (magic link / universal link) while promptAsync is still open.
+        if (isLoginInProgress && !props?.code) {
           return
         }
+
         setIsLoginInProgress(true)
         const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
         if (!session) {
@@ -74,7 +83,18 @@ export function SessionProvider(props: React.PropsWithChildren) {
         queryClient.resetQueries()
         router.replace((normalizeStateRedirect(props?.state) ?? '/') as Href)
       } catch (e) {
-        ErrorMonitor.log(e.message, { e })
+        const authSource = props?.code ? 'oauth_callback' : 'user_action'
+        ErrorMonitor.logError({
+          message: 'Login failed',
+          domain: 'auth',
+          error: e,
+          extra: {
+            hasCode: Boolean(props?.code),
+            source: authSource,
+            ...(e instanceof AuthFlowError && e.details !== undefined ? { details: e.details } : {}),
+          },
+          tags: { auth_source: authSource },
+        })
         toast.show('Erreur lors de la connexion', { type: 'error' })
       } finally {
         if (!keepLoadingForWebRedirect) {
@@ -107,10 +127,11 @@ export function SessionProvider(props: React.PropsWithChildren) {
     const { queryParams } = parse(url)
     const code = queryParams?.code as string | undefined
     if (!code || processedCodeRef.current === code) return
-    processedCodeRef.current = code
 
     const state = queryParams?.state as string | undefined
-    handleSignIn({ code, state })
+
+    processedCodeRef.current = code
+    void handleSignIn({ code, state })
   }, [url, handleSignIn])
 
   const handleRegister = React.useCallback(async () => {
@@ -119,7 +140,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
   const handleSignOut = React.useCallback(async () => {
     await logout()
-  }, [])
+  }, [logout])
 
   const providerValue = useMemo(
     () =>
@@ -130,11 +151,12 @@ export function SessionProvider(props: React.PropsWithChildren) {
         session: existingSession,
         isLoading: isGlobalLoading,
         isAuth,
+        isLoggingOut,
         isAdmin: existingSession?.isAdmin === true,
         user,
         scope,
       }) satisfies AuthContextType,
-    [handleSignIn, handleSignOut, handleRegister, existingSession, isGlobalLoading, isAuth, user, scope],
+    [handleSignIn, handleSignOut, handleRegister, existingSession, isGlobalLoading, isAuth, isLoggingOut, user, scope],
   )
 
   return <AuthContext.Provider value={providerValue}>{props.children}</AuthContext.Provider>

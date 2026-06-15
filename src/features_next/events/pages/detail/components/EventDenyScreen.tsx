@@ -14,12 +14,14 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { DetailedAPIErrorPayload, ForbiddenError, UnauthorizedError } from '@/core/errors'
 import { useSession } from '@/ctx/SessionProvider'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 
 import visuCadnasImg from '@/assets/illustrations/VisuCadnas.png'
 
 const AdhButton = () => {
   const { isPending, open: handleClick } = useOpenExternalContent({
     slug: 'adhesion',
+    source: HIT_SOURCES.PAGE_EVENT_DETAIL,
     utm_source: 'app',
     utm_campaign: 'event',
   })

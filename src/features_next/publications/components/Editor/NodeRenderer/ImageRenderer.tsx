@@ -7,6 +7,7 @@ import { View, YStack } from 'tamagui'
 import { useThemeStyle } from '@/features_next/publications/components/Editor/hooks/useThemeStyle'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
 
+import { type HitSource } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 import { handleLinkPress } from '@/utils/linkHandler'
 
@@ -18,12 +19,14 @@ export const ImageRenderer = ({
   displayToolbar = true,
   allowHits = false,
   publicationUuid,
+  hitSource,
 }: {
   data: S.ImageNode
   edgePosition?: 'leading' | 'trailing' | 'alone'
   displayToolbar?: boolean
   allowHits?: boolean
   publicationUuid?: string
+  hitSource?: HitSource
 }) => {
   const {
     containerStyle: { paddingBottom, ...containerStyle },
@@ -55,6 +58,7 @@ export const ImageRenderer = ({
           trackClick({
             object_type: 'publication',
             object_id: publicationUuid,
+            source: hitSource,
             target_url: safeLinkUrl,
             button_name: 'Image',
           })

@@ -5,6 +5,7 @@ import { VoxButton } from '@/components/Button'
 import RenewMembershipButton from '@/features_next/profil/pages/donations/components/RenewMembershipButton'
 
 import { RestItemEvent } from '@/services/events/schema'
+import { HIT_SOURCES } from '@/services/hits/constants'
 
 export type PremiumLockButtonProps = ComponentPropsWithoutRef<typeof VoxButton> &
   Pick<RestItemEvent, 'uuid'> & {
@@ -29,6 +30,7 @@ export const EventSubscribePremiumLockButton = ({ isDue, slug, variant, ...butto
       iconLeft={HelpingHand}
       variant={dynVariant}
       source="evenement"
+      hitSource={HIT_SOURCES.PAGE_EVENT_DETAIL}
       page={slug ?? 'event'}
       testID="event-subscribe-lock-button"
       style={{

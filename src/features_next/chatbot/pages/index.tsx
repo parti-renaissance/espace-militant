@@ -9,7 +9,6 @@ import MessageList from '@/components/chat/messages/MessageList'
 import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
 import { useChatMessageActions } from '@/hooks/chat/useChatMessageActions'
 import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage'
-import { useInitialScroll } from '@/hooks/chat/useInitialScroll'
 import { useShowJumpToBottom } from '@/hooks/chat/useShowJumpToBottom'
 import type { ChatMessage } from '@/hooks/chat/types'
 import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef'
@@ -43,19 +42,11 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
   })
   const { handleCopy, handleEdit } = useChatMessageActions({ inputRef, setInput: handleInputChange })
 
-  const scrollToBottom = useCallback((animated = true) => {
-    requestAnimationFrame(() => scrollViewRef.current?.scrollToEnd({ animated }))
-  }, [])
-
-  const { scrollToLastAssistant, armScrollToLastUser, scrollToInitial } = useChatScrollToMessage({
+  const { scrollToBottom, armScrollToLastUser } = useChatScrollToMessage({
     ref: scrollViewRef,
     messages,
-    isLoading,
-    scrollToBottom,
     webDomIdPrefix: 'chat-msg-',
   })
-
-  useInitialScroll(scrollToInitial, messages.length > 0)
 
   const lastMessageId = messages.length > 0 ? messages[messages.length - 1].id : null
   const { show: showJumpToBottom, handleScroll: handleJumpScroll } = useShowJumpToBottom({ lastMessageId })
@@ -97,7 +88,7 @@ export default function ChatbotPage({ activeDiscussionId, onActiveDiscussionChan
             onRetry={handleRetry}
             onScroll={handleJumpScroll}
           />
-          {showJumpToBottom && <JumpToBottomButton onPress={scrollToLastAssistant} bottom={scrollButtonBottom} />}
+          {showJumpToBottom && <JumpToBottomButton onPress={scrollToBottom} bottom={scrollButtonBottom} />}
           <InputDock
             inputRef={inputRef}
             value={input}

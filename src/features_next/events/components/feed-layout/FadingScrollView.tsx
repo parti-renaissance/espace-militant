@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useState } from 'react'
 import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, ScrollViewProps } from 'react-native'
 import { ScrollView, StyleSheet } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
@@ -60,16 +60,19 @@ export interface FadingScrollViewProps extends ScrollViewProps {
   showGradients?: boolean
 }
 
-export function FadingScrollView({
-  children,
-  gradientColors = ['#fafafb', '#fafafb00'],
-  gradientWidth = 40,
-  showGradients = true,
-  onScroll: externalOnScroll,
-  onContentSizeChange: externalOnContentSizeChange,
-  onLayout: externalOnLayout,
-  ...props
-}: FadingScrollViewProps) {
+export const FadingScrollView = forwardRef<ScrollView, FadingScrollViewProps>(function FadingScrollView(
+  {
+    children,
+    gradientColors = ['#fafafb', '#fafafb00'],
+    gradientWidth = 40,
+    showGradients = true,
+    onScroll: externalOnScroll,
+    onContentSizeChange: externalOnContentSizeChange,
+    onLayout: externalOnLayout,
+    ...props
+  },
+  ref,
+) {
   const { onScroll, onContentSizeChange, onLayout, leftFadeStyle, rightFadeStyle } = useHorizontalScrollFade()
 
   const handleScroll = useCallback(
@@ -99,6 +102,7 @@ export function FadingScrollView({
   return (
     <YStack width="100%" position="relative">
       <ScrollView
+        ref={ref}
         horizontal
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={16}
@@ -122,4 +126,4 @@ export function FadingScrollView({
       )}
     </YStack>
   )
-}
+})

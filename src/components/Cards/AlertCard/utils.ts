@@ -3,9 +3,10 @@ import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 
 import { genericErrorThrower } from '@/services/common/errors/generic-errors'
+import { type HitSource } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 
-export const createOnShow = (url: string | null, buttonLabel?: string | null) => {
+export const createOnShow = (url: string | null, buttonLabel: string | null | undefined, hitSource: HitSource) => {
   const { trackClick } = useHits()
 
   return () => {
@@ -13,6 +14,7 @@ export const createOnShow = (url: string | null, buttonLabel?: string | null) =>
       try {
         trackClick({
           object_type: 'alert',
+          source: hitSource,
           target_url: url || undefined,
           button_name: buttonLabel || undefined,
         })

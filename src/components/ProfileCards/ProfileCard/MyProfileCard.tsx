@@ -12,6 +12,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import RenewMembershipButton from '@/features_next/profil/pages/donations/components/RenewMembershipButton'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useGetExecutiveScopes, useGetProfil, useGetSuspenseProfil, useProfileCompletion } from '@/services/profile/hook'
 import { RestProfilResponse } from '@/services/profile/schema'
 import { useUserStore } from '@/store/user-store'
@@ -22,7 +23,7 @@ export const GoToAdminCard = ({ profil }: { profil: RestProfilResponse }) => {
   const { data } = useGetExecutiveScopes()
   const default_scope = data?.default
   const isCadre = profil?.cadre_auth_path && default_scope
-  const { open: openCadre, isPending } = useOpenExternalContent({ slug: 'cadre' })
+  const { open: openCadre, isPending } = useOpenExternalContent({ slug: 'cadre', source: HIT_SOURCES.PAGE_TIMELINE })
 
   if (!isCadre) {
     return null
@@ -90,7 +91,13 @@ const MembershipCard = ({ status }: { status: 'renew' | 'tofinish' }) => {
   const icon = status === 'renew' ? History : UserPlus
 
   return (
-    <InfoCard button={<RenewMembershipButton text={buttonText} page="accueil-connecte" full inverse bg="white" />} icon={icon} theme="yellow">
+    <InfoCard
+      button={
+        <RenewMembershipButton text={buttonText} page="accueil-connecte" hitSource={HIT_SOURCES.PAGE_TIMELINE} full inverse bg="white" />
+      }
+      icon={icon}
+      theme="yellow"
+    >
       {text}
     </InfoCard>
   )
@@ -134,7 +141,10 @@ export default function MyProfileCard() {
   const profile = user?.data
   const statusAdh = profile ? getMembershipCardStatus(profile.tags) : null
   const showEluCard = (profile?.tags ?? []).map((tag) => tag.code).find((x) => ['elu:attente_declaration', 'elu:cotisation_nok'].includes(x))
-  const { open: openFormations, isPending: isPendingFormations } = useOpenExternalContent({ slug: 'formation' })
+  const { open: openFormations, isPending: isPendingFormations } = useOpenExternalContent({
+    slug: 'formation',
+    source: HIT_SOURCES.PAGE_TIMELINE,
+  })
 
   if (!profile) {
     return null

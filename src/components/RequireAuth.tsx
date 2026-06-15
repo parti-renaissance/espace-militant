@@ -16,11 +16,11 @@ export function useRequireAuth() {
 }
 
 export function RequireAuth({ children }: PropsWithChildren) {
-  const { isAuth, isLoading } = useSession()
+  const { isAuth, isLoading, isLoggingOut } = useSession()
   const pathname = usePathname()
   const isNavigationReady = useRootNavigationState()?.key != null
 
-  if (isLoading || !isNavigationReady) return null
+  if (isLoading || !isNavigationReady || isLoggingOut) return null
 
   if (!isAuth) {
     return <Redirect href={getAuthHref(AuthRoutes.INSCRIPTION, pathname)} />

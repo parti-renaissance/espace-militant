@@ -10,6 +10,7 @@ export type AuthContextType = {
   signUp: () => Promise<void>
   isAuth: boolean
   isAdmin: boolean
+  isLoggingOut: boolean
   session?: User | null
   isLoading: boolean
   user: UseQueryResult<RestProfilResponse>

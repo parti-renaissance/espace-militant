@@ -6,6 +6,7 @@ import { VoxButton } from '@/components/Button'
 import VoxCard, { VoxCardAuthorProps, VoxCardDateProps, VoxCardFrameProps, VoxCardLocationProps } from '@/components/VoxCard/VoxCard'
 
 import { genericErrorThrower } from '@/services/common/errors/generic-errors'
+import { HIT_SOURCES, type HitSource } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 
 export type NewsVoxCardProps = {
@@ -22,7 +23,11 @@ export type NewsVoxCardProps = {
     VoxCardAuthorProps
 } & VoxCardFrameProps
 
-const NewsCard = ({ payload, ...props }: NewsVoxCardProps) => {
+type NewsCardProps = NewsVoxCardProps & {
+  hitSource?: HitSource
+}
+
+const NewsCard = ({ payload, hitSource = HIT_SOURCES.PAGE_TIMELINE, ...props }: NewsCardProps) => {
   const { trackClick } = useHits()
 
   const onShow = async () => {
@@ -32,6 +37,7 @@ const NewsCard = ({ payload, ...props }: NewsVoxCardProps) => {
       try {
         trackClick({
           object_type: 'news',
+          source: hitSource,
           target_url: url,
           button_name: payload.ctaLabel || undefined,
         })

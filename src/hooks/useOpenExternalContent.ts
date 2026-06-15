@@ -1,11 +1,12 @@
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 
+import { type HitSource } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 import { useGetMagicLink } from '@/services/magic-link/hook'
 import * as types from '@/services/magic-link/schema'
 
-function useOpenExternalContent(props: { slug: types.Slugs; utm_source?: string; utm_campaign?: string }) {
+function useOpenExternalContent(props: { slug: types.Slugs; source: HitSource; utm_source?: string; utm_campaign?: string }) {
   const queryLink = useGetMagicLink(props)
   const { trackClick } = useHits()
 
@@ -20,6 +21,7 @@ function useOpenExternalContent(props: { slug: types.Slugs; utm_source?: string;
       queryLink.mutateAsync(params).then(({ url }) => {
         try {
           trackClick({
+            source: props.source,
             target_url: url,
             button_name: props.slug,
             utm_source: props.utm_source,

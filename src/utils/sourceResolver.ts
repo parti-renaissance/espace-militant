@@ -1,3 +1,5 @@
+import { HIT_SOURCES } from '@/services/hits/constants'
+
 import { getNavigationType } from './navigationType'
 
 /**
@@ -6,9 +8,9 @@ import { getNavigationType } from './navigationType'
  * @param defaultSource - The default source to use if no URL source is provided
  * @returns The appropriate source value
  */
-export function resolveSource(urlSource?: string, defaultSource = 'direct_link'): string {
+export function resolveSource(urlSource?: string, defaultSource: string = HIT_SOURCES.DIRECT_LINK): string {
   const navigationType = getNavigationType()
   if (urlSource) return urlSource
-  if (navigationType === 'reload') return 'reload'
+  if (navigationType === 'reload') return HIT_SOURCES.RELOAD
   return defaultSource
 }

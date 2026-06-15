@@ -20,6 +20,7 @@ import { useSession } from '@/ctx/SessionProvider'
 import { usePinnedEventsInfiniteQuery, useSuspensePaginatedEvents } from '@/services/events/hook'
 import { QUERY_KEY_PAGINATED_SHORT_EVENTS } from '@/services/events/hook/queryKeys'
 import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 import { useGetProfil } from '@/services/profile/hook'
 
@@ -210,7 +211,7 @@ const EventFeed = () => {
             </YStack>
           )
         case 'event':
-          return <EventCard event={item.event} userUuid={userData?.uuid} source="page_events" />
+          return <EventCard event={item.event} userUuid={userData?.uuid} source={HIT_SOURCES.PAGE_EVENTS} />
         default:
           return null
       }
@@ -225,7 +226,7 @@ const EventFeed = () => {
         trackImpressionRef.current({
           object_type: 'event',
           object_id: viewToken.item.event.uuid,
-          source: 'page_events',
+          source: HIT_SOURCES.PAGE_EVENTS,
         })
       }
     })

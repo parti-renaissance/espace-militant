@@ -1,4 +1,4 @@
-import React, { type ComponentProps, type ComponentType } from 'react'
+import React, { forwardRef, type ComponentProps, type ComponentRef, type ComponentType } from 'react'
 import * as MapboxGl from '@rnmapbox/maps'
 
 export type UserLocationProps = ComponentProps<typeof MapboxGl.UserLocation> & {
@@ -10,6 +10,12 @@ export type UserLocationProps = ComponentProps<typeof MapboxGl.UserLocation> & {
 type ExtendedMapboxGl = typeof MapboxGl & {
   UserLocation: ComponentType<UserLocationProps>
 }
+
+const MapView = forwardRef<ComponentRef<typeof MapboxGl.MapView>, ComponentProps<typeof MapboxGl.MapView>>((props, ref) => {
+  const { localizeLabels = { locale: 'fr' }, ...rest } = props
+  return <MapboxGl.MapView ref={ref} localizeLabels={localizeLabels} {...rest} />
+})
+MapView.displayName = 'MapView'
 
 const UserLocation: ComponentType<UserLocationProps> = (props) => {
   // React-native: on ne transmet pas les props "web-only"/custom.
@@ -25,6 +31,7 @@ const UserLocation: ComponentType<UserLocationProps> = (props) => {
 
 const ExtendedMapboxGl = {
   ...MapboxGl,
+  MapView,
   UserLocation,
 } as unknown as ExtendedMapboxGl
 

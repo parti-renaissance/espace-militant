@@ -7,6 +7,7 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import cotisationIllu from '@/features_next/profil/assets/cotisation-illu.png'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
+import { HIT_SOURCES } from '@/services/hits/constants'
 
 import type { CommonMembershipCardProps } from './types'
 
@@ -17,7 +18,11 @@ const HeaderFrame = styled(XStack, {
 })
 
 export default function (props: CommonMembershipCardProps) {
-  const { isPending, open: openAdh } = useOpenExternalContent({ slug: 'adhesion', utm_campaign: 'profil' })
+  const { isPending, open: openAdh } = useOpenExternalContent({
+    slug: 'adhesion',
+    source: HIT_SOURCES.PAGE_PROFIL,
+    utm_campaign: 'profil',
+  })
   return (
     <VoxCard bg={props.full ? 'white' : '$yellow1'} inside>
       <HeaderFrame bg="$yellow1" borderRadius="$medium">

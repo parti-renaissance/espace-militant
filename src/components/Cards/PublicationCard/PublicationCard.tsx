@@ -12,6 +12,7 @@ import { ImageRenderer } from '@/features_next/publications/components/Editor/No
 import { ButtonRenderer } from '@/features_next/publications/components/Editor/NodeRenderer/ButtonRenderer'
 import { AttachmentRenderer } from '@/features_next/publications/components/Editor/NodeRenderer/AttachmentRenderer'
 import * as S from '@/features_next/publications/components/Editor/schemas/messageBuilderSchema'
+import { HIT_SOURCES, type HitSource } from '@/services/hits/constants'
 import { useMedia, XStack, YStack } from 'tamagui'
 
 export type PublicationCardProps = {
@@ -21,9 +22,18 @@ export type PublicationCardProps = {
   date?: string | null
   uuid?: string | null
   showFullContent?: boolean
+  hitSource?: HitSource
 }
 
-const PublicationCard = ({ title, description, author, date, uuid, showFullContent = false }: PublicationCardProps) => {
+const PublicationCard = ({
+  title,
+  description,
+  author,
+  date,
+  uuid,
+  showFullContent = false,
+  hitSource = HIT_SOURCES.PAGE_TIMELINE,
+}: PublicationCardProps) => {
   const media = useMedia()
 
   const renderContent = () => {
@@ -54,6 +64,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                       data={item as S.RichTextNode}
                       displayToolbar={false}
                       object_id={uuid || undefined}
+                      hitSource={hitSource}
                     />
                   )
                 }
@@ -65,6 +76,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                       data={item as S.ButtonNode}
                       displayToolbar={false}
                       allowHits={true}
+                      hitSource={hitSource}
                     />
                   )
                 }
@@ -107,6 +119,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                     displayToolbar={false}
                     numberOfLines={3}
                     object_id={uuid || undefined}
+                    hitSource={hitSource}
                   />
                 )}
               </YStack>
@@ -122,6 +135,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
                 displayToolbar={false}
                 numberOfLines={4}
                 object_id={uuid || undefined}
+                hitSource={hitSource}
               />
             )
           }
@@ -146,7 +160,7 @@ const PublicationCard = ({ title, description, author, date, uuid, showFullConte
         {renderContent()}
         { !showFullContent ? (
           <XStack px="$medium" pb="$medium" pt="$small" gap="$medium" justifyContent="flex-end">
-            <VoxButton variant="outlined" theme="blue" iconLeft={Eye} size="sm" disabled={!uuid} onPress={() => { router.push({ pathname: '/publications/[id]', params: { id: uuid ?? '', source: 'page_timeline' } }) }}>Lire</VoxButton>
+            <VoxButton variant="outlined" theme="blue" iconLeft={Eye} size="sm" disabled={!uuid} onPress={() => { router.push({ pathname: '/publications/[id]', params: { id: uuid ?? '', source: hitSource } }) }}>Lire</VoxButton>
           </XStack>
         ) : <YStack pb="$medium"></YStack>}
       </VoxCard.Content>

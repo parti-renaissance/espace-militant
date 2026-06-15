@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback, useEffect, useRef } from 'react'
+import React, { PropsWithChildren, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { Modal, Platform, Pressable, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ScrollView, useMedia, View } from 'tamagui'
@@ -21,20 +21,30 @@ interface ModalOrPageBaseProps extends PropsWithChildren {
 export default function ModalOrBottomSheet({ children, onClose, open, snapPoints, allowDrag }: ModalOrPageBaseProps) {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null)
   const viewport = useMedia()
+  const isDesktop = viewport.gtSm
+  const prevIsDesktop = useRef(isDesktop)
   const insets = useSafeAreaInsets()
 
   // for iOS only
   const keyboardHeight = useKeyboardHeight()
 
-  useEffect(() => {
-    if (bottomSheetModalRef.current) {
-      if (open) {
-        bottomSheetModalRef.current.present()
-      } else {
-        bottomSheetModalRef.current.close()
-      }
+  // Desktop uses <Modal>, mobile uses <BottomSheetModal> — switching viewport unmounts
+  // one without calling onClose, leaving open=true in the parent (clicks then no-op).
+  useLayoutEffect(() => {
+    if (prevIsDesktop.current !== isDesktop) {
+      prevIsDesktop.current = isDesktop
+      if (open) onClose?.()
     }
-  }, [open])
+  }, [isDesktop, open, onClose])
+
+  useEffect(() => {
+    if (isDesktop || !bottomSheetModalRef.current) return
+    if (open) {
+      bottomSheetModalRef.current.present()
+    } else {
+      bottomSheetModalRef.current.close()
+    }
+  }, [open, isDesktop])
 
   const onCloseModal = useCallback(() => {
     onClose?.()
@@ -43,7 +53,7 @@ export default function ModalOrBottomSheet({ children, onClose, open, snapPoints
 
   const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={1} />, [])
 
-  if (viewport.gtSm) {
+  if (isDesktop) {
     return (
       <Modal animationType={'fade'} transparent visible={!!open}>
         <View style={styles.centeredView}>

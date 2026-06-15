@@ -4,8 +4,11 @@ import type { PublicationCardProps } from '@/components/Cards/PublicationCard/Pu
 import type { SocialPostCardProps } from '@/components/Cards/SocialPostCard/SocialPostCard'
 import type { TransactionalCardProps } from '@/components/Cards/TransactionalCard'
 import type { EventItemProps } from '@/features_next/events/types'
+import type { HitSource } from '@/services/hits/constants'
 
-export type FeedCardProps =
+export type FeedCardProps = {
+  hitSource?: HitSource
+} & (
   | ({
       type: 'event'
     } & EventItemProps)
@@ -24,3 +27,4 @@ export type FeedCardProps =
   | ({
       type: 'social_post'
     } & SocialPostCardProps)
+)
