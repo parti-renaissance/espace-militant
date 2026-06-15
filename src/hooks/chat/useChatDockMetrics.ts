@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react'
-import { type LayoutChangeEvent, Platform } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import type { LayoutChangeEvent } from 'react-native'
 import { isWeb } from 'tamagui'
 
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
@@ -17,12 +16,11 @@ export type ChatDockMetrics = {
 const INITIAL_DOCK_HEIGHT_WEB = 180
 
 export function useChatDockMetrics(): ChatDockMetrics {
-  const insets = useSafeAreaInsets()
   const keyboardHeight = useKeyboardHeight()
   const [dockHeight, setDockHeight] = useState(isWeb ? INITIAL_DOCK_HEIGHT_WEB : 0)
 
   const keyboardOpen = !isWeb && keyboardHeight > 0
-  const dockBottomOffset = isWeb ? 0 : keyboardOpen ? keyboardHeight + 8 : Platform.OS === 'ios' ? insets.bottom : 16
+  const dockBottomOffset = isWeb ? 0 : keyboardOpen ? keyboardHeight + 8 : 0
   const scrollButtonBottom = dockBottomOffset + dockHeight + 8
   const contentPaddingBottom = dockBottomOffset + dockHeight + 16
 

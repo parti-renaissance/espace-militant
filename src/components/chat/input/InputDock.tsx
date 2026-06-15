@@ -1,5 +1,6 @@
 import { type ReactNode, type RefObject } from 'react'
-import type { LayoutChangeEvent } from 'react-native'
+import { StyleSheet, type LayoutChangeEvent } from 'react-native'
+import { BlurView } from 'expo-blur'
 import { isWeb, useMedia, YStack } from 'tamagui'
 import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef'
 import BotDisclaimer from './BotDisclaimer'
@@ -32,11 +33,12 @@ export function InputDock({ inputRef, value, isLoading, keyboardOpen, bottomOffs
       maxWidth={media.gtSm ? 650 : '100%'}
       alignSelf="center"
       zIndex={100}
-      bg="$textSurface"
       pb={media.gtMd ? '$medium' : 0}
       paddingHorizontal={media.sm ? 16 : 0}
       gap="$small"
     >
+      <BlurView intensity={18} tint="light" style={styles.blurBackground} pointerEvents="none" />
+      <YStack fullscreen  pointerEvents="none" />
       {topSlot ? <YStack mb={16}>{topSlot}</YStack> : null}
       <ChatInput
         inputRef={inputRef}
@@ -52,5 +54,11 @@ export function InputDock({ inputRef, value, isLoading, keyboardOpen, bottomOffs
     </YStack>
   )
 }
+
+const styles = StyleSheet.create({
+  blurBackground: {
+    ...StyleSheet.absoluteFillObject,
+  },
+})
 
 export default InputDock
