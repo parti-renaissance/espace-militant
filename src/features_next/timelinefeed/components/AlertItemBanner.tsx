@@ -41,6 +41,7 @@ const AlertImageTile = memo(({ alert, onPress, pressable = true }: { alert: Aler
     height={ALERT_IMAGE_SIZE}
     borderRadius={8}
     overflow="hidden"
+    backgroundColor="$gray100"
     cursor={pressable ? 'pointer' : undefined}
     onPress={pressable ? onPress : undefined}
     onMouseDown={pressable ? preventWebMouseSelection : undefined}
@@ -106,6 +107,7 @@ AlertMeetingImage.displayName = 'AlertMeetingImage'
 
 const AlertElectionCard = memo(({ alert, hitSource, fullWidth }: AlertVariantProps) => {
   const onShow = createOnShow(alert.cta_url, alert.cta_label, hitSource)
+  const isPressable = Boolean(alert.cta_url)
 
   return (
     <YStack
@@ -115,7 +117,19 @@ const AlertElectionCard = memo(({ alert, hitSource, fullWidth }: AlertVariantPro
       height={ALERT_IMAGE_SIZE}
       {...webNoSelectProps}
     >
-      <VoxCard borderRadius="$medium" flex={1} height={ALERT_IMAGE_SIZE} overflow="hidden" backgroundColor="$orange100" {...webNoSelectProps}>
+      <VoxCard
+        borderRadius="$medium"
+        flex={1}
+        height={ALERT_IMAGE_SIZE}
+        overflow="hidden"
+        backgroundColor="$orange100"
+        cursor={isPressable ? 'pointer' : undefined}
+        onPress={isPressable ? onShow : undefined}
+        onMouseDown={isPressable ? preventWebMouseSelection : undefined}
+        pressStyle={isPressable ? { opacity: 0.85 } : undefined}
+        hoverStyle={isPressable ? { opacity: 0.9 } : undefined}
+        {...webNoSelectProps}
+      >
         <VoxCard.Content flex={1} py={12} pl={12} pr={16}>
           <YStack gap="$small" flex={1} justifyContent="space-between">
             <YStack gap={12}>
@@ -137,8 +151,8 @@ const AlertElectionCard = memo(({ alert, hitSource, fullWidth }: AlertVariantPro
                 {alert.title}
               </Text.MD>
             </YStack>
-            <YStack>
-              <VoxButton variant="text" bg="white" theme="orange" size="xs" flexShrink={0} disabled={!alert.cta_url} onPress={onShow}>
+            <YStack pointerEvents="none">
+              <VoxButton variant="text" bg="white" theme="orange" size="xs" flexShrink={0} disabled={!isPressable}>
                 {alert.cta_label ?? 'Voir'}
               </VoxButton>
             </YStack>
