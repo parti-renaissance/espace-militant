@@ -6,7 +6,7 @@ import type { ChatError, ChatMessage } from '@/hooks/chat/types'
 
 import AssistantMessage from './AssistantMessage'
 import ErrorBubble from './ErrorBubble'
-import LoadingMessage from './LoadingMessage'
+import StreamingMessage from './StreamingMessage'
 import UserMessage from './UserMessage'
 
 type Props = {
@@ -74,7 +74,7 @@ export const MessageList = forwardRef<FlatList<ChatMessage>, Props>(function Mes
   const ListFooter = useMemo(
     () => (
       <>
-        {isLoading && <LoadingMessage streamedContent={streamedContent} />}
+        {isLoading && <StreamingMessage content={streamedContent} />}
         {error && <ErrorBubble error={error} isLoading={isLoading} onRetry={onRetry} />}
         {messages.length > 0 && <View style={{ height: spacerHeight }} />}
       </>
