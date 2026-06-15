@@ -17,7 +17,6 @@ type Args<T extends HasRoleAndId> = {
 export type ChatScrollToMessage = {
   scrollToBottom: () => void
   armScrollToLastUser: () => void
-  scrollToInitial: () => void
 }
 
 export function useChatScrollToMessage<T extends HasRoleAndId>({ ref, messages, streamedContent, isStreaming, webDomIdPrefix }: Args<T>): ChatScrollToMessage {
@@ -62,20 +61,9 @@ export function useChatScrollToMessage<T extends HasRoleAndId>({ ref, messages, 
     ref.current?.scrollToEnd({ animated: true })
   }, [ref, layoutRef])
 
-  const scrollToInitial = useCallback(() => {
-    const lastUserIndex = messages.findLastIndex((m) => m.role === 'user')
-    if (lastUserIndex < 0) return
-    if (isWeb && webDomIdPrefix) {
-      const el = document.getElementById(`${webDomIdPrefix}${messages[lastUserIndex].id}`)
-      if (el) el.scrollIntoView({ behavior: 'auto', block: 'start' })
-      return
-    }
-    ref.current?.scrollToIndex({ index: lastUserIndex, viewPosition: 0, animated: false })
-  }, [messages, ref, webDomIdPrefix])
-
   const armScrollToLastUser = useCallback(() => {
     pendingScrollAfterSubmitRef.current = true
   }, [])
 
-  return { scrollToBottom, armScrollToLastUser, scrollToInitial }
+  return { scrollToBottom, armScrollToLastUser }
 }
