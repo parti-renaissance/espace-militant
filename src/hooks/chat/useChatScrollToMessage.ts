@@ -9,8 +9,6 @@ type HasRoleAndId = { role: string; id: string }
 type Args<T extends HasRoleAndId> = {
   ref: RefObject<FlatList<T> | null>
   messages: T[]
-  streamedContent?: string
-  isStreaming?: boolean
   webDomIdPrefix?: string
 }
 
@@ -19,19 +17,9 @@ export type ChatScrollToMessage = {
   armScrollToLastUser: () => void
 }
 
-export function useChatScrollToMessage<T extends HasRoleAndId>({ ref, messages, streamedContent, isStreaming, webDomIdPrefix }: Args<T>): ChatScrollToMessage {
+export function useChatScrollToMessage<T extends HasRoleAndId>({ ref, messages, webDomIdPrefix }: Args<T>): ChatScrollToMessage {
   const { layoutRef } = useContext(ScrollContext)
   const pendingScrollAfterSubmitRef = useRef(false)
-
-  useEffect(() => {
-    if (!isStreaming) return
-    if (isWeb) {
-      const el = layoutRef?.current
-      if (el) el.scrollTo({ top: el.scrollHeight })
-      return
-    }
-    ref.current?.scrollToEnd({ animated: false })
-  }, [streamedContent, isStreaming, layoutRef, ref])
 
   useEffect(() => {
     if (!pendingScrollAfterSubmitRef.current) return
@@ -44,11 +32,11 @@ export function useChatScrollToMessage<T extends HasRoleAndId>({ ref, messages, 
         if (isWeb && webDomIdPrefix) {
           const el = document.getElementById(`${webDomIdPrefix}${lastUserMessage.id}`)
           if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            el.scrollIntoView({ behavior: 'auto', block: 'start' })
             return
           }
         }
-        ref.current?.scrollToIndex({ index: lastUserIndex, viewPosition: 0, animated: true })
+        ref.current?.scrollToIndex({ index: lastUserIndex, viewPosition: 0, animated: false })
       })
     })
   }, [messages, ref, webDomIdPrefix])
