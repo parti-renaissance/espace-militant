@@ -135,11 +135,13 @@ const TimelineFeedMain = () => {
   const header = useMemo(
     () => (
       <YStack gap={media.sm ? 8 : 16}>
-        <YStack gap={16} mt={16}>
-          {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
-          {hasLiveAlerts ? <LiveAlerts alerts={liveAlerts} /> : null}
-          {hasAlerts ? <AlertItemBanner alerts={bannerAlerts} /> : null}
-        </YStack>
+        {hasContentAboveTitle ? (
+          <YStack gap={16} mt={16}>
+            {shouldShowNotificationCard ? <NotificationSubscribeCard /> : null}
+            {hasLiveAlerts ? <LiveAlerts alerts={liveAlerts} /> : null}
+            {hasAlerts ? <AlertItemBanner alerts={bannerAlerts} /> : null}
+          </YStack>
+        ) : null}
         <XStack
           justifyContent="space-between"
           alignItems="center"
