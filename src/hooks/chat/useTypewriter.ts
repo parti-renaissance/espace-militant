@@ -1,7 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-const TICK_MS = 40
-const MAX_STEP = 16
+const TOKEN_FADE_MS = 5
+const SPACE_DELAY_MS = 10
+const PUNCTUATION_DELAY_MS = 15
+const SENTENCE_DELAY_MS = 3
+
+function getNextTokenEnd(text: string, start: number): number {
+  const codePoint = text.codePointAt(start)
+  if (codePoint === undefined) return start
+  return start + (codePoint > 0xffff ? 2 : 1)
+}
+
+function getTokenDelay(token: string): number {
+  if (/^\s$/.test(token)) return SPACE_DELAY_MS
+  if (/^[.!?…]$/.test(token)) return SENTENCE_DELAY_MS
+  if (/^[,;:]$/.test(token)) return PUNCTUATION_DELAY_MS
+  return TOKEN_FADE_MS
+}
 
 export type Typewriter = {
   display: string
@@ -17,6 +32,7 @@ export function useTypewriter(): Typewriter {
   const [busy, setBusy] = useState(false)
   const bufferRef = useRef('')
   const indexRef = useRef(0)
+  const delayRef = useRef(TOKEN_FADE_MS)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const finishRef = useRef<((text: string) => void) | null>(null)
 
@@ -30,6 +46,7 @@ export function useTypewriter(): Typewriter {
   const clearInternals = useCallback(() => {
     bufferRef.current = ''
     indexRef.current = 0
+    delayRef.current = TOKEN_FADE_MS
     finishRef.current = null
     setDisplay('')
   }, [])
@@ -39,14 +56,13 @@ export function useTypewriter(): Typewriter {
       timerRef.current = null
       const full = bufferRef.current
       if (indexRef.current < full.length) {
-        const remaining = full.length - indexRef.current
-        const step = Math.min(MAX_STEP, Math.max(1, Math.ceil(remaining / 50)))
-        const next = full.indexOf(' ', indexRef.current + step)
-        indexRef.current = next === -1 ? full.length : next + 1
+        const previousIndex = indexRef.current
+        indexRef.current = getNextTokenEnd(full, previousIndex)
+        delayRef.current = getTokenDelay(full.slice(previousIndex, indexRef.current))
         setDisplay(full.slice(0, indexRef.current))
       }
       if (indexRef.current < full.length) {
-        timerRef.current = setTimeout(tick, TICK_MS)
+        timerRef.current = setTimeout(tick, delayRef.current)
         return
       }
       const done = finishRef.current
@@ -78,7 +94,7 @@ export function useTypewriter(): Typewriter {
       }
       finishRef.current = onDone
       setBusy(true)
-      if (timerRef.current === null) timerRef.current = setTimeout(tick, TICK_MS)
+      if (timerRef.current === null) timerRef.current = setTimeout(tick, delayRef.current)
     },
     [clearInternals, tick],
   )

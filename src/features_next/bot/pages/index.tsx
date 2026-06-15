@@ -9,7 +9,6 @@ import type { ChatMessage } from '@/hooks/chat/types';
 import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics';
 import { useChatMessageActions } from '@/hooks/chat/useChatMessageActions';
 import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage';
-import { useInitialScroll } from '@/hooks/chat/useInitialScroll';
 import { useShowJumpToBottom } from '@/hooks/chat/useShowJumpToBottom';
 import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef';
 import { BOT_MESSAGE_MAX_LENGTH } from '@/services/bot/api';
@@ -26,15 +25,13 @@ export default function BotPage() {
   const { messages, input, handleInputChange, handleSubmit: rawHandleSubmit, isLoading, streamedContent, error, retry, stop, submit } = useBotChat()
   const { handleCopy, handleEdit } = useChatMessageActions({ inputRef, setInput: handleInputChange })
 
-  const { scrollToBottom, armScrollToLastUser, scrollToInitial } = useChatScrollToMessage({
+  const { scrollToBottom, armScrollToLastUser } = useChatScrollToMessage({
     ref: scrollViewRef,
     messages,
     streamedContent,
     isStreaming: isLoading,
     webDomIdPrefix: 'chat-msg-',
   })
-
-  useInitialScroll(scrollToInitial, messages.length > 0)
 
   const lastMessageId = messages.length > 0 ? messages[messages.length - 1].id : null
   const { show: showJumpToBottom, handleScroll: handleJumpScroll } = useShowJumpToBottom({ lastMessageId })
