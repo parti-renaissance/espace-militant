@@ -7,7 +7,8 @@ export { default as LayoutFlatList } from './Layout/LayoutFlatList'
 
 // Navigation components
 export { SideBar, SideBarArea, WIDTH_MILITANT, WIDTH_COLLAPSED, MARGINS, type SideBarState } from './Navigation/SideBar'
-export { default as TabBar } from './Navigation/TabBar'
+export { default as FloatingTabBar, type FloatingTabBarItem, type FloatingTabBarProps } from './Navigation/FloatingTabBar/FloatingTabBar'
+export { useFloatingTabBar, type UseFloatingTabBarOptions } from './Navigation/FloatingTabBar/useFloatingTabBar'
 export { NavItem, type NavItemProps } from './Navigation/NavItem'
 export { NavItemDropdown, type NavItemSubItem } from './Navigation/NavItemDropdown'
 export { default as NavSheet, type NavSheetRef } from './Navigation/NavSheet'

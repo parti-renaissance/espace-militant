@@ -1,18 +1,22 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { LayoutChangeEvent, LayoutRectangle, Platform, Pressable, StyleSheet, View } from 'react-native'
-import Animated, { type AnimatedStyle, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { LayoutRectangle, Pressable, StyleSheet, View } from 'react-native'
 import type { ViewStyle } from 'react-native'
-import { BlurView } from 'expo-blur'
-import { LinearGradient } from 'expo-linear-gradient'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, type AnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { getThemes, isWeb, XStack, YStack } from 'tamagui'
+import { LinearGradient } from 'expo-linear-gradient'
+import { isWeb, styled, useTheme, XStack, YStack } from 'tamagui'
 
-import NavSheet, { type NavSheetRef } from '@/components/AppStructure/Navigation/NavSheet'
 import { FeaturebaseFooterItems } from '@/components/AppStructure/Navigation/FeaturebaseFooterItems'
+import NavSheet, { type NavSheetRef } from '@/components/AppStructure/Navigation/NavSheet'
 import { ScopeSelector } from '@/components/AppStructure/Navigation/ScopeSelector'
 import Text from '@/components/base/Text'
+
 import type { NavItemConfig } from '@/config/navigationItems'
 import type { IconComponent } from '@/models/common.model'
+
+import { estimateTabBarLayerHeight, layout } from './floatingTabBarLayout'
+
+export { TABBAR_LAYER_HEIGHT } from './floatingTabBarLayout'
 
 type Theme = 'blue' | 'pink' | 'green' | 'orange'
 
@@ -27,8 +31,8 @@ export type FloatingTabBarItem = {
 export type FloatingTabBarProps = {
   items: FloatingTabBarItem[]
   initialActiveId?: string
+  activeId?: string
   onTabPress?: (id: string) => void
-  moreSheetItems?: NavItemConfig[]
   cadreSheetItems?: NavItemConfig[]
   cadreSheetHeader?: React.ReactNode
   cadreSheetFooter?: React.ReactNode
@@ -36,77 +40,72 @@ export type FloatingTabBarProps = {
   hide?: boolean
 }
 
-const springConfig = {
-  duration: 350,
-  dampingRatio: 0.75,
+const springConfig = { duration: 350, dampingRatio: 0.75 }
+
+const TabBarInset = styled(YStack, {
+  width: '100%',
+  paddingHorizontal: 24,
+  pointerEvents: 'box-none',
+})
+
+function useTabBarThemeColors() {
+  const theme = useTheme()
+
+  return useMemo(
+    () => ({
+      surfaceSunken: theme.gray100.val,
+      surfacePage: theme.textSurface?.val ?? theme.gray50.val,
+      selectionFill: theme.white3.val,
+      badgeRed: theme.red5.val,
+      inactiveColor: theme.textSecondary.val,
+    }),
+    [theme],
+  )
 }
 
-const SURFACE_SUNKEN = '#F6F0EA'
-const SURFACE_PAGE = '#FAF7F4'
-const SELECTION_FILL = '#FBF9F7'
-const PILL_BORDER = 'rgba(255, 255, 255, 0.85)'
-const TAB_HEIGHT = 56
-const PILL_PADDING = 4
-const TAB_OVERLAP = 8
-const BOTTOM_PADDING = 24
-const GRADIENT_FOOTER_PADDING_TOP = 48
+const TabBadge = ({ badge, bgColor }: { badge: number | boolean; bgColor: string }) => {
+  const isDot = badge === true
+  const label = typeof badge === 'number' ? (badge > 9 ? '9+' : String(badge)) : null
 
-const estimateTabBarLayerHeight = (bottomInset: number, hasFloatingContent: boolean) =>
-  FLOATING_TAB_BAR_PILL_HEIGHT + Math.max(BOTTOM_PADDING, bottomInset) + (hasFloatingContent ? 0 : GRADIENT_FOOTER_PADDING_TOP)
-
-export const FLOATING_TAB_BAR_PILL_HEIGHT = TAB_HEIGHT + PILL_PADDING * 2
-export const FLOATING_TAB_BAR_BOTTOM_PADDING = BOTTOM_PADDING
-export const FLOATING_TAB_BAR_DEFAULT_OFFSET = FLOATING_TAB_BAR_BOTTOM_PADDING + FLOATING_TAB_BAR_PILL_HEIGHT
-export const FLOATING_TAB_BAR_Z_INDEX = 100
-export const FLOATING_ACTION_Z_INDEX = 1
+  return (
+    <View style={[styles.badge, { backgroundColor: bgColor }, isDot ? styles.badgeDot : styles.badgeCount]}>
+      {!isDot && label && (
+        <Text style={styles.badgeText} semibold>
+          {label}
+        </Text>
+      )}
+    </View>
+  )
+}
 
 type TabProps = {
   item: FloatingTabBarItem
   isFocus: boolean
   isLast: boolean
-  onPressRef: React.MutableRefObject<((id: string) => void) | null>
-  onLayoutRef: React.MutableRefObject<((key: string, layout: LayoutRectangle) => void) | null>
+  onPress: (id: string) => void
+  onLayout: (key: string, layout: LayoutRectangle) => void
   inactiveColorVal: string
+  badgeBgColor: string
 }
 
-const TabBadge = ({ badge }: { badge: number | boolean }) => {
-  const isDot = badge === true
-  const label = typeof badge === 'number' ? (badge > 9 ? '9+' : String(badge)) : null
-
-  return (
-    <View style={[styles.badge, isDot ? styles.badgeDot : styles.badgeCount]}>
-      {!isDot && label ? (
-        <Text style={styles.badgeText} semibold>
-          {label}
-        </Text>
-      ) : null}
-    </View>
-  )
-}
-
-const Tab = ({ item, isFocus, isLast, onPressRef, onLayoutRef, inactiveColorVal }: TabProps) => {
+const Tab = ({ item, isFocus, isLast, onPress, onLayout, inactiveColorVal, badgeBgColor }: TabProps) => {
   const { id, label, icon: Icon, theme = 'blue', badge } = item
-  const themes = getThemes()
-  const activeColor = themes.light[`${theme}5`]?.val ?? themes.light.blue5?.val ?? '#0094FF'
+  const globalTheme = useTheme()
+  const activeColor = globalTheme[`${theme}5`]?.val ?? globalTheme.blue5.val
   const color = isFocus ? activeColor : inactiveColorVal
 
-  const onPress = useCallback(() => {
-    onPressRef.current?.(id)
-  }, [id, onPressRef])
-
-  const onLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      onLayoutRef.current?.(id, e.nativeEvent.layout)
-    },
-    [id, onLayoutRef],
-  )
-
   return (
-    <View style={[styles.tabSlot, !isLast && styles.tabSlotOverlap]} onLayout={onLayout}>
-      <Pressable accessibilityRole="button" onPress={onPress} style={styles.tabPressable}>
+    <View style={[styles.tabSlot, !isLast && styles.tabSlotOverlap]} onLayout={(e) => onLayout(id, e.nativeEvent.layout)}>
+      <Pressable
+        accessibilityRole="tab"
+        accessibilityState={{ selected: isFocus }}
+        accessibilityLabel={label}
+        onPress={() => onPress(id)}
+        style={styles.tabPressable}
+      >
         <View style={styles.iconWrapper}>
-          {Icon ? <Icon color={color} size={20} /> : null}
-          {badge != null ? <TabBadge badge={badge} /> : null}
+          {Icon && <Icon color={color} size={20} />}
+          {badge != null && <TabBadge badge={badge} bgColor={badgeBgColor} />}
         </View>
         <Text.XSM semibold color={color} textAlign="center" {...(isWeb ? { userSelect: 'none' } : {})}>
           {label}
@@ -115,234 +114,188 @@ const Tab = ({ item, isFocus, isLast, onPressRef, onLayoutRef, inactiveColorVal 
     </View>
   )
 }
-
 const MemoTab = React.memo(Tab)
 
-const SelectionIndicator = ({ style }: { style: AnimatedStyle<ViewStyle> }) => {
-  if (isWeb) {
-    return <Animated.View style={[styles.indicator, { backgroundColor: SELECTION_FILL }, style]} pointerEvents="none" />
-  }
-
-  return (
-    <Animated.View style={[styles.indicator, style]} pointerEvents="none">
-      <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
-      <View style={[StyleSheet.absoluteFill, styles.selectionOverlay]} />
-    </Animated.View>
-  )
-}
+const SelectionIndicator = ({ style, fillColor }: { style: AnimatedStyle<ViewStyle>; fillColor: string }) => (
+  <Animated.View style={[styles.indicator, { backgroundColor: fillColor }, style]} pointerEvents="none" />
+)
 
 export const FloatingTabBar = ({
   items,
   initialActiveId,
+  activeId,
   onTabPress,
-  moreSheetItems = [],
   cadreSheetItems = [],
   cadreSheetHeader,
   cadreSheetFooter,
   floatingContent,
   hide = false,
 }: FloatingTabBarProps) => {
-  const themes = getThemes()
-  const inactiveColor = themes.light.textSecondary.val
   const insets = useSafeAreaInsets()
-  const layoutsByKey = useRef(new Map<string, LayoutRectangle>())
+  const colors = useTabBarThemeColors()
+
   const position = useSharedValue(0)
   const indicatorWidth = useSharedValue(0)
 
-  const [activeRouteId, setActiveRouteId] = useState(initialActiveId ?? items[0]?.id ?? '')
+  const isControlled = activeId !== undefined
+  const [internalActiveId, setInternalActiveId] = useState(initialActiveId ?? items[0]?.id ?? '')
+  const activeRouteId = isControlled ? activeId : internalActiveId
   const [activeSpecialTab, setActiveSpecialTab] = useState<string | null>(null)
   const [tabBarOffset, setTabBarOffset] = useState(() => estimateTabBarLayerHeight(insets.bottom, Boolean(floatingContent)))
 
-  const moreSheetRef = useRef<NavSheetRef>(null)
-  const cadreSheetRef = useRef<NavSheetRef>(null)
-
-  const sheetRefs = useMemo(
-    () =>
-      ({
-        more: moreSheetRef,
-        cadreSheet: cadreSheetRef,
-      }) as Record<string, React.RefObject<NavSheetRef | null>>,
-    [],
-  )
-
   const activeTabId = activeSpecialTab ?? activeRouteId
 
-  const sheetProps = useMemo(
-    () => ({
-      behindTabBar: true as const,
-      tabBarOffset,
-    }),
-    [tabBarOffset],
-  )
+  const cadreSheetRef = useRef<NavSheetRef>(null)
+  const layoutsByKey = useRef(new Map<string, LayoutRectangle>())
+  const prevActiveRouteId = useRef(activeRouteId)
 
-  const cadreSheetListHeader =
-    cadreSheetHeader ?? (
-      <YStack paddingHorizontal={16} marginBottom={12}>
-        <ScopeSelector />
-      </YStack>
-    )
+  const latestPropsAndState = useRef({ activeRouteId, activeSpecialTab, isControlled, onTabPress })
+  latestPropsAndState.current = { activeRouteId, activeSpecialTab, isControlled, onTabPress }
 
-  const cadreSheetListFooter = cadreSheetFooter ?? <FeaturebaseFooterItems variant="button" />
-
-  const hasMoreSheet = items.some((item) => item.id === 'more') && moreSheetItems.length > 0
   const hasCadreSheet = items.some((item) => item.id === 'cadreSheet') && cadreSheetItems.length > 0
 
-  const applyIndicatorLayout = useCallback(
-    (layout: LayoutRectangle, animate: boolean) => {
-      if (animate) {
-        position.value = withSpring(layout.x, springConfig)
-        indicatorWidth.value = withSpring(layout.width, springConfig)
-        return
+  const animateToTab = useCallback(
+    (tabId: string, smooth = true) => {
+      const tabLayout = layoutsByKey.current.get(tabId)
+      if (!tabLayout) return
+
+      if (smooth) {
+        position.value = withSpring(tabLayout.x, springConfig)
+        indicatorWidth.value = withSpring(tabLayout.width, springConfig)
+      } else {
+        position.value = tabLayout.x
+        indicatorWidth.value = tabLayout.width
       }
-      position.value = layout.x
-      indicatorWidth.value = layout.width
     },
     [indicatorWidth, position],
   )
 
-  const animateToTab = useCallback(
-    (tabId: string) => {
-      const layout = layoutsByKey.current.get(tabId)
-      if (!layout) return
-      applyIndicatorLayout(layout, true)
-    },
-    [applyIndicatorLayout],
-  )
-
-  const closeAllSheets = useCallback(() => {
-    moreSheetRef.current?.close()
+  const closeCadreSheet = useCallback(() => {
     cadreSheetRef.current?.close()
-  }, [])
-
-  const handleSheetClose = useCallback((id?: string) => {
-    setActiveSpecialTab((current) => (current === id ? null : current))
   }, [])
 
   const handleTabPress = useCallback(
     (id: string) => {
-      const targetSheet = sheetRefs[id]
+      const { activeRouteId: currentRoute, activeSpecialTab: currentSpecial, isControlled: ctrl, onTabPress: cb } = latestPropsAndState.current
 
-      if (targetSheet && (id === 'more' ? hasMoreSheet : hasCadreSheet)) {
-        if (activeSpecialTab === id) {
-          targetSheet.current?.close()
+      if (id === 'cadreSheet' && hasCadreSheet) {
+        if (currentSpecial === 'cadreSheet') {
+          closeCadreSheet()
           setActiveSpecialTab(null)
-          return
-        }
-        if (activeSpecialTab && sheetRefs[activeSpecialTab]) {
-          sheetRefs[activeSpecialTab].current?.close()
-          targetSheet.current?.expand()
-          setActiveSpecialTab(id)
+        } else {
+          cadreSheetRef.current?.expand()
+          setActiveSpecialTab('cadreSheet')
           animateToTab(id)
-          return
         }
-        targetSheet.current?.expand()
-        setActiveSpecialTab(id)
-        animateToTab(id)
         return
       }
 
-      closeAllSheets()
+      closeCadreSheet()
       setActiveSpecialTab(null)
-      if (id === activeRouteId) return
 
-      setActiveRouteId(id)
+      if (id === currentRoute) return
+
+      if (!ctrl) setInternalActiveId(id)
       animateToTab(id)
-      onTabPress?.(id)
+      cb?.(id)
     },
-    [activeRouteId, activeSpecialTab, animateToTab, closeAllSheets, hasCadreSheet, hasMoreSheet, onTabPress, sheetRefs],
+    [animateToTab, closeCadreSheet, hasCadreSheet],
   )
-
-  const handleTabPressRef = useRef(handleTabPress)
-  useLayoutEffect(() => {
-    handleTabPressRef.current = handleTabPress
-  }, [handleTabPress])
 
   const saveLayoutToRef = useCallback(
-    (key: string, layout: LayoutRectangle) => {
-      layoutsByKey.current.set(key, layout)
-      if (key === activeTabId) {
-        applyIndicatorLayout(layout, false)
+    (key: string, tabLayout: LayoutRectangle) => {
+      const isFirstLayout = !layoutsByKey.current.has(key)
+      layoutsByKey.current.set(key, tabLayout)
+
+      if (key === activeTabId && isFirstLayout) {
+        animateToTab(key, false)
       }
     },
-    [activeTabId, applyIndicatorLayout],
+    [activeTabId, animateToTab],
   )
-  const handleSaveLayoutRef = useRef(saveLayoutToRef)
-  useLayoutEffect(() => {
-    handleSaveLayoutRef.current = saveLayoutToRef
-  }, [saveLayoutToRef])
 
-  React.useEffect(() => {
+  useEffect(() => {
     animateToTab(activeTabId)
   }, [activeTabId, animateToTab])
+
+  useEffect(() => {
+    if (prevActiveRouteId.current === activeRouteId) return
+    prevActiveRouteId.current = activeRouteId
+    setActiveSpecialTab(null)
+    closeCadreSheet()
+  }, [activeRouteId, closeCadreSheet])
 
   const indicatorAnimatedStyle = useAnimatedStyle(() => ({
     left: position.value,
     width: indicatorWidth.value,
   }))
 
-  const handleTabBarAreaLayout = useCallback((e: LayoutChangeEvent) => {
-    setTabBarOffset(e.nativeEvent.layout.height)
-  }, [])
+  const sheetProps = useMemo(() => ({ behindTabBar: true as const, tabBarOffset }), [tabBarOffset])
+  const layerHideStyle = hide ? styles.hiddenLayer : null
+  const bottomInset = Math.max(layout.bottomPadding, insets.bottom)
 
-  if (hide) return null
+  const cadreSheetListHeader = cadreSheetHeader ?? (
+    <YStack paddingHorizontal={16} marginBottom={12}>
+      <ScopeSelector />
+    </YStack>
+  )
+  const cadreSheetListFooter = cadreSheetFooter ?? <FeaturebaseFooterItems variant="button" />
 
   return (
     <>
-      {hasMoreSheet ? (
-        <NavSheet ref={moreSheetRef} onClose={() => handleSheetClose('more')} items={moreSheetItems} {...sheetProps} />
-      ) : null}
-
-      {hasCadreSheet ? (
-        <NavSheet
-          ref={cadreSheetRef}
-          onClose={() => handleSheetClose('cadreSheet')}
-          items={cadreSheetItems}
-          showLine
-          ListHeaderComponent={cadreSheetListHeader}
-          ListFooterComponent={cadreSheetListFooter}
-          {...sheetProps}
-        />
-      ) : null}
-
-      {floatingContent ? (
-        <View style={[styles.floatingActionLayer, { bottom: tabBarOffset + 12 }]} pointerEvents="box-none">
+      {floatingContent && (
+        <View style={[styles.floatingActionLayer, layerHideStyle, { bottom: tabBarOffset + 12 }]} pointerEvents={hide ? 'none' : 'box-none'}>
           <XStack width="100%" paddingHorizontal={24} justifyContent="flex-end" pointerEvents="box-none">
             {floatingContent}
           </XStack>
         </View>
-      ) : null}
+      )}
 
-      <View style={styles.tabBarLayer} pointerEvents="box-none" onLayout={handleTabBarAreaLayout}>
+      <View style={styles.sheetLayer} pointerEvents="box-none">
+        {hasCadreSheet && (
+          <NavSheet
+            ref={cadreSheetRef}
+            onClose={() => setActiveSpecialTab(null)}
+            items={cadreSheetItems}
+            showLine
+            ListHeaderComponent={cadreSheetListHeader}
+            ListFooterComponent={cadreSheetListFooter}
+            {...sheetProps}
+          />
+        )}
+      </View>
+
+      <View
+        style={[styles.tabBarLayer, layerHideStyle]}
+        pointerEvents={hide ? 'none' : 'box-none'}
+        onLayout={(e) => setTabBarOffset(e.nativeEvent.layout.height)}
+      >
         <LinearGradient
-          colors={['rgba(250, 247, 244, 0)', SURFACE_PAGE]}
+          colors={['transparent', colors.surfacePage]}
           start={[0, 0]}
           end={[0, 1]}
           style={[styles.gradientFooter, floatingContent ? styles.gradientFooterWithAction : null]}
           pointerEvents="box-none"
         >
-          <YStack
-            width="100%"
-            paddingHorizontal={24}
-            paddingBottom={Math.max(BOTTOM_PADDING, insets.bottom)}
-            pointerEvents="box-none"
-          >
-            <View style={styles.pill}>
-              <View style={styles.tabsRow}>
-                <SelectionIndicator style={indicatorAnimatedStyle} />
+          <TabBarInset paddingBottom={bottomInset}>
+            <View style={[styles.pill, { backgroundColor: colors.surfaceSunken }]}>
+              <View style={styles.tabsRow} accessibilityRole="tablist">
+                <SelectionIndicator style={indicatorAnimatedStyle} fillColor={colors.selectionFill} />
                 {items.map((item, index) => (
                   <MemoTab
                     key={item.id}
                     item={item}
                     isFocus={activeTabId === item.id}
                     isLast={index === items.length - 1}
-                    onPressRef={handleTabPressRef}
-                    onLayoutRef={handleSaveLayoutRef}
-                    inactiveColorVal={inactiveColor}
+                    onPress={handleTabPress}
+                    onLayout={saveLayoutToRef}
+                    inactiveColorVal={colors.inactiveColor}
+                    badgeBgColor={colors.badgeRed}
                   />
                 ))}
               </View>
             </View>
-          </YStack>
+          </TabBarInset>
         </LinearGradient>
       </View>
     </>
@@ -350,37 +303,20 @@ export const FloatingTabBar = ({
 }
 
 const styles = StyleSheet.create({
-  floatingActionLayer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    zIndex: FLOATING_ACTION_Z_INDEX,
-    elevation: FLOATING_ACTION_Z_INDEX,
-  },
-  tabBarLayer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: FLOATING_TAB_BAR_Z_INDEX,
-    elevation: FLOATING_TAB_BAR_Z_INDEX,
-  },
-  gradientFooter: {
-    width: '100%',
-    paddingTop: GRADIENT_FOOTER_PADDING_TOP,
-  },
-  gradientFooterWithAction: {
-    paddingTop: 0,
-  },
+  sheetLayer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10, elevation: 10 },
+  hiddenLayer: { opacity: 0, ...(isWeb ? { display: 'none' as const } : {}) },
+  floatingActionLayer: { position: 'absolute', left: 0, right: 0, zIndex: 1, elevation: 1 },
+  tabBarLayer: { position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 100, elevation: 100 },
+  gradientFooter: { width: '100%', paddingTop: layout.gradientHeight },
+  gradientFooterWithAction: { paddingTop: 0 },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: TAB_HEIGHT + PILL_PADDING * 2,
-    padding: PILL_PADDING,
+    height: layout.pillHeight,
+    padding: layout.pillPadding,
     borderRadius: 999,
-    backgroundColor: SURFACE_SUNKEN,
     borderWidth: 1,
-    borderColor: PILL_BORDER,
+    borderColor: 'rgba(255, 255, 255, 0.85)',
     shadowColor: 'rgba(0, 0, 0, 0.06)',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 1,
@@ -388,72 +324,16 @@ const styles = StyleSheet.create({
     elevation: 4,
     userSelect: 'none',
   },
-  tabsRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'relative',
-    height: TAB_HEIGHT,
-    userSelect: 'none',
-  },
-  indicator: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    height: TAB_HEIGHT,
-    borderRadius: 999,
-    overflow: 'hidden',
-    zIndex: 0,
-  },
-  tabSlot: {
-    flex: 1,
-    height: TAB_HEIGHT,
-    zIndex: 1,
-  },
-  tabSlotOverlap: {
-    marginRight: -TAB_OVERLAP,
-  },
-  tabPressable: {
-    flex: 1,
-    height: TAB_HEIGHT,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 2,
-    userSelect: 'none',
-  },
-  iconWrapper: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badge: {
-    position: 'absolute',
-    top: -2,
-    right: -8,
-    backgroundColor: '#E53935',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  badgeCount: {
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
-    paddingHorizontal: 4,
-  },
-  badgeText: {
-    color: 'white',
-    fontSize: 9,
-    lineHeight: 12,
-  },
-  selectionOverlay: {
-    backgroundColor: Platform.OS === 'ios' ? 'rgba(251, 249, 247, 0.75)' : SELECTION_FILL,
-  },
+  tabsRow: { flex: 1, flexDirection: 'row', alignItems: 'center', position: 'relative', height: layout.tabHeight, userSelect: 'none' },
+  indicator: { position: 'absolute', top: 0, left: 0, height: layout.tabHeight, borderRadius: 999, overflow: 'hidden', zIndex: 0 },
+  tabSlot: { flex: 1, height: layout.tabHeight, zIndex: 1 },
+  tabSlotOverlap: { marginRight: -layout.tabOverlap },
+  tabPressable: { flex: 1, height: layout.tabHeight, borderRadius: 999, alignItems: 'center', justifyContent: 'center', gap: 2, userSelect: 'none' },
+  iconWrapper: { position: 'relative', alignItems: 'center', justifyContent: 'center' },
+  badge: { position: 'absolute', top: -2, right: -8, alignItems: 'center', justifyContent: 'center' },
+  badgeDot: { width: 8, height: 8, borderRadius: 4 },
+  badgeCount: { minWidth: 16, height: 16, borderRadius: 8, paddingHorizontal: 4 },
+  badgeText: { color: 'white', fontSize: 9, lineHeight: 12 },
 })
 
 export default FloatingTabBar

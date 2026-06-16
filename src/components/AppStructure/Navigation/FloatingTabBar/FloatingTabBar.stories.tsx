@@ -9,7 +9,7 @@ import FloatingTabBar from './FloatingTabBar'
 import { mockCadreSheetFooter, mockCadreSheetHeader } from './mockComponents'
 import { mockCadreSheetItems, mockCadreTabItems, mockCadreTabItemsWithBadges, mockMembreTabItems } from './mockData'
 
-const SURFACE_PAGE = '#FAF7F4'
+const SURFACE_PAGE = '$textSurface'
 
 const SCROLL_BLOCK_TEMPLATES = [
   { color: '#D4E8F7', title: 'Actualités' },

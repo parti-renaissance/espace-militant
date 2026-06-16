@@ -33,9 +33,6 @@ interface NavSheetProps {
 }
 
 export const DEFAULT_NAV_SHEET_TAB_BAR_OFFSET = 64
-const OPEN_Z_INDEX_ABOVE_TAB_BAR = 10
-export const NAV_SHEET_Z_INDEX_BEHIND_TAB_BAR = 10
-const OPEN_Z_INDEX_BEHIND_TAB_BAR = NAV_SHEET_Z_INDEX_BEHIND_TAB_BAR
 const SCROLL_CONTENT_PADDING = 20
 
 export interface NavSheetRef {
@@ -61,7 +58,7 @@ const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(
     const bsRef = useRef<BottomSheet>(null)
     const zIndex = useSharedValue(-10)
     const [currentIndex, setCurrentIndex] = useState(-1)
-    const openZIndex = behindTabBar ? OPEN_Z_INDEX_BEHIND_TAB_BAR : OPEN_Z_INDEX_ABOVE_TAB_BAR
+    const openZIndex = behindTabBar ? 10 : 110
     const tabBarZoneHeight = behindTabBar ? tabBarOffset : 0
     const scrollBottomPadding = contentBottomPadding ?? (behindTabBar ? tabBarZoneHeight + SCROLL_CONTENT_PADDING : 20)
     const bottomInset = behindTabBar ? tabBarOffset : tabBarOffset + insets.bottom
@@ -188,13 +185,8 @@ const styles = StyleSheet.create({
   },
   containerBehindTabBar: {
     bottom: 0,
-    zIndex: 1,
-    elevation: 1,
   },
-  sheetBehindTabBar: {
-    zIndex: 1,
-    elevation: 1,
-  },
+  sheetBehindTabBar: {},
   sheetBackground: {
     backgroundColor: 'white',
     borderTopLeftRadius: 24,
