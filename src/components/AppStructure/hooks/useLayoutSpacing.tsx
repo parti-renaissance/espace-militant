@@ -1,8 +1,10 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia } from 'tamagui'
 
-/** Hauteur fixe du `TabBarFrame` (ConfigurableTabBar) — même valeur pour le padding sous le contenu. */
-export const TABBAR_HEIGHT_SM = 64
+import { TABBAR_LAYER_HEIGHT } from '@/components/AppStructure/Navigation/FloatingTabBar/floatingTabBarLayout'
+
+/** Reserved height for the floating tab bar layer (pill + bottom padding + gradient, excluding safe area). */
+export const TABBAR_HEIGHT_SM = TABBAR_LAYER_HEIGHT
 
 type SpacingConfig = {
   /** Active l'espacement de base et le safe spacing en haut */

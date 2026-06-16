@@ -1,14 +1,14 @@
 import React, { Children, isValidElement } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Href, useRouter } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
-import { ArrowLeft, EyeOff } from '@tamagui/lucide-icons'
+import { EyeOff } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { ContentBackButton } from '@/components/ContentBackButton'
+import { FloatingBackButton } from '@/components/FloatingBackButton'
 import { TipTapRenderer } from '@/components/TipTapRenderer'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { CategoryChip } from '@/features_next/events/components/list-item/CategoryChip'
@@ -36,26 +36,6 @@ const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 
       end={props.finish_at ? new Date(props.finish_at) : undefined}
       timeZone={props.time_zone}
     />
-  )
-}
-
-const FloatingBackButton = ({ withSafeArea = true }: { withSafeArea?: boolean }) => {
-  const router = useRouter()
-  const insets = useSafeAreaInsets()
-  const fallbackPath: Href = '/'
-
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back()
-    } else {
-      router.replace(fallbackPath)
-    }
-  }
-
-  return (
-    <YStack position="absolute" top={(withSafeArea ? insets.top : 0) + 16} left={16} zIndex={100}>
-      <VoxButton variant="contained" theme="gray" iconLeft={ArrowLeft} size="md" shrink onPress={handleBack} />
-    </YStack>
   )
 }
 

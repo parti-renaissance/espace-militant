@@ -1,6 +1,5 @@
-import React, { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { StyleSheet } from 'react-native'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { styled, YStack } from 'tamagui'
@@ -25,122 +24,173 @@ interface NavSheetProps {
   ListHeaderComponent?: React.ReactNode
   ListFooterComponent?: React.ReactNode
   showLine?: boolean
+  /** Reserved height at the bottom for the tab bar layer (includes safe area when measured from FloatingTabBar). */
+  tabBarOffset?: number
+  /** Extra padding at the bottom of the scroll content so items clear the tab bar. */
+  contentBottomPadding?: number
+  /** Keep the sheet behind the tab bar instead of covering it. */
+  behindTabBar?: boolean
 }
+
+export const DEFAULT_NAV_SHEET_TAB_BAR_OFFSET = 64
+const SCROLL_CONTENT_PADDING = 20
 
 export interface NavSheetRef {
   expand: () => void
   close: () => void
 }
 
-const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(({ onClose, items, ListHeaderComponent, ListFooterComponent, showLine = false }, ref) => {
-  const insets = useSafeAreaInsets()
-  const bsRef = useRef<BottomSheet>(null)
-  const zIndex = useSharedValue(-10)
-  const [currentIndex, setCurrentIndex] = useState(-1)
+const NavSheet = forwardRef<NavSheetRef, NavSheetProps>(
+  (
+    {
+      onClose,
+      items,
+      ListHeaderComponent,
+      ListFooterComponent,
+      showLine = false,
+      tabBarOffset = DEFAULT_NAV_SHEET_TAB_BAR_OFFSET,
+      contentBottomPadding,
+      behindTabBar = false,
+    },
+    ref,
+  ) => {
+    const insets = useSafeAreaInsets()
+    const bsRef = useRef<BottomSheet>(null)
+    const zIndex = useSharedValue(-10)
+    const [currentIndex, setCurrentIndex] = useState(-1)
+    const openZIndex = behindTabBar ? 10 : 110
+    const tabBarZoneHeight = behindTabBar ? tabBarOffset : 0
+    const scrollBottomPadding = contentBottomPadding ?? (behindTabBar ? tabBarZoneHeight + SCROLL_CONTENT_PADDING : 20)
+    const bottomInset = behindTabBar ? tabBarOffset : tabBarOffset + insets.bottom
+    const sheetBottomInset = behindTabBar ? 0 : insets.bottom
 
-  const handleSheetChange = useCallback((index: number) => {
-    setCurrentIndex(index)
-  }, [])
+    const isOpen = currentIndex >= 0
 
-  const [closeRequested, setCloseRequested] = useState(false)
+    const scrollContentContainerStyle = useMemo(
+      () => ({
+        width: '100%' as const,
+        paddingBottom: scrollBottomPadding,
+        paddingTop: 8,
+        ...(behindTabBar ? { flexGrow: 0 as const } : {}),
+      }),
+      [behindTabBar, scrollBottomPadding],
+    )
 
-  useEffect(() => {
-    if (!closeRequested) return
-    zIndex.value = -10
-    setCurrentIndex(-1)
-    setCloseRequested(false)
-  }, [closeRequested, zIndex])
+    const handleSheetChange = useCallback((index: number) => {
+      setCurrentIndex(index)
+    }, [])
 
-  const handleClose = useCallback(() => {
-    onClose?.()
-    setCloseRequested(true)
-  }, [onClose])
+    const [closeRequested, setCloseRequested] = useState(false)
 
-  useImperativeHandle(ref, () => {
-    return {
-      expand: () => {
-        zIndex.value = 10
-        setCurrentIndex(0)
-        bsRef.current?.expand()
-      },
-      close: () => {
-        bsRef.current?.close()
-        // zIndex et setCurrentIndex sont mis à jour dans handleClose (onClose) une fois l'animation terminée
-      },
-    }
-  })
+    useEffect(() => {
+      if (!closeRequested) return
+      zIndex.value = -10
+      setCurrentIndex(-1)
+      setCloseRequested(false)
+    }, [closeRequested, zIndex])
 
-  const styleContainer = useAnimatedStyle(() => {
-    return {
+    const handleClose = useCallback(() => {
+      onClose?.()
+      setCloseRequested(true)
+    }, [onClose])
+
+    useImperativeHandle(ref, () => {
+      return {
+        expand: () => {
+          zIndex.value = openZIndex
+          bsRef.current?.expand()
+        },
+        close: () => {
+          bsRef.current?.close()
+        },
+      }
+    })
+
+    const styleContainer = useAnimatedStyle(() => ({
       zIndex: zIndex.value,
-    }
-  })
+    }))
 
-  const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={1} />, [])
+    const renderBackdrop = useCallback(
+      (props: BottomSheetBackdropProps) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} />,
+      [],
+    )
 
-  return (
-    <Animated.View style={[styles.container, { bottom: 54 + insets.bottom + 10 }, styleContainer]}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+    return (
+      <Animated.View
+        pointerEvents={isOpen ? 'box-none' : 'none'}
+        style={[styles.container, behindTabBar ? styles.containerBehindTabBar : { bottom: bottomInset }, styleContainer]}
+      >
         <BottomSheet
           ref={bsRef}
-          index={currentIndex}
+          index={-1}
           onChange={handleSheetChange}
           backdropComponent={renderBackdrop}
           onClose={handleClose}
-          enablePanDownToClose
+          enablePanDownToClose={isOpen}
+          enableDynamicSizing
+          enableContentPanningGesture={isOpen && !behindTabBar}
+          enableHandlePanningGesture={isOpen}
           topInset={insets.top}
+          bottomInset={sheetBottomInset}
+          style={[
+            behindTabBar ? styles.sheetBehindTabBar : undefined,
+            !isOpen ? ({ pointerEvents: 'none' } as const) : undefined,
+          ]}
+          backgroundStyle={styles.sheetBackground}
           handleIndicatorStyle={{
             backgroundColor: '#D2DCE5',
             width: 48,
           }}
         >
-          <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
-            <YStack paddingVertical={8}>
-              {ListHeaderComponent && <YStack>{ListHeaderComponent}</YStack>}
-              <YStack gap={4} paddingHorizontal={16}>
-                {showLine && <Line />}
-                {items.map((item) => (
-                  <NavItem
-                    key={item.id}
-                    text={item.text}
-                    iconLeft={item.iconLeft}
-                    href={item.href}
-                    isNew={item.isNew}
-                    externalLink={item.externalLink}
-                    disabled={item.disabled}
-                    active={item.active}
-                    onPress={() => {
-                      item.onPress?.()
-                      bsRef.current?.close()
-                    }}
-                    theme={item.theme}
-                    frame={item.frame}
-                  />
-                ))}
-              </YStack>
-
-              {ListFooterComponent && <YStack>{ListFooterComponent}</YStack>}
+          <BottomSheetScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled contentContainerStyle={scrollContentContainerStyle}>
+            {ListHeaderComponent ? <YStack>{ListHeaderComponent}</YStack> : null}
+            <YStack gap={4} paddingHorizontal={16}>
+              {showLine ? <Line /> : null}
+              {items.map((item) => (
+                <NavItem
+                  key={item.id}
+                  text={item.text}
+                  iconLeft={item.iconLeft}
+                  href={item.href}
+                  isNew={item.isNew}
+                  externalLink={item.externalLink}
+                  disabled={item.disabled}
+                  active={item.active}
+                  onPress={() => {
+                    item.onPress?.()
+                    bsRef.current?.close()
+                  }}
+                  theme={item.theme}
+                  frame={item.frame}
+                />
+              ))}
             </YStack>
+
+            {ListFooterComponent ? <YStack>{ListFooterComponent}</YStack> : null}
           </BottomSheetScrollView>
         </BottomSheet>
-      </GestureHandlerRootView>
-    </Animated.View>
-  )
-})
+      </Animated.View>
+    )
+  },
+)
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'absolute',
-    pointerEvents: 'box-none',
     top: 0,
     left: 0,
     right: 0,
-    bottom: 54,
+    bottom: 0,
   },
-  contentContainer: {
-    width: '100%',
-    paddingBottom: 20,
+  containerBehindTabBar: {
+    bottom: 0,
+  },
+  sheetBehindTabBar: {},
+  sheetBackground: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
   },
 })
 

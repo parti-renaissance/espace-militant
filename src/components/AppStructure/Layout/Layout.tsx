@@ -5,11 +5,12 @@ import { isWeb, styled, useMedia, View, ViewProps, withStaticProperties, XStack,
 
 import useLayoutSpacing, { UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
 import { SideBar, SideBarState } from '@/components/AppStructure/Navigation/SideBar'
-import ConfigurableTabBar from '@/components/AppStructure/Navigation/TabBar'
+import FloatingTabBar from '@/components/AppStructure/Navigation/FloatingTabBar/FloatingTabBar'
+import { useFloatingTabBar } from '@/components/AppStructure/Navigation/FloatingTabBar/useFloatingTabBar'
 import { SignInButton, SignUpButton } from '@/components/Buttons/AuthButton'
 
 import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
-import { useCadreNavItems } from '@/config/navigationItems'
+import { useCadreNavItems, type NavItemConfig } from '@/config/navigationItems'
 import { useSession } from '@/ctx/SessionProvider'
 
 import Header from '../Header'
@@ -46,6 +47,11 @@ interface LayoutProps extends ViewProps {
   hideTabBar?: boolean
 }
 
+function LayoutMobileTabBar({ hide, navCadreItems }: { hide?: boolean; navCadreItems: NavItemConfig[] }) {
+  const tabBarProps = useFloatingTabBar({ hide, navCadreItems })
+  return <FloatingTabBar {...tabBarProps} />
+}
+
 const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) => {
   const media = useMedia()
   const cadreNavItems = useCadreNavItems()
@@ -68,7 +74,7 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
         {sidebarState && media.gtSm && <SideBar state={sidebarState} navCadreItems={cadreNavItems} />}
         {children}
       </LayoutWrapper>
-      {!media.gtSm && <ConfigurableTabBar hide={hideTabBar} navCadreItems={cadreNavItems} />}
+      {!media.gtSm && <LayoutMobileTabBar hide={hideTabBar} navCadreItems={cadreNavItems} />}
     </LayoutRoot>
   )
 }
@@ -116,8 +122,14 @@ const Container = ({
   const insets = useSafeAreaInsets()
   const layoutRef = useRef<HTMLDivElement>(null)
   const media = useMedia()
-  const { setHideSideBar, setHideTabBar, setSidebarState, setFloatingContent } = useLayoutContext()
+  const { setHideSideBar, setHideTabBar, setSidebarState, setFloatingContent, setPageScrollToTop } = useLayoutContext()
   const spacingValues = useLayoutSpacing({ left: true, right: true })
+
+  const scrollPageToTop = useCallback(() => {
+    if (isWeb && layoutRef.current) {
+      layoutRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [])
 
   useFocusEffect(
     useCallback(() => {
@@ -126,6 +138,14 @@ const Container = ({
       setHideTabBar(hideTabBar ?? false)
       setFloatingContent(floatingContent ?? null)
     }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, setFloatingContent, setSidebarState, sidebarState, floatingContent]),
+  )
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!isWeb) return
+      setPageScrollToTop(scrollPageToTop)
+      return () => setPageScrollToTop(null)
+    }, [scrollPageToTop, setPageScrollToTop]),
   )
 
   const scrollBehavior = alwaysShowScrollbar ? 'scroll' : 'auto'
