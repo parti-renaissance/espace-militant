@@ -24,7 +24,7 @@ export type UseFloatingTabBarOptions = {
 export function useFloatingTabBar({ hide = false, navCadreItems = cadreNavItems }: UseFloatingTabBarOptions = {}): FloatingTabBarProps {
   const router = useRouter()
   const pathname = usePathname()
-  const { floatingContent } = useLayoutContext()
+  const { floatingContent, pageScrollToTop } = useLayoutContext()
   const militantNavItems = useMilitantNavItems()
   const { data: userScopes } = useGetUserScopes({ enabled: true })
 
@@ -79,15 +79,24 @@ export function useFloatingTabBar({ hide = false, navCadreItems = cadreNavItems 
     (id: string) => {
       const config = getConfig(id)
       if (!config) return
+
+      const isCurrentTab = currentRouteId !== null && id === currentRouteId
+
+      if (isCurrentTab) {
+        pageScrollToTop()
+        return
+      }
+
       if (config.onPress) config.onPress()
       else if (config.href) router.navigate(config.href)
     },
-    [getConfig, router],
+    [currentRouteId, getConfig, pageScrollToTop, router],
   )
 
   return {
     items,
     activeId,
+    currentRouteId,
     onTabPress,
     cadreSheetItems,
     floatingContent,

@@ -32,6 +32,7 @@ export type FloatingTabBarProps = {
   items: FloatingTabBarItem[]
   initialActiveId?: string
   activeId?: string
+  currentRouteId?: string | null
   onTabPress?: (id: string) => void
   cadreSheetItems?: NavItemConfig[]
   cadreSheetHeader?: React.ReactNode
@@ -124,6 +125,7 @@ export const FloatingTabBar = ({
   items,
   initialActiveId,
   activeId,
+  currentRouteId,
   onTabPress,
   cadreSheetItems = [],
   cadreSheetHeader,
@@ -149,8 +151,8 @@ export const FloatingTabBar = ({
   const layoutsByKey = useRef(new Map<string, LayoutRectangle>())
   const prevActiveRouteId = useRef(activeRouteId)
 
-  const latestPropsAndState = useRef({ activeRouteId, activeSpecialTab, isControlled, onTabPress })
-  latestPropsAndState.current = { activeRouteId, activeSpecialTab, isControlled, onTabPress }
+  const latestPropsAndState = useRef({ activeRouteId, currentRouteId, activeSpecialTab, isControlled, onTabPress })
+  latestPropsAndState.current = { activeRouteId, currentRouteId, activeSpecialTab, isControlled, onTabPress }
 
   const hasCadreSheet = items.some((item) => item.id === 'cadreSheet') && cadreSheetItems.length > 0
 
@@ -176,7 +178,12 @@ export const FloatingTabBar = ({
 
   const handleTabPress = useCallback(
     (id: string) => {
-      const { activeRouteId: currentRoute, activeSpecialTab: currentSpecial, isControlled: ctrl, onTabPress: cb } = latestPropsAndState.current
+      const {
+        currentRouteId: matchedRoute,
+        activeSpecialTab: currentSpecial,
+        isControlled: ctrl,
+        onTabPress: cb,
+      } = latestPropsAndState.current
 
       if (id === 'cadreSheet' && hasCadreSheet) {
         if (currentSpecial === 'cadreSheet') {
@@ -193,7 +200,10 @@ export const FloatingTabBar = ({
       closeCadreSheet()
       setActiveSpecialTab(null)
 
-      if (id === currentRoute) return
+      if (matchedRoute != null && id === matchedRoute) {
+        cb?.(id)
+        return
+      }
 
       if (!ctrl) setInternalActiveId(id)
       animateToTab(id)

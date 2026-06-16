@@ -122,8 +122,14 @@ const Container = ({
   const insets = useSafeAreaInsets()
   const layoutRef = useRef<HTMLDivElement>(null)
   const media = useMedia()
-  const { setHideSideBar, setHideTabBar, setSidebarState, setFloatingContent } = useLayoutContext()
+  const { setHideSideBar, setHideTabBar, setSidebarState, setFloatingContent, setPageScrollToTop } = useLayoutContext()
   const spacingValues = useLayoutSpacing({ left: true, right: true })
+
+  const scrollPageToTop = useCallback(() => {
+    if (isWeb && layoutRef.current) {
+      layoutRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [])
 
   useFocusEffect(
     useCallback(() => {
@@ -132,6 +138,14 @@ const Container = ({
       setHideTabBar(hideTabBar ?? false)
       setFloatingContent(floatingContent ?? null)
     }, [hideSideBar, hideTabBar, setHideSideBar, setHideTabBar, setFloatingContent, setSidebarState, sidebarState, floatingContent]),
+  )
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!isWeb) return
+      setPageScrollToTop(scrollPageToTop)
+      return () => setPageScrollToTop(null)
+    }, [scrollPageToTop, setPageScrollToTop]),
   )
 
   const scrollBehavior = alwaysShowScrollbar ? 'scroll' : 'auto'

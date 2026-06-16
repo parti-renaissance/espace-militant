@@ -4,6 +4,7 @@ import { isWeb, YStack } from 'tamagui'
 
 import useLayoutSpacing, { type UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
 import { usePageLayoutScroll } from '@/components/AppStructure/hooks/usePageLayoutScroll'
+import { useRegisterPageScrollToTop } from '@/components/AppStructure/hooks/useRegisterPageScrollToTop'
 
 type LayoutScrollViewProps = Omit<ScrollViewProps, 'onEndReached'> & {
   onEndReached?: () => void
@@ -59,6 +60,16 @@ const LayoutScrollView = forwardRef<LayoutScrollViewRef, LayoutScrollViewProps>(
       onScroll,
       scrollEventThrottle: rest.scrollEventThrottle,
     })
+
+    const scrollToTop = useCallback(() => {
+      if (isWeb && layoutRef?.current) {
+        layoutRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+      } else {
+        scrollViewRef.current?.scrollTo({ y: 0, animated: true })
+      }
+    }, [layoutRef])
+
+    useRegisterPageScrollToTop(scrollToTop)
 
     // Expose scrollTo method via ref
     useImperativeHandle(

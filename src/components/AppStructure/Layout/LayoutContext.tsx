@@ -12,6 +12,8 @@ interface LayoutContextType {
   setHideSideBar: (hide: boolean) => void
   floatingContent: ReactNode | null
   setFloatingContent: (content: ReactNode | null) => void
+  pageScrollToTop: () => void
+  setPageScrollToTop: (handler: (() => void) | null) => void
 }
 
 export const LayoutContext = createContext<LayoutContextType>({
@@ -23,6 +25,8 @@ export const LayoutContext = createContext<LayoutContextType>({
   setHideSideBar: () => {},
   floatingContent: null,
   setFloatingContent: () => {},
+  pageScrollToTop: () => {},
+  setPageScrollToTop: () => {},
 })
 
 export const useLayoutContext = () => useContext(LayoutContext)
