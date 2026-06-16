@@ -7,6 +7,7 @@ import { HelpingHand } from '@tamagui/lucide-icons'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import { FloatingBackButton } from '@/components/FloatingBackButton'
 import DeleteAccountModal from '@/components/DeleteAccountModal/DeleteAccountModal'
 import ProfilBlock from '@/components/ProfilBlock'
 import VoxCard from '@/components/VoxCard/VoxCard'
@@ -39,6 +40,7 @@ const DashboardContent = () => {
 
   return (
     <>
+      {media.sm && <FloatingBackButton fallbackPath="/" />}
       <LayoutScrollView>
         <YStack gap="$medium" flex={1} pt={media.sm ? 8 + insets.top : undefined}>
           <ProfilBlock />
