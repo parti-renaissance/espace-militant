@@ -178,12 +178,7 @@ export const FloatingTabBar = ({
 
   const handleTabPress = useCallback(
     (id: string) => {
-      const {
-        currentRouteId: matchedRoute,
-        activeSpecialTab: currentSpecial,
-        isControlled: ctrl,
-        onTabPress: cb,
-      } = latestPropsAndState.current
+      const { currentRouteId: matchedRoute, activeSpecialTab: currentSpecial, isControlled: ctrl, onTabPress: cb } = latestPropsAndState.current
 
       if (id === 'cadreSheet' && hasCadreSheet) {
         if (currentSpecial === 'cadreSheet') {
@@ -281,7 +276,7 @@ export const FloatingTabBar = ({
         onLayout={(e) => setTabBarOffset(e.nativeEvent.layout.height)}
       >
         <LinearGradient
-          colors={['transparent', colors.surfacePage]}
+          colors={['rgba(255, 255, 255, 0)', colors.surfacePage]}
           start={[0, 0]}
           end={[0, 1]}
           style={[styles.gradientFooter, floatingContent ? styles.gradientFooterWithAction : null]}
@@ -317,7 +312,7 @@ const styles = StyleSheet.create({
   hiddenLayer: { opacity: 0, ...(isWeb ? { display: 'none' as const } : {}) },
   floatingActionLayer: { position: 'absolute', left: 0, right: 0, zIndex: 1, elevation: 1 },
   tabBarLayer: { position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 100, elevation: 100 },
-  gradientFooter: { width: '100%', paddingTop: layout.gradientHeight },
+  gradientFooter: { width: '100%', paddingTop: layout.gradientTopPadding },
   gradientFooterWithAction: { paddingTop: 0 },
   pill: {
     flexDirection: 'row',
