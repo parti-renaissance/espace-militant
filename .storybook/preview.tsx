@@ -1,4 +1,5 @@
 import React from 'react'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { YStack } from 'tamagui'
 
 /** @type{import("@storybook/react").Preview} */
@@ -15,11 +16,13 @@ const preview = {
 
   decorators: [
     (Story) => (
-      <YStack flex={1} width="100%" backgroundColor="$white1" justifyContent="center" alignItems="center">
-        <YStack flex={1} width="100%" $gtSm={{ maxWidth: 800 }} backgroundColor="$white1" justifyContent="center" alignItems="center">
-          <Story />
+      <GestureHandlerRootView style={{ flex: 1, width: '100%' }}>
+        <YStack flex={1} width="100%" backgroundColor="$white1" justifyContent="center" alignItems="center">
+          <YStack flex={1} width="100%" $gtSm={{ maxWidth: 800 }} backgroundColor="$white1" justifyContent="center" alignItems="center">
+            <Story />
+          </YStack>
         </YStack>
-      </YStack>
+      </GestureHandlerRootView>
     ),
   ],
 }
