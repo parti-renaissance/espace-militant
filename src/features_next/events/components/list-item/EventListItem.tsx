@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Href, useRouter } from 'expo-router'
 import { useMedia, View, XStack } from 'tamagui'
 import { Eye, EyeOff } from '@tamagui/lucide-icons'
@@ -106,4 +107,7 @@ const EventListItem = ({ event, userUuid, source }: EventItemProps) => {
   return <BaseEventListItem event={event} userUuid={userUuid} source={source} />
 }
 
-export default EventListItem
+export default memo(
+  EventListItem,
+  (prev, next) => prev.event.uuid === next.event.uuid && prev.userUuid === next.userUuid && prev.source === next.source,
+)
