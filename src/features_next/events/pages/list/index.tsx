@@ -24,6 +24,7 @@ import HubSideContent from '@/features_next/events/components/feed-layout/SideCo
 import { HubFeedRow } from '@/features_next/events/components/list-item/HubFeedRow'
 import { eventFiltersState, type HubItemTypeFilter } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection, isEventPast } from '@/features_next/events/utils'
+import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { HIT_SOURCES } from '@/services/hits/constants'
@@ -32,8 +33,6 @@ import { hubKeys, useHubItemsInfiniteQuery, usePinnedHubItemsInfiniteQuery } fro
 import { mapHubItemsToPinnedEvents, mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
 import type { RestHubItem } from '@/services/hub/schema'
 import { useGetProfil } from '@/services/profile/hook'
-
-import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
 
 import { MapListToggle } from '../../components/feed-layout/MapListToggle'
 import { HubOrganizeCategoryModal } from '../hub/components/HubOrganizeCategoryModal'
@@ -455,9 +454,9 @@ const HubFeed = () => {
             hasMore={hasNextPage ?? false}
             contentContainerStyle={feedContentContainerStyle}
             removeClippedSubviews={Platform.OS === 'android'}
-            windowSize={21}
-            initialNumToRender={10}
-            maxToRenderPerBatch={10}
+            windowSize={6}
+            initialNumToRender={4}
+            maxToRenderPerBatch={9}
             ListEmptyComponent={
               showSkeleton ? (
                 <HubListSkeleton />
