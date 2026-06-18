@@ -13,8 +13,19 @@ import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/Sign
 
 export default function SignupVerificationEmailDesktopScreen() {
   const insets = useSafeAreaInsets()
-  const { email, firstName, inlineError, isActivating, requiresManualLogin, needsRedirect, onActivate, onStartEditingCode, onSignIn } =
-    useSignupVerificationEmailScreen()
+  const {
+    email,
+    firstName,
+    inlineError,
+    isActivating,
+    isChangingEmail,
+    requiresManualLogin,
+    needsRedirect,
+    onActivate,
+    onStartEditingCode,
+    onChangeEmail,
+    onSignIn,
+  } = useSignupVerificationEmailScreen()
 
   if (needsRedirect) {
     return <Redirect href={AuthRoutes.INSCRIPTION} />
@@ -33,9 +44,11 @@ export default function SignupVerificationEmailDesktopScreen() {
             firstName={firstName}
             inlineError={inlineError}
             isActivating={isActivating}
+            isChangingEmail={isChangingEmail}
             requiresManualLogin={requiresManualLogin}
             onActivate={onActivate}
             onStartEditingCode={onStartEditingCode}
+            onChangeEmail={onChangeEmail}
             onSignIn={onSignIn}
           />
         }
