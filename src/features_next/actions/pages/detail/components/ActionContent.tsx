@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Href, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
-import { ArrowLeft, Clock9, PenLine, XCircle, Zap } from '@tamagui/lucide-icons'
+import { Clock9, PenLine, XCircle, Zap } from '@tamagui/lucide-icons'
 import { isBefore } from 'date-fns'
 import { capitalize } from 'lodash'
 
@@ -12,6 +12,7 @@ import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { SubscribeButton } from '@/components/Cards'
 import { ContentBackButton } from '@/components/ContentBackButton'
+import { FloatingBackButton } from '@/components/FloatingBackButton'
 import { DetailShareGroup } from '@/components/ShareGroup/DetailShareGroup'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { formatActionDetailTitle } from '@/features_next/actions/utils/formatActionDetailTitle'
@@ -24,26 +25,6 @@ import ParticipantAvatar from './ParticipantAvatar'
 
 export type ActionContentProps = {
   data: RestActionFull
-}
-
-const FloatingBackButton = () => {
-  const router = useRouter()
-  const insets = useSafeAreaInsets()
-  const fallbackPath: Href = '/'
-
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back()
-    } else {
-      router.replace(fallbackPath)
-    }
-  }
-
-  return (
-    <YStack position="absolute" top={insets.top + 16} left={16} zIndex={100}>
-      <VoxButton variant="contained" theme="gray" iconLeft={ArrowLeft} size="md" shrink onPress={handleBack} />
-    </YStack>
-  )
 }
 
 type ActionInnerProps = {

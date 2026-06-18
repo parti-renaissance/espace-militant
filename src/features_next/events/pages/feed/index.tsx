@@ -9,10 +9,15 @@ import useLayoutSpacing from '@/components/AppStructure/hooks/useLayoutSpacing'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutFlatList from '@/components/AppStructure/Layout/LayoutFlatList'
 import BigSwitch, { type OptionsArray } from '@/components/base/BigSwitch'
-import TrackImpressionWeb from '@/components/TrackImpressionWeb'
-import EventListItem from '@/features_next/events/components/list-item/EventListItem'
-import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
 import { QueryBoundary } from '@/components/QueryBoundary'
+import TrackImpressionWeb from '@/components/TrackImpressionWeb'
+import type { EmptyStateReason } from '@/features_next/events/components/feed-layout/EmptyStateSection'
+import { EmptyStateSection } from '@/features_next/events/components/feed-layout/EmptyStateSection'
+import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
+import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
+import { FeedSectionHeader } from '@/features_next/events/components/feed-layout/SectionHeader'
+import HubSideContent from '@/features_next/events/components/feed-layout/SideContent'
+import EventListItem from '@/features_next/events/components/list-item/EventListItem'
 import { eventFiltersState } from '@/features_next/events/store/filterStore'
 import { groupEventsBySection } from '@/features_next/events/utils'
 
@@ -23,12 +28,6 @@ import { RestItemEvent, RestPublicItemEvent } from '@/services/events/schema'
 import { HIT_SOURCES } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 import { useGetProfil } from '@/services/profile/hook'
-
-import type { EmptyStateReason } from '@/features_next/events/components/feed-layout/EmptyStateSection'
-import { EmptyStateSection } from '@/features_next/events/components/feed-layout/EmptyStateSection'
-import { FeedSectionHeader } from '@/features_next/events/components/feed-layout/SectionHeader'
-import HubSideContent from '@/features_next/events/components/feed-layout/SideContent'
-import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
 
 const EVENTS_SWITCH_OPTIONS: OptionsArray = [
   { label: 'Tous', value: 'events' },
@@ -298,9 +297,9 @@ const EventFeed = () => {
           hasMore={hasNextPage ?? false}
           contentContainerStyle={feedContentContainerStyle}
           removeClippedSubviews={Platform.OS === 'android'}
-          windowSize={21}
-          initialNumToRender={10}
-          maxToRenderPerBatch={10}
+          windowSize={6}
+          initialNumToRender={4}
+          maxToRenderPerBatch={4}
           ListEmptyComponent={
             showSkeleton ? (
               <HubListSkeleton />

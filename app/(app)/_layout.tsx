@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { Stack } from 'expo-router'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
@@ -48,6 +48,7 @@ export default function AppNewLayout() {
   const [hideTabBar, setHideTabBar] = useState(false)
   const [hideSideBar, setHideSideBar] = useState(false)
   const [floatingContent, setFloatingContent] = useState<React.ReactNode | null>(null)
+  const pageScrollToTopRef = useRef<(() => void) | null>(null)
 
   const setSidebarStateOptimized = useCallback((newState: SideBarState) => {
     setSidebarState((prev) => (prev === newState ? prev : newState))
@@ -65,6 +66,14 @@ export default function AppNewLayout() {
     setFloatingContent((prev) => (prev === newValue ? prev : newValue))
   }, [])
 
+  const setPageScrollToTop = useCallback((handler: (() => void) | null) => {
+    pageScrollToTopRef.current = handler
+  }, [])
+
+  const pageScrollToTop = useCallback(() => {
+    pageScrollToTopRef.current?.()
+  }, [])
+
   const contextValue = useMemo(
     () => ({
       sidebarState,
@@ -75,12 +84,16 @@ export default function AppNewLayout() {
       setHideSideBar: setHideSideBarOptimized,
       floatingContent,
       setFloatingContent: setFloatingContentOptimized,
+      pageScrollToTop,
+      setPageScrollToTop,
     }),
     [
       sidebarState,
       hideTabBar,
       hideSideBar,
       floatingContent,
+      pageScrollToTop,
+      setPageScrollToTop,
       setSidebarStateOptimized,
       setHideTabBarOptimized,
       setHideSideBarOptimized,

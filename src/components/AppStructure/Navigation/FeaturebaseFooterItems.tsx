@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import { YStack } from 'tamagui'
 import { CircleHelp, LifeBuoy, RefreshCcw } from '@tamagui/lucide-icons'
 
@@ -48,7 +48,12 @@ export const FeaturebaseFooterItems = ({ variant, collapsed }: FeaturebaseFooter
 
   if (variant === 'button') {
     return (
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 32, paddingLeft: 16, paddingTop: 16 }}>
+      <ScrollView
+        horizontal
+        nestedScrollEnabled
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 8, paddingRight: 32, paddingLeft: 16, paddingTop: 16 }}
+      >
         {FEATUREBASE_ITEMS.map((item) => (
           <VoxButton key={item.text} variant="outlined" theme="gray" iconLeft={item.icon} onPress={() => handleItemPress(item)}>
             {item.text}

@@ -211,6 +211,9 @@ const TimelineFeedMain = () => {
       contentContainerStyle={{
         gap: getToken('$medium', 'space'),
       }}
+      windowSize={6}
+      initialNumToRender={4}
+      maxToRenderPerBatch={9}
       ListFooterComponent={
         hasNextPage ? (
           <YStack p="$medium" pb="$large">
