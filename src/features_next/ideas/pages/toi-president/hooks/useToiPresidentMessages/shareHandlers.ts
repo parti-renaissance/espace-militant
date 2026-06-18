@@ -1,6 +1,5 @@
 import { TOI_PRESIDENT_SHARE_MESSAGE } from '../../config'
 import { stripBase64Prefix } from '../../utils'
-
 import { DEFAULT_IMAGE_MIME, SHARE_FILE_NAME } from './constants'
 import type { Handler, Msg } from './types'
 

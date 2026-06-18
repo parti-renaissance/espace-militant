@@ -1,4 +1,4 @@
-import { startTransition, Suspense, useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useState } from 'react'
 import { Linking } from 'react-native'
 import { useRouter } from 'expo-router'
 import { XStack, YStack } from 'tamagui'
@@ -12,6 +12,7 @@ import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenO
 import { DoubleSquare } from '@/features_next/profil/pages/instances/components/icons'
 
 import clientEnv from '@/config/clientEnv'
+import { useDeferredRender } from '@/hooks/useDeferredRender'
 import { useShareOrCopy } from '@/hooks/useShareOrCopy'
 import { openExternalLink } from '@/utils/linkHandler'
 
@@ -40,13 +41,7 @@ function useSoutenirCallToActionCards(userId?: string) {
   const { openOrganiserModal } = useOpenOrganiserEvenement()
   const { isAuth, redirectToSignup } = useRequireAuth()
   const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
-  const [showSecondaryCards, setShowSecondaryCards] = useState(false)
-
-  useEffect(() => {
-    startTransition(() => {
-      setShowSecondaryCards(true)
-    })
-  }, [])
+  const showSecondaryCards = useDeferredRender()
 
   const handleDeposerUneIdee = useCallback(() => {
     if (!isAuth) {

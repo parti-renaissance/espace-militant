@@ -51,14 +51,12 @@ export default function SoutenirScreen() {
   const isSm = media.sm
 
   return (
-    <Layout.Container>
-      <Layout.Main maxWidth={892}>
-        <LayoutScrollView padding={isSm ? { top: false } : true}>
-          <YStack backgroundColor="$gray50" p={isSm ? 0 : '$medium'}>
-            {media.gtMd ? <SoutenirDesktopScreen isSm={isSm} userId={userId} /> : <SoutenirMobileScreen isSm={isSm} userId={userId} />}
-          </YStack>
-        </LayoutScrollView>
-      </Layout.Main>
-    </Layout.Container>
+    <Layout.Main maxWidth={892}>
+      <LayoutScrollView padding={isSm ? { top: false } : true}>
+        <YStack backgroundColor="$gray50" p={isSm ? 0 : '$medium'}>
+          {media.gtMd ? <SoutenirDesktopScreen isSm={isSm} userId={userId} /> : <SoutenirMobileScreen isSm={isSm} userId={userId} />}
+        </YStack>
+      </LayoutScrollView>
+    </Layout.Main>
   )
 }

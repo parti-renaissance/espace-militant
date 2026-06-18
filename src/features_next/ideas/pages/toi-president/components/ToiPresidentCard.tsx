@@ -1,18 +1,13 @@
-import { ComponentProps } from 'react';
-import { Image } from 'expo-image';
-import { useMedia, XStack, YStack } from 'tamagui';
-import { LinearGradient } from '@tamagui/linear-gradient';
-import { Dices, Share2 } from '@tamagui/lucide-icons';
+import { ComponentProps } from 'react'
+import { Image } from 'expo-image'
+import { useMedia, XStack, YStack } from 'tamagui'
+import { LinearGradient } from '@tamagui/linear-gradient'
+import { Dices, Share2 } from '@tamagui/lucide-icons'
 
+import { VoxButton } from '@/components/Button'
+import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
 
-
-import { VoxButton } from '@/components/Button';
-import CallToActionCard from '@/components/CallToActionCard/CallToActionCard';
-
-
-
-import GAME_IMAGE from '../assets/game-card.jpg';
-
+import GAME_IMAGE from '../assets/game-card.jpg'
 
 export type ToiPresidentCardProps = ComponentProps<typeof YStack> & {
   onPlay?: () => void

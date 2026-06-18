@@ -2,16 +2,18 @@ import { Platform, useWindowDimensions } from 'react-native'
 import { Image } from 'expo-image'
 import { XStack, YStack } from 'tamagui'
 import { ArrowUpRight, BotMessageSquare, Sparkles } from '@tamagui/lucide-icons'
+
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
-import NUIT_IMAGE from '../assets/nuit-ia-badge.gif'
 
-export type BotQuestionCardProps = {
+import NUIT_IMAGE from '@/features_next/ideas/assets/nuit-ia-badge.gif'
+
+export type IdeesBotQuestionCardProps = {
   onPress?: () => void
   badge?: string
 }
 
-export default function BotQuestionCard({ onPress, badge = 'Nuit' }: BotQuestionCardProps) {
+export default function IdeesBotQuestionCard({ onPress, badge = 'Nuit' }: IdeesBotQuestionCardProps) {
   const { width: windowWidth } = useWindowDimensions()
   const hideRobot = Platform.OS === 'web' && windowWidth <= 1065
 
@@ -83,14 +85,7 @@ export default function BotQuestionCard({ onPress, badge = 'Nuit' }: BotQuestion
           <Text.MD flex={1} color="$gray600" numberOfLines={1}>
             Posez votre question ici
           </Text.MD>
-          <VoxButton
-            size="md"
-            shrink
-            iconLeft={ArrowUpRight}
-            onPress={onPress}
-            theme="purple"
-            variant="contained"
-          />
+          <VoxButton size="md" shrink iconLeft={ArrowUpRight} onPress={onPress} theme="purple" variant="contained" />
         </XStack>
       </YStack>
     </YStack>
