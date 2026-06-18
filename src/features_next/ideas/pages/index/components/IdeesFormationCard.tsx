@@ -7,7 +7,7 @@ import { useRequireAuth } from '@/components/RequireAuth'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { HIT_SOURCES } from '@/services/hits/constants'
 
-export default function FormationCard() {
+export default function IdeesFormationCard() {
   const { isAuth, redirectToSignup } = useRequireAuth()
   const { isPending, open: openFormation } = useOpenExternalContent({
     slug: 'formation',

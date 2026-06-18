@@ -1,5 +1,4 @@
 import type { ToiPresidentMessage } from '../../utils'
-
 import { shareGeneric, shareProfile } from './shareHandlers'
 import type { BridgeContext, Handler, Msg } from './types'
 import { withHit } from './withHit'

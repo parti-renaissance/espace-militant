@@ -1,6 +1,6 @@
-import type { ToiPresidentMessage } from '../../utils'
-
 import { HIT_SOURCES } from '@/services/hits/constants'
+
+import type { ToiPresidentMessage } from '../../utils'
 import type { Handler } from './types'
 
 export function withHit<M extends ToiPresidentMessage>(hitPayloadOf: (message: M) => Record<string, unknown>, inner?: Handler<M>): Handler<M> {
