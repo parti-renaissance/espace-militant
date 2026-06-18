@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react'
 import type { WebViewMessageEvent } from 'react-native-webview'
 
+import { useWindowMessage } from '@/features_next/ideas/pages/toi-president/hooks/useWindowMessage'
+
 import useShareApi from '@/hooks/useShareApi'
-import { useWindowMessage } from '@/features_next/ideas/toiPresident/hooks/useWindowMessage'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 
 import { ALLOWED_ORIGINS, getToiPresidentShareUrl } from '../config'
 import { parseToiPresidentMessage } from '../utils'
-
-import { HIT_SOURCES } from '@/services/hits/constants'
 import { dispatchMessage } from './useToiPresidentMessages/registry'
 
 export function useToiPresidentMessages() {

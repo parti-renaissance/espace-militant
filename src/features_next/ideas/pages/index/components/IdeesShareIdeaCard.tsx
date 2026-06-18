@@ -3,11 +3,11 @@ import { Lightbulb } from '@tamagui/lucide-icons'
 import { VoxButton } from '@/components/Button'
 import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
 
-export type ShareIdeaCardProps = {
+export type IdeesShareIdeaCardProps = {
   onPress?: () => void
 }
 
-export default function ShareIdeaCard({ onPress }: ShareIdeaCardProps) {
+export default function IdeesShareIdeaCard({ onPress }: IdeesShareIdeaCardProps) {
   return (
     <CallToActionCard
       icon={Lightbulb}

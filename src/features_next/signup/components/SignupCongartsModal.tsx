@@ -5,8 +5,8 @@ import { VoxButton } from '@/components/Button'
 import Chip from '@/components/Chip/Chip'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import Title from '@/components/Title/Title'
-import ToiPresidentCard from '@/features_next/ideas/toiPresident/components/ToiPresidentCard'
-import { useToiPresidentActions } from '@/features_next/ideas/toiPresident/hooks/useToiPresidentActions'
+import ToiPresidentCard from '@/features_next/ideas/pages/toi-president/components/ToiPresidentCard'
+import { useToiPresidentActions } from '@/features_next/ideas/pages/toi-president/hooks/useToiPresidentActions'
 
 type SignupCongartsModalProps = {
   isOpen: boolean

@@ -1,4 +1,4 @@
-import clientEnv from '@/config/clientEnv';
+import clientEnv from '@/config/clientEnv'
 
 export const UUID_PARAM = 'uuid'
 export const SHARE_URL_PARAM = 'share_url'

@@ -6,7 +6,7 @@ import { Dices } from '@tamagui/lucide-icons'
 import Header from '@/components/AppStructure/Header'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { RequireAuth } from '@/components/RequireAuth'
-import ToiPresidentGameScreen from '@/features_next/ideas/toiPresident/page'
+import ToiPresidentGameScreen from '@/features_next/ideas/pages/toi-president'
 
 import * as metatags from '@/config/metatags'
 
