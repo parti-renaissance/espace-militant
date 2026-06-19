@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@10play/react-native-web-webview": "^0.0.3",
-    "@10play/tentap-editor": "^0.6.1",
+    "@10play/tentap-editor": "1.0.1",
     "@eslint/js": "^10.0.0",
     "@friendlycaptcha/sdk": "^0.2.0",
     "@gorhom/bottom-sheet": "^5.2.6",

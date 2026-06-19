@@ -71,7 +71,6 @@
             "forceStaticLinking": [
               "RNFBApp",
               "RNFBMessaging",
-              "rnmapbox-maps",
               "MapboxMaps",
               "MapboxCoreMaps",
               "MapboxCommon",
@@ -137,8 +136,7 @@
         {
           "RNMapboxMapsImpl": "mapbox"
         }
-      ],
-      "./plugins/withIosMapboxFirebaseFix.cjs"
+      ]
     ],
     "extra": {
       "eas_update_version": "9",
