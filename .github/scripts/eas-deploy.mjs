@@ -38,7 +38,11 @@ async function actionHandler() {
         break
       }
       case 'build': {
-        const expoCommandBase = `eas build --non-interactive --no-wait --platform ${platform}`
+        const clearCacheFlag = process.env.EAS_CLEAR_CACHE === 'true' ? ' --clear-cache' : ''
+        const expoCommandBase = `eas build --non-interactive --no-wait --platform ${platform}${clearCacheFlag}`
+        if (clearCacheFlag) {
+          console.log(chalk.yellow('EAS build cache will be cleared.'))
+        }
         if (process.env.WORKFLOW_ENVIRONMENT === 'production') {
           console.log(chalk.magenta('Will do a build on production env...'))
           await aExec(`${expoCommandBase} --profile production --auto-submit`)

@@ -66,17 +66,6 @@
       [
         "expo-build-properties",
         {
-          "ios": {
-            "useFrameworks": "static",
-            "forceStaticLinking": [
-              "RNFBApp",
-              "RNFBMessaging",
-              "MapboxMaps",
-              "MapboxCoreMaps",
-              "MapboxCommon",
-              "Turf"
-            ]
-          },
           "android": {
             "playServicesLocationVersion": "21.0.1",
             "enableProguardInReleaseBuilds": true,
