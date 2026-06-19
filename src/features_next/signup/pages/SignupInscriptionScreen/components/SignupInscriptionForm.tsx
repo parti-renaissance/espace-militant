@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useImperativeHandle, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react'
 import { Linking, Pressable } from 'react-native'
 import { XStack, YStack } from 'tamagui'
 import { AlertTriangle, MapPin } from '@tamagui/lucide-icons'
@@ -8,7 +8,6 @@ import { Controller, useForm } from 'react-hook-form'
 import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
-import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import FriendlyCaptchaWidget from '@/features_next/signup/pages/SignupInscriptionScreen/components/FriendlyCaptchaWidget'
 import { useSignupSessionStore } from '@/features_next/signup/store/signup-session-store'
@@ -34,16 +33,17 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
   const [formError, setFormError] = useState<string | null>(null)
   const { mutateAsync: signup } = useSignup()
   const { signIn } = useSession()
+  const sessionEmail = useSignupSessionStore((s) => s.email)
   const setEmail = useSignupSessionStore((s) => s.setEmail)
   const setFirstName = useSignupSessionStore((s) => s.setFirstName)
   const startResendCooldown = useSignupSessionStore((s) => s.startResendCooldown)
   const redirectUri = useSignupSessionStore((s) => s.redirectUri)
   const referrerCode = useSignupSessionStore((s) => s.ref)
 
-  const { control, handleSubmit, setError } = useForm<SignupInscriptionFormValues>({
+  const { control, handleSubmit, setError, setValue } = useForm<SignupInscriptionFormValues>({
     defaultValues: {
       first_name: '',
-      email: '',
+      email: sessionEmail,
       postal_code: '',
       email_opt_in: false,
       cgu_accepted: false,
@@ -51,6 +51,10 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
     resolver: zodResolver(SignupInscriptionFormSchema),
     mode: 'onSubmit',
   })
+
+  useEffect(() => {
+    setValue('email', sessionEmail)
+  }, [sessionEmail, setValue])
 
   const handleCaptchaToken = useCallback((token: string) => {
     setRecaptchaToken(token)

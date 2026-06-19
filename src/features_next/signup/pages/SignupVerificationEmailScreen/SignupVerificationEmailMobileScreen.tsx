@@ -7,8 +7,19 @@ import SignupVerificationEmailFooter from '@/features_next/signup/pages/SignupVe
 import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/SignupVerificationEmailScrollBody'
 
 export default function SignupVerificationEmailMobileScreen() {
-  const { email, firstName, inlineError, isActivating, requiresManualLogin, needsRedirect, onActivate, onStartEditingCode, onSignIn } =
-    useSignupVerificationEmailScreen()
+  const {
+    email,
+    firstName,
+    inlineError,
+    isActivating,
+    isChangingEmail,
+    requiresManualLogin,
+    needsRedirect,
+    onActivate,
+    onStartEditingCode,
+    onChangeEmail,
+    onSignIn,
+  } = useSignupVerificationEmailScreen()
 
   if (needsRedirect) {
     return <Redirect href={AuthRoutes.INSCRIPTION} />
@@ -24,9 +35,11 @@ export default function SignupVerificationEmailMobileScreen() {
         firstName={firstName}
         inlineError={inlineError}
         isActivating={isActivating}
+        isChangingEmail={isChangingEmail}
         requiresManualLogin={requiresManualLogin}
         onActivate={onActivate}
         onStartEditingCode={onStartEditingCode}
+        onChangeEmail={onChangeEmail}
         onSignIn={onSignIn}
       />
     </SignupMobileScrollShell>
