@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Platform, StyleSheet } from 'react-native'
-import { useVideoPlayer, VideoView } from 'expo-video'
 import { Image } from 'expo-image'
-import { Volume2, VolumeX } from '@tamagui/lucide-icons'
+import { useVideoPlayer, VideoView } from 'expo-video'
 import { Circle, YStack } from 'tamagui'
+import { Volume2, VolumeX } from '@tamagui/lucide-icons'
 
-import { useIsContentInFeedView, useVideoFeedStore } from '@/features_next/video/store/videoFeedStore'
 import { getVideoAspectRatio } from '@/features_next/video/components/VideoPlayer.types'
 import { VideoPlayIcon } from '@/features_next/video/components/VideoPlayIcon'
 import { safePlayerAction, useExpoPlayerAutoPlayback } from '@/features_next/video/helpers/safePlayerPlayback'
 import { shouldShowVideoPlayIcon } from '@/features_next/video/helpers/videoPlaybackUi'
+import { useIsContentInFeedView, useVideoFeedStore } from '@/features_next/video/store/videoFeedStore'
 
 export type FeedVideoPlayerProps = {
   contentId: string
@@ -110,13 +110,7 @@ function FeedVideoLayer({ contentId, hlsUrl, videoId, isSlideViewable, contentFi
 
   return (
     <>
-      <VideoView
-        style={styles.video}
-        player={player}
-        nativeControls={false}
-        contentFit={contentFit}
-        pointerEvents="none"
-      />
+      <VideoView style={styles.video} player={player} nativeControls={false} contentFit={contentFit} pointerEvents="none" />
       <YStack
         position="absolute"
         top={0}
@@ -195,13 +189,7 @@ export default function FeedVideoPlayer({
       <YStack flex={1} position="relative" width="100%" height="100%">
         <Image source={{ uri: thumbnailUrl }} style={styles.thumbnailBackground} contentFit="cover" pointerEvents="none" />
         {shouldMountPlayer ? (
-          <FeedVideoLayer
-            contentId={contentId}
-            hlsUrl={hlsUrl}
-            videoId={videoId}
-            isSlideViewable={isSlideViewable}
-            contentFit={contentFit}
-          />
+          <FeedVideoLayer contentId={contentId} hlsUrl={hlsUrl} videoId={videoId} isSlideViewable={isSlideViewable} contentFit={contentFit} />
         ) : null}
         {showManualPlayOverlay ? (
           <YStack
@@ -229,12 +217,12 @@ export default function FeedVideoPlayer({
 
 const styles = StyleSheet.create({
   thumbnailBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },
   video: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
     zIndex: 1,

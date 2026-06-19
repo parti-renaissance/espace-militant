@@ -2,7 +2,7 @@
   "expo": {
     "slug": "vox",
     "scheme": "vox",
-    "version": "7.0.1",
+    "version": "7.1.0",
     "owner": "parti-renaissance",
     "runtimeVersion": {
       "policy": "appVersion"
@@ -75,14 +75,7 @@
             "useFrameworks": "static",
             "usePrecompiledModules": false,
             "buildReactNativeFromSource": true,
-            "forceStaticLinking": [
-              "RNFBApp",
-              "RNFBMessaging",
-              "MapboxMaps",
-              "MapboxCoreMaps",
-              "MapboxCommon",
-              "Turf"
-            ]
+            "forceStaticLinking": ["RNFBApp", "RNFBMessaging", "MapboxMaps", "MapboxCoreMaps", "MapboxCommon", "Turf"]
           }
         }
       ],
@@ -142,7 +135,7 @@
       ]
     ],
     "extra": {
-      "eas_update_version": "9",
+      "eas_update_version": "0",
 
       "router": {
         "origin": false

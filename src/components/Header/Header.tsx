@@ -1,9 +1,22 @@
 import React from 'react'
 import { Platform, SafeAreaView as RNSafeAreaView, TouchableWithoutFeedback } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { type NativeStackHeaderProps } from 'expo-router'
-import { Link, router, usePathname, useSegments } from 'expo-router'
-import { isWeb, Spinner, Stack, styled, ThemeableStack, useMedia, useStyle, View, withStaticProperties, XStack, XStackProps, YStackProps } from 'tamagui'
+import { Link, router, usePathname, useSegments, type NativeStackHeaderProps } from 'expo-router'
+import {
+  isWeb,
+  Spinner,
+  Stack,
+  styled,
+  ThemeableStack,
+  useMedia,
+  useStyle,
+  View,
+  withStaticProperties,
+  XStack,
+  XStackProps,
+  YStack,
+  YStackProps,
+} from 'tamagui'
 import { ArrowLeft } from '@tamagui/lucide-icons'
 import { capitalize } from 'lodash'
 
@@ -13,8 +26,8 @@ import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import { ROUTES } from '@/config/routes'
 import { useSession } from '@/ctx/SessionProvider'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
-import { HIT_SOURCES } from '@/services/hits/constants'
 import type { IconComponent } from '@/models/common.model'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { useGetProfil } from '@/services/profile/hook'
 
 import Text from '../base/Text'
@@ -181,8 +194,10 @@ export const ProfileNav = (props: XStackProps) => {
       {!profilIsLoading ? (
         <XStack alignItems="center" gap="$medium" {...props}>
           <DisabledNotificationBell />
-          <Link href="/profil">
-            <ProfileView fullName={`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`} imageUrl={profile?.image_url ?? undefined} />
+          <Link href="/profil" asChild={!isWeb}>
+            <YStack cursor="pointer">
+              <ProfileView fullName={`${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`} imageUrl={profile?.image_url ?? undefined} />
+            </YStack>
           </Link>
         </XStack>
       ) : (

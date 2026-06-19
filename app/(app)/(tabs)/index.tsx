@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Link, Redirect, useLocalSearchParams, useRouter } from 'expo-router'
 import Head from 'expo-router/head'
-import { useMedia, XStack } from 'tamagui'
+import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import { QrCode } from '@tamagui/lucide-icons'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
@@ -25,11 +25,11 @@ const HomeHeader = () => {
 
   return (
     <VoxHeader justifyContent="space-between" backgroundColor="$textSurface" borderWidth={0}>
-      <XStack flex={1} flexBasis={0}>
-        <Link href="/" replace>
+      <Link href="/" replace asChild={!isWeb}>
+        <YStack cursor="pointer">
           <Attal2027Illustration cursor="pointer" />
-        </Link>
-      </XStack>
+        </YStack>
+      </Link>
       <ProfileNav flex={1} flexBasis={0} justifyContent="flex-end" />
     </VoxHeader>
   )

@@ -39,6 +39,7 @@ export const HubFeedRow = memo(({ row, userUuid, source }: HubFeedRowProps) => {
     <ActionCard
       payload={row.payload}
       isMyAction={row.editable}
+      hitSource={source}
       onShow={() => {
         if (row.payload.id) {
           router.push({ pathname: '/actions/[id]', params: { id: row.payload.id } })

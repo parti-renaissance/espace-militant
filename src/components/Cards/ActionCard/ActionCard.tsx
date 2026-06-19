@@ -11,6 +11,8 @@ import VoxCard, { VoxCardAttendeesProps, VoxCardAuthorProps, VoxCardDateProps, V
 
 import { useSubscribeAction, useUnsubscribeAction } from '@/services/actions/hook'
 import { ActionStatus } from '@/services/actions/schema'
+import { HIT_SOURCES, type HitSource } from '@/services/hits/constants'
+import { useHits } from '@/services/hits/hook'
 
 export type ActionVoxCardProps = {
   onShow?: () => void
@@ -27,16 +29,51 @@ export type ActionVoxCardProps = {
     VoxCardAttendeesProps
 } & VoxCardFrameProps
 
+type ActionCardProps = ActionVoxCardProps & {
+  hitSource?: HitSource
+  asFull?: boolean
+  children?: React.ReactNode
+}
+
 const ActionCard = ({
   payload,
   onShow,
   onEdit,
   asFull = false,
   isMyAction,
+  hitSource = HIT_SOURCES.PAGE_TIMELINE,
   ...props
-}: ActionVoxCardProps & { asFull?: boolean; children?: React.ReactNode }) => {
+}: ActionCardProps) => {
+  const { trackClick } = useHits()
   const isPassed = isBefore(payload.date.start, new Date())
   const isCancelled = payload.status === ActionStatus.CANCELLED
+
+  const handleShow = () => {
+    if (payload.id) {
+      trackClick({
+        object_type: 'action',
+        object_id: payload.id,
+        source: hitSource,
+        target_url: `/actions/${payload.id}`,
+        button_name: 'Voir',
+      })
+    }
+    onShow?.()
+  }
+
+  const handleEdit = () => {
+    if (payload.id) {
+      trackClick({
+        object_type: 'action',
+        object_id: payload.id,
+        source: hitSource,
+        target_url: `/actions/${payload.id}/modifier`,
+        button_name: 'Gérer',
+      })
+    }
+    onEdit?.()
+  }
+
   return (
     <VoxCard {...props}>
       <VoxCard.Content>
@@ -57,15 +94,15 @@ const ActionCard = ({
         {!asFull && <VoxCard.Author author={payload.author} />}
         {!asFull && (
           <XStack justifyContent="space-between">
-            <VoxButton variant="outlined" theme="green" onPress={onShow} iconLeft={Eye}>
+            <VoxButton variant="outlined" theme="green" onPress={handleShow} iconLeft={Eye}>
               Voir
             </VoxButton>
             {isMyAction ? (
-              <VoxButton disabled={isCancelled || isPassed} variant="outlined" theme="pink" iconLeft={Sparkle} onPress={onEdit}>
+              <VoxButton disabled={isCancelled || isPassed} variant="outlined" theme="pink" iconLeft={Sparkle} onPress={handleEdit}>
                 Gérer
               </VoxButton>
             ) : (
-              <SubscribeButton disabled={isCancelled || isPassed} isRegister={payload.isSubscribed} id={payload.id} />
+              <SubscribeButton disabled={isCancelled || isPassed} isRegister={payload.isSubscribed} id={payload.id} hitSource={hitSource} />
             )}
           </XStack>
         )}
@@ -75,9 +112,22 @@ const ActionCard = ({
   )
 }
 
-export function SubscribeButton({ isRegister, id, large, disabled }: { isRegister: boolean; id?: string; large?: boolean; disabled?: boolean }) {
+export function SubscribeButton({
+  isRegister,
+  id,
+  large,
+  disabled,
+  hitSource = HIT_SOURCES.PAGE_TIMELINE,
+}: {
+  isRegister: boolean
+  id?: string
+  large?: boolean
+  disabled?: boolean
+  hitSource?: HitSource
+}) {
   const { isAuth, signIn } = useSession()
   const pathname = usePathname()
+  const { trackClick } = useHits()
   const subscribe = useSubscribeAction(id)
   const unsubscribe = useUnsubscribeAction(id)
   const isloaderSub = subscribe.isPending || unsubscribe.isPending
@@ -86,6 +136,14 @@ export function SubscribeButton({ isRegister, id, large, disabled }: { isRegiste
     if (!isAuth) {
       signIn({ state: pathname })
       return
+    }
+    if (id) {
+      trackClick({
+        object_type: 'action',
+        object_id: id,
+        source: hitSource,
+        button_name: isRegister ? 'Me désinscrire' : 'Participer',
+      })
     }
     isRegister ? unsubscribe.mutate() : subscribe.mutate()
   }, 300)
