@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { StyleSheet } from 'react-native'
-import { useVideoPlayer, VideoView } from 'expo-video'
 import { Image } from 'expo-image'
+import { useVideoPlayer, VideoView } from 'expo-video'
 import { YStack } from 'tamagui'
 
 import { safePlayerAction, useExpoPlayerAutoPlayback } from '@/features_next/video/helpers/safePlayerPlayback'
@@ -43,13 +43,7 @@ function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount
     setAutoplayFailed(true)
   }, [])
 
-  useExpoPlayerAutoPlayback(
-    player,
-    shouldAttemptAutoPlay && !isUserPaused,
-    undefined,
-    handleAutoplayFailed,
-    autoPlay,
-  )
+  useExpoPlayerAutoPlayback(player, shouldAttemptAutoPlay && !isUserPaused, undefined, handleAutoplayFailed, autoPlay)
 
   const pendingManualStartRef = useRef(startOnMount)
 
@@ -75,12 +69,7 @@ function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount
     return () => subscription.remove()
   }, [active, player, startOnMount])
 
-  const showPlayIcon = shouldShowVideoPlayIcon(
-    isPlaying,
-    isUserPaused,
-    autoplayFailed && shouldAttemptAutoPlay,
-    shouldAttemptAutoPlay || startOnMount,
-  )
+  const showPlayIcon = shouldShowVideoPlayIcon(isPlaying, isUserPaused, autoplayFailed && shouldAttemptAutoPlay, shouldAttemptAutoPlay || startOnMount)
 
   const handleVideoPress = useCallback(() => {
     safePlayerAction(() => {
@@ -98,13 +87,7 @@ function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount
   return (
     <YStack flex={1} position="relative" width="100%" height="100%">
       <Image source={{ uri: thumbnailUrl }} style={styles.thumbnailBackground} contentFit="cover" pointerEvents="none" />
-      <VideoView
-        style={styles.video}
-        player={player}
-        nativeControls={controls}
-        contentFit={contentFit}
-        pointerEvents={controls ? 'auto' : 'none'}
-      />
+      <VideoView style={styles.video} player={player} nativeControls={controls} contentFit={contentFit} pointerEvents={controls ? 'auto' : 'none'} />
       {!controls ? (
         <YStack
           position="absolute"
@@ -196,12 +179,12 @@ export default function VideoPlayer({
 
 const styles = StyleSheet.create({
   thumbnailBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },
   video: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
     zIndex: 1,

@@ -57,7 +57,7 @@ export function InputDock({ inputRef, value, isLoading, keyboardOpen, bottomOffs
 
 const styles = StyleSheet.create({
   blurBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
 })
 
