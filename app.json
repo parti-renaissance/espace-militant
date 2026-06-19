@@ -70,9 +70,23 @@
             "playServicesLocationVersion": "21.0.1",
             "enableProguardInReleaseBuilds": true,
             "enableShrinkResourcesInReleaseBuilds": true
+          },
+          "ios": {
+            "useFrameworks": "static",
+            "usePrecompiledModules": false,
+            "buildReactNativeFromSource": true,
+            "forceStaticLinking": [
+              "RNFBApp",
+              "RNFBMessaging",
+              "MapboxMaps",
+              "MapboxCoreMaps",
+              "MapboxCommon",
+              "Turf"
+            ]
           }
         }
       ],
+      "./plugins/withIosModularHeaders.cjs",
       [
         "expo-splash-screen",
         {
