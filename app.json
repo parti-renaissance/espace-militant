@@ -66,18 +66,6 @@
       [
         "expo-build-properties",
         {
-          "ios": {
-            "useFrameworks": "static",
-            "forceStaticLinking": [
-              "RNFBApp",
-              "RNFBMessaging",
-              "rnmapbox-maps",
-              "MapboxMaps",
-              "MapboxCoreMaps",
-              "MapboxCommon",
-              "Turf"
-            ]
-          },
           "android": {
             "playServicesLocationVersion": "21.0.1",
             "enableProguardInReleaseBuilds": true,
@@ -137,8 +125,7 @@
         {
           "RNMapboxMapsImpl": "mapbox"
         }
-      ],
-      "./plugins/withIosMapboxFirebaseFix.cjs"
+      ]
     ],
     "extra": {
       "eas_update_version": "9",
