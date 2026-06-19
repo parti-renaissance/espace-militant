@@ -4,7 +4,7 @@
 import type { ReactNode } from 'react'
 import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform } from 'react-native'
-import { useScrollToTop } from '@react-navigation/native'
+import { useScrollToTop } from "expo-router/react-navigation"
 import { Link, router } from 'expo-router'
 import { getToken, Image, Spinner, XStack, YStack } from 'tamagui'
 import { CalendarCheck2, ClipboardCheck, DoorOpen, Plus } from '@tamagui/lucide-icons'

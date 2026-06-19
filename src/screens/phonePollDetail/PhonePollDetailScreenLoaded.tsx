@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from "expo-router/react-navigation"
 import { PhonePollResult } from '../../core/entities/PhonePollResult'
 import { PhoningSatisfactionQuestion } from '../../core/entities/PhoningSessionConfiguration'
 import { Poll } from '../../core/entities/Poll'

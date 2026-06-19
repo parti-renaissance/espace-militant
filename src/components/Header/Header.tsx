@@ -1,7 +1,7 @@
 import React from 'react'
 import { Platform, SafeAreaView as RNSafeAreaView, TouchableWithoutFeedback } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { NativeStackHeaderProps } from '@react-navigation/native-stack'
+import { type NativeStackHeaderProps } from 'expo-router'
 import { Link, router, usePathname, useSegments } from 'expo-router'
 import { isWeb, Spinner, Stack, styled, ThemeableStack, useMedia, useStyle, View, withStaticProperties, XStack, XStackProps, YStackProps } from 'tamagui'
 import { ArrowLeft } from '@tamagui/lucide-icons'
