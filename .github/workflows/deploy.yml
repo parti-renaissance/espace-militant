@@ -41,7 +41,7 @@ on:
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
-run-name: '${{ github.event.inputs.type }} ${{ github.event.inputs.environment }} from ${{ github.ref_name }}${{ github.event.inputs.clear_cache == true && ' (clear cache)' || '' }}'
+run-name: "${{ github.event.inputs.type }} ${{ github.event.inputs.environment }} from ${{ github.ref_name }}${{ github.event.inputs.clear_cache == true && ' (clear cache)' || '' }}"
 env:
   EAS_WORKFLOW_TYPE: ${{ github.event.inputs.type }}
   WORFLOW_COMMENT_INPUT: ${{ github.event.inputs.comment }}
