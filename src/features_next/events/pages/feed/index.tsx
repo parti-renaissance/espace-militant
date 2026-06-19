@@ -1,6 +1,6 @@
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
-import { useScrollToTop } from '@react-navigation/native'
+import { useScrollToTop } from "expo-router/react-navigation"
 import { getToken, Spinner, useMedia, YStack } from 'tamagui'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'

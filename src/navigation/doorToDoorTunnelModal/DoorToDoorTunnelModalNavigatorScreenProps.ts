@@ -1,5 +1,5 @@
-import { CompositeScreenProps } from '@react-navigation/native'
-import { StackScreenProps } from '@react-navigation/stack'
+import { CompositeScreenProps } from "expo-router/react-navigation"
+import { StackScreenProps } from "expo-router/js-stack"
 import { AuthenticatedRootNavigatorScreenProps } from '../authenticatedRoot/AuthenticatedRootNavigatorScreenProps'
 import { DoorToDoorTunnelModalNavigatorParamList } from './DoorToDoorTunnelModalNavigatorParamList'
 

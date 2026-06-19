@@ -71,7 +71,6 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
   const plugins = (config.plugins || []).filter((p: unknown) => (typeof p === 'string' ? p : Array.isArray(p) ? p[0] : null) !== 'expo-notifications')
   if (plugins) {
     plugins.push(['expo-font', { fonts: FontLib }])
-    plugins.push('@rnmapbox/maps')
     plugins.push(['expo-router', { origin: `https://${process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN}` }])
     plugins.push('expo-web-browser')
     plugins.push('expo-image')

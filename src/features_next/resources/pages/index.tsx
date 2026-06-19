@@ -1,6 +1,6 @@
 import React, { ComponentRef, useRef } from 'react'
 import { RefreshControl } from 'react-native'
-import { useScrollToTop } from '@react-navigation/native'
+import { useScrollToTop } from "expo-router/react-navigation"
 import { isWeb, ScrollView, useMedia, View } from 'tamagui'
 
 import { Layout } from '@/components/AppStructure'

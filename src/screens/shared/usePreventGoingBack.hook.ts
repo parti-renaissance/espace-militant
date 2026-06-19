@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect } from 'react'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from "expo-router/react-navigation"
 
 export const usePreventGoingBack = (forceBack = false): void => {
   const { addListener, setOptions } = useNavigation()

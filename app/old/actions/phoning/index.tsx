@@ -15,7 +15,7 @@ import { ViewState } from '@/screens/shared/ViewState'
 import { ViewStateUtils } from '@/screens/shared/ViewStateUtils'
 import { Colors, Spacing, Typography } from '@/styles'
 import i18n from '@/utils/i18n'
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect } from "expo-router/react-navigation"
 import { router } from 'expo-router'
 
 export interface PhoningResources {

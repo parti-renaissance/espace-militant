@@ -15,7 +15,7 @@ import LoadingOverlay from '@/screens/shared/LoadingOverlay'
 import { CloseButton } from '@/screens/shared/NavigationHeaderButton'
 import { FlexibleVerticalSpacer, VerticalSpacer } from '@/screens/shared/Spacer'
 
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from "expo-router/react-navigation"
 import {router, useLocalSearchParams } from 'expo-router'
 import { useCampaignStore, useSessionStore } from '@/data/store/phoning'
 

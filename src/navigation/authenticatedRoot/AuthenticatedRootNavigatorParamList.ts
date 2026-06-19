@@ -1,4 +1,4 @@
-import { NavigatorScreenParams } from '@react-navigation/native'
+import { NavigatorScreenParams } from "expo-router/react-navigation"
 import { DoorToDoorTunnelModalNavigatorParamList } from '../doorToDoorTunnelModal/DoorToDoorTunnelModalNavigatorParamList'
 import { EventsFilterModalNavigatorParamList } from '../eventsFilterModal/EventsFilterModalNavigatorParamList'
 import { LocationPickerModalNavigatorParamList } from '../locationPickerModal/LocationPickerModalNavigatorParamList'

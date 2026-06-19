@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDtdTunnelStore } from '@/data/store/door-to-door'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from "expo-router/react-navigation"
 import { router } from 'expo-router'
 import { DoorToDoorPollConfigResponseStatus } from '../../../../core/entities/DoorToDoorPollConfig'
 import { INTERLOCUTOR_ACCEPT_TO_ANSWER_CODE, SendDoorPollAnswersInteractor } from '../../../../core/interactor/SendDoorPollAnswersInteractor'

@@ -2,7 +2,7 @@ import React, { ComponentRef, useRef } from 'react'
 import { RefreshControl } from 'react-native'
 import { useTools } from '@/hooks/useTools'
 import CardTool from '@/screens/tools/components/CardTool'
-import { useScrollToTop } from '@react-navigation/native'
+import { useScrollToTop } from "expo-router/react-navigation"
 import { isWeb, ScrollView, useMedia, View } from 'tamagui'
 
 const ResourcesList = () => {
