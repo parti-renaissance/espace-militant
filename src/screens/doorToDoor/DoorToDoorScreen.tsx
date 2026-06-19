@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Modal, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LatLng, Region } from '@/components/Maps/Maps'
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect } from "expo-router/react-navigation"
 import * as Geolocation from 'expo-location'
 import { DoorToDoorAddress } from '../../core/entities/DoorToDoor'
 import { DoorToDoorCharterNotAccepted, DoorToDoorCharterState } from '../../core/entities/DoorToDoorCharterState'

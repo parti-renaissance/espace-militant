@@ -1,7 +1,7 @@
 import { Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useScrollToTop } from '@react-navigation/native'
+import { useScrollToTop } from "expo-router/react-navigation"
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { getToken, getTokenValue, isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft, CirclePlus } from '@tamagui/lucide-icons'

@@ -26,7 +26,7 @@ import { Colors, Spacing, Styles, Typography } from '@/styles'
 import { margin, mediumMargin } from '@/styles/spacing'
 import AlphabetHelper from '@/utils/AlphabetHelper'
 import i18n from '@/utils/i18n'
-import { useIsFocused } from '@react-navigation/native'
+import { useIsFocused } from "expo-router/react-navigation"
 import { router, useNavigation } from 'expo-router'
 import { isWeb } from 'tamagui'
 

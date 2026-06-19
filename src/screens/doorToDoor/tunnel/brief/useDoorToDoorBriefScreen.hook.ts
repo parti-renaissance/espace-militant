@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from "expo-router/react-navigation"
 import { router } from 'expo-router'
 import { DoorToDoorCampaign } from '../../../../core/entities/DoorToDoorCampaign'
 import DoorToDoorRepository from '../../../../data/DoorToDoorRepository'

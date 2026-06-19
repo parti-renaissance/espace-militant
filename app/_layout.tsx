@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DefaultTheme, ThemeProvider } from "expo-router/react-navigation";
 import { BlurView } from 'expo-blur';
 import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';

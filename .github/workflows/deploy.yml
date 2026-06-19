@@ -33,10 +33,15 @@ on:
         description: 'Comment'
         required: false
         type: string
+      clear_cache:
+        description: 'Clear EAS build cache (use after dependency or native config changes)'
+        required: false
+        type: boolean
+        default: false
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
-run-name: '${{ github.event.inputs.type }} ${{ github.event.inputs.environment }} from ${{ github.ref_name }}'
+run-name: "${{ github.event.inputs.type }} ${{ github.event.inputs.environment }} from ${{ github.ref_name }}${{ github.event.inputs.clear_cache == true && ' (clear cache)' || '' }}"
 env:
   EAS_WORKFLOW_TYPE: ${{ github.event.inputs.type }}
   WORFLOW_COMMENT_INPUT: ${{ github.event.inputs.comment }}
@@ -130,6 +135,7 @@ jobs:
       APP_STORE_BUNDLE_ID: fr.en-marche.jecoute
       REF_TYPE: ${{ github.ref_type }}
       PLATFORM: ${{ github.event.inputs.platform }}
+      EAS_CLEAR_CACHE: ${{ github.event.inputs.clear_cache }}
     steps:
       - name: 🏗 Setup repo
         uses: actions/checkout@v4

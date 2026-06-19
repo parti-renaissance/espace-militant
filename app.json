@@ -28,8 +28,8 @@
         "NSCalendarsUsageDescription": "Requis pour partager les événements dans le calendrier",
         "NSContactsUsageDescription": "Requis pour partager les événements dans le calendrier",
         "NSCalendarsWriteOnlyAccessUsageDescription": "Requis pour partager les événements dans le calendrier",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Requis pour localiser les portes à frapper et les questionnaires réalisés.",
-        "NSLocationWhenInUseUsageDescription": "Requis pour localiser les portes à frapper et les questionnaires réalisés."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Nécessaire pour vous proposer les événements et actualités à proximité.",
+        "NSLocationWhenInUseUsageDescription": "Nécessaire pour vous proposer les événements et actualités à proximité."
       }
     },
     "android": {
@@ -66,17 +66,27 @@
       [
         "expo-build-properties",
         {
-          "ios": {
-            "useFrameworks": "static",
-            "forceStaticLinking": ["RNFBApp", "RNFBMessaging"]
-          },
           "android": {
             "playServicesLocationVersion": "21.0.1",
             "enableProguardInReleaseBuilds": true,
             "enableShrinkResourcesInReleaseBuilds": true
+          },
+          "ios": {
+            "useFrameworks": "static",
+            "usePrecompiledModules": false,
+            "buildReactNativeFromSource": true,
+            "forceStaticLinking": [
+              "RNFBApp",
+              "RNFBMessaging",
+              "MapboxMaps",
+              "MapboxCoreMaps",
+              "MapboxCommon",
+              "Turf"
+            ]
           }
         }
       ],
+      "./plugins/withIosModularHeaders.cjs",
       [
         "expo-splash-screen",
         {
@@ -106,7 +116,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Autorisez $(PRODUCT_NAME) à vous localiser pour vous aider à trouver les portes à frapper et les actions à réaliser."
+          "locationAlwaysAndWhenInUsePermission": "Autorisez $(PRODUCT_NAME) à accéder à votre localisation pour vous proposer les événements et actualités à proximité."
         }
       ],
       ["expo-notifications"],
@@ -123,10 +133,16 @@
         }
       ],
       "@react-native-firebase/app",
-      "@react-native-firebase/messaging"
+      "@react-native-firebase/messaging",
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsImpl": "mapbox"
+        }
+      ]
     ],
     "extra": {
-      "eas_update_version": "8",
+      "eas_update_version": "9",
 
       "router": {
         "origin": false
@@ -136,7 +152,8 @@
       }
     },
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     },
     "updates": {
       "url": "https://u.expo.dev/3b41ebc2-860e-4ccb-a101-5edc6b0c7558",
