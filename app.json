@@ -68,7 +68,15 @@
         {
           "ios": {
             "useFrameworks": "static",
-            "forceStaticLinking": ["RNFBApp", "RNFBMessaging"]
+            "forceStaticLinking": [
+              "RNFBApp",
+              "RNFBMessaging",
+              "rnmapbox-maps",
+              "MapboxMaps",
+              "MapboxCoreMaps",
+              "MapboxCommon",
+              "Turf"
+            ]
           },
           "android": {
             "playServicesLocationVersion": "21.0.1",
@@ -129,7 +137,8 @@
         {
           "RNMapboxMapsImpl": "mapbox"
         }
-      ]
+      ],
+      "./plugins/withIosMapboxFirebaseFix.cjs"
     ],
     "extra": {
       "eas_update_version": "9",
