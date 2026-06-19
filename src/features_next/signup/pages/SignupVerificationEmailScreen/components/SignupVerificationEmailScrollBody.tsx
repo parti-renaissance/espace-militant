@@ -1,9 +1,11 @@
-import { YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui';
 
-import Text from '@/components/base/Text'
-import { VoxButton } from '@/components/Button'
-import Title from '@/components/Title/Title'
-import Otp3Input from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/Otp3Input'
+import Text from '@/components/base/Text';
+import { VoxButton } from '@/components/Button';
+import { ContentBackButton } from '@/components/ContentBackButton';
+import Title from '@/components/Title/Title';
+import Otp3Input from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/Otp3Input';
+import { AuthRoutes } from '@/features_next/signup/utils/authNavigation';
 
 type SignupVerificationEmailScrollBodyProps = {
   email: string
@@ -28,6 +30,10 @@ export default function SignupVerificationEmailScrollBody({
 }: SignupVerificationEmailScrollBodyProps) {
   return (
     <YStack gap="$medium" width="100%">
+      <XStack ml={-12} mb={-8}>
+        <ContentBackButton fallbackPath={AuthRoutes.INSCRIPTION} showOnMobile />
+      </XStack>
+
       <Title>
         <Title.Highlight>Merci{firstName ? ` ${firstName}` : ''}</Title.Highlight>
         <Title.Text>😊</Title.Text>
