@@ -13,27 +13,35 @@ const PRE_INSTALL_OVERRIDE = `
     end
     # @generated end mapbox-firebase-static-linking`
 
+const POST_INSTALL_OVERRIDE = `
+    # @generated begin mapbox-firebase-swift-header - expo prebuild (DO NOT MODIFY)
+    # useFrameworks: static enables RNMBX_USE_FRAMEWORKS in the podspec, but rnmapbox-maps links as a
+    # static library — strip the flag so Objective-C++ imports <rnmapbox_maps-Swift.h> instead.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'rnmapbox-maps'
+      target.build_configurations.each do |config|
+        %w[OTHER_CFLAGS OTHER_CPLUSPLUSFLAGS GCC_PREPROCESSOR_DEFINITIONS].each do |key|
+          value = config.build_settings[key]
+          next if value.nil?
+          if value.is_a?(Array)
+            config.build_settings[key] = value.reject { |f| f.to_s.include?('RNMBX_USE_FRAMEWORKS') }
+          elsif value.is_a?(String)
+            config.build_settings[key] = value.gsub(/-DRNMBX_USE_FRAMEWORKS=1\\s*/, '').strip
+          end
+        end
+      end
+    end
+    # @generated end mapbox-firebase-swift-header`
+
 /**
- * Fixes iOS pod install when combining @react-native-firebase (useFrameworks: static)
+ * Fixes iOS build when combining @react-native-firebase (useFrameworks: static)
  * with @rnmapbox/maps on Expo SDK 56+.
  */
 function withIosMapboxFirebaseFix(config) {
   return withPodfile(config, (exportedConfig) => {
     let contents = exportedConfig.modResults.contents
 
-    if (!contents.includes('$RNMapboxMapsUseFrameworks')) {
-      if (contents.includes("$RNMapboxMapsImpl = 'mapbox'")) {
-        contents = contents.replace(
-          "$RNMapboxMapsImpl = 'mapbox'",
-          "$RNMapboxMapsImpl = 'mapbox'\n$RNMapboxMapsUseFrameworks = true",
-        )
-      } else {
-        contents = contents.replace(
-          /target .+ do\n/,
-          (match) => `${match}$RNMapboxMapsUseFrameworks = true\n`,
-        )
-      }
-    }
+    // Do NOT set $RNMapboxMapsUseFrameworks — rnmapbox-maps is statically linked here.
 
     if (!contents.includes('mapbox-firebase-static-linking')) {
       contents = contents.replace(
@@ -42,9 +50,16 @@ function withIosMapboxFirebaseFix(config) {
       )
     }
 
+    if (!contents.includes('mapbox-firebase-swift-header')) {
+      contents = contents.replace(
+        '$RNMapboxMaps.post_install(installer)',
+        `$RNMapboxMaps.post_install(installer)${POST_INSTALL_OVERRIDE}`,
+      )
+    }
+
     exportedConfig.modResults.contents = contents
     return exportedConfig
   })
 }
 
-module.exports = createRunOncePlugin(withIosMapboxFirebaseFix, 'with-ios-mapbox-firebase-fix', '1.0.0')
+module.exports = createRunOncePlugin(withIosMapboxFirebaseFix, 'with-ios-mapbox-firebase-fix', '1.0.1')
