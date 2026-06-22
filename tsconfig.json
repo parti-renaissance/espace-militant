@@ -1,11 +1,11 @@
 {
   "extends": "./tsconfig.base",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "tamagui.config": ["./tamagui.config.ts"],
+      "assets/*": ["./assets/*"]
     },
-    "strictNullChecks": true,
     "moduleSuffixes": [".ios", ".android", ".native", ""]
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", ".expo/types/**/*.ts", "expo-env.d.ts", "scripts/prepare-client-env.ts", "queryError.d.ts"]

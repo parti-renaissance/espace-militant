@@ -95,7 +95,7 @@ Outils à lancer avant de commiter :
 ```bash
 yarn lint        # ESLint
 yarn ts:check    # Vérification TypeScript
-yarn knip        # Détection de code mort (exports/imports inutilisés)
+yarn knip:check  # Détection de code mort (exports/imports inutilisés)
 ```
 
 ---
