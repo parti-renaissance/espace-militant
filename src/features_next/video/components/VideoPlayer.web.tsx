@@ -93,6 +93,8 @@ function VideoPlayerSurface({
   const [isUserPaused, setIsUserPaused] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [autoplayFailed, setAutoplayFailed] = useState(false)
+  const [autoplayFallbackMuted, setAutoplayFallbackMuted] = useState(false)
+  const effectiveMuted = muted || autoplayFallbackMuted
   const effectiveShouldPlay = isControlled ? shouldPlay : shouldPlay && !isUserPaused
 
   const setVideoNode = useCallback((node: HTMLVideoElement | null) => {
@@ -107,7 +109,6 @@ function VideoPlayerSurface({
 
     node.addEventListener('play', onPlay)
     node.addEventListener('pause', onPause)
-    node.muted = muted
     setIsPlaying(!node.paused)
 
     return () => {
@@ -115,13 +116,34 @@ function VideoPlayerSurface({
       node.removeEventListener('pause', onPause)
       videoRef.current = null
     }
-  }, [muted])
+  }, [])
+
+  useEffect(() => {
+    setAutoplayFallbackMuted(false)
+  }, [hlsUrl])
 
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
-    video.muted = muted
-  }, [muted])
+    video.muted = effectiveMuted
+  }, [effectiveMuted])
+
+  const attemptPlay = useCallback(
+    (video: HTMLVideoElement) => {
+      void video.play().catch((error) => {
+        if (isAutoplayPolicyError(error) && !video.muted && expectsAutoPlay) {
+          setAutoplayFallbackMuted(true)
+          video.muted = true
+          void video.play().catch((retryError) => {
+            if (isAutoplayPolicyError(retryError)) setAutoplayFailed(true)
+          })
+          return
+        }
+        if (isAutoplayPolicyError(error)) setAutoplayFailed(true)
+      })
+    },
+    [expectsAutoPlay],
+  )
 
   useEffect(() => {
     const video = videoRef.current
@@ -174,13 +196,11 @@ function VideoPlayerSurface({
     if (!video) return
 
     if (effectiveShouldPlay) {
-      void video.play().catch((error) => {
-        if (isAutoplayPolicyError(error)) setAutoplayFailed(true)
-      })
+      attemptPlay(video)
     } else {
       video.pause()
     }
-  }, [effectiveShouldPlay, ready])
+  }, [attemptPlay, effectiveShouldPlay, ready])
 
   const showPlayIcon = shouldShowVideoPlayIcon(
     isPlaying,
@@ -206,6 +226,14 @@ function VideoPlayerSurface({
       video.pause()
     }
   }, [isControlled, onUserPause, onUserPlay])
+
+  const handleAutoplayUnmute = useCallback(() => {
+    setAutoplayFallbackMuted(false)
+    const video = videoRef.current
+    if (video) video.muted = muted
+  }, [muted])
+
+  const showAutoplayUnmuteButton = autoplayFallbackMuted && effectiveMuted && isPlaying
 
   return (
     <YStack flex={1} position="relative" width="100%" height="100%">
@@ -251,7 +279,9 @@ function VideoPlayerSurface({
         </YStack>
       ) : null}
       {showMuteButton && isPlaying && onMutedChange ? (
-        <VideoMuteButton muted={muted} onPress={onMutedChange} />
+        <VideoMuteButton muted={effectiveMuted} onPress={onMutedChange} />
+      ) : showAutoplayUnmuteButton ? (
+        <VideoMuteButton muted onPress={handleAutoplayUnmute} />
       ) : null}
     </YStack>
   )
