@@ -1,7 +1,7 @@
 import { YStack } from 'tamagui'
 
-import OpenMailboxButton from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/OpenMailboxButton'
-import ResendCountdown from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/ResendCountdown'
+import OpenMailboxButton from '@/features_next/signup/pages/verification-email/components/OpenMailboxButton'
+import ResendCountdown from '@/features_next/signup/pages/verification-email/components/ResendCountdown'
 
 type SignupVerificationEmailFooterProps = {
   email: string

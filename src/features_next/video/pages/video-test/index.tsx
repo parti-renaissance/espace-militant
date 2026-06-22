@@ -224,7 +224,7 @@ export default function VideoTestPage() {
                       thumbnailUrl={data.thumbnail_url}
                       width={data.width}
                       height={data.height}
-                      autoPlay={autoPlay}
+                      {...(autoPlay ? { startActivated: true, shouldPlay: true } : {})}
                       loop={loop}
                     />
 

@@ -1,12 +1,12 @@
 import { Redirect } from 'expo-router'
 
 import SignupMobileScrollShell from '@/features_next/signup/components/SignupMobileScrollShell'
-import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
 import { useSignupVerificationEmailScreen } from '@/features_next/signup/hooks/useSignupVerificationEmailScreen'
-import SignupVerificationEmailFooter from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/SignupVerificationEmailFooter'
-import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/SignupVerificationEmailScrollBody'
+import SignupVerificationEmailFooter from '@/features_next/signup/pages/verification-email/components/SignupVerificationEmailFooter'
+import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/verification-email/components/SignupVerificationEmailScrollBody'
+import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
 
-export default function SignupVerificationEmailMobileScreen() {
+export default function VerificationEmailMobileScreen() {
   const {
     email,
     firstName,
@@ -26,10 +26,7 @@ export default function SignupVerificationEmailMobileScreen() {
   }
 
   return (
-    <SignupMobileScrollShell
-      gap="$medium"
-      footer={!requiresManualLogin ? <SignupVerificationEmailFooter email={email} /> : undefined}
-    >
+    <SignupMobileScrollShell gap="$medium" footer={!requiresManualLogin ? <SignupVerificationEmailFooter email={email} /> : undefined}>
       <SignupVerificationEmailScrollBody
         email={email}
         firstName={firstName}

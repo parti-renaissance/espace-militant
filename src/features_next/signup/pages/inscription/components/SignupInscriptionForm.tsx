@@ -9,7 +9,7 @@ import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
-import FriendlyCaptchaWidget from '@/features_next/signup/pages/SignupInscriptionScreen/components/FriendlyCaptchaWidget'
+import FriendlyCaptchaWidget from '@/features_next/signup/pages/inscription/components/FriendlyCaptchaWidget'
 import { useSignupSessionStore } from '@/features_next/signup/store/signup-session-store'
 import { applySignupFormError } from '@/features_next/signup/utils/errors'
 

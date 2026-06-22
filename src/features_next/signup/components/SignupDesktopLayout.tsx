@@ -40,13 +40,22 @@ export function SignupEngagementCard() {
   )
 }
 
-export function SignupDesktopIllustrationColumn() {
+type SignupDesktopIllustrationColumnProps = {
+  /** `undefined` = carte d'engagement par défaut, `null` = masquée */
+  engagementCard?: ReactNode | null
+}
+
+export function SignupDesktopIllustrationColumn({ engagementCard }: SignupDesktopIllustrationColumnProps = {}) {
+  const resolvedEngagementCard = engagementCard === undefined ? <SignupEngagementCard /> : engagementCard
+
   return (
     <YStack width="50%" minWidth={300} minHeight={0} height="100%" position="relative" overflow="hidden">
       <Image source={illuInscription} style={{ width: '100%', height: '100%' }} contentFit="cover" cachePolicy="memory-disk" />
-      <YStack position="absolute" bottom={0} left={0} right={0} padding="$large" zIndex={1}>
-        <SignupEngagementCard />
-      </YStack>
+      {resolvedEngagementCard ? (
+        <YStack position="absolute" bottom={0} left={0} right={0} padding="$large" zIndex={1}>
+          {resolvedEngagementCard}
+        </YStack>
+      ) : null}
     </YStack>
   )
 }
