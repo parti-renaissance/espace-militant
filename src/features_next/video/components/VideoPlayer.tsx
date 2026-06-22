@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { Image } from 'expo-image'
 import { useVideoPlayer, VideoView } from 'expo-video'
@@ -8,28 +8,59 @@ import { safePlayerAction, useExpoPlayerAutoPlayback } from '@/features_next/vid
 import { shouldShowVideoPlayIcon } from '@/features_next/video/helpers/videoPlaybackUi'
 
 import { getVideoAspectRatio, type VideoPlayerProps } from './VideoPlayer.types'
+import { VideoMuteButton } from './VideoMuteButton'
 import { VideoPlayIcon } from './VideoPlayIcon'
 
-type NativeVideoContentProps = {
-  hlsUrl: string
-  thumbnailUrl: string
-  loop: boolean
-  autoPlay: boolean
-  /** Lecture demandée par un tap sur le poster (autoPlay=false). */
-  startOnMount: boolean
-  active: boolean
-  controls: boolean
+type VideoPlayerSurfaceProps = Pick<
+  VideoPlayerProps,
+  | 'hlsUrl'
+  | 'thumbnailUrl'
+  | 'loop'
+  | 'controls'
+  | 'muted'
+  | 'onMutedChange'
+  | 'showMuteButton'
+  | 'onUserPlay'
+  | 'onUserPause'
+  | 'playAllowedRef'
+  | 'embedded'
+> & {
+  shouldPlay: boolean
   contentFit: 'contain' | 'cover'
+  expectsAutoPlay: boolean
 }
 
-function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount, active, controls, contentFit }: NativeVideoContentProps) {
+function VideoPlayerSurface({
+  hlsUrl,
+  thumbnailUrl,
+  loop = true,
+  shouldPlay,
+  controls = true,
+  muted = false,
+  onMutedChange,
+  showMuteButton = false,
+  onUserPlay,
+  onUserPause,
+  playAllowedRef,
+  contentFit,
+  expectsAutoPlay,
+  embedded = false,
+}: VideoPlayerSurfaceProps) {
   const player = useVideoPlayer(hlsUrl, (p) => {
     p.loop = loop
+    p.muted = muted
   })
   const [isUserPaused, setIsUserPaused] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [autoplayFailed, setAutoplayFailed] = useState(false)
-  const shouldAttemptAutoPlay = autoPlay && active
+  const isControlled = onUserPlay != null || onUserPause != null
+  const effectiveShouldPlay = isControlled ? shouldPlay : shouldPlay && !isUserPaused
+
+  useEffect(() => {
+    safePlayerAction(() => {
+      player.muted = muted
+    })
+  }, [muted, player])
 
   useEffect(() => {
     const subscription = player.addListener('playingChange', ({ isPlaying: playing }) => {
@@ -43,20 +74,19 @@ function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount
     setAutoplayFailed(true)
   }, [])
 
-  useExpoPlayerAutoPlayback(player, shouldAttemptAutoPlay && !isUserPaused, undefined, handleAutoplayFailed, autoPlay)
-
-  const pendingManualStartRef = useRef(startOnMount)
+  useExpoPlayerAutoPlayback(
+    player,
+    effectiveShouldPlay,
+    playAllowedRef,
+    handleAutoplayFailed,
+    !isControlled || expectsAutoPlay,
+  )
 
   useEffect(() => {
-    pendingManualStartRef.current = startOnMount
-  }, [startOnMount])
-
-  useEffect(() => {
-    if (!startOnMount || !active) return
+    if (expectsAutoPlay || !effectiveShouldPlay) return
 
     const tryStart = () => {
-      if (!pendingManualStartRef.current || player.status !== 'readyToPlay') return
-      pendingManualStartRef.current = false
+      if (player.status !== 'readyToPlay') return
       safePlayerAction(() => {
         setIsUserPaused(false)
         setAutoplayFailed(false)
@@ -67,27 +97,41 @@ function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount
     const subscription = player.addListener('statusChange', tryStart)
     if (player.status === 'readyToPlay') queueMicrotask(tryStart)
     return () => subscription.remove()
-  }, [active, player, startOnMount])
+  }, [effectiveShouldPlay, expectsAutoPlay, player])
 
-  const showPlayIcon = shouldShowVideoPlayIcon(isPlaying, isUserPaused, autoplayFailed && shouldAttemptAutoPlay, shouldAttemptAutoPlay || startOnMount)
+  const showPlayIcon = shouldShowVideoPlayIcon(
+    isPlaying,
+    isControlled ? !shouldPlay : isUserPaused,
+    autoplayFailed && expectsAutoPlay && effectiveShouldPlay,
+    isControlled ? shouldPlay : expectsAutoPlay || isControlled,
+  )
 
   const handleVideoPress = useCallback(() => {
     safePlayerAction(() => {
       if (player.playing) {
-        setIsUserPaused(true)
+        if (!isControlled) setIsUserPaused(true)
+        onUserPause?.()
         player.pause()
-      } else {
-        setIsUserPaused(false)
-        setAutoplayFailed(false)
-        player.play()
+        return
       }
+
+      if (!isControlled) setIsUserPaused(false)
+      setAutoplayFailed(false)
+      onUserPlay?.()
+      player.play()
     })
-  }, [player])
+  }, [isControlled, onUserPause, onUserPlay, player])
 
   return (
     <YStack flex={1} position="relative" width="100%" height="100%">
       <Image source={{ uri: thumbnailUrl }} style={styles.thumbnailBackground} contentFit="cover" pointerEvents="none" />
-      <VideoView style={styles.video} player={player} nativeControls={controls} contentFit={contentFit} pointerEvents={controls ? 'auto' : 'none'} />
+      <VideoView
+        style={embedded ? styles.videoEmbedded : styles.video}
+        player={player}
+        nativeControls={controls}
+        contentFit={contentFit}
+        pointerEvents={controls ? 'auto' : 'none'}
+      />
       {!controls ? (
         <YStack
           position="absolute"
@@ -106,6 +150,9 @@ function NativeVideoContent({ hlsUrl, thumbnailUrl, loop, autoPlay, startOnMount
           {showPlayIcon ? <VideoPlayIcon /> : null}
         </YStack>
       ) : null}
+      {showMuteButton && isPlaying && onMutedChange ? (
+        <VideoMuteButton muted={muted} onPress={onMutedChange} />
+      ) : null}
     </YStack>
   )
 }
@@ -115,33 +162,68 @@ export default function VideoPlayer({
   thumbnailUrl,
   width,
   height,
-  autoPlay = false,
   loop = true,
+  shouldPlay: shouldPlayProp,
+  autoPlay = false,
   active = true,
   controls = true,
+  muted = false,
+  onMutedChange,
+  showMuteButton = false,
+  onUserPlay,
+  onUserPause,
+  playAllowedRef,
+  startActivated,
+  embedded = false,
   fill = false,
   rounded = true,
+  containerBackgroundColor = '#000',
 }: VideoPlayerProps) {
-  const [playedHlsUrl, setPlayedHlsUrl] = useState<string | null>(autoPlay ? hlsUrl : null)
+  const resolvedStartActivated = startActivated ?? autoPlay
+  const [activated, setActivated] = useState(resolvedStartActivated)
+  const derivedShouldPlay =
+    shouldPlayProp ?? (activated && active && (autoPlay || !resolvedStartActivated))
+  const expectsAutoPlay = shouldPlayProp != null ? shouldPlayProp : autoPlay
   const aspectRatio = getVideoAspectRatio(width, height)
-  const showPoster = !autoPlay && playedHlsUrl !== hlsUrl
-  const shouldPlay = autoPlay || playedHlsUrl === hlsUrl
-
   const contentFit = fill ? 'cover' : 'contain'
 
-  const handlePlay = useCallback(() => {
-    setPlayedHlsUrl(hlsUrl)
-  }, [hlsUrl])
+  const handlePosterPress = useCallback(() => {
+    setActivated(true)
+    onUserPlay?.()
+  }, [onUserPlay])
+
+  const surface = (
+    <VideoPlayerSurface
+      hlsUrl={hlsUrl}
+      thumbnailUrl={thumbnailUrl}
+      loop={loop}
+      shouldPlay={derivedShouldPlay}
+      controls={controls}
+      muted={muted}
+      onMutedChange={onMutedChange}
+      showMuteButton={showMuteButton}
+      onUserPlay={onUserPlay}
+      onUserPause={onUserPause}
+      playAllowedRef={playAllowedRef}
+      contentFit={contentFit}
+      expectsAutoPlay={expectsAutoPlay}
+      embedded={embedded}
+    />
+  )
+
+  if (embedded) {
+    return surface
+  }
 
   return (
     <YStack
       width="100%"
       borderRadius={rounded ? 8 : 0}
       overflow="hidden"
-      backgroundColor="#000"
+      backgroundColor={containerBackgroundColor}
       {...(fill ? { flex: 1, height: '100%' } : { style: { aspectRatio } })}
     >
-      {showPoster ? (
+      {!activated ? (
         <YStack flex={1} position="relative" width="100%" height="100%">
           <Image source={{ uri: thumbnailUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
           <YStack
@@ -153,7 +235,7 @@ export default function VideoPlayer({
             alignItems="center"
             justifyContent="center"
             backgroundColor="rgba(0,0,0,0.2)"
-            onPress={handlePlay}
+            onPress={handlePosterPress}
             role="button"
             aria-label="Lire la vidéo"
             pressStyle={{ opacity: 0.9 }}
@@ -162,16 +244,7 @@ export default function VideoPlayer({
           </YStack>
         </YStack>
       ) : (
-        <NativeVideoContent
-          hlsUrl={hlsUrl}
-          thumbnailUrl={thumbnailUrl}
-          loop={loop}
-          autoPlay={autoPlay}
-          startOnMount={!autoPlay && shouldPlay}
-          active={active}
-          controls={controls}
-          contentFit={contentFit}
-        />
+        surface
       )}
     </YStack>
   )
@@ -184,6 +257,13 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   video: {
+    ...StyleSheet.absoluteFill,
+    width: '100%',
+    height: '100%',
+    zIndex: 1,
+    backgroundColor: 'transparent',
+  },
+  videoEmbedded: {
     ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',

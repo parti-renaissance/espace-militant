@@ -3,7 +3,7 @@ import { useMedia } from 'tamagui'
 
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import VideoTestPage from '@/features_next/video/pages/VideoTestPage'
+import VideoTestPage from '@/features_next/video/pages/video-test'
 
 import * as metatags from '@/config/metatags'
 

@@ -14,7 +14,7 @@ import { Circle, XStack, YStack } from 'tamagui'
 import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
 
 import AutoSizeImage from '@/components/AutoSizeImage'
-import FeedVideoPlayer from '@/features_next/video/components/FeedVideoPlayer'
+import FeedVideoPlayer from '@/features_next/video/components/feed/FeedVideoPlayer'
 import { getVideoAspectRatio } from '@/features_next/video/components/VideoPlayer.types'
 import { buildVideoId, useIsContentInFeedView, useVideoFeedStore } from '@/features_next/video/store/videoFeedStore'
 import { RestTimelineFeedSocialMediaItem } from '@/services/timeline-feed/schema'
