@@ -1,59 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Image } from 'expo-image'
 import { YStack } from 'tamagui'
 
-import { isAutoplayPolicyError, shouldShowVideoPlayIcon } from '@/features_next/video/helpers/videoPlaybackUi'
+import { useWebVideoPlayback } from '@/features_next/video/hooks/useWebVideoPlayback'
 
 import { getVideoAspectRatio, type VideoPlayerProps } from './VideoPlayer.types'
 import { VideoMuteButton } from './VideoMuteButton'
 import { VideoPlayIcon } from './VideoPlayIcon'
-
-const HLS_JS_URL = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js'
-
-type HlsPlayer = {
-  loadSource: (url: string) => void
-  attachMedia: (video: HTMLVideoElement) => void
-  destroy: () => void
-}
-
-declare global {
-  interface Window {
-    Hls?: {
-      isSupported: () => boolean
-      new (): HlsPlayer
-    }
-  }
-}
-
-const loadHlsScript = (signal: AbortSignal): Promise<void> =>
-  new Promise<void>((resolve, reject) => {
-    if (window.Hls) {
-      resolve()
-      return
-    }
-    if (signal.aborted) {
-      reject(new DOMException('Aborted', 'AbortError'))
-      return
-    }
-
-    const existing = document.querySelector<HTMLScriptElement>(`script[src="${HLS_JS_URL}"]`)
-    const script = existing ?? document.createElement('script')
-    const isOwner = existing === null
-
-    script.addEventListener('load', () => resolve(), { signal })
-    script.addEventListener('error', () => reject(new Error('hls.js load failed')), { signal })
-
-    signal.addEventListener('abort', () => {
-      reject(new DOMException('Aborted', 'AbortError'))
-      if (isOwner && !window.Hls) script.remove()
-    })
-
-    if (isOwner) {
-      script.src = HLS_JS_URL
-      script.async = true
-      document.head.appendChild(script)
-    }
-  })
 
 type VideoPlayerSurfaceProps = Pick<
   VideoPlayerProps,
@@ -88,152 +41,23 @@ function VideoPlayerSurface({
   expectsAutoPlay,
   isControlled,
 }: VideoPlayerSurfaceProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const [ready, setReady] = useState(false)
-  const [isUserPaused, setIsUserPaused] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [autoplayFailed, setAutoplayFailed] = useState(false)
-  const [autoplayFallbackMuted, setAutoplayFallbackMuted] = useState(false)
-  const effectiveMuted = muted || autoplayFallbackMuted
-  const effectiveShouldPlay = isControlled ? shouldPlay : shouldPlay && !isUserPaused
-
-  const setVideoNode = useCallback((node: HTMLVideoElement | null) => {
-    videoRef.current = node
-    if (!node) return
-
-    const onPlay = () => {
-      setIsPlaying(true)
-      setAutoplayFailed(false)
-    }
-    const onPause = () => setIsPlaying(false)
-
-    node.addEventListener('play', onPlay)
-    node.addEventListener('pause', onPause)
-    setIsPlaying(!node.paused)
-
-    return () => {
-      node.removeEventListener('play', onPlay)
-      node.removeEventListener('pause', onPause)
-      videoRef.current = null
-    }
-  }, [])
-
-  useEffect(() => {
-    setAutoplayFallbackMuted(false)
-  }, [hlsUrl])
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-    video.muted = effectiveMuted
-  }, [effectiveMuted])
-
-  const attemptPlay = useCallback(
-    (video: HTMLVideoElement) => {
-      void video.play().catch((error) => {
-        if (isAutoplayPolicyError(error) && !video.muted && expectsAutoPlay) {
-          setAutoplayFallbackMuted(true)
-          video.muted = true
-          void video.play().catch((retryError) => {
-            if (isAutoplayPolicyError(retryError)) setAutoplayFailed(true)
-          })
-          return
-        }
-        if (isAutoplayPolicyError(error)) setAutoplayFailed(true)
-      })
-    },
-    [expectsAutoPlay],
-  )
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    const controller = new AbortController()
-    let hls: HlsPlayer | null = null
-
-    const setup = async () => {
-      let hlsSupported = false
-      try {
-        await loadHlsScript(controller.signal)
-        hlsSupported = !controller.signal.aborted && !!window.Hls?.isSupported()
-      } catch {
-        // hls.js indisponible : on tentera le fallback natif (Safari / iOS).
-      }
-
-      if (controller.signal.aborted) return
-
-      if (hlsSupported && window.Hls) {
-        hls = new window.Hls()
-        hls.loadSource(hlsUrl)
-        hls.attachMedia(video)
-        setReady(true)
-        return
-      }
-
-      if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = hlsUrl
-        setReady(true)
-      }
-    }
-
-    void setup()
-
-    return () => {
-      controller.abort()
-      setReady(false)
-      hls?.destroy()
-      hls = null
-      video.pause()
-      video.removeAttribute('src')
-      video.load()
-    }
-  }, [hlsUrl])
-
-  useEffect(() => {
-    if (!ready) return
-    const video = videoRef.current
-    if (!video) return
-
-    if (effectiveShouldPlay) {
-      attemptPlay(video)
-    } else {
-      video.pause()
-    }
-  }, [attemptPlay, effectiveShouldPlay, ready])
-
-  const showPlayIcon = shouldShowVideoPlayIcon(
+  const {
+    setVideoNode,
+    effectiveMuted,
     isPlaying,
-    isControlled ? !shouldPlay : isUserPaused,
-    autoplayFailed && expectsAutoPlay && effectiveShouldPlay,
-    isControlled ? shouldPlay : expectsAutoPlay,
-  )
-
-  const handleTogglePlay = useCallback(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    if (video.paused) {
-      if (!isControlled) setIsUserPaused(false)
-      setAutoplayFailed(false)
-      onUserPlay?.()
-      void video.play().catch((error) => {
-        if (isAutoplayPolicyError(error)) setAutoplayFailed(true)
-      })
-    } else {
-      if (!isControlled) setIsUserPaused(true)
-      onUserPause?.()
-      video.pause()
-    }
-  }, [isControlled, onUserPause, onUserPlay])
-
-  const handleAutoplayUnmute = useCallback(() => {
-    setAutoplayFallbackMuted(false)
-    const video = videoRef.current
-    if (video) video.muted = muted
-  }, [muted])
-
-  const showAutoplayUnmuteButton = autoplayFallbackMuted && effectiveMuted && isPlaying
+    showPlayIcon,
+    showAutoplayUnmuteButton,
+    handleTogglePlay,
+    handleAutoplayUnmute,
+  } = useWebVideoPlayback({
+    hlsUrl,
+    shouldPlay,
+    muted,
+    expectsAutoPlay,
+    isControlled,
+    onUserPlay,
+    onUserPause,
+  })
 
   return (
     <YStack flex={1} position="relative" width="100%" height="100%">
