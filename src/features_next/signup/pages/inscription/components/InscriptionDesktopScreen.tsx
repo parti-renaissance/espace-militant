@@ -6,10 +6,10 @@ import {
   SignupDesktopPageShell,
 } from '@/features_next/signup/components/SignupDesktopLayout'
 import { useSignupInscriptionScreen } from '@/features_next/signup/hooks/useSignupInscriptionScreen'
-import SignupInscriptionActions from '@/features_next/signup/pages/SignupInscriptionScreen/components/SignupInscriptionActions'
-import SignupInscriptionScrollBody from '@/features_next/signup/pages/SignupInscriptionScreen/components/SignupInscriptionScrollBody'
+import SignupInscriptionActions from '@/features_next/signup/pages/inscription/components/SignupInscriptionActions'
+import SignupInscriptionScrollBody from '@/features_next/signup/pages/inscription/components/SignupInscriptionScrollBody'
 
-export default function SignupInscriptionDesktopScreen() {
+export default function InscriptionDesktopScreen() {
   const insets = useSafeAreaInsets()
   const { formRef, isSubmitting, handleSkip, handleSuccess } = useSignupInscriptionScreen()
 

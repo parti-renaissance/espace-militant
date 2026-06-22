@@ -8,10 +8,10 @@ import {
   SignupDesktopPageShell,
 } from '@/features_next/signup/components/SignupDesktopLayout'
 import { useSignupVerificationEmailScreen } from '@/features_next/signup/hooks/useSignupVerificationEmailScreen'
-import SignupVerificationEmailFooter from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/SignupVerificationEmailFooter'
-import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/SignupVerificationEmailScrollBody'
+import SignupVerificationEmailFooter from '@/features_next/signup/pages/verification-email/components/SignupVerificationEmailFooter'
+import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/verification-email/components/SignupVerificationEmailScrollBody'
 
-export default function SignupVerificationEmailDesktopScreen() {
+export default function VerificationEmailDesktopScreen() {
   const insets = useSafeAreaInsets()
   const {
     email,

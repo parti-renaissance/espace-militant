@@ -8,7 +8,7 @@ import Text from '@/components/base/Text';
 import { VoxButton } from '@/components/Button';
 import { ContentBackButton } from '@/components/ContentBackButton';
 import Title from '@/components/Title/Title';
-import Otp3Input from '@/features_next/signup/pages/SignupVerificationEmailScreen/components/Otp3Input';
+import Otp3Input from '@/features_next/signup/pages/verification-email/components/Otp3Input';
 import { AuthRoutes } from '@/features_next/signup/utils/authNavigation';
 import { getSignupErrorMessage } from '@/features_next/signup/utils/errors';
 import { errorMessages } from '@/utils/errorMessages';

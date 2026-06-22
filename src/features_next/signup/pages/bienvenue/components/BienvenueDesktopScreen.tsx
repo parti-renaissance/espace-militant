@@ -3,10 +3,10 @@ import { YStack } from 'tamagui'
 
 import { SignupDesktopPageShell } from '@/features_next/signup/components/SignupDesktopLayout'
 import { useSignupBienvenueScreen } from '@/features_next/signup/hooks/useSignupBienvenueScreen'
-import BienvenueTitleAndCta from '@/features_next/signup/pages/SignupBienvenueScreen/components/BienvenueTitleAndCta'
-import BienvenueVideo from '@/features_next/signup/pages/SignupBienvenueScreen/components/BienvenueVideo'
+import BienvenueTitleAndCta from '@/features_next/signup/pages/bienvenue/components/BienvenueTitleAndCta'
+import BienvenueVideo from '@/features_next/signup/pages/bienvenue/components/BienvenueVideo'
 
-export default function SignupBienvenueDesktopScreen() {
+export default function BienvenueDesktopScreen() {
   const insets = useSafeAreaInsets()
   const { data, isLoading, isError, isScreenFocused, handleContinue } = useSignupBienvenueScreen()
 

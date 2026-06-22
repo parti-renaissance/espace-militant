@@ -3,7 +3,7 @@ import { YStack } from 'tamagui'
 import { ArrowRight } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
-import type { SignupInscriptionFormHandle } from '@/features_next/signup/pages/SignupInscriptionScreen/components/SignupInscriptionForm'
+import type { SignupInscriptionFormHandle } from '@/features_next/signup/pages/inscription/components/SignupInscriptionForm'
 
 type SignupInscriptionActionsProps = {
   formRef: RefObject<SignupInscriptionFormHandle | null>
