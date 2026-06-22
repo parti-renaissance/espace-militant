@@ -1,23 +1,24 @@
-import { useEffect, useState } from 'react';
-import { XStack, YStack } from 'tamagui';
-import { Mail } from '@tamagui/lucide-icons';
-import { z } from 'zod';
+import { useEffect, useState } from 'react'
+import { XStack, YStack } from 'tamagui'
+import { Mail } from '@tamagui/lucide-icons'
+import { z } from 'zod'
 
-import Input from '@/components/base/Input/Input';
-import Text from '@/components/base/Text';
-import { VoxButton } from '@/components/Button';
-import { ContentBackButton } from '@/components/ContentBackButton';
-import Title from '@/components/Title/Title';
-import Otp3Input from '@/features_next/signup/pages/verification-email/components/Otp3Input';
-import { AuthRoutes } from '@/features_next/signup/utils/authNavigation';
-import { getSignupErrorMessage } from '@/features_next/signup/utils/errors';
-import { errorMessages } from '@/utils/errorMessages';
+import Input from '@/components/base/Input/Input'
+import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
+import { ContentBackButton } from '@/components/ContentBackButton'
+import Title from '@/components/Title/Title'
+import Otp3Input from '@/features_next/signup/pages/verification-email/components/Otp3Input'
+import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
+import { getSignupErrorMessage } from '@/features_next/signup/utils/errors'
+
+import { errorMessages } from '@/utils/errorMessages'
 
 const MailCircleIcon = () => (
   <YStack width={32} height={32} borderRadius={16} backgroundColor="#BCEFC3" alignItems="center" justifyContent="center">
     <Mail size={16} color="$black2" />
   </YStack>
-);
+)
 
 type SignupVerificationEmailScrollBodyProps = {
   email: string
@@ -150,12 +151,7 @@ export default function SignupVerificationEmailScrollBody({
             <Text.MD semibold textAlign="center">
               Saisissez le code reçu par email pour valider votre inscription.
             </Text.MD>
-            <Otp3Input
-              onComplete={onActivate}
-              disabled={isActivating}
-              hasError={Boolean(inlineError)}
-              onStartEditing={onStartEditingCode}
-            />
+            <Otp3Input onComplete={onActivate} disabled={isActivating} hasError={Boolean(inlineError)} onStartEditing={onStartEditingCode} />
             {inlineError ? <Text.MD color="$red600">{inlineError}</Text.MD> : null}
           </>
         )}

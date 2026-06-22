@@ -6,20 +6,25 @@ import {
   SignupDesktopPageShell,
 } from '@/features_next/signup/components/SignupDesktopLayout'
 import { useSignupInscriptionScreen } from '@/features_next/signup/hooks/useSignupInscriptionScreen'
+import { useInscriptionContent } from '@/features_next/signup/pages/inscription/hooks/useInscriptionContent'
 import SignupInscriptionActions from '@/features_next/signup/pages/inscription/components/SignupInscriptionActions'
 import SignupInscriptionScrollBody from '@/features_next/signup/pages/inscription/components/SignupInscriptionScrollBody'
 
 export default function InscriptionDesktopScreen() {
   const insets = useSafeAreaInsets()
   const { formRef, isSubmitting, handleSkip, handleSuccess } = useSignupInscriptionScreen()
+  const content = useInscriptionContent()
+  const EngagementComponent = content.EngagementComponent
 
   return (
     <SignupDesktopPageShell paddingLeft={insets.left + 16}>
-      <SignupDesktopIllustrationColumn />
+      <SignupDesktopIllustrationColumn engagementCard={EngagementComponent ? <EngagementComponent /> : null} />
       <SignupDesktopFormColumn
         paddingRight={insets.right + 32}
         paddingBottom={insets.bottom + 16}
-        scrollContent={<SignupInscriptionScrollBody formRef={formRef} onSuccess={handleSuccess} showEngagementCard={false} />}
+        scrollContent={
+          <SignupInscriptionScrollBody formRef={formRef} onSuccess={handleSuccess} content={content} showEngagementCard={false} />
+        }
         footer={<SignupInscriptionActions formRef={formRef} isSubmitting={isSubmitting} onSkip={handleSkip} />}
       />
     </SignupDesktopPageShell>

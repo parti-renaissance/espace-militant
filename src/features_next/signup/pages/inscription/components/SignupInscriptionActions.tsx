@@ -14,15 +14,7 @@ type SignupInscriptionActionsProps = {
 export default function SignupInscriptionActions({ formRef, isSubmitting, onSkip }: SignupInscriptionActionsProps) {
   return (
     <YStack gap="$medium" width="100%">
-      <VoxButton
-        theme="blue"
-        size="xl"
-        onPress={() => formRef.current?.submit()}
-        loading={isSubmitting}
-        disabled={isSubmitting}
-        full
-        iconRight={ArrowRight}
-      >
+      <VoxButton theme="blue" size="xl" onPress={() => formRef.current?.submit()} loading={isSubmitting} disabled={isSubmitting} full iconRight={ArrowRight}>
         Continuer
       </VoxButton>
       <VoxButton variant="soft" theme="gray" bg="white" size="xl" onPress={onSkip} full>

@@ -1,15 +1,11 @@
-import { Redirect } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Redirect } from 'expo-router'
 
-import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
-import {
-  SignupDesktopFormColumn,
-  SignupDesktopIllustrationColumn,
-  SignupDesktopPageShell,
-} from '@/features_next/signup/components/SignupDesktopLayout'
+import { SignupDesktopFormColumn, SignupDesktopIllustrationColumn, SignupDesktopPageShell } from '@/features_next/signup/components/SignupDesktopLayout'
 import { useSignupVerificationEmailScreen } from '@/features_next/signup/hooks/useSignupVerificationEmailScreen'
 import SignupVerificationEmailFooter from '@/features_next/signup/pages/verification-email/components/SignupVerificationEmailFooter'
 import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/verification-email/components/SignupVerificationEmailScrollBody'
+import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
 
 export default function VerificationEmailDesktopScreen() {
   const insets = useSafeAreaInsets()

@@ -18,14 +18,7 @@ type BienvenueVideoProps = {
   fillAvailableSpace?: boolean
 }
 
-export default function BienvenueVideo({
-  data,
-  isLoading,
-  isError,
-  isScreenFocused,
-  maxHeight,
-  fillAvailableSpace = false,
-}: BienvenueVideoProps) {
+export default function BienvenueVideo({ data, isLoading, isError, isScreenFocused, maxHeight, fillAvailableSpace = false }: BienvenueVideoProps) {
   const aspectRatio = data ? getVideoAspectRatio(data.width, data.height) : BIENVENUE_VIDEO_ASPECT_RATIO
 
   return (

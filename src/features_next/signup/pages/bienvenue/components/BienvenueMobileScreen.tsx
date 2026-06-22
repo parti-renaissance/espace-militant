@@ -11,13 +11,7 @@ export default function BienvenueMobileScreen() {
   return (
     <SignupMobileScrollShell footer={<BienvenueTitleAndCta onContinue={handleContinue} />} footerSpacerHeight={220}>
       <YStack flex={1} minHeight={0} width="100%">
-        <BienvenueVideo
-          data={data}
-          isLoading={isLoading}
-          isError={isError}
-          isScreenFocused={isScreenFocused}
-          fillAvailableSpace
-        />
+        <BienvenueVideo data={data} isLoading={isLoading} isError={isError} isScreenFocused={isScreenFocused} fillAvailableSpace />
       </YStack>
     </SignupMobileScrollShell>
   )
