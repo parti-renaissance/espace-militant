@@ -56,9 +56,9 @@ export default function BienvenueVideo({
             thumbnailUrl={data.thumbnail_url}
             width={data.width}
             height={data.height}
-            autoPlay
+            startActivated
+            shouldPlay={isScreenFocused}
             loop
-            active={isScreenFocused}
             controls={false}
             fill
           />
