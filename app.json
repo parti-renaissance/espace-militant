@@ -101,7 +101,7 @@
         "@sentry/react-native/expo",
         {
           "project": "vox",
-          "organization": "parti-renaissance"
+          "organization": "renaissance-fr"
         }
       ],
       "expo-localization",
