@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { View as RNView, StyleSheet } from 'react-native';
 import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { Image } from 'expo-image';
@@ -10,11 +11,11 @@ import Title from '@/components/Title/Title';
 import heroImage from '../assets/gabriel-attal-onboarding-prono.png';
 import { PronoMatchView } from '../model';
 import { formatScore, formatTeamLabel } from '../utils';
+import PronoBadge from './PronoBadge';
 
 const MATCH_REGION_HEIGHT = 355
 const IMAGE_WIDTH = 230
 const IMAGE_HEIGHT = Math.round(IMAGE_WIDTH * (842 / 463))
-const IMAGE_OVERFLOW_TOP = IMAGE_HEIGHT - MATCH_REGION_HEIGHT
 const PANEL_RADIUS = 24
 const PANEL_PADDING_BOTTOM = 15
 const GLOW_WIDTH = 320
@@ -73,13 +74,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: -PANEL_PADDING_BOTTOM,
-    top: -IMAGE_OVERFLOW_TOP,
     alignItems: 'center',
     justifyContent: 'flex-end',
-  },
-  image: {
-    width: IMAGE_WIDTH,
-    height: IMAGE_HEIGHT,
   },
   blurClip: {
     position: 'absolute',
@@ -103,10 +99,25 @@ const softWhite = '#FFFFFF'
 
 type PronoMatchCardProps = {
   match: PronoMatchView
+  showAuthorPrediction?: boolean
+  showBadge?: boolean
+  image?: number | { uri: string }
+  imageWidth?: number
+  imageHeight?: number
+  children?: ReactNode
 }
 
-export default function PronoMatchCard({ match }: PronoMatchCardProps) {
-  const imageSource = match.imageUrl ? { uri: match.imageUrl } : heroImage
+export default function PronoMatchCard({
+  match,
+  showAuthorPrediction = true,
+  showBadge = false,
+  image = heroImage,
+  imageWidth = IMAGE_WIDTH,
+  imageHeight = IMAGE_HEIGHT,
+  children,
+}: PronoMatchCardProps) {
+  const imageSource = match.imageUrl ? { uri: match.imageUrl } : image
+  const overflowTop = imageHeight - MATCH_REGION_HEIGHT
 
   return (
     <PanelFrame>
@@ -114,9 +125,10 @@ export default function PronoMatchCard({ match }: PronoMatchCardProps) {
         <LinearGradient colors={[...baseGradient]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
         <LinearGradient colors={[...overlayGradient]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={[StyleSheet.absoluteFill, { opacity: 0.1 }]} />
       </RNView>
+      {showBadge ? <PronoBadge position="absolute" top="$medium" left="$medium" zIndex={2} /> : null}
       <MatchRegion>
-        <View style={styles.imageLayer} pointerEvents="none">
-          <Image source={imageSource} style={styles.image} contentFit="contain" />
+        <View style={[styles.imageLayer, { top: -overflowTop }]} pointerEvents="none">
+          <Image source={imageSource} style={{ width: imageWidth, height: imageHeight }} contentFit="contain" />
         </View>
         <RNView style={styles.blurClip} pointerEvents="none">
           <Svg width={GLOW_WIDTH} height={GLOW_HEIGHT} style={styles.glow}>
@@ -140,18 +152,20 @@ export default function PronoMatchCard({ match }: PronoMatchCardProps) {
               {match.kickoffLabel}
             </Text.LG>
           </YStack>
-          {match.authorPrediction ? (
-            <PronosticBox>
-              <Text.SM semibold color="black" maxWidth={90} multiline>
-                Le pronostic de Gabriel Attal
-              </Text.SM>
-              <ScoreBox>
-                <Text bold fontSize={20} color="#27221F">
-                  {formatScore(match.authorPrediction)}
-                </Text>
-              </ScoreBox>
-            </PronosticBox>
-          ) : null}
+          {children
+            ? children
+            : showAuthorPrediction && match.authorPrediction ? (
+                <PronosticBox>
+                  <Text.SM semibold color="black" maxWidth={90} multiline>
+                    Le pronostic de Gabriel Attal
+                  </Text.SM>
+                  <ScoreBox>
+                    <Text bold fontSize={20} color="#27221F">
+                      {formatScore(match.authorPrediction)}
+                    </Text>
+                  </ScoreBox>
+                </PronosticBox>
+              ) : null}
         </YStack>
       </MatchRegion>
     </PanelFrame>
