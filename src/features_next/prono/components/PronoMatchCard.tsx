@@ -104,6 +104,9 @@ type PronoMatchCardProps = {
   image?: number | { uri: string }
   imageWidth?: number
   imageHeight?: number
+  cropAfterKickoff?: boolean
+  panelPaddingBottom?: number
+  contentOffsetY?: number
   children?: ReactNode
 }
 
@@ -114,20 +117,24 @@ export default function PronoMatchCard({
   image = heroImage,
   imageWidth = IMAGE_WIDTH,
   imageHeight = IMAGE_HEIGHT,
+  cropAfterKickoff = false,
+  panelPaddingBottom = PANEL_PADDING_BOTTOM,
+  contentOffsetY = 0,
   children,
 }: PronoMatchCardProps) {
   const imageSource = match.imageUrl ? { uri: match.imageUrl } : image
   const overflowTop = imageHeight - MATCH_REGION_HEIGHT
+  const imageTop = -overflowTop + (cropAfterKickoff ? 36 : 0)
 
   return (
-    <PanelFrame>
+    <PanelFrame paddingBottom={cropAfterKickoff ? '$small' : '$medium'}>
       <RNView style={styles.gradientBg}>
         <LinearGradient colors={[...baseGradient]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
         <LinearGradient colors={[...overlayGradient]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={[StyleSheet.absoluteFill, { opacity: 0.1 }]} />
       </RNView>
       {showBadge ? <PronoBadge position="absolute" top="$medium" left="$medium" zIndex={2} /> : null}
       <MatchRegion>
-        <View style={[styles.imageLayer, { top: -overflowTop }]} pointerEvents="none">
+        <View style={[styles.imageLayer, { top: imageTop, bottom: -panelPaddingBottom }]} pointerEvents="none">
           <Image source={imageSource} style={{ width: imageWidth, height: imageHeight }} contentFit="contain" />
         </View>
         <RNView style={styles.blurClip} pointerEvents="none">
@@ -142,7 +149,7 @@ export default function PronoMatchCard({
             <Ellipse cx="50%" cy="50%" rx="50%" ry="50%" fill="url(#pronoGlow)" />
           </Svg>
         </RNView>
-        <YStack width="100%" height={145} gap="$medium" zIndex={1}>
+        <YStack width="100%" height={cropAfterKickoff ? undefined : 145} gap="$medium" zIndex={1} marginBottom={contentOffsetY}>
           <YStack gap="$xsmall">
             <Text.MD semibold lineHeight={14} letterSpacing={0} color={softWhite}>
               {match.label}
