@@ -16,6 +16,9 @@ interface ConfigOptions {
   icon?: string
 }
 
+/** ASCII bundle name for ASWebAuthenticationSession (iOS strips diacritics otherwise). */
+const toIosBundleName = (name: string) => name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
 const setAssociatedDomain = (config: Partial<ExpoConfig>, associatedDomain: string | undefined) => {
   if (!associatedDomain) return
   if (config.ios) {
@@ -41,6 +44,11 @@ const applyConfig = (config: Partial<ExpoConfig>, options: ConfigOptions) => {
     }
     if (options.icon) {
       config.ios.icon = options.icon
+    }
+    config.ios.infoPlist = {
+      ...config.ios.infoPlist,
+      CFBundleDisplayName: options.name,
+      CFBundleName: toIosBundleName(options.name),
     }
   }
   if (config.android) {
@@ -71,7 +79,6 @@ export default (payload: ConfigContext): Partial<ExpoConfig> => {
   const plugins = (config.plugins || []).filter((p: unknown) => (typeof p === 'string' ? p : Array.isArray(p) ? p[0] : null) !== 'expo-notifications')
   if (plugins) {
     plugins.push(['expo-font', { fonts: FontLib }])
-    plugins.push('@rnmapbox/maps')
     plugins.push(['expo-router', { origin: `https://${process.env.EXPO_PUBLIC_ASSOCIATED_DOMAIN}` }])
     plugins.push('expo-web-browser')
     plugins.push('expo-image')

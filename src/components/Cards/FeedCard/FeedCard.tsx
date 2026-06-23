@@ -13,21 +13,24 @@ export type { FeedCardProps } from './FeedCard.types'
 
 function FeedCard(props: FeedCardProps) {
   const { data } = useGetSuspenseProfil()
-  const hitSource = props.hitSource ?? HIT_SOURCES.PAGE_TIMELINE
+  const { hitSource: hitSourceProp, ...cardProps } = props
+  const hitSource = hitSourceProp ?? HIT_SOURCES.PAGE_TIMELINE
 
-  switch (props.type) {
+  switch (cardProps.type) {
     case 'event':
-      return <EventListItem {...props} userUuid={data!.uuid} source={hitSource} />
+      return <EventListItem {...cardProps} userUuid={data!.uuid} source={hitSource} />
     case 'action':
-      return <ActionCard {...props} />
+      return <ActionCard {...cardProps} hitSource={hitSource} />
     case 'news':
-      return <NewsCard {...props} hitSource={hitSource} />
+      return <NewsCard {...cardProps} hitSource={hitSource} />
     case 'publication':
-      return <PublicationCard {...props} hitSource={hitSource} />
+      return <PublicationCard {...cardProps} hitSource={hitSource} />
     case 'transactional_message':
-      return <TransactionalCard {...props} hitSource={hitSource} />
-    case 'social_post':
-      return <SocialPostCard {...props} />
+      return <TransactionalCard {...cardProps} hitSource={hitSource} />
+    case 'social_post': {
+      const { type: _type, ...socialPostProps } = cardProps
+      return <SocialPostCard {...socialPostProps} />
+    }
     default:
       return null
   }

@@ -1,6 +1,6 @@
 import { useColorScheme } from 'react-native'
 import Error404 from '@/components/404/Error404'
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
+import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router/react-navigation"
 import { TamaguiProvider } from '@tamagui/core'
 
 export default function UnmatchedRoute() {

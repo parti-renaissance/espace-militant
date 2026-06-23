@@ -1,4 +1,4 @@
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps } from "expo-router/js-stack"
 import { AuthenticatedRootNavigatorParamList } from './AuthenticatedRootNavigatorParamList'
 
 export type AuthenticatedRootNavigatorScreenProps =

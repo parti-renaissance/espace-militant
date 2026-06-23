@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
-import { useScrollToTop } from '@react-navigation/native'
+import { useScrollToTop } from "expo-router/react-navigation"
 import { Link } from 'expo-router'
 import { getToken, ScrollView, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { Sparkle } from '@tamagui/lucide-icons'

@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react'
 import { FlatList, ScrollView, StyleSheet, View } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from "expo-router/react-navigation"
 import { Poll } from '../../core/entities/Poll'
 import { PollResult } from '../../core/entities/PollResult'
 import PollsRepository from '../../data/PollsRepository'

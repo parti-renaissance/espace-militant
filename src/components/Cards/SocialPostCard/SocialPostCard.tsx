@@ -8,7 +8,7 @@ import VoxCard, { VoxCardFrameProps } from '@/components/VoxCard/VoxCard'
 import { RestTimelineFeedSocialMedia } from '@/services/timeline-feed/schema'
 import { relativeDateFormatter } from '@/utils/DateFormatter'
 
-import VideoFeedPostVisibility from '@/features_next/video/components/VideoFeedPostVisibility'
+import VideoFeedPostVisibility from '@/features_next/video/components/feed/VideoFeedPostVisibility'
 
 import SocialPostDescription from './SocialPostDescription'
 import SocialPostMedia from './SocialPostMedia'

@@ -1,10 +1,11 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react'
 import { Redirect, usePathname, useSegments } from 'expo-router'
-import { isWeb } from 'tamagui';
+import { isWeb } from 'tamagui'
 
-import { useSession } from '@/ctx/SessionProvider';
-import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation';
-import { useUserStore } from '@/store/user-store';
+import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation'
+
+import { useSession } from '@/ctx/SessionProvider'
+import { useUserStore } from '@/store/user-store'
 
 /**
  * Mobile uniquement : affiche le tunnel signup tant que l'utilisateur
@@ -19,13 +20,7 @@ export default function SignupTunnelGuard({ children }: PropsWithChildren) {
 
   const isInSignupFlow = segments[0] === '(signup)' || pathname.includes('inscription') || pathname.includes('bienvenue')
 
-  const shouldEnterSignupTunnel =
-    !isWeb &&
-    hasHydrated &&
-    !isLoading &&
-    !isAuth &&
-    signupTunnelStatus === 'pending' &&
-    !isInSignupFlow
+  const shouldEnterSignupTunnel = !isWeb && hasHydrated && !isLoading && !isAuth && signupTunnelStatus === 'pending' && !isInSignupFlow
 
   if (shouldEnterSignupTunnel) {
     return <Redirect href={getAuthHref(AuthRoutes.BIENVENUE, pathname)} />

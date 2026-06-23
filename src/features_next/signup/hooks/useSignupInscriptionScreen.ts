@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { Href, router } from 'expo-router'
 
-import type { SignupInscriptionFormHandle } from '@/features_next/signup/pages/SignupInscriptionScreen/components/SignupInscriptionForm'
+import type { SignupInscriptionFormHandle } from '@/features_next/signup/pages/inscription/components/SignupInscriptionForm'
 import { useSignupSessionStore } from '@/features_next/signup/store/signup-session-store'
 
 import { useSignup } from '@/services/signup/hook'

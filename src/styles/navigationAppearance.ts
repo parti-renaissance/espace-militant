@@ -1,4 +1,4 @@
-import { type NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import { type NativeStackNavigationOptions } from 'expo-router'
 import * as Colors from './colors'
 
 export const headerBlank: NativeStackNavigationOptions = {

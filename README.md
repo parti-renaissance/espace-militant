@@ -18,14 +18,14 @@ Attal Président App est l'application mobile et web officielle d'Attal Préside
 
 | Technologie                                               | Version | Rôle                           |
 | --------------------------------------------------------- | ------- | ------------------------------ |
-| [Expo](https://docs.expo.dev/)                            | ~55     | Framework universel            |
-| React Native                                              | 0.83.2  | Runtime iOS / Android          |
-| React                                                     | 19.2    | Runtime Web                    |
+| [Expo](https://docs.expo.dev/)                            | ~56     | Framework universel            |
+| React Native                                              | 0.85.3  | Runtime iOS / Android          |
+| React                                                     | 19.2    | UI (mobile et web)             |
 | [Tamagui](https://tamagui.dev/)                           | ^1.144  | UI cross-platform              |
-| TypeScript                                                | ~5.9    | Typage strict                  |
-| [Expo Router](https://docs.expo.dev/router/introduction/) | ~55     | Navigation file-system         |
+| TypeScript                                                | ~6.0    | Typage                         |
+| [Expo Router](https://docs.expo.dev/router/introduction/) | ~56     | Navigation file-system         |
 | [EAS Build / Update](https://docs.expo.dev/eas/)          | —       | CI/CD mobile                   |
-| Firebase (FCM / APNs)                                     | ^23     | Notifications push             |
+| Firebase (FCM / APNs)                                     | ^24     | Notifications push             |
 | Mapbox                                                    | ~10.3   | Cartographie                   |
 | Sentry                                                    | ~7.11   | Monitoring et crash reporting  |
 | Storybook                                                 | 7.6     | Développement de composants UI |
@@ -40,16 +40,17 @@ espace-militant/
 ├── assets/           # Images, fonts, icônes (par profil : dev / staging / prod)
 ├── scripts/          # Scripts de build et de préparation
 ├── .env.exemple      # Variables d'environnement (template, sans secrets)
+├── app.json          # Configuration Expo statique (plugins, permissions)
 └── app.config.ts     # Configuration Expo dynamique (profils EAS)
 ```
 
 L'application utilise trois profils EAS :
 
-| Profil      | Nom affiché  | Scheme           |
-| ----------- | ------------ | ---------------- |
-| Development | Vox Dev      | `vox-dev://`     |
-| Staging     | _(variable)_ | `vox-staging://` |
-| Production  | Attal Président  | `vox://`         |
+| Profil      | Nom affiché     | Scheme           |
+| ----------- | --------------- | ---------------- |
+| Development | Vox Dev         | `vox-dev://`     |
+| Staging     | _(variable)_    | `vox-staging://` |
+| Production  | Attal Président | `vox://`         |
 
 ## Prérequis
 
@@ -97,7 +98,7 @@ Les variables préfixées `EXPO_PUBLIC_` sont **intégrées dans le binaire** au
 
 | Variable                           | Description                                                                                                                                   |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `EXPO_PUBLIC_API_BASE_URL`         | URL de base de l'API Attal Président Plateforme                                                                                                   |
+| `EXPO_PUBLIC_API_BASE_URL`         | URL de base de l'API Attal Président Plateforme                                                                                               |
 | `EXPO_PUBLIC_OAUTH_BASE_URL`       | URL du serveur d'authentification OAuth                                                                                                       |
 | `EXPO_PUBLIC_OAUTH_CLIENT_ID`      | Client ID OAuth 2.0 (public)                                                                                                                  |
 | `EXPO_PUBLIC_ASSOCIATED_DOMAIN`    | Domaine pour les universal links                                                                                                              |
