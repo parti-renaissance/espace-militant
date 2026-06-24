@@ -1,4 +1,5 @@
 import { StyleSheet, View as RNView } from 'react-native'
+import { useGlobalSearchParams } from 'expo-router'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { styled, View, XStack, YStack } from 'tamagui'
@@ -8,8 +9,8 @@ import Title from '@/components/Title/Title'
 
 import heroImage from '../assets/gabriel-attal-onboarding-prono.png'
 import { padCountdownUnit, usePronoCountdown } from '../hooks/usePronoCountdown'
-import { PRONO_FALLBACK_MATCH, PronoScore, PronoTeam } from '../model'
-import { formatTeamLabel } from '../utils'
+import { PRONO_FALLBACK_MATCH, PronoMatchView, PronoScore, PronoTeam } from '../model'
+import { formatTeamLabel, parsePlayerPredictionFromUri } from '../utils'
 
 const PLAYER_MOCK_PREDICTION: PronoScore = { home: 3, away: 0 }
 
@@ -115,9 +116,16 @@ function PronoCountdownInline({ targetAt }: { targetAt: string }) {
   )
 }
 
-export function PronoSignupCard() {
-  const match = PRONO_FALLBACK_MATCH
+type PronoSignupCardProps = {
+  match?: PronoMatchView
+  playerPrediction?: PronoScore
+}
+
+export function PronoSignupCard({ match: matchProp, playerPrediction: playerPredictionProp }: PronoSignupCardProps = {}) {
+  const match = matchProp ?? PRONO_FALLBACK_MATCH
   const authorPrediction = match.authorPrediction ?? { home: 0, away: 0 }
+  const { redirectUri } = useGlobalSearchParams<{ redirectUri?: string }>()
+  const playerPrediction = playerPredictionProp ?? parsePlayerPredictionFromUri(redirectUri) ?? PLAYER_MOCK_PREDICTION
 
   return (
     <CardRoot>
@@ -138,7 +146,7 @@ export function PronoSignupCard() {
         <Text bold fontSize={14} color="#27221F" flexShrink={0}>
           VS
         </Text>
-        <PredictionGroup title="Ton pronostic :" homeTeam={match.homeTeam} awayTeam={match.awayTeam} prediction={PLAYER_MOCK_PREDICTION} />
+        <PredictionGroup title="Ton pronostic :" homeTeam={match.homeTeam} awayTeam={match.awayTeam} prediction={playerPrediction} />
       </PredictionsBox>
     </CardRoot>
   )
