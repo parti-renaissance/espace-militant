@@ -29,14 +29,6 @@ const PRONO_TITLE = (
   </Title>
 )
 
-const PRONO_CONTENT: InscriptionConfigItem = {
-  TitleComponent: PRONO_TITLE,
-  SubtitleComponent: (
-    <Text.LG regular>Inscrivez-vous vite pour découvrir si votre pronostic fera la différence face à Gabriel Attal.</Text.LG>
-  ),
-  EngagementComponent: PronoSignupCard,
-}
-
 export const INSCRIPTION_CONFIG: Record<string, InscriptionConfigItem> = {
   default: {
     TitleComponent: INSCRIPTION_TITLE,
@@ -57,8 +49,11 @@ export const INSCRIPTION_CONFIG: Record<string, InscriptionConfigItem> = {
     SubtitleComponent: <Text.LG regular>Pour accéder à Toi Président, il vous faudra d’abord créer un compte. Cela ne prendra qu’un instant.</Text.LG>,
     EngagementComponent: ToiPresidentEngagementCard,
   },
-  '/prono/resultat': PRONO_CONTENT,
-  '/prono/jouer': PRONO_CONTENT,
+  '/prono/jouer': {
+    TitleComponent: PRONO_TITLE,
+    SubtitleComponent: <Text.LG regular>Inscrivez-vous vite pour découvrir si votre pronostic fera la différence face à Gabriel Attal.</Text.LG>,
+    EngagementComponent: PronoSignupCard,
+  },
 }
 
 export function getInscriptionContent(redirectUri: string | null): InscriptionConfigItem {

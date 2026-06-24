@@ -19,7 +19,7 @@ type LiveAlertRowProps = {
 }
 
 const LiveAlertRow = memo(({ alert, hitSource }: LiveAlertRowProps) => {
-  const onShow = createOnShow(alert.cta_url, alert.cta_label, hitSource)
+  const onShow = createOnShow(alert.cta_url, alert.cta_label, hitSource, alert)
   const isLive = alert.type === 'live'
   const isPressable = Boolean(alert.cta_url)
 

@@ -9,6 +9,8 @@ export type PronoScore = {
   away: number
 }
 
+export type PronoStatus = 'scheduled' | 'not_participated' | 'participated' | 'closed' | 'result_available'
+
 export type PronoMatchView = {
   uuid?: string
   label: string
@@ -17,6 +19,10 @@ export type PronoMatchView = {
   kickoffLabel: string
   kickoffAt?: string
   authorPrediction?: PronoScore
+  playerPrediction?: PronoScore
+  result?: PronoScore
+  status?: PronoStatus
+  won?: boolean
   playersCount?: number
   imageUrl?: string
 }

@@ -82,7 +82,7 @@ const AlertImageTile = memo(({ alert, onPress, pressable = true }: { alert: Aler
 AlertImageTile.displayName = 'AlertImageTile'
 
 const AlertImage = memo(({ alert, hitSource }: AlertVariantProps) => {
-  const onShow = createOnShow(alert.cta_url, alert.cta_label, hitSource)
+  const onShow = createOnShow(alert.cta_url, alert.cta_label, hitSource, alert)
   const isPressable = Boolean(alert.cta_url)
 
   return <AlertImageTile alert={alert} onPress={onShow} pressable={isPressable} />
@@ -106,7 +106,7 @@ const AlertMeetingImage = memo(({ alert, hitSource }: AlertVariantProps) => {
 AlertMeetingImage.displayName = 'AlertMeetingImage'
 
 const AlertElectionCard = memo(({ alert, hitSource, fullWidth }: AlertVariantProps) => {
-  const onShow = createOnShow(alert.cta_url, alert.cta_label, hitSource)
+  const onShow = createOnShow(alert.cta_url, alert.cta_label, hitSource, alert)
   const isPressable = Boolean(alert.cta_url)
 
   return (

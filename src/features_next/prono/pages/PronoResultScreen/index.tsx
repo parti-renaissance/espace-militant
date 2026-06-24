@@ -1,11 +1,7 @@
 import { Redirect, useLocalSearchParams, useRootNavigationState } from 'expo-router'
-import { useToastController } from '@tamagui/toast'
-import { Send } from '@tamagui/lucide-icons'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation'
 
-import PronoCtaSection from '../../components/PronoCtaSection'
 import PronoResultCard, { PronoResultVariant } from '../../components/PronoResultCard'
 import PronoScreenShell from '../../components/PronoScreenShell'
 import { useCurrentPronoMatch } from '../../hooks/useCurrentPronoMatch'
@@ -25,23 +21,19 @@ const RESULT_MOCKS: Record<PronoResultVariant, ResultMock> = {
 const parseVariant = (value?: string): PronoResultVariant => (value === 'gabriel' ? value : 'win')
 
 export default function PronoResultScreen() {
-  const { match } = useCurrentPronoMatch()
+  const { match, isLoading: isPronoLoading } = useCurrentPronoMatch()
   const params = useLocalSearchParams<{ variant?: string }>()
   const { isAuth, isLoading } = useSession()
   const isNavigationReady = useRootNavigationState()?.key != null
-  const toast = useToastController()
-  const variant = parseVariant(params.variant)
+  const variant = match.won === undefined ? parseVariant(params.variant) : match.won ? 'win' : 'gabriel'
   const mock = RESULT_MOCKS[variant]
-  const redirectUri = params.variant ? `/prono/resultat?variant=${encodeURIComponent(params.variant)}` : '/prono/resultat'
-
-  const handleShare = () => {
-    toast.show('Partage', { message: 'Bientôt disponible', type: 'success' })
-  }
-
-  if (isLoading || !isNavigationReady) return null
+  const result = match.result ?? mock.result
+  const authorPrediction = match.authorPrediction ?? mock.authorPrediction
+  const playerPrediction = match.playerPrediction ?? mock.playerPrediction
+  if (isLoading || isPronoLoading || !isNavigationReady) return null
 
   if (!isAuth) {
-    return <Redirect href={getAuthHref(AuthRoutes.INSCRIPTION, redirectUri)} />
+    return <Redirect href="/prono" />
   }
 
   return (
@@ -50,20 +42,9 @@ export default function PronoResultScreen() {
         variant={variant}
         homeTeam={match.homeTeam}
         awayTeam={match.awayTeam}
-        result={mock.result}
-        authorPrediction={mock.authorPrediction}
-        playerPrediction={mock.playerPrediction}
-        footer={
-          <PronoCtaSection
-            label="Je partage mon résultat"
-            icon={Send}
-            backgroundColor="#F0F1FF"
-            textColor="#27221F"
-            hoverColor="#E5E8FF"
-            pressColor="#E5E8FF"
-            onPress={handleShare}
-          />
-        }
+        result={result}
+        authorPrediction={authorPrediction}
+        playerPrediction={playerPrediction}
       />
     </PronoScreenShell>
   )
