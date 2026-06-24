@@ -6,14 +6,12 @@ import { ArrowLeft, UserRound } from '@tamagui/lucide-icons';
 
 import { VoxButton } from '@/components/Button';
 
-
-
-
-
 export default function PronoNavHeader() {
   return (
-    <XStack width="100%" alignItems="center" justifyContent="space-between" paddingHorizontal="$medium" paddingVertical="$small">
-      <VoxButton variant="text" iconLeft={ArrowLeft} iconSize={24} onPress={() => router.back()} />
+    <XStack width="100%" alignItems="center" justifyContent="space-between" paddingHorizontal="$medium" paddingTop="$xxxlarge">
+      <VoxButton variant="text" iconLeft={ArrowLeft} iconSize={20} textColor="#5B5651" onPress={() => router.back()}>
+        Retour
+      </VoxButton>
       <VoxButton
         iconLeft={UserRound}
         size="md"

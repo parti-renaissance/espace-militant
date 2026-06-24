@@ -29,7 +29,8 @@ export default function PronoScreenShell({ children }: PronoScreenShellProps) {
         width="100%"
         maxWidth={isDesktop ? 480 : undefined}
         paddingHorizontal={isDesktop ? '$large' : '$medium'}
-        paddingVertical={isDesktop ? '$xlarge' : '$medium'}
+        paddingTop={isDesktop ? '$xlarge' : '$xsmall'}
+        paddingBottom={isDesktop ? '$xlarge' : '$medium'}
         gap="$medium"
       >
         {children}

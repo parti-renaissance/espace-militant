@@ -25,6 +25,13 @@ const DescriptionCard = styled(YStack, {
   borderRadius: '$7',
   padding: '$medium',
   zIndex: 1,
+  variants: {
+    compact: {
+      true: {
+        height: 148,
+      },
+    },
+  } as const,
 })
 
 const InnerCard = styled(XStack, {
@@ -34,6 +41,14 @@ const InnerCard = styled(XStack, {
   paddingHorizontal: '$medium',
   alignItems: 'center',
   justifyContent: 'space-around',
+  variants: {
+    compact: {
+      true: {
+        paddingHorizontal: '$small',
+        justifyContent: 'space-between',
+      },
+    },
+  } as const,
 })
 
 const ScoreBox = styled(View, {
@@ -50,6 +65,13 @@ const ScoreBox = styled(View, {
         borderColor: HIGHLIGHT_COLOR,
       },
     },
+    compact: {
+      true: {
+        width: 44,
+        height: 56,
+        borderRadius: 10,
+      },
+    },
   } as const,
 })
 
@@ -58,13 +80,17 @@ type ScoreCellProps = {
   value?: number
   highlighted?: boolean
   editable?: boolean
+  valueColor?: string
+  compact?: boolean
   onChangeValue?: (value: number) => void
 }
 
-function ScoreCell({ code, value, highlighted, editable, onChangeValue }: ScoreCellProps) {
+function ScoreCell({ code, value, highlighted, editable, valueColor = SCORE_TEXT_COLOR, compact, onChangeValue }: ScoreCellProps) {
+  const fontSize = compact ? 26 : 32
+
   return (
     <YStack alignItems="center" gap="$xsmall">
-      <ScoreBox highlighted={highlighted}>
+      <ScoreBox highlighted={highlighted} compact={compact}>
         {editable ? (
           <TextInput
             value={value === undefined ? '' : String(value)}
@@ -72,10 +98,10 @@ function ScoreCell({ code, value, highlighted, editable, onChangeValue }: ScoreC
             keyboardType="number-pad"
             maxLength={2}
             selectTextOnFocus
-            style={{ width: '100%', height: '100%', textAlign: 'center', fontSize: 32, fontWeight: '700', color: SCORE_TEXT_COLOR }}
+            style={{ width: '100%', height: '100%', textAlign: 'center', fontSize, fontWeight: '700', color: valueColor }}
           />
         ) : (
-          <Text bold fontSize={32} color={SCORE_TEXT_COLOR}>
+          <Text bold fontSize={fontSize} color={valueColor}>
             {value ?? '–'}
           </Text>
         )}
@@ -94,24 +120,30 @@ type PronoGroupProps = {
   prediction?: EditableScore
   highlighted?: boolean
   editable?: boolean
+  scoreColor?: string
+  compact?: boolean
   onChange?: (prediction: EditableScore) => void
 }
 
-function PronoGroup({ title, homeTeam, awayTeam, prediction, highlighted, editable, onChange }: PronoGroupProps) {
+function PronoGroup({ title, homeTeam, awayTeam, prediction, highlighted, editable, scoreColor, compact, onChange }: PronoGroupProps) {
+  const separatorLineHeight = compact ? 56 : 64
+
   return (
-    <YStack alignItems="center" gap="$small">
-      <Text.MD semibold color={SCORE_TEXT_COLOR}>
+    <YStack alignItems="center" gap="$small" flex={1} minWidth={0}>
+      <Text.MD semibold color={SCORE_TEXT_COLOR} numberOfLines={1}>
         {title}
       </Text.MD>
-      <XStack alignItems="flex-start" gap="$xsmall">
+      <XStack alignItems="flex-start" gap={compact ? 4 : '$xsmall'} justifyContent="center">
         <ScoreCell
           code={homeTeam.code}
           value={prediction?.home}
           highlighted={highlighted}
           editable={editable}
+          valueColor={scoreColor}
+          compact={compact}
           onChangeValue={(home) => onChange?.({ home, away: prediction?.away })}
         />
-        <Text bold fontSize={20} lineHeight={64} color={SCORE_TEXT_COLOR}>
+        <Text bold fontSize={compact ? 18 : 20} lineHeight={separatorLineHeight} color={SCORE_TEXT_COLOR}>
           -
         </Text>
         <ScoreCell
@@ -119,6 +151,8 @@ function PronoGroup({ title, homeTeam, awayTeam, prediction, highlighted, editab
           value={prediction?.away}
           highlighted={highlighted}
           editable={editable}
+          valueColor={scoreColor}
+          compact={compact}
           onChangeValue={(away) => onChange?.({ home: prediction?.home, away })}
         />
       </XStack>
@@ -133,14 +167,31 @@ type PronoPronosticsCardProps = {
   playerPrediction?: EditableScore
   onPlayerChange?: (prediction: EditableScore) => void
   locked?: boolean
+  backgroundColor?: string
+  innerBackgroundColor?: string
+  authorScoreColor?: string
+  playerScoreColor?: string
+  compact?: boolean
 }
 
-export default function PronoPronosticsCard({ homeTeam, awayTeam, authorPrediction, playerPrediction, onPlayerChange, locked }: PronoPronosticsCardProps) {
+export default function PronoPronosticsCard({
+  homeTeam,
+  awayTeam,
+  authorPrediction,
+  playerPrediction,
+  onPlayerChange,
+  locked,
+  backgroundColor = '#D8DCFF',
+  innerBackgroundColor = '#F5F6FF',
+  authorScoreColor,
+  playerScoreColor,
+  compact,
+}: PronoPronosticsCardProps) {
   return (
-    <DescriptionCard>
-      <InnerCard>
-        <PronoGroup title="Prono. de Gabriel :" homeTeam={homeTeam} awayTeam={awayTeam} prediction={authorPrediction} />
-        <Text bold fontSize={16} color="$textPrimary">
+    <DescriptionCard backgroundColor={backgroundColor} compact={compact}>
+      <InnerCard backgroundColor={innerBackgroundColor} compact={compact}>
+        <PronoGroup title="Prono. de Gabriel :" homeTeam={homeTeam} awayTeam={awayTeam} prediction={authorPrediction} scoreColor={authorScoreColor} compact={compact} />
+        <Text bold fontSize={16} color="$textPrimary" flexShrink={0} width={32} textAlign="center">
           VS
         </Text>
         <PronoGroup
@@ -150,6 +201,8 @@ export default function PronoPronosticsCard({ homeTeam, awayTeam, authorPredicti
           prediction={playerPrediction}
           highlighted={!locked}
           editable={!locked}
+          scoreColor={playerScoreColor}
+          compact={compact}
           onChange={onPlayerChange}
         />
       </InnerCard>
