@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
 import { Clock } from '@tamagui/lucide-icons'
 import { styled, XStack, YStack } from 'tamagui'
 
 import Text from '@/components/base/Text'
+
+import { padCountdownUnit as pad, usePronoCountdown } from '../hooks/usePronoCountdown'
 
 const Bar = styled(XStack, {
   alignSelf: 'stretch',
@@ -18,30 +19,12 @@ const Bar = styled(XStack, {
   gap: '$small',
 })
 
-const pad = (value: number) => String(value).padStart(2, '0')
-
-const getRemaining = (target: number) => {
-  const total = Math.max(0, Math.floor((target - Date.now()) / 1000))
-  return {
-    days: Math.floor(total / 86400),
-    hours: Math.floor((total % 86400) / 3600),
-    minutes: Math.floor((total % 3600) / 60),
-    seconds: total % 60,
-  }
-}
-
 type PronoCountdownProps = {
   targetAt: string
 }
 
 export default function PronoCountdown({ targetAt }: PronoCountdownProps) {
-  const target = new Date(targetAt).getTime()
-  const [remaining, setRemaining] = useState(() => getRemaining(target))
-
-  useEffect(() => {
-    const id = setInterval(() => setRemaining(getRemaining(target)), 1000)
-    return () => clearInterval(id)
-  }, [target])
+  const remaining = usePronoCountdown(targetAt)
 
   const units: { value: number; unit: string }[] = [
     { value: remaining.days, unit: 'j' },
