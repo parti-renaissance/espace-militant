@@ -27,5 +27,5 @@ export const defaultEventFilters: EventFilters = {
 export const eventFiltersState = create<FiltersState>((set) => ({
   searchInputRef: React.createRef(),
   value: defaultEventFilters,
-  setValue: (x) => (typeof x === 'function' ? set((y) => ({ ...x, value: x(y.value) })) : set({ value: x })),
+  setValue: (x) => (typeof x === 'function' ? set((y) => ({ ...y, value: x(y.value) })) : set((y) => ({ ...y, value: x }))),
 }))
