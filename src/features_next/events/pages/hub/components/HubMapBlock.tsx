@@ -1,10 +1,13 @@
 import type { ReactNode, Ref } from 'react'
+import { useRef } from 'react'
+import { View } from 'react-native'
 import { Spinner, YStack } from 'tamagui'
 import { Crosshair } from '@tamagui/lucide-icons'
 import type { CameraPadding } from '@rnmapbox/maps'
 import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
 
 import { VoxButton } from '@/components/Button'
+import { VoxBlurTarget } from '@/components/VoxBlur/VoxBlur'
 
 import HubItemMap, { FRANCE_METRO_CAMERA_BOUNDS, HubItemMapHandle, HubItemMapItem } from '../../map/components/HubItemMap'
 import { HubMapPromoOverlay } from './HubMapPromoOverlay'
@@ -38,6 +41,8 @@ export function HubMapBlock({
   promoLeadingAccessory,
   variant,
 }: HubMapBlockProps) {
+  const blurTargetRef = useRef<View | null>(null)
+
   const content = (
     <>
       <YStack position="absolute" top={topInset === 0 ? '$medium' : 0} pt={topInset} right="$medium" zIndex={20}>
@@ -54,18 +59,20 @@ export function HubMapBlock({
           Recentrer
         </VoxButton>
       </YStack>
-      <HubItemMap
-        ref={hubItemMapRef}
-        items={mapItems}
-        isInteractive
-        clusterItems={false}
-        onItemPress={onItemPress}
-        initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
-        padding={padding}
-        userLocationLngLat={userLocationLngLat}
-        embeddedInScrollView={variant === 'embedded'}
-      />
-      <HubMapPromoOverlay leadingAccessory={promoLeadingAccessory} />
+      <VoxBlurTarget ref={blurTargetRef} style={{ flex: 1, width: '100%' }}>
+        <HubItemMap
+          ref={hubItemMapRef}
+          items={mapItems}
+          isInteractive
+          clusterItems={false}
+          onItemPress={onItemPress}
+          initialBounds={FRANCE_METRO_CAMERA_BOUNDS}
+          padding={padding}
+          userLocationLngLat={userLocationLngLat}
+          embeddedInScrollView={variant === 'embedded'}
+        />
+      </VoxBlurTarget>
+      <HubMapPromoOverlay blurTarget={blurTargetRef} leadingAccessory={promoLeadingAccessory} />
       {showLoadingSpinner && (
         <YStack position="absolute" right={0} bottom={0} pointerEvents="none">
           <Spinner size="large" />

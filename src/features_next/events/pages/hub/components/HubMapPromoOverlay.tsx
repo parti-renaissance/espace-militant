@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import { memo, useCallback } from 'react'
+import { View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { List, Map } from '@tamagui/lucide-icons'
@@ -10,9 +11,10 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 
 type HubMapPromoOverlayProps = {
   leadingAccessory?: ReactNode
+  blurTarget?: RefObject<View | null>
 }
 
-export const HubMapPromoOverlay = memo(function HubMapPromoOverlay({ leadingAccessory }: HubMapPromoOverlayProps) {
+export const HubMapPromoOverlay = memo(function HubMapPromoOverlay({ leadingAccessory, blurTarget }: HubMapPromoOverlayProps) {
   const media = useMedia()
   const router = useRouter()
   const onOpenFullMap = useCallback(() => {
@@ -25,7 +27,7 @@ export const HubMapPromoOverlay = memo(function HubMapPromoOverlay({ leadingAcce
   return (
     <XStack position="absolute" left={0} right={0} bottom={0} zIndex={10} p="$medium" pointerEvents="box-none" alignItems="flex-end" gap="$medium">
       {leadingAccessory}
-      <VoxCard flexShrink={1} width="100%" maxWidth={media.gtXs ? 340 : undefined} borderRadius={16}>
+      <VoxCard.Blur blurTarget={blurTarget} flexShrink={1} width="100%" maxWidth={media.gtXs ? 340 : undefined} borderRadius={16}>
         <VoxCard.Content>
           <YStack gap="$small">
             <Title size="h1">
@@ -44,7 +46,7 @@ export const HubMapPromoOverlay = memo(function HubMapPromoOverlay({ leadingAcce
             </VoxButton>
           </XStack>
         </VoxCard.Content>
-      </VoxCard>
+      </VoxCard.Blur>
     </XStack>
   )
 })

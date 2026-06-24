@@ -1,6 +1,6 @@
 import { type ReactNode, type RefObject } from 'react'
 import { StyleSheet, type LayoutChangeEvent } from 'react-native'
-import { BlurView } from 'expo-blur'
+import VoxBlur from '@/components/VoxBlur/VoxBlur'
 import { isWeb, useMedia, YStack } from 'tamagui'
 import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef'
 import BotDisclaimer from './BotDisclaimer'
@@ -37,7 +37,7 @@ export function InputDock({ inputRef, value, isLoading, keyboardOpen, bottomOffs
       paddingHorizontal={media.sm ? 16 : 0}
       gap="$small"
     >
-      <BlurView intensity={18} tint="light" style={styles.blurBackground} pointerEvents="none" />
+      <VoxBlur variant="frosted" style={styles.blurBackground} pointerEvents="none" />
       <YStack fullscreen  pointerEvents="none" />
       {topSlot ? <YStack mb={16}>{topSlot}</YStack> : null}
       <ChatInput
