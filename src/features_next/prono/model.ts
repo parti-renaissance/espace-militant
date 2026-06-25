@@ -18,23 +18,15 @@ export type PronoMatchView = {
   awayTeam: PronoTeam
   kickoffLabel: string
   kickoffAt?: string
+  beginAt?: string
   authorPrediction?: PronoScore
   playerPrediction?: PronoScore
   result?: PronoScore
   status?: PronoStatus
+  resultStatus?: 'won' | 'lost' | 'draw' | 'pending'
   won?: boolean
   playersCount?: number
   imageUrl?: string
-}
-
-export const PRONO_FALLBACK_MATCH: PronoMatchView = {
-  label: 'Prochain match',
-  homeTeam: { code: 'FRA', name: 'France', flag: '🇫🇷' },
-  awayTeam: { code: 'BRA', name: 'Brésil', flag: '🇧🇷' },
-  kickoffLabel: 'Mercredi 25 juin - 21:00',
-  kickoffAt: '2026-06-25T21:00:00',
-  authorPrediction: { home: 2, away: 1 },
-  playersCount: 10000,
 }
 
 export const PRONO_PAGE_COPY = {

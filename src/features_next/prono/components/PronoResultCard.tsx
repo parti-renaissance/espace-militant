@@ -1,19 +1,24 @@
-import { ReactNode } from 'react'
-import { Platform, View as RNView, StyleSheet, ViewStyle } from 'react-native'
-import { Image } from 'expo-image'
-import { LinearGradient } from 'expo-linear-gradient'
-import { styled, View, XStack, YStack } from 'tamagui'
+import { ReactNode } from 'react';
+import { Platform, View as RNView, StyleSheet, ViewStyle } from 'react-native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { styled, View, XStack, YStack } from 'tamagui';
 
-import Text from '@/components/base/Text'
 
-import resultGabrielImage from '../assets/result-gabriel.png'
-import resultWinImage from '../assets/result-win.png'
-import { PronoScore, PronoTeam } from '../model'
-import PronoBadge from './PronoBadge'
-import PronoPronosticsCard from './PronoPronosticsCard'
-import { PLAAK_44_BOLD } from '../../../../theme/fonts'
 
-export type PronoResultVariant = 'win' | 'gabriel'
+import Text from '@/components/base/Text';
+
+
+
+import { PLAAK_44_BOLD } from '../../../../theme/fonts';
+import resultGabrielImage from '../assets/result-gabriel.png';
+import resultWinImage from '../assets/result-win.png';
+import { PronoScore, PronoTeam } from '../model';
+import PronoBadge from './PronoBadge';
+import PronoPronosticsCard from './PronoPronosticsCard';
+
+
+export type PronoResultVariant = 'win' | 'gabriel' | 'draw'
 
 const PANEL_TEXT_COLOR = '#27221F'
 const IMAGE_TOP = -118
@@ -61,6 +66,19 @@ const VARIANTS: Record<PronoResultVariant, VariantConfig> = {
     image: resultGabrielImage,
     imageWidth: 292,
     imageHeight: Math.round(292 * (816 / 500)),
+  },
+  draw: {
+    label: 'BALLE AU CENTRE !',
+    gradient: ['#70BBFF', '#4555D1'],
+    bannerColor: '#004580CC',
+    labelColor: '#D5D9FF',
+    panelColor: '#AAD4FF',
+    predictionPanelColor: '#EAF4FF',
+    authorAccentColor: '#BF9824',
+    playerAccentColor: '#C7652B',
+    image: resultWinImage,
+    imageWidth: 292,
+    imageHeight: Math.round(292 * (840 / 549)),
   },
 }
 

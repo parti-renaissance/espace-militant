@@ -17,47 +17,8 @@ const clientEnv = clientEnvSchema.parse(unParsedClientEnv)
 
 function generateClientEnvTsFileContent(clientEnv: ClientEnv) {
   return `
-  import { Platform } from 'react-native'
-  import { isEmulatorSync } from 'react-native-device-info'
   import type { ClientEnv } from '../../client-env-schema'
-
-  const rawClientEnv: ClientEnv = ${JSON.stringify(clientEnv, null, 2)}
-
-  const isAndroidEmulator = (): boolean => {
-    try {
-      return Platform.OS === 'android' && isEmulatorSync()
-    } catch {
-      return false
-    }
-  }
-
-  const resolveLocalAndroidUrl = (value: string): string => {
-    if (!__DEV__ || !isAndroidEmulator()) {
-      return value
-    }
-
-    try {
-      const url = new URL(value)
-      if (!url.hostname.endsWith('.code')) {
-        return value
-      }
-
-      const hasTrailingSlash = value.endsWith('/')
-      url.hostname = '10.0.2.2'
-
-      const nextValue = url.toString()
-      return hasTrailingSlash ? nextValue : nextValue.replace(/\\/$/, '')
-    } catch {
-      return value
-    }
-  }
-
-  const clientEnv: ClientEnv = {
-    ...rawClientEnv,
-    API_BASE_URL: resolveLocalAndroidUrl(rawClientEnv.API_BASE_URL),
-    OAUTH_BASE_URL: resolveLocalAndroidUrl(rawClientEnv.OAUTH_BASE_URL),
-  }
-
+  const clientEnv:ClientEnv = ${JSON.stringify(clientEnv, null, 2)}
   export default clientEnv
   `
 }

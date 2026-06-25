@@ -2,8 +2,8 @@ import { Href, router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 
-import { genericErrorThrower } from '@/services/common/errors/generic-errors'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
+import { genericErrorThrower } from '@/services/common/errors/generic-errors'
 import { type HitSource } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 
@@ -12,14 +12,10 @@ type AlertItem = RestAlertsResponse[number]
 const getPronosticRoute = (alert?: AlertItem) => {
   if (alert?.type?.toLowerCase() !== 'pronostic') return undefined
 
-  const data = alert.data ?? {}
-  const status = typeof data.status === 'string' ? data.status : undefined
+  const uuid = typeof alert.data?.uuid === 'string' ? alert.data.uuid : undefined
+  if (!uuid) return undefined
 
-  if (status === 'result_available') {
-    return data.won === false ? '/prono/resultat?variant=gabriel' : '/prono/resultat?variant=win'
-  }
-
-  return '/prono/jouer'
+  return `/prono/${uuid}`
 }
 
 export const createOnShow = (url: string | null, buttonLabel: string | null | undefined, hitSource: HitSource, alert?: AlertItem) => {

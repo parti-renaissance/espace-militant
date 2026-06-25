@@ -8,8 +8,9 @@ import Text from '@/components/base/Text'
 import Title from '@/components/Title/Title'
 
 import heroImage from '../assets/gabriel-attal-onboarding-prono.png'
+import { useCurrentPronoMatch } from '../hooks/useCurrentPronoMatch'
 import { padCountdownUnit, usePronoCountdown } from '../hooks/usePronoCountdown'
-import { PRONO_FALLBACK_MATCH, PronoMatchView, PronoScore, PronoTeam } from '../model'
+import { PronoMatchView, PronoScore, PronoTeam } from '../model'
 import { formatTeamLabel, parsePlayerPredictionFromUri } from '../utils'
 
 const PLAYER_MOCK_PREDICTION: PronoScore = { home: 3, away: 0 }
@@ -122,10 +123,14 @@ type PronoSignupCardProps = {
 }
 
 export function PronoSignupCard({ match: matchProp, playerPrediction: playerPredictionProp }: PronoSignupCardProps = {}) {
-  const match = matchProp ?? PRONO_FALLBACK_MATCH
-  const authorPrediction = match.authorPrediction ?? { home: 0, away: 0 }
   const { redirectUri } = useGlobalSearchParams<{ redirectUri?: string }>()
+  const { match: currentMatch } = useCurrentPronoMatch()
+  const match = matchProp ?? currentMatch
   const playerPrediction = playerPredictionProp ?? parsePlayerPredictionFromUri(redirectUri) ?? PLAYER_MOCK_PREDICTION
+
+  if (!match) return null
+
+  const authorPrediction = match.authorPrediction ?? { home: 0, away: 0 }
 
   return (
     <CardRoot>
