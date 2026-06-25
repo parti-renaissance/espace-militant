@@ -9,13 +9,13 @@ import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNaviga
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
 
-export default function PronosticDetailRoute() {
+export default function PronoDetailRoute() {
   const { uuid } = useLocalSearchParams<{ uuid: string }>()
   const { isAuth, isLoading } = useSession()
 
   if (!uuid) return <Error404 />
   if (isLoading) return null
-  if (!isAuth) return <Redirect href={getAuthHref(AuthRoutes.INSCRIPTION, `/pronostics/${uuid}`)} />
+  if (!isAuth) return <Redirect href={getAuthHref(AuthRoutes.INSCRIPTION, `/prono/${uuid}`)} />
 
   return (
     <>

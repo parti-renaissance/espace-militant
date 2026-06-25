@@ -19,6 +19,7 @@ import PronoResultCard from '../../components/PronoResultCard'
 import PronoScreenShell from '../../components/PronoScreenShell'
 import { usePronosticMatch } from '../../hooks/usePronosticMatch'
 import { PronoScore } from '../../model'
+import { resolveResultVariant } from '../../utils'
 
 const EMPTY_SCORE: PronoScore = { home: 0, away: 0 }
 
@@ -53,7 +54,7 @@ export default function PronoDetailScreen({ uuid }: PronoDetailScreenProps) {
     return (
       <PronoScreenShell>
         <PronoResultCard
-          variant={match.won ? 'win' : 'gabriel'}
+          variant={resolveResultVariant(match.resultStatus)}
           homeTeam={match.homeTeam}
           awayTeam={match.awayTeam}
           result={match.result ?? EMPTY_SCORE}

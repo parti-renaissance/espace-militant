@@ -1,8 +1,17 @@
 import { z } from 'zod'
 
+import { RestAlertsResponseSchema } from '@/services/alerts/schema'
 import { api } from '@/utils/api'
 
 import * as schemas from './schema'
+
+export const getPublicAlerts = api({
+  method: 'get',
+  path: 'api/v3/alerts',
+  requestSchema: z.void(),
+  responseSchema: RestAlertsResponseSchema,
+  type: 'public',
+})
 
 export const getPronostic = (props: { uuid: string }) =>
   api({

@@ -7,6 +7,6 @@ export function usePronosticMatch(uuid: string): { match: PronoMatchView } {
   const { data } = usePronostic(uuid)
 
   return {
-    match: mapPronosticDataToMatch(data, data.image_url ?? undefined),
+    match: mapPronosticDataToMatch(data),
   }
 }

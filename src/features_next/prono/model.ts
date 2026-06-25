@@ -23,6 +23,7 @@ export type PronoMatchView = {
   playerPrediction?: PronoScore
   result?: PronoScore
   status?: PronoStatus
+  resultStatus?: 'won' | 'lost' | 'draw' | 'pending'
   won?: boolean
   playersCount?: number
   imageUrl?: string

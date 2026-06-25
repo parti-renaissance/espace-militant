@@ -1,12 +1,13 @@
 import { useToastController } from '@tamagui/toast'
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
+import { useSession } from '@/ctx/SessionProvider'
 import { getAlerts } from '@/services/alerts/api'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 
-import { createPronosticParticipation, getPronostic } from './api'
-import { RestPronosticAlertDataSchema, type RestPostPronosticParticipationRequest, type RestPronosticAlertData } from './schema'
+import { createPronosticParticipation, getPronostic, getPublicAlerts } from './api'
+import { RestPronosticDataSchema, type RestPostPronosticParticipationRequest, type RestPronosticData } from './schema'
 
 const ALERTS_QUERY_KEY = 'alerts'
 const PRONOSTIC_ALERTS_QUERY_KEY = 'pronostic-alerts'
@@ -14,19 +15,21 @@ const PRONOSTIC_QUERY_KEY = 'pronostic'
 
 const findPronosticAlert = (alerts?: RestAlertsResponse) => alerts?.find((alert) => alert.type?.toLowerCase() === 'pronostic')
 
-const parsePronosticAlert = (alert?: RestAlertsResponse[number]): { data: RestPronosticAlertData; imageUrl?: string } | null => {
+const parsePronosticAlert = (alert?: RestAlertsResponse[number]): { data: RestPronosticData; imageUrl?: string } | null => {
   if (!alert?.data) return null
 
-  const parsed = RestPronosticAlertDataSchema.safeParse(alert.data)
+  const parsed = RestPronosticDataSchema.safeParse(alert.data)
   if (!parsed.success) return null
 
-  return { data: parsed.data, imageUrl: alert.image_url ?? undefined }
+  return { data: parsed.data, imageUrl: parsed.data.image_url ?? undefined }
 }
 
 export const useCurrentPronostic = () => {
+  const { isAuth, isLoading: isSessionLoading } = useSession()
   const alertsQuery = useQuery({
-    queryKey: [PRONOSTIC_ALERTS_QUERY_KEY],
-    queryFn: () => getAlerts(),
+    queryKey: [PRONOSTIC_ALERTS_QUERY_KEY, isAuth],
+    queryFn: () => (isAuth ? getAlerts() : getPublicAlerts()),
+    enabled: !isSessionLoading,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnMount: true,
@@ -34,7 +37,7 @@ export const useCurrentPronostic = () => {
 
   return {
     pronostic: parsePronosticAlert(findPronosticAlert(alertsQuery.data)),
-    isLoading: alertsQuery.isLoading,
+    isLoading: isSessionLoading || alertsQuery.isLoading,
   }
 }
 
@@ -64,10 +67,10 @@ export const useCreatePronosticParticipation = (uuid?: string) => {
       await queryClient.cancelQueries({ queryKey: [ALERTS_QUERY_KEY] })
       await queryClient.cancelQueries({ queryKey: [PRONOSTIC_ALERTS_QUERY_KEY] })
       const previousAlerts = queryClient.getQueryData<RestAlertsResponse>([ALERTS_QUERY_KEY])
-      const previousPronosticAlerts = queryClient.getQueryData<RestAlertsResponse>([PRONOSTIC_ALERTS_QUERY_KEY])
+      const previousPronosticAlerts = queryClient.getQueriesData<RestAlertsResponse>({ queryKey: [PRONOSTIC_ALERTS_QUERY_KEY] })
 
       queryClient.setQueryData<RestAlertsResponse>([ALERTS_QUERY_KEY], (alerts) => updatePronosticAlert(alerts, payload))
-      queryClient.setQueryData<RestAlertsResponse>([PRONOSTIC_ALERTS_QUERY_KEY], (alerts) => updatePronosticAlert(alerts, payload))
+      queryClient.setQueriesData<RestAlertsResponse>({ queryKey: [PRONOSTIC_ALERTS_QUERY_KEY] }, (alerts) => updatePronosticAlert(alerts, payload))
 
       return { previousAlerts, previousPronosticAlerts }
     },
@@ -75,9 +78,7 @@ export const useCreatePronosticParticipation = (uuid?: string) => {
       if (context?.previousAlerts) {
         queryClient.setQueryData([ALERTS_QUERY_KEY], context.previousAlerts)
       }
-      if (context?.previousPronosticAlerts) {
-        queryClient.setQueryData([PRONOSTIC_ALERTS_QUERY_KEY], context.previousPronosticAlerts)
-      }
+      context?.previousPronosticAlerts?.forEach(([key, data]) => queryClient.setQueryData(key, data))
 
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })

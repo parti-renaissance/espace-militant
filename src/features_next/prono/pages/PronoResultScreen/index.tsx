@@ -6,6 +6,7 @@ import PronoResultCard, { PronoResultVariant } from '../../components/PronoResul
 import PronoScreenShell from '../../components/PronoScreenShell'
 import { useCurrentPronoMatch } from '../../hooks/useCurrentPronoMatch'
 import { PronoScore } from '../../model'
+import { resolveResultVariant } from '../../utils'
 
 type ResultMock = {
   result: PronoScore
@@ -16,9 +17,10 @@ type ResultMock = {
 const RESULT_MOCKS: Record<PronoResultVariant, ResultMock> = {
   win: { result: { home: 3, away: 1 }, authorPrediction: { home: 2, away: 1 }, playerPrediction: { home: 3, away: 1 } },
   gabriel: { result: { home: 3, away: 0 }, authorPrediction: { home: 2, away: 0 }, playerPrediction: { home: 3, away: 0 } },
+  draw: { result: { home: 3, away: 2 }, authorPrediction: { home: 3, away: 0 }, playerPrediction: { home: 3, away: 0 } },
 }
 
-const parseVariant = (value?: string): PronoResultVariant => (value === 'gabriel' ? value : 'win')
+const parseVariant = (value?: string): PronoResultVariant => (value === 'gabriel' || value === 'draw' ? value : 'win')
 
 export default function PronoResultScreen() {
   const { match, isLoading: isPronoLoading } = useCurrentPronoMatch()
@@ -36,7 +38,7 @@ export default function PronoResultScreen() {
     return <Redirect href="/prono" />
   }
 
-  const variant = match.won === undefined ? parseVariant(params.variant) : match.won ? 'win' : 'gabriel'
+  const variant: PronoResultVariant = match.resultStatus ? resolveResultVariant(match.resultStatus) : parseVariant(params.variant)
   const mock = RESULT_MOCKS[variant]
   const result = match.result ?? mock.result
   const authorPrediction = match.authorPrediction ?? mock.authorPrediction
