@@ -25,7 +25,7 @@ export const HubFeedRow = memo(({ row, userUuid, source }: HubFeedRowProps) => {
   const paddingX = media.gtSm ? '$medium' : 0
 
   if (row.type === 'event') {
-    const content = <EventListItem event={row.event} userUuid={userUuid} source={source} />
+    const content = <EventListItem event={row.event} userUuid={userUuid} source={source} seed={row.seed} />
     if (Platform.OS === 'web') {
       return (
         <YStack px={paddingX}>

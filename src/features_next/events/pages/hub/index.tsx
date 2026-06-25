@@ -1,13 +1,15 @@
 import { Suspense, useCallback, useMemo, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useRouter } from 'expo-router'
 import { Spinner, useMedia, YStack } from 'tamagui'
 import type { MapboxOnPressEvent } from '@/components/Mapbox/types'
 
 import { SideBarArea } from '@/components/AppStructure'
 import { TABBAR_HEIGHT_SM } from '@/components/AppStructure/hooks/useLayoutSpacing'
 import { useNavigateToAction } from '@/features_next/actions/hooks/useNavigateToAction'
+import { useNavigateToEvent } from '@/features_next/events/hooks/useNavigateToEvent'
 import { useHubActionSeeds } from '@/features_next/events/hooks/useHubActionSeeds'
+import { useHubEventSeeds } from '@/features_next/events/hooks/useHubEventSeeds'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
 import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
@@ -21,8 +23,8 @@ import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenO
 import { HubOrganizeCategoryModal } from './components/HubOrganizeCategoryModal'
 
 const EventsHubPage = () => {
-  const router = useRouter()
   const navigateToAction = useNavigateToAction()
+  const navigateToEvent = useNavigateToEvent()
   const hubItemMapRef = useRef<HubItemMapHandle>(null)
   const { coords, isLocating, requestLocation } = useUserLocation()
 
@@ -67,6 +69,7 @@ const EventsHubPage = () => {
 
   const mapItems = useMemo(() => mapHubItemsToMapMarkers(data?.items ?? []), [data?.items])
   const hubActionSeeds = useHubActionSeeds(data?.items)
+  const hubEventSeeds = useHubEventSeeds(data?.items)
 
   const handleMapItemPress = useCallback(
     (event: MapboxOnPressEvent) => {
@@ -82,10 +85,10 @@ const EventsHubPage = () => {
 
       const slug = properties.slug
       if (typeof slug === 'string' && slug.length > 0) {
-        router.push(`/evenements/${slug}`)
+        navigateToEvent(slug, hubEventSeeds.get(slug) ?? null, { source: HIT_SOURCES.PAGE_EVENTS_HUB })
       }
     },
-    [hubActionSeeds, navigateToAction, router],
+    [hubActionSeeds, hubEventSeeds, navigateToAction, navigateToEvent],
   )
 
   const handleRecenterPress = useCallback(() => {

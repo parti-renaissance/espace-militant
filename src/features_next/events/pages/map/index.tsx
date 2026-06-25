@@ -10,7 +10,10 @@ import { SideBarArea } from '@/components/AppStructure/Navigation/SideBar'
 import { VoxButton } from '@/components/Button'
 
 import { useNavigateToAction } from '@/features_next/actions/hooks/useNavigateToAction'
+import { useNavigateToEvent } from '@/features_next/events/hooks/useNavigateToEvent'
 import { useHubActionSeeds } from '@/features_next/events/hooks/useHubActionSeeds'
+import { useHubEventSeeds } from '@/features_next/events/hooks/useHubEventSeeds'
+import { HIT_SOURCES } from '@/services/hits/constants'
 import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
 import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
@@ -27,6 +30,7 @@ import { mapCameraSnapshotFromHubBounds, mapCameraSnapshotFromVisibleBounds, typ
 const EventsMapPage = () => {
   const router = useRouter()
   const navigateToAction = useNavigateToAction()
+  const navigateToEvent = useNavigateToEvent()
   const hubItemMapRef = useRef<HubItemMapHandle>(null)
   const hasAutoFlownToUserRef = useRef(false)
   const { coords, isLocating, requestLocation } = useUserLocation()
@@ -77,6 +81,7 @@ const EventsMapPage = () => {
 
   const mapItems = useMemo(() => mapHubItemsToMapMarkers(data?.items ?? []), [data?.items])
   const hubActionSeeds = useHubActionSeeds(data?.items)
+  const hubEventSeeds = useHubEventSeeds(data?.items)
 
   useEffect(() => {
     if (hasAutoFlownToUserRef.current || coords == null || isLoading || isFetching) {
@@ -136,7 +141,7 @@ const EventsMapPage = () => {
 
     const slug = properties.slug
     if (typeof slug === 'string' && slug.length > 0) {
-      router.push(`/evenements/${slug}`)
+      navigateToEvent(slug, hubEventSeeds.get(slug) ?? null, { source: HIT_SOURCES.PAGE_EVENTS })
     }
   }
 

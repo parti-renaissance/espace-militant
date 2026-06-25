@@ -25,6 +25,7 @@ import { useSession } from '@/ctx/SessionProvider'
 import { transformFeedItemToProps } from '@/features_next/timelinefeed/helpers/transformFeedItemToProps'
 import { useNavigateToAction } from '@/features_next/actions/hooks/useNavigateToAction'
 import { mapFeedItemToRestActionFull } from '@/services/common/mapper/mapTimelineFeedToRestAction'
+import { mapFeedItemToRestEventSeed } from '@/services/common/mapper/mapTimelineFeedToRestEvent'
 import { useAlerts } from '@/services/alerts/hook'
 import { filterBannerAlerts, filterLiveAlerts } from '@/services/alerts/utils'
 import { HIT_SOURCES } from '@/services/hits/constants'
@@ -75,7 +76,12 @@ const TimelineFeedCard = memo((item: RestTimelineFeedItem) => {
           onShow: () => navigateToAction(item.objectID, mapFeedItemToRestActionFull(item)),
           onEdit: () => router.push(`/actions/${item.objectID}/modifier`),
         }
-      : props
+      : props.type === 'event'
+        ? {
+            ...props,
+            seed: mapFeedItemToRestEventSeed(item),
+          }
+        : props
 
   if (Platform.OS === 'web' && cardProps) {
     return (

@@ -1,5 +1,35 @@
-import { RestFullEvent } from '@/services/events/schema'
+import { RestFullEvent, type RestPartialEvent } from '@/services/events/schema'
 import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
+
+export const mapFeedItemToRestEventSeed = (feed: RestTimelineFeedItem): RestPartialEvent | null => {
+  if (feed.type !== 'event' || !feed.identifier) {
+    return null
+  }
+
+  const mapped = map(feed)
+
+  return {
+    object_state: 'partial',
+    uuid: mapped.uuid,
+    slug: mapped.slug,
+    name: mapped.name ?? '',
+    status: 'SCHEDULED',
+    visibility: (mapped.visibility ?? 'public') as RestPartialEvent['visibility'],
+    begin_at: mapped.begin_at ?? feed.date ?? new Date().toISOString(),
+    finish_at: mapped.finish_at ?? null,
+    time_zone: mapped.time_zone ?? 'Europe/Paris',
+    post_address: mapped.post_address ?? null,
+    organizer: mapped.organizer ?? null,
+    image: mapped.image ?? null,
+    mode: mapped.mode ?? null,
+    category: mapped.category ?? null,
+    participants_count: mapped.participants_count,
+    visio_url: null,
+    hidden: false,
+    user_registered_at: mapped.user_registered_at ?? null,
+    editable: mapped.editable,
+  }
+}
 
 export const map = (x: RestTimelineFeedItem): Partial<RestFullEvent> & { uuid: string; slug: string } => {
   return {

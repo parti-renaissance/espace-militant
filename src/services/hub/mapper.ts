@@ -1,10 +1,11 @@
 import type { ActionVoxCardProps } from '@/components/Cards/ActionCard'
 import type { HubItemMapItem } from '@/features_next/events/pages/map/components/HubItemMap'
-import { isEventPast } from '@/features_next/events/utils'
+import { isEventPast } from '@/services/events/selectors'
 
 import { mapHubItemToRestActionFull, parseActionType } from '@/services/actions/mapper'
 import { ActionStatus, type RestActionFull } from '@/services/actions/schema'
-import type { RestItemEvent, RestPartialEvent } from '@/services/events/schema'
+import { mapItemEventToRestEventSeed } from '@/services/common/mapper/mapItemEventToRestEventSeed'
+import type { RestEvent, RestItemEvent, RestPartialEvent } from '@/services/events/schema'
 
 import { isHubActionItem, isHubEventItem, type RestHubItem } from './schema'
 
@@ -73,6 +74,13 @@ export const mapHubItemToRestItemEvent = (item: RestHubItem): RestItemEvent | nu
   return { object_state: 'partial', ...base } as RestPartialEvent
 }
 
+export { mapItemEventToRestEventSeed } from '@/services/common/mapper/mapItemEventToRestEventSeed'
+
+export const mapHubItemToRestEventSeed = (item: RestHubItem): RestPartialEvent | null => {
+  const event = mapHubItemToRestItemEvent(item)
+  return event ? mapItemEventToRestEventSeed(event) : null
+}
+
 export const mapHubItemToActionCardPayload = (item: RestHubItem): ActionVoxCardProps['payload'] | null => {
   if (!isHubActionItem(item)) {
     return null
@@ -121,7 +129,7 @@ export const mapHubItemToActionCardPayload = (item: RestHubItem): ActionVoxCardP
 }
 
 export type HubFeedRow =
-  | { type: 'event'; event: RestItemEvent }
+  | { type: 'event'; event: RestItemEvent; seed: RestEvent | null }
   | { type: 'action'; payload: ActionVoxCardProps['payload']; editable: boolean; seed: RestActionFull | null }
 
 export const mapHubItemToFeedRow = (item: RestHubItem): HubFeedRow | null => {
@@ -131,7 +139,7 @@ export const mapHubItemToFeedRow = (item: RestHubItem): HubFeedRow | null => {
   }
 
   const event = mapHubItemToRestItemEvent(item)
-  return event ? { type: 'event', event } : null
+  return event ? { type: 'event', event, seed: mapItemEventToRestEventSeed(event) } : null
 }
 
 const isFiniteCoordinate = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
