@@ -1,35 +1,26 @@
-name: Deploy on firebase
-description: Deploy on firebase hosting
+name: Deploy on firebase live
+description: Deploy on firebase hosting live channel
+
+inputs:
+  firebaseServiceAccount:
+    description: Firebase service account JSON
+    required: true
+  projectId:
+    description: Firebase project ID
+    required: true
 
 outputs:
   url:
-    description: "Deployment URL"
-    value: ${{steps.extractor.outputs.url}}"
+    description: Deployment URL
+    value: ${{ steps.deploy.outputs.details_url }}
 
 runs:
   using: composite
   steps:
-    - name: 🔎 Debug firebase auth
-      shell: bash
-      env:
-        NODE_OPTIONS: --dns-result-order=ipv4first
-      run: node ./.github/scripts/debug-firebase-auth.mjs || true
-    - name: 📦 Deploy on firebase
-      shell: bash
-      env:
-        NODE_OPTIONS: --dns-result-order=ipv4first
-      run: |
-        set -o pipefail
-        n=0
-        until [ "$n" -ge 4 ]; do
-          npx firebase deploy --only hosting --project "${EXPO_PUBLIC_FB_PROJECT_ID}" | tee output.txt && exit 0
-          n=$((n + 1))
-          echo "::warning::firebase deploy attempt $n failed, retrying in 15s..."
-          sleep 15
-        done
-        echo "::error::firebase deploy failed after $n attempts"
-        exit 1
-    - name: Extract deployed URL
-      id: extractor
-      shell: bash
-      run: cat output.txt | grep "Hosting URL" | awk -F 'https://' '{print "https://" $2}' | awk '{print "url="$1}' >> $GITHUB_OUTPUT
+    - uses: FirebaseExtended/action-hosting-deploy@v0
+      id: deploy
+      with:
+        firebaseServiceAccount: ${{ inputs.firebaseServiceAccount }}
+        projectId: ${{ inputs.projectId }}
+        channelId: live
+        firebaseToolsVersion: '13.35.1'
