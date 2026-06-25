@@ -25,16 +25,22 @@ export default function PronoResultScreen() {
   const params = useLocalSearchParams<{ variant?: string }>()
   const { isAuth, isLoading } = useSession()
   const isNavigationReady = useRootNavigationState()?.key != null
-  const variant = match.won === undefined ? parseVariant(params.variant) : match.won ? 'win' : 'gabriel'
-  const mock = RESULT_MOCKS[variant]
-  const result = match.result ?? mock.result
-  const authorPrediction = match.authorPrediction ?? mock.authorPrediction
-  const playerPrediction = match.playerPrediction ?? mock.playerPrediction
+
   if (isLoading || isPronoLoading || !isNavigationReady) return null
 
   if (!isAuth) {
     return <Redirect href="/prono" />
   }
+
+  if (!match) {
+    return <Redirect href="/prono" />
+  }
+
+  const variant = match.won === undefined ? parseVariant(params.variant) : match.won ? 'win' : 'gabriel'
+  const mock = RESULT_MOCKS[variant]
+  const result = match.result ?? mock.result
+  const authorPrediction = match.authorPrediction ?? mock.authorPrediction
+  const playerPrediction = match.playerPrediction ?? mock.playerPrediction
 
   return (
     <PronoScreenShell>

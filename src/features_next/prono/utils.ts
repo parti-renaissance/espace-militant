@@ -1,7 +1,49 @@
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
-import { PronoScore, PronoTeam } from './model'
+import type { PronosticStatus, RestPronosticScore } from '@/services/pronostics/schema'
+
+import { PronoMatchView, PronoScore, PronoTeam } from './model'
+
+const TEAM_FLAGS: Record<string, string> = {
+  BRA: '🇧🇷',
+  FRA: '🇫🇷',
+}
+
+type PronosticMatchSource = {
+  uuid: string
+  title: string
+  begin_at?: string
+  match_at: string
+  team_1: string
+  team_2: string
+  gabriel_pronostic: RestPronosticScore
+  status: PronosticStatus
+  participation?: RestPronosticScore | null
+  result?: RestPronosticScore | null
+  won?: boolean | null
+}
+
+const toPronoScore = (score: RestPronosticScore): PronoScore => ({
+  home: score.team_1_score,
+  away: score.team_2_score,
+})
+
+export const mapPronosticDataToMatch = (data: PronosticMatchSource, imageUrl?: string): PronoMatchView => ({
+  uuid: data.uuid,
+  label: data.title,
+  homeTeam: { code: data.team_1, flag: TEAM_FLAGS[data.team_1] },
+  awayTeam: { code: data.team_2, flag: TEAM_FLAGS[data.team_2] },
+  kickoffLabel: formatKickoffLabel(data.match_at),
+  kickoffAt: data.match_at,
+  beginAt: data.begin_at,
+  authorPrediction: toPronoScore(data.gabriel_pronostic),
+  playerPrediction: data.participation ? toPronoScore(data.participation) : undefined,
+  result: data.result ? toPronoScore(data.result) : undefined,
+  status: data.status,
+  won: data.won ?? undefined,
+  imageUrl,
+})
 
 export const formatTeamLabel = (home: PronoTeam, away: PronoTeam): string => {
   const formatTeam = (team: PronoTeam) => [team.flag, team.code].filter(Boolean).join(' ')
@@ -9,7 +51,6 @@ export const formatTeamLabel = (home: PronoTeam, away: PronoTeam): string => {
 }
 
 export const formatScore = (score: PronoScore): string => `${score.home} - ${score.away}`
-
 
 export const formatKickoffLabel = (iso: string): string => {
   const label = format(new Date(iso), 'EEEE d MMMM - HH:mm', { locale: fr })

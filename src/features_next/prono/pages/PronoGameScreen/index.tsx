@@ -4,10 +4,10 @@ import { Redirect, router, useLocalSearchParams, useRootNavigationState } from '
 import { YStack } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 
+import Text from '@/components/base/Text'
 import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import { useCreatePronosticParticipation } from '@/services/pronostics/hook'
 
 import jouerImage from '../../assets/gabriel-attal-jouer.png'
@@ -52,18 +52,12 @@ export default function PronoGameScreen() {
   const [hasPlayed, setHasPlayed] = useState(() => resumePrediction != null)
   const [launchModalOpen, setLaunchModalOpen] = useState(() => resumePrediction != null)
   const hasSubmittedResumePredictionRef = useRef(false)
-  const createParticipation = useCreatePronosticParticipation(match.uuid)
-  const hasBackendParticipation = Boolean(match.playerPrediction) || match.status === 'participated' || match.status === 'result_available'
-  const isPredictionLocked = hasPlayed || hasBackendParticipation
-  const displayedPlayerPrediction = match.playerPrediction ?? playerPrediction
-  const matchImage = isPredictionLocked ? pronoFinished : jouerImage
-  const matchImageWidth = isPredictionLocked ? 400 : 300
-  const matchImageHeight = isPredictionLocked ? Math.round(matchImageWidth * (818 / 779)) : 409
+  const createParticipation = useCreatePronosticParticipation(match?.uuid)
   const launchVariant = Platform.OS === 'web' ? 'download' : 'app'
 
   const submitPrediction = useCallback(
     async (prediction: { home: number; away: number }) => {
-      if (!match.uuid) {
+      if (!match?.uuid) {
         toast.show('Pronostic indisponible', { message: 'Réessaie dans quelques instants.', type: 'error' })
         return false
       }
@@ -74,32 +68,43 @@ export default function PronoGameScreen() {
           team_2_score: prediction.away,
         })
         setHasPlayed(true)
-        toast.show('Prono enregistré', { message: `Ton score : ${prediction.home} - ${prediction.away}`, type: 'success' })
         return true
-      } catch (error) {
+      } catch {
         setHasPlayed(false)
-        const message = error instanceof GenericResponseError ? error.message : "Impossible d'enregistrer ton pronostic."
-        toast.show('Erreur', { message, type: 'error' })
         return false
       }
     },
-    [createParticipation, match.uuid, toast],
+    [createParticipation, match?.uuid, toast],
   )
 
   useEffect(() => {
-    if (!resumePrediction || !isAuth || !match.uuid || hasSubmittedResumePredictionRef.current) return
+    if (!resumePrediction || !isAuth || !match?.uuid || hasSubmittedResumePredictionRef.current) return
 
     hasSubmittedResumePredictionRef.current = true
-    createParticipation.mutate(
-      { team_1_score: resumePrediction.home, team_2_score: resumePrediction.away },
-      {
-        onError: (error) => {
-          const message = error instanceof GenericResponseError ? error.message : "Impossible d'enregistrer ton pronostic."
-          toast.show('Erreur', { message, type: 'error' })
-        },
-      },
+    createParticipation.mutate({ team_1_score: resumePrediction.home, team_2_score: resumePrediction.away })
+  }, [isAuth, resumePrediction, match?.uuid, createParticipation])
+
+  if (isLoading || isPronoLoading || !isNavigationReady) return null
+
+  if (!match) {
+    return (
+      <PronoScreenShell>
+        <YStack marginTop="$medium">
+          <PronoHeroSection showSubtitle={false} showBadge={false} />
+        </YStack>
+        <Text.MD semibold textAlign="center" color="#4555D1">
+          Aucun pronostic disponible pour le moment.
+        </Text.MD>
+      </PronoScreenShell>
     )
-  }, [isAuth, resumePrediction, match.uuid, createParticipation, toast])
+  }
+
+  const hasBackendParticipation = Boolean(match.playerPrediction) || match.status === 'participated' || match.status === 'result_available'
+  const isPredictionLocked = hasPlayed || hasBackendParticipation
+  const displayedPlayerPrediction = match.playerPrediction ?? playerPrediction
+  const matchImage = isPredictionLocked ? pronoFinished : jouerImage
+  const matchImageWidth = isPredictionLocked ? 400 : 300
+  const matchImageHeight = isPredictionLocked ? Math.round(matchImageWidth * (818 / 779)) : 409
 
   const handlePlay = async () => {
     const prediction = {
@@ -122,8 +127,6 @@ export default function PronoGameScreen() {
       setLaunchModalOpen(true)
     }
   }
-
-  if (isLoading || isPronoLoading || !isNavigationReady) return null
 
   if (match.status === 'result_available') {
     return <Redirect href={match.won === false ? '/prono/resultat?variant=gabriel' : '/prono/resultat?variant=win'} />
