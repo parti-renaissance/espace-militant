@@ -7,7 +7,7 @@ import { styled, View, XStack, YStack } from 'tamagui'
 import Text from '@/components/base/Text'
 import Title from '@/components/Title/Title'
 
-import heroImage from '../assets/gabriel-attal-onboarding-prono.png'
+import heroImage from '../assets/gabriel-attal-ball.png'
 import { useCurrentPronoMatch } from '../hooks/useCurrentPronoMatch'
 import { padCountdownUnit, usePronoCountdown } from '../hooks/usePronoCountdown'
 import { PronoMatchView, PronoScore, PronoTeam } from '../model'
@@ -18,7 +18,7 @@ const PLAYER_MOCK_PREDICTION: PronoScore = { home: 3, away: 0 }
 const CARD_HEIGHT = 235
 const CARD_RADIUS = 20
 const IMAGE_WIDTH = 200
-const IMAGE_HEIGHT = Math.round(IMAGE_WIDTH * (842 / 463))
+const IMAGE_HEIGHT = Math.round(IMAGE_WIDTH * (864 / 614))
 
 const baseGradient = ['#29C45D', '#4555D1'] as const
 const overlayGradient = ['#E0DBD7', '#6E6764'] as const

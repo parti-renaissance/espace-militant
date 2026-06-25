@@ -11,6 +11,7 @@ import Text from '@/components/base/Text';
 
 
 import { PLAAK_44_BOLD } from '../../../../theme/fonts';
+import resultDrawImage from '../assets/result-draw.png';
 import resultGabrielImage from '../assets/result-gabriel.png';
 import resultWinImage from '../assets/result-win.png';
 import { PronoScore, PronoTeam } from '../model';
@@ -22,7 +23,7 @@ export type PronoResultVariant = 'win' | 'gabriel' | 'draw'
 
 const PANEL_TEXT_COLOR = '#27221F'
 const IMAGE_TOP = -118
-const SPACER_HEIGHT = 236
+const SPACER_HEIGHT = 150
 const CARD_RADIUS = 24
 const PANEL_RADIUS = 24
 
@@ -51,8 +52,8 @@ const VARIANTS: Record<PronoResultVariant, VariantConfig> = {
     authorAccentColor: '#BF9824',
     playerAccentColor: '#4B9F57',
     image: resultWinImage,
-    imageWidth: 292,
-    imageHeight: Math.round(292 * (840 / 549)),
+    imageWidth: 160,
+    imageHeight: Math.round(150 * (840 / 549)),
   },
   gabriel: {
     label: 'GABRIEL A GAGNÉ',
@@ -64,21 +65,21 @@ const VARIANTS: Record<PronoResultVariant, VariantConfig> = {
     authorAccentColor: '#BF9824',
     playerAccentColor: '#C7652B',
     image: resultGabrielImage,
-    imageWidth: 292,
-    imageHeight: Math.round(292 * (816 / 500)),
+    imageWidth: 160,
+    imageHeight: Math.round(150 * (840 / 549)),
   },
   draw: {
     label: 'BALLE AU CENTRE !',
     gradient: ['#70BBFF', '#4555D1'],
     bannerColor: '#004580CC',
-    labelColor: '#D5D9FF',
+    labelColor: '#AAD4FF',
     panelColor: '#AAD4FF',
     predictionPanelColor: '#EAF4FF',
     authorAccentColor: '#BF9824',
     playerAccentColor: '#C7652B',
-    image: resultWinImage,
-    imageWidth: 292,
-    imageHeight: Math.round(292 * (840 / 549)),
+    image: resultDrawImage,
+    imageWidth: 160,
+    imageHeight: Math.round(150 * (840 / 549)),
   },
 }
 

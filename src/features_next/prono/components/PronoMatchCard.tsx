@@ -5,10 +5,14 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { styled, View, XStack, YStack } from 'tamagui';
 
+
+
 import Text from '@/components/base/Text';
 import Title from '@/components/Title/Title';
 
-import heroImage from '../assets/gabriel-attal-onboarding-prono.png';
+
+
+import heroImage from '../assets/gabriel-attal-ball.png';
 import { PronoMatchView } from '../model';
 import { formatScore, formatTeamLabel } from '../utils';
 import PronoBadge from './PronoBadge';
@@ -19,7 +23,7 @@ const IMAGE_HEIGHT = Math.round(IMAGE_WIDTH * (842 / 463))
 const PANEL_RADIUS = 24
 const PANEL_PADDING_BOTTOM = 15
 const GLOW_WIDTH = 320
-const GLOW_HEIGHT = 180
+const GLOW_HEIGHT = 210
 
 const PanelFrame = styled(YStack, {
   position: 'relative',

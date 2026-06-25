@@ -1,25 +1,31 @@
-import { useState } from 'react'
-import { Platform } from 'react-native'
-import { YStack } from 'tamagui'
-import { useToastController } from '@tamagui/toast'
+import { useState } from 'react';
+import { Platform } from 'react-native';
+import { YStack } from 'tamagui';
+import { useToastController } from '@tamagui/toast';
 
-import Text from '@/components/base/Text'
 
-import { useCreatePronosticParticipation } from '@/services/pronostics/hook'
 
-import jouerImage from '../../assets/gabriel-attal-jouer.png'
-import pronoFinished from '../../assets/gabriel-attal-onboarding-prono.png'
-import PronoCountdown from '../../components/PronoCountdown'
-import PronoCtaSection from '../../components/PronoCtaSection'
-import PronoHeroSection from '../../components/PronoHeroSection'
-import PronoLaunchModal from '../../components/PronoLaunchModal'
-import PronoMatchCard from '../../components/PronoMatchCard'
-import PronoPronosticsCard, { EditableScore } from '../../components/PronoPronosticsCard'
-import PronoResultCard from '../../components/PronoResultCard'
-import PronoScreenShell from '../../components/PronoScreenShell'
-import { usePronosticMatch } from '../../hooks/usePronosticMatch'
-import { PronoScore } from '../../model'
-import { resolveResultVariant } from '../../utils'
+import Text from '@/components/base/Text';
+
+
+
+import { useCreatePronosticParticipation } from '@/services/pronostics/hook';
+
+
+
+import gabrielBall from '../../assets/gabriel-attal-ball.png';
+import PronoCountdown from '../../components/PronoCountdown';
+import PronoCtaSection from '../../components/PronoCtaSection';
+import PronoHeroSection from '../../components/PronoHeroSection';
+import PronoLaunchModal from '../../components/PronoLaunchModal';
+import PronoMatchCard from '../../components/PronoMatchCard';
+import PronoPronosticsCard, { EditableScore } from '../../components/PronoPronosticsCard';
+import PronoResultCard from '../../components/PronoResultCard';
+import PronoScreenShell from '../../components/PronoScreenShell';
+import { usePronosticMatch } from '../../hooks/usePronosticMatch';
+import { PronoScore } from '../../model';
+import { resolveResultVariant } from '../../utils';
+
 
 const EMPTY_SCORE: PronoScore = { home: 0, away: 0 }
 
@@ -35,9 +41,9 @@ export default function PronoDetailScreen({ uuid }: PronoDetailScreenProps) {
   const [launchModalOpen, setLaunchModalOpen] = useState(false)
 
   const isFormState = match.status === 'not_participated'
-  const matchImage = isFormState ? jouerImage : pronoFinished
-  const matchImageWidth = isFormState ? 300 : 400
-  const matchImageHeight = isFormState ? 409 : Math.round(400 * (818 / 779))
+  const matchImage = gabrielBall
+  const matchImageWidth = isFormState ? 300 : 300
+  const matchImageHeight = Math.round(matchImageWidth * (810 / 600))
   const launchVariant = Platform.OS === 'web' ? 'download' : 'app'
   const modalPrediction = match.playerPrediction ?? (draft.home !== undefined && draft.away !== undefined ? { home: draft.home, away: draft.away } : undefined)
 
