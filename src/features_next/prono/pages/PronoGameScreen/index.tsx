@@ -10,8 +10,7 @@ import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNaviga
 import { useSession } from '@/ctx/SessionProvider'
 import { useCreatePronosticParticipation } from '@/services/pronostics/hook'
 
-import jouerImage from '../../assets/gabriel-attal-jouer.png'
-import pronoFinished from '../../assets/gabriel-attal-onboarding-prono.png'
+import gabrielBall from '../../assets/gabriel-attal-ball.png'
 import PronoCountdown from '../../components/PronoCountdown'
 import PronoCtaSection from '../../components/PronoCtaSection'
 import PronoHeroSection from '../../components/PronoHeroSection'
@@ -102,9 +101,9 @@ export default function PronoGameScreen() {
   const hasBackendParticipation = Boolean(match.playerPrediction) || match.status === 'participated' || match.status === 'result_available'
   const isPredictionLocked = hasPlayed || hasBackendParticipation
   const displayedPlayerPrediction = match.playerPrediction ?? playerPrediction
-  const matchImage = isPredictionLocked ? pronoFinished : jouerImage
-  const matchImageWidth = isPredictionLocked ? 400 : 300
-  const matchImageHeight = isPredictionLocked ? Math.round(matchImageWidth * (818 / 779)) : 409
+  const matchImage = gabrielBall
+  const matchImageWidth = isPredictionLocked ? 280 : 300
+  const matchImageHeight = Math.round(matchImageWidth * (864 / 614))
 
   const handlePlay = async () => {
     const prediction = {
@@ -153,9 +152,13 @@ export default function PronoGameScreen() {
         authorPrediction={match.authorPrediction}
         playerPrediction={displayedPlayerPrediction}
         onPlayerChange={setPlayerPrediction}
-        locked={isPredictionLocked}
+        locked={isPredictionLocked || match.status === 'closed'}
       />
-      {isPredictionLocked ? (
+      {match.status === 'closed' ? (
+        <Text.MD semibold textAlign="center" color="#4555D1">
+          Le match a commencé, le résultat arrive bientôt.
+        </Text.MD>
+      ) : isPredictionLocked ? (
         match.kickoffAt ? (
           <PronoCountdown targetAt={match.kickoffAt} />
         ) : null

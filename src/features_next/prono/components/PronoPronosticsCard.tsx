@@ -1,3 +1,4 @@
+import { useRef, type RefObject } from 'react'
 import { TextInput } from 'react-native'
 import { styled, View, XStack, YStack } from 'tamagui'
 
@@ -83,9 +84,11 @@ type ScoreCellProps = {
   valueColor?: string
   compact?: boolean
   onChangeValue?: (value: number) => void
+  inputRef?: RefObject<TextInput | null>
+  onFilled?: () => void
 }
 
-function ScoreCell({ code, value, highlighted, editable, valueColor = SCORE_TEXT_COLOR, compact, onChangeValue }: ScoreCellProps) {
+function ScoreCell({ code, value, highlighted, editable, valueColor = SCORE_TEXT_COLOR, compact, onChangeValue, inputRef, onFilled }: ScoreCellProps) {
   const fontSize = compact ? 26 : 32
 
   return (
@@ -93,8 +96,14 @@ function ScoreCell({ code, value, highlighted, editable, valueColor = SCORE_TEXT
       <ScoreBox highlighted={highlighted} compact={compact}>
         {editable ? (
           <TextInput
+            ref={inputRef}
             value={value === undefined ? '' : String(value)}
-            onChangeText={(text) => onChangeValue?.(parseScore(text))}
+            onChangeText={(text) => {
+              onChangeValue?.(parseScore(text))
+              if (text.replace(/[^0-9]/g, '') !== '') {
+                onFilled?.()
+              }
+            }}
             keyboardType="number-pad"
             maxLength={2}
             selectTextOnFocus
@@ -127,6 +136,7 @@ type PronoGroupProps = {
 
 function PronoGroup({ title, homeTeam, awayTeam, prediction, highlighted, editable, scoreColor, compact, onChange }: PronoGroupProps) {
   const separatorLineHeight = compact ? 56 : 64
+  const awayInputRef = useRef<TextInput>(null)
 
   return (
     <YStack alignItems="center" gap="$small" flex={1} minWidth={0}>
@@ -142,6 +152,7 @@ function PronoGroup({ title, homeTeam, awayTeam, prediction, highlighted, editab
           valueColor={scoreColor}
           compact={compact}
           onChangeValue={(home) => onChange?.({ home, away: prediction?.away })}
+          onFilled={() => awayInputRef.current?.focus()}
         />
         <Text bold fontSize={compact ? 18 : 20} lineHeight={separatorLineHeight} color={SCORE_TEXT_COLOR}>
           -
@@ -153,6 +164,7 @@ function PronoGroup({ title, homeTeam, awayTeam, prediction, highlighted, editab
           editable={editable}
           valueColor={scoreColor}
           compact={compact}
+          inputRef={awayInputRef}
           onChangeValue={(away) => onChange?.({ home: prediction?.home, away })}
         />
       </XStack>

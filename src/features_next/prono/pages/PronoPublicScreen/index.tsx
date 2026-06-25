@@ -1,6 +1,6 @@
 import Text from '@/components/base/Text'
 
-import jouerImage from '../../assets/gabriel-attal-jouer.png'
+import gabrielBall from '../../assets/gabriel-attal-ball.png'
 import PronoCtaSection from '../../components/PronoCtaSection'
 import PronoHeroSection from '../../components/PronoHeroSection'
 import PronoMatchCard from '../../components/PronoMatchCard'
@@ -16,7 +16,7 @@ export default function PronoPublicScreen() {
       <PronoHeroSection />
       {isLoading ? null : match ? (
         <>
-          <PronoMatchCard match={match} image={jouerImage} imageWidth={300} imageHeight={409} />
+          <PronoMatchCard match={match} image={gabrielBall} imageWidth={300} imageHeight={Math.round(300 * (850 / 620))} />
           <PronoCtaSection label={PRONO_PAGE_COPY.cta} href="/prono/jouer" />
         </>
       ) : (

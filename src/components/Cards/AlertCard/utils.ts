@@ -12,10 +12,7 @@ type AlertItem = RestAlertsResponse[number]
 const getPronosticRoute = (alert?: AlertItem) => {
   if (alert?.type?.toLowerCase() !== 'pronostic') return undefined
 
-  const uuid = typeof alert.data?.uuid === 'string' ? alert.data.uuid : undefined
-  if (!uuid) return undefined
-
-  return `/prono/${uuid}`
+  return alert.data?.participation ? '/prono/jouer' : '/prono'
 }
 
 export const createOnShow = (url: string | null, buttonLabel: string | null | undefined, hitSource: HitSource, alert?: AlertItem) => {
