@@ -117,19 +117,12 @@ function PronoCountdownInline({ targetAt }: { targetAt: string }) {
   )
 }
 
-type PronoSignupCardProps = {
-  match?: PronoMatchView
-  playerPrediction?: PronoScore
+type PronoSignupCardContentProps = {
+  match: PronoMatchView
+  playerPrediction: PronoScore
 }
 
-export function PronoSignupCard({ match: matchProp, playerPrediction: playerPredictionProp }: PronoSignupCardProps = {}) {
-  const { redirectUri } = useGlobalSearchParams<{ redirectUri?: string }>()
-  const { match: currentMatch } = useCurrentPronoMatch()
-  const match = matchProp ?? currentMatch
-  const playerPrediction = playerPredictionProp ?? parsePlayerPredictionFromUri(redirectUri) ?? PLAYER_MOCK_PREDICTION
-
-  if (!match) return null
-
+export function PronoSignupCardContent({ match, playerPrediction }: PronoSignupCardContentProps) {
   const authorPrediction = match.authorPrediction ?? { home: 0, away: 0 }
 
   return (
@@ -155,4 +148,20 @@ export function PronoSignupCard({ match: matchProp, playerPrediction: playerPred
       </PredictionsBox>
     </CardRoot>
   )
+}
+
+type PronoSignupCardProps = {
+  match?: PronoMatchView
+  playerPrediction?: PronoScore
+}
+
+export function PronoSignupCard({ match: matchProp, playerPrediction: playerPredictionProp }: PronoSignupCardProps = {}) {
+  const { redirectUri } = useGlobalSearchParams<{ redirectUri?: string }>()
+  const { match: currentMatch } = useCurrentPronoMatch()
+  const match = matchProp ?? currentMatch
+  const playerPrediction = playerPredictionProp ?? parsePlayerPredictionFromUri(redirectUri) ?? PLAYER_MOCK_PREDICTION
+
+  if (!match) return null
+
+  return <PronoSignupCardContent match={match} playerPrediction={playerPrediction} />
 }

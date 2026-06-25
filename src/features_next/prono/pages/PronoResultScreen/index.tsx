@@ -8,7 +8,7 @@ import { useCurrentPronoMatch } from '../../hooks/useCurrentPronoMatch'
 import { resolveResultVariant } from '../../utils'
 
 export default function PronoResultScreen() {
-  const { match, isLoading: isPronoLoading } = useCurrentPronoMatch()
+  const { match, isLoading: isPronoLoading, isRefetching, refetch } = useCurrentPronoMatch()
   const { isAuth, isLoading } = useSession()
   const isNavigationReady = useRootNavigationState()?.key != null
 
@@ -19,7 +19,7 @@ export default function PronoResultScreen() {
   }
 
   return (
-    <PronoScreenShell>
+    <PronoScreenShell onRefresh={refetch} refreshing={isRefetching}>
       <PronoResultCard
         variant={resolveResultVariant(match.resultStatus)}
         homeTeam={match.homeTeam}

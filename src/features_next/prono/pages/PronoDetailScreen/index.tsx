@@ -23,7 +23,7 @@ import PronoPronosticsCard, { EditableScore } from '../../components/PronoPronos
 import PronoResultCard from '../../components/PronoResultCard';
 import PronoScreenShell from '../../components/PronoScreenShell';
 import { usePronosticMatch } from '../../hooks/usePronosticMatch';
-import { PronoScore } from '../../model';
+import { PRONO_PAGE_COPY, PronoScore } from '../../model';
 import { resolveResultVariant } from '../../utils';
 
 
@@ -34,7 +34,7 @@ type PronoDetailScreenProps = {
 }
 
 export default function PronoDetailScreen({ uuid }: PronoDetailScreenProps) {
-  const { match } = usePronosticMatch(uuid)
+  const { match, isRefetching, refetch } = usePronosticMatch(uuid)
   const toast = useToastController()
   const createParticipation = useCreatePronosticParticipation(uuid)
   const [draft, setDraft] = useState<EditableScore>({})
@@ -58,7 +58,7 @@ export default function PronoDetailScreen({ uuid }: PronoDetailScreenProps) {
 
   if (match.status === 'result_available') {
     return (
-      <PronoScreenShell>
+      <PronoScreenShell onRefresh={refetch} refreshing={isRefetching}>
         <PronoResultCard
           variant={resolveResultVariant(match.resultStatus)}
           homeTeam={match.homeTeam}
@@ -72,7 +72,7 @@ export default function PronoDetailScreen({ uuid }: PronoDetailScreenProps) {
   }
 
   return (
-    <PronoScreenShell>
+    <PronoScreenShell onRefresh={refetch} refreshing={isRefetching}>
       <YStack marginTop="$medium">
         <PronoHeroSection showSubtitle={false} showBadge={false} />
       </YStack>
@@ -99,7 +99,7 @@ export default function PronoDetailScreen({ uuid }: PronoDetailScreenProps) {
           Les pronostics ouvrent bientôt.
         </Text.MD>
       ) : null}
-      {match.status === 'not_participated' ? <PronoCtaSection label="Je défie Gabriel Attal" onPress={handleParticipate} /> : null}
+      {match.status === 'not_participated' ? <PronoCtaSection label={PRONO_PAGE_COPY.cta} onPress={handleParticipate} /> : null}
       {match.status === 'participated' && match.kickoffAt ? <PronoCountdown targetAt={match.kickoffAt} /> : null}
       {match.status === 'closed' ? (
         <Text.MD semibold textAlign="center" color="#4555D1">

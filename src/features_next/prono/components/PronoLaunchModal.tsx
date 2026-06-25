@@ -12,7 +12,7 @@ import Title from '@/components/Title/Title'
 import redirectToStore from '@/helpers/redirectToStore'
 
 import { PronoMatchView, PronoScore } from '../model'
-import { PronoSignupCard } from './PronoSignupCard'
+import { PronoSignupCardContent } from './PronoSignupCard'
 
 export type PronoLaunchVariant = 'download' | 'app'
 
@@ -79,7 +79,7 @@ export default function PronoLaunchModal({ open, onClose, variant, match, player
 
         <LaunchTitle variant={variant} />
 
-        <PronoSignupCard match={match} playerPrediction={playerPrediction} />
+        <PronoSignupCardContent match={match} playerPrediction={playerPrediction} />
 
         <Text.MD regular color="$textPrimary" lineHeight={22}>
           {description}
