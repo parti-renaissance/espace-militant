@@ -3,12 +3,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { getTokenValue, isWeb, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { ArrowLeft, CirclePlus, Crosshair } from '@tamagui/lucide-icons'
-import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
+import type { MapboxOnPressEvent } from '@/components/Mapbox/types'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { SideBarArea } from '@/components/AppStructure/Navigation/SideBar'
 import { VoxButton } from '@/components/Button'
 
+import { useNavigateToAction } from '@/features_next/actions/hooks/useNavigateToAction'
+import { useHubActionSeeds } from '@/features_next/events/hooks/useHubActionSeeds'
 import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
 import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
@@ -24,6 +26,7 @@ import { mapCameraSnapshotFromHubBounds, mapCameraSnapshotFromVisibleBounds, typ
 
 const EventsMapPage = () => {
   const router = useRouter()
+  const navigateToAction = useNavigateToAction()
   const hubItemMapRef = useRef<HubItemMapHandle>(null)
   const hasAutoFlownToUserRef = useRef(false)
   const { coords, isLocating, requestLocation } = useUserLocation()
@@ -73,6 +76,7 @@ const EventsMapPage = () => {
   })
 
   const mapItems = useMemo(() => mapHubItemsToMapMarkers(data?.items ?? []), [data?.items])
+  const hubActionSeeds = useHubActionSeeds(data?.items)
 
   useEffect(() => {
     if (hasAutoFlownToUserRef.current || coords == null || isLoading || isFetching) {
@@ -119,14 +123,14 @@ const EventsMapPage = () => {
     })()
   }, [commitSearch])
 
-  const handleItemPress = (event: OnPressEvent) => {
+  const handleItemPress = (event: MapboxOnPressEvent) => {
     const properties = event.features?.[0]?.properties as { itemType?: string; uuid?: string; slug?: string | null } | undefined
     if (!properties) {
       return
     }
 
     if (properties.itemType === 'action' && typeof properties.uuid === 'string' && properties.uuid.length > 0) {
-      router.push({ pathname: '/actions/[id]', params: { id: properties.uuid } })
+      navigateToAction(properties.uuid, hubActionSeeds.get(properties.uuid) ?? null)
       return
     }
 

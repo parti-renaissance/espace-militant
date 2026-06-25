@@ -2,17 +2,11 @@ import type { ActionVoxCardProps } from '@/components/Cards/ActionCard'
 import type { HubItemMapItem } from '@/features_next/events/pages/map/components/HubItemMap'
 import { isEventPast } from '@/features_next/events/utils'
 
-import { ActionStatus, ActionType } from '@/services/actions/schema'
+import { mapHubItemToRestActionFull, parseActionType } from '@/services/actions/mapper'
+import { ActionStatus, type RestActionFull } from '@/services/actions/schema'
 import type { RestItemEvent, RestPartialEvent } from '@/services/events/schema'
 
 import { isHubActionItem, isHubEventItem, type RestHubItem } from './schema'
-
-const parseActionType = (slug: string | undefined | null): ActionType | null => {
-  if (!slug) {
-    return null
-  }
-  return (Object.values(ActionType) as string[]).includes(slug) ? (slug as ActionType) : null
-}
 
 const mapHubEventStatus = (status: RestHubItem['status']): RestItemEvent['status'] => {
   if (status === 'SCHEDULED' || status === 'CANCELLED') {
@@ -126,12 +120,14 @@ export const mapHubItemToActionCardPayload = (item: RestHubItem): ActionVoxCardP
   }
 }
 
-export type HubFeedRow = { type: 'event'; event: RestItemEvent } | { type: 'action'; payload: ActionVoxCardProps['payload']; editable: boolean }
+export type HubFeedRow =
+  | { type: 'event'; event: RestItemEvent }
+  | { type: 'action'; payload: ActionVoxCardProps['payload']; editable: boolean; seed: RestActionFull | null }
 
 export const mapHubItemToFeedRow = (item: RestHubItem): HubFeedRow | null => {
   if (isHubActionItem(item)) {
     const payload = mapHubItemToActionCardPayload(item)
-    return payload ? { type: 'action', payload, editable: item.editable } : null
+    return payload ? { type: 'action', payload, editable: item.editable, seed: mapHubItemToRestActionFull(item) } : null
   }
 
   const event = mapHubItemToRestItemEvent(item)

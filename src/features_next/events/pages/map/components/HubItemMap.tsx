@@ -1,7 +1,7 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react'
 import { Platform } from 'react-native'
 import type { CameraPadding, MapState } from '@rnmapbox/maps'
-import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
+import type { MapboxOnPressEvent } from '@/components/Mapbox/types'
 import { Feature, FeatureCollection, Point, type Position as GeoPosition } from 'geojson'
 
 import MapboxGl from '@/components/Mapbox/Mapbox'
@@ -226,7 +226,7 @@ type HubItemMapSharedProps = {
   items: HubItemMapItem[]
   isInteractive?: boolean
   clusterItems?: boolean
-  onItemPress: (event: OnPressEvent) => void
+  onItemPress: (event: MapboxOnPressEvent) => void
   padding?: CameraPadding
   /** `[lng, lat]` — affichée via marqueur custom (source : page / `expo-location`). */
   userLocationLngLat?: [number, number] | null

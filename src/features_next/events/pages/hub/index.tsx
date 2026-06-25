@@ -2,10 +2,12 @@ import { Suspense, useCallback, useMemo, useRef, useState } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { Spinner, useMedia, YStack } from 'tamagui'
-import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
+import type { MapboxOnPressEvent } from '@/components/Mapbox/types'
 
 import { SideBarArea } from '@/components/AppStructure'
 import { TABBAR_HEIGHT_SM } from '@/components/AppStructure/hooks/useLayoutSpacing'
+import { useNavigateToAction } from '@/features_next/actions/hooks/useNavigateToAction'
+import { useHubActionSeeds } from '@/features_next/events/hooks/useHubActionSeeds'
 import { FRANCE_METRO_HUB_BBOX, useHubItemsQuery } from '@/services/hub/hook'
 import { mapHubItemsToMapMarkers } from '@/services/hub/mapper'
 
@@ -20,6 +22,7 @@ import { HubOrganizeCategoryModal } from './components/HubOrganizeCategoryModal'
 
 const EventsHubPage = () => {
   const router = useRouter()
+  const navigateToAction = useNavigateToAction()
   const hubItemMapRef = useRef<HubItemMapHandle>(null)
   const { coords, isLocating, requestLocation } = useUserLocation()
 
@@ -63,16 +66,17 @@ const EventsHubPage = () => {
   })
 
   const mapItems = useMemo(() => mapHubItemsToMapMarkers(data?.items ?? []), [data?.items])
+  const hubActionSeeds = useHubActionSeeds(data?.items)
 
   const handleMapItemPress = useCallback(
-    (event: OnPressEvent) => {
+    (event: MapboxOnPressEvent) => {
       const properties = event.features?.[0]?.properties as { itemType?: string; uuid?: string; slug?: string | null } | undefined
       if (!properties) {
         return
       }
 
       if (properties.itemType === 'action' && typeof properties.uuid === 'string' && properties.uuid.length > 0) {
-        router.push({ pathname: '/actions/[id]', params: { id: properties.uuid } })
+        navigateToAction(properties.uuid, hubActionSeeds.get(properties.uuid) ?? null)
         return
       }
 
@@ -81,7 +85,7 @@ const EventsHubPage = () => {
         router.push(`/evenements/${slug}`)
       }
     },
-    [router],
+    [hubActionSeeds, navigateToAction, router],
   )
 
   const handleRecenterPress = useCallback(() => {

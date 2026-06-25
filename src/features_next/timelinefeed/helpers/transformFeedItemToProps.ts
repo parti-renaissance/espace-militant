@@ -1,9 +1,6 @@
-import { router } from 'expo-router'
-
 import { type FeedCardProps } from '@/components/Cards'
 
-import { ActionType } from '@/core/entities/Action'
-import { ReadableActionType } from '@/services/actions/schema'
+import { ActionType, ReadableActionType } from '@/services/actions/schema'
 import * as FeedMapper from '@/services/common/mapper/mapTimelineFeedToRestEvent'
 import { RestTimelineFeedItem } from '@/services/timeline-feed/schema'
 
@@ -51,7 +48,6 @@ const transformFeedItemTypeToTag = (type: RestTimelineFeedItem['type']) => {
   }
 }
 
-// TODO improve with real user name
 const getAuthorName = (feed: RestTimelineFeedItem) => {
   const parts = [feed.author?.first_name, feed.author?.last_name].filter(Boolean)
   return parts.length > 0 ? parts.join(' ') : null
@@ -106,12 +102,6 @@ export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardPr
     case 'action':
       return {
         type,
-        onShow: () => {
-          router.push({ pathname: '/actions/[id]', params: { id: feed.objectID } })
-        },
-        onEdit: () => {
-          router.push(`/actions/${feed.objectID}/modifier`)
-        },
         isMyAction: feed.editable ?? undefined,
         payload: {
           tag: ReadableActionType[feed.category?.toLowerCase() as ActionType],
@@ -123,10 +113,6 @@ export const transformFeedItemToProps = (feed: RestTimelineFeedItem): FeedCardPr
           },
           location,
           author,
-          // attendees: {
-          //   pictures: ['https://picsum.photos/id/64/200/200', 'https://picsum.photos/id/66/200/200', 'https://picsum.photos/id/71/200/200'],
-          //   count: 40,
-          // },
         },
       }
     case 'publication':

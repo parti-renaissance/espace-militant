@@ -81,6 +81,23 @@ const DesktopSkeleton = () => (
   </Layout.Main>
 )
 
+export function ActionDescriptionSkeleton() {
+  return <SkeCard.Description />
+}
+
+export function ActionParticipantsSkeleton() {
+  return (
+    <YStack gap="$medium" pb="$medium">
+      <SkeCard.Line width={140} />
+      <XStack flexWrap="wrap" gap="$medium" justifyContent="flex-start">
+        <SkeCard.Author />
+        <SkeCard.Author />
+        <SkeCard.Author />
+      </XStack>
+    </YStack>
+  )
+}
+
 export function ActionSkeleton() {
   const media = useMedia()
   return media.sm ? <MobileSkeleton /> : <DesktopSkeleton />
