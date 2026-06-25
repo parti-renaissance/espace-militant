@@ -6,13 +6,17 @@ import { VoxButton } from '@/components/Button';
 import useShareApi from '@/hooks/useShareApi';
 import clientEnv from '@/config/clientEnv';
 
-const PRONO_SHARE_URL = `https://${clientEnv.ASSOCIATED_DOMAIN}/prono/jouer`
+const PRONO_SHARE_URL = `https://${clientEnv.ASSOCIATED_DOMAIN}/prono`
 
 export default function PronoNavHeader() {
   const { shareAsync } = useShareApi()
 
   const handleInvite = () => {
-    shareAsync({ url: PRONO_SHARE_URL, title: 'Défie Gabriel Attal !' })
+    shareAsync({
+      url: PRONO_SHARE_URL,
+      message: `Défie Gabriel Attal sur le prochain match des Bleus ⚽\n${PRONO_SHARE_URL}`,
+      title: 'Défie Gabriel Attal !',
+    })
   }
 
   return (
@@ -29,7 +33,7 @@ export default function PronoNavHeader() {
         pressStyle={{ backgroundColor: '#DFE2FF' }}
         onPress={handleInvite}
       >
-        Inviter un ami
+        J'invite un ami
       </VoxButton>
     </XStack>
   )

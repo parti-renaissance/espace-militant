@@ -6,17 +6,17 @@ import PronoHeroSection from '../../components/PronoHeroSection'
 import PronoMatchCard from '../../components/PronoMatchCard'
 import PronoScreenShell from '../../components/PronoScreenShell'
 import { useCurrentPronoMatch } from '../../hooks/useCurrentPronoMatch'
-import { PRONO_PAGE_COPY } from '../../model'
+import { PRONO_MATCH_IMAGE, PRONO_PAGE_COPY } from '../../model'
 
 export default function PronoPublicScreen() {
-  const { match, isLoading } = useCurrentPronoMatch()
+  const { match, isLoading, isRefetching, refetch } = useCurrentPronoMatch()
 
   return (
-    <PronoScreenShell>
+    <PronoScreenShell onRefresh={refetch} refreshing={isRefetching}>
       <PronoHeroSection />
       {isLoading ? null : match ? (
         <>
-          <PronoMatchCard match={match} image={gabrielBall} imageWidth={300} imageHeight={Math.round(300 * (850 / 620))} />
+          <PronoMatchCard match={match} image={gabrielBall} imageWidth={PRONO_MATCH_IMAGE.width} imageHeight={PRONO_MATCH_IMAGE.height} />
           <PronoCtaSection label={PRONO_PAGE_COPY.cta} href="/prono/jouer" />
         </>
       ) : (

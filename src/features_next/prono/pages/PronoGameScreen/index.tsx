@@ -19,6 +19,7 @@ import PronoMatchCard from '../../components/PronoMatchCard'
 import PronoPronosticsCard, { EditableScore } from '../../components/PronoPronosticsCard'
 import PronoScreenShell from '../../components/PronoScreenShell'
 import { useCurrentPronoMatch } from '../../hooks/useCurrentPronoMatch'
+import { PRONO_MATCH_IMAGE, PRONO_PAGE_COPY } from '../../model'
 
 const MAX_SCORE = 10
 
@@ -33,7 +34,7 @@ const parseScoreParam = (value: string | string[] | undefined): number | undefin
 const buildResumeRedirectUri = (prediction: { home: number; away: number }) => `/prono/jouer?home=${prediction.home}&away=${prediction.away}&autoLaunch=1`
 
 export default function PronoGameScreen() {
-  const { match, isLoading: isPronoLoading } = useCurrentPronoMatch()
+  const { match, isLoading: isPronoLoading, isRefetching, refetch } = useCurrentPronoMatch()
   const { isAuth, isLoading } = useSession()
   const isNavigationReady = useRootNavigationState()?.key != null
   const params = useLocalSearchParams<{ home?: string; away?: string; autoLaunch?: string }>()
@@ -87,7 +88,7 @@ export default function PronoGameScreen() {
 
   if (!match) {
     return (
-      <PronoScreenShell>
+      <PronoScreenShell onRefresh={refetch} refreshing={isRefetching}>
         <YStack marginTop="$medium">
           <PronoHeroSection showSubtitle={false} showBadge={false} />
         </YStack>
@@ -102,7 +103,7 @@ export default function PronoGameScreen() {
   const isPredictionLocked = hasPlayed || hasBackendParticipation
   const displayedPlayerPrediction = match.playerPrediction ?? playerPrediction
   const matchImage = gabrielBall
-  const matchImageWidth = isPredictionLocked ? 280 : 300
+  const matchImageWidth = isPredictionLocked ? 280 : PRONO_MATCH_IMAGE.width
   const matchImageHeight = Math.round(matchImageWidth * (864 / 614))
 
   const handlePlay = async () => {
@@ -132,7 +133,7 @@ export default function PronoGameScreen() {
   }
 
   return (
-    <PronoScreenShell>
+    <PronoScreenShell onRefresh={refetch} refreshing={isRefetching}>
       <YStack marginTop="$medium">
         <PronoHeroSection showSubtitle={false} showBadge={false} />
       </YStack>
@@ -163,7 +164,7 @@ export default function PronoGameScreen() {
           <PronoCountdown targetAt={match.kickoffAt} />
         ) : null
       ) : (
-        <PronoCtaSection label="Je défie Gabriel Attal" onPress={handlePlay} />
+        <PronoCtaSection label={PRONO_PAGE_COPY.cta} onPress={handlePlay} />
       )}
       {displayedPlayerPrediction.home !== undefined && displayedPlayerPrediction.away !== undefined ? (
         <PronoLaunchModal

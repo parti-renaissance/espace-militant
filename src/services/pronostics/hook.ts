@@ -38,6 +38,8 @@ export const useCurrentPronostic = () => {
   return {
     pronostic: parsePronosticAlert(findPronosticAlert(alertsQuery.data)),
     isLoading: isSessionLoading || alertsQuery.isLoading,
+    isRefetching: alertsQuery.isRefetching,
+    refetch: alertsQuery.refetch,
   }
 }
 

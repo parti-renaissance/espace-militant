@@ -3,10 +3,18 @@ import { usePronostic } from '@/services/pronostics/hook'
 import { PronoMatchView } from '../model'
 import { mapPronosticDataToMatch } from '../utils'
 
-export function usePronosticMatch(uuid: string): { match: PronoMatchView } {
-  const { data } = usePronostic(uuid)
+type UsePronosticMatchResult = {
+  match: PronoMatchView
+  isRefetching: boolean
+  refetch: () => void
+}
+
+export function usePronosticMatch(uuid: string): UsePronosticMatchResult {
+  const { data, isRefetching, refetch } = usePronostic(uuid)
 
   return {
     match: mapPronosticDataToMatch(data),
+    isRefetching,
+    refetch,
   }
 }
