@@ -7,7 +7,7 @@ import * as schemas from './schema'
 
 export const getPublicAlerts = api({
   method: 'get',
-  path: 'api/v3/alerts',
+  path: 'api/alerts',
   requestSchema: z.void(),
   responseSchema: RestAlertsResponseSchema,
   type: 'public',
