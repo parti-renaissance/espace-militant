@@ -1,23 +1,34 @@
-name: Deploy on firebase
-description: Deploy on firebase hosting
+name: Deploy on firebase preview channel
+description: Deploy on firebase hosting preview channel
 
 inputs:
+  firebaseServiceAccount:
+    description: Firebase service account JSON
+    required: true
+  projectId:
+    description: Firebase project ID
+    required: true
+  channelId:
+    description: Preview channel ID (branch name by default)
+    required: true
   expire:
-    description: 'Time of expiry (default to 7 days)'
+    description: Time of expiry (default to 7 days)
     required: false
     default: '7d'
+
 outputs:
   url:
-    description: "Deployment URL"
-    value: ${{steps.extractor.outputs.url}}"
+    description: Deployment URL
+    value: ${{ steps.deploy.outputs.details_url }}
 
 runs:
   using: composite
   steps:
-    - name: 📦 Deploy on firebase
-      shell: bash
-      run: npx firebase hosting:channel:deploy "${{env.BRANCH_NAME}}" --expires ${{inputs.expire}} --project "${{env.EXPO_PUBLIC_FB_PROJECT_ID}}" | tee output.txt
-    - name: Extract deployed URL
-      id: extractor
-      shell: bash
-      run: cat output.txt | grep "Channel URL" | awk -F 'https://' '{print "https://" $2}' | awk '{print "url="$1}' >> $GITHUB_OUTPUT
+    - uses: FirebaseExtended/action-hosting-deploy@v0
+      id: deploy
+      with:
+        firebaseServiceAccount: ${{ inputs.firebaseServiceAccount }}
+        projectId: ${{ inputs.projectId }}
+        channelId: ${{ inputs.channelId }}
+        expires: ${{ inputs.expire }}
+        firebaseToolsVersion: '13.35.1'
