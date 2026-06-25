@@ -16,7 +16,14 @@ export const markActionAsSeeded = (action: RestActionFull): SeededRestActionFull
 export const isSeededAction = (action: RestActionFull): action is SeededRestActionFull =>
   SEEDED_ACTION_KEY in action && action[SEEDED_ACTION_KEY as keyof typeof action] === true
 
+export const getActionQueryCache = (queryClient: QueryClient, id: string) =>
+  queryClient.getQueryData<RestActionFull>([QUERY_KEY_ACTION, id])
+
 export const seedActionQuery = (queryClient: QueryClient, id: string, seed: RestActionFull) => {
+  if (getActionQueryCache(queryClient, id)) {
+    return
+  }
+
   queryClient.setQueryData([QUERY_KEY_ACTION, id], markActionAsSeeded(seed))
   queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ACTION, id] })
 }

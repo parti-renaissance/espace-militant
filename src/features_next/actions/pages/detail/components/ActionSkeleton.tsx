@@ -4,6 +4,10 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 
+export function ActionMapPlaceholder() {
+  return <YStack height="100%" width="100%" backgroundColor="$gray1" />
+}
+
 const MapPlaceholder = () => <YStack height={240} width="100%" backgroundColor="$gray1" />
 
 const MobileSkeleton = () => (

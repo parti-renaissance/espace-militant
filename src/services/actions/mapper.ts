@@ -1,4 +1,5 @@
 import { ActionStatus, ActionType, type RestActionFull } from '@/services/actions/schema'
+import { hasValidActionCoordinates } from '@/services/actions/selectors'
 import { isHubActionItem, type RestHubItem } from '@/services/hub/schema'
 
 export const parseActionType = (slug: string | undefined | null): ActionType | null => {
@@ -22,7 +23,7 @@ export const mapHubItemToRestActionFull = (item: RestHubItem): RestActionFull | 
     return null
   }
 
-  if (typeof address.latitude !== 'number' || typeof address.longitude !== 'number') {
+  if (!hasValidActionCoordinates(address)) {
     return null
   }
 
