@@ -11,10 +11,24 @@ runs:
   steps:
     - name: 🔎 Debug firebase auth
       shell: bash
+      env:
+        NODE_OPTIONS: --dns-result-order=ipv4first
       run: node ./.github/scripts/debug-firebase-auth.mjs || true
     - name: 📦 Deploy on firebase
       shell: bash
-      run: npx firebase deploy --only hosting --project "${EXPO_PUBLIC_FB_PROJECT_ID}" | tee output.txt
+      env:
+        NODE_OPTIONS: --dns-result-order=ipv4first
+      run: |
+        set -o pipefail
+        n=0
+        until [ "$n" -ge 4 ]; do
+          npx firebase deploy --only hosting --project "${EXPO_PUBLIC_FB_PROJECT_ID}" | tee output.txt && exit 0
+          n=$((n + 1))
+          echo "::warning::firebase deploy attempt $n failed, retrying in 15s..."
+          sleep 15
+        done
+        echo "::error::firebase deploy failed after $n attempts"
+        exit 1
     - name: Extract deployed URL
       id: extractor
       shell: bash
