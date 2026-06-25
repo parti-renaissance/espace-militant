@@ -1,26 +1,38 @@
-name: Deploy on firebase live
+name: Deploy on firebase
 description: Deploy on firebase hosting live channel
-
-inputs:
-  firebaseServiceAccount:
-    description: Firebase service account JSON
-    required: true
-  projectId:
-    description: Firebase project ID
-    required: true
 
 outputs:
   url:
     description: Deployment URL
-    value: ${{ steps.deploy.outputs.details_url }}
+    value: ${{ steps.extractor.outputs.url }}
 
 runs:
   using: composite
   steps:
-    - uses: FirebaseExtended/action-hosting-deploy@v0
-      id: deploy
-      with:
-        firebaseServiceAccount: ${{ inputs.firebaseServiceAccount }}
-        projectId: ${{ inputs.projectId }}
-        channelId: live
-        firebaseToolsVersion: '13.35.1'
+    - name: 🔎 Network probe
+      shell: bash
+      run: |
+        echo "node: $(node -v)"
+        echo "== curl (system TLS stack) — any http code means the connection completed =="
+        for u in https://www.googleapis.com/oauth2/v4/token https://oauth2.googleapis.com/token https://github.com; do
+          curl -sS -o /dev/null --max-time 25 -w "$u -> http=%{http_code} t=%{time_total}s\n" "$u" || echo "$u -> CURL FAIL exit=$?"
+        done
+        echo "== node fetch (node stack) =="
+        for u in https://www.googleapis.com/oauth2/v4/token https://oauth2.googleapis.com/token; do
+          node -e "fetch('$u',{method:'POST'}).then(r=>console.log('$u http='+r.status)).catch(e=>console.log('$u FAIL '+(e.cause?.code||e.message)))" || true
+        done
+        echo "== real SA token mint (google-auth-library, exactly what firebase uses) =="
+        node -e "const {GoogleAuth}=require('google-auth-library');(async()=>{try{const c=await new GoogleAuth({scopes:'https://www.googleapis.com/auth/cloud-platform'}).getClient();const t=await c.getAccessToken();console.log('MINT OK len='+(t?.token||'').length)}catch(e){console.log('MINT FAIL: '+(e?.response?.data?JSON.stringify(e.response.data):e.message))}})()" || true
+        echo "== mint with keepAlive DISABLED (candidate fix) =="
+        node -e "require('http').globalAgent.keepAlive=false;require('https').globalAgent.keepAlive=false;const {GoogleAuth}=require('google-auth-library');(async()=>{try{const c=await new GoogleAuth({scopes:'https://www.googleapis.com/auth/cloud-platform'}).getClient();const t=await c.getAccessToken();console.log('MINT(no-keepalive) OK len='+(t?.token||'').length)}catch(e){console.log('MINT(no-keepalive) FAIL: '+(e?.response?.data?JSON.stringify(e.response.data):e.message))}})()" || true
+    - name: 📦 Deploy on firebase
+      shell: bash
+      # Workaround: disable HTTP keep-alive so google-auth-library's bundled
+      # node-fetch (gaxios 6) stops reusing stale sockets ("Premature close").
+      run: |
+        export NODE_OPTIONS="--require $GITHUB_WORKSPACE/.github/scripts/no-keepalive.cjs"
+        npx firebase deploy --only hosting --project "${EXPO_PUBLIC_FB_PROJECT_ID}" | tee output.txt
+    - name: Extract deployed URL
+      id: extractor
+      shell: bash
+      run: cat output.txt | grep "Hosting URL" | awk -F 'https://' '{print "https://" $2}' | awk '{print "url="$1}' >> $GITHUB_OUTPUT
