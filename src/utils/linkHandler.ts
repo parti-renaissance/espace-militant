@@ -1,5 +1,6 @@
 import { Href, router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
+import { Linking } from 'react-native'
 import { isWeb } from 'tamagui'
 
 import clientEnv from '@/config/clientEnv'
@@ -60,6 +61,8 @@ export const handleLinkPress = async (url: string, onLinkClick?: (target_url: st
     router.push(urlObj.pathname as Href)
   } else if (isWeb) {
     window.open(url, '_blank', 'noopener,noreferrer')
+  } else if (url.startsWith('mailto:') || url.startsWith('tel:')) {
+    await Linking.openURL(url).catch(() => {})
   } else {
     await WebBrowser.openBrowserAsync(url)
   }

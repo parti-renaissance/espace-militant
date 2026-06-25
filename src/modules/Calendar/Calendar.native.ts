@@ -1,9 +1,25 @@
-import { Alert, Linking } from 'react-native'
-import { CalendarDialogResultActions, createEventInCalendarAsync, getCalendarPermissionsAsync, requestCalendarPermissionsAsync } from 'expo-calendar'
+import { Alert, Linking, Platform } from 'react-native'
+import * as Calendar from 'expo-calendar'
 import { useToastController } from '@tamagui/toast'
 
 import { UseCreateEvent } from './CalendarTypes'
 import { isAllday as getIsAllDay, handleCreateEventError, successToast } from './utils'
+
+const getWritableCalendar = async () => {
+  if (Platform.OS === 'ios') {
+    return Calendar.getDefaultCalendarSync()
+  }
+
+  const calendars = await Calendar.getCalendars(Calendar.EntityTypes.EVENT)
+  const calendar =
+    calendars.find((c) => c.allowsModifications && c.isPrimary) ?? calendars.find((c) => c.allowsModifications)
+
+  if (!calendar) {
+    throw new Error('No writable calendar found')
+  }
+
+  return calendar
+}
 
 const useCreateEvent: UseCreateEvent = () => {
   const toast = useToastController()
@@ -27,37 +43,40 @@ const useCreateEvent: UseCreateEvent = () => {
       },
     )
   }
+
   return async (event) => {
-    const isAllday = getIsAllDay(event)
-    const { status, canAskAgain } = await getCalendarPermissionsAsync()
+    try {
+      const isAllday = getIsAllDay(event)
+      let permission = await Calendar.getCalendarPermissions(true)
 
-    if (status !== 'granted') {
-      if (canAskAgain) {
-        await requestCalendarPermissionsAsync().then((permi) => {
-          if (permi.status !== 'granted') {
-            showCalendarPermissionAlert()
-          }
-        })
-      } else {
-        showCalendarPermissionAlert()
-      }
-      return
-    }
-
-    return createEventInCalendarAsync({
-      ...event,
-      allDay: isAllday,
-      startDate: event.startDate ? event.startDate : undefined,
-      endDate: !isAllday && event.endDate ? event.endDate : undefined,
-    })
-      .then(({ action }) => {
-        if (action === CalendarDialogResultActions.saved || action === CalendarDialogResultActions.done) {
-          successToast(toast)
+      if (permission.status !== 'granted') {
+        if (permission.canAskAgain) {
+          permission = await Calendar.requestCalendarPermissions(true)
         }
+
+        if (permission.status !== 'granted') {
+          showCalendarPermissionAlert()
+          return
+        }
+      }
+
+      const calendar = await getWritableCalendar()
+      const { action } = await calendar.addEventWithForm({
+        title: event.title,
+        location: event.location ?? undefined,
+        notes: event.notes,
+        url: event.url,
+        allDay: isAllday,
+        startDate: event.startDate ? event.startDate : undefined,
+        endDate: !isAllday && event.endDate ? event.endDate : undefined,
       })
-      .catch((error) => {
-        handleCreateEventError(error, toast)
-      })
+
+      if (action === Calendar.CalendarDialogResultActions.saved || action === Calendar.CalendarDialogResultActions.done) {
+        successToast(toast)
+      }
+    } catch (error) {
+      handleCreateEventError(error, toast)
+    }
   }
 }
 
