@@ -1,26 +1,18 @@
-name: Deploy on firebase live
+name: Deploy on firebase
 description: Deploy on firebase hosting live channel
-
-inputs:
-  firebaseServiceAccount:
-    description: Firebase service account JSON
-    required: true
-  projectId:
-    description: Firebase project ID
-    required: true
 
 outputs:
   url:
     description: Deployment URL
-    value: ${{ steps.deploy.outputs.details_url }}
+    value: ${{ steps.extractor.outputs.url }}
 
 runs:
   using: composite
   steps:
-    - uses: FirebaseExtended/action-hosting-deploy@v0
-      id: deploy
-      with:
-        firebaseServiceAccount: ${{ inputs.firebaseServiceAccount }}
-        projectId: ${{ inputs.projectId }}
-        channelId: live
-        firebaseToolsVersion: '13.35.1'
+    - name: 📦 Deploy on firebase
+      shell: bash
+      run: npx firebase deploy --only hosting --project "${EXPO_PUBLIC_FB_PROJECT_ID}" | tee output.txt
+    - name: Extract deployed URL
+      id: extractor
+      shell: bash
+      run: cat output.txt | grep "Hosting URL" | awk -F 'https://' '{print "https://" $2}' | awk '{print "url="$1}' >> $GITHUB_OUTPUT
