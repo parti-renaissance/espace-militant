@@ -32,7 +32,7 @@ function LaunchTitle({ variant }: { variant: PronoLaunchVariant }) {
 
   return (
     <Title size="h2">
-      <Title.Highlight>FÉLICITATION</Title.Highlight>
+      <Title.Highlight>FÉLICITATIONS</Title.Highlight>
       <Title.Text> 🎉</Title.Text>
       <Title.Break />
       <Title.Text>LE DÉFI EST LANCÉ !</Title.Text>

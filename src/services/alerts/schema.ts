@@ -11,7 +11,7 @@ export const RestAlertsResponseSchema = z.array(
     cta_url: z.string().nullable(),
     image_url: z.string().nullish(),
     share_url: z.string().nullish(),
-    data: z.record(z.any()).nullish(),
+    data: z.any().nullish(),
   }),
 )
 
