@@ -1,5 +1,5 @@
-import React, { ComponentProps, ReactNode } from 'react'
-import { ImageRequireSource } from 'react-native'
+import React, { ComponentProps, ReactNode, RefObject } from 'react'
+import { ImageRequireSource, StyleSheet, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 import { Anchor, Separator, Stack, StackProps, styled, useTheme, withStaticProperties, XStack, YStack, ZStack } from 'tamagui'
 import { CalendarDays, CheckCircle, ExternalLink, LockKeyhole, MapPin, Ticket, UserCheck, Users, Video } from '@tamagui/lucide-icons'
@@ -7,9 +7,17 @@ import { CalendarDays, CheckCircle, ExternalLink, LockKeyhole, MapPin, Ticket, U
 import Text from '@/components/base/Text'
 import Chip from '@/components/Chip/Chip'
 import ProfilePicture from '@/components/ProfilePicture'
+import VoxBlur from '@/components/VoxBlur/VoxBlur'
 
 import AutoSizeImage from '../AutoSizeImage'
 import { getFormatedVoxCardDate } from '../utils'
+
+const VoxCardBlurFrameRoot = styled(YStack, {
+  overflow: 'hidden',
+  borderRadius: 16,
+  position: 'relative',
+  gap: '$medium',
+})
 
 export const CardFrame = styled(YStack, {
   backgroundColor: '$white1',
@@ -46,6 +54,21 @@ export const VoxCardFrame = CardFrame.styleable(({ children, ...props }: VoxCard
     </CardFrame>
   )
 })
+
+export type VoxCardBlurFrameProps = ComponentProps<typeof YStack> & {
+  blurTarget?: RefObject<View | null>
+}
+
+export const VoxCardBlurFrame = ({ children, blurTarget, ...props }: VoxCardBlurFrameProps) => {
+  return (
+    <VoxCardBlurFrameRoot {...props}>
+      <VoxBlur variant="card" blurTarget={blurTarget} pointerEvents="none" style={StyleSheet.absoluteFill} />
+      <YStack gap="$medium" width="100%" position="relative" zIndex={1}>
+        {children}
+      </YStack>
+    </VoxCardBlurFrameRoot>
+  )
+}
 
 export const VoxCardContent = styled(YStack, {
   padding: '$medium',
@@ -325,6 +348,7 @@ const VoxCardAdhLock = (props?: { lock?: boolean; due?: boolean; isPrivate?: boo
 }
 
 export const VoxCard = withStaticProperties(VoxCardFrame, {
+  Blur: VoxCardBlurFrame,
   Content: VoxCardContent,
   Chip: VoxCardChip,
   Title: VoxCardTitle,

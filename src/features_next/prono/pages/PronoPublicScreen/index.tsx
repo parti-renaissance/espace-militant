@@ -1,48 +1,29 @@
-import { ScrollView, useMedia, XStack, YStack } from 'tamagui'
+import Text from '@/components/base/Text'
 
-import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation'
-
+import gabrielBall from '../../assets/gabriel-attal-ball.png'
 import PronoCtaSection from '../../components/PronoCtaSection'
 import PronoHeroSection from '../../components/PronoHeroSection'
 import PronoMatchCard from '../../components/PronoMatchCard'
-import PronoNavHeader from '../../components/PronoNavHeader'
+import PronoScreenShell from '../../components/PronoScreenShell'
 import { useCurrentPronoMatch } from '../../hooks/useCurrentPronoMatch'
-import { PRONO_PAGE_COPY } from '../../model'
+import { PRONO_MATCH_IMAGE, PRONO_PAGE_COPY } from '../../model'
 
 export default function PronoPublicScreen() {
-  const media = useMedia()
-  const { match } = useCurrentPronoMatch()
-  const ctaHref = getAuthHref(AuthRoutes.BIENVENUE, '/prono')
-  const isDesktop = media.gtSm
-
-  const content = (
-    <YStack
-      width="100%"
-      maxWidth={isDesktop ? 480 : undefined}
-      paddingHorizontal={isDesktop ? '$large' : '$medium'}
-      paddingVertical={isDesktop ? '$xlarge' : '$medium'}
-      gap="$medium"
-    >
-      <PronoHeroSection />
-      <PronoMatchCard match={match} />
-      <PronoCtaSection label={PRONO_PAGE_COPY.cta} href={ctaHref} />
-    </YStack>
-  )
-
-  if (isDesktop) {
-    return (
-      <XStack flex={1} backgroundColor="$gray50">
-        <ScrollView flex={1} contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}>
-          {content}
-        </ScrollView>
-      </XStack>
-    )
-  }
+  const { match, isLoading, isRefetching, refetch } = useCurrentPronoMatch()
 
   return (
-    <ScrollView flex={1} backgroundColor="$gray50" contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}>
-      <PronoNavHeader />
-      {content}
-    </ScrollView>
+    <PronoScreenShell onRefresh={refetch} refreshing={isRefetching}>
+      <PronoHeroSection />
+      {isLoading ? null : match ? (
+        <>
+          <PronoMatchCard match={match} image={gabrielBall} imageWidth={PRONO_MATCH_IMAGE.width} imageHeight={PRONO_MATCH_IMAGE.height} />
+          <PronoCtaSection label={PRONO_PAGE_COPY.cta} href="/prono/jouer" />
+        </>
+      ) : (
+        <Text.MD semibold textAlign="center" color="#4555D1">
+          Aucun pronostic disponible pour le moment.
+        </Text.MD>
+      )}
+    </PronoScreenShell>
   )
 }

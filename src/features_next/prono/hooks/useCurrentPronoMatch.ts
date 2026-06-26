@@ -1,13 +1,22 @@
-import { PRONO_FALLBACK_MATCH, PronoMatchView } from '../model'
+import { useCurrentPronostic } from '@/services/pronostics/hook'
+
+import { PronoMatchView } from '../model'
+import { mapPronosticDataToMatch } from '../utils'
 
 type UseCurrentPronoMatchResult = {
-  match: PronoMatchView
+  match?: PronoMatchView
   isLoading: boolean
+  isRefetching: boolean
+  refetch: () => void
 }
 
 export function useCurrentPronoMatch(): UseCurrentPronoMatchResult {
+  const { pronostic, isLoading, isRefetching, refetch } = useCurrentPronostic()
+
   return {
-    match: PRONO_FALLBACK_MATCH,
-    isLoading: false,
+    match: pronostic ? mapPronosticDataToMatch(pronostic.data, pronostic.imageUrl) : undefined,
+    isLoading,
+    isRefetching,
+    refetch,
   }
 }

@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react'
-import { Linking, Pressable } from 'react-native'
+import { Pressable } from 'react-native'
 import { XStack, YStack } from 'tamagui'
 import { AlertTriangle, MapPin } from '@tamagui/lucide-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,6 +14,7 @@ import { useSignupSessionStore } from '@/features_next/signup/store/signup-sessi
 import { applySignupFormError } from '@/features_next/signup/utils/errors'
 
 import { useSession } from '@/ctx/SessionProvider'
+import { openExternalLink } from '@/utils/linkHandler'
 import { DEFAULT_SIGNUP_SOURCE } from '@/services/signup/constants'
 import { useSignup } from '@/services/signup/hook'
 import { SignupInscriptionFormSchema, type RestPostSignupRequest, type SignupInscriptionFormValues } from '@/services/signup/schema'
@@ -195,11 +196,11 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
               <Pressable onPress={() => onChange(!value)} style={{ flex: 1 }}>
                 <Text.SM multiline color={error ? '$red600' : '$textPrimary'}>
                   En continuant, vous acceptez nos{' '}
-                  <Text.SM color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://attalpresident.fr/cgu')}>
+                  <Text.SM color="$blue9" cursor="pointer" onPress={() => void openExternalLink('https://attalpresident.fr/cgu')}>
                     CGU
                   </Text.SM>{' '}
                   et notre{' '}
-                  <Text.SM color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://attalpresident.fr/confidentialite')}>
+                  <Text.SM color="$blue9" cursor="pointer" onPress={() => void openExternalLink('https://attalpresident.fr/confidentialite')}>
                     Politique de confidentialité
                   </Text.SM>
                   , et vous autorisez Renaissance à vous envoyer des emails relatifs à votre inscription.
@@ -233,11 +234,11 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
         vous proposer des événements et actions près de chez vous. Avec votre accord, elles servent également à vous tenir informé(e) de nos activités.
         Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression et d&apos;opposition sur vos données, que vous pouvez
         exercer en écrivant à{' '}
-        <Text.SM secondary color="$blue9" cursor="pointer" onPress={() => Linking.openURL('mailto:dpo@parti-renaissance.fr')}>
+        <Text.SM secondary color="$blue9" cursor="pointer" onPress={() => void openExternalLink('mailto:dpo@parti-renaissance.fr')}>
           dpo@parti-renaissance.fr
         </Text.SM>
         . Vous pouvez également introduire une réclamation auprès de la CNIL. Pour en savoir plus, consultez notre{' '}
-        <Text.SM secondary color="$blue9" cursor="pointer" onPress={() => Linking.openURL('https://attalpresident.fr/confidentialite')}>
+        <Text.SM secondary color="$blue9" cursor="pointer" onPress={() => void openExternalLink('https://attalpresident.fr/confidentialite')}>
           politique de confidentialité
         </Text.SM>
         .

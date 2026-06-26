@@ -9,6 +9,7 @@ import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
 import { useRequireAuth } from '@/components/RequireAuth'
 import { HubOrganizeCategoryModal } from '@/features_next/events/pages/hub/components/HubOrganizeCategoryModal'
 import { useOpenOrganiserEvenement } from '@/features_next/profil/hooks/useOpenOrganiserEvenement'
+import { useProfileCompletionAccess } from '@/features_next/profil/hooks/useProfileCompletionAccess'
 import { DoubleSquare } from '@/features_next/profil/pages/instances/components/icons'
 
 import clientEnv from '@/config/clientEnv'
@@ -40,6 +41,7 @@ function useSoutenirCallToActionCards(userId?: string) {
   const { handleShareOrCopy } = useShareOrCopy()
   const { openOrganiserModal } = useOpenOrganiserEvenement()
   const { isAuth, redirectToSignup } = useRequireAuth()
+  const { runWithCompleteProfile } = useProfileCompletionAccess()
   const [organizeModalOpen, setOrganizeModalOpen] = useState(false)
   const showSecondaryCards = useDeferredRender()
 
@@ -79,8 +81,10 @@ function useSoutenirCallToActionCards(userId?: string) {
   }, [router])
 
   const handleRejoindreEquipe = useCallback(() => {
-    void openExternalLink(EXTERNAL_LINKS.rejoindreEquipe, { public_id: userId })
-  }, [userId])
+    runWithCompleteProfile(() => {
+      void openExternalLink(EXTERNAL_LINKS.rejoindreEquipe, { public_id: userId })
+    })
+  }, [runWithCompleteProfile, userId])
 
   return {
     showSecondaryCards,

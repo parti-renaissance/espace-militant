@@ -2,20 +2,31 @@ import { Href, router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import { isWeb } from 'tamagui'
 
+import type { RestAlertsResponse } from '@/services/alerts/schema'
 import { genericErrorThrower } from '@/services/common/errors/generic-errors'
 import { type HitSource } from '@/services/hits/constants'
 import { useHits } from '@/services/hits/hook'
 
-export const createOnShow = (url: string | null, buttonLabel: string | null | undefined, hitSource: HitSource) => {
+type AlertItem = RestAlertsResponse[number]
+
+const getPronosticRoute = (alert?: AlertItem) => {
+  if (alert?.type?.toLowerCase() !== 'pronostic') return undefined
+
+  return alert.data?.participation ? '/prono/jouer' : '/prono'
+}
+
+export const createOnShow = (url: string | null, buttonLabel: string | null | undefined, hitSource: HitSource, alert?: AlertItem) => {
   const { trackClick } = useHits()
 
   return () => {
-    if (url) {
+    const targetUrl = getPronosticRoute(alert) ?? url
+
+    if (targetUrl) {
       try {
         trackClick({
           object_type: 'alert',
           source: hitSource,
-          target_url: url || undefined,
+          target_url: targetUrl || undefined,
           button_name: buttonLabel || undefined,
         })
       } catch (error) {
@@ -27,12 +38,12 @@ export const createOnShow = (url: string | null, buttonLabel: string | null | un
       }
 
       try {
-        if (url.startsWith('/')) {
-          router.push(url as Href)
+        if (targetUrl.startsWith('/')) {
+          router.push(targetUrl as Href)
         } else if (isWeb) {
-          window.open(url, '_blank')
+          window.open(targetUrl, '_blank')
         } else {
-          WebBrowser.openBrowserAsync(url)
+          WebBrowser.openBrowserAsync(targetUrl)
         }
       } catch (error) {
         genericErrorThrower(error)

@@ -1,3 +1,5 @@
+'use no memo'
+
 import React, { memo, RefObject, useCallback, useEffect, useMemo } from 'react'
 import { TextInput } from 'react-native'
 import { useMedia, View, YStack } from 'tamagui'
@@ -5,7 +7,7 @@ import { useMedia, View, YStack } from 'tamagui'
 import { assemblies } from '@/components/AssemblySelect/assemblies'
 import AssemblySelect from '@/components/AssemblySelect/AssemblySelect'
 import SearchBox from '@/components/Search/SearchBox'
-import { eventFiltersState } from '@/features_next/events/store/filterStore'
+import { defaultEventFilters, eventFiltersState } from '@/features_next/events/store/filterStore'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetProfil } from '@/services/profile/hook'
@@ -43,36 +45,39 @@ const EventFilters = ({ onSearchFocus }: EventFiltersProps) => {
   const media = useMedia()
   const { isAuth } = useSession()
   const { data: user } = useGetProfil({ enabled: isAuth })
-  const { value, setValue, searchInputRef } = eventFiltersState()
+  const value = eventFiltersState((s) => s.value ?? defaultEventFilters)
+  const setValue = eventFiltersState((s) => s.setValue)
+  const searchInputRef = eventFiltersState((s) => s.searchInputRef)
 
   const defaultAssembly = user?.instances?.assembly?.code
+  const zone = value.zone
 
   useEffect(() => {
-    if (value.zone === undefined && defaultAssembly) {
+    if (zone === undefined && defaultAssembly) {
       const assembly = assemblies.find((a) => a.value === defaultAssembly)
       const detailZone = assembly ? { value: assembly.value, label: `${assembly.value} • ${assembly.label}` } : undefined
-      setValue((y) => ({
-        ...y,
+      setValue((prev) => ({
+        ...prev,
         zone: defaultAssembly,
         detailZone: detailZone ?? { value: defaultAssembly, label: defaultAssembly },
       }))
     }
-  }, [defaultAssembly, setValue, value.zone])
+  }, [defaultAssembly, setValue, zone])
 
   const handleAssemblyChange = useCallback((x?: { value: string; label: string }) => {
-    setValue((y) => ({ ...y, zone: x?.value, detailZone: x }))
-  }, [])
+    setValue((prev) => ({ ...prev, zone: x?.value, detailZone: x }))
+  }, [setValue])
 
   const handleSearchChange = useCallback((x: string) => {
-    setValue((y) => ({ ...y, search: x }))
-  }, [])
+    setValue((prev) => ({ ...prev, search: x }))
+  }, [setValue])
 
   const gap = useMemo(() => (media.lg ? 8 : 16), [media])
   const flexDirection = useMemo(() => (media.md ? 'row' : 'column'), [media])
 
   return (
     <View flexDirection={flexDirection} gap={gap}>
-      <AssemblySelectWrapper zone={value.zone} defaultAssembly={defaultAssembly} onDetailChange={handleAssemblyChange} />
+      <AssemblySelectWrapper zone={zone} defaultAssembly={defaultAssembly} onDetailChange={handleAssemblyChange} />
       <YStack flex={1}>
         <SearchBox
           label={value.detailZone ? `Dans ${value.detailZone.label}` : undefined}

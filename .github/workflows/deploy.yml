@@ -109,6 +109,9 @@ jobs:
         uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         name: ⬇️ Download web artifacts
+        with:
+          name: dist
+          path: dist
       - uses: ./.github/actions/setup-base
       - uses: ./.github/actions/dependencies
       - uses: google-github-actions/auth@v2

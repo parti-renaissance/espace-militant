@@ -1,10 +1,10 @@
 import { XStack, YStack } from 'tamagui';
+
+
+
 import Text from '@/components/base/Text';
 
-const SUGGESTIONS = [
-  'Quelles sont les priorités de Gabriel Attal pour la France ?',
-  'Quelle est la politique économique de Gabriel Attal ?',
-]
+const SUGGESTIONS = ['Que propose Gabriel Attal contre la canicule ?']
 
 type Props = {
   onPress: (question: string) => void

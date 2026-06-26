@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DefaultTheme, ThemeProvider } from "expo-router/react-navigation";
-import { BlurView } from 'expo-blur';
+import VoxBlur from '@/components/VoxBlur/VoxBlur';
 import { Slot, SplashScreen, useNavigationContainerRef } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { isWeb, TamaguiProvider, ViewProps } from 'tamagui';
@@ -101,18 +102,7 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
       {props.children}
       {(isLoading || props.isLoading) && (
         <>
-          <BlurView
-            blurMethod="dimezisBlurView"
-            intensity={50}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              zIndex: 1000,
-            }}
-          />
+          <VoxBlur variant="overlay" fullscreen />
           <WaitingScreen />
         </>
       )}
@@ -142,26 +132,28 @@ function Root() {
   return (
     <View style={isWeb ? { maxHeight: '100dvh' as any, flex: 1, backgroundColor: 'white' } : { flex: 1, backgroundColor: 'white' }}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar animated style="dark" />
-        <ToastProvider swipeDirection="up">
-          <QueryClientProvider client={queryClient}>
-            <TamaguiProvider config={config} defaultTheme="light">
-              <ThemeProvider value={DefaultTheme}>
-                <BottomSheetModalProvider>
-                  <SessionProvider>
-                    <PortalLayout>
-                      <WaitingRoomHoc isLoading={!isFontsLoaded}>
-                        <SignupTunnelGuard>
-                          <Slot />
-                        </SignupTunnelGuard>
-                      </WaitingRoomHoc>
-                    </PortalLayout>
-                  </SessionProvider>
-                </BottomSheetModalProvider>
-              </ThemeProvider>
-            </TamaguiProvider>
-          </QueryClientProvider>
-        </ToastProvider>
+        <SafeAreaProvider>
+          <StatusBar animated style="dark" />
+          <ToastProvider swipeDirection="up">
+            <QueryClientProvider client={queryClient}>
+              <TamaguiProvider config={config} defaultTheme="light">
+                <ThemeProvider value={DefaultTheme}>
+                  <BottomSheetModalProvider>
+                    <SessionProvider>
+                      <PortalLayout>
+                        <WaitingRoomHoc isLoading={!isFontsLoaded}>
+                          <SignupTunnelGuard>
+                            <Slot />
+                          </SignupTunnelGuard>
+                        </WaitingRoomHoc>
+                      </PortalLayout>
+                    </SessionProvider>
+                  </BottomSheetModalProvider>
+                </ThemeProvider>
+              </TamaguiProvider>
+            </QueryClientProvider>
+          </ToastProvider>
+        </SafeAreaProvider>
       </GestureHandlerRootView>
     </View>
   )
