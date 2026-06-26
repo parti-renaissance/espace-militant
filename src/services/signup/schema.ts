@@ -20,6 +20,7 @@ const RestPostSignupRequestObjectSchema = z.object({
   email_opt_in: z.boolean().optional(),
   sms_opt_in: z.boolean().optional(),
   referrer_code: z.string().max(100).optional(),
+  utm_source: z.string().max(255).optional(),
 })
 
 export const RestPostSignupRequestSchema = RestPostSignupRequestObjectSchema.superRefine((data, ctx) => {
