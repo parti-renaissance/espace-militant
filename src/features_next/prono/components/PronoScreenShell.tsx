@@ -7,6 +7,8 @@ import { useLayoutContext } from '@/components/AppStructure/Layout/LayoutContext
 
 import PronoNavHeader from './PronoNavHeader'
 
+const KEYBOARD_VERTICAL_OFFSET = 100
+
 type PronoScreenShellProps = {
   children: ReactNode
   onRefresh?: () => void
@@ -26,7 +28,7 @@ export default function PronoScreenShell({ children, onRefresh, refreshing }: Pr
   )
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'android' ? 'height' : 'padding'}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'android' ? 'height' : 'padding'} keyboardVerticalOffset={KEYBOARD_VERTICAL_OFFSET}>
       <ScrollView
         flex={1}
         backgroundColor="$gray50"
