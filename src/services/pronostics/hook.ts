@@ -2,33 +2,24 @@ import { useToastController } from '@tamagui/toast'
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { getAlerts } from '@/services/alerts/api'
 import type { RestAlertsResponse } from '@/services/alerts/schema'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 
-import { createPronosticParticipation, getPronostic, getPublicAlerts } from './api'
-import { RestPronosticDataSchema, type RestPostPronosticParticipationRequest, type RestPronosticData } from './schema'
+import { createPronosticParticipation, getCurrentPronostic, getPronostic } from './api'
+import { type RestPostPronosticParticipationRequest } from './schema'
 
 const ALERTS_QUERY_KEY = 'alerts'
 const PRONOSTIC_ALERTS_QUERY_KEY = 'pronostic-alerts'
 const PRONOSTIC_QUERY_KEY = 'pronostic'
 
-const findPronosticAlert = (alerts?: RestAlertsResponse) => alerts?.find((alert) => alert.type?.toLowerCase() === 'pronostic')
-
-const parsePronosticAlert = (alert?: RestAlertsResponse[number]): { data: RestPronosticData; imageUrl?: string } | null => {
-  if (!alert?.data) return null
-
-  const parsed = RestPronosticDataSchema.safeParse(alert.data)
-  if (!parsed.success) return null
-
-  return { data: parsed.data, imageUrl: parsed.data.image_url ?? undefined }
-}
-
 export const useCurrentPronostic = () => {
   const { isAuth, isLoading: isSessionLoading } = useSession()
-  const alertsQuery = useQuery({
+  const pronosticQuery = useQuery({
     queryKey: [PRONOSTIC_ALERTS_QUERY_KEY, isAuth],
-    queryFn: () => (isAuth ? getAlerts() : getPublicAlerts()),
+    queryFn: async () => {
+      const data = await getCurrentPronostic({ isAuth })
+      return data ? { data } : null
+    },
     enabled: !isSessionLoading,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -36,10 +27,10 @@ export const useCurrentPronostic = () => {
   })
 
   return {
-    pronostic: parsePronosticAlert(findPronosticAlert(alertsQuery.data)),
-    isLoading: isSessionLoading || alertsQuery.isLoading,
-    isRefetching: alertsQuery.isRefetching,
-    refetch: alertsQuery.refetch,
+    pronostic: pronosticQuery.data,
+    isLoading: isSessionLoading || pronosticQuery.isLoading,
+    isRefetching: pronosticQuery.isRefetching,
+    refetch: pronosticQuery.refetch,
   }
 }
 

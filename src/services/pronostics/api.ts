@@ -1,17 +1,9 @@
 import { z } from 'zod'
 
-import { RestAlertsResponseSchema } from '@/services/alerts/schema'
+import { authInstance, publicInstance } from '@/lib/axios'
 import { api } from '@/utils/api'
 
 import * as schemas from './schema'
-
-export const getPublicAlerts = api({
-  method: 'get',
-  path: 'api/alerts',
-  requestSchema: z.void(),
-  responseSchema: RestAlertsResponseSchema,
-  type: 'public',
-})
 
 export const getPronostic = (props: { uuid: string }) =>
   api({
@@ -21,6 +13,18 @@ export const getPronostic = (props: { uuid: string }) =>
     responseSchema: schemas.RestGetPronosticResponseSchema,
     type: 'private',
   })()
+
+export const getCurrentPronostic = async (props: { isAuth: boolean }) => {
+  const instance = props.isAuth ? authInstance : publicInstance
+  const path = props.isAuth ? 'api/v3/pronostics/current' : 'api/pronostics/current'
+  const response = await instance.get(path)
+
+  if (response.status === 204) {
+    return null
+  }
+
+  return schemas.RestGetPronosticResponseSchema.parse(response.data)
+}
 
 export const createPronosticParticipation = (props: { uuid: string; payload: schemas.RestPostPronosticParticipationRequest }) =>
   api({
