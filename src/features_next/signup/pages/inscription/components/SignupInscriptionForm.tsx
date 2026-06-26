@@ -40,6 +40,7 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
   const startResendCooldown = useSignupSessionStore((s) => s.startResendCooldown)
   const redirectUri = useSignupSessionStore((s) => s.redirectUri)
   const referrerCode = useSignupSessionStore((s) => s.ref)
+  const utmSource = useSignupSessionStore((s) => s.utmSource)
 
   const { control, handleSubmit, setError, setValue } = useForm<SignupInscriptionFormValues>({
     defaultValues: {
@@ -63,18 +64,23 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
   }, [])
 
   const mapToApiPayload = useCallback(
-    (data: SignupInscriptionFormValues, token: string): RestPostSignupRequest => ({
-      email: data.email.trim(),
-      source: DEFAULT_SIGNUP_SOURCE,
-      recaptcha: token,
-      cgu_accepted: true,
-      first_name: data.first_name.trim(),
-      postal_code: data.postal_code.trim(),
-      country: 'FR',
-      email_opt_in: data.email_opt_in,
-      ...(referrerCode ? { referrer_code: referrerCode } : {}),
-    }),
-    [referrerCode],
+    (data: SignupInscriptionFormValues, token: string): RestPostSignupRequest => {
+      const effectiveUtmSource = utmSource ?? redirectUri ?? undefined
+
+      return {
+        email: data.email.trim(),
+        source: DEFAULT_SIGNUP_SOURCE,
+        recaptcha: token,
+        cgu_accepted: true,
+        first_name: data.first_name.trim(),
+        postal_code: data.postal_code.trim(),
+        country: 'FR',
+        email_opt_in: data.email_opt_in,
+        ...(referrerCode ? { referrer_code: referrerCode } : {}),
+        ...(effectiveUtmSource ? { utm_source: effectiveUtmSource } : {}),
+      }
+    },
+    [referrerCode, utmSource, redirectUri],
   )
 
   const onSubmit = handleSubmit(async (data) => {

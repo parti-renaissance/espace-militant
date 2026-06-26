@@ -25,11 +25,12 @@ export function useSignupBienvenueScreen() {
 
   const handleContinue = useCallback(() => {
     setIsScreenFocused(false)
-    const { redirectUri, ref } = useSignupSessionStore.getState()
+    const { redirectUri, ref, utmSource } = useSignupSessionStore.getState()
     router.replace(
       getAuthHref(AuthRoutes.INSCRIPTION, {
         redirectUri: redirectUri ?? undefined,
         ref: ref ?? undefined,
+        utm_source: utmSource ?? undefined,
       }),
     )
   }, [])
