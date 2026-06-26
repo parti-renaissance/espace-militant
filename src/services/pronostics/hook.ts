@@ -2,33 +2,24 @@ import { useToastController } from '@tamagui/toast'
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { getAlerts } from '@/services/alerts/api'
-import type { RestAlertsResponse } from '@/services/alerts/schema'
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 
-import { createPronosticParticipation, getPronostic, getPublicAlerts } from './api'
-import { RestPronosticDataSchema, type RestPostPronosticParticipationRequest, type RestPronosticData } from './schema'
+import { createPronosticParticipation, getCurrentPronostic, getPronostic } from './api'
+import { type RestGetPronosticResponse, type RestPostPronosticParticipationRequest } from './schema'
 
-const ALERTS_QUERY_KEY = 'alerts'
-const PRONOSTIC_ALERTS_QUERY_KEY = 'pronostic-alerts'
+const CURRENT_PRONOSTIC_QUERY_KEY = 'current-pronostic'
 const PRONOSTIC_QUERY_KEY = 'pronostic'
 
-const findPronosticAlert = (alerts?: RestAlertsResponse) => alerts?.find((alert) => alert.type?.toLowerCase() === 'pronostic')
-
-const parsePronosticAlert = (alert?: RestAlertsResponse[number]): { data: RestPronosticData; imageUrl?: string } | null => {
-  if (!alert?.data) return null
-
-  const parsed = RestPronosticDataSchema.safeParse(alert.data)
-  if (!parsed.success) return null
-
-  return { data: parsed.data, imageUrl: parsed.data.image_url ?? undefined }
-}
+type CurrentPronosticQueryData = { data: RestGetPronosticResponse; imageUrl?: string } | null
 
 export const useCurrentPronostic = () => {
   const { isAuth, isLoading: isSessionLoading } = useSession()
-  const alertsQuery = useQuery({
-    queryKey: [PRONOSTIC_ALERTS_QUERY_KEY, isAuth],
-    queryFn: () => (isAuth ? getAlerts() : getPublicAlerts()),
+  const pronosticQuery = useQuery({
+    queryKey: [CURRENT_PRONOSTIC_QUERY_KEY, isAuth],
+    queryFn: async () => {
+      const data = await getCurrentPronostic({ isAuth })
+      return data ? { data } : null
+    },
     enabled: !isSessionLoading,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -36,10 +27,10 @@ export const useCurrentPronostic = () => {
   })
 
   return {
-    pronostic: parsePronosticAlert(findPronosticAlert(alertsQuery.data)),
-    isLoading: isSessionLoading || alertsQuery.isLoading,
-    isRefetching: alertsQuery.isRefetching,
-    refetch: alertsQuery.refetch,
+    pronostic: pronosticQuery.data,
+    isLoading: isSessionLoading || pronosticQuery.isLoading,
+    isRefetching: pronosticQuery.isRefetching,
+    refetch: pronosticQuery.refetch,
   }
 }
 
@@ -53,12 +44,18 @@ export const usePronostic = (uuid: string) =>
 export const useCreatePronosticParticipation = (uuid?: string) => {
   const toast = useToastController()
   const queryClient = useQueryClient()
-  const updatePronosticAlert = (alerts?: RestAlertsResponse, payload?: RestPostPronosticParticipationRequest) =>
-    alerts?.map((alert) =>
-      alert.type?.toLowerCase() === 'pronostic' && alert.data?.uuid === uuid
-        ? { ...alert, data: { ...alert.data, participation: payload, status: 'participated' } }
-        : alert,
-    )
+  const updateCurrentPronostic = (current?: CurrentPronosticQueryData, payload?: RestPostPronosticParticipationRequest): CurrentPronosticQueryData => {
+    if (!current || current.data.uuid !== uuid) return current ?? null
+
+    return {
+      ...current,
+      data: {
+        ...current.data,
+        participation: payload,
+        status: 'participated',
+      },
+    }
+  }
 
   return useMutation({
     mutationFn: (payload: RestPostPronosticParticipationRequest) => {
@@ -66,21 +63,15 @@ export const useCreatePronosticParticipation = (uuid?: string) => {
       return createPronosticParticipation({ uuid, payload })
     },
     onMutate: async (payload) => {
-      await queryClient.cancelQueries({ queryKey: [ALERTS_QUERY_KEY] })
-      await queryClient.cancelQueries({ queryKey: [PRONOSTIC_ALERTS_QUERY_KEY] })
-      const previousAlerts = queryClient.getQueryData<RestAlertsResponse>([ALERTS_QUERY_KEY])
-      const previousPronosticAlerts = queryClient.getQueriesData<RestAlertsResponse>({ queryKey: [PRONOSTIC_ALERTS_QUERY_KEY] })
+      await queryClient.cancelQueries({ queryKey: [CURRENT_PRONOSTIC_QUERY_KEY] })
+      const previousCurrentPronostics = queryClient.getQueriesData<CurrentPronosticQueryData>({ queryKey: [CURRENT_PRONOSTIC_QUERY_KEY] })
 
-      queryClient.setQueryData<RestAlertsResponse>([ALERTS_QUERY_KEY], (alerts) => updatePronosticAlert(alerts, payload))
-      queryClient.setQueriesData<RestAlertsResponse>({ queryKey: [PRONOSTIC_ALERTS_QUERY_KEY] }, (alerts) => updatePronosticAlert(alerts, payload))
+      queryClient.setQueriesData<CurrentPronosticQueryData>({ queryKey: [CURRENT_PRONOSTIC_QUERY_KEY] }, (current) => updateCurrentPronostic(current, payload))
 
-      return { previousAlerts, previousPronosticAlerts }
+      return { previousCurrentPronostics }
     },
     onError: (error, _payload, context) => {
-      if (context?.previousAlerts) {
-        queryClient.setQueryData([ALERTS_QUERY_KEY], context.previousAlerts)
-      }
-      context?.previousPronosticAlerts?.forEach(([key, data]) => queryClient.setQueryData(key, data))
+      context?.previousCurrentPronostics?.forEach(([key, data]) => queryClient.setQueryData(key, data))
 
       if (error instanceof GenericResponseError) {
         toast.show('Erreur', { message: error.message, type: 'error' })
@@ -94,8 +85,7 @@ export const useCreatePronosticParticipation = (uuid?: string) => {
       toast.show('Prono enregistré', { message: `Ton score : ${payload.team_1_score} - ${payload.team_2_score}`, type: 'success' })
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: [ALERTS_QUERY_KEY] })
-      queryClient.invalidateQueries({ queryKey: [PRONOSTIC_ALERTS_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [CURRENT_PRONOSTIC_QUERY_KEY] })
       if (uuid) queryClient.invalidateQueries({ queryKey: [PRONOSTIC_QUERY_KEY, uuid] })
     },
   })
