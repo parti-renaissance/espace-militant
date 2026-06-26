@@ -10,10 +10,11 @@ export type AuthRoutePath = (typeof AuthRoutes)[keyof typeof AuthRoutes]
 export type AuthHrefParams = {
   redirectUri?: string
   ref?: string
+  utm_source?: string
 }
 
 export function getAuthHref(route: AuthRoutePath, params?: string | AuthHrefParams): Href {
-  const { redirectUri, ref } = typeof params === 'string' ? { redirectUri: params } : (params ?? {})
+  const { redirectUri, ref, utm_source } = typeof params === 'string' ? { redirectUri: params } : (params ?? {})
   const query = new URLSearchParams()
 
   if (redirectUri && redirectUri !== '/') {
@@ -21,6 +22,9 @@ export function getAuthHref(route: AuthRoutePath, params?: string | AuthHrefPara
   }
   if (ref) {
     query.set('ref', ref)
+  }
+  if (utm_source) {
+    query.set('utm_source', utm_source)
   }
 
   const qs = query.toString()

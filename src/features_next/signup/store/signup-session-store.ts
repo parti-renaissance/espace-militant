@@ -11,6 +11,7 @@ type SignupSessionState = {
   firstName: string
   redirectUri: string | null
   ref: string | null
+  utmSource: string | null
   inlineError: string | null
   requiresManualLogin: boolean
   resendAvailableAt: number | null
@@ -18,6 +19,7 @@ type SignupSessionState = {
   setFirstName: (firstName: string) => void
   setRedirectUri: (redirectUri: string | null) => void
   setRef: (ref: string | null) => void
+  setUtmSource: (utmSource: string | null) => void
   setInlineError: (message: string | null) => void
   setRequiresManualLogin: (value: boolean) => void
   startResendCooldown: () => void
@@ -29,6 +31,7 @@ const initialState = {
   firstName: '',
   redirectUri: null as string | null,
   ref: null as string | null,
+  utmSource: null as string | null,
   inlineError: null as string | null,
   requiresManualLogin: false,
   resendAvailableAt: null as number | null,
@@ -40,6 +43,7 @@ export const useSignupSessionStore = create<SignupSessionState>((set) => ({
   setFirstName: (firstName) => set({ firstName }),
   setRedirectUri: (redirectUri) => set({ redirectUri }),
   setRef: (ref) => set({ ref }),
+  setUtmSource: (utmSource) => set({ utmSource }),
   setInlineError: (inlineError) => set({ inlineError }),
   setRequiresManualLogin: (requiresManualLogin) => set({ requiresManualLogin }),
   startResendCooldown: () => set({ resendAvailableAt: Date.now() + SIGNUP_RESEND_COOLDOWN_MS }),
