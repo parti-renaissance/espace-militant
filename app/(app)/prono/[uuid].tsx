@@ -4,7 +4,6 @@ import Head from 'expo-router/head'
 import Error404 from '@/components/404/Error404'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
 import PronoDetailScreen from '@/features_next/prono/pages/PronoDetailScreen'
-import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'
@@ -15,7 +14,7 @@ export default function PronoDetailRoute() {
 
   if (!uuid) return <Error404 />
   if (isLoading) return null
-  if (!isAuth) return <Redirect href={getAuthHref(AuthRoutes.INSCRIPTION, `/prono/${uuid}`)} />
+  if (!isAuth) return <Redirect href="/prono" />
 
   return (
     <>
