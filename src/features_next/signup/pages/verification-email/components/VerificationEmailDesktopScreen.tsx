@@ -5,6 +5,7 @@ import { SignupDesktopFormColumn, SignupDesktopIllustrationColumn, SignupDesktop
 import { useSignupVerificationEmailScreen } from '@/features_next/signup/hooks/useSignupVerificationEmailScreen'
 import SignupVerificationEmailFooter from '@/features_next/signup/pages/verification-email/components/SignupVerificationEmailFooter'
 import SignupVerificationEmailScrollBody from '@/features_next/signup/pages/verification-email/components/SignupVerificationEmailScrollBody'
+import { useInscriptionContent } from '@/features_next/signup/pages/inscription/hooks/useInscriptionContent'
 import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
 
 export default function VerificationEmailDesktopScreen() {
@@ -22,6 +23,7 @@ export default function VerificationEmailDesktopScreen() {
     onChangeEmail,
     onSignIn,
   } = useSignupVerificationEmailScreen()
+  const { DesktopIllustrationComponent } = useInscriptionContent()
 
   if (needsRedirect) {
     return <Redirect href={AuthRoutes.INSCRIPTION} />
@@ -29,7 +31,7 @@ export default function VerificationEmailDesktopScreen() {
 
   return (
     <SignupDesktopPageShell paddingLeft={insets.left + 16}>
-      <SignupDesktopIllustrationColumn />
+      <SignupDesktopIllustrationColumn illustration={DesktopIllustrationComponent ? <DesktopIllustrationComponent /> : undefined} />
       <SignupDesktopFormColumn
         stickyFooter={false}
         paddingRight={insets.right + 32}

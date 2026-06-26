@@ -4,6 +4,7 @@ import Text from '@/components/base/Text'
 import Title from '@/components/Title/Title'
 import { SignupEngagementCard } from '@/features_next/signup/components/SignupDesktopLayout'
 import { PronoSignupCard } from '@/features_next/prono/components/PronoSignupCard'
+import PronoSignupIllustration from '@/features_next/prono/components/PronoSignupIllustration'
 
 import { ToiPresidentEngagementCard } from './components/ToiPresidentEngagementCard'
 
@@ -11,6 +12,7 @@ export type InscriptionConfigItem = {
   TitleComponent: ReactNode
   SubtitleComponent: ReactNode
   EngagementComponent: ComponentType | null
+  DesktopIllustrationComponent?: ComponentType | null
 }
 
 const INSCRIPTION_TITLE = (
@@ -53,6 +55,7 @@ export const INSCRIPTION_CONFIG: Record<string, InscriptionConfigItem> = {
     TitleComponent: PRONO_TITLE,
     SubtitleComponent: <Text.LG regular>Inscrivez-vous vite pour découvrir si votre pronostic fera la différence face à Gabriel Attal.</Text.LG>,
     EngagementComponent: PronoSignupCard,
+    DesktopIllustrationComponent: PronoSignupIllustration,
   },
 }
 

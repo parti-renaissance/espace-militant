@@ -13,8 +13,6 @@ import { padCountdownUnit, usePronoCountdown } from '../hooks/usePronoCountdown'
 import { PronoMatchView, PronoScore, PronoTeam } from '../model'
 import { formatTeamLabel, parsePlayerPredictionFromUri } from '../utils'
 
-const PLAYER_MOCK_PREDICTION: PronoScore = { home: 3, away: 0 }
-
 const CARD_HEIGHT = 235
 const CARD_RADIUS = 20
 const IMAGE_WIDTH = 200
@@ -34,7 +32,7 @@ const CardRoot = styled(YStack, {
   overflow: 'hidden',
 })
 
-const PredictionsBox = styled(XStack, {
+export const PredictionsBox = styled(XStack, {
   alignSelf: 'stretch',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -77,7 +75,7 @@ function ScoreCell({ code, value }: { code: string; value: number }) {
   )
 }
 
-function PredictionGroup({ title, homeTeam, awayTeam, prediction }: { title: string; homeTeam: PronoTeam; awayTeam: PronoTeam; prediction: PronoScore }) {
+export function PredictionGroup({ title, homeTeam, awayTeam, prediction }: { title: string; homeTeam: PronoTeam; awayTeam: PronoTeam; prediction: PronoScore }) {
   return (
     <YStack flex={1} alignItems="center" gap="$small">
       <Text.SM semibold color="#27221F" numberOfLines={1}>
@@ -94,7 +92,7 @@ function PredictionGroup({ title, homeTeam, awayTeam, prediction }: { title: str
   )
 }
 
-function PronoCountdownInline({ targetAt }: { targetAt: string }) {
+export function PronoCountdownInline({ targetAt }: { targetAt: string }) {
   const remaining = usePronoCountdown(targetAt)
   const units: { value: number; unit: string }[] = [
     { value: remaining.days, unit: 'j' },
@@ -159,9 +157,9 @@ export function PronoSignupCard({ match: matchProp, playerPrediction: playerPred
   const { redirectUri } = useGlobalSearchParams<{ redirectUri?: string }>()
   const { match: currentMatch } = useCurrentPronoMatch()
   const match = matchProp ?? currentMatch
-  const playerPrediction = playerPredictionProp ?? parsePlayerPredictionFromUri(redirectUri) ?? PLAYER_MOCK_PREDICTION
+  const playerPrediction = playerPredictionProp ?? parsePlayerPredictionFromUri(redirectUri)
 
-  if (!match) return null
+  if (!match || !playerPrediction) return null
 
   return <PronoSignupCardContent match={match} playerPrediction={playerPrediction} />
 }
