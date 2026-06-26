@@ -36,12 +36,14 @@ export default function PronoScreenShell({ children, onRefresh, refreshing }: Pr
         keyboardShouldPersistTaps="handled"
         refreshControl={onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} /> : undefined}
       >
-        {!isDesktop ? <PronoNavHeader /> : null}
+        <YStack width="100%" maxWidth={isDesktop ? 480 : undefined}>
+          <PronoNavHeader />
+        </YStack>
         <YStack
           width="100%"
           maxWidth={isDesktop ? 480 : undefined}
           paddingHorizontal={isDesktop ? '$large' : '$medium'}
-          paddingTop={isDesktop ? '$xlarge' : '$xsmall'}
+          paddingTop="$xsmall"
           paddingBottom={isDesktop ? '$xlarge' : '$medium'}
           gap="$medium"
         >
