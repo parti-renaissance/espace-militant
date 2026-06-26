@@ -39,7 +39,7 @@ const EventDetailScreen: React.FC = () => {
 }
 
 function _EventDetailScreen(props: Readonly<{ id: string }>) {
-  const { data, isLoading: isEventLoading, error: eventError } = useGetEvent({ id: props.id })
+  const { data, isFetching, error: eventError } = useGetEvent({ id: props.id })
   const { trackOpen } = useHits()
   const searchParams = useGlobalSearchParams<{
     utm_source?: string
@@ -51,7 +51,7 @@ function _EventDetailScreen(props: Readonly<{ id: string }>) {
   const ogUrl = `${BASE_URL}/evenements/${props.id}`
 
   React.useEffect(() => {
-    if (!isEventLoading && !eventError && data) {
+    if (!isFetching && !eventError && data) {
       if (sentRef.current !== props.id) {
         sentRef.current = props.id
 
@@ -75,7 +75,7 @@ function _EventDetailScreen(props: Readonly<{ id: string }>) {
         cleanupUrlParams(['source'])
       }
     }
-  }, [props.id, isEventLoading, eventError, data, trackOpen, searchParams])
+  }, [props.id, isFetching, eventError, data, trackOpen, searchParams])
 
   return (
     <>
@@ -92,7 +92,7 @@ function _EventDetailScreen(props: Readonly<{ id: string }>) {
         <meta key="og-url" property="og:url" content={ogUrl} />
         <meta key="og-type" property="og:type" content="event" />
       </Head>
-      <EventDetailsScreen data={data} />
+      <EventDetailsScreen data={data} isFetching={isFetching} />
     </>
   )
 }

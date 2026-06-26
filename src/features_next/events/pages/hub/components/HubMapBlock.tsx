@@ -4,7 +4,7 @@ import { View } from 'react-native'
 import { Spinner, YStack } from 'tamagui'
 import { Crosshair } from '@tamagui/lucide-icons'
 import type { CameraPadding } from '@rnmapbox/maps'
-import { OnPressEvent } from '@rnmapbox/maps/src/types/OnPressEvent'
+import type { MapboxOnPressEvent } from '@/components/Mapbox/types'
 
 import { VoxButton } from '@/components/Button'
 import { VoxBlurTarget } from '@/components/VoxBlur/VoxBlur'
@@ -15,7 +15,7 @@ import { HubMapPromoOverlay } from './HubMapPromoOverlay'
 export type HubMapBlockProps = {
   hubItemMapRef: Ref<HubItemMapHandle>
   mapItems: HubItemMapItem[]
-  onItemPress: (event: OnPressEvent) => void
+  onItemPress: (event: MapboxOnPressEvent) => void
   onRecenterPress: () => void
   padding: CameraPadding
   isLocating: boolean

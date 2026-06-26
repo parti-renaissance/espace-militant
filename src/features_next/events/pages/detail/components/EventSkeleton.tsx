@@ -74,6 +74,18 @@ const DesktopSkeleton = () => {
   )
 }
 
+export function EventDescriptionSkeleton() {
+  return <SkeCard.Description />
+}
+
+export function EventCapacitySkeleton() {
+  return <SkeCard.Line width={180} />
+}
+
+export function EventAttendeesSkeleton() {
+  return <SkeCard.Line width={140} />
+}
+
 export function EventSkeleton() {
   const media = useMedia()
   return media.sm ? <MobileSkeleton /> : <DesktopSkeleton />

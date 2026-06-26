@@ -6,6 +6,7 @@ import type { CameraPadding } from '@rnmapbox/maps'
 import MapboxGl from '@/components/Mapbox/Mapbox'
 
 import { ActionType, RestAction, RestActionFull } from '@/services/actions/schema'
+import { hasValidActionCoordinates } from '@/services/actions/selectors'
 
 import pinBoitage from '../../../assets/map/action-boitage.png'
 import pinCollage from '../../../assets/map/action-collage.png'
@@ -13,6 +14,7 @@ import pinPap from '../../../assets/map/action-porte-a-porte.png'
 import pinQuestionnaire from '../../../assets/map/action-questionnaire.png'
 import pinTractage from '../../../assets/map/action-tractage.png'
 import { createActionMapSource } from '../../../utils/mapSource'
+import { ActionMapPlaceholder } from './ActionSkeleton'
 
 const ACTION_DETAIL_MAP_IMAGES = {
   'action-detail-pap': pinPap,
@@ -51,6 +53,7 @@ export function ActionDetailMap({ action, cameraPadding }: ActionDetailMapProps)
   const media = useMedia()
   const shape = useMemo(() => createActionMapSource([action as RestAction], action.uuid), [action])
   const center: [number, number] = [action.post_address.longitude, action.post_address.latitude]
+  const cameraKey = `${action.uuid}-${center[0]}-${center[1]}`
 
   const mobileSnapCamera = media.sm ? ({ animationMode: 'moveTo' as const, animationDuration: 0 } as const) : undefined
 
@@ -64,7 +67,14 @@ export function ActionDetailMap({ action, cameraPadding }: ActionDetailMapProps)
       rotateEnabled={false}
       pitchEnabled={false}
     >
-      <MapboxGl.Camera followUserLocation={false} centerCoordinate={center} zoomLevel={15} padding={cameraPadding} {...mobileSnapCamera} />
+      <MapboxGl.Camera
+        key={cameraKey}
+        followUserLocation={false}
+        centerCoordinate={center}
+        zoomLevel={15}
+        padding={cameraPadding}
+        {...mobileSnapCamera}
+      />
       <MapboxGl.Images images={ACTION_DETAIL_MAP_IMAGES} />
       <MapboxGl.ShapeSource id="action-detail" shape={shape} cluster={false} onPress={() => {}} hitbox={{ width: 20, height: 20 }}>
         <MapboxGl.SymbolLayer
@@ -83,10 +93,27 @@ export function ActionDetailMap({ action, cameraPadding }: ActionDetailMapProps)
   )
 }
 
+function ActionDetailMapFrame({ children, baseHeight, topInset = 0 }: { children: React.ReactNode; baseHeight: number; topInset?: number }) {
+  return (
+    <YStack
+      height={baseHeight + topInset}
+      width="100%"
+      flexShrink={0}
+      overflow="hidden"
+      position="relative"
+      borderRadius={0}
+      marginTop={topInset ? -topInset : 0}
+    >
+      {children}
+    </YStack>
+  )
+}
+
 export function ActionDetailMapBlock({ action }: ActionDetailMapBlockProps) {
   const media = useMedia()
   const insets = useSafeAreaInsets()
   const baseHeight = media.sm ? 250 : 300
+  const showMap = hasValidActionCoordinates(action.post_address)
 
   if (media.sm) {
     const top = insets.top
@@ -98,15 +125,15 @@ export function ActionDetailMapBlock({ action }: ActionDetailMapBlockProps) {
     }
 
     return (
-      <YStack height={baseHeight + top} width="100%" flexShrink={0} overflow="hidden" position="relative" borderRadius={0} marginTop={-top}>
-        <ActionDetailMap action={action} cameraPadding={cameraPadding} />
-      </YStack>
+      <ActionDetailMapFrame baseHeight={baseHeight} topInset={top}>
+        {showMap ? <ActionDetailMap action={action} cameraPadding={cameraPadding} /> : <ActionMapPlaceholder />}
+      </ActionDetailMapFrame>
     )
   }
 
   return (
-    <YStack height={baseHeight} width="100%" flexShrink={0} overflow="hidden" position="relative" borderRadius={0}>
-      <ActionDetailMap action={action} />
-    </YStack>
+    <ActionDetailMapFrame baseHeight={baseHeight}>
+      {showMap ? <ActionDetailMap action={action} /> : <ActionMapPlaceholder />}
+    </ActionDetailMapFrame>
   )
 }

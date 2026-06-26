@@ -4,7 +4,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInf
 import { format } from 'date-fns'
 
 import type { HubItemMapItem } from '@/features_next/events/pages/map/components/HubItemMap'
-import { isEventPast } from '@/features_next/events/utils'
+import { isEventPast } from '@/services/events/selectors'
 
 import { EventFilters } from '@/core/entities/Event'
 import { useSession } from '@/ctx/SessionProvider'

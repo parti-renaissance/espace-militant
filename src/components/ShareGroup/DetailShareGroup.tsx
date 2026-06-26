@@ -7,7 +7,7 @@ import { VoxButton } from '@/components/Button'
 import ShareButton from '@/components/Buttons/ShareButton'
 import { getFormatedVoxCardDate } from '@/components/utils'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { isEventFull } from '@/features_next/events/utils'
+import { isEventCancelled, isEventFull, isEventPast } from '@/services/events/selectors'
 
 import clientEnv from '@/config/clientEnv'
 import { useHandleCopyUrl } from '@/hooks/useHandleCopy'
@@ -20,6 +20,7 @@ import { useGetProfil } from '@/services/profile/hook'
 
 export type EventShareGroupProps = {
   event: Partial<RestEvent> & Pick<RestEvent, 'uuid' | 'slug'>
+  isDetailsLoading?: boolean
 }
 
 export const useEventSharing = ({ event }: EventShareGroupProps) => {
@@ -115,10 +116,10 @@ export const useActionSharing = ({ action }: ActionShareProps) => {
 }
 
 export type DetailShareGroupProps =
-  | { event: EventShareGroupProps['event']; action?: never }
+  | { event: EventShareGroupProps['event']; isDetailsLoading?: boolean; action?: never }
   | { action: RestActionFull; event?: never }
 
-function EventShareGroupInner({ event }: EventShareGroupProps) {
+function EventShareGroupInner({ event, isDetailsLoading = false }: EventShareGroupProps) {
   const { copyUrl, shareUrl, openShareDialog, isShareAvailable } = useEventSharing({ event })
 
   const createEventData = (ev: Partial<eventTypes.RestFullEvent> & { begin_at: string }) => {
@@ -138,9 +139,15 @@ function EventShareGroupInner({ event }: EventShareGroupProps) {
 
   const addToCalendar = useCreateEvent()
 
-  const canAddEventToCalendar = (ev: EventShareGroupProps['event']): ev is Partial<eventTypes.RestFullEvent> & Pick<RestEvent, 'uuid' | 'slug' | 'begin_at'> => {
-    return isEventFull(ev) && typeof ev.begin_at === 'string'
-  }
+  const isCalendarEligible = (ev: EventShareGroupProps['event']): ev is Partial<eventTypes.RestFullEvent> & Pick<RestEvent, 'uuid' | 'slug' | 'begin_at'> =>
+    typeof ev.begin_at === 'string' && !isEventCancelled(ev) && !isEventPast(ev)
+
+  const canAddEventToCalendar = (
+    ev: EventShareGroupProps['event'],
+  ): ev is Partial<eventTypes.RestFullEvent> & Pick<RestEvent, 'uuid' | 'slug' | 'begin_at'> => isEventFull(ev) && isCalendarEligible(ev)
+
+  const canAddEnabled = canAddEventToCalendar(event)
+  const isCalendarLoading = Boolean(isDetailsLoading && isCalendarEligible(event))
 
   return (
     <VoxCard.Section title="Partagez cet événement avec vos contacts pour maximiser sa portée.">
@@ -152,8 +159,20 @@ function EventShareGroupInner({ event }: EventShareGroupProps) {
         </VoxButton>
       )}
 
-      {canAddEventToCalendar(event) ? (
-        <VoxButton variant="outlined" full size="xl" iconLeft={CalendarPlus} onPress={() => addToCalendar(createEventData(event))}>
+      {canAddEnabled || isCalendarLoading ? (
+        <VoxButton
+          variant="outlined"
+          full
+          size="xl"
+          iconLeft={CalendarPlus}
+          disabled={isCalendarLoading}
+          onPress={() => {
+            if (!canAddEnabled) {
+              return
+            }
+            addToCalendar(createEventData(event))
+          }}
+        >
           Ajouter à mon calendrier
         </VoxButton>
       ) : null}
@@ -204,5 +223,5 @@ export function DetailShareGroup(props: DetailShareGroupProps) {
   if ('action' in props && props.action) {
     return <ActionShareGroupInner action={props.action} />
   }
-  return <EventShareGroupInner event={props.event} />
+  return <EventShareGroupInner event={props.event} isDetailsLoading={props.isDetailsLoading} />
 }

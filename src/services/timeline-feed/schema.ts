@@ -9,6 +9,8 @@ export const RestTimelineFeedAddressSchema = z.object({
   city_name: z.string().nullable(),
   postal_code: z.string().nullable(),
   country: z.string().nullable(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
 })
 
 export type RestTimelineFeedSocialMediaPhoto = z.infer<typeof RestTimelineFeedSocialMediaPhotoSchema>

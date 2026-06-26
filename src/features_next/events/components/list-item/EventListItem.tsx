@@ -1,12 +1,13 @@
 import { memo } from 'react'
-import { Href, useRouter } from 'expo-router'
 import { useMedia, View, XStack } from 'tamagui'
 import { Eye, EyeOff } from '@tamagui/lucide-icons'
 
 import { VoxButton } from '@/components/Button'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
-import { RestItemEvent } from '@/services/events/schema'
+import { useNavigateToEvent } from '@/features_next/events/hooks/useNavigateToEvent'
+import { mapItemEventToRestEventSeed } from '@/services/common/mapper/mapItemEventToRestEventSeed'
+import { RestItemEvent, type RestEvent } from '@/services/events/schema'
 
 import { EventItemProps } from '../../types'
 import { getEventItemImageFallback, isEventFull, isEventPrivate } from '../../utils'
@@ -33,13 +34,11 @@ const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 
   )
 }
 
-const GoToButton = ({ eventUuid, source }: { eventUuid: string; source?: string }) => {
-  const router = useRouter()
-  const href = `/evenements/${eventUuid}?source=${source || ''}` as Href
+const GoToButton = ({ event, seed, source }: { event: RestItemEvent; seed?: RestEvent | null; source?: string }) => {
+  const navigateToEvent = useNavigateToEvent()
 
-  // Sur mobile, utiliser router.push
   const handlePress = () => {
-    router.push(href)
+    navigateToEvent(event.slug, seed ?? mapItemEventToRestEventSeed(event), { source })
   }
 
   return (
@@ -49,7 +48,7 @@ const GoToButton = ({ eventUuid, source }: { eventUuid: string; source?: string 
   )
 }
 
-export const BaseEventListItem = ({ event, userUuid, source }: EventItemProps) => {
+export const BaseEventListItem = ({ event, userUuid, source, seed }: EventItemProps) => {
   const media = useMedia()
   const fallbackImage = getEventItemImageFallback(event)
   const isFull = isEventFull(event)
@@ -87,7 +86,7 @@ export const BaseEventListItem = ({ event, userUuid, source }: EventItemProps) =
           }}
         />
         <EventItemActions>
-          <GoToButton eventUuid={event.slug} source={source} />
+          <GoToButton event={event as RestItemEvent} seed={seed} source={source} />
           <EventToggleSubscribeButton event={event} userUuid={userUuid} />
           <EventItemHandleButton event={event} userUuid={userUuid} />
         </EventItemActions>
@@ -96,18 +95,22 @@ export const BaseEventListItem = ({ event, userUuid, source }: EventItemProps) =
   )
 }
 
-const EventListItem = ({ event, userUuid, source }: EventItemProps) => {
+const EventListItem = ({ event, userUuid, source, seed }: EventItemProps) => {
   if (!userUuid && isEventPrivate(event)) {
     return (
       <EventAuthDialog>
-        <BaseEventListItem event={event} source={source} />
+        <BaseEventListItem event={event} userUuid={userUuid} source={source} seed={seed} />
       </EventAuthDialog>
     )
   }
-  return <BaseEventListItem event={event} userUuid={userUuid} source={source} />
+  return <BaseEventListItem event={event} userUuid={userUuid} source={source} seed={seed} />
 }
 
 export default memo(
   EventListItem,
-  (prev, next) => prev.event.uuid === next.event.uuid && prev.userUuid === next.userUuid && prev.source === next.source,
+  (prev, next) =>
+    prev.event.uuid === next.event.uuid &&
+    prev.userUuid === next.userUuid &&
+    prev.source === next.source &&
+    prev.seed === next.seed,
 )

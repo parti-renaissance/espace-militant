@@ -6,6 +6,8 @@ import { useMedia, YStack } from 'tamagui'
 import { ActionCard } from '@/components/Cards'
 import TrackImpressionWeb from '@/components/TrackImpressionWeb'
 
+import { useNavigateToAction } from '@/features_next/actions/hooks/useNavigateToAction'
+import type { HitSource } from '@/services/hits/constants'
 import type { HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
 
 import EventListItem from './EventListItem'
@@ -13,16 +15,17 @@ import EventListItem from './EventListItem'
 type HubFeedRowProps = {
   row: HubFeedRowType
   userUuid?: string
-  source: string
+  source: HitSource
 }
 
 export const HubFeedRow = memo(({ row, userUuid, source }: HubFeedRowProps) => {
   const media = useMedia()
   const router = useRouter()
+  const navigateToAction = useNavigateToAction()
   const paddingX = media.gtSm ? '$medium' : 0
 
   if (row.type === 'event') {
-    const content = <EventListItem event={row.event} userUuid={userUuid} source={source} />
+    const content = <EventListItem event={row.event} userUuid={userUuid} source={source} seed={row.seed} />
     if (Platform.OS === 'web') {
       return (
         <YStack px={paddingX}>
@@ -42,7 +45,7 @@ export const HubFeedRow = memo(({ row, userUuid, source }: HubFeedRowProps) => {
       hitSource={source}
       onShow={() => {
         if (row.payload.id) {
-          router.push({ pathname: '/actions/[id]', params: { id: row.payload.id } })
+          navigateToAction(row.payload.id, row.seed)
         }
       }}
       onEdit={() => {

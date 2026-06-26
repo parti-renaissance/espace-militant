@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, Platform, ViewToken } from 'react-native'
 import { useScrollToTop } from "expo-router/react-navigation"
-import { Link } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
 import { getToken, ScrollView, Spinner, useMedia, XStack, YStack } from 'tamagui'
 import { Sparkle } from '@tamagui/lucide-icons'
 import { useDebouncedCallback } from 'use-debounce'
@@ -22,7 +22,10 @@ import { syncTimelinePostVideoVisibility } from '@/features_next/video/helpers/s
 import { useVideoFeedScreenFocus } from '@/features_next/video/hooks/useVideoFeedScreenFocus'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { transformFeedItemToProps } from '@/helpers/homeFeed'
+import { transformFeedItemToProps } from '@/features_next/timelinefeed/helpers/transformFeedItemToProps'
+import { useNavigateToAction } from '@/features_next/actions/hooks/useNavigateToAction'
+import { mapFeedItemToRestActionFull } from '@/services/common/mapper/mapTimelineFeedToRestAction'
+import { mapFeedItemToRestEventSeed } from '@/services/common/mapper/mapTimelineFeedToRestEvent'
 import { useAlerts } from '@/services/alerts/hook'
 import { filterBannerAlerts, filterLiveAlerts } from '@/services/alerts/utils'
 import { HIT_SOURCES } from '@/services/hits/constants'
@@ -60,19 +63,35 @@ const onTimelineViewableItemsChanged = ({ viewableItems, changed }: { viewableIt
 const FeedCardMemoized = memo(FeedCard) as typeof FeedCard
 
 const TimelineFeedCard = memo((item: RestTimelineFeedItem) => {
+  const router = useRouter()
+  const navigateToAction = useNavigateToAction()
   const props = transformFeedItemToProps(item)
 
   if (!props) return null
 
-  if (Platform.OS === 'web' && props) {
+  const cardProps =
+    props.type === 'action'
+      ? {
+          ...props,
+          onShow: () => navigateToAction(item.objectID, mapFeedItemToRestActionFull(item)),
+          onEdit: () => router.push(`/actions/${item.objectID}/modifier`),
+        }
+      : props.type === 'event'
+        ? {
+            ...props,
+            seed: mapFeedItemToRestEventSeed(item),
+          }
+        : props
+
+  if (Platform.OS === 'web' && cardProps) {
     return (
       <TrackImpressionWeb objectType={item.type} objectId={item.objectID} source={HIT_SOURCES.PAGE_TIMELINE}>
-        <FeedCardMemoized {...props} hitSource={HIT_SOURCES.PAGE_TIMELINE} />
+        <FeedCardMemoized {...cardProps} hitSource={HIT_SOURCES.PAGE_TIMELINE} />
       </TrackImpressionWeb>
     )
   }
 
-  return <FeedCardMemoized {...props} hitSource={HIT_SOURCES.PAGE_TIMELINE} />
+  return <FeedCardMemoized {...cardProps} hitSource={HIT_SOURCES.PAGE_TIMELINE} />
 })
 
 const TimelineFeedMain = () => {
