@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { View as RNView, StyleSheet } from 'react-native';
+import { Platform, View as RNView, StyleSheet, ViewStyle } from 'react-native';
 import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -89,17 +89,22 @@ const styles = StyleSheet.create({
     right: -16,
     borderRadius: PANEL_RADIUS,
     overflow: 'hidden',
+    alignItems: 'center',
   },
   glow: {
-    position: 'absolute',
-    top: 180,
-    left: -16,
+    marginTop: 180,
+    width: GLOW_WIDTH,
+    height: GLOW_HEIGHT,
   },
 })
 
 const baseGradient = ['#29C45D', '#4555D1'] as const
 const overlayGradient = ['#E0DBD7', '#6E6764'] as const
 const softWhite = '#FFFFFF'
+
+const glowWebStyle = {
+  backgroundImage: 'radial-gradient(50% 50% at 50% 50%, rgba(69,85,209,0.95) 0%, rgba(69,85,209,0.6) 55%, rgba(69,85,209,0) 100%)',
+} as unknown as ViewStyle
 
 type PronoMatchCardProps = {
   match: PronoMatchView
@@ -138,21 +143,27 @@ export default function PronoMatchCard({
       </RNView>
       {showBadge ? <PronoBadge position="absolute" top="$medium" left="$medium" zIndex={2} /> : null}
       <MatchRegion>
+        <RNView style={styles.blurClip} pointerEvents="none">
+          {Platform.OS === 'web' ? (
+            <RNView style={[styles.glow, glowWebStyle]} />
+          ) : (
+            <RNView style={styles.glow}>
+              <Svg width={GLOW_WIDTH} height={GLOW_HEIGHT}>
+                <Defs>
+                  <RadialGradient id="pronoGlow" cx="50%" cy="50%" rx="50%" ry="50%">
+                    <Stop offset="0%" stopColor="#4555D1" stopOpacity={0.95} />
+                    <Stop offset="55%" stopColor="#4555D1" stopOpacity={0.6} />
+                    <Stop offset="100%" stopColor="#4555D1" stopOpacity={0} />
+                  </RadialGradient>
+                </Defs>
+                <Ellipse cx={GLOW_WIDTH / 2} cy={GLOW_HEIGHT / 2} rx={GLOW_WIDTH / 2} ry={GLOW_HEIGHT / 2} fill="url(#pronoGlow)" />
+              </Svg>
+            </RNView>
+          )}
+        </RNView>
         <View style={[styles.imageLayer, { top: imageTop, bottom: -panelPaddingBottom }]} pointerEvents="none">
           <Image source={imageSource} style={{ width: imageWidth, height: imageHeight }} contentFit="contain" />
         </View>
-        <RNView style={styles.blurClip} pointerEvents="none">
-          <Svg width={GLOW_WIDTH} height={GLOW_HEIGHT} style={styles.glow}>
-            <Defs>
-              <RadialGradient id="pronoGlow" cx="50%" cy="50%" rx="50%" ry="50%">
-                <Stop offset="0%" stopColor="#4555D1" stopOpacity={0.95} />
-                <Stop offset="55%" stopColor="#4555D1" stopOpacity={0.6} />
-                <Stop offset="100%" stopColor="#4555D1" stopOpacity={0} />
-              </RadialGradient>
-            </Defs>
-            <Ellipse cx="50%" cy="50%" rx="50%" ry="50%" fill="url(#pronoGlow)" />
-          </Svg>
-        </RNView>
         <YStack width="100%" height={cropAfterKickoff ? undefined : 145} gap="$medium" zIndex={1} marginBottom={contentOffsetY}>
           <YStack gap="$xsmall">
             <Text.MD semibold lineHeight={14} letterSpacing={0} color={softWhite}>

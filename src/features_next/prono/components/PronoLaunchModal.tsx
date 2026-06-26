@@ -1,5 +1,5 @@
 import { TouchableOpacity } from 'react-native'
-import { Image as TamaguiImage, XStack, YStack } from 'tamagui'
+import { Image as TamaguiImage, isWeb, useMedia, XStack, YStack } from 'tamagui'
 import { CheckCircle2 } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
@@ -12,6 +12,7 @@ import Title from '@/components/Title/Title'
 import redirectToStore from '@/helpers/redirectToStore'
 
 import { PronoMatchView, PronoScore } from '../model'
+import PronoLaunchModalDesktop from './PronoLaunchModalDesktop'
 import { PronoSignupCardContent } from './PronoSignupCard'
 
 export type PronoLaunchVariant = 'download' | 'app'
@@ -62,6 +63,12 @@ type PronoLaunchModalProps = {
 }
 
 export default function PronoLaunchModal({ open, onClose, variant, match, playerPrediction }: PronoLaunchModalProps) {
+  const media = useMedia()
+
+  if (isWeb && media.gtSm && variant === 'download') {
+    return <PronoLaunchModalDesktop open={open} onClose={onClose} match={match} playerPrediction={playerPrediction} />
+  }
+
   const description =
     variant === 'download'
       ? 'Pour être notifié en direct du résultat de votre défi, installez l’application Attal Président.'
