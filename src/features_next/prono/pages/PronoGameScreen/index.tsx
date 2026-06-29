@@ -4,7 +4,6 @@ import { Redirect, router, useLocalSearchParams, useRootNavigationState } from '
 import { YStack } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 
-import Text from '@/components/base/Text'
 import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation'
 
 import { useSession } from '@/ctx/SessionProvider'
@@ -16,10 +15,12 @@ import PronoCtaSection from '../../components/PronoCtaSection'
 import PronoHeroSection from '../../components/PronoHeroSection'
 import PronoLaunchModal from '../../components/PronoLaunchModal'
 import PronoMatchCard from '../../components/PronoMatchCard'
+import PronoNotice from '../../components/PronoNotice'
 import PronoPronosticsCard, { EditableScore } from '../../components/PronoPronosticsCard'
 import PronoScreenShell from '../../components/PronoScreenShell'
 import { useCurrentPronoMatch } from '../../hooks/useCurrentPronoMatch'
 import { PRONO_MATCH_IMAGE, PRONO_PAGE_COPY } from '../../model'
+import { getPronoCtaState, hasPronoMatchStarted } from '../../utils'
 
 const MAX_SCORE = 10
 
@@ -92,15 +93,15 @@ export default function PronoGameScreen() {
         <YStack marginTop="$medium">
           <PronoHeroSection showSubtitle={false} showBadge={false} />
         </YStack>
-        <Text.MD semibold textAlign="center" color="#4555D1">
-          Aucun pronostic disponible pour le moment.
-        </Text.MD>
+        <PronoNotice>{PRONO_PAGE_COPY.noMatch}</PronoNotice>
       </PronoScreenShell>
     )
   }
 
   const hasBackendParticipation = Boolean(match.playerPrediction) || match.status === 'participated' || match.status === 'result_available'
   const isPredictionLocked = hasPlayed || hasBackendParticipation
+  const hasMatchStarted = hasPronoMatchStarted(match)
+  const ctaState = getPronoCtaState(match, isPredictionLocked)
   const displayedPlayerPrediction = match.playerPrediction ?? playerPrediction
   const matchImage = gabrielBall
   const matchImageWidth = isPredictionLocked ? 280 : PRONO_MATCH_IMAGE.width
@@ -153,16 +154,14 @@ export default function PronoGameScreen() {
         authorPrediction={match.authorPrediction}
         playerPrediction={displayedPlayerPrediction}
         onPlayerChange={setPlayerPrediction}
-        locked={isPredictionLocked || match.status === 'closed'}
+        locked={isPredictionLocked || hasMatchStarted}
       />
-      {match.status === 'closed' ? (
-        <Text.MD semibold textAlign="center" color="#4555D1">
-          Le match a commencé, le résultat arrive bientôt.
-        </Text.MD>
-      ) : isPredictionLocked ? (
-        match.kickoffAt ? (
-          <PronoCountdown targetAt={match.kickoffAt} />
-        ) : null
+      {ctaState === 'awaiting_result' ? (
+        <PronoNotice>{PRONO_PAGE_COPY.matchStarted}</PronoNotice>
+      ) : ctaState === 'predictions_soon' ? (
+        <PronoNotice>{PRONO_PAGE_COPY.predictionsSoon}</PronoNotice>
+      ) : ctaState === 'awaiting_kickoff' ? (
+        match.kickoffAt ? <PronoCountdown targetAt={match.kickoffAt} /> : null
       ) : (
         <PronoCtaSection label={PRONO_PAGE_COPY.cta} onPress={handlePlay} />
       )}

@@ -33,6 +33,9 @@ export const PRONO_PAGE_COPY = {
   badge: 'Le défi du Mondial',
   subtitle: 'Avant chaque match des Bleus, Gabriel Attal annonce son pronostic. Défie-le avec le tien.',
   cta: 'Je défie Gabriel',
+  matchStarted: 'Le match a commencé, le résultat arrive bientôt.',
+  predictionsSoon: 'Les pronostics ouvrent bientôt.',
+  noMatch: 'Aucun pronostic disponible pour le moment.',
 }
 
 export const PRONO_MATCH_IMAGE = {

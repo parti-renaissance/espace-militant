@@ -45,6 +45,24 @@ export const formatKickoffLabel = (iso: string): string => {
   return label.charAt(0).toUpperCase() + label.slice(1)
 }
 
+export const hasPronoMatchStarted = (match: Pick<PronoMatchView, 'status' | 'kickoffAt'>): boolean => {
+  if (match.status === 'closed') return true
+  if (!match.kickoffAt) return false
+
+  const kickoffAt = new Date(match.kickoffAt)
+  return !Number.isNaN(kickoffAt.getTime()) && Date.now() >= kickoffAt.getTime()
+}
+
+export type PronoCtaState = 'can_play' | 'predictions_soon' | 'awaiting_kickoff' | 'awaiting_result'
+
+export const getPronoCtaState = (match: Pick<PronoMatchView, 'status' | 'kickoffAt'>, hasParticipation: boolean): PronoCtaState => {
+  if (match.status === 'closed') return 'awaiting_result'
+  if (hasParticipation) return 'awaiting_kickoff'
+  if (hasPronoMatchStarted(match)) return 'awaiting_result'
+  if (match.status === 'scheduled') return 'predictions_soon'
+  return 'can_play'
+}
+
 export const parsePlayerPredictionFromUri = (uri?: string | string[]): PronoScore | null => {
   const raw = Array.isArray(uri) ? uri[0] : uri
   if (!raw || !raw.includes('?')) return null
