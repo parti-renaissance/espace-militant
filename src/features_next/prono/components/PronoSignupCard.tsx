@@ -1,4 +1,4 @@
-import { StyleSheet, View as RNView } from 'react-native'
+import { Platform, StyleSheet, View as RNView } from 'react-native'
 import { useGlobalSearchParams } from 'expo-router'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -137,7 +137,7 @@ export function PronoSignupCardContent({ match, playerPrediction, showGlow = tru
 
       <Image source={heroImage} style={[styles.imageLayer, { width: IMAGE_WIDTH, height: IMAGE_HEIGHT }]} contentFit="contain" pointerEvents="none" />
 
-      {showGlow ? <PronoGlow position={position} width={GLOW_WIDTH} height={GLOW_HEIGHT} /> : null}
+      {showGlow && Platform.OS === 'web' ? <PronoGlow position={position} width={GLOW_WIDTH} height={GLOW_HEIGHT} /> : null}
 
       <YStack gap="$xsmall" zIndex={1}>
         <RNView ref={labelRef} onLayout={measure} style={{ alignSelf: 'flex-start' }}>

@@ -1,4 +1,4 @@
-import { StyleSheet, View as RNView } from 'react-native'
+import { Platform, StyleSheet, View as RNView } from 'react-native'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { YStack } from 'tamagui'
@@ -48,7 +48,7 @@ export default function PronoSignupIllustration() {
         <Image source={heroImage} style={{ width: '100%', height: '100%' }} contentFit="contain" />
       </RNView>
 
-      <PronoGlow position={position} width={GLOW_WIDTH} height={GLOW_HEIGHT} />
+      {Platform.OS === 'web' ? <PronoGlow position={position} width={GLOW_WIDTH} height={GLOW_HEIGHT} /> : null}
 
       {match ? (
         <YStack gap="$medium" zIndex={1}>
