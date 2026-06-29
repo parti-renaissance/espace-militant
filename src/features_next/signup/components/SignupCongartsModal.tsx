@@ -1,6 +1,9 @@
+import { useMemo } from 'react'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { ArrowRight, Check, ChevronDown } from '@tamagui/lucide-icons'
 
+import { estimateTabBarLayerHeight } from '@/components/AppStructure/Navigation/FloatingTabBar/floatingTabBarLayout'
 import { VoxButton } from '@/components/Button'
 import Chip from '@/components/Chip/Chip'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
@@ -17,10 +20,22 @@ type SignupCongartsModalProps = {
 export default function SignupCongartsModal({ isOpen, firstName, onClose }: SignupCongartsModalProps) {
   const toiPresident = useToiPresidentActions()
   const media = useMedia()
+  const insets = useSafeAreaInsets()
+  const tabBarSafeBottom = useMemo(
+    () => (!media.gtSm ? estimateTabBarLayerHeight(insets.bottom, false) : 0),
+    [media.gtSm, insets.bottom],
+  )
 
   return (
     <ModalOrBottomSheet open={isOpen} onClose={onClose} allowDrag>
-      <YStack p="$medium" gap="$large" width="100%" maxWidth={media.gtMd ? 440 : undefined}>
+      <YStack
+        pt="$medium"
+        px="$medium"
+        pb={tabBarSafeBottom > 0 ? tabBarSafeBottom : '$medium'}
+        gap="$large"
+        width="100%"
+        maxWidth={media.gtMd ? 440 : undefined}
+      >
         <YStack gap="$medium" alignItems="flex-start">
           <Chip theme="blue" icon={Check}>
             Compte créé
