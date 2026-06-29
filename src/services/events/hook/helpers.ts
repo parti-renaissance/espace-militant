@@ -6,7 +6,7 @@ import {
   getCachedPaginatedShortFeedItems,
   optimisticFeedUpdate,
   optimisticToggleSubscribe as toggleSubscribeOnfeed,
-} from '@/services/timeline-feed/hook/helpers'
+} from '@/services/timeline-feed/helpers'
 import { QueryClient } from '@tanstack/react-query'
 import { QUERY_KEY_PAGINATED_SHORT_EVENTS, QUERY_KEY_SINGLE_EVENT } from './queryKeys'
 

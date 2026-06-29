@@ -6,4 +6,13 @@ export const getAlerts = api({
   method: 'GET',
   requestSchema: schema.RestAlertsRequestSchema,
   responseSchema: schema.RestAlertsResponseSchema,
+  type: 'private',
+})
+
+export const getPublicAlerts = api({
+  path: 'api/alerts',
+  method: 'GET',
+  requestSchema: schema.RestAlertsRequestSchema,
+  responseSchema: schema.RestAlertsResponseSchema,
+  type: 'public',
 })

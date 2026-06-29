@@ -13,7 +13,7 @@ import pinCollage from '../../../assets/map/action-collage.png'
 import pinPap from '../../../assets/map/action-porte-a-porte.png'
 import pinQuestionnaire from '../../../assets/map/action-questionnaire.png'
 import pinTractage from '../../../assets/map/action-tractage.png'
-import { createActionMapSource } from '../../../utils/mapSource'
+import { createActionMapSource } from '@/features_next/actions/pages/detail/helpers/mapSource'
 import { ActionMapPlaceholder } from './ActionSkeleton'
 
 const ACTION_DETAIL_MAP_IMAGES = {
@@ -93,7 +93,7 @@ export function ActionDetailMap({ action, cameraPadding }: ActionDetailMapProps)
   )
 }
 
-function ActionDetailMapFrame({ children, baseHeight, topInset = 0 }: { children: React.ReactNode; baseHeight: number; topInset?: number }) {
+export function ActionDetailMapFrame({ children, baseHeight, topInset = 0 }: { children: React.ReactNode; baseHeight: number; topInset?: number }) {
   return (
     <YStack
       height={baseHeight + topInset}

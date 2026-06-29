@@ -1,6 +1,7 @@
-import { RestTimelineFeedItem, RestTimelineFeedResponse } from '@/services/timeline-feed/schema'
 import { InfiniteData, QueryClient } from '@tanstack/react-query'
-import { PAGINATED_QUERY_FEED } from '.'
+
+import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook'
+import { RestTimelineFeedItem, RestTimelineFeedResponse } from '@/services/timeline-feed/schema'
 
 type ShortFeedItemUpdater = (oldShortFeedItemData: RestTimelineFeedItem) => RestTimelineFeedItem
 type OptimisticFeedItemSetter = (params: { id: string; updater: ShortFeedItemUpdater; queryClient: QueryClient }) => void

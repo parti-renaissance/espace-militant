@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Link, Redirect, useLocalSearchParams, useRouter } from 'expo-router'
+import { Link, useLocalSearchParams, useRouter } from 'expo-router'
 import Head from 'expo-router/head'
 import { isWeb, useMedia, XStack, YStack } from 'tamagui'
 import { QrCode } from '@tamagui/lucide-icons'
@@ -9,7 +9,7 @@ import Text from '@/components/base/Text'
 import FutureButton from '@/components/Buttons/FutureButton'
 import { ProfileNav, VoxHeader } from '@/components/Header/Header'
 import SignupCongartsModal from '@/features_next/signup/components/SignupCongartsModal'
-import TimelineFeedScreen from '@/features_next/timelinefeed/TimelineFeedScreen'
+import TimelineFeedPage from '@/features_next/timelinefeed/pages/feed'
 
 import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
 import * as metatags from '@/config/metatags'
@@ -39,7 +39,7 @@ export default function AccueilPage() {
   const { isAuth, isLoading } = useSession()
   const router = useRouter()
   const { signupCongrats, firstName } = useLocalSearchParams<{ signupCongrats?: '1'; firstName?: string }>()
-  const { data: userScopes } = useGetUserScopes({ enabled: true })
+  const { data: userScopes } = useGetUserScopes({ enabled: isAuth })
   const hasScannerScope = useMemo(() => userScopes?.some((s) => s.code === 'meeting_scanner') ?? false, [userScopes])
   const closeSignupCongratsModal = () => {
     router.setParams({ signupCongrats: undefined, firstName: undefined })
@@ -63,10 +63,6 @@ export default function AccueilPage() {
     return null
   }
 
-  if (!isAuth) {
-    return <Redirect href={'/evenements'} />
-  }
-
   return (
     <>
       <Head>
@@ -75,7 +71,7 @@ export default function AccueilPage() {
       <HomeHeader />
       <Layout.Container floatingContent={floatingContent}>
         <SignupCongartsModal isOpen={signupCongrats === '1'} firstName={firstName} onClose={closeSignupCongratsModal} />
-        <TimelineFeedScreen />
+        <TimelineFeedPage />
       </Layout.Container>
     </>
   )

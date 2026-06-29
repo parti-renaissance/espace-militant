@@ -10,7 +10,7 @@ import { VoxButton } from '@/components/Button'
 import { VoxHeader } from '@/components/Header/Header'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import ModalOrPageBase from '@/components/ModalOrPageBase/ModalOrPageBase'
-import ActionTypeSelector from '@/features_next/actions/pages/create-edit/components/ActionTypeSelector'
+import ActionTypeSelector from '@/features_next/actions/components/ActionTypeSelector'
 
 import { useProfileCompletionAccess } from '@/features_next/profil/hooks/useProfileCompletionAccess'
 import { CREER_ACTION_HREF, CREER_EVENEMENT_HREF } from '@/features_next/profil/profileCompletion'
