@@ -11,14 +11,13 @@ import Title from '@/components/Title/Title'
 
 import redirectToStore from '@/helpers/redirectToStore'
 
-import phoneGame from '../assets/prono-phone-game.png'
-import phoneResult from '../assets/prono-phone-result.png'
-import qrStores from '../assets/prono-qr-stores.png'
+import launchPhones from '../assets/prono-launch-phones.png'
 import { PronoMatchView, PronoScore } from '../model'
 import { PronoSignupCardContent } from './PronoSignupCard'
 
 const CARD_MAX_WIDTH = 1136
 const CARD_MAX_HEIGHT = isWeb ? 'calc(100dvh - 48px)' : '100%'
+const CARD_MIN_HEIGHT = 560
 const CARD_BACKGROUND = '#FAF7F4'
 const BADGE_BACKGROUND = '#F2FCF3'
 const BADGE_TEXT = '#34A044'
@@ -26,68 +25,11 @@ const CLOSE_TEXT = '#554F4C'
 
 const LEFT_GRADIENT = ['#29C45D', '#4555D1'] as const
 
-const SCREEN_WIDTH = 196
-const SCREEN_HEIGHT = Math.round((SCREEN_WIDTH * 844) / 390)
-const PHONE_PADDING = 8
-const PHONE_BODY_WIDTH = SCREEN_WIDTH + PHONE_PADDING * 2
-const PHONE_BODY_HEIGHT = SCREEN_HEIGHT + PHONE_PADDING * 2
-
-const STAGE_WIDTH = 362
-const STAGE_HEIGHT = 480
-const QR_CARD_SIZE = 130
-
-type PhoneMockProps = {
-  source: number
-  rotate: string
-  top: number
-  left: number
-  zIndex: number
-}
-
-function PhoneMock({ source, rotate, top, left, zIndex }: PhoneMockProps) {
-  return (
-    <View
-      position="absolute"
-      top={top}
-      left={left}
-      zIndex={zIndex}
-      width={PHONE_BODY_WIDTH}
-      height={PHONE_BODY_HEIGHT}
-      backgroundColor="#0B0B0F"
-      borderRadius={38}
-      padding={PHONE_PADDING}
-      style={[styles.phoneShadow, { transform: [{ rotate }] }]}
-    >
-      <Image source={source} style={styles.phoneScreen} contentFit="cover" />
-    </View>
-  )
-}
-
 function LeftColumn() {
   return (
     <YStack width="50%" minWidth={300} height="100%" alignItems="center" justifyContent="center" overflow="hidden" position="relative">
       <LinearGradient colors={[...LEFT_GRADIENT]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
-
-      <View width={STAGE_WIDTH} height={STAGE_HEIGHT} position="relative">
-        <PhoneMock source={phoneResult} rotate="6deg" top={0} left={150} zIndex={1} />
-        <PhoneMock source={phoneGame} rotate="-2deg" top={24} left={0} zIndex={2} />
-
-        <View
-          position="absolute"
-          top={200}
-          left={(STAGE_WIDTH - QR_CARD_SIZE) / 2}
-          zIndex={3}
-          width={QR_CARD_SIZE}
-          height={QR_CARD_SIZE}
-          backgroundColor="white"
-          borderRadius={14}
-          alignItems="center"
-          justifyContent="center"
-          style={styles.qrShadow}
-        >
-          <Image source={qrStores} style={styles.qrImage} contentFit="contain" />
-        </View>
-      </View>
+      <Image source={launchPhones} style={styles.launchImage} contentFit="contain" />
     </YStack>
   )
 }
@@ -156,18 +98,23 @@ function RightColumn({ match, playerPrediction, onClose }: PronoLaunchModalDeskt
 export default function PronoLaunchModalDesktop({ open, onClose, match, playerPrediction }: PronoLaunchModalDesktopProps) {
   return (
     <Modal animationType="fade" transparent visible={open}>
-      <View style={styles.overlay}>
+      <View flex={1} backgroundColor="rgba(135,151,168,0.2)" style={Platform.select({ web: { backdropFilter: 'blur(30px)', height: '100dvh' } as object })}>
         <Pressable style={styles.backdrop} onPress={(event) => event.target === event.currentTarget && onClose()}>
           <XStack
             width="100%"
             maxWidth={CARD_MAX_WIDTH}
             height="100%"
+            minHeight={CARD_MIN_HEIGHT}
             maxHeight={CARD_MAX_HEIGHT}
             borderRadius="$medium"
             overflow="hidden"
             backgroundColor={CARD_BACKGROUND}
             alignItems="stretch"
-            style={styles.cardShadow}
+            shadowColor="#919EAB"
+            shadowOffset={{ width: 0, height: -24 }}
+            shadowOpacity={0.16}
+            shadowRadius={48}
+            elevation={12}
           >
             <LeftColumn />
             <RightColumn open={open} onClose={onClose} match={match} playerPrediction={playerPrediction} />
@@ -179,11 +126,6 @@ export default function PronoLaunchModalDesktop({ open, onClose, match, playerPr
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(135,151,168,0.2)',
-    ...Platform.select({ web: { backdropFilter: 'blur(30px)', height: '100dvh' } as object }),
-  },
   backdrop: {
     flex: 1,
     width: '100%',
@@ -199,35 +141,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 64,
   },
-  cardShadow: {
-    shadowColor: '#919EAB',
-    shadowOffset: { width: 0, height: -24 },
-    shadowOpacity: 0.16,
-    shadowRadius: 48,
-    elevation: 12,
-  },
-  phoneScreen: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-    borderRadius: 30,
-  },
-  phoneShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  qrShadow: {
-    shadowColor: 'rgba(0,93,168,0.16)',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  qrImage: {
-    width: 98,
-    height: 98,
+  launchImage: {
+    width: 400,
+    maxWidth: '90%',
+    aspectRatio: 1428 / 1940,
   },
   storeBadge: {
     width: 180,
