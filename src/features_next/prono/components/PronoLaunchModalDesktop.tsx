@@ -128,7 +128,7 @@ function RightColumn({ match, playerPrediction, onClose }: PronoLaunchModalDeskt
             </Title>
           </YStack>
 
-          <PronoSignupCardContent match={match} playerPrediction={playerPrediction} />
+          <PronoSignupCardContent match={match} playerPrediction={playerPrediction} showGlow={false} />
 
           <Text.MD regular color="$textPrimary" lineHeight={22}>
             Pour être notifié en direct du résultat de votre défi, installez l’application Attal Président.

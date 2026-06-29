@@ -86,7 +86,7 @@ export default function PronoLaunchModal({ open, onClose, variant, match, player
 
         <LaunchTitle variant={variant} />
 
-        <PronoSignupCardContent match={match} playerPrediction={playerPrediction} />
+        <PronoSignupCardContent match={match} playerPrediction={playerPrediction} showGlow={false} />
 
         <Text.MD regular color="$textPrimary" lineHeight={22}>
           {description}

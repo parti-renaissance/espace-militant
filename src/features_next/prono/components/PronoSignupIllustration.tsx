@@ -10,10 +10,13 @@ import { useSignupSessionStore } from '@/features_next/signup/store/signup-sessi
 import heroImage from '../assets/gabriel-attal-ball.png'
 import { useCurrentPronoMatch } from '../hooks/useCurrentPronoMatch'
 import { formatTeamLabel, parsePlayerPredictionFromUri } from '../utils'
+import PronoGlow, { PRONO_HERO_GLOW_HEIGHT, PRONO_HERO_GLOW_WIDTH, usePronoGlowCenter } from './PronoGlow'
 import { PredictionGroup, PredictionsBox, PronoCountdownInline } from './PronoSignupCard'
 
 const baseGradient = ['#29C45D', '#4555D1'] as const
 const overlayGradient = ['#E0DBD7', '#6E6764'] as const
+const GLOW_WIDTH = PRONO_HERO_GLOW_WIDTH
+const GLOW_HEIGHT = PRONO_HERO_GLOW_HEIGHT
 
 const styles = StyleSheet.create({
   imageLayer: {
@@ -32,9 +35,10 @@ export default function PronoSignupIllustration() {
   const { match } = useCurrentPronoMatch()
   const playerPrediction = parsePlayerPredictionFromUri(redirectUri ?? undefined)
   const authorPrediction = match?.authorPrediction ?? { home: 0, away: 0 }
+  const { containerRef, labelRef, measure, position } = usePronoGlowCenter(GLOW_WIDTH, GLOW_HEIGHT)
 
   return (
-    <YStack flex={1} width="100%" height="100%" position="relative" overflow="hidden" justifyContent="flex-end" padding="$large" gap="$large">
+    <YStack ref={containerRef} flex={1} width="100%" height="100%" position="relative" overflow="hidden" justifyContent="flex-end" padding="$large" gap="$large">
       <RNView style={StyleSheet.absoluteFill}>
         <LinearGradient colors={[...baseGradient]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
         <LinearGradient colors={[...overlayGradient]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={[StyleSheet.absoluteFill, { opacity: 0.1 }]} />
@@ -44,10 +48,14 @@ export default function PronoSignupIllustration() {
         <Image source={heroImage} style={{ width: '100%', height: '100%' }} contentFit="contain" />
       </RNView>
 
+      <PronoGlow position={position} width={GLOW_WIDTH} height={GLOW_HEIGHT} />
+
       {match ? (
         <YStack gap="$medium" zIndex={1}>
           <YStack gap="$xsmall">
-            <Title.Text color="white">{formatTeamLabel(match.homeTeam, match.awayTeam)}</Title.Text>
+            <RNView ref={labelRef} onLayout={measure} style={{ alignSelf: 'flex-start' }}>
+              <Title.Text color="white">{formatTeamLabel(match.homeTeam, match.awayTeam)}</Title.Text>
+            </RNView>
             {match.kickoffAt ? <PronoCountdownInline targetAt={match.kickoffAt} /> : null}
           </YStack>
           {playerPrediction ? (
