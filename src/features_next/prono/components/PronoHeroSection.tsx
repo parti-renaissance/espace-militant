@@ -18,7 +18,7 @@ export default function PronoHeroSection({ showSubtitle = true, showBadge = true
       <YStack gap="$medium">
         <YStack gap="$xsmall">
           <Title size="h1" aria-label="Défie Gabriel Attal">
-            <Title.Highlight>Défie Gabriel Attal</Title.Highlight>
+            <Title.Highlight>je défie Gabriel Attal</Title.Highlight>
           </Title>
           <Title size="h1">
             <Title.Text>sur le prochain match 🇫🇷</Title.Text>

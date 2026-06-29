@@ -14,7 +14,7 @@ export default function PronoNavHeader() {
   const handleInvite = () => {
     shareAsync({
       url: PRONO_SHARE_URL,
-      message: 'Défie Gabriel Attal sur le prochain match des Bleus ⚽',
+      message: `Défie Gabriel Attal sur le prochain match des Bleus ⚽\n${PRONO_SHARE_URL}`,
       title: 'Défie Gabriel Attal !',
     })
   }
