@@ -5,10 +5,6 @@ import { useToastController } from '@tamagui/toast';
 
 
 
-import Text from '@/components/base/Text';
-
-
-
 import { useCreatePronosticParticipation } from '@/services/pronostics/hook';
 
 
@@ -19,12 +15,13 @@ import PronoCtaSection from '../../components/PronoCtaSection';
 import PronoHeroSection from '../../components/PronoHeroSection';
 import PronoLaunchModal from '../../components/PronoLaunchModal';
 import PronoMatchCard from '../../components/PronoMatchCard';
+import PronoNotice from '../../components/PronoNotice';
 import PronoPronosticsCard, { EditableScore } from '../../components/PronoPronosticsCard';
 import PronoResultCard from '../../components/PronoResultCard';
 import PronoScreenShell from '../../components/PronoScreenShell';
 import { usePronosticMatch } from '../../hooks/usePronosticMatch';
 import { PRONO_PAGE_COPY, PronoScore } from '../../model';
-import { resolveResultVariant } from '../../utils';
+import { getPronoCtaState, hasPronoMatchStarted, resolveResultVariant } from '../../utils';
 
 
 const EMPTY_SCORE: PronoScore = { home: 0, away: 0 }
@@ -40,7 +37,10 @@ export default function PronoDetailScreen({ uuid }: PronoDetailScreenProps) {
   const [draft, setDraft] = useState<EditableScore>({})
   const [launchModalOpen, setLaunchModalOpen] = useState(false)
 
-  const isFormState = match.status === 'not_participated'
+  const hasBackendParticipation = Boolean(match.playerPrediction) || match.status === 'participated' || match.status === 'result_available'
+  const hasMatchStarted = hasPronoMatchStarted(match)
+  const isFormState = match.status === 'not_participated' && !hasMatchStarted
+  const ctaState = getPronoCtaState(match, hasBackendParticipation)
   const matchImage = gabrielBall
   const matchImageWidth = isFormState ? 300 : 300
   const matchImageHeight = Math.round(matchImageWidth * (810 / 600))
@@ -94,18 +94,15 @@ export default function PronoDetailScreen({ uuid }: PronoDetailScreenProps) {
         onPlayerChange={setDraft}
         locked={!isFormState}
       />
-      {match.status === 'scheduled' ? (
-        <Text.MD semibold textAlign="center" color="#4555D1">
-          Les pronostics ouvrent bientôt.
-        </Text.MD>
-      ) : null}
-      {match.status === 'not_participated' ? <PronoCtaSection label={PRONO_PAGE_COPY.cta} onPress={handleParticipate} /> : null}
-      {match.status === 'participated' && match.kickoffAt ? <PronoCountdown targetAt={match.kickoffAt} /> : null}
-      {match.status === 'closed' ? (
-        <Text.MD semibold textAlign="center" color="#4555D1">
-          Le match a commencé, le résultat arrive bientôt.
-        </Text.MD>
-      ) : null}
+      {ctaState === 'predictions_soon' ? (
+        <PronoNotice>{PRONO_PAGE_COPY.predictionsSoon}</PronoNotice>
+      ) : ctaState === 'can_play' ? (
+        <PronoCtaSection label={PRONO_PAGE_COPY.cta} onPress={handleParticipate} />
+      ) : ctaState === 'awaiting_kickoff' ? (
+        match.kickoffAt ? <PronoCountdown targetAt={match.kickoffAt} /> : null
+      ) : (
+        <PronoNotice>{PRONO_PAGE_COPY.matchStarted}</PronoNotice>
+      )}
       {modalPrediction ? (
         <PronoLaunchModal
           open={launchModalOpen}
