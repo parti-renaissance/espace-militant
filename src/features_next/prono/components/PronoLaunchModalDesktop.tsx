@@ -1,26 +1,25 @@
-import { Modal, Platform, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
-import { Image } from 'expo-image'
-import { LinearGradient } from 'expo-linear-gradient'
-import { isWeb, ScrollView, View, XStack, YStack } from 'tamagui'
-import { CheckCircle2 } from '@tamagui/lucide-icons'
+import { Modal, Platform, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { isWeb, ScrollView, View, XStack, YStack } from 'tamagui';
+import { CheckCircle2 } from '@tamagui/lucide-icons';
 
-import Text from '@/components/base/Text'
-import appStoreBadge from '@/components/ProfileCards/AppDownloadCTA/Assets/app-store-badge-fr.png'
-import googlePlayBadge from '@/components/ProfileCards/AppDownloadCTA/Assets/google-play-badge-fr.png'
-import Title from '@/components/Title/Title'
+import Text from '@/components/base/Text';
+import Chip from '@/components/Chip/Chip';
+import appStoreBadge from '@/components/ProfileCards/AppDownloadCTA/Assets/Apple.png';
+import googlePlayBadge from '@/components/ProfileCards/AppDownloadCTA/Assets/Google.png';
+import Title from '@/components/Title/Title';
 
-import redirectToStore from '@/helpers/redirectToStore'
+import redirectToStore from '@/helpers/redirectToStore';
 
-import launchPhones from '../assets/prono-launch-phones.png'
-import { PronoMatchView, PronoScore } from '../model'
-import { PronoSignupCardContent } from './PronoSignupCard'
+import launchPhones from '../assets/prono-launch-phones.png';
+import { PronoMatchView, PronoScore } from '../model';
+import { PronoSignupCardContent } from './PronoSignupCard';
 
 const CARD_MAX_WIDTH = 1136
 const CARD_MAX_HEIGHT = isWeb ? 'calc(100dvh - 48px)' : '100%'
 const CARD_MIN_HEIGHT = 560
 const CARD_BACKGROUND = '#FAF7F4'
-const BADGE_BACKGROUND = '#F2FCF3'
-const BADGE_TEXT = '#34A044'
 const CLOSE_TEXT = '#554F4C'
 
 const LEFT_GRADIENT = ['#29C45D', '#4555D1'] as const
@@ -41,26 +40,42 @@ type PronoLaunchModalDesktopProps = {
   playerPrediction: PronoScore
 }
 
+type StoreButtonProps = {
+  source: number
+  label: string
+  onPress: () => void
+}
+
+function StoreButton({ source, label, onPress }: StoreButtonProps) {
+  return (
+    <XStack
+      onPress={onPress}
+      role="button"
+      aria-label={label}
+      cursor="pointer"
+      pressStyle={{ opacity: 0.85 }}
+      width="100%"
+      height={40}
+      borderRadius={999}
+      backgroundColor="$gray900"
+      alignItems="center"
+      justifyContent="center"
+      overflow="hidden"
+    >
+      <Image source={source} style={styles.storeBadge} contentFit="contain" />
+    </XStack>
+  )
+}
+
 function RightColumn({ match, playerPrediction, onClose }: PronoLaunchModalDesktopProps) {
   return (
     <YStack flex={1} minWidth={0} height="100%" backgroundColor={CARD_BACKGROUND}>
       <ScrollView flex={1} width="100%" height="100%" minHeight={0} showsVerticalScrollIndicator={false} contentContainerStyle={styles.rightScroll}>
         <YStack width={358} maxWidth="100%" gap={24}>
           <YStack gap={16}>
-            <XStack
-              alignSelf="flex-start"
-              alignItems="center"
-              gap={4}
-              backgroundColor={BADGE_BACKGROUND}
-              borderRadius={999}
-              paddingHorizontal={8}
-              paddingVertical={4}
-            >
-              <CheckCircle2 size={12} color={BADGE_TEXT} />
-              <Text.SM semibold color={BADGE_TEXT}>
-                Compte créé
-              </Text.SM>
-            </XStack>
+            <Chip theme="green" icon={CheckCircle2} alignSelf="flex-start">
+              Compte créé
+            </Chip>
 
             <Title size="h1">
               <Title.Highlight>FÉLICITATIONS</Title.Highlight>
@@ -76,13 +91,9 @@ function RightColumn({ match, playerPrediction, onClose }: PronoLaunchModalDeskt
             Pour être notifié en direct du résultat de votre défi, installez l’application Attal Président.
           </Text.MD>
 
-          <YStack gap={16} alignItems="center">
-            <TouchableOpacity onPress={() => redirectToStore('ios')} accessibilityRole="button" accessibilityLabel="Télécharger dans l'App Store">
-              <Image source={appStoreBadge} style={styles.storeBadge} contentFit="contain" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => redirectToStore('android')} accessibilityRole="button" accessibilityLabel="Disponible sur Google Play">
-              <Image source={googlePlayBadge} style={styles.storeBadge} contentFit="contain" />
-            </TouchableOpacity>
+          <YStack gap="$medium" alignItems="center" width="100%">
+            <StoreButton source={appStoreBadge} label="Télécharger dans l'App Store" onPress={() => redirectToStore('ios')} />
+            <StoreButton source={googlePlayBadge} label="Disponible sur Google Play" onPress={() => redirectToStore('android')} />
             <TouchableOpacity onPress={onClose} accessibilityRole="button">
               <Text.MD semibold color={CLOSE_TEXT} textAlign="center">
                 Fermer
@@ -147,7 +158,7 @@ const styles = StyleSheet.create({
     aspectRatio: 1428 / 1940,
   },
   storeBadge: {
-    width: 180,
-    height: 53,
+    height: 36,
+    aspectRatio: 521 / 161,
   },
 })

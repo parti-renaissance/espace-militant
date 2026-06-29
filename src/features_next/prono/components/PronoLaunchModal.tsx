@@ -4,6 +4,7 @@ import { CheckCircle2 } from '@tamagui/lucide-icons'
 
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
+import Chip from '@/components/Chip/Chip'
 import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomSheet'
 import appStoreBadge from '@/components/ProfileCards/AppDownloadCTA/Assets/app-store-badge-fr.png'
 import googlePlayBadge from '@/components/ProfileCards/AppDownloadCTA/Assets/google-play-badge-fr.png'
@@ -18,7 +19,6 @@ import { PronoSignupCardContent } from './PronoSignupCard'
 export type PronoLaunchVariant = 'download' | 'app'
 
 const ACCENT_BLUE = '#4555D1'
-const CHECK_GREEN = '#1F9D55'
 
 function LaunchTitle({ variant }: { variant: PronoLaunchVariant }) {
   if (variant === 'download') {
@@ -77,12 +77,9 @@ export default function PronoLaunchModal({ open, onClose, variant, match, player
   return (
     <ModalOrBottomSheet open={open} onClose={onClose} allowDrag>
       <YStack width="100%" maxWidth={420} alignSelf="center" padding="$large" gap="$medium" $gtSm={{ width: 380 }}>
-        <XStack alignItems="center" gap="$xsmall">
-          <CheckCircle2 size={18} color={CHECK_GREEN} />
-          <Text.SM semibold color={CHECK_GREEN}>
-            Pronostic enregistré
-          </Text.SM>
-        </XStack>
+        <Chip theme="green" icon={CheckCircle2} alignSelf="flex-start">
+          Pronostic enregistré
+        </Chip>
 
         <LaunchTitle variant={variant} />
 
