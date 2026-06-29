@@ -19,8 +19,8 @@ import WaitingScreen from '@/components/WaitingScreen';
 import SignupTunnelGuard from '@/features_next/signup/components/SignupTunnelGuard';
 import { useInitPushNotification } from '@/features/push-notification/hook';
 import initRootAppNotification from '@/features/push-notification/logic/initRootAppNotification';
-import { useCheckExpoUpdate, useCheckStoreUpdate } from '@/features/update/hooks/useAppUpdate';
-import { UpdateExpoScreen, UpdateStoreScreen } from '@/features/update/updateScreen';
+import UpdateGatewayScreen from '@/features_next/update/components/UpdateGatewayScreen';
+import { useUpdateGateway } from '@/features_next/update/hooks/useUpdateGateway';
 
 import clientEnv from '@/config/clientEnv';
 import { SessionProvider, useSession } from '@/ctx/SessionProvider';
@@ -63,8 +63,6 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
   const { isLoading, isAuth } = useSession()
   const { trackActivitySession } = useHits()
   const didStartRef = useRef(false)
-  const { isAvailable: isUpdateAvailable, isError: isUpdateError } = useCheckStoreUpdate()
-  const { isAvailable: isExpoUpdateAvailable, isError: isExpoUpdateError, isProcessing: isExpoUpdateProcessing } = useCheckExpoUpdate()
 
   useInitPushNotification()
 
@@ -87,14 +85,6 @@ const WaitingRoomHoc = (props: { children: ViewProps['children']; isLoading?: bo
 
   if (isLoading && !hasMountedNavigatorOnce) {
     return <WaitingScreen />
-  }
-
-  if (isUpdateAvailable && !isUpdateError) {
-    return <UpdateStoreScreen />
-  }
-
-  if ((isExpoUpdateAvailable || isExpoUpdateProcessing) && !isExpoUpdateError) {
-    return <UpdateExpoScreen />
   }
 
   return (
@@ -124,8 +114,18 @@ const queryClient = new QueryClient({
   },
 })
 
+function UpdateGatewayShell({ children }: { children: React.ReactNode }) {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <StatusBar animated style="dark" />
+        {children}
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  )
+}
 
-function Root() {
+function AppShell() {
   const [isFontsLoaded] = useImportFont()
   useRegisterRoutingInstrumentation()
 
@@ -157,6 +157,37 @@ function Root() {
       </GestureHandlerRootView>
     </View>
   )
+}
+
+function Root() {
+  const update = useUpdateGateway()
+
+  const showGateway = !isWeb && (update.mode !== 'ready' || update.error !== null)
+
+  useEffect(() => {
+    if (showGateway || update.mode === 'ready') {
+      SplashScreen.hideAsync()
+    }
+  }, [showGateway, update.mode])
+
+  if (showGateway) {
+    const gatewayMode = update.mode === 'ready' ? 'ota' : update.mode
+
+    return (
+      <UpdateGatewayShell>
+        <UpdateGatewayScreen
+          mode={gatewayMode}
+          otaPhase={update.otaPhase}
+          error={update.error}
+          isStoreActionPending={update.isStoreActionPending}
+          onRetry={update.retry}
+          onOpenStore={update.openStore}
+        />
+      </UpdateGatewayShell>
+    )
+  }
+
+  return <AppShell />
 }
 
 export default ErrorMonitor.wrap(Root)
