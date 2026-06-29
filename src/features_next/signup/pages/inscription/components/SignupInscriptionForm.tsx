@@ -8,6 +8,7 @@ import { Controller, useForm } from 'react-hook-form'
 import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
 import Text from '@/components/base/Text'
+import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
 import FriendlyCaptchaWidget from '@/features_next/signup/pages/inscription/components/FriendlyCaptchaWidget'
 import { useSignupSessionStore } from '@/features_next/signup/store/signup-session-store'
@@ -116,6 +117,13 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
 
   return (
     <YStack gap="$medium">
+      <VoxButton variant="soft" theme="blue" size="xl" full onPress={() => signIn({ state: redirectUri || '/' })}>
+        Je me connecte
+      </VoxButton>
+      <Text.MD semibold textAlign="center">
+        Ou
+      </Text.MD>
+
       {formError ? (
         <MessageCard iconLeft={AlertTriangle} theme="orange">
           {formError}
@@ -221,15 +229,6 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
           </YStack>
         )}
       />
-
-      <YStack gap="$small" py="$medium">
-        <Text.MD semibold>
-          Un compte Renaissance ?{' '}
-          <Text.MD semibold color="$blue600" cursor="pointer" onPress={() => signIn({ state: redirectUri || '/' })}>
-            Je me connecte
-          </Text.MD>
-        </Text.MD>
-      </YStack>
 
       <YStack alignItems="center" height={100}>
         <FriendlyCaptchaWidget key={captchaResetKey} onToken={handleCaptchaToken} error={recaptchaError} />
