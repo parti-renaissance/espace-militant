@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import { View as RNView, StyleSheet } from 'react-native';
-import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { styled, View, XStack, YStack } from 'tamagui';
@@ -16,14 +15,18 @@ import heroImage from '../assets/gabriel-attal-ball.png';
 import { PronoMatchView } from '../model';
 import { formatScore, formatTeamLabel } from '../utils';
 import PronoBadge from './PronoBadge';
+import PronoGlow, { usePronoGlowCenter } from './PronoGlow';
 
 const MATCH_REGION_HEIGHT = 355
 const IMAGE_WIDTH = 230
 const IMAGE_HEIGHT = Math.round(IMAGE_WIDTH * (842 / 463))
 const PANEL_RADIUS = 24
 const PANEL_PADDING_BOTTOM = 15
-const GLOW_WIDTH = 320
-const GLOW_HEIGHT = 210
+const PANEL_PADDING_X = 16
+const GLOW_WIDTH = 231
+const GLOW_HEIGHT = 105
+const GLOW_LEFT = -16
+const GLOW_VERTICAL_OFFSET = 16
 
 const PanelFrame = styled(YStack, {
   position: 'relative',
@@ -81,19 +84,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
-  blurClip: {
+  glowClip: {
     position: 'absolute',
     top: 0,
-    bottom: 0,
-    left: -16,
-    right: -16,
+    left: -PANEL_PADDING_X,
+    right: -PANEL_PADDING_X,
     borderRadius: PANEL_RADIUS,
     overflow: 'hidden',
-  },
-  glow: {
-    position: 'absolute',
-    top: 180,
-    left: -16,
   },
 })
 
@@ -129,36 +126,32 @@ export default function PronoMatchCard({
   const imageSource = match.imageUrl ? { uri: match.imageUrl } : image
   const overflowTop = imageHeight - MATCH_REGION_HEIGHT
   const imageTop = -overflowTop + (cropAfterKickoff ? 36 : 0)
+  const { containerRef, labelRef, measure, position } = usePronoGlowCenter(GLOW_WIDTH, GLOW_HEIGHT)
+  const glowPosition = position ? { left: GLOW_LEFT, top: position.top + GLOW_VERTICAL_OFFSET } : null
+  const cardPaddingBottom = cropAfterKickoff ? 8 : 16
 
   return (
-    <PanelFrame paddingBottom={cropAfterKickoff ? '$small' : '$medium'}>
+    <PanelFrame paddingTop={"$medium"} paddingBottom={cropAfterKickoff ? '$small' : '$medium'}>
       <RNView style={styles.gradientBg}>
         <LinearGradient colors={[...baseGradient]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
         <LinearGradient colors={[...overlayGradient]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={[StyleSheet.absoluteFill, { opacity: 0.1 }]} />
       </RNView>
       {showBadge ? <PronoBadge position="absolute" top="$medium" left="$medium" zIndex={2} /> : null}
-      <MatchRegion>
+      <MatchRegion ref={containerRef}>
         <View style={[styles.imageLayer, { top: imageTop, bottom: -panelPaddingBottom }]} pointerEvents="none">
           <Image source={imageSource} style={{ width: imageWidth, height: imageHeight }} contentFit="contain" />
         </View>
-        <RNView style={styles.blurClip} pointerEvents="none">
-          <Svg width={GLOW_WIDTH} height={GLOW_HEIGHT} style={styles.glow}>
-            <Defs>
-              <RadialGradient id="pronoGlow" cx="50%" cy="50%" rx="50%" ry="50%">
-                <Stop offset="0%" stopColor="#4555D1" stopOpacity={0.95} />
-                <Stop offset="55%" stopColor="#4555D1" stopOpacity={0.6} />
-                <Stop offset="100%" stopColor="#4555D1" stopOpacity={0} />
-              </RadialGradient>
-            </Defs>
-            <Ellipse cx="50%" cy="50%" rx="50%" ry="50%" fill="url(#pronoGlow)" />
-          </Svg>
+        <RNView style={[styles.glowClip, { bottom: -cardPaddingBottom }]} pointerEvents="none">
+          <PronoGlow position={glowPosition} width={GLOW_WIDTH} height={GLOW_HEIGHT} />
         </RNView>
         <YStack width="100%" height={cropAfterKickoff ? undefined : 145} gap="$medium" zIndex={1} marginBottom={contentOffsetY}>
           <YStack gap="$xsmall">
             <Text.MD semibold lineHeight={14} letterSpacing={0} color={softWhite}>
               {match.label}
             </Text.MD>
-            <Title.Text color="white">{formatTeamLabel(match.homeTeam, match.awayTeam)}</Title.Text>
+            <RNView ref={labelRef} onLayout={measure} style={{ alignSelf: 'flex-start' }}>
+              <Title.Text color="white">{formatTeamLabel(match.homeTeam, match.awayTeam)}</Title.Text>
+            </RNView>
             <Text.LG bold lineHeight={16} letterSpacing={0} color={softWhite}>
               {match.kickoffLabel}
             </Text.LG>

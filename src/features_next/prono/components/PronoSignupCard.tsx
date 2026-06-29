@@ -1,4 +1,4 @@
-import { StyleSheet, View as RNView } from 'react-native'
+import { Platform, StyleSheet, View as RNView } from 'react-native'
 import { useGlobalSearchParams } from 'expo-router'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -12,13 +12,14 @@ import { useCurrentPronoMatch } from '../hooks/useCurrentPronoMatch'
 import { padCountdownUnit, usePronoCountdown } from '../hooks/usePronoCountdown'
 import { PronoMatchView, PronoScore, PronoTeam } from '../model'
 import { formatTeamLabel, parsePlayerPredictionFromUri } from '../utils'
-
-const PLAYER_MOCK_PREDICTION: PronoScore = { home: 3, away: 0 }
+import PronoGlow, { usePronoGlowCenter } from './PronoGlow'
 
 const CARD_HEIGHT = 235
 const CARD_RADIUS = 20
 const IMAGE_WIDTH = 200
 const IMAGE_HEIGHT = Math.round(IMAGE_WIDTH * (864 / 614))
+const GLOW_WIDTH = 300
+const GLOW_HEIGHT = 170
 
 const baseGradient = ['#29C45D', '#4555D1'] as const
 const overlayGradient = ['#E0DBD7', '#6E6764'] as const
@@ -34,7 +35,7 @@ const CardRoot = styled(YStack, {
   overflow: 'hidden',
 })
 
-const PredictionsBox = styled(XStack, {
+export const PredictionsBox = styled(XStack, {
   alignSelf: 'stretch',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -77,7 +78,7 @@ function ScoreCell({ code, value }: { code: string; value: number }) {
   )
 }
 
-function PredictionGroup({ title, homeTeam, awayTeam, prediction }: { title: string; homeTeam: PronoTeam; awayTeam: PronoTeam; prediction: PronoScore }) {
+export function PredictionGroup({ title, homeTeam, awayTeam, prediction }: { title: string; homeTeam: PronoTeam; awayTeam: PronoTeam; prediction: PronoScore }) {
   return (
     <YStack flex={1} alignItems="center" gap="$small">
       <Text.SM semibold color="#27221F" numberOfLines={1}>
@@ -94,7 +95,7 @@ function PredictionGroup({ title, homeTeam, awayTeam, prediction }: { title: str
   )
 }
 
-function PronoCountdownInline({ targetAt }: { targetAt: string }) {
+export function PronoCountdownInline({ targetAt }: { targetAt: string }) {
   const remaining = usePronoCountdown(targetAt)
   const units: { value: number; unit: string }[] = [
     { value: remaining.days, unit: 'j' },
@@ -120,13 +121,15 @@ function PronoCountdownInline({ targetAt }: { targetAt: string }) {
 type PronoSignupCardContentProps = {
   match: PronoMatchView
   playerPrediction: PronoScore
+  showGlow?: boolean
 }
 
-export function PronoSignupCardContent({ match, playerPrediction }: PronoSignupCardContentProps) {
+export function PronoSignupCardContent({ match, playerPrediction, showGlow = true }: PronoSignupCardContentProps) {
   const authorPrediction = match.authorPrediction ?? { home: 0, away: 0 }
+  const { containerRef, labelRef, measure, position } = usePronoGlowCenter(GLOW_WIDTH, GLOW_HEIGHT)
 
   return (
-    <CardRoot>
+    <CardRoot ref={containerRef}>
       <RNView style={StyleSheet.absoluteFill}>
         <LinearGradient colors={[...baseGradient]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
         <LinearGradient colors={[...overlayGradient]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={[StyleSheet.absoluteFill, { opacity: 0.1 }]} />
@@ -134,8 +137,12 @@ export function PronoSignupCardContent({ match, playerPrediction }: PronoSignupC
 
       <Image source={heroImage} style={[styles.imageLayer, { width: IMAGE_WIDTH, height: IMAGE_HEIGHT }]} contentFit="contain" pointerEvents="none" />
 
+      {showGlow && Platform.OS === 'web' ? <PronoGlow position={position} width={GLOW_WIDTH} height={GLOW_HEIGHT} /> : null}
+
       <YStack gap="$xsmall" zIndex={1}>
-        <Title.Text color="white">{formatTeamLabel(match.homeTeam, match.awayTeam)}</Title.Text>
+        <RNView ref={labelRef} onLayout={measure} style={{ alignSelf: 'flex-start' }}>
+          <Title.Text color="white">{formatTeamLabel(match.homeTeam, match.awayTeam)}</Title.Text>
+        </RNView>
         {match.kickoffAt ? <PronoCountdownInline targetAt={match.kickoffAt} /> : null}
       </YStack>
 
@@ -159,9 +166,9 @@ export function PronoSignupCard({ match: matchProp, playerPrediction: playerPred
   const { redirectUri } = useGlobalSearchParams<{ redirectUri?: string }>()
   const { match: currentMatch } = useCurrentPronoMatch()
   const match = matchProp ?? currentMatch
-  const playerPrediction = playerPredictionProp ?? parsePlayerPredictionFromUri(redirectUri) ?? PLAYER_MOCK_PREDICTION
+  const playerPrediction = playerPredictionProp ?? parsePlayerPredictionFromUri(redirectUri)
 
-  if (!match) return null
+  if (!match || !playerPrediction) return null
 
   return <PronoSignupCardContent match={match} playerPrediction={playerPrediction} />
 }

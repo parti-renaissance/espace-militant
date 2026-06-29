@@ -43,19 +43,27 @@ export function SignupEngagementCard() {
 type SignupDesktopIllustrationColumnProps = {
   /** `undefined` = carte d'engagement par défaut, `null` = masquée */
   engagementCard?: ReactNode | null
+  /** Illustration plein-panneau qui remplace l'image générique + la carte d'engagement */
+  illustration?: ReactNode
 }
 
-export function SignupDesktopIllustrationColumn({ engagementCard }: SignupDesktopIllustrationColumnProps = {}) {
+export function SignupDesktopIllustrationColumn({ engagementCard, illustration }: SignupDesktopIllustrationColumnProps = {}) {
   const resolvedEngagementCard = engagementCard === undefined ? <SignupEngagementCard /> : engagementCard
 
   return (
     <YStack width="50%" minWidth={300} minHeight={0} height="100%" position="relative" overflow="hidden">
-      <Image source={illuInscription} style={{ width: '100%', height: '100%' }} contentFit="cover" cachePolicy="memory-disk" />
-      {resolvedEngagementCard ? (
-        <YStack position="absolute" bottom={0} left={0} right={0} padding="$large" zIndex={1}>
-          {resolvedEngagementCard}
-        </YStack>
-      ) : null}
+      {illustration ? (
+        illustration
+      ) : (
+        <>
+          <Image source={illuInscription} style={{ width: '100%', height: '100%' }} contentFit="cover" cachePolicy="memory-disk" />
+          {resolvedEngagementCard ? (
+            <YStack position="absolute" bottom={0} left={0} right={0} padding="$large" zIndex={1}>
+              {resolvedEngagementCard}
+            </YStack>
+          ) : null}
+        </>
+      )}
     </YStack>
   )
 }

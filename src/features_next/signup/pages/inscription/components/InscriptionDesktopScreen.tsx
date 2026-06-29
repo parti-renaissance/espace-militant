@@ -15,10 +15,14 @@ export default function InscriptionDesktopScreen() {
   const { formRef, isSubmitting, handleSkip, handleSuccess } = useSignupInscriptionScreen()
   const content = useInscriptionContent()
   const EngagementComponent = content.EngagementComponent
+  const DesktopIllustrationComponent = content.DesktopIllustrationComponent
 
   return (
     <SignupDesktopPageShell paddingLeft={insets.left + 16}>
-      <SignupDesktopIllustrationColumn engagementCard={EngagementComponent ? <EngagementComponent /> : null} />
+      <SignupDesktopIllustrationColumn
+        engagementCard={EngagementComponent ? <EngagementComponent /> : null}
+        illustration={DesktopIllustrationComponent ? <DesktopIllustrationComponent /> : undefined}
+      />
       <SignupDesktopFormColumn
         paddingRight={insets.right + 32}
         paddingBottom={insets.bottom + 16}
