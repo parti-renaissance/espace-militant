@@ -14,7 +14,7 @@ on:
         description: 'EAS deployment type'
         required: true
         type: choice
-        default: build
+        default: update
         options:
           - build
           - update
