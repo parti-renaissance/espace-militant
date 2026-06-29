@@ -12,7 +12,7 @@ import ModalOrBottomSheet from '@/components/ModalOrBottomSheet/ModalOrBottomShe
 import Title from '@/components/Title/Title'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { FadingScrollView } from '@/features_next/events/components/feed-layout/FadingScrollView'
-import { AlertMeetingSheet } from '@/features_next/timelinefeed/components/AlertMeetingSheet'
+import { AlertMeetingSheet } from './AlertMeetingSheet'
 
 import type { RestAlertsResponse } from '@/services/alerts/schema'
 import { HIT_SOURCES, type HitSource } from '@/services/hits/constants'

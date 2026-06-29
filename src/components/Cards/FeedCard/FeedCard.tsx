@@ -18,7 +18,7 @@ function FeedCard(props: FeedCardProps) {
 
   switch (cardProps.type) {
     case 'event':
-      return <EventListItem {...cardProps} userUuid={data!.uuid} source={hitSource} />
+      return <EventListItem {...cardProps} userUuid={data?.uuid} source={hitSource} />
     case 'action':
       return <ActionCard {...cardProps} hitSource={hitSource} />
     case 'news':

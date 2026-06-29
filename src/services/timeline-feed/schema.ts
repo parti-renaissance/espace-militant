@@ -47,8 +47,8 @@ export const RestTimelineFeedSocialMediaSchema = z.object({
 
 export type RestTimelineFeedAuthor = z.infer<typeof RestTimelineFeedAuthorSchema>
 export const RestTimelineFeedAuthorSchema = z.object({
-  first_name: z.string().nullable(),
-  last_name: z.string().nullable(),
+  first_name: z.string().nullish(),
+  last_name: z.string().nullish(),
   username: z.string().nullish(),
   role: z.string().nullish(),
   instance: z.string().nullish(),
@@ -126,6 +126,52 @@ export const RestTimelineFeedItemSchema = z.object({
 export type RestTimelineFeedResponse = z.infer<typeof RestTimelineFeedResponseSchema>
 export const RestTimelineFeedResponseSchema = z.object({
   hits: z.array(RestTimelineFeedItemSchema),
+  page: z.number(),
+  nbHits: z.number(),
+  nbPages: z.number(),
+  hitsPerPage: z.number(),
+  params: z.string().optional(),
+})
+
+export type RestPublicTimelineFeedItem = z.infer<typeof RestPublicTimelineFeedItemSchema>
+export const RestPublicTimelineFeedItemSchema = z.object({
+  identifier: z.string(),
+  objectID: z.string().optional(),
+  type: RestTimelineFeedItemSchema.shape.type,
+  title: z.string().nullish(),
+  description: z.string().nullish(),
+  author: RestTimelineFeedAuthorSchema.nullish(),
+  date: z.string().nullish(),
+  begin_at: z.string().nullish(),
+  finish_at: z.string().nullish(),
+  image: RestTimelineFeedItemSchema.shape.image.nullish(),
+  address: z.string().nullish(),
+  category: z.string().nullish(),
+  is_national: z.boolean().nullish(),
+  media_type: z.string().nullish(),
+  cta_link: z.string().nullish(),
+  cta_label: z.string().nullish(),
+  editable: z.boolean().nullish(),
+  url: z.string().nullish(),
+  capacity: z.number().nullish(),
+  user_registered_at: z.string().nullish(),
+  time_zone: z.string().nullish(),
+  mode: z.enum(['meeting', 'online']).nullish(),
+  post_address: RestTimelineFeedAddressSchema.nullish(),
+  object_state: z.enum(['full', 'partial']).nullish(),
+  visibility: z.string().nullish(),
+  live_url: z.string().nullish(),
+  participants_count: z.number().nullish(),
+  zone_codes: z.union([z.array(z.string()), z.array(z.array(z.string()))]).nullish(),
+  committee_uuid: z.string().nullish(),
+  agora_uuid: z.string().nullish(),
+  media: RestTimelineFeedSocialMediaSchema.nullish(),
+  access: RestTimelineFeedItemSchema.shape.access,
+})
+
+export type RestPublicTimelineFeedResponse = z.infer<typeof RestPublicTimelineFeedResponseSchema>
+export const RestPublicTimelineFeedResponseSchema = z.object({
+  hits: z.array(RestPublicTimelineFeedItemSchema),
   page: z.number(),
   nbHits: z.number(),
   nbPages: z.number(),

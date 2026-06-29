@@ -12,7 +12,7 @@ export const SignInButton = (props: Omit<ComponentProps<typeof VoxButton>, 'chil
 
   return (
     <VoxButton onPress={() => signIn(redirectUri ? { state: redirectUri } : undefined)} variant="text" size="md" {...buttonProps}>
-      Me connecter
+      Je me connecte
     </VoxButton>
   )
 }

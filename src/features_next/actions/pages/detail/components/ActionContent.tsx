@@ -15,12 +15,12 @@ import { ContentBackButton } from '@/components/ContentBackButton'
 import { FloatingBackButton } from '@/components/FloatingBackButton'
 import { DetailShareGroup } from '@/components/ShareGroup/DetailShareGroup'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { formatActionDetailTitle } from '@/features_next/actions/utils/formatActionDetailTitle'
+import { formatActionDetailTitle } from '@/features_next/actions/pages/detail/helpers/formatActionDetailTitle'
 
 import { isSeededAction } from '@/services/actions/helpers'
 import { ActionStatus, RestActionFull } from '@/services/actions/schema'
 
-import { mapPayload } from '../../../utils/mapPayload'
+import { mapPayload } from '@/features_next/actions/pages/detail/helpers/mapPayload'
 import { ActionDetailMapBlock } from './ActionDetailMap'
 import { ActionDescriptionSkeleton, ActionParticipantsSkeleton } from './ActionSkeleton'
 import ParticipantAvatar from './ParticipantAvatar'
@@ -206,10 +206,10 @@ const DesktopLayout = (props: ActionInnerProps) => (
       <YStack gap="$medium">
         <VoxCard>
           <XStack alignItems="flex-start" py="$medium">
-            <YStack flex={1} flexShrink={1} gap="$medium" px="$medium" borderRightColor="$textOutline32" borderRightWidth={1}>
+            <YStack flex={1} flexShrink={1} minWidth={0} gap="$medium" px="$medium" borderRightColor="$textOutline32" borderRightWidth={1}>
               <ActionInfo {...props} includeParticipants />
             </YStack>
-            <YStack maxWidth={320} px="$medium" gap="$medium">
+            <YStack width={320} flexShrink={0} px="$medium" gap="$medium">
               <ActionButtons {...props} />
               <VoxCard.Separator />
               <ActionMeta payload={props.payload} />

@@ -10,7 +10,7 @@ import {
   restoreHubQueries,
   type HubQueriesSnapshot,
 } from '@/services/hub/helpers'
-import { getCachedPaginatedShortFeedItems, optimisticToggleSubscribe as toggleSubscribeOnfeed } from '@/services/timeline-feed/hook/helpers'
+import { getCachedPaginatedShortFeedItems, optimisticToggleSubscribe as toggleSubscribeOnfeed } from '@/services/timeline-feed/helpers'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
 import type { RestProfilResponse } from '@/services/profile/schema'
 

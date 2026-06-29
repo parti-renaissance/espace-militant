@@ -3,7 +3,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInf
 
 import { GenericResponseError } from '@/services/common/errors/generic-errors'
 import * as api from '@/services/publications/api'
-import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook/index'
+import { PAGINATED_QUERY_FEED } from '@/services/timeline-feed/hook'
 
 import { RestGetMessageResponse, RestPostMessageRequest, RestPutMessageFiltersRequest } from './schema'
 

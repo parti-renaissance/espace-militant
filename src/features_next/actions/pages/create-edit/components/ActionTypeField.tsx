@@ -5,7 +5,7 @@ import { Controller } from 'react-hook-form'
 import { ActionType, ActionTypeIcon, ReadableActionType } from '@/services/actions/schema'
 
 import { useActionFormContext } from '../helpers/context'
-import ActionTypeSelector from './ActionTypeSelector'
+import ActionTypeSelector from '@/features_next/actions/components/ActionTypeSelector'
 
 export default function ActionTypeField() {
   const { control } = useActionFormContext()

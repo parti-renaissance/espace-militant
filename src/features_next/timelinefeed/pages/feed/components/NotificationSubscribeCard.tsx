@@ -9,7 +9,7 @@ import { VoxCard } from '@/components/VoxCard/VoxCard'
 
 import { useUserStore } from '@/store/user-store'
 
-import reaboIllu from '../assets/reabo-illu.png'
+import reaboIllu from '@/features_next/timelinefeed/assets/reabo-illu.png'
 
 export default function NotificationSubscribeCard() {
   const userStore = useUserStore()

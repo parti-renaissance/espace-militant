@@ -39,7 +39,6 @@ import {
 import { NavItem } from '@/components/AppStructure/Navigation/NavItem'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { HIT_SOURCES } from '@/services/hits/constants'
 import type { IconComponent } from '@/models/common.model'
@@ -73,7 +72,7 @@ const militantNavItemsAuthConfig: NavItemConfig[] = [
 
 // Configuration des items du menu militant pour utilisateurs non connectés
 const militantNavItemsPublicConfig: NavItemConfig[] = [
-  { id: 'accueil', iconLeft: Newspaper, text: 'M’informer', href: AuthRoutes.BIENVENUE },
+  { id: 'accueil', iconLeft: Newspaper, text: 'M’informer', href: '/' },
   { id: 'evenements', iconLeft: Zap, text: 'Agir', href: '/evenements' },
   { id: 'soutenir', iconLeft: HeartHandshake, text: 'Soutenir', href: '/soutenir' },
   { id: 'idees', iconLeft: Lightbulb, text: 'Débattre', href: '/idees' },

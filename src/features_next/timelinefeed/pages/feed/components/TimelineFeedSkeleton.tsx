@@ -1,7 +1,6 @@
 import React from 'react'
 import { ScrollView, useMedia, YStack } from 'tamagui'
 
-import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 
@@ -17,22 +16,18 @@ const ItemFeedSkeleton = () => (
   </SkeCard>
 )
 
-export const HomeFeedMainSkeleton: React.FC = () => {
-  const media = useMedia()
-
+export function TimelineFeedMainSkeleton() {
   return (
-    <Layout.Main>
-      <LayoutScrollView>
-        <YStack gap="$medium">
-          <ItemFeedSkeleton />
-          <ItemFeedSkeleton />
-        </YStack>
-      </LayoutScrollView>
-    </Layout.Main>
+    <LayoutScrollView>
+      <YStack gap="$medium">
+        <ItemFeedSkeleton />
+        <ItemFeedSkeleton />
+      </YStack>
+    </LayoutScrollView>
   )
 }
 
-export const HomeFeedSidebarSkeleton: React.FC = () => {
+export function TimelineFeedSidebarSkeleton() {
   const media = useMedia()
 
   if (!media.gtMd) {
