@@ -8,7 +8,7 @@ import { ActionDenyScreen } from './components/ActionDenyScreen'
 import { ActionSkeleton } from './components/ActionSkeleton'
 import { GreetingCreateModal } from './components/GreetingCreateModal'
 
-export default function ActionDetailsScreen({ data }: { data: RestActionFull }) {
+export default function ActionDetailsScreen({ data, isFetching = false }: { data: RestActionFull; isFetching?: boolean }) {
   const { greet } = useLocalSearchParams<{ greet: string }>()
   const setIsGreet = () => {
     router.setParams({ greet: undefined })
@@ -17,7 +17,7 @@ export default function ActionDetailsScreen({ data }: { data: RestActionFull }) 
   return (
     <>
       <GreetingCreateModal action={data} modalProps={{ open: greet === 'new', onClose: setIsGreet }} />
-      <ActionContent data={data} />
+      <ActionContent data={data} isFetching={isFetching} />
     </>
   )
 }

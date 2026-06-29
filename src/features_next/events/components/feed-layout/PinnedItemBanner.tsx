@@ -1,7 +1,8 @@
 import { memo, useMemo, type ReactNode } from 'react'
 import { Dimensions } from 'react-native'
 import { Image } from 'expo-image'
-import { Href, useRouter } from 'expo-router'
+import { useNavigateToEvent } from '@/features_next/events/hooks/useNavigateToEvent'
+import { mapItemEventToRestEventSeed } from '@/services/common/mapper/mapItemEventToRestEventSeed'
 import { useMedia, XStack, YStack } from 'tamagui'
 import { CalendarDays, MapPin, Pin, Video } from '@tamagui/lucide-icons'
 import { formatInTimeZone } from 'date-fns-tz'
@@ -121,8 +122,7 @@ function PinnedEventCardWrapper({ sizeMode, isSmallContainer, children }: { size
 }
 
 const PinnedEventCard = memo(({ event, sizeMode, isSmallContainer }: { event: PinnedEventItem; sizeMode: CardSizeMode; isSmallContainer: boolean }) => {
-  const router = useRouter()
-  const href = `/evenements/${event.slug}?source=${HIT_SOURCES.PAGE_EVENTS_PINNED}` as Href
+  const navigateToEvent = useNavigateToEvent()
 
   return (
     <PinnedEventCardWrapper sizeMode={sizeMode} isSmallContainer={isSmallContainer}>
@@ -131,7 +131,9 @@ const PinnedEventCard = memo(({ event, sizeMode, isSmallContainer }: { event: Pi
           cursor="pointer"
           flex={1}
           width={sizeMode === 'split' ? '100%' : undefined}
-          onPress={() => router.push(href)}
+          onPress={() =>
+            navigateToEvent(event.slug, mapItemEventToRestEventSeed(event), { source: HIT_SOURCES.PAGE_EVENTS_PINNED })
+          }
           borderRadius="$medium"
           hoverStyle={{
             backgroundColor: '$textSurface',

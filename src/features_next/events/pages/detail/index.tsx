@@ -10,7 +10,7 @@ import { EventDenyScreen } from './components/EventDenyScreen'
 import { EventSkeleton } from './components/EventSkeleton'
 import { GreetingCreateModal } from './components/GreetingCreateModal'
 
-export default function EventDetailsScreen({ data }: { data: eventTypes.RestEvent }) {
+export default function EventDetailsScreen({ data, isFetching = false }: { data: eventTypes.RestEvent; isFetching?: boolean }) {
   const { greet } = useLocalSearchParams<{ greet: string }>()
   const setIsGreet = () => {
     router.setParams({ greet: undefined })
@@ -20,7 +20,7 @@ export default function EventDetailsScreen({ data }: { data: eventTypes.RestEven
   return (
     <>
       <GreetingCreateModal event={data} modalProps={{ open: greet === 'new', onClose: setIsGreet }} />
-      <EventContent event={data} userUuid={user?.data?.uuid} />
+      <EventContent event={data} userUuid={user?.data?.uuid} isFetching={isFetching} />
     </>
   )
 }

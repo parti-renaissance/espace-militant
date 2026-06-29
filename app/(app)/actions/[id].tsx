@@ -36,7 +36,7 @@ const ActionDetailPage: React.FC = () => {
 }
 
 function ActionDetailInner(props: Readonly<{ id: string }>) {
-  const { data } = useAction({ id: props.id })
+  const { data, isFetching } = useAction({ id: props.id })
   const ogUrl = `${BASE_URL}/actions/${props.id}`
   const headerTitle = formatActionDetailTitle({ date: data.date, type: data.type })
 
@@ -52,7 +52,7 @@ function ActionDetailInner(props: Readonly<{ id: string }>) {
         <meta key="og-title" property="og:title" content={metatags.createTitle(headerTitle)} />
         <meta key="og-url" property="og:url" content={ogUrl} />
       </Head>
-      <ActionDetailsScreen data={data} />
+      <ActionDetailsScreen data={data} isFetching={isFetching} />
     </>
   )
 }

@@ -4,6 +4,10 @@ import Layout from '@/components/AppStructure/Layout/Layout'
 import LayoutScrollView from '@/components/AppStructure/Layout/LayoutScrollView'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 
+export function ActionMapPlaceholder() {
+  return <YStack height="100%" width="100%" backgroundColor="$gray1" />
+}
+
 const MapPlaceholder = () => <YStack height={240} width="100%" backgroundColor="$gray1" />
 
 const MobileSkeleton = () => (
@@ -80,6 +84,23 @@ const DesktopSkeleton = () => (
     </LayoutScrollView>
   </Layout.Main>
 )
+
+export function ActionDescriptionSkeleton() {
+  return <SkeCard.Description />
+}
+
+export function ActionParticipantsSkeleton() {
+  return (
+    <YStack gap="$medium" pb="$medium">
+      <SkeCard.Line width={140} />
+      <XStack flexWrap="wrap" gap="$medium" justifyContent="flex-start">
+        <SkeCard.Author />
+        <SkeCard.Author />
+        <SkeCard.Author />
+      </XStack>
+    </YStack>
+  )
+}
 
 export function ActionSkeleton() {
   const media = useMedia()

@@ -24,7 +24,8 @@ import { EventItemProps } from '@/features_next/events/types'
 
 import { RestItemEvent } from '@/services/events/schema'
 
-import { getEventDetailImageFallback, isEventFull, isEventPartial } from '../../../utils'
+import { getEventDetailImageFallback, isEventDetailsLoading, isEventFull, isEventPartial } from '../../../utils'
+import { EventAttendeesSkeleton, EventCapacitySkeleton, EventDescriptionSkeleton } from './EventSkeleton'
 
 const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 'time_zone'>> & { showTime?: boolean }) => {
   if (!props.begin_at) return null
@@ -88,8 +89,9 @@ const MobileBottomCTA = (props: EventItemProps) => {
   )
 }
 
-const EventInfo = ({ event }: EventItemProps) => {
+const EventInfo = ({ event, isDescriptionLoading }: EventItemProps & { isDescriptionLoading?: boolean }) => {
   const isFull = isEventFull(event)
+  const fullEvent = isFull ? event : null
   const fallbackImage = getEventDetailImageFallback(event)
   const media = useMedia()
 
@@ -121,22 +123,41 @@ const EventInfo = ({ event }: EventItemProps) => {
           </VoxCard>
         ) : null}
         {event.name ? <VoxCard.Title underline={false}>{event.name}</VoxCard.Title> : null}
-        {isFull && event.description ? <TipTapRenderer content={event.json_description ?? ''} /> : null}
+        {isDescriptionLoading ? (
+          <EventDescriptionSkeleton />
+        ) : fullEvent?.description ? (
+          <TipTapRenderer content={fullEvent.json_description ?? ''} />
+        ) : null}
       </YStack>
     </>
   )
 }
 
-const EventMeta = ({ event, userUuid }: EventItemProps) => {
+const EventMeta = ({
+  event,
+  userUuid,
+  isCapacityLoading,
+  isAttendeesLoading,
+  isDetailsLoading,
+}: EventItemProps & { isCapacityLoading?: boolean; isAttendeesLoading?: boolean; isDetailsLoading?: boolean }) => {
   const isFull = isEventFull(event)
+  const fullEvent = isFull ? event : null
   const media = useMedia()
 
   return (
     <YStack gap="$medium" px={media.sm ? '$medium' : 0}>
       <DateItem begin_at={event.begin_at} finish_at={event.finish_at} time_zone={event.time_zone} showTime={isFull} />
       <EventLocation event={event} />
-      {isFull && !!event.capacity ? <VoxCard.Capacity>Limité à {event.capacity} inscrits</VoxCard.Capacity> : null}
-      {isFull && userUuid ? <VoxCard.Attendees attendees={{ count: event.participants_count ?? 12 }} /> : null}
+      {isCapacityLoading ? (
+        <EventCapacitySkeleton />
+      ) : fullEvent?.capacity != null ? (
+        <VoxCard.Capacity>Limité à {fullEvent.capacity} inscrits</VoxCard.Capacity>
+      ) : null}
+      {isAttendeesLoading ? (
+        <EventAttendeesSkeleton />
+      ) : isFull && userUuid ? (
+        <VoxCard.Attendees attendees={{ count: event.participants_count ?? 12 }} />
+      ) : null}
       {event.organizer ? (
         <VoxCard.Section title="Événement créé par :">
           <VoxCard.Author
@@ -150,13 +171,18 @@ const EventMeta = ({ event, userUuid }: EventItemProps) => {
           />
         </VoxCard.Section>
       ) : null}
-      <DetailShareGroup event={event} />
+      <DetailShareGroup event={event} isDetailsLoading={isDetailsLoading} />
     </YStack>
   )
 }
 
 // Mobile Layout
 const MobileLayout = (props: EventItemProps) => {
+  const isDetailsLoading = isEventDetailsLoading(props.event, props.isFetching)
+  const isDescriptionLoading = isDetailsLoading
+  const isCapacityLoading = isDetailsLoading && !isEventFull(props.event)
+  const isAttendeesLoading = isDetailsLoading && props.event.participants_count == null
+
   return (
     <>
       <Layout.Main maxWidth={892}>
@@ -164,9 +190,9 @@ const MobileLayout = (props: EventItemProps) => {
           <YStack paddingBottom={100}>
             <EventLive event={props.event} userUuid={props.userUuid} />
             <VoxCard overflow="hidden" pb={66} borderWidth={0}>
-              <EventInfo {...props} />
+              <EventInfo {...props} isDescriptionLoading={isDescriptionLoading} />
               <VoxCard.Separator />
-              <EventMeta {...props} />
+              <EventMeta {...props} isCapacityLoading={isCapacityLoading} isAttendeesLoading={isAttendeesLoading} isDetailsLoading={isDetailsLoading} />
               <EventManagementSection event={props.event} userUuid={props.userUuid} />
             </VoxCard>
           </YStack>
@@ -180,6 +206,11 @@ const MobileLayout = (props: EventItemProps) => {
 
 // Desktop Layout
 const DesktopLayout = (props: EventItemProps) => {
+  const isDetailsLoading = isEventDetailsLoading(props.event, props.isFetching)
+  const isDescriptionLoading = isDetailsLoading
+  const isCapacityLoading = isDetailsLoading && !isEventFull(props.event)
+  const isAttendeesLoading = isDetailsLoading && props.event.participants_count == null
+
   return (
     <Layout.Main maxWidth={892}>
       <LayoutScrollView>
@@ -189,12 +220,12 @@ const DesktopLayout = (props: EventItemProps) => {
           <VoxCard>
             <XStack alignItems="flex-start" py="$medium">
               <YStack flex={1} flexShrink={1} gap="$medium" px="$medium" borderRightColor="$textOutline32" borderRightWidth={1}>
-                <EventInfo {...props} />
+                <EventInfo {...props} isDescriptionLoading={isDescriptionLoading} />
               </YStack>
               <YStack maxWidth={320} px="$medium" gap="$medium">
                 <ActionButtons {...props} />
                 <VoxCard.Separator />
-                <EventMeta {...props} />
+                <EventMeta {...props} isCapacityLoading={isCapacityLoading} isAttendeesLoading={isAttendeesLoading} isDetailsLoading={isDetailsLoading} />
               </YStack>
             </XStack>
           </VoxCard>
@@ -205,7 +236,7 @@ const DesktopLayout = (props: EventItemProps) => {
   )
 }
 
-export function EventContent(props: EventItemProps) {
+export function EventContent({ isFetching = false, ...props }: EventItemProps) {
   const media = useMedia()
-  return media.sm ? <MobileLayout {...props} /> : <DesktopLayout {...props} />
+  return media.sm ? <MobileLayout {...props} isFetching={isFetching} /> : <DesktopLayout {...props} isFetching={isFetching} />
 }

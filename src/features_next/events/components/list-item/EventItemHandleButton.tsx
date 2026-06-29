@@ -6,7 +6,7 @@ import HandleButton from '@/components/Buttons/HandleButton'
 
 import { RestEvent } from '@/services/events/schema'
 
-import { isEventEditable, isEventToggleRegisterHided } from '../../utils'
+import { isEventEditable, isEventEditorKnown, isEventToggleRegisterHided } from '../../utils'
 
 type EventItemHandleButtonProps = {
   event: Partial<RestEvent>
@@ -15,7 +15,13 @@ type EventItemHandleButtonProps = {
 }
 
 export const EventItemHandleButton = ({ event, userUuid, buttonProps }: EventItemHandleButtonProps) => {
-  return isEventEditable(event) ? (
+  const canNavigateToEdit = isEventEditable(event) || isEventEditorKnown(event)
+
+  if (!canNavigateToEdit) {
+    return null
+  }
+
+  return (
     <Link
       href={{
         pathname: '/evenements/[id]/modifier',
@@ -23,7 +29,12 @@ export const EventItemHandleButton = ({ event, userUuid, buttonProps }: EventIte
       }}
       asChild={!isWeb}
     >
-      <HandleButton children="Modifier" testID="event-item-handle-button" shrink={!isEventToggleRegisterHided(event, userUuid)} {...buttonProps} />
+      <HandleButton
+        children="Modifier"
+        testID="event-item-handle-button"
+        shrink={!isEventToggleRegisterHided(event, userUuid)}
+        {...buttonProps}
+      />
     </Link>
-  ) : null
+  )
 }

@@ -17,14 +17,17 @@ import { DetailShareGroup } from '@/components/ShareGroup/DetailShareGroup'
 import VoxCard from '@/components/VoxCard/VoxCard'
 import { formatActionDetailTitle } from '@/features_next/actions/utils/formatActionDetailTitle'
 
+import { isSeededAction } from '@/services/actions/helpers'
 import { ActionStatus, RestActionFull } from '@/services/actions/schema'
 
 import { mapPayload } from '../../../utils/mapPayload'
 import { ActionDetailMapBlock } from './ActionDetailMap'
+import { ActionDescriptionSkeleton, ActionParticipantsSkeleton } from './ActionSkeleton'
 import ParticipantAvatar from './ParticipantAvatar'
 
 export type ActionContentProps = {
   data: RestActionFull
+  isFetching?: boolean
 }
 
 type ActionInnerProps = {
@@ -33,6 +36,8 @@ type ActionInnerProps = {
   isPassed: boolean
   isCancelled: boolean
   isMyAction: boolean
+  isDescriptionLoading: boolean
+  isParticipantsLoading: boolean
   onEdit: () => void
 }
 
@@ -60,8 +65,12 @@ const ActionInfo = ({
   payload,
   isPassed,
   isCancelled,
+  isDescriptionLoading,
+  isParticipantsLoading,
   includeParticipants = false,
-}: Pick<ActionInnerProps, 'data' | 'payload' | 'isPassed' | 'isCancelled'> & { includeParticipants?: boolean }) => {
+}: Pick<ActionInnerProps, 'data' | 'payload' | 'isPassed' | 'isCancelled' | 'isDescriptionLoading' | 'isParticipantsLoading'> & {
+  includeParticipants?: boolean
+}) => {
   const media = useMedia()
   const detailTitle = useMemo(() => formatActionDetailTitle({ date: data.date, type: data.type }), [data.date, data.type])
 
@@ -81,13 +90,18 @@ const ActionInfo = ({
           {!isCancelled && isPassed ? <VoxCard.Chip icon={Clock9}>Terminé</VoxCard.Chip> : null}
         </XStack>
         <VoxCard.Title underline={false}>{detailTitle}</VoxCard.Title>
-        {data.description ? (
+        {isDescriptionLoading ? (
+          <>
+            <ActionDescriptionSkeleton />
+            {includeParticipants ? <VoxCard.Separator /> : null}
+          </>
+        ) : data.description ? (
           <>
             <VoxCard.Description markdown full children={data.description} />
             {includeParticipants ? <VoxCard.Separator /> : null}
           </>
         ) : null}
-        {includeParticipants ? <ActionParticipantsSection data={data} /> : null}
+        {includeParticipants ? isParticipantsLoading ? <ActionParticipantsSkeleton /> : <ActionParticipantsSection data={data} /> : null}
       </YStack>
     </>
   )
@@ -173,7 +187,7 @@ const MobileLayout = (props: ActionInnerProps) => (
             <ActionMeta payload={props.payload} />
             <VoxCard.Separator mx={'$medium'} />
             <YStack px="$medium" gap="$medium">
-              <ActionParticipantsSection data={props.data} />
+              {props.isParticipantsLoading ? <ActionParticipantsSkeleton /> : <ActionParticipantsSection data={props.data} />}
               <DetailShareGroup action={props.data} />
             </YStack>
           </VoxCard>
@@ -208,13 +222,16 @@ const DesktopLayout = (props: ActionInnerProps) => (
   </Layout.Main>
 )
 
-export function ActionContent({ data }: ActionContentProps) {
+export function ActionContent({ data, isFetching = false }: ActionContentProps) {
   const media = useMedia()
   const router = useRouter()
   const payload = useMemo(() => mapPayload(data), [data])
   const isPassed = isBefore(data.date, new Date())
   const isCancelled = data.status === ActionStatus.CANCELLED
   const isMyAction = data.editable
+  const isDetailsLoading = isSeededAction(data) && isFetching
+  const isDescriptionLoading = isDetailsLoading && !data.description
+  const isParticipantsLoading = isDetailsLoading && data.participants.length === 0
 
   const onEdit = () => {
     router.push(`/actions/${data.uuid}/modifier`)
@@ -226,6 +243,8 @@ export function ActionContent({ data }: ActionContentProps) {
     isPassed,
     isCancelled,
     isMyAction,
+    isDescriptionLoading,
+    isParticipantsLoading,
     onEdit,
   }
 
