@@ -76,7 +76,7 @@ const InstancesContent = () => {
             theme="yellow"
             icon={UserPlus}
             button={
-              <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingCommitee} onPress={openAdhCommitee()}>
+              <VoxButton variant="outlined" full theme="yellow" disabled={isPendingCommitee} onPress={openAdhCommitee()}>
                 J’adhère
               </VoxButton>
             }
@@ -158,7 +158,7 @@ const InstancesContent = () => {
             theme="yellow"
             icon={UserPlus}
             button={
-              <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
+              <VoxButton variant="outlined" full theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
                 J’adhère
               </VoxButton>
             }
@@ -219,7 +219,7 @@ const InstancesContent = () => {
             theme="yellow"
             icon={UserPlus}
             button={
-              <VoxButton full inverse bg={'white'} theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
+              <VoxButton variant="outlined" full theme="yellow" disabled={isPendingAgora} onPress={openAdhAgora()}>
                 Je cotise
               </VoxButton>
             }

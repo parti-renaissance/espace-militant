@@ -4,9 +4,9 @@ import { useFocusEffect } from 'expo-router'
 import { isWeb, styled, useMedia, View, ViewProps, withStaticProperties, XStack, YStack } from 'tamagui'
 
 import useLayoutSpacing, { UseLayoutSpacingOptions } from '@/components/AppStructure/hooks/useLayoutSpacing'
-import { SideBar, SideBarState } from '@/components/AppStructure/Navigation/SideBar'
 import FloatingTabBar from '@/components/AppStructure/Navigation/FloatingTabBar/FloatingTabBar'
 import { useFloatingTabBar } from '@/components/AppStructure/Navigation/FloatingTabBar/useFloatingTabBar'
+import { SideBar, SideBarState } from '@/components/AppStructure/Navigation/SideBar'
 import { SignInButton, SignUpButton } from '@/components/Buttons/AuthButton'
 
 import Attal2027Illustration from '@/assets/illustrations/Attal2027Illustration'
@@ -81,7 +81,7 @@ const Layout = ({ children, sidebarState, hideTabBar, ...props }: LayoutProps) =
 
 /** Align with `Main` / `SideBar` default max widths and `ContentContainer` gaps. */
 const LAYOUT_MAIN_MAX_WIDTH = 520
-const LAYOUT_SIDEBAR_MAX_WIDTH = 320
+const LAYOUT_SIDEBAR_MAX_WIDTH = 336
 
 const ContentContainer = styled(XStack, {
   flex: 1,
