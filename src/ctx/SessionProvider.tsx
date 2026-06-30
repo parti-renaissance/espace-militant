@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 
 import { navigateToWelcome } from '@/features_next/signup/utils/authNavigation'
 
+import { normalizeInternalRedirect, parseWebAuthState } from '@/hooks/pkceWebStore'
 import useBfcacheRestore from '@/hooks/useBfcacheRestore'
 import useLogin, { AuthFlowError, credentialsFromTokenResponse } from '@/hooks/useLogin'
 import { useLogOut } from '@/services/logout/api'
@@ -18,16 +19,7 @@ import { AuthContext, type AuthContextType } from './AuthContext'
 
 export { useSession } from './AuthContext'
 
-const normalizeStateRedirect = (state?: string) => {
-  if (!state) return undefined
-
-  try {
-    const path = decodeURIComponent(state)
-    return path.startsWith('/') && !path.startsWith('//') ? path : undefined
-  } catch {
-    return undefined
-  }
-}
+const resolveStateRedirect = (state?: string) => normalizeInternalRedirect(parseWebAuthState(state).redirectPath)
 
 export function SessionProvider(props: React.PropsWithChildren) {
   const { user: existingSession, setCredentials: setSession, removeCredentials, _hasHydrated } = useUserStore()
@@ -81,7 +73,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
         }
         setSession(credentialsFromTokenResponse(session, props?.isAdmin))
         queryClient.resetQueries()
-        router.replace((normalizeStateRedirect(props?.state) ?? '/') as Href)
+        router.replace((resolveStateRedirect(props?.state) ?? '/') as Href)
       } catch (e) {
         const authSource = props?.code ? 'oauth_callback' : 'user_action'
         ErrorMonitor.logError({
@@ -113,6 +105,13 @@ export function SessionProvider(props: React.PropsWithChildren) {
     if (!isWeb) return
     const { code, state, _switch_user } = bootParams
     if (!code) return
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      ;['code', 'state', '_switch_user'].forEach((key) => params.delete(key))
+      const query = params.toString()
+      window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
+    }
     if (_switch_user) {
       queryClient.cancelQueries()
       queryClient.clear()

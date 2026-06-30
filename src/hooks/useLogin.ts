@@ -9,6 +9,7 @@ import clientEnv from '@/config/clientEnv'
 import { AUTHORIZATION_ENDPOINT, getDiscoveryDocument, REGISTRATION_ENDPOINT } from '@/config/discoveryDocument'
 import type { User } from '@/store/user-store'
 
+import { buildWebAuthState, consumePkceVerifier, createNonce, parseWebAuthState, storePkceVerifier } from './pkceWebStore'
 import useBrowserWarmUp from './useBrowserWarmUp'
 
 const STABILIZATION_DELAY_MS = 150
@@ -47,24 +48,8 @@ try {
 
 export const REDIRECT_URI = AuthSession.makeRedirectUri()
 const BASE_REQUEST_CONFIG = { clientId: clientEnv.OAUTH_CLIENT_ID, redirectUri: REDIRECT_URI }
-const PKCE_VERIFIER_STORAGE_KEY = 'pkce_code_verifier'
 
-const storePkceVerifier = (verifier?: string) => {
-  if (isWeb && typeof window !== 'undefined' && verifier) {
-    window.sessionStorage.setItem(PKCE_VERIFIER_STORAGE_KEY, verifier)
-  }
-}
-
-const consumePkceVerifier = (): string | undefined => {
-  if (!isWeb || typeof window === 'undefined') {
-    return undefined
-  }
-  const verifier = window.sessionStorage.getItem(PKCE_VERIFIER_STORAGE_KEY) ?? undefined
-  if (verifier) {
-    window.sessionStorage.removeItem(PKCE_VERIFIER_STORAGE_KEY)
-  }
-  return verifier
-}
+const webStorage = (): Storage | undefined => (isWeb && typeof window !== 'undefined' ? window.sessionStorage : undefined)
 
 export const useDiscoveryDocument = (register?: boolean) => {
   const [discovery, setDiscovery] = useState<DiscoveryDocument | null>(null)
@@ -139,25 +124,38 @@ export const useLogin = () => {
   return async (payload?: { code?: string; sessionId?: string; state?: string }) => {
     if (payload?.code) {
       await safelyDismissAuthSession()
-      const codeVerifier = isWeb ? consumePkceVerifier() : req?.codeVerifier
+      let codeVerifier = req?.codeVerifier
+      if (isWeb) {
+        const storage = webStorage()
+        const { nonce } = parseWebAuthState(payload?.state)
+        codeVerifier = storage ? consumePkceVerifier(storage, nonce) : undefined
+
+        if (nonce && !codeVerifier) {
+          throw new AuthFlowError('PKCE verifier missing for OAuth callback')
+        }
+      }
       return exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId, codeVerifier })
     }
 
     if (isWeb) {
+      if (!req?.codeChallenge || !req?.codeVerifier) {
+        throw new AuthFlowError('Login not ready')
+      }
+      // Bind this verifier to this request via a per-request nonce that round-trips in `state`.
+      const nonce = createNonce()
+      const storage = webStorage()
+      if (storage) {
+        storePkceVerifier(storage, nonce, req.codeVerifier)
+      }
       const url = new URL(AUTHORIZATION_ENDPOINT)
-      url.searchParams.set('redirect_uri', req?.redirectUri ?? '')
-      url.searchParams.set('client_id', req?.clientId ?? '')
+      url.searchParams.set('redirect_uri', req.redirectUri)
+      url.searchParams.set('client_id', req.clientId)
       url.searchParams.set('response_type', 'code')
-      if (req?.codeChallenge) {
-        url.searchParams.set('code_challenge', req.codeChallenge)
-        url.searchParams.set('code_challenge_method', 'S256')
-        storePkceVerifier(req.codeVerifier)
-      }
-      if (payload?.state) {
-        url.searchParams.set('state', payload?.state)
-      }
-      req?.scopes!.forEach((scope) => url.searchParams.append('scope[]', scope))
-      Object.entries(req?.extraParams ?? {}).forEach(([key, value]) => url.searchParams.set(key, value))
+      url.searchParams.set('code_challenge', req.codeChallenge)
+      url.searchParams.set('code_challenge_method', 'S256')
+      url.searchParams.set('state', buildWebAuthState(nonce, payload?.state))
+      req.scopes?.forEach((scope) => url.searchParams.append('scope[]', scope))
+      Object.entries(req.extraParams ?? {}).forEach(([key, value]) => url.searchParams.set(key, value))
       window.location.href = url.toString()
       return null
     }
@@ -193,9 +191,13 @@ export const useRegister = () => {
   return async ({ utm_campaign }: { utm_campaign?: string } = {}) => {
     if (isWeb) {
       let url = REGISTRATION_ENDPOINT + `?redirect_uri=${REDIRECT_URI}&utm_source=app`
-      if (req?.codeChallenge) {
-        url += `&code_challenge=${encodeURIComponent(req.codeChallenge)}&code_challenge_method=S256`
-        storePkceVerifier(req.codeVerifier)
+      if (req?.codeChallenge && req?.codeVerifier) {
+        const nonce = createNonce()
+        const storage = webStorage()
+        if (storage) {
+          storePkceVerifier(storage, nonce, req.codeVerifier)
+        }
+        url += `&code_challenge=${encodeURIComponent(req.codeChallenge)}&code_challenge_method=S256&state=${encodeURIComponent(buildWebAuthState(nonce))}`
       }
       if (utm_campaign) {
         url += `&utm_campaign=${encodeURIComponent(utm_campaign)}`
