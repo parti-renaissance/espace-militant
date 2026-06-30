@@ -1,3 +1,4 @@
+import { getCountryCodeForRegionCode, parsePhoneNumber } from 'awesome-phonenumber'
 import { z } from 'zod'
 
 import { errorMessages } from '@/utils/errorMessages'
@@ -65,6 +66,16 @@ export const SignupInscriptionFormSchema = RestPostSignupRequestObjectSchema.pic
     .min(3, 'Le code postal doit contenir au moins 3 caractères')
     .max(10, 'Le code postal ne peut pas dépasser 10 caractères'),
   email_opt_in: z.boolean(),
+  phone: z
+    .object({
+      country: z.string().refine((x) => getCountryCodeForRegionCode(x) !== undefined, {
+        message: 'Pays non supporté',
+      }),
+      number: z.string({ required_error: errorMessages.required }).min(1, errorMessages.required),
+    })
+    .refine(({ country, number }) => parsePhoneNumber(number, { regionCode: country }).valid, {
+      message: 'Le numéro de téléphone n’est pas valide',
+    }),
   cgu_accepted: z
     .boolean({ required_error: errorMessages.required })
     .refine((value) => value, { message: errorMessages.needChecked }),

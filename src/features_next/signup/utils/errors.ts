@@ -58,7 +58,16 @@ export function applySignupFormError(options: {
       setRecaptchaError(violation.message)
       continue
     }
-    if (isPathExist(violation.propertyPath, { first_name: '', email: '', postal_code: '', email_opt_in: false, cgu_accepted: false })) {
+    if (
+      isPathExist(violation.propertyPath, {
+        first_name: '',
+        email: '',
+        phone: { country: 'FR', number: '' },
+        postal_code: '',
+        email_opt_in: false,
+        cgu_accepted: false,
+      })
+    ) {
       setError(violation.propertyPath as FieldPath<SignupInscriptionFormValues>, { message: violation.message })
       continue
     }
