@@ -1,25 +1,32 @@
-import { useCallback, useRef } from 'react';
-import { FlatList, Keyboard } from 'react-native';
-import { isWeb, useMedia, YStack } from 'tamagui';
-import Layout from '@/components/AppStructure/Layout/Layout';
-import InputDock from '@/components/chat/input/InputDock';
-import JumpToBottomButton from '@/components/chat/JumpToBottomButton';
-import MessageList from '@/components/chat/messages/MessageList';
-import type { ChatMessage } from '@/hooks/chat/types';
-import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics';
-import { useChatMessageActions } from '@/hooks/chat/useChatMessageActions';
-import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage';
-import { useShowJumpToBottom } from '@/hooks/chat/useShowJumpToBottom';
-import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef';
-import { BOT_MESSAGE_MAX_LENGTH } from '@/services/bot/api';
-import { useBotChat } from '@/services/bot/hook';
-import EmptyState from '../components/EmptyState';
-import SuggestionsList from '../components/input/SuggestionsList';
+import { useCallback, useEffect, useRef } from 'react'
+import { FlatList, Keyboard } from 'react-native'
+import { useLocalSearchParams } from 'expo-router'
+import { isWeb, useMedia, YStack } from 'tamagui'
+
+import Layout from '@/components/AppStructure/Layout/Layout'
+import InputDock from '@/components/chat/input/InputDock'
+import JumpToBottomButton from '@/components/chat/JumpToBottomButton'
+import MessageList from '@/components/chat/messages/MessageList'
+
+import type { ChatMessage } from '@/hooks/chat/types'
+import { useChatDockMetrics } from '@/hooks/chat/useChatDockMetrics'
+import { useChatMessageActions } from '@/hooks/chat/useChatMessageActions'
+import { useChatScrollToMessage } from '@/hooks/chat/useChatScrollToMessage'
+import { useShowJumpToBottom } from '@/hooks/chat/useShowJumpToBottom'
+import type { TamaguiInputRef } from '@/hooks/chat/utils/getDomFromTamaguiRef'
+import { BOT_MESSAGE_MAX_LENGTH } from '@/services/bot/api'
+import { useBotChat } from '@/services/bot/hook'
+import { cleanupUrlParams } from '@/utils/urlCleanup'
+
+import EmptyState from '../components/EmptyState'
+import SuggestionsList from '../components/input/SuggestionsList'
 
 export default function BotPage() {
   const media = useMedia()
+  const params = useLocalSearchParams<Record<string, string | string[]>>()
   const scrollViewRef = useRef<FlatList<ChatMessage>>(null)
   const inputRef = useRef<TamaguiInputRef>(null)
+  const handledUrlQuestionRef = useRef<string | null>(null)
   const { keyboardOpen, dockBottomOffset, scrollButtonBottom, contentPaddingBottom, onDockLayout } = useChatDockMetrics()
 
   const { messages, input, handleInputChange, handleSubmit: rawHandleSubmit, isLoading, streamedContent, error, retry, stop, submit } = useBotChat()
@@ -33,6 +40,25 @@ export default function BotPage() {
 
   const lastMessageId = messages.length > 0 ? messages[messages.length - 1].id : null
   const { show: showJumpToBottom, handleScroll: handleJumpScroll } = useShowJumpToBottom({ lastMessageId })
+
+  const questionParam = Object.keys(params)[0] ?? ''
+  const urlQuestion = questionParam.trim().slice(0, BOT_MESSAGE_MAX_LENGTH)
+
+  useEffect(() => {
+    if (!urlQuestion || isLoading) return
+    if (handledUrlQuestionRef.current === urlQuestion) return
+
+    handledUrlQuestionRef.current = urlQuestion
+
+    if (!isWeb) {
+      inputRef.current?.blur()
+      Keyboard.dismiss()
+    }
+
+    armScrollToLastUser()
+    submit(urlQuestion)
+    cleanupUrlParams([questionParam])
+  }, [armScrollToLastUser, isLoading, questionParam, submit, urlQuestion])
 
   const handleSubmit = useCallback(() => {
     if (!input.trim() || isLoading) return
@@ -48,19 +74,6 @@ export default function BotPage() {
     armScrollToLastUser()
     retry()
   }, [retry, armScrollToLastUser])
-
-  const handleSuggestionPress = useCallback(
-    (question: string) => {
-      if (isLoading) return
-      if (!isWeb) {
-        inputRef.current?.blur()
-        Keyboard.dismiss()
-      }
-      armScrollToLastUser()
-      submit(question)
-    },
-    [isLoading, submit, armScrollToLastUser],
-  )
 
   const showEmpty = !error && messages.length === 0 && !isLoading && !streamedContent
 
@@ -91,7 +104,7 @@ export default function BotPage() {
           bottomOffset={dockBottomOffset}
           placeholder="Formulez votre demande…"
           maxLength={BOT_MESSAGE_MAX_LENGTH}
-          topSlot={showEmpty && !keyboardOpen ? <SuggestionsList onPress={handleSuggestionPress} /> : undefined}
+          topSlot={showEmpty && !keyboardOpen ? <SuggestionsList /> : undefined}
           onChange={handleInputChange}
           onSubmit={handleSubmit}
           onStop={stop}
