@@ -1,55 +1,119 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
+import { Platform } from 'react-native'
+import * as Linking from 'expo-linking'
+import { useGlobalSearchParams, usePathname } from 'expo-router'
+
 import clientEnv from '@/config/clientEnv'
+import { AsyncStorage } from '@/hooks/useStorageState'
 import * as api from '@/services/matomo/api'
-import { usePathname } from 'expo-router'
+import { buildMatomoUrl, extractUtmFromSearchParams, hasUtmParams, utmToMatomoParams } from '@/services/matomo/helpers'
 
-const matomoApiObject =
-  clientEnv.ENVIRONMENT === 'production'
-    ? {
-        trackEvent: (data: Parameters<typeof api.trackEvent>[0]) => {
-          api.trackEvent({ ...data })
-        },
-        trackAction: (data: Parameters<typeof api.trackAction>[0]) => {
-          api.trackAction({ ...data })
-        },
-        trackScreenView: (data: Parameters<typeof api.trackScreenView>[0]) => {
-          api.trackScreenView({ ...data })
-        },
-        trackAppStart: (data?: Parameters<typeof api.trackAppStart>[0]) => {
-          api.trackAppStart({ ...data })
-        },
-      }
-    : {
-        trackEvent: async (x: Parameters<typeof api.trackEvent>[0]) => {
-          // eslint-disable-next-line no-console
-          console.log('trackEvent', x)
-        },
-        trackAction: (x: Parameters<typeof api.trackAction>[0]) => {
-          // eslint-disable-next-line no-console
-          console.log('trackAction', x)
-        },
-        trackScreenView: (x: Parameters<typeof api.trackScreenView>[0]) => {
-          // eslint-disable-next-line no-console
-          console.log('trackScreenView', x)
-        },
-        trackAppStart: (x?: Parameters<typeof api.trackAppStart>[0]) => {
-          // eslint-disable-next-line no-console
-          console.log('trackAppStart', x)
-        },
-      }
+const FIRST_OPEN_KEY = 'trackings.first_open'
+const TRACKINGS_LOG_PREFIX = '[trackings]'
+const isProduction = clientEnv.ENVIRONMENT === 'production'
 
-export const useMatomo = () => {
-  return matomoApiObject
+function logScreenViewPayload(data: Parameters<typeof api.trackScreenView>[0]) {
+  // eslint-disable-next-line no-console
+  console.log(TRACKINGS_LOG_PREFIX, 'screenView', {
+    pathname: data.pathname,
+    utm: data.utm,
+    url: buildMatomoUrl(data.pathname, data.utm),
+    campaignParams: utmToMatomoParams(data.utm),
+  })
+}
+
+function logFirstOpenPayload(data?: Parameters<typeof api.trackFirstOpen>[0]) {
+  // eslint-disable-next-line no-console
+  console.log(TRACKINGS_LOG_PREFIX, 'firstOpen', {
+    utm: data?.utm,
+    campaignParams: utmToMatomoParams(data?.utm),
+  })
+}
+
+function trackEvent(data: Parameters<typeof api.trackEvent>[0]) {
+  if (isProduction) return api.trackEvent(data)
+  // eslint-disable-next-line no-console
+  console.log(TRACKINGS_LOG_PREFIX, 'event', data)
+}
+
+function trackAction(data: Parameters<typeof api.trackAction>[0]) {
+  if (isProduction) return api.trackAction(data)
+  // eslint-disable-next-line no-console
+  console.log(TRACKINGS_LOG_PREFIX, 'action', data)
+}
+
+function trackScreenView(data: Parameters<typeof api.trackScreenView>[0]) {
+  if (isProduction) return api.trackScreenView(data)
+  logScreenViewPayload(data)
+}
+
+function trackAppStart(data?: Parameters<typeof api.trackAppStart>[0]) {
+  if (isProduction) return api.trackAppStart(data)
+  // eslint-disable-next-line no-console
+  console.log(TRACKINGS_LOG_PREFIX, 'appStart', data)
+}
+
+function trackFirstOpen(data?: Parameters<typeof api.trackFirstOpen>[0]) {
+  if (isProduction) return api.trackFirstOpen(data)
+  logFirstOpenPayload(data)
+  return Promise.resolve()
+}
+
+async function getBootUtmParams(searchParams: Record<string, string | string[] | undefined>) {
+  const fromRoute = extractUtmFromSearchParams(searchParams)
+  if (hasUtmParams(fromRoute) || Platform.OS === 'web') {
+    return fromRoute
+  }
+
+  const initialUrl = await Linking.getInitialURL()
+  if (!initialUrl) return fromRoute
+
+  const parsed = Linking.parse(initialUrl)
+  const fromInitialUrl = extractUtmFromSearchParams(parsed.queryParams ?? {})
+  return hasUtmParams(fromInitialUrl) ? fromInitialUrl : fromRoute
 }
 
 export const useInitMatomo = () => {
-  const matomo = useMatomo()
   const pathname = usePathname()
-  useEffect(() => {
-    matomo.trackAppStart()
-  }, [matomo])
+  const searchParams = useGlobalSearchParams()
+  const utm = useMemo(() => extractUtmFromSearchParams(searchParams), [searchParams])
 
   useEffect(() => {
-    matomo.trackScreenView({ pathname })
-  }, [pathname, matomo])
+    let cancelled = false
+
+    async function trackBoot() {
+      const bootUtm = await getBootUtmParams(searchParams)
+      if (cancelled) return
+
+      if (Platform.OS !== 'web') {
+        const alreadySent = await AsyncStorage.getItem(FIRST_OPEN_KEY)
+        if (!alreadySent) {
+          try {
+            await trackFirstOpen({ utm: bootUtm })
+            await AsyncStorage.setItem(FIRST_OPEN_KEY, '1')
+          } catch (error) {
+            if (__DEV__) {
+              // eslint-disable-next-line no-console
+              console.warn(TRACKINGS_LOG_PREFIX, 'firstOpen failed, flag not persisted', error)
+            }
+          }
+        }
+      }
+
+      if (cancelled) return
+      trackAppStart({ utm: bootUtm })
+    }
+
+    void trackBoot()
+
+    return () => {
+      cancelled = true
+    }
+    // Boot tracking (first_open + app start) runs once per mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    trackScreenView({ pathname, utm })
+  }, [pathname, utm])
 }
