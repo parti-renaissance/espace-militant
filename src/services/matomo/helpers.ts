@@ -2,6 +2,15 @@ import clientEnv from '@/config/clientEnv'
 
 import type { RestMatomoCampaignParams, RestMatomoUtmParams } from './schema'
 
+const MATOMO_SITE_ID_BY_ENVIRONMENT = {
+  production: '6',
+  staging: '10',
+} as const
+
+export function resolveMatomoSiteId(): string {
+  return MATOMO_SITE_ID_BY_ENVIRONMENT[clientEnv.ENVIRONMENT]
+}
+
 function getParam(value: string | string[] | undefined): string | undefined {
   if (typeof value === 'string' && value.length > 0) return value
   if (Array.isArray(value) && typeof value[0] === 'string' && value[0].length > 0) return value[0]

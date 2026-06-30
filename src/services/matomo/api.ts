@@ -1,7 +1,7 @@
 import { createApi } from '@/utils/constructApi'
 import axios from 'axios'
 
-import { buildMatomoUrl, utmToMatomoParams } from './helpers'
+import { buildMatomoUrl, resolveMatomoSiteId, utmToMatomoParams } from './helpers'
 import * as schemas from './schema'
 
 const matomoInstance = axios.create({
@@ -16,7 +16,12 @@ const matomoApiConfig = {
   axiosConfig: { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
 }
 
-const matomoDefaults = { idsite: '6', rec: 1, apiv: 1, send_image: 0 } as const
+const matomoDefaults = () => ({
+  idsite: resolveMatomoSiteId(),
+  rec: 1,
+  apiv: 1,
+  send_image: 0,
+} as const)
 
 const postMatomoEvent = createApi({ authInstance: matomoInstance, publicInstance: matomoInstance })({
   ...matomoApiConfig,
@@ -48,7 +53,7 @@ export const trackEvent = (data: {
     e_n: data.name,
     e_v: data.value,
     ...campaignParams,
-    ...matomoDefaults,
+    ...matomoDefaults(),
   })
 }
 
@@ -66,7 +71,7 @@ export const trackAction = (data: {
     action_name: data.name,
     url: data.url,
     ...campaignParams,
-    ...matomoDefaults,
+    ...matomoDefaults(),
   })
 }
 

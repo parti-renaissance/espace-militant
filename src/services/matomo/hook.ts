@@ -6,11 +6,16 @@ import { useGlobalSearchParams, usePathname } from 'expo-router'
 import clientEnv from '@/config/clientEnv'
 import { AsyncStorage } from '@/hooks/useStorageState'
 import * as api from '@/services/matomo/api'
-import { buildMatomoUrl, extractUtmFromSearchParams, hasUtmParams, utmToMatomoParams } from '@/services/matomo/helpers'
+import {
+  buildMatomoUrl,
+  extractUtmFromSearchParams,
+  hasUtmParams,
+  utmToMatomoParams,
+} from '@/services/matomo/helpers'
 
 const FIRST_OPEN_KEY = 'trackings.first_open'
 const TRACKINGS_LOG_PREFIX = '[trackings]'
-const isProduction = clientEnv.ENVIRONMENT === 'production'
+const shouldLogTrackings = clientEnv.ENVIRONMENT === 'staging'
 
 function logScreenViewPayload(data: Parameters<typeof api.trackScreenView>[0]) {
   // eslint-disable-next-line no-console
@@ -30,33 +35,44 @@ function logFirstOpenPayload(data?: Parameters<typeof api.trackFirstOpen>[0]) {
   })
 }
 
-function trackEvent(data: Parameters<typeof api.trackEvent>[0]) {
-  if (isProduction) return api.trackEvent(data)
+function logEventPayload(data: Parameters<typeof api.trackEvent>[0]) {
   // eslint-disable-next-line no-console
   console.log(TRACKINGS_LOG_PREFIX, 'event', data)
 }
 
-function trackAction(data: Parameters<typeof api.trackAction>[0]) {
-  if (isProduction) return api.trackAction(data)
+function logActionPayload(data: Parameters<typeof api.trackAction>[0]) {
   // eslint-disable-next-line no-console
   console.log(TRACKINGS_LOG_PREFIX, 'action', data)
 }
 
-function trackScreenView(data: Parameters<typeof api.trackScreenView>[0]) {
-  if (isProduction) return api.trackScreenView(data)
-  logScreenViewPayload(data)
-}
-
-function trackAppStart(data?: Parameters<typeof api.trackAppStart>[0]) {
-  if (isProduction) return api.trackAppStart(data)
+function logAppStartPayload(data?: Parameters<typeof api.trackAppStart>[0]) {
   // eslint-disable-next-line no-console
   console.log(TRACKINGS_LOG_PREFIX, 'appStart', data)
 }
 
+function trackEvent(data: Parameters<typeof api.trackEvent>[0]) {
+  if (shouldLogTrackings) logEventPayload(data)
+  return api.trackEvent(data)
+}
+
+function trackAction(data: Parameters<typeof api.trackAction>[0]) {
+  if (shouldLogTrackings) logActionPayload(data)
+  return api.trackAction(data)
+}
+
+function trackScreenView(data: Parameters<typeof api.trackScreenView>[0]) {
+  if (shouldLogTrackings) logScreenViewPayload(data)
+  return api.trackScreenView(data)
+}
+
+function trackAppStart(data?: Parameters<typeof api.trackAppStart>[0]) {
+  if (shouldLogTrackings) logAppStartPayload(data)
+  return api.trackAppStart(data)
+}
+
 function trackFirstOpen(data?: Parameters<typeof api.trackFirstOpen>[0]) {
-  if (isProduction) return api.trackFirstOpen(data)
-  logFirstOpenPayload(data)
-  return Promise.resolve()
+  if (shouldLogTrackings) logFirstOpenPayload(data)
+  return api.trackFirstOpen(data)
 }
 
 async function getBootUtmParams(searchParams: Record<string, string | string[] | undefined>) {
