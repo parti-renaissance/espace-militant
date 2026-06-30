@@ -93,7 +93,7 @@ const MembershipCard = ({ status }: { status: 'renew' | 'tofinish' }) => {
   return (
     <InfoCard
       button={
-        <RenewMembershipButton text={buttonText} page="accueil-connecte" hitSource={HIT_SOURCES.PAGE_TIMELINE} full inverse bg="white" />
+        <RenewMembershipButton text={buttonText} page="accueil-connecte" hitSource={HIT_SOURCES.PAGE_TIMELINE} variant="outlined" full />
       }
       icon={icon}
       theme="yellow"

@@ -5,7 +5,7 @@ import { defineColorScale } from './legacyColorAliases'
 export const gray = defineColorScale('gray', {
   gray50: '#FAF7F4',
   gray100: '#F6F0EA',
-  gray200: '#D9D3CE',
+  gray200: '#E0DBD7',
   gray300: '#BDB7B2',
   gray400: '#A29C97',
   gray500: '#87817D',
@@ -63,13 +63,13 @@ export const green = defineColorScale('green', {
   green100: '#E0F8E3',
   green200: '#BCEFC3',
   green300: '#90E49D',
-  green400: '#6FDA7E',
-  green500: '#4BC45D',
+  green400: '#4BDD80',
+  green500: '#29C45D',
   green600: '#34A044',
   green700: '#267D33',
   green800: '#1C6026',
   green900: '#13461B',
-  green950: '#0A260E',
+  green950: '#0A2D10',
 })
 
 export const yellow = defineColorScale('yellow', {
@@ -79,7 +79,7 @@ export const yellow = defineColorScale('yellow', {
   yellow300: '#FFFF68',
   yellow400: '#FFE633',
   yellow500: '#FFCC00',
-  yellow600: '#D6A300',
+  yellow600: '#C79700',
   yellow700: '#A87C00',
   yellow800: '#805C00',
   yellow900: '#5A3F00',
@@ -102,9 +102,9 @@ export const orange = defineColorScale('orange', {
 
 export const red = defineColorScale('red', {
   red50: '#FDEBEE',
-  red100: '#FBD2D6',
-  red200: '#F69DA5',
-  red300: '#F06571',
+  red100: '#FDD7DB',
+  red200: '#F9A4AC',
+  red300: '#F37984',
   red400: '#EF4C5A',
   red500: '#E83644',
   red600: '#C72431',
@@ -119,13 +119,13 @@ export const pink = defineColorScale('pink', {
   pink100: '#FFDFEE',
   pink200: '#FFBEE0',
   pink300: '#FFA0D2',
-  pink400: '#FF8AC1',
+  pink400: '#FF7CC0',
   pink500: '#EC5DA0',
   pink600: '#C73D80',
   pink700: '#9E2861',
   pink800: '#781B47',
-  pink900: '#571032',
-  pink950: '#2E081A',
+  pink900: '#521230',
+  pink950: '#330A1E',
 })
 
 export const white = {
