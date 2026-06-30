@@ -55,6 +55,7 @@ const Select = <A extends string>(props: SelectProps<A>) => {
   }
 
   const isFailed = Boolean(props.error)
+  const hasLabel = Boolean(props.label || props.placeholder)
 
   return (
     <YStack gap="$xsmall">
@@ -81,10 +82,12 @@ const Select = <A extends string>(props: SelectProps<A>) => {
           {...props.frameProps}
         >
           <SF.Container resetable={props.resetable && !!props.value} icon={props.icon} onResetPress={handleResetPress}>
-            <Text width="fit-content" maxWidth="50%" mr="$medium" numberOfLines={1}>
-              {props.label || props.placeholder ? <SF.Label numberOfLines={1}>{props.label || props.placeholder}</SF.Label> : null}
-            </Text>
-            <SF.ValueContainer theme={fullValue?.theme}>
+            {hasLabel ? (
+              <Text width="fit-content" maxWidth="50%" mr="$medium" numberOfLines={1}>
+                <SF.Label numberOfLines={1}>{props.label || props.placeholder}</SF.Label>
+              </Text>
+            ) : null}
+            <SF.ValueContainer theme={fullValue?.theme} {...(hasLabel ? {} : { justifyContent: 'flex-start' })}>
               {props.allowInverseSelection ? isInverseSelectionActive ? <EqualNot size={16} color="$orange5" /> : null : null}
               {fullValue?.icon ? <SF.Icon themedText={Boolean(fullValue?.theme)} icon={fullValue.icon} /> : null}
               <SF.Text themedText={Boolean(fullValue?.theme)} placeholder={!fullValue}>

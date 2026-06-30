@@ -1,12 +1,14 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react'
 import { Pressable } from 'react-native'
-import { XStack, YStack } from 'tamagui'
+import { View, XStack, YStack } from 'tamagui'
 import { AlertTriangle, MapPin } from '@tamagui/lucide-icons'
+import { parsePhoneNumber } from 'awesome-phonenumber'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 
 import Checkbox from '@/components/base/Checkbox/Checkbox'
 import Input from '@/components/base/Input/Input'
+import SelectV3 from '@/components/base/Select/SelectV3'
 import Text from '@/components/base/Text'
 import { VoxButton } from '@/components/Button'
 import { MessageCard } from '@/components/MessageCard/MessageCard'
@@ -15,10 +17,11 @@ import { useSignupSessionStore } from '@/features_next/signup/store/signup-sessi
 import { applySignupFormError } from '@/features_next/signup/utils/errors'
 
 import { useSession } from '@/ctx/SessionProvider'
-import { openExternalLink } from '@/utils/linkHandler'
 import { DEFAULT_SIGNUP_SOURCE } from '@/services/signup/constants'
 import { useSignup } from '@/services/signup/hook'
 import { SignupInscriptionFormSchema, type RestPostSignupRequest, type SignupInscriptionFormValues } from '@/services/signup/schema'
+import { openExternalLink } from '@/utils/linkHandler'
+import { phoneCodes } from '@/utils/phoneCodes'
 
 export type SignupInscriptionFormHandle = {
   submit: () => void
@@ -47,6 +50,10 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
     defaultValues: {
       first_name: '',
       email: sessionEmail,
+      phone: {
+        country: 'FR',
+        number: '',
+      },
       postal_code: '',
       email_opt_in: false,
       cgu_accepted: false,
@@ -74,8 +81,9 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
         recaptcha: token,
         cgu_accepted: true,
         first_name: data.first_name.trim(),
+        phone: parsePhoneNumber(data.phone.number, { regionCode: data.phone.country }).number?.e164 || data.phone.number.trim(),
         postal_code: data.postal_code.trim(),
-        country: 'FR',
+        country: data.phone.country ?? 'FR',
         email_opt_in: data.email_opt_in,
         ...(referrerCode ? { referrer_code: referrerCode } : {}),
         ...(effectiveUtmSource ? { utm_source: effectiveUtmSource } : {}),
@@ -153,6 +161,37 @@ function SignupInscriptionForm({ onSuccess }: SignupInscriptionFormProps, ref: R
             autoComplete="email"
             size="sm"
           />
+        )}
+      />
+
+      <Controller
+        name="phone"
+        control={control}
+        render={({ field: { onBlur, onChange, value }, fieldState: { error } }) => (
+          <XStack gap="$small">
+            <View width={120}>
+              <SelectV3
+                searchable
+                color="white"
+                value={value?.country ?? 'FR'}
+                size="sm"
+                options={phoneCodes}
+                onChange={(country) => onChange({ number: value?.number ?? '', country })}
+              />
+            </View>
+            <View flexGrow={1}>
+              <Input
+                value={value?.number}
+                placeholder="Téléphone"
+                onBlur={onBlur}
+                onChange={(inputValue) => onChange({ number: inputValue, country: value?.country ?? 'FR' })}
+                error={error?.message || (error as { number?: { message?: string } } | undefined)?.number?.message}
+                keyboardType="phone-pad"
+                autoComplete="tel"
+                size="sm"
+              />
+            </View>
+          </XStack>
         )}
       />
 
