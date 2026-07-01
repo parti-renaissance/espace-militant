@@ -2,8 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Alert, Linking } from 'react-native'
 import { useSession } from '@/ctx/SessionProvider'
 import FB from '@/config/firebaseConfig'
-import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
-import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
+import { useAddPushToken, useRemovePushToken } from '@/services/push-token/hook'
 import { getPermissionsAsync, PermissionStatus } from 'expo-notifications'
 
 export default function useCheckNotificationsState() {

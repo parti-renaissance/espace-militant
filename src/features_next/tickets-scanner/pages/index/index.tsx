@@ -16,9 +16,9 @@ import VoxCard from '@/components/VoxCard/VoxCard'
 import { useScanTicket } from '@/services/tickets/hook'
 import { ScanTicketResponse } from '@/services/tickets/schema'
 
-import StatusIndicator, { StatusIndicatorSkeleton } from '../components/StatusIndicator'
+import StatusIndicator, { StatusIndicatorSkeleton } from './components/StatusIndicator'
 
-const { width, height } = Dimensions.get('window')
+const { height } = Dimensions.get('window')
 
 export default function TicketScannerPage() {
   const media = useMedia()
@@ -50,20 +50,16 @@ export default function TicketScannerPage() {
 
   const handleScanTicket = useCallback(
     (ticketUuid: string) => {
-      // Vérifier si c'est le même ticket que le dernier scanné
       if (lastScannedId === ticketUuid) {
         return
       }
       setScanned(true)
-      // Appeler l'API pour vérifier le ticket
       scanTicketMutation.mutate(ticketUuid, {
         onSettled: () => {
-          // Annuler le timeout précédent s'il existe
           if (resetTimeoutRef.current) {
             clearTimeout(resetTimeoutRef.current)
           }
 
-          // Programmer le reset de scanned à false dans 5 secondes
           resetTimeoutRef.current = setTimeout(() => {
             setScanned(false)
             resetTimeoutRef.current = null
@@ -83,7 +79,6 @@ export default function TicketScannerPage() {
     [scanTicketMutation, lastScannedId, toast],
   )
 
-  // Nettoyer le timeout au démontage du composant
   useEffect(() => {
     return () => {
       if (resetTimeoutRef.current) {
@@ -93,7 +88,7 @@ export default function TicketScannerPage() {
   }, [])
 
   const handleBarCodeScanned = useCallback(
-    ({ type, data }: BarcodeScanningResult) => {
+    ({ data }: BarcodeScanningResult) => {
       if (scanned) return
 
       handleScanTicket(data)
@@ -246,7 +241,6 @@ export default function TicketScannerPage() {
                   </YStack>
                 )}
 
-                {/* Informations utilisateur */}
                 {ticketData.user && (
                   <VoxCard>
                     <VoxCard.Content>

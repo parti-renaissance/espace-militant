@@ -19,19 +19,16 @@ export const useInitPushNotification = () => {
     let fbNotificationSubscription: (() => void) | null = null
 
     if (Platform.OS !== 'web') {
-      // 1. Vérifier si une notification a ouvert l'app AVANT que le listener soit monté (cold start)
       Notifications.getLastNotificationResponseAsync().then((response) => {
         if (response && isMounted) {
           const possibleLinkData1 = response.notification?.request?.content?.data?.link
           //@ts-expect-error type do not contain payload key inside trigger
           const possibleLinkData2 = response.notification?.request?.trigger?.payload?.link
           const link = parseHref(possibleLinkData1 ?? possibleLinkData2, 'push_notification')
-          // Cold start : attendre 2s que l'app soit chargée
           if (link) setTimeout(() => router.push(link), 2000)
         }
       })
 
-      // 2. Écouter les notifications suivantes (app déjà ouverte)
       expoNotificationSubscription = Notifications.addNotificationResponseReceivedListener((e) => {
         try {
           if (isMounted) {
@@ -39,7 +36,6 @@ export const useInitPushNotification = () => {
             //@ts-expect-error type do not contain payload key inside trigger
             const possibleLinkData2 = e.notification?.request?.trigger?.payload?.link
             const link = parseHref(possibleLinkData1 ?? possibleLinkData2, 'push_notification')
-            // App déjà ouverte : navigation immédiate
             if (link) setTimeout(() => router.push(link), 100)
           }
         } catch (e) {

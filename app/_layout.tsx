@@ -17,8 +17,8 @@ import { PortalLayout } from '@/components/layouts/PortalLayout';
 import MapboxGl from '@/components/Mapbox/Mapbox';
 import WaitingScreen from '@/components/WaitingScreen';
 import SignupTunnelGuard from '@/features_next/signup/components/SignupTunnelGuard';
-import { useInitPushNotification } from '@/features/push-notification/hook';
-import initRootAppNotification from '@/features/push-notification/logic/initRootAppNotification';
+import { useInitPushNotification } from '@/features_next/push-notification/hooks';
+import initRootAppNotification from '@/features_next/push-notification/utils';
 import UpdateGatewayScreen from '@/features_next/update/components/UpdateGatewayScreen';
 import { useUpdateGateway } from '@/features_next/update/hooks/useUpdateGateway';
 

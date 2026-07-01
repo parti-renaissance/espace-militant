@@ -6,8 +6,8 @@ import {
   PhoningSessionFinishedCampaignError,
   PhoningSessionNoNumberError,
   PublicSubscribeEventFormError,
-  TokenCannotBeSubscribedError,
 } from '../../core/errors'
+import { TokenCannotBeSubscribedError } from '@/services/push-token/error'
 import { RestLoginErrorResponse } from '../restObjects/RestLoginErrorResponse'
 import { RestPhoningSessionErrorResponse } from '../restObjects/RestPhoningSession'
 import { RestUpdateErrorResponse } from '../restObjects/RestUpdateProfileRequest'

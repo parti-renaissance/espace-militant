@@ -1,4 +1,4 @@
-import * as schemas from '@/features/push-notification/schema'
+import * as schemas from '@/services/push-token/schema'
 import { api } from '@/utils/api'
 import { z } from 'zod'
 

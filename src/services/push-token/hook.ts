@@ -1,7 +1,8 @@
 import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { useMutation } from '@tanstack/react-query'
-import { addPushToken } from '../api'
-import { TokenCannotBeSubscribedError } from '../errors'
+
+import { addPushToken, removePushToken } from './api'
+import { TokenCannotBeSubscribedError } from './error'
 
 export function useAddPushToken() {
   return useMutation({
@@ -19,5 +20,11 @@ export function useAddPushToken() {
         })
       }
     },
+  })
+}
+
+export function useRemovePushToken() {
+  return useMutation({
+    mutationFn: removePushToken,
   })
 }

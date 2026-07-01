@@ -2,7 +2,7 @@ import React from 'react'
 import Head from 'expo-router/head'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
-import TicketScannerPage from '@/features/tickets-scanner/pages'
+import TicketScannerPage from '@/features_next/tickets-scanner/pages/index'
 
 import * as metatags from '@/config/metatags'
 

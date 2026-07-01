@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSession } from '@/ctx/SessionProvider'
 import FB from '@/config/firebaseConfig'
-import { useAddPushToken } from '@/features/push-notification/hook/useAddPushToken'
-import { useRemovePushToken } from '@/features/push-notification/hook/useRemovePushToken'
+import { useAddPushToken, useRemovePushToken } from '@/services/push-token/hook'
 import { isSupported } from '@firebase/messaging'
 import { useToastController } from '@tamagui/toast'
 
