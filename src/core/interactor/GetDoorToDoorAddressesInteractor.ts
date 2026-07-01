@@ -23,12 +23,14 @@ export class GetDoorToDoorAddressesInteractor {
         campaignIds.add(campaign.campaignId)
       }
     })
-    campaignIds.forEach(async (id) => {
-      await this.repository.getCampaign(id, 'remote')
-      await this.repository.getDoorToDoorCampaignRanking(id, 'remote')
-      await this.repository.getDoorToDoorPollConfig(id, 'remote')
-      await this.repository.getDoorToDoorPoll(id, 'remote')
-    })
+    await Promise.all(
+      [...campaignIds].map(async (id) => {
+        await this.repository.getCampaign(id, 'remote')
+        await this.repository.getDoorToDoorCampaignRanking(id, 'remote')
+        await this.repository.getDoorToDoorPollConfig(id, 'remote')
+        await this.repository.getDoorToDoorPoll(id, 'remote')
+      }),
+    )
     return addresses
   }
 }

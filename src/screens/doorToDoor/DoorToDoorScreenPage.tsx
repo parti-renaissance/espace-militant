@@ -15,7 +15,7 @@ import RankingModal from '@/screens/doorToDoor/rankings/RankingModal'
 import LoadingView from '@/screens/shared/LoadingView'
 import { Colors, Spacing, Typography } from '@/styles'
 import { useOnFocus } from '@/utils/useOnFocus.hook'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import * as Geolocation from 'expo-location'
 import { router } from 'expo-router'
 import { YStack } from 'tamagui'
@@ -83,7 +83,7 @@ const DoorToDoorScreenPage = ({ embeddedInLayout = false }: DoorToDoorScreenPage
 
   const { setAddress } = useDoorToDoorStore()
 
-  const { data: charterState, refetch: fetchCharterState } = useQuery({
+  const { data: charterState, refetch: fetchCharterState } = useSuspenseQuery({
     queryKey: ['doorToDoorCharterState'],
     queryFn: () => DoorToDoorRepository.getInstance().getDoorToDoorCharterState(),
   })
@@ -100,6 +100,7 @@ const DoorToDoorScreenPage = ({ embeddedInLayout = false }: DoorToDoorScreenPage
   const {
     data: addresses,
     isLoading,
+    error: addressesError,
     refetch: refetchAddresses,
   } = useQuery({
     queryKey: ['doorToDoorAddresses', currentSearchRegion],
@@ -157,6 +158,10 @@ const DoorToDoorScreenPage = ({ embeddedInLayout = false }: DoorToDoorScreenPage
   )
 
   const renderContent = () => {
+    if (addressesError) {
+      throw addressesError
+    }
+
     if (errorPermission instanceof ErrorPermission) {
       return renderAskPersmission()
     }

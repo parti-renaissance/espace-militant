@@ -15,7 +15,6 @@ import { VoxButton } from '@/components/Button'
 import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
 import IconTitleRow from '@/components/CallToActionCard/IconTitleRow'
 import { QueryBoundary } from '@/components/QueryBoundary'
-import Title from '@/components/Title/Title'
 import ILLUMATERIEL from '@/features_next/events/assets/images/illu-materiel.png'
 import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
 import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
@@ -28,8 +27,9 @@ import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
 import { HIT_SOURCES } from '@/services/hits/constants'
 import { mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
 import type { RestHubItem } from '@/services/hub/schema'
-import { useGetProfil } from '@/services/profile/hook'
+import { useGetProfil, useUserScopeFeatures } from '@/services/profile/hook'
 import { openExternalLink } from '@/utils/linkHandler'
+import { FEATURES } from '@/utils/Scopes'
 
 import { MaterielOrderAccessModal } from './MaterielOrderAccessModal'
 
@@ -84,13 +84,7 @@ const HubOrganizePromptCards = memo(function HubOrganizePromptCards({
         <Image source={ILLUMATERIEL} width={84} height={112} objectFit="contain" />
         <YStack gap="$medium" flexShrink={1}>
           <YStack gap="$small">
-            <IconTitleRow
-              title={
-                <Title size="h2">
-                  <Title.Text>Je Commande du matériel</Title.Text>
-                </Title>
-              }
-            />
+            <IconTitleRow title="Je Commande du matériel" />
             <Text.SM color="$gray6" regular>
               Recevez gratuitement tracts et affiches officiels pour vos actions.
             </Text.SM>
@@ -110,6 +104,8 @@ const HubOrganizePromptCards = memo(function HubOrganizePromptCards({
 
 const HubFooterResourceCards = memo(function HubFooterResourceCards() {
   const { isAuth } = useSession()
+  const { hasFeature, isLoading } = useUserScopeFeatures({ enabled: isAuth })
+  const canAccessPap = hasFeature(FEATURES.PAP)
   const { runWithCompleteProfile } = useProfileCompletionAccess()
 
   const handleOpenPap = useCallback(() => {
@@ -134,7 +130,7 @@ const HubFooterResourceCards = memo(function HubFooterResourceCards() {
           </VoxButton>
         </Link>
       </CallToActionCard>
-      {isAuth ? (
+      {isAuth && !isLoading && canAccessPap ? (
         <CallToActionCard
           icon={DoorOpen}
           title="Je fais un Porte-à-porte"
