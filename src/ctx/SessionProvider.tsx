@@ -66,7 +66,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
         }
 
         setIsLoginInProgress(true)
-        const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state })
+        const session = await login({ code: props?.code, sessionId: existingSession?.sessionId, state: props?.state, redirectUri: props?.redirectUri })
         if (!session) {
           keepLoadingForWebRedirect = isWeb && !props?.code
           return
@@ -123,14 +123,15 @@ export function SessionProvider(props: React.PropsWithChildren) {
   const processedCodeRef = React.useRef<string | undefined>(undefined)
   React.useEffect(() => {
     if (isWeb || !url) return
-    const { queryParams } = parse(url)
+    const { scheme, hostname, queryParams } = parse(url)
     const code = queryParams?.code as string | undefined
     if (!code || processedCodeRef.current === code) return
 
     const state = queryParams?.state as string | undefined
+    const redirectUri = scheme === 'https' && hostname ? `https://${hostname}` : undefined
 
     processedCodeRef.current = code
-    void handleSignIn({ code, state })
+    void handleSignIn({ code, state, redirectUri })
   }, [url, handleSignIn])
 
   const handleRegister = React.useCallback(async () => {
