@@ -40,12 +40,11 @@ export default function PorteAPortePage() {
           </Layout.Main>
         ) : (
           <YStack flex={1}>
-            <ContentBackButton fallbackPath="/" />
             <BoundarySuspenseWrapper
               errorChildren={(payload) => {
                 if (payload.error instanceof ForbiddenError || payload.error instanceof UnauthorizedError) {
                   return (
-                    <Layout.Main>
+                    <Layout.Main w="100%" margin="auto">
                       <LayoutScrollView>
                         <VoxCard>
                           <AccessDeny message={payload.error.detail ?? payload.error.message} />
