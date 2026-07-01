@@ -24,7 +24,7 @@ import { EventItemProps } from '@/features_next/events/types'
 
 import { RestItemEvent } from '@/services/events/schema'
 
-import { getEventDetailImageFallback, isEventDetailsLoading, isEventFull, isEventPartial } from '../../../utils'
+import { getEventDetailImageFallback, isEventDetailsLoading, isEventFull, isEventPartial, isEventPast } from '../../../utils'
 import { EventAttendeesSkeleton, EventCapacitySkeleton, EventDescriptionSkeleton } from './EventSkeleton'
 
 const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 'time_zone'>> & { showTime?: boolean }) => {
@@ -42,7 +42,7 @@ const DateItem = (props: Partial<Pick<RestItemEvent, 'begin_at' | 'finish_at' | 
 
 const ActionButtons = (props: EventItemProps) => {
   const buttonProps = { variant: 'contained', full: true, flex: 1, width: '100%', size: 'xl', shrink: false } as const
-  const needAuth = isEventPartial(props.event) && !props.userUuid
+  const needAuth = isEventPartial(props.event) && !props.userUuid && !isEventPast(props.event)
 
   const elements = Children.map(
     [
