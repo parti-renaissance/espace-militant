@@ -5,7 +5,7 @@ import type { RestProfilResponse } from '@/services/profile/schema'
 import type { User } from '@/store/user-store'
 
 export type AuthContextType = {
-  signIn: (props?: { code?: string; isAdmin?: boolean; state?: string }) => Promise<void>
+  signIn: (props?: { code?: string; isAdmin?: boolean; state?: string; redirectUri?: string }) => Promise<void>
   signOut: () => Promise<void>
   signUp: () => Promise<void>
   isAuth: boolean

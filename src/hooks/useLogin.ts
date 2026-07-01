@@ -82,7 +82,17 @@ export const useCodeAuthRequest = (props?: { register?: boolean; utm_campaign?: 
   return AuthSession.useAuthRequest(requestConfig, discovery)
 }
 
-export const exchangeCodeAsync = async ({ code, sessionId, codeVerifier }: { code: string; sessionId?: string; codeVerifier?: string }) => {
+export const exchangeCodeAsync = async ({
+  code,
+  sessionId,
+  codeVerifier,
+  redirectUri,
+}: {
+  code: string
+  sessionId?: string
+  codeVerifier?: string
+  redirectUri?: string
+}) => {
   if (!code) {
     return null
   }
@@ -90,6 +100,7 @@ export const exchangeCodeAsync = async ({ code, sessionId, codeVerifier }: { cod
   return AuthSession.exchangeCodeAsync(
     {
       ...BASE_REQUEST_CONFIG,
+      ...(redirectUri ? { redirectUri } : {}),
       code,
       extraParams: { session_id: sessionId ?? '', ...(codeVerifier ? { code_verifier: codeVerifier } : {}) },
     },
@@ -121,9 +132,12 @@ export const createPkcePair = async (): Promise<{ codeChallenge: string; codeVer
 export const useLogin = () => {
   useBrowserWarmUp()
   const [req, , promptAsync] = useCodeAuthRequest() ?? []
-  return async (payload?: { code?: string; sessionId?: string; state?: string }) => {
+  return async (payload?: { code?: string; sessionId?: string; state?: string; redirectUri?: string }) => {
     if (payload?.code) {
       await safelyDismissAuthSession()
+      if (payload.redirectUri) {
+        return exchangeCodeAsync({ code: payload.code, sessionId: payload.sessionId, redirectUri: payload.redirectUri })
+      }
       let codeVerifier = req?.codeVerifier
       if (isWeb) {
         const storage = webStorage()
