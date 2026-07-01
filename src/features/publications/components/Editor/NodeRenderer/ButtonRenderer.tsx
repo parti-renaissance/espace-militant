@@ -1,0 +1,72 @@
+import { Text, TextStyle } from 'react-native'
+import { View, YStack } from 'tamagui'
+
+import { useThemeStyle } from '@/features/publications/components/Editor/hooks/useThemeStyle'
+import * as S from '@/features/publications/components/Editor/schemas/messageBuilderSchema'
+
+import { type HitSource } from '@/services/hits/constants'
+import { useHits } from '@/services/hits/hook'
+import { handleLinkPress } from '@/utils/linkHandler'
+
+export const ButtonRenderer = ({
+  data,
+  edgePosition,
+  displayToolbar = true,
+  allowHits = false,
+  publicationUuid,
+  hitSource,
+}: {
+  data: S.ButtonNode
+  edgePosition?: 'leading' | 'trailing' | 'alone'
+  displayToolbar?: boolean
+  allowHits?: boolean
+  publicationUuid?: string
+  hitSource?: HitSource
+}) => {
+  const {
+    containerStyle,
+    baseStyle,
+    wrapperStyle: { paddingTop, paddingBottom, paddingLeft, paddingRight, ...wrapperStyle },
+  } = useThemeStyle(data, edgePosition)
+  const { trackClick } = useHits()
+
+  if (!data.content) return null
+
+  const handlePress = async () => {
+    if (data.content?.link) {
+      if (allowHits) {
+        try {
+          trackClick({
+            object_type: 'publication',
+            object_id: publicationUuid,
+            source: hitSource,
+            target_url: data.content.link,
+            button_name: data.content.text,
+          })
+        } catch (error) {
+          // Silently ignore tracking errors - they should not impact user experience
+          if (__DEV__) {
+            // eslint-disable-next-line no-console
+            console.warn('[ButtonRenderer] trackClick error:', error)
+          }
+        }
+      }
+
+      await handleLinkPress(data.content.link, undefined, data.content.text)
+    }
+  }
+
+  return (
+    <YStack
+      style={wrapperStyle}
+      paddingTop={displayToolbar ? (Number(paddingTop) || 8) + 8 : paddingTop}
+      paddingBottom={displayToolbar ? (Number(paddingBottom) || 8) + 8 : paddingBottom}
+      paddingLeft={paddingLeft}
+      paddingRight={paddingRight}
+    >
+      <View tag="button" style={containerStyle} onPress={handlePress}>
+        <Text style={baseStyle as TextStyle}>{data.content.text}</Text>
+      </View>
+    </YStack>
+  )
+}

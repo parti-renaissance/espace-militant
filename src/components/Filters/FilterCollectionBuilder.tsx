@@ -11,7 +11,7 @@ import { GlobalSearch } from '@/components/GlobalSearch'
 import { ZoneProvider } from '@/components/GlobalSearch/providers/ZoneProvider'
 import type { ZoneProviderOptions } from '@/components/GlobalSearch/providers/ZoneProvider'
 import type { SearchProvider, SearchResult } from '@/components/GlobalSearch/types'
-import DateInterval, { type DateIntervalValue } from '@/features_next/publications/components/Editor/RenderFields/SelectFilters/AdvancedFilters/DateInterval'
+import DateInterval, { type DateIntervalValue } from '@/features/publications/components/Editor/RenderFields/SelectFilters/AdvancedFilters/DateInterval'
 
 import { useGetFiltersCollection } from '@/services/filters-collection/hook'
 import type {

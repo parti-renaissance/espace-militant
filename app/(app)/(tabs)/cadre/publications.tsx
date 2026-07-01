@@ -6,7 +6,7 @@ import { Sparkle } from '@tamagui/lucide-icons'
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { VoxButton } from '@/components/Button'
-import PublicationsScreen from '@/features_next/publications/pages/list'
+import PublicationsScreen from '@/features/publications/pages/list'
 
 import * as metatags from '@/config/metatags'
 

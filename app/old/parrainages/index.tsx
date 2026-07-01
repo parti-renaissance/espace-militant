@@ -5,7 +5,7 @@ import { HeartHandshake } from '@tamagui/lucide-icons'
 
 import Header from '@/components/AppStructure/Header'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import ReferralsScreen from '@/features_next/referrals/pages/index/index'
+import ReferralsScreen from '@/features/referrals/pages/index/index'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'

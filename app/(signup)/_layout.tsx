@@ -1,3 +1,3 @@
-import SignupTunnelLayout from '@/features_next/signup/components/SignupTunnelLayout'
+import SignupTunnelLayout from '@/features/signup/components/SignupTunnelLayout'
 
 export default SignupTunnelLayout

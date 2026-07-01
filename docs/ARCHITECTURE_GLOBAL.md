@@ -12,7 +12,7 @@ Le dépôt contient **deux générations de code** qui coexistent. Le legacy n'e
 
 | Zone | Statut | Règle |
 |------|--------|-------|
-| `src/features_next/` | ✅ Moderne | Nouveau code métier UI |
+| `src/features/` | ✅ Moderne | Nouveau code métier UI |
 | `src/services/` | ✅ Moderne | Nouveaux appels API / données |
 | `app/(app)/`, `app/(signup)/` | ✅ Moderne | Nouvelles routes |
 | `src/components/AppStructure/` | ✅ Moderne | Shell applicatif (layout, nav) |
@@ -22,9 +22,8 @@ Le dépôt contient **deux générations de code** qui coexistent. Le legacy n'e
 | `src/data/` | ❌ Legacy | Repositories, stores phoning/dtd — **ne pas étendre** |
 | `src/navigation/` | ❌ Legacy | Ancienne navigation modale — **ne pas étendre** |
 | `src/core/` | ⚠️ Transitoire | Entités / erreurs encore consommées — **ne pas ajouter de nouvelle logique** |
-| `src/features/` | ⚠️ Transitoire | Sous-features isolées (scanner, push…) — migrer vers `features_next` si touché |
 
-**Instruction stricte** : ce fichier est la **source de vérité** pour l'organisation du code UI et des features. En cas de conflit entre ce document et du code existant (y compris dans `features_next`), **ce document prime**. Le legacy se corrige au fil des changements, pas l'inverse.
+**Instruction stricte** : ce fichier est la **source de vérité** pour l'organisation du code UI et des features. En cas de conflit entre ce document et du code existant (y compris dans `features`), **ce document prime**. Le legacy se corrige au fil des changements, pas l'inverse.
 
 **Ne pas inférer de conventions** en copiant un dossier legacy (`screens/`, `data/`, `app/old/`) ou un service historique non conforme.
 
@@ -39,7 +38,7 @@ espace-militant/
 │   ├── (signup)/           # Tunnel d'inscription (moderne)
 │   └── old/                # Routes legacy — ne pas étendre
 ├── src/
-│   ├── features_next/      # Modules métier UI (moderne)
+│   ├── features/           # Modules métier UI (moderne)
 │   ├── services/           # Couche données / API (moderne)
 │   ├── components/         # Composants UI partagés
 │   │   └── AppStructure/   # Layout, navigation, shell
@@ -58,15 +57,15 @@ espace-militant/
 ### Flux de dépendances (moderne)
 
 ```
-app/  →  features_next/  →  services/
+app/  →  features/  →  services/
               ↓                  ↓
          components/        utils/api
               ↓
            theme/
 ```
 
-- `app/` orchestre (layout, suspense, SEO, tracking) et délègue à `features_next/`.
-- `features_next/` contient l'UI métier ; elle consomme `services/` pour les données.
+- `app/` orchestre (layout, suspense, SEO, tracking) et délègue à `features/`.
+- `features/` contient l'UI métier ; elle consomme `services/` pour les données.
 - `components/` fournit des briques UI **sans logique métier**.
 - Les dépendances **descendantes** (services → features, features → app) sont interdites.
 
@@ -83,13 +82,13 @@ Les fichiers dans `app/` sont des **wrappers minces**. Ils ne contiennent pas de
 - Suspense / error boundaries (`BoundarySuspenseWrapper`)
 - SEO web (`Head`, meta OG)
 - Tracking (hits, UTM)
-- Export par défaut vers un screen `features_next/`
+- Export par défaut vers un screen `features/`
 
 **Exemple conforme :**
 
 ```tsx
 // app/(app)/(tabs)/evenements.tsx
-import EventsHubPage from '@/features_next/events/pages/hub'
+import EventsHubPage from '@/features/events/pages/hub'
 
 export default function EvenementsPage() {
   return (
@@ -110,14 +109,14 @@ Nouvelle route → `app/(app)/` ou `app/(signup)/`, **jamais** `app/old/`.
 
 ---
 
-## Features — `src/features_next/`
+## Features — `src/features/`
 
 Chaque domaine métier a son dossier : `events`, `actions`, `profil`, `signup`, etc.
 
 ### Structure type d'une feature
 
 ```
-src/features_next/<feature>/
+src/features/<feature>/
 ├── pages/                  # Écrans (un dossier = un écran ou flux)
 │   └── <page>/
 │       ├── index.tsx       # Point d'entrée du screen (export default)
@@ -147,10 +146,10 @@ Tous les sous-dossiers listés sous `pages/<page>/` et à la racine de la featur
 **Principe** : colocaliser au plus près du consommateur. On remonte d'un niveau uniquement quand un second consommateur apparaît.
 
 ```
-❌ Mauvais : créer tout dans features_next/events/components/
+❌ Mauvais : créer tout dans features/events/components/
    alors que le composant n'est utilisé que par pages/detail/
 
-✅ Bon : features_next/events/pages/detail/components/EventContent.tsx
+✅ Bon : features/events/pages/detail/components/EventContent.tsx
 ```
 
 ### Règle de colocation des hooks et utilitaires
@@ -197,7 +196,7 @@ Ces exports sont consommés par `app/` via `BoundarySuspenseWrapper`.
 
 **Règles :**
 
-- Un composant ici **ne doit pas** importer depuis `features_next/` (dépendance inverse).
+- Un composant ici **ne doit pas** importer depuis `features/` (dépendance inverse).
 - Utiliser les **primitives Tamagui** (`YStack`, `XStack`, `Text`) — voir [CONTRIBUTING.md](../CONTRIBUTING.md).
 - Si un composant n'est utilisé que dans une feature → le déplacer vers cette feature.
 
@@ -232,7 +231,7 @@ Ce document couvre : nommage des schemas, query keys, optimistic updates, erreur
 | `src/config/` | Constantes de navigation, routes protégées, métadonnées — pas de logique métier |
 | `src/ctx/` | Contextes React **globaux** (session, auth) |
 | `src/hooks/` | Hooks **transverses** non liés à un domaine (`useShareOrCopy`, `useOpenExternalContent`) |
-| `src/store/` | Stores Zustand **globaux** (`user-store`) — préférer `features_next/<feature>/store/` pour l'état local |
+| `src/store/` | Stores Zustand **globaux** (`user-store`) — préférer `features/<feature>/store/` pour l'état local |
 | `src/utils/` | Fonctions pures transverses (`api`, formatage, scopes) |
 | `src/assets/` | Assets **partagés** entre plusieurs features |
 | `theme/` | Tokens et configuration Tamagui |
@@ -246,7 +245,7 @@ Le code moderne **évite** les imports depuis le legacy. Exceptions tolérées *
 | Import legacy | Alternative moderne |
 |---------------|---------------------|
 | `@/data/*` | `@/services/<name>/` |
-| `@/screens/*` | Composant dans `features_next/` ou `components/` |
+| `@/screens/*` | Composant dans `features/` ou `components/` |
 | `@/core/entities/*` | Type depuis `@/services/<name>/schema` |
 | `@/core/errors` | Toujours acceptable (erreurs transverses) — migrer si un équivalent apparaît dans `services/common/errors/` |
 | `@/navigation/*` | Expo Router + `app/` |
@@ -257,13 +256,13 @@ Le code moderne **évite** les imports depuis le legacy. Exceptions tolérées *
 
 ## Anti-patterns
 
-- ❌ Logique métier dans `app/` au lieu de `features_next/`
-- ❌ Composant page-specific dans `features_next/<feature>/components/` alors qu'il n'est utilisé que par une page
-- ❌ Composant cross-feature dans `features_next/` au lieu de `src/components/`
+- ❌ Logique métier dans `app/` au lieu de `features/`
+- ❌ Composant page-specific dans `features/<feature>/components/` alors qu'il n'est utilisé que par une page
+- ❌ Composant cross-feature dans `features/` au lieu de `src/components/`
 - ❌ Nouvel appel API hors de `src/services/`
 - ❌ Copier la structure `src/screens/` ou `src/data/` pour une nouvelle feature
-- ❌ `features_next/` qui importe depuis `features_next/<autre>/pages/` (importer depuis `components/`, `hooks/` ou `utils/` de l'autre feature)
-- ❌ Dépendance `components/` → `features_next/`
+- ❌ `features/` qui importe depuis `features/<autre>/pages/` (importer depuis `components/`, `hooks/` ou `utils/` de l'autre feature)
+- ❌ Dépendance `components/` → `features/`
 - ❌ Route nouvelle dans `app/old/`
 - ❌ Inférer des conventions depuis le legacy ou un service non conforme
 
@@ -271,7 +270,7 @@ Le code moderne **évite** les imports depuis le legacy. Exceptions tolérées *
 
 ## Checklist — nouvelle feature
 
-1. Créer `src/features_next/<feature>/` avec la structure type (§ Features).
+1. Créer `src/features/<feature>/` avec la structure type (§ Features).
 2. Créer le service associé dans `src/services/<feature>/` — suivre [`src/services/ARCHITECTURE.md`](../src/services/ARCHITECTURE.md).
 3. Ajouter la route mince dans `app/(app)/` (ou `(signup)/`).
 4. Colocaliser composants et hooks au niveau page, remonter seulement si réutilisés.

@@ -6,7 +6,7 @@ import { ClipboardCheck } from '@tamagui/lucide-icons'
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { RequireAuth } from '@/components/RequireAuth'
-import FieldSurveysListPage from '@/features_next/field-surveys/pages/list'
+import FieldSurveysListPage from '@/features/field-surveys/pages/list'
 
 import * as metatags from '@/config/metatags'
 

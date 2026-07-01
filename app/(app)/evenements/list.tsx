@@ -8,9 +8,9 @@ import { useLayoutSpacing } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { VoxButton } from '@/components/Button'
 import { QueryBoundary } from '@/components/QueryBoundary'
-import { MapListToggle } from '@/features_next/events/components/feed-layout/MapListToggle'
-import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
-import EventsListPage from '@/features_next/events/pages/list'
+import { MapListToggle } from '@/features/events/components/feed-layout/MapListToggle'
+import { PinnedItemBanner } from '@/features/events/components/feed-layout/PinnedItemBanner'
+import EventsListPage from '@/features/events/pages/list'
 
 import * as metatags from '@/config/metatags'
 

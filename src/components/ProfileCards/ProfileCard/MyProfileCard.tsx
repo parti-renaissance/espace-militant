@@ -9,7 +9,7 @@ import InfoCard from '@/components/InfoCard/InfoCard'
 import Menu from '@/components/menu/Menu'
 import ProfilBlock from '@/components/ProfilBlock'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import RenewMembershipButton from '@/features_next/profil/pages/donations/components/RenewMembershipButton'
+import RenewMembershipButton from '@/features/profil/pages/donations/components/RenewMembershipButton'
 
 import { useOpenExternalContent } from '@/hooks/useOpenExternalContent'
 import { HIT_SOURCES } from '@/services/hits/constants'

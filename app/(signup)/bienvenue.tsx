@@ -1,6 +1,6 @@
 import Head from 'expo-router/head'
 
-import BienvenuePage from '@/features_next/signup/pages/bienvenue'
+import BienvenuePage from '@/features/signup/pages/bienvenue'
 
 import * as metatags from '@/config/metatags'
 

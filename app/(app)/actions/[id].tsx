@@ -3,7 +3,7 @@ import { useLocalSearchParams } from 'expo-router'
 
 import Error404 from '@/components/404/Error404'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import { ActionDetailPage } from '@/features_next/actions/pages/detail'
+import { ActionDetailPage } from '@/features/actions/pages/detail'
 
 const ActionDetailRoute: React.FC = () => {
   const params = useLocalSearchParams<{ id: string }>()

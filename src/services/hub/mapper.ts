@@ -1,5 +1,5 @@
 import type { ActionVoxCardProps } from '@/components/Cards/ActionCard'
-import type { HubItemMapItem } from '@/features_next/events/pages/map/components/HubItemMap'
+import type { HubItemMapItem } from '@/features/events/pages/map/components/HubItemMap'
 import { isEventPast } from '@/services/events/selectors'
 
 import { mapHubItemToRestActionFull, parseActionType } from '@/services/actions/mapper'

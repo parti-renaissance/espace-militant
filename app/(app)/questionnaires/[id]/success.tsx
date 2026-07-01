@@ -1,7 +1,7 @@
 import React from 'react'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
-import FieldSurveySuccessScreen from '@/features_next/field-surveys/pages/success'
+import FieldSurveySuccessScreen from '@/features/field-surveys/pages/success'
 
 export default function QuestionnairesSuccessPage() {
   return (

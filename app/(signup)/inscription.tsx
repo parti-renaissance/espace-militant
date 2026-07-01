@@ -1,6 +1,6 @@
 import Head from 'expo-router/head'
 
-import InscriptionPage from '@/features_next/signup/pages/inscription'
+import InscriptionPage from '@/features/signup/pages/inscription'
 
 import * as metatags from '@/config/metatags'
 

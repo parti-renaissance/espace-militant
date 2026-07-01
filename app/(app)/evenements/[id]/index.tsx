@@ -5,7 +5,7 @@ import Head from 'expo-router/head'
 import Error404 from '@/components/404/Error404'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
-import EventDetailsScreen, { EventDetailsScreenDeny, EventDetailsScreenSkeleton } from '@/features_next/events/pages/detail'
+import EventDetailsScreen, { EventDetailsScreenDeny, EventDetailsScreenSkeleton } from '@/features/events/pages/detail'
 
 import clientEnv from '@/config/clientEnv'
 import * as metatags from '@/config/metatags'

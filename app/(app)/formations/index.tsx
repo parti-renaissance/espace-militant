@@ -3,7 +3,7 @@ import { Redirect } from 'expo-router'
 import Head from 'expo-router/head'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
-import FormationsScreen from '@/features_next/formations/pages/index'
+import FormationsScreen from '@/features/formations/pages/index'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'

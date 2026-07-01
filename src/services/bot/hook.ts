@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 
-import { useBotStore } from '@/features_next/bot/store/bot-store'
+import { useBotStore } from '@/features/bot/store/bot-store'
 import { useChat, type UseChatReturn } from '@/hooks/chat/useChat'
 
 import { BOT_AGENT_ID, BOT_CHAT_URL, BOT_THREAD_HEADER } from './api'

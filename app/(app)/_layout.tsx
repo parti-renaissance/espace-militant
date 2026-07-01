@@ -4,7 +4,7 @@ import { Stack } from 'expo-router'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { LayoutContext, useLayoutContext } from '@/components/AppStructure/Layout/LayoutContext'
 import { SideBarState } from '@/components/AppStructure/Navigation/SideBar'
-import { CompleteProfilProvider } from '@/features_next/profil/context/CompleteProfilContext'
+import { CompleteProfilProvider } from '@/features/profil/context/CompleteProfilContext'
 
 export const unstable_settings = {
   initialRouteName: '(tabs)',

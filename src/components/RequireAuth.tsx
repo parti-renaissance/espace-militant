@@ -1,7 +1,7 @@
 import { PropsWithChildren, useCallback } from 'react';
 import { Redirect, router, useRootNavigationState, usePathname } from 'expo-router';
 
-import { AuthRoutes, getAuthHref } from '@/features_next/signup/utils/authNavigation';
+import { AuthRoutes, getAuthHref } from '@/features/signup/utils/authNavigation';
 import { useSession } from '@/ctx/SessionProvider';
 
 export function useRequireAuth() {

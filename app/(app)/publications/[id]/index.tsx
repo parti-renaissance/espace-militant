@@ -6,7 +6,7 @@ import Error404 from '@/components/404/Error404'
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
-import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSkeleton } from '@/features_next/publications/pages/detail'
+import MessageDetailsScreen, { MessageDetailsScreenDeny, MessageDetailsScreenSkeleton } from '@/features/publications/pages/detail'
 
 import * as metatags from '@/config/metatags'
 import { ForbiddenError, UnauthorizedError } from '@/core/errors'

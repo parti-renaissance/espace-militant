@@ -5,7 +5,7 @@ import { isWeb } from 'tamagui'
 import { useToastController } from '@tamagui/toast'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { navigateToWelcome } from '@/features_next/signup/utils/authNavigation'
+import { navigateToWelcome } from '@/features/signup/utils/authNavigation'
 
 import { normalizeInternalRedirect, parseWebAuthState } from '@/hooks/pkceWebStore'
 import useBfcacheRestore from '@/hooks/useBfcacheRestore'

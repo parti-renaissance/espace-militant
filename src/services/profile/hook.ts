@@ -21,7 +21,7 @@ import { ErrorMonitor } from '@/utils/ErrorMonitor'
 import { getMembershipStatus } from '@/utils/membershipStatus'
 import { getFullVersion } from '@/utils/version'
 
-import { isProfileComplete } from '@/features_next/profil/profileCompletion'
+import { isProfileComplete } from '@/features/profil/profileCompletion'
 
 import { GenericResponseError } from '../common/errors/generic-errors'
 import { ProfilChangePasswordFormError } from './error'
@@ -172,7 +172,7 @@ export const useGetDetailProfil = () => {
   })
 }
 
-export { isProfileComplete, isProfileIdentityIncomplete } from '@/features_next/profil/profileCompletion'
+export { isProfileComplete, isProfileIdentityIncomplete } from '@/features/profil/profileCompletion'
 
 /** Profil détaillé (`/api/v3/profile/me`) — champs requis pour l’inscription complète. */
 export const useProfileCompletion = () => {

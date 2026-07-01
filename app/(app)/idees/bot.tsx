@@ -6,7 +6,7 @@ import { AccessDeny } from '@/components/AccessDeny'
 import Header from '@/components/AppStructure/Header'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import { RequireAuth } from '@/components/RequireAuth'
-import BotPage from '@/features_next/bot/pages/index'
+import BotPage from '@/features/bot/pages/index'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'

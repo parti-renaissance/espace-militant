@@ -16,11 +16,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PortalLayout } from '@/components/layouts/PortalLayout';
 import MapboxGl from '@/components/Mapbox/Mapbox';
 import WaitingScreen from '@/components/WaitingScreen';
-import SignupTunnelGuard from '@/features_next/signup/components/SignupTunnelGuard';
-import { useInitPushNotification } from '@/features_next/push-notification/hooks';
-import initRootAppNotification from '@/features_next/push-notification/utils';
-import UpdateGatewayScreen from '@/features_next/update/components/UpdateGatewayScreen';
-import { useUpdateGateway } from '@/features_next/update/hooks/useUpdateGateway';
+import SignupTunnelGuard from '@/features/signup/components/SignupTunnelGuard';
+import { useInitPushNotification } from '@/features/push-notification/hooks';
+import initRootAppNotification from '@/features/push-notification/utils';
+import UpdateGatewayScreen from '@/features/update/components/UpdateGatewayScreen';
+import { useUpdateGateway } from '@/features/update/hooks/useUpdateGateway';
 
 import clientEnv from '@/config/clientEnv';
 import { SessionProvider, useSession } from '@/ctx/SessionProvider';

@@ -3,7 +3,7 @@ import Head from 'expo-router/head'
 
 import Error404 from '@/components/404/Error404'
 import BoundarySuspenseWrapper from '@/components/BoundarySuspenseWrapper'
-import PronoDetailScreen from '@/features_next/prono/pages/PronoDetailScreen'
+import PronoDetailScreen from '@/features/prono/pages/PronoDetailScreen'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'

@@ -2,7 +2,7 @@ import { MessageCircle } from '@tamagui/lucide-icons'
 
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import CommunicationsScreen from '@/features_next/profil/pages/communications'
+import CommunicationsScreen from '@/features/profil/pages/communications'
 
 export default function CommunicationsPage() {
   return (

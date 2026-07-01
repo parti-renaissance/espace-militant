@@ -5,7 +5,7 @@ import Head from 'expo-router/head'
 import { AccessDeny } from '@/components/AccessDeny'
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import MessagePageIndex from '@/features_next/publications/pages/index'
+import MessagePageIndex from '@/features/publications/pages/index'
 
 import * as metatags from '@/config/metatags'
 import { useSession } from '@/ctx/SessionProvider'

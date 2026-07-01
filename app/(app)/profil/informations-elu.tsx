@@ -2,7 +2,7 @@ import { TreeDeciduous } from '@tamagui/lucide-icons'
 
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import EluScreen from '@/features_next/profil/pages/elu'
+import EluScreen from '@/features/profil/pages/elu'
 
 export default function InformationsEluPage() {
   return (

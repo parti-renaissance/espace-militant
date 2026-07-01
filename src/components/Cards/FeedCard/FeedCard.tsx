@@ -1,6 +1,6 @@
 import { ActionCard } from '@/components/Cards/ActionCard'
 import { NewsCard } from '@/components/Cards/NewsCard'
-import EventListItem from '@/features_next/events/components/list-item/EventListItem'
+import EventListItem from '@/features/events/components/list-item/EventListItem'
 import PublicationCard from '@/components/Cards/PublicationCard/PublicationCard'
 import { useGetSuspenseProfil } from '@/services/profile/hook'
 import { HIT_SOURCES } from '@/services/hits/constants'

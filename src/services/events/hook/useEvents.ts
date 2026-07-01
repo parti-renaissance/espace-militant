@@ -3,7 +3,7 @@ import { useToastController } from '@tamagui/toast'
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 
-import type { HubItemMapItem } from '@/features_next/events/pages/map/components/HubItemMap'
+import type { HubItemMapItem } from '@/features/events/pages/map/components/HubItemMap'
 import { isEventPast } from '@/services/events/selectors'
 
 import { EventFilters } from '@/core/entities/Event'

@@ -2,7 +2,7 @@ import React from 'react'
 import Head from 'expo-router/head'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
-import EventsHubPage from '@/features_next/events/pages/hub'
+import EventsHubPage from '@/features/events/pages/hub'
 
 import * as metatags from '@/config/metatags'
 

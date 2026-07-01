@@ -1,6 +1,6 @@
 import Head from 'expo-router/head'
 
-import VerificationEmailPage from '@/features_next/signup/pages/verification-email'
+import VerificationEmailPage from '@/features/signup/pages/verification-email'
 
 import * as metatags from '@/config/metatags'
 

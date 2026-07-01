@@ -164,7 +164,7 @@ interface AlertStackProps {
   hitSource?: HitSource
 }
 
-/** @deprecated Use `AlertItemBanner` from `@/features_next/timelinefeed/pages/feed/components/AlertItemBanner` instead. */
+/** @deprecated Use `AlertItemBanner` from `@/features/timelinefeed/pages/feed/components/AlertItemBanner` instead. */
 const AlertStack: React.FC<AlertStackProps> = ({ alerts, initialCollapsed, hitSource = HIT_SOURCES.PAGE_TIMELINE }) => {
   const media = useMedia()
   const hasMultiple = alerts.length > 1

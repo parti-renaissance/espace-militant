@@ -4,7 +4,7 @@ import { Redirect } from 'expo-router'
 import { AccessDeny } from '@/components/AccessDeny'
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import DraftPage from '@/features_next/publications/pages/draft'
+import DraftPage from '@/features/publications/pages/draft'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'

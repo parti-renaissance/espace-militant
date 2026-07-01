@@ -3,7 +3,7 @@ import Head from 'expo-router/head'
 
 import { Header } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
-import MilitantsScreen from '@/features_next/militants/pages/list'
+import MilitantsScreen from '@/features/militants/pages/list'
 
 import * as metatags from '@/config/metatags'
 

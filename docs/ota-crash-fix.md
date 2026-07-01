@@ -27,8 +27,8 @@ Séparer **toutes** les mises à jour (store + OTA) de l'app et **démonter l'ar
 
 | Fichier | Rôle |
 |---------|------|
-| `src/features_next/update/hooks/useUpdateGateway.ts` | Vérif store + pipeline OTA (machine à états unifiée) |
-| `src/features_next/update/components/UpdateGatewayScreen.tsx` | UI minimale (RN pur) — store, OTA et erreur |
+| `src/features/update/hooks/useUpdateGateway.ts` | Vérif store + pipeline OTA (machine à états unifiée) |
+| `src/features/update/components/UpdateGatewayScreen.tsx` | UI minimale (RN pur) — store, OTA et erreur |
 | `app/_layout.tsx` | `Root` (gateway) vs `AppShell` (app complète) |
 
 ---

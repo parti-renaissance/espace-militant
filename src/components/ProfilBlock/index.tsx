@@ -12,7 +12,7 @@ import { VoxButton } from '@/components/Button'
 import ProfilePicture from '@/components/ProfilePicture'
 import SkeCard from '@/components/Skeleton/CardSkeleton'
 import VoxCard from '@/components/VoxCard/VoxCard'
-import { useCompleteProfil } from '@/features_next/profil/context/CompleteProfilContext'
+import { useCompleteProfil } from '@/features/profil/context/CompleteProfilContext'
 
 import { UserTagEnum } from '@/core/entities/UserProfile'
 import { useDeleteProfilPicture, useGetProfil, useGetTags, usePostProfilPicture, useProfileCompletion } from '@/services/profile/hook'

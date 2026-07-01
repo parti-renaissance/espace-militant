@@ -2,7 +2,7 @@ import { ComponentProps } from 'react'
 import { Link } from 'expo-router'
 
 import { VoxButton } from '@/components/Button'
-import { AuthRoutes } from '@/features_next/signup/utils/authNavigation'
+import { AuthRoutes } from '@/features/signup/utils/authNavigation'
 
 import { useSession } from '@/ctx/SessionProvider'
 

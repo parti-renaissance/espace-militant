@@ -3,7 +3,7 @@ import { Redirect, useLocalSearchParams } from 'expo-router'
 
 import { AccessDeny } from '@/components/AccessDeny'
 import { Layout } from '@/components/AppStructure'
-import MessageEditorPage from '@/features_next/publications/pages/create-update'
+import MessageEditorPage from '@/features/publications/pages/create-update'
 
 import { useSession } from '@/ctx/SessionProvider'
 import { useGetExecutiveScopes } from '@/services/profile/hook'

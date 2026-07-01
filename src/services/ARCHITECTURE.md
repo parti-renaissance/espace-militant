@@ -8,7 +8,7 @@ Un « service » encapsule **tout ce qui touche à un domaine métier côté cli
 
 Le dépôt contient des services **historiques (legacy)** qui ne respectent pas l’ensemble des règles décrites ici. Exemples fréquents : sous-dossiers `hook/`, `api/`, ou `schema/` ; concaténation de query params dans l’URL `path` ; fichiers listés comme **MAY** fragmentés ou emplacement des helpers incohérent avec ce document.
 
-**Instruction stricte pour les humains et pour les LLM** : ce fichier est la **seule et unique source de vérité** pour la conception et la modification des services. Vous **MUST NOT** inférer de nouvelles conventions par mimétisme à partir d’autres dossiers du projet (`src/services/*`, `features_next`, etc.). Lorsqu’une règle du présent document entre en conflit avec du code existant, **MUST** primer ce document ; le legacy se corrige progressivement au fil des changements, pas l’inverse.
+**Instruction stricte pour les humains et pour les LLM** : ce fichier est la **seule et unique source de vérité** pour la conception et la modification des services. Vous **MUST NOT** inférer de nouvelles conventions par mimétisme à partir d’autres dossiers du projet (`src/services/*`, `features`, etc.). Lorsqu’une règle du présent document entre en conflit avec du code existant, **MUST** primer ce document ; le legacy se corrige progressivement au fil des changements, pas l’inverse.
 
 ---
 

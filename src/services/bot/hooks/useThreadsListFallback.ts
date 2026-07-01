@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { useBotStore } from '@/features_next/bot/store/bot-store'
+import { useBotStore } from '@/features/bot/store/bot-store'
 
 import { BOT_AGENT_ID, getBotThreadsList } from '../api'
 

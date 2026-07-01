@@ -3,11 +3,11 @@ import { Platform } from 'react-native'
 import { YStack } from 'tamagui'
 
 import AutoSizeImage from '@/components/AutoSizeImage'
-import FeedVideoPlayer from '@/features_next/video/components/feed/FeedVideoPlayer'
-import { getVideoAspectRatio } from '@/features_next/video/components/VideoPlayer.types'
-import VideoMediaCarousel from '@/features_next/video/components/feed/VideoMediaCarousel'
-import { useVideoFeedAppState } from '@/features_next/video/hooks/useVideoFeedAppState'
-import { buildVideoId, useIsContentInFeedView, useIsFocusedContent } from '@/features_next/video/store/videoFeedStore'
+import FeedVideoPlayer from '@/features/video/components/feed/FeedVideoPlayer'
+import { getVideoAspectRatio } from '@/features/video/components/VideoPlayer.types'
+import VideoMediaCarousel from '@/features/video/components/feed/VideoMediaCarousel'
+import { useVideoFeedAppState } from '@/features/video/hooks/useVideoFeedAppState'
+import { buildVideoId, useIsContentInFeedView, useIsFocusedContent } from '@/features/video/store/videoFeedStore'
 import { RestTimelineFeedSocialMedia, RestTimelineFeedSocialMediaItem } from '@/services/timeline-feed/schema'
 
 type FeedImage = {

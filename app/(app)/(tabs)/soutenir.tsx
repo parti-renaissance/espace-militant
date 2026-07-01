@@ -2,7 +2,7 @@ import React from 'react'
 import Head from 'expo-router/head'
 
 import Layout from '@/components/AppStructure/Layout/Layout'
-import SoutenirScreen from '@/features_next/soutenir/pages/index'
+import SoutenirScreen from '@/features/soutenir/pages/index'
 
 import * as metatags from '@/config/metatags'
 
