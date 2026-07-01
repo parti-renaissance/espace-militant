@@ -28,8 +28,9 @@ import { useHubItemsInfiniteQuery } from '@/services/hub/hook'
 import { HIT_SOURCES } from '@/services/hits/constants'
 import { mapHubItemToFeedRow, type HubFeedRow as HubFeedRowType } from '@/services/hub/mapper'
 import type { RestHubItem } from '@/services/hub/schema'
-import { useGetProfil } from '@/services/profile/hook'
+import { useGetProfil, useUserScopeFeatures } from '@/services/profile/hook'
 import { openExternalLink } from '@/utils/linkHandler'
+import { FEATURES } from '@/utils/Scopes'
 
 import { MaterielOrderAccessModal } from './MaterielOrderAccessModal'
 
@@ -110,6 +111,8 @@ const HubOrganizePromptCards = memo(function HubOrganizePromptCards({
 
 const HubFooterResourceCards = memo(function HubFooterResourceCards() {
   const { isAuth } = useSession()
+  const { hasFeature, isLoading } = useUserScopeFeatures({ enabled: isAuth })
+  const canAccessPap = hasFeature(FEATURES.PAP)
   const { runWithCompleteProfile } = useProfileCompletionAccess()
 
   const handleOpenPap = useCallback(() => {
@@ -134,7 +137,7 @@ const HubFooterResourceCards = memo(function HubFooterResourceCards() {
           </VoxButton>
         </Link>
       </CallToActionCard>
-      {isAuth ? (
+      {isAuth && !isLoading && canAccessPap ? (
         <CallToActionCard
           icon={DoorOpen}
           title="Je fais un Porte-à-porte"
