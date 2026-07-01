@@ -15,7 +15,6 @@ import { VoxButton } from '@/components/Button'
 import CallToActionCard from '@/components/CallToActionCard/CallToActionCard'
 import IconTitleRow from '@/components/CallToActionCard/IconTitleRow'
 import { QueryBoundary } from '@/components/QueryBoundary'
-import Title from '@/components/Title/Title'
 import ILLUMATERIEL from '@/features_next/events/assets/images/illu-materiel.png'
 import HubListSkeleton from '@/features_next/events/components/feed-layout/HubListSkeleton'
 import { PinnedItemBanner } from '@/features_next/events/components/feed-layout/PinnedItemBanner'
@@ -85,13 +84,7 @@ const HubOrganizePromptCards = memo(function HubOrganizePromptCards({
         <Image source={ILLUMATERIEL} width={84} height={112} objectFit="contain" />
         <YStack gap="$medium" flexShrink={1}>
           <YStack gap="$small">
-            <IconTitleRow
-              title={
-                <Title size="h2">
-                  <Title.Text>Je Commande du matériel</Title.Text>
-                </Title>
-              }
-            />
+            <IconTitleRow title="Je Commande du matériel" />
             <Text.SM color="$gray6" regular>
               Recevez gratuitement tracts et affiches officiels pour vos actions.
             </Text.SM>

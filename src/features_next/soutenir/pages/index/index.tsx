@@ -18,13 +18,13 @@ type SoutenirScreenProps = {
 function SoutenirDesktopScreen({ isSm, userId }: SoutenirScreenProps) {
   return (
     <XStack flexDirection="row" gap="$large">
-      <YStack flex={1} maxWidth={424} gap="$large" flexShrink={0}>
+      <YStack flex={1} w="50%" maxWidth={424} gap="$large">
         <SoutenirHeroTitle />
         <SoutenirHeroImage isDesktop isSm={isSm} />
         <SoutenirContactNationalButton userId={userId} />
       </YStack>
 
-      <YStack flex={1} maxWidth={424}>
+      <YStack flex={1} w="50%" maxWidth={424}>
         <SoutenirCallToActionCards userId={userId} />
       </YStack>
     </XStack>

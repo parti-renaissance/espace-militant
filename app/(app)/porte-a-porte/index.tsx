@@ -7,7 +7,6 @@ import { AccessDeny } from '@/components/AccessDeny'
 import { Header, LayoutScrollView } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
-import { ContentBackButton } from '@/components/ContentBackButton'
 import { RequireAuth } from '@/components/RequireAuth'
 import VoxCard from '@/components/VoxCard/VoxCard'
 
