@@ -96,7 +96,7 @@ export const useMilitantNavItems = (): NavItemConfig[] => {
       if (item.id === 'formations' && !hasFormationsAccess) {
         return {
           ...item,
-          href: '/(tabs)/formations',
+          href: '/formations',
           externalUrlSlug: undefined,
           externalLink: false,
         }

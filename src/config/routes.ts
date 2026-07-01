@@ -1,11 +1,11 @@
 import { RestProfilResponse } from '@/services/profile/schema'
-import { Calendar, CircleUser, ClipboardCheck, DoorOpen, GraduationCap, Home, Link, Zap } from '@tamagui/lucide-icons'
+import { Calendar, CircleUser, Home, Zap } from '@tamagui/lucide-icons'
 import { ThemeName } from 'tamagui'
 import { IconComponent } from '@/models/common.model'
 import * as magicLinkTypes from '@/services/magic-link/schema'
 
 export type TabRoute = {
-  name: '(home)' | 'evenements' | 'actions' | 'news' | 'ressources' | 'porte-a-porte' | 'formations' | 'profil' | 'messages' | 'questionnaires' | 'scanner'
+  name: '(home)' | 'evenements' | 'actions' | 'news' | 'profil' | 'messages' | 'scanner'
   screenName: string
   highlighted?: boolean
   icon: IconComponent
@@ -35,40 +35,6 @@ export const ROUTES: TabRoute[] = [
     screenName: 'Actions',
     icon: Zap,
     theme: 'green',
-  },
-  {
-    name: 'formations',
-    screenName: 'Formations',
-    icon: GraduationCap,
-    theme: 'gray',
-    hidden: true,
-    hiddenMobile: true,
-    externalSlug: 'formation',
-  },
-  {
-    name: 'ressources',
-    screenName: 'Ressources',
-    icon: Link,
-    theme: 'gray',
-    hidden: true,
-    hiddenMobile: true,
-  },
-  {
-    name: 'porte-a-porte',
-    screenName: 'Porte à Porte',
-    icon: DoorOpen,
-    theme: 'orange',
-    hiddenMobile: true,
-    hidden: true,
-  },
-  {
-    name: 'questionnaires',
-    screenName: 'Questionnaires',
-    icon: ClipboardCheck,
-    theme: 'gray',
-    hidden: true,
-    hiddenMobile: true,
-    disabled: false
   },
   {
     name: 'profil',

@@ -27,7 +27,7 @@ export default function RessourcesPage() {
         <title>{metatags.createTitle('Ressources')}</title>
       </Head>
       <Header title="Ressources" icon={Link2} navigation={{ showBackButton: false }} style={{ showOn: 'sm' }} />
-      <Layout.Container safeHorizontalPadding={false}>
+      <Layout.Container safeHorizontalPadding={false} hideTabBar>
         <ResourcesScreen />
       </Layout.Container>
     </>

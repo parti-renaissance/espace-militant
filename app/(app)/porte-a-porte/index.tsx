@@ -4,7 +4,7 @@ import { YStack } from 'tamagui'
 import { DoorOpen } from '@tamagui/lucide-icons'
 
 import { AccessDeny } from '@/components/AccessDeny'
-import { Header } from '@/components/AppStructure'
+import { Header, LayoutScrollView } from '@/components/AppStructure'
 import Layout from '@/components/AppStructure/Layout/Layout'
 import BoundarySuspenseWrapper, { DefaultErrorFallback } from '@/components/BoundarySuspenseWrapper'
 import { ContentBackButton } from '@/components/ContentBackButton'
@@ -29,11 +29,15 @@ export default function PorteAPortePage() {
         <title>{metatags.createTitle('Porte à porte')}</title>
       </Head>
       <Header title="Porte à porte" icon={DoorOpen} navigation={{ showBackButton: true }} style={{ showOn: 'sm' }} />
-      <Layout.Container safeHorizontalPadding={false}>
+      <Layout.Container safeHorizontalPadding={false} hideTabBar>
         {!canAccess && !isLoading ? (
-          <VoxCard>
-            <AccessDeny />
-          </VoxCard>
+          <Layout.Main>
+            <LayoutScrollView>
+              <VoxCard>
+                <AccessDeny />
+              </VoxCard>
+            </LayoutScrollView>
+          </Layout.Main>
         ) : (
           <YStack flex={1}>
             <ContentBackButton fallbackPath="/" />
@@ -41,9 +45,13 @@ export default function PorteAPortePage() {
               errorChildren={(payload) => {
                 if (payload.error instanceof ForbiddenError || payload.error instanceof UnauthorizedError) {
                   return (
-                    <VoxCard>
-                      <AccessDeny message={payload.error.detail ?? payload.error.message} />
-                    </VoxCard>
+                    <Layout.Main>
+                      <LayoutScrollView>
+                        <VoxCard>
+                          <AccessDeny message={payload.error.detail ?? payload.error.message} />
+                        </VoxCard>
+                      </LayoutScrollView>
+                    </Layout.Main>
                   )
                 }
                 return <DefaultErrorFallback {...payload} />

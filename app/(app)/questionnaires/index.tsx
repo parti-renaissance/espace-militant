@@ -24,7 +24,7 @@ export default function QuestionnairesPage() {
         navigation={{ showBackButton: true }}
         style={{ showOn: 'sm' }}
       />
-      <Layout.Container safeHorizontalPadding={false}>
+      <Layout.Container safeHorizontalPadding={false} hideTabBar>
         <FieldSurveysListPage />
       </Layout.Container>
     </RequireAuth>

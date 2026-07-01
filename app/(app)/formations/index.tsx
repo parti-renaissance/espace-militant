@@ -24,7 +24,7 @@ export default function FormationsPage() {
       <Head>
         <title>{metatags.createTitle('Formations')}</title>
       </Head>
-      <Layout.Container>
+      <Layout.Container hideTabBar>
         <FormationsScreen />
       </Layout.Container>
     </>
